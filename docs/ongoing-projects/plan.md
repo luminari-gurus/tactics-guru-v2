@@ -5,7 +5,9 @@ Date: 2026-11-03 (Asia/Jerusalem). Status: root-entry PR published; transient-ow
 ### Current qualification checkpoint
 
 Implementation is published in #275/#277; frozen runtime inputs are `4de79c1`.
-The scoped CI test/collector-description repairs below are being validated separately.
+Final test/collector-description inputs are `30dc8ac`; cleanup `e168f43` changes only
+documentation and removes the temporary trigger. Subsequent documentation commits
+may advance the branch head. The scoped repairs below are being validated separately.
 Independent Windows contract repair #276 is mirrored as a separate dependency commit.
 
 OpenSpec tasks 1–3 are complete (7/9 total): the consumer/selection audit covers all ordinary,
@@ -100,13 +102,43 @@ in 14.3s; the trace records a 6.5s dev-server wait for preferences CSS before Ph
 startup. It does not establish the timeout's cause or a product fix. Diagnostic trace
 is `verification-receipts/issue-259-dev-load-diagnostic`; it is not performance evidence.
 
-All scoped audio checks are complete and the repair is pushed as `4de79c1`; the
-queued qualification branch is aligned. No local browser/server run remains active.
-`origin/main` was rechecked and remains `d8692f9`; #273 advanced independently and
-is still unmerged. Next: inspect final self-hosted artifacts, account for supplements
-and prior failures, then clean the trigger and finalize PR #277. The ignored local scripts and
-receipts support continuation. `%TEMP%/tactics-259-baseline` now hosts the temporary
-qualification branch; its current head is not the earlier literal-parent comparison.
+Supplemental job steps through both root/prefix isolation matrices, both configured
+telemetry modes, all audio/collector modes and restored-root build have passed.
+The same live job `126058161857` is executing Chromium extended journeys; WebKit
+extended journeys follow. Scoped repair run `41680229366` remains queued behind it.
+No local browser/server process remains active, and no qualification run was restarted.
+The bounded observation cell `g15:293` ended normally after 15 minutes; that is an
+observation deadline, not a stopped CI run. Poll these same run IDs before acting.
+
+Current source audit traces every #259 criterion to the implementation and its proof:
+
+- **Saved games unchanged after testing:** the five storage-condition journeys in
+  [battle-persistence.spec.ts](../../tests/battle-persistence.spec.ts) compare exact
+  primary/backup/handoff bytes through all seven entry families and real actions,
+  restart, reload, cleanup and history, then return to menu Continue. The repaired
+  run defeat journey also checks exact saved state after testing-link navigation.
+- **Testing always fresh:** [routes.ts](../../src/app/routes.ts) makes direct paths
+  and supported diagnostics transient regardless of forged intents; standalone
+  testing uses a fresh `BattleSession`, and run/dungeon hosts construct fresh memory
+  state. Existing isolation, reload/restart and random-new-layout cases prove these
+  boundaries across root/prefix, engines and profiles.
+- **No saved-game access:** hosts pass absent storage before provider construction;
+  owner save/inspect/export/recovery paths guard that absence. Browser spies cover
+  all progress keys and the menu handoff; owner units fail on provider acquisition.
+  Non-game preferences keep their existing separate behavior.
+- **Persistence regression coverage retained under menu ownership:** saved cases now
+  use root game entries, the moved item/ability obligations are reconciled in the
+  [coverage ledger](../qa/issue-259/coverage-map.json), and all 1,550 full-run browser
+  execution IDs match discovery. Menu negative recovery/new-game, replay, lifecycle,
+  BFCache and old-format raw export evidence is retained above.
+
+This source audit found no further production change. Final acceptance still requires
+inspecting both pending jobs' artifacts, proving all repaired and extended executions,
+and reconciling source/build/browser identities and failures before closing tasks 4.1/4.2.
+`origin/main` remains `d8692f9`; #273/#274 remain unmerged independent drafts. The
+ignored local scripts and receipts support continuation. `%TEMP%/tactics-259-baseline`
+hosts the temporary extended-qualification branch; `%TEMP%/tactics-259-repairs` hosts
+the repair-qualification branch. Neither workflow belongs in an implementation PR.
 
 - Issue: [#259](https://github.com/luminari-gurus/tactics-guru-v2/issues/259).
 - Owner: `moshehbenavraham`; [pickup comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/259#issuecomment-6603160055).
