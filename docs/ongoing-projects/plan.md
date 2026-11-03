@@ -41,6 +41,12 @@ unchanged from the earlier tested candidate. The merged `BattleScene.begin` inpu
 implementation is identical to main; the feature changes only admission/session setup.
 Unchanged map/placement and noninteractive visual/resource checks retain their prior
 evidence. Preserve all original failures and incomplete runs; do not wait for CI.
+The task-specific runner is `tmp/issue-259/current-qualification.mjs`. It retains
+source and build identities, exact per-stage discovery, logs and incremental outcomes
+under `tmp/issue-259/current-qualification/`. It guards builds with the completed full
+unit/content checks and fresh typecheck, records performance before other browser
+work, serializes every browser stage at one worker/zero retries, preserves failures,
+and runs both complete extended matrices after restoring the root bundle.
 
 The prior local sequence completed 11 WebKit repairs and all 9 Chromium extended
 journeys. Its old-source WebKit extended stage was deliberately interrupted before
