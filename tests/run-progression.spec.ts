@@ -112,9 +112,13 @@ test('legal defeat reload, native keyboard restart and isolated single-battle sa
  test.setTimeout(180000);await start(page);await fight(page,true);await expect(page.getByRole('heading',{name:'Run defeat',exact:true})).toBeVisible();
  const ended=await snapshot(page);await page.reload();await page.locator('#run-continue').click();expect(await snapshot(page)).toEqual(ended);
  await page.locator('#run-new').focus();await page.keyboard.press('Enter');await expect(page.locator('#run-start-encounter')).toBeVisible();
+ const saved=await snapshot(page),slots=await page.evaluate(keys=>[localStorage.getItem(keys.primary),localStorage.getItem(keys.backup)],RUN_STORAGE_KEYS);
  await page.getByRole('link',{name:'Single battle',exact:true}).click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const run=await page.evaluate(key=>localStorage.getItem(key),RUN_STORAGE_KEYS.primary);expect(JSON.parse(run!).payload.items.run.encounterIndex).toBe(0);
- await page.getByRole('link',{name:'Play three-encounter run'}).click();await page.locator('#run-continue').click();await expect(page.locator('#run-start-encounter')).toBeVisible();
+ await page.getByRole('link',{name:'Play three-encounter run'}).click();await expect(page.locator('#run-start')).toBeVisible();await expect(page.locator('#run-continue')).toHaveCount(0);
+ expect(await page.evaluate(keys=>[localStorage.getItem(keys.primary),localStorage.getItem(keys.backup)],RUN_STORAGE_KEYS)).toEqual(slots);
+ await page.getByRole('link',{name:'Main menu',exact:true}).click();await page.getByRole('button',{name:'Continue',exact:true}).click();
+ await expect(page.locator('#run-start-encounter')).toBeVisible();expect(await snapshot(page)).toEqual(saved);
 });
 test('accepted player presentation reload preserves exact boundary without old cues',async({page})=>{
  await start(page);await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});

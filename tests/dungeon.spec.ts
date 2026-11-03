@@ -52,11 +52,11 @@ test('testing dungeon legally clears a floor, descends and backtracks without ac
  for(let slot=0;slot<3;slot++){
   await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
   for(let step=0;step<500;step++){
-   await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||(await readSession(page)).phase==='player';}).toBe(true);
+   await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||(await readSession(page))?.phase==='player';}).toBe(true);
    const s=await snapshot(page);if(s.phase!=='battle')break;
    const command=fighterDecision((await readSession(page)).state,dungeonBattle(s)!.catalog,taunted);
    await playCommand(page,command);taunted ||= command.type==='useAbility'&&command.abilityId==='ability:taunt';
-   await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||(await readSession(page)).phase==='player';}).toBe(true);
+   await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||(await readSession(page))?.phase==='player';}).toBe(true);
   }
   const finished=await snapshot(page);expect(finished.phase).not.toBe('defeat');expect(finished.floors[0].completed).toBe(slot+1);
   for(let i=0;i<20;i++){
@@ -178,7 +178,15 @@ test('automatic stairs preserve healed Fighter carry and fresh battle resources'
 async function seed(page:Page,s:DungeonState){const encoded=encodeDungeon(s);if(!encoded.ok)throw Error(encoded.reason);await page.goto('./?game=dungeon');await page.evaluate(({key,text})=>{localStorage.setItem(key,text);}, {key:DUNGEON_KEYS.primary,text:encoded.text});await page.reload();await continueSavedDungeon(page);}
 function fixture(slot:number){for(let seed=1;seed<=50;seed++){const f=dungeonVictoryBoundary(seed,slot);if(f)return f;}throw Error('No legal fixture');}
 test('dungeon battle undo survives reload and a legal defeat journey',async({page,isMobile})=>{
- test.setTimeout(300000);await page.goto('./?game=dungeon');
+ test.setTimeout(300000);
+ // This case qualifies undo/reload/defeat; random-layout identity has its own case.
+ await page.addInitScript(()=>{
+  const draw=crypto.getRandomValues.bind(crypto);
+  crypto.getRandomValues=((array:ArrayBufferView<ArrayBuffer>)=>{
+   if(array instanceof Uint32Array&&array.length===1){array[0]=28;return array;}return draw(array);
+  }) as typeof crypto.getRandomValues;
+ });
+ await page.goto('./?game=dungeon');
  await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();
  await walkDungeon(page,undefined,isMobile?'touch':'keyboard');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const entry=await snapshot(page);const restored=await playUndo(page,dungeonBattle(entry)!.catalog,isMobile);

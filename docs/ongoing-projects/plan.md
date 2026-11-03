@@ -4,8 +4,8 @@ Date: 2026-11-03 (Asia/Jerusalem). Status: root-entry PR published; transient-ow
 
 ### Current qualification checkpoint
 
-Implementation is published in #275/#277; frozen implementation inputs are `4de79c1`
-(later documentation-only commits may advance the branch head).
+Implementation is published in #275/#277; frozen runtime inputs are `4de79c1`.
+The scoped CI test/collector-description repairs below are being validated separately.
 Independent Windows contract repair #276 is mirrored as a separate dependency commit.
 
 OpenSpec tasks 1–3 are complete (7/9 total): the consumer/selection audit covers all ordinary,
@@ -31,12 +31,41 @@ Collector functional cold/warm proof includes the passing traced dev case; that 
 is not used for performance/budget acceptance. Original asset-matrix failures remain
 retained, and qualified aggregate/extended/performance gates are still required.
 
-Routine self-hosted [run 41647380978](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41647380978) is executing frozen `04cf227` on
-`unraid-tactics-01`. Current queued supplemental [run 41657053991](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41657053991), qualification
+Routine self-hosted [run 41647380978](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41647380978) completed **failed** at frozen `04cf227` on
+`unraid-tactics-01`. Current executing supplemental [run 41657053991](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41657053991), qualification
 branch `a3799e3`, asserts source equivalence to `4de79c1` except its temporary
 workflow. It covers changed telemetry, repaired audio workloads/collector controls,
 root/prefix isolation/history and both extended engines. Earlier queued runs
 41647577545/41648868922/41651717195 were cancelled before execution.
+
+Full-run triage retains all 12 unexpected executions: Chromium 885 passed, 6 owning-mode
+skips, 7 failed; WebKit acceptance 118 passed, 2 failed; root dev assets 73 passed,
+3 production-only skips, 2 failed; prefix dev assets 74 passed, 3 skips, 1 failed.
+WebKit exploration passes 120/120. All other routine stages, including 18 untraced
+performance samples, completed successfully. Reports were recovered with ZIP entry CRC
+verification under `verification-receipts/ci/41647380978/reports`; the complete archive
+also passes SHA-256 verification. Artifact `13251420700` is 583,252,554 bytes, digest
+`df5b926cfbfcdaf7b41e81dd41fe11e891ced5c98d94d53ac1508b4a439c43b4`.
+
+Scoped repairs in progress: the run defeat regression still expected saved Continue
+after following an intentional testing link. It now checks unchanged primary/backup
+bytes through direct battle/run entries and returns through Main menu → Continue for
+exact saved state. The new transient dungeon case must tolerate a not-yet-mounted
+battle session while polling readiness on touch devices. Two save/input dungeon cases
+also reached the existing random-layout navigator cycle; pin only those workloads to
+the established legal seed fixture, retaining independent fresh-layout proof. No
+production route/domain behavior, assertions, retry count or timeout is relaxed.
+The collector's stale descriptive `warmStorage` metadata is corrected to match its
+already-tested preservation behavior; historical captures remain unmodified.
+All four repaired cases now pass across the three Chromium profiles: **12/12**,
+zero skips/flakes/retries (`run-OWih7J`, `tmp/issue-259/ci-repairs-chromium.log`).
+Both TypeScript scopes and strict OpenSpec validation pass. The unchanged runtime
+bundle is reused; only these test bodies and collector description changed.
+The runtime report/selection audit matches all **1,550** full-run browser stage IDs
+exactly (`tmp/issue-259/full-ci-audit.json`). Its 12 skips are the six preview placement
+executions (covered in dev) and six dev-only production-hint executions (covered in
+preview); none is a missing owning-mode obligation. Qualified scoped repair checks
+will run behind the current supplemental/extended job on the same exclusive lock.
 
 Root and prefix isolation/history are **50/50 passing** across Chromium/WebKit;
 configured production/development telemetry are **72/72 passing**. The local four-mode
