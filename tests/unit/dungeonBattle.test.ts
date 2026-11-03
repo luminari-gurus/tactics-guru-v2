@@ -38,7 +38,7 @@ it('completes production Shaman Hex and healing through the real session with ex
 });
 
 it('retains a legal six-battle Fighter level-three witness with healing, Taunt and exact terminal replay',()=>{
-  const witness=fighterJourney(28);
+  const witness=fighterJourney(191);
   expect({phase:witness.state.phase,healed:witness.healed,taunted:witness.taunted,depth:witness.depth,slot:witness.slot})
     .toEqual({phase:'defeat',healed:true,taunted:true,depth:2,slot:2});
   expect(witness.records).toHaveLength(6);
@@ -76,7 +76,7 @@ it('roundtrips live Weakened and Shaman ally healing without broadening party HP
 });
 
 it('finds a legal earned Mage Snare and multi-missile journey with exact replay and terminal cleanup',()=>{
-  const journey=mageJourney(46);
+  const journey=mageJourney(68);
   expect({used:journey.used,phase:journey.state.phase,party:journey.state.party}).toMatchObject({used:{snare:true,missiles:true},phase:'defeat'});
   expect(journey.state.party.find(h=>h.heroId==='mage')!.level).toBeGreaterThanOrEqual(3);
   expect(journey.records.some(r=>r.events.some(e=>e.type==='movementBlockExpired'&&e.abilityId==='ability:frost_snare'))).toBe(true);
@@ -105,7 +105,7 @@ it('roundtrips active Mage Snare in dungeon continuation and clears it before th
 });
 
 it('finds a legal earned Ranger level-three witness using both controls and retains replayable histories',()=>{
-  const journey=rangerJourney(12);
+  const journey=rangerJourney(44);
   expect({used:journey.used,phase:journey.state.phase,party:journey.state.party}).toMatchObject({used:{mark:true,pin:true}});
   expect(journey.records.length).toBeGreaterThanOrEqual(4);
   expect(journey.state.phase).toBe('defeat');

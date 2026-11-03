@@ -832,3 +832,17 @@ test('direct map disposer is idempotent and detaches listeners', async ({ page }
   await expectMarkers(page);
   await page.clock.runFor(1000); await expectMarkers(page);
 });
+
+test('sector and arena profiles retain biome and art controls', async ({page}) => {
+  await page.goto('map');
+  for (const type of ['sector-graph','arena']) for (const biome of ['grassland','forest','desert']) {
+    await page.getByLabel('Map type', {exact:true}).selectOption(type);
+    await page.getByLabel('Biome', {exact:true}).selectOption(biome);
+    await expect(page.locator('#map-grid')).toHaveAttribute('data-type',type);
+    await expect(page.locator('#map-grid')).toHaveAttribute('data-biome',biome);
+    await expect(page.locator('#map-grid [data-terrain]')).toHaveCount(400);
+    await page.getByLabel('Art style', {exact:true}).selectOption('legacy-8bit');
+    await expect(page.locator('#map-grid')).toHaveAttribute('data-art','legacy-8bit');
+    await page.getByLabel('Art style', {exact:true}).selectOption('simple');
+  }
+});

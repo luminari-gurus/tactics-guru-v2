@@ -25,8 +25,8 @@ export function renderDungeon(root: HTMLElement, session: DungeonSession, dialog
     {id:'dungeon-item-cancel',label:'Cancel',run:()=>root.querySelector<HTMLElement>('h1')?.focus()},
   ]);
 
-  mapView.render(s,cache.resolve(floor.descriptor.seed));root.append(mapView.root);
-  const canEnter=s.phase==='ready'&&floor.completed<3&&floor.exploration.pois.some(p=>!clearedDungeonSlots(floor).includes(p.encounterSlot)&&floor.position===poiCell(p));
+  mapView.render(s,cache.resolve(floor.descriptor.seed, floor.descriptor.generator, floor.descriptor.size ?? 20));root.append(mapView.root);
+  const canEnter=s.phase==='ready'&&floor.completed<3&&floor.exploration.pois.some(p=>!clearedDungeonSlots(floor).includes(p.encounterSlot)&&floor.position===poiCell(p, floor.descriptor.size ?? 20));
   if(canEnter)root.append(button('Enter encounter',actions.start,false,'dungeon-start-encounter'));
   const travel=el('section');travel.setAttribute('aria-label','Stairs');
   travel.append(el('h2','Stairs'),el('p','Move onto an available stair to travel automatically. On arrival or after continuing a save, move off and back onto the stair to travel again. Upstairs is unavailable on floor 1.'),el('p',floor.completed===3?'All encounters cleared. Descent is unlocked.':'Clear all three encounters and claim pending rewards to unlock descent.'));root.append(travel);

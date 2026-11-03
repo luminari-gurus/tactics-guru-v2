@@ -1,5 +1,5 @@
 import { freshExploration, neighbors, poiCell, visit } from '../../src/domain/exploration';
-import { freshDungeon, floorDescriptor, dungeonOffer, readDungeon, startDungeonBattle, dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, travelDungeon, stepDungeon, clearedDungeonSlots, type DungeonState, type DungeonResult, type DungeonItemCommand } from '../../src/domain/dungeon';
+import { freshDungeon, floorDescriptor, floorMap, dungeonOffer, readDungeon, startDungeonBattle, dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, travelDungeon, stepDungeon, clearedDungeonSlots, type DungeonState, type DungeonResult, type DungeonItemCommand } from '../../src/domain/dungeon';
 import { generateMap } from '../../src/map/generate';
 import { BattleSession } from '../../src/app/BattleSession';
 import { playerDecision, fighterDecision, rangerDecision, mageDecision } from './playerPolicy';
@@ -62,7 +62,7 @@ export function dungeonVictoryBoundary(seed: number, slot = 0) {
 export function dungeonCapacityFixture(policy: DungeonEncounterPolicy = DUNGEON_ENCOUNTER_POLICY): DungeonState {
   for(let seed=1;seed<=100;seed++){
     const base=freshDungeon('dungeon-capacity-fixture',seed,policy);
-    const floors=Array.from({length:4},(_,i)=>{const descriptor=floorDescriptor(seed,i+1,undefined,policy);return {descriptor,position:descriptor.upstairs,completed:i===3?1:3,exploration:freshExploration(descriptor.seed,descriptor.upstairs)};});
+    const floors=Array.from({length:4},(_,i)=>{const descriptor=floorDescriptor(seed,i+1,undefined,policy);return {descriptor,position:descriptor.upstairs,completed:i===3?1:3,exploration:freshExploration(descriptor.seed,descriptor.upstairs,floorMap(descriptor))};});
     const equipment=Array.from({length:6},(_,i)=>({instanceId:`${base.id}:floor:${Math.floor(i/2)+1}:reward:${i%2}:option:0`,itemId:'item:warding_charm' as const}));
     const candidate:DungeonState={...base,revision:100,depth:4,floors,phase:'reward',ownership:{consumables:[],equipment,assignments:[{heroId:'fighter',slot:'charm',instanceId:equipment[0].instanceId}]}};
     const offer=dungeonOffer(candidate);
@@ -74,17 +74,17 @@ export function dungeonCapacityFixture(policy: DungeonEncounterPolicy = DUNGEON_
 /** Structural position fixture, not evidence of UI traversal. */
 export function atCell(s: DungeonState, position: number): DungeonState {
   const floors = [...s.floors], f = floors[s.depth-1];
-  floors[s.depth-1] = { ...f, position, exploration: visit(f.exploration,position) };
+  floors[s.depth-1] = { ...f, position, exploration: visit(f.exploration,position,f.descriptor.size ?? 20) };
   return { ...s, floors };
 }
 export function atEncounter(s: DungeonState, slot = s.floors[s.depth-1].completed): DungeonState {
-  return slot >= 3 ? s : atCell(s, poiCell(s.floors[s.depth-1].exploration.pois[slot]));
+  return slot >= 3 ? s : atCell(s, poiCell(s.floors[s.depth-1].exploration.pois[slot], s.floors[s.depth-1].descriptor.size ?? 20));
 }
 /** Structural adjacent position for exercising the real stair-entry command. */
 export function atStairApproach(s: DungeonState, direction: 'ascend' | 'descend' = 'descend') {
   const f = s.floors[s.depth-1], stair = direction === 'ascend' ? f.descriptor.upstairs : f.descriptor.downstairs;
-  const map = generateMap(f.descriptor.seed, 'rooms');
-  const cell = neighbors(stair).find(n => map.cells[n] && !f.exploration.pois.some(p => poiCell(p) === n));
+  const map = floorMap(f.descriptor);
+  const cell = neighbors(stair,map.width,map.height).find(n => map.cells[n] && !f.exploration.pois.some(p => poiCell(p,map.width) === n));
   if (cell === undefined) throw Error('No safe stair approach');
   return atCell(s, cell);
 }
@@ -171,13 +171,14 @@ function walkWitness(initial:DungeonState):DungeonState {
   let state=initial;
   for(let attempt=0;attempt<400;attempt++) {
     const f=state.floors[state.depth-1], live=f.exploration.pois.filter(p=>!clearedDungeonSlots(f).includes(p.encounterSlot));
-    const blocked=new Set(live.map(poiCell));
+    const width=f.descriptor.size ?? 20;
+    const blocked=new Set(live.map(p => poiCell(p,width)));
     if(state.depth>1)blocked.add(f.descriptor.upstairs);
     if(f.completed===3)blocked.add(f.descriptor.downstairs);
-    const map=generateMap(f.descriptor.seed,'rooms'),previous=new Map<number,number>([[f.position,-1]]),queue=[f.position];
+    const map=floorMap(f.descriptor),previous=new Map<number,number>([[f.position,-1]]),queue=[f.position];
     let destination:number|undefined;
-    for(let i=0;i<queue.length&&destination===undefined;i++)for(const n of neighbors(queue[i]))if(map.cells[n]&&!previous.has(n)){
-      if(blocked.has(n)){if(live.some(p=>poiCell(p)===n)){previous.set(n,queue[i]);destination=n;break;}continue;}
+    for(let i=0;i<queue.length&&destination===undefined;i++)for(const n of neighbors(queue[i],width))if(map.cells[n]&&!previous.has(n)){
+      if(blocked.has(n)){if(live.some(p=>poiCell(p,width)===n)){previous.set(n,queue[i]);destination=n;break;}continue;}
       previous.set(n,queue[i]);queue.push(n);
     }
     if(destination===undefined)throw Error('No reachable encounter');

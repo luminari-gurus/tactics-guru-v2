@@ -15,7 +15,7 @@ const legacy=(s:ReturnType<typeof fresh>)=>priorDungeonPayload(s, 1);
 const envelope=(payload:unknown)=>{const body={kind:'tactics-guru:dungeon',format:1,identity:legacyDungeonIdentity,payload};return canonical({...body,digest:hashJson(body)});};
 describe('exploration placement and validation',()=>{
  it('reproduces connected distinct markers without changing terrain for 100 seeds',()=>{
-  for(let seed=0;seed<100;seed++){const map=generateMap(seed,'rooms'),before=canonical(map),pois=encounterPois(seed,map);expect(pois).toEqual(encounterPois(seed));expect(new Set(pois.map(poiCell)).size).toBe(3);for(const p of pois){expect(map.cells[poiCell(p)]).toBe(1);expect([map.cells.indexOf(1),map.cells.lastIndexOf(1)]).not.toContain(poiCell(p));}expect(canonical(map)).toBe(before);}
+  for(let seed=0;seed<100;seed++){const map=generateMap(seed,'rooms'),before=canonical(map),pois=encounterPois(seed,map);expect(pois).toEqual(encounterPois(seed));expect(new Set(pois.map(p => poiCell(p))).size).toBe(3);for(const p of pois){expect(map.cells[poiCell(p)]).toBe(1);expect([map.cells.indexOf(1),map.cells.lastIndexOf(1)]).not.toContain(poiCell(p));}expect(canonical(map)).toBe(before);}
   expect(()=>encounterPois(1,{...generateMap(1,'rooms'),cells:Array(400).fill(0)})).toThrow();
  });
  it('reveals exactly radius two through walls, with bounded sorted indices',()=>{expect(reveal(0)).toEqual([0,1,2,20,21,40]);expect(reveal(210)).toHaveLength(13);const s=fresh();expect(readDungeon(s)).toEqual({ok:true,state:s});});

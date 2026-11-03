@@ -17,7 +17,7 @@ function inspect(cells: readonly MapCell[]): Set<number> {
   expect(cells.every(c => c === 0 || c === 1)).toBe(true);
   const floors = cells.flatMap((cell, i) => cell === 1 ? [i] : []);
   expect(floors.length).toBeGreaterThanOrEqual(60);
-  expect(floors.length).toBeLessThanOrEqual(320);
+  expect(floors.length).toBeLessThanOrEqual(324);
   expect(floors.every(i => i % 20 > 0 && i % 20 < 19 && Math.floor(i / 20) > 0 && Math.floor(i / 20) < 19)).toBe(true);
   const reached = new Set([floors[0]]);
   const todo = [floors[0]];
@@ -64,7 +64,7 @@ describe('independent seeded map', () => {
     const source = readFileSync('src/map/generate.ts', 'utf8');
     expect(source).not.toMatch(/\b(?:window|document|localStorage|sessionStorage|BattleSession|Math\.random|Date\.now)\b/);
   });
-  it.each(MAP_TYPES)('caps unusable candidates and returns the same validated fallback ($id)', ({ id }) => {
+  it.each(MAP_TYPES.slice(0,3))('caps unusable candidates and returns the same validated fallback ($id)', ({ id }) => {
     const draw = vi.spyOn(rng, 'nextUint32').mockImplementation(state => ({ value: id === 'cellular' ? 99 : 0, rng: state }));
     try {
       const map = generateMap(1, id);
@@ -106,11 +106,13 @@ describe('map type contract', () => {
     for (const seed of seeds) {
       const map = generateMap(seed, id);
       inspect(map.cells);
+      if (id !== 'arena') expect(map.cells.filter(Boolean).length).toBeLessThanOrEqual(320);
       expect(map).toMatchObject({ seed, type: id, version, width: 20, height: 20 });
       expect(generateMap(seed, id)).toEqual(map);
       if (seed < 256) layouts.add(map.cells.join(''));
     }
-    expect(layouts.size).toBeGreaterThanOrEqual(Math.ceil(256 * 0.9));
+    if (id === 'arena') expect(layouts.size).toBe(1);
+    else expect(layouts.size).toBeGreaterThanOrEqual(Math.ceil(256 * 0.9));
   });
   it('rejects unknown types and invalid seeds for all types', () => {
     expect(() => generateMap(1, 'unknown' as MapType)).toThrow(RangeError);
@@ -120,7 +122,7 @@ describe('map type contract', () => {
   });
   it('the three algorithms have different layouts at representative seeds', () => {
     for (const seed of [1, 12345, 424242]) {
-      expect(new Set(MAP_TYPES.map(({ id }) => generateMap(seed, id).cells.join(''))).size).toBe(3);
+      expect(new Set(MAP_TYPES.map(({ id }) => generateMap(seed, id).cells.join(''))).size).toBe(MAP_TYPES.length);
     }
   });
 });
@@ -174,7 +176,7 @@ describe('authoritative overworld markers', () => {
     }
   });
 
-  it.each(MAP_TYPES)('populates the real generator fallback with unmocked placement ($id)', ({ id }) => {
+  it.each(MAP_TYPES.slice(0,3))('populates the real generator fallback with unmocked placement ($id)', ({ id }) => {
     const draw = vi.spyOn(rng, 'nextUint32').mockImplementation(state => ({ value: id === 'cellular' ? 99 : 0, rng: state }));
     let layout;
     try { layout = generateMap(1, id); } finally { draw.mockRestore(); }
@@ -245,7 +247,7 @@ describe('topology-preserving biome treatment', () => {
     expect(applyBiome(generateMap(1)).biome).toBe('grassland');
     expect(() => applyBiome(generateMap(1), 'snow' as Biome)).toThrow(RangeError);
   });
-  it.each(MAP_TYPES)('retains bounded fallback for every biome ($id)', ({ id }) => {
+  it.each(MAP_TYPES.slice(0,3))('retains bounded fallback for every biome ($id)', ({ id }) => {
     const draw = vi.spyOn(rng, 'nextUint32').mockImplementation(state => ({ value: id === 'cellular' ? 99 : 0, rng: state }));
     try {
       const layout = generateMap(1, id);
@@ -488,5 +490,17 @@ describe('independent overworld enemy movement', () => {
     try { expect(stepMovement(state)).toEqual(stepMovement(state)); }
     finally { clock.mockRestore(); random.mockRestore(); }
     expect(() => stepMovement({...state,step:Number.MAX_SAFE_INTEGER})).toThrow(RangeError);
+  });
+});
+
+describe('sized layout profiles', () => {
+  it.each(['sector-graph','arena'] as const)('%s is connected and reproducible at every supported floor size', type => {
+    for (const size of [20,24,28,32,36]) for (const seed of [...Array.from({length:128},(_,i)=>i),12345,0xffffffff]) {
+      const map=generateMap(seed,type,size);
+      expect(map.cells).toHaveLength(size*size);
+      expect(validMapCells(map.cells,size,size,type==='arena')).toBe(true);
+      expect(generateMap(seed,type,size)).toEqual(map);
+      expect(createOverworld(applyBiome(map)).ok).toBe(true);
+    }
   });
 });

@@ -7,6 +7,8 @@ export const MAP_TYPES = [
   { id: 'rooms', label: 'Rooms', version: 'rooms-v1' },
   { id: 'random-walker', label: 'Random walker', version: 'random-walker-v1' },
   { id: 'cellular', label: 'Cellular caves', version: 'cellular-v1' },
+  { id: 'sector-graph', label: 'Sector graph', version: 'sector-graph-v1' },
+  { id: 'arena', label: 'Arena', version: 'arena-v1' },
 ] as const;
 export type MapType = typeof MAP_TYPES[number]['id'];
 export type MapCell = 0 | 1; // blocked | walkable
@@ -20,18 +22,17 @@ export interface GeneratedMap {
   readonly fallback: boolean;
 }
 
-export function validMapCells(cells: readonly MapCell[]): boolean {
-  if (cells.length !== 400 || cells.some(cell => cell !== 0 && cell !== 1)) return false;
+export function validMapCells(cells: readonly MapCell[], width = 20, height = width, allowOpen = false): boolean {
+  if (!Number.isInteger(width) || !Number.isInteger(height) || width < 20 || height < 20 || width > 36 || height > 36 || cells.length !== width * height || cells.some(cell => cell !== 0 && cell !== 1)) return false;
   const floorCount = cells.reduce<number>((sum, cell) => sum + cell, 0);
-  if (floorCount < 60 || floorCount > 320) return false;
-  for (let i = 0; i < MAP_SIZE; i++) {
-    if (cells[i] || cells[380 + i] || cells[i * 20] || cells[i * 20 + 19]) return false;
-  }
+  if (floorCount < 60 || floorCount > (allowOpen ? (width - 2) * (height - 2) : width * height - (2 * width + 2 * height))) return false;
+  for (let x = 0; x < width; x++) if (cells[x] || cells[(height - 1) * width + x]) return false;
+  for (let y = 0; y < height; y++) if (cells[y * width] || cells[y * width + width - 1]) return false;
   const visited = new Set<number>();
   const queue = [cells.indexOf(1)];
   visited.add(queue[0]);
   for (let i = 0; i < queue.length; i++) {
-    for (const next of [queue[i] - 20, queue[i] + 20, queue[i] - 1, queue[i] + 1]) {
+    for (const next of [queue[i] - width, queue[i] + width, queue[i] - 1, queue[i] + 1]) {
       if (cells[next] === 1 && !visited.has(next)) { visited.add(next); queue.push(next); }
     }
   }
@@ -143,10 +144,13 @@ function cellular(draw: (range: number) => number): MapCell[] {
   return cells;
 }
 
-export function generateMap(seed: number, type: MapType = 'rooms'): GeneratedMap {
+export function generateMap(seed: number, type: MapType = 'rooms', size = 20): GeneratedMap {
   if (!Number.isSafeInteger(seed) || seed < 0 || seed > 0xffffffff) throw new RangeError('Invalid seed');
   const entry = MAP_TYPES.find(entry => entry.id === type);
   if (!entry) throw new RangeError('Invalid map type');
+  if (!Number.isInteger(size) || size < 20 || size > 36) throw new RangeError('Invalid map size');
+  if (type === 'sector-graph' || type === 'arena') return generateSized(seed, type, size);
+  if (size !== 20) throw new RangeError('Unsupported map size');
   if (type === 'rooms') return generateRooms(seed);
   const result = (cells: MapCell[], fallback: boolean): GeneratedMap => ({
     seed, type, version: entry.version, width: MAP_SIZE, height: MAP_SIZE, cells, fallback,
@@ -161,4 +165,37 @@ export function generateMap(seed: number, type: MapType = 'rooms'): GeneratedMap
   for (let y = 6; y < 14; y++) for (let x = 5; x < 15; x++) cells[y * 20 + x] = 1;
   if (!validMapCells(cells)) throw new Error('Invalid map fallback');
   return result(cells, true);
+}
+
+/** Versioned square profiles use a private random stream and fixed work bounds. */
+function generateSized(seed: number, type: 'sector-graph' | 'arena', size: number): GeneratedMap {
+  const draw = localDraw((seed ^ 0x53454354) >>> 0);
+  const cells: MapCell[] = Array<MapCell>(size * size).fill(0);
+  if (type === 'arena') {
+    for (let y = 1; y < size - 1; y++) for (let x = 1; x < size - 1; x++) cells[y * size + x] = 1;
+  } else {
+    const centers: {x:number; y:number}[] = [];
+    for (let sy = 0; sy < 3; sy++) for (let sx = 0; sx < 3; sx++) {
+      const left = 1 + Math.floor(sx * (size - 2) / 3), right = 1 + Math.floor((sx + 1) * (size - 2) / 3);
+      const top = 1 + Math.floor(sy * (size - 2) / 3), bottom = 1 + Math.floor((sy + 1) * (size - 2) / 3);
+      const w = 3 + draw(Math.max(1, right - left - 3)), h = 3 + draw(Math.max(1, bottom - top - 3));
+      const x = left + draw(right - left - w + 1), y = top + draw(bottom - top - h + 1);
+      for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) cells[yy * size + xx] = 1;
+      centers.push({x:x + Math.floor(w / 2), y:y + Math.floor(h / 2)});
+    }
+    const connect = (a: typeof centers[number], b: typeof centers[number]) => {
+      let {x,y} = a; while (x !== b.x) { cells[y * size + x] = 1; x += Math.sign(b.x - x); }
+      while (y !== b.y) { cells[y * size + x] = 1; y += Math.sign(b.y - y); } cells[y * size + x] = 1;
+    };
+    for (let i = 1; i < centers.length; i++) connect(centers[i], centers[i % 3 ? i - 1 : i - 3]);
+    for (let i = 3; i < centers.length; i++) if (draw(3) === 0) connect(centers[i], centers[i - 3]);
+  }
+  let fallback = false;
+  if (!validMapCells(cells, size, size, type === 'arena')) {
+    cells.fill(0);
+    for (let y = 1; y < 9; y++) for (let x = 1; x < 11; x++) cells[y * size + x] = 1;
+    if (!validMapCells(cells, size, size, type === 'arena')) throw new Error('Invalid map fallback');
+    fallback = true;
+  }
+  return {seed, type, version: type + '-v1', width:size, height:size, cells, fallback};
 }

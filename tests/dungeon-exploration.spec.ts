@@ -4,7 +4,7 @@ import { gzipSync } from 'node:zlib';
 import { dungeonSnapshot, walkDungeon, continueSavedDungeon } from './helpers/dungeonTraversal';
 import { neighbors, poiCell } from '../src/domain/exploration';
 import { generateMap } from '../src/map/generate';
-import { freshDungeon, floorDescriptor, readDungeon, dungeonSeed, type DungeonState } from '../src/domain/dungeon';
+import { freshDungeon, floorDescriptor, floorMap, readDungeon, dungeonSeed, type DungeonState } from '../src/domain/dungeon';
 import { legacyDungeonIdentity } from '../src/content/dungeon';
 import { canonical, hashJson } from '../src/domain/contentIdentity';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
@@ -39,7 +39,7 @@ test('map markers respect stair availability, discovery and saved floor state',a
  await expect(page.locator('#dungeon-descend')).toHaveCount(0);
  await page.locator('#dungeon-map').screenshot({path:test.info().outputPath('markers-uncleared-map.png')});
  const firstMap=generateMap(floor.descriptor.seed,'rooms');
- const firstStep=neighbors(floor.position).find(n=>firstMap.cells[n]&&!floor.exploration.pois.some(p=>poiCell(p)===n))!;
+ const firstStep=neighbors(floor.position).find(n=>firstMap.cells[n]&&!floor.exploration.pois.some(p=>poiCell(p,firstMap.width)===n))!;
  await walkDungeon(page,firstStep,isMobile?'touch':'keyboard');
  await expect(cell(floor.descriptor.upstairs)).toHaveText('');
  await reload();await expect(cell(floor.descriptor.upstairs)).toHaveText('');await expect(places.locator('[data-poi-id="stairs-up"]')).toHaveCount(0);
@@ -54,12 +54,12 @@ test('map markers respect stair availability, discovery and saved floor state',a
  await reload();await expect(cell(floor.descriptor.downstairs)).toHaveText('↓');
  await page.locator('#dungeon-map').scrollIntoViewIfNeeded();
  await page.locator('#dungeon-map').screenshot({path:test.info().outputPath('markers-cleared-map.png')});
- const descriptor=floorDescriptor(base.seed,2),exploration=freshExploration(descriptor.seed,descriptor.upstairs);
+ const descriptor=floorDescriptor(base.seed,2),exploration=freshExploration(descriptor.seed,descriptor.upstairs,floorMap(descriptor));
  const second={descriptor,completed:0,position:descriptor.upstairs,exploration};
  await load({...base,depth:2,floors:[{...floor,completed:3},second]});
  await expect(places.locator('[data-poi-id="stairs-up"]')).toContainText('Upstairs');
  await expect(places.locator('[data-poi-id="stairs-down"]')).toHaveCount(0);
- const map=generateMap(descriptor.seed,'rooms'),adjacent=neighbors(descriptor.upstairs).find(n=>map.cells[n]&&!exploration.pois.some(p=>poiCell(p)===n))!;
+ const map=floorMap(descriptor),adjacent=neighbors(descriptor.upstairs,map.width,map.height).find(n=>map.cells[n]&&!exploration.pois.some(p=>poiCell(p,map.width)===n))!;
  await walkDungeon(page,adjacent,isMobile?'touch':'keyboard');await expect(cell(descriptor.upstairs)).toHaveText('↑');
  await reload();await expect(cell(descriptor.upstairs)).toHaveText('↑');
  await page.locator('#dungeon-map').scrollIntoViewIfNeeded();
@@ -69,19 +69,19 @@ test('map markers respect stair availability, discovery and saved floor state',a
 });
 
 test('stairs remain visible under cleared saved markers and live markers stay visible',async({page})=>{
- const base=freshDungeon('stair-overlap',1), descriptor=floorDescriptor(base.seed,2), initial=freshExploration(descriptor.seed,descriptor.upstairs);
- const map=generateMap(descriptor.seed,'rooms'), from=neighbors(descriptor.upstairs).find(n=>map.cells[n]&&!initial.pois.some(p=>poiCell(p)===n));
+ const base=freshDungeon('stair-overlap',1), descriptor=floorDescriptor(base.seed,2), initial=freshExploration(descriptor.seed,descriptor.upstairs,floorMap(descriptor));
+ const map=floorMap(descriptor), from=neighbors(descriptor.upstairs,map.width,map.height).find(n=>map.cells[n]&&!initial.pois.some(p=>poiCell(p,map.width)===n));
  if(from===undefined)throw Error('No safe approach');
  const explore=movableExploration(initial,descriptor.seed,0,'ready');
- const pois=explore.pois.map((p,i)=>i===0?{...p,x:descriptor.upstairs%20,y:Math.floor(descriptor.upstairs/20)}:p);
+ const pois=explore.pois.map((p,i)=>i===0?{...p,x:descriptor.upstairs%map.width,y:Math.floor(descriptor.upstairs/map.width)}:p);
  const state=atCell({...base,depth:2,floors:[{...base.floors[0],completed:3},{descriptor,position:descriptor.upstairs,completed:0,exploration:{...explore,pois}}]},from);
  const load=async(s:DungeonState)=>{const encoded=encodeDungeon(s);if(!encoded.ok)throw Error(encoded.reason);await page.goto('dungeon');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});await page.reload();await continueSavedDungeon(page);};
  const stair=page.locator(`#dungeon-map [data-cell="${descriptor.upstairs}"]`);
  await load(state);await expect(stair).toHaveText('M');
  const floor=state.floors[1];await load({...state,floors:[state.floors[0],{...floor,completed:1,exploration:{...floor.exploration,cleared:[0]}}]});
  await expect(stair).toHaveText('↑');await page.reload();await continueSavedDungeon(page);await expect(stair).toHaveText('↑');
- const down=descriptor.downstairs, moved=pois.map((p,i)=>i===0?{...p,x:down%20,y:Math.floor(down/20)}:p);
- const all={...floor,completed:3,exploration:{...floor.exploration,pois:moved,cleared:[0,1,2],revealed:Array.from({length:400},(_,i)=>i)}};
+ const down=descriptor.downstairs, moved=pois.map((p,i)=>i===0?{...p,x:down%map.width,y:Math.floor(down/map.width)}:p);
+ const all={...floor,completed:3,exploration:{...floor.exploration,pois:moved,cleared:[0,1,2],revealed:Array.from({length:map.width*map.height},(_,i)=>i)}};
  await load({...state,floors:[state.floors[0],all]});await expect(page.locator(`#dungeon-map [data-cell="${down}"]`)).toHaveText('↓');
 });
 
@@ -95,8 +95,8 @@ for(const control of ['arrows','wasd','compass','cell'] as const)test(`stairs tr
  };
  const reload=async()=>{await page.reload();await continueSavedDungeon(page);};
  const move=async(destination:number)=>{
-  const before=await dungeonSnapshot(page),delta=destination-before.floors[before.depth-1].position;
-  const direction=delta===-20?'north':delta===20?'south':delta===1?'east':'west';
+  const before=await dungeonSnapshot(page),delta=destination-before.floors[before.depth-1].position, width=before.floors[before.depth-1].descriptor.size ?? 20;
+  const direction=delta===-width?'north':delta===width?'south':delta===1?'east':'west';
   if(control==='arrows'||control==='wasd'){
    await page.locator('#dungeon-map').focus();
    const key=control==='arrows'?{north:'ArrowUp',south:'ArrowDown',east:'ArrowRight',west:'ArrowLeft'}[direction]:{north:'w',south:'s',east:'d',west:'a'}[direction];
@@ -250,7 +250,7 @@ test('pre-progression dungeon remains incompatible and exportable',async({page})
 test('cold progression-format Continue retains a long saved history within the startup budget',async({page})=>{
  const base=freshDungeon('cold-browser',13),floors=Array.from({length:250},(_,i)=>{
   const descriptor=floorDescriptor(base.seed,i+1);
-  return {descriptor,completed:i===249?0:3,position:descriptor.upstairs,exploration:freshExploration(descriptor.seed,descriptor.upstairs)};
+  return {descriptor,completed:i===249?0:3,position:descriptor.upstairs,exploration:freshExploration(descriptor.seed,descriptor.upstairs,floorMap(descriptor))};
  });
  const encoded=encodeDungeon({...base,depth:250,floors});if(!encoded.ok)throw Error(encoded.reason);
  await page.goto('dungeon');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
@@ -277,7 +277,7 @@ test('records route transfer and map responsiveness against established budgets'
  const created=await dungeonSnapshot(page),cleared={...created,floors:[{...created.floors[0],completed:3}]};
  const encoded=encodeDungeon(cleared);if(!encoded.ok)throw Error(encoded.reason);
  await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});await page.reload();await continueSavedDungeon(page);
- const start=await dungeonSnapshot(page),f=start.floors[0],map=generateMap(f.descriptor.seed,'rooms'),neighbor=neighbors(f.position).find(n=>map.cells[n]&&n!==f.descriptor.downstairs&&!f.exploration.pois.some(p=>poiCell(p)===n))!;
+ const start=await dungeonSnapshot(page),f=start.floors[0],map=generateMap(f.descriptor.seed,'rooms'),neighbor=neighbors(f.position).find(n=>map.cells[n]&&n!==f.descriptor.downstairs&&!f.exploration.pois.some(p=>poiCell(p,map.width)===n))!;
  for(let i=0;i<20;i++)timings.push(await page.evaluate(destination=>{const begin=performance.now();const cell=document.querySelector<HTMLElement>(`#dungeon-map [data-cell="${destination}"]`)!;cell.click();return performance.now()-begin;},i%2===0?neighbor:f.position));
  const frames=await page.evaluate(async({a,b})=>{
    const idle:number[]=[],steps:number[]=[];
@@ -304,18 +304,18 @@ for(const biome of ['forest','desert'] as const)test(`${biome} saved kinds, scal
   for(let seed=0;seed<128&&!state;seed++){
    const base=freshDungeon('biome-view',seed),descriptor=floorDescriptor(seed,2),selection=descriptor.encounters[slot].selection;
    if(descriptor.biome!==`${biome}-v1`||selection.kind!==kind)continue;
-   const candidate={...base,depth:2,floors:[{...base.floors[0],completed:3},{descriptor,position:descriptor.upstairs,completed:slot,exploration:freshExploration(descriptor.seed,descriptor.upstairs)}]};
+   const candidate={...base,depth:2,floors:[{...base.floors[0],completed:3},{descriptor,position:descriptor.upstairs,completed:slot,exploration:freshExploration(descriptor.seed,descriptor.upstairs,floorMap(descriptor))}]};
    const read=readDungeon(candidate);if(!read.ok)throw Error(read.reason);state=read.state;
   }
   if(!state)throw Error('No kind fixture');
-  const floor=state.floors[1],target=poiCell(floor.exploration.pois[slot]),map=generateMap(floor.descriptor.seed,'rooms');
-  const prior=neighbors(target).find(n=>map.cells[n]&&!floor.exploration.pois.some(p=>poiCell(p)===n));if(prior===undefined)throw Error('No safe approach');
+  const floor=state.floors[1],map=floorMap(floor.descriptor),target=poiCell(floor.exploration.pois[slot],map.width);
+  const prior=neighbors(target,map.width,map.height).find(n=>map.cells[n]&&!floor.exploration.pois.some(p=>poiCell(p,map.width)===n));if(prior===undefined)throw Error('No safe approach');
   state=atCell(state,prior);const encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
   await page.goto('dungeon');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});await page.reload();await continueSavedDungeon(page);
   await expect(page.locator('#dungeon-map')).toHaveAttribute('data-biome',biome);
   expect(await page.locator('#dungeon-screen').evaluate(n=>n.scrollWidth<=n.clientWidth)).toBe(true);
   await expect(page.locator('#dungeon-screen h1')).toHaveText(`Dungeon · Floor 2 · ${biome==='forest'?'Forest':'Desert'}`);
-  const undiscovered=state.floors[1].exploration.pois.filter(p=>!state!.floors[1].exploration.revealed.includes(poiCell(p)));
+  const undiscovered=state.floors[1].exploration.pois.filter(p=>!state!.floors[1].exploration.revealed.includes(poiCell(p,map.width)));
   for(const p of undiscovered)await expect(page.locator(`[data-poi-id="${p.id}"]`)).toHaveCount(0);
   await walkDungeon(page,target,isMobile?'touch':'keyboard');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const label=kind==='boss'?'Guardian · Goblins':`${kind[0].toUpperCase()}${kind.slice(1)} encounter ${slot+1}`;
@@ -355,7 +355,7 @@ test('dungeon enemies move only after a player step and persist across reload', 
  await page.clock.install();await page.clock.runFor(5000);
  expect(await dungeonSnapshot(page)).toEqual(before);expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe(savedBefore);
  const f=before.floors[0],map=generateMap(f.descriptor.seed,'rooms');
- const destination=neighbors(f.position).find(n=>map.cells[n]&&!f.exploration.pois.some(p=>poiCell(p)===n));if(destination===undefined)throw Error('No safe step');
+ const destination=neighbors(f.position).find(n=>map.cells[n]&&!f.exploration.pois.some(p=>poiCell(p,map.width)===n));if(destination===undefined)throw Error('No safe step');
  const cell=page.locator(`#dungeon-map [data-cell="${destination}"]`);if(isMobile)await cell.tap();else await cell.click();
  const after=await dungeonSnapshot(page);expect(after.revision).toBe(before.revision+1);expect(after.floors[0].exploration.movement!.step).toBe(1);
  expect(after.floors[0].exploration.pois).not.toEqual(before.floors[0].exploration.pois);
@@ -367,7 +367,7 @@ test('dungeon enemies move only after a player step and persist across reload', 
 test('walking onto a guardian before other enemies starts and resumes its own encounter', async ({page,isMobile})=>{
  const base=freshDungeon('unordered-guardian-browser',1),f=base.floors[0],target=poiCell(f.exploration.pois[2]);
  const map=generateMap(f.descriptor.seed,'rooms');
- const prior=neighbors(target).find(n=>map.cells[n]&&!f.exploration.pois.some(p=>poiCell(p)===n));
+ const prior=neighbors(target,map.width,map.height).find(n=>map.cells[n]&&!f.exploration.pois.some(p=>poiCell(p,map.width)===n));
  if(prior===undefined)throw Error('No safe adjacent cell');
  const state=atCell(base,prior), encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
  await page.goto('dungeon');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
@@ -413,4 +413,34 @@ test('chase follows the previous cell while block targets the resulting cell', a
   await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();
   expect(await dungeonSnapshot(page)).toEqual(after);
  }
+});
+
+test('maximum-size saved floor renders and accepts a step after reload', async ({page,isMobile}) => {
+ const base=freshDungeon('large-floor-browser',19);
+ const floors=Array.from({length:5},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1),map=floorMap(descriptor);return {descriptor,position:descriptor.upstairs,completed:i===4?0:3,exploration:freshExploration(descriptor.seed,descriptor.upstairs,map)};});
+ const state={...base,depth:5,floors}, encoded=encodeDungeon(state); if(!encoded.ok)throw Error(encoded.reason);
+ await page.goto('dungeon'); await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
+ await page.reload(); await continueSavedDungeon(page);
+ const map=page.locator('#dungeon-map'); await expect(map.locator('[data-cell]')).toHaveCount(36*36);
+ const before=await dungeonSnapshot(page), floor=before.floors[4], layout=floorMap(floor.descriptor);
+ const destination=neighbors(floor.position,layout.width).find(n=>layout.cells[n]&&!floor.exploration.pois.some(p=>poiCell(p,layout.width)===n));
+ if(destination===undefined) throw Error('No safe step on maximum floor');
+ await walkDungeon(page,destination,isMobile?'touch':'keyboard');
+ const after=await dungeonSnapshot(page);expect(after.floors[4].position).toBe(destination);
+ await page.reload(); await continueSavedDungeon(page); expect(await dungeonSnapshot(page)).toEqual(after);
+});
+
+test('maximum-size floor step responsiveness meets the established budget', async ({page}) => {
+ const base=freshDungeon('large-floor-performance',19);
+ const floors=Array.from({length:5},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1),map=floorMap(descriptor);return {descriptor,position:descriptor.upstairs,completed:3,exploration:freshExploration(descriptor.seed,descriptor.upstairs,map)};});
+ const floor=floors[4],map=floorMap(floor.descriptor), stairs=[floor.descriptor.upstairs,floor.descriptor.downstairs];
+ const first=map.cells.findIndex((v,i)=>v===1&&!stairs.includes(i)&&neighbors(i,map.width).some(n=>map.cells[n]&&!stairs.includes(n)));
+ const second=neighbors(first,map.width).find(n=>map.cells[n]&&!stairs.includes(n));if(first<0||second===undefined)throw Error('No safe timing pair');
+ const state=atCell({...base,depth:5,floors},first),encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
+ await page.goto('dungeon');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});await page.reload();await continueSavedDungeon(page);
+ const times:number[]=[];
+ for(let i=0;i<20;i++)times.push(await page.evaluate(destination=>{const start=performance.now();document.querySelector<HTMLElement>(`#dungeon-map [data-cell="${destination}"]`)!.click();return performance.now()-start;},i%2===0?second:first));
+ const sorted=[...times].sort((a,b)=>a-b),p95=sorted[Math.ceil(sorted.length*.95)-1];
+ writeFileSync(test.info().outputPath('maximum-floor-step-performance.json'),JSON.stringify({times,p95,budgetMs:33.4,dimension:map.width},null,2));
+ expect((await dungeonSnapshot(page)).floors[4].position).toBe(first);expect(p95).toBeLessThanOrEqual(33.4);
 });

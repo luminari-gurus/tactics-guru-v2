@@ -32,23 +32,23 @@ export function describeBehavior(behavior: EnemyBehavior): string {
   return behavior.kind === 'passive' ? 'passive wandering' : `${behavior.kind} pursuit · range ${behavior.range}`;
 }
 
-const cellOf = (marker: OverworldMarker) => marker.y * 20 + marker.x;
-const distance = (a: number, b: number) => Math.abs(a % 20 - b % 20) + Math.abs(Math.floor(a / 20) - Math.floor(b / 20));
-function neighbors(cell: number): number[] {
-  return [cell - 20, cell + 1, cell + 20, cell - 1]
-    .filter(next => next >= 0 && next < 400 && distance(cell, next) === 1);
+const cellOf = (marker: OverworldMarker, width: number) => marker.y * width + marker.x;
+const distance = (a: number, b: number, width: number) => Math.abs(a % width - b % width) + Math.abs(Math.floor(a / width) - Math.floor(b / width));
+function neighbors(cell: number, width: number, height: number): number[] {
+  return [cell - width, cell + 1, cell + width, cell - 1]
+    .filter(next => next >= 0 && next < width * height && distance(cell, next, width) === 1);
 }
 
 /** FIFO search with fixed neighbor order; at most 400 cells, no RNG or terrain mutation. */
-function pursue(start: number, target: number, legal: (cell: number) => boolean, occupyTarget = false): number {
+function pursue(start: number, target: number, legal: (cell: number) => boolean, width: number, height: number, occupyTarget = false): number {
   const canOccupy = occupyTarget && legal(target);
-  if (canOccupy ? start === target : distance(start, target) === 1) return start;
+  if (canOccupy ? start === target : distance(start, target, width) === 1) return start;
   const queue = [{ cell: start, first: start }];
   const visited = new Set([start]);
-  const isGoal = (cell: number) => canOccupy ? cell === target : distance(cell, target) === 1;
+  const isGoal = (cell: number) => canOccupy ? cell === target : distance(cell, target, width) === 1;
   for (let cursor = 0; cursor < queue.length; cursor++) {
     const current = queue[cursor];
-    for (const next of neighbors(current.cell)) {
+    for (const next of neighbors(current.cell, width, height)) {
       if (visited.has(next) || !legal(next)) continue;
       visited.add(next);
       const first = current.cell === start ? next : current.first;
@@ -59,8 +59,8 @@ function pursue(start: number, target: number, legal: (cell: number) => boolean,
   return start;
 }
 
-function chaseTarget(previousPlayer: number | undefined, player: number): number {
-  return previousPlayer !== undefined && Number.isInteger(previousPlayer) && previousPlayer >= 0 && previousPlayer < 400 && previousPlayer !== player
+function chaseTarget(previousPlayer: number | undefined, player: number, limit: number): number {
+  return previousPlayer !== undefined && Number.isInteger(previousPlayer) && previousPlayer >= 0 && previousPlayer < limit && previousPlayer !== player
     ? previousPlayer : player;
 }
 
@@ -71,30 +71,31 @@ export function stepMovement(state: OverworldMovement, inactive: readonly EnemyI
   }
   const { world } = state;
   const markers = [...world.markers];
-  const player = cellOf(markers.find(marker => marker.id === 'player')!);
+  const {width, height} = world.map;
+  const player = cellOf(markers.find(marker => marker.id === 'player')!, width);
   let rng = state.rng;
   for (const id of ENEMIES) {
     if (inactive.includes(id)) continue;
     const index = markers.findIndex(marker => marker.id === id);
     const marker = markers[index];
-    const start = cellOf(marker);
-    const occupied = new Set(markers.filter(other => other.id !== id && (other.id === 'player' || !inactive.includes(other.id))).map(cellOf));
+    const start = cellOf(marker, width);
+    const occupied = new Set(markers.filter(other => other.id !== id && (other.id === 'player' || !inactive.includes(other.id))).map(marker => cellOf(marker, width)));
     const legal = (cell: number) => world.map.cells[cell] === 1 && !occupied.has(cell) && !blocked.includes(cell);
     const behavior = state.behaviors.find(profile => profile.id === id)!;
     let destination = start;
     if (behavior.kind === 'passive') {
       const draw = nextUint32(rng);
       rng = draw.rng;
-      const choices = neighbors(start).filter(legal);
+      const choices = neighbors(start, width, height).filter(legal);
       if (choices.length) destination = choices[draw.value % choices.length];
     } else {
-      const target = behavior.kind === 'chase' ? chaseTarget(previousPlayer, player) : player;
-      if (distance(start, target) <= behavior.range) {
-        const next = pursue(start, target, legal, target !== player);
+      const target = behavior.kind === 'chase' ? chaseTarget(previousPlayer, player, width * height) : player;
+      if (distance(start, target, width) <= behavior.range) {
+        const next = pursue(start, target, legal, width, height, target !== player);
         destination = next === player ? start : next;
       }
     }
-    markers[index] = { ...marker, x: destination % 20, y: Math.floor(destination / 20) };
+    markers[index] = { ...marker, x: destination % width, y: Math.floor(destination / width) };
   }
   return { ...state, world: { ...world, markers }, rng, step: state.step + 1 };
 }
