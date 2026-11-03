@@ -45,7 +45,9 @@ The `main-menu.spec.ts` suite belongs to the default three-profile Chromium matr
 and the existing two-profile iPhone WebKit acceptance stage. Serial batch selection
 includes it exactly once per Chromium project. Existing test identities are retained
 while saved journeys use the root selector. `/map` remains inspection. Supported
-explicit root `scene` diagnostics take precedence over `game`; unknown or duplicate
+explicit root `scene` diagnostics take precedence over `game`. The first `scene`
+value controls both route resolution and scene startup; later values are ignored.
+Unknown or duplicate
 `game` values render the menu. Direct paths cannot select a persistent entry through
 query parameters. The follow-up #259 owner change removes their legacy save access;
 this entry-routing chunk alone does not claim testing-route isolation.
