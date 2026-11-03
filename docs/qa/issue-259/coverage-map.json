@@ -6,7 +6,7 @@
   "after": {
     "parentCommit": "ffbdde0f02abbfc3cc041ec49d1570a98e575d9b",
     "selectionInputHash": "b119b07df9f304fda386de5d0bc00621f961c89b8264898b34719e9ad06299e8",
-    "currentInputHash": "25f7673ddfb592a4894e5d98edc557aa18124d54af7c27ff1100803e9d612e6a"
+    "currentInputHash": "bc22a74b53ab6bff0692fc533fcb45399adb4a08545a40ae1f842e41de30d5ac"
   },
   "conditions": "Selection only, locked Playwright 1.64.1, Windows x64, one worker and zero retries. Full captures remain in ignored tmp/issue-259. Existing approved 23 matrix reductions remain unchanged.",
   "counts": {
