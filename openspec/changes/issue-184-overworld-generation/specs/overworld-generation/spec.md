@@ -20,8 +20,15 @@ Generated layouts SHALL preserve the blocked perimeter, connected traversal, and
 - **WHEN** generation cannot produce a valid map within its bounds
 - **THEN** a deterministic validated fallback supplies legal connected placements
 
+### Requirement: Floor size increases with depth
+New dungeon floors SHALL start at 20×20 and increase by four cells per side per depth until reaching 36×36 at depth 5.
+
+#### Scenario: Creating deeper floors
+- **WHEN** a new floor is created at depths 1, 2, 5 or beyond 5
+- **THEN** its dimensions are respectively 20×20, 24×24, 36×36 and 36×36
+
 ### Requirement: Durable floor identity
-Dungeon floors SHALL resolve their saved profile version and geometry identity across reload and floor revisits.
+Dungeon floors SHALL resolve their saved profile version, dimensions and geometry identity across reload and floor revisits.
 
 #### Scenario: Existing rooms floor is resumed
 - **WHEN** a save created with rooms-v1 is loaded after new profiles are introduced

@@ -7,7 +7,7 @@ The overworld has three generation families, but lacks the distinct legacy layou
 ## What Changes
 
 - Compare Digger, Rogue, sector graph and Arena against Rooms; document equivalents and select distinct profiles on evidence.
-- Add selected deterministic, bounded profiles to inspection and durable dungeon floors, retaining biome/art independence, valid placement and compatibility.
+- Add selected deterministic, bounded profiles to inspection and durable dungeon floors, retaining biome/art independence, valid placement and compatibility. New dungeon floors grow from 20×20 with depth under a bounded size policy.
 - Verify generation, save/resume, accessibility, and rendering budgets against the issue's acceptance criteria.
 
 ## Capabilities
