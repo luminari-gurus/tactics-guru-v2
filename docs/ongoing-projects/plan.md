@@ -47,7 +47,7 @@ verification under `verification-receipts/ci/41647380978/reports`; the complete 
 also passes SHA-256 verification. Artifact `13251420700` is 583,252,554 bytes, digest
 `df5b926cfbfcdaf7b41e81dd41fe11e891ced5c98d94d53ac1508b4a439c43b4`.
 
-Scoped repairs in progress: the run defeat regression still expected saved Continue
+Scoped repairs published as `30dc8ac`: the run defeat regression still expected saved Continue
 after following an intentional testing link. It now checks unchanged primary/backup
 bytes through direct battle/run entries and returns through Main menu → Continue for
 exact saved state. The new transient dungeon case must tolerate a not-yet-mounted
@@ -64,8 +64,19 @@ bundle is reused; only these test bodies and collector description changed.
 The runtime report/selection audit matches all **1,550** full-run browser stage IDs
 exactly (`tmp/issue-259/full-ci-audit.json`). Its 12 skips are the six preview placement
 executions (covered in dev) and six dev-only production-hint executions (covered in
-preview); none is a missing owning-mode obligation. Qualified scoped repair checks
-will run behind the current supplemental/extended job on the same exclusive lock.
+preview); none is a missing owning-mode obligation. Qualified scoped repair
+[run 41680229366](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41680229366)
+is queued behind the current supplemental/extended job on the same exclusive lock.
+Its verification-only branch `branch/issue-259-repair-qualification` at `b9366a1`
+differs from candidate `30dc8ac` only by its workflow, asserted before execution.
+It builds the exact candidate and runs Chromium 12, WebKit acceptance 2 and WebKit
+exploration 9 repaired cases (23 total), one worker/zero retries, retaining independent
+stage failures and source/browser/results artifacts. This workflow is outside #277.
+The temporary `.github/full-verify-request` is removed. Its deletion otherwise triggers
+another full capture; this docs/trigger-only cleanup uses `[skip ci]` to avoid that
+duplicate run. Source-bound qualification still runs at the immutable candidates above,
+and the original full failure remains retained. No application/test/config input changes
+with this cleanup, and neither remaining task is marked complete yet.
 
 Root and prefix isolation/history are **50/50 passing** across Chromium/WebKit;
 configured production/development telemetry are **72/72 passing**. The local four-mode
