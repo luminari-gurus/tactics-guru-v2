@@ -110,6 +110,16 @@ original failed fixture report remains intact (`run-tnMhYj`). This test-only edi
 not affect the active asset, prefix, lifecycle or extended consumers; no sequence is
 restarted and no timeout is raised.
 
+Current local run: prefix isolation passes **18/18 Chromium + 12/12 WebKit** and
+the root bundle is restored. Root dev, prefix preview and prefix dev audio/collector/menu
+subsets pass **27/27 each**. Root preview retains **26 passes / 1 failure**, a Web Audio
+battle completion check on mobile portrait (`run-fCug6z`); check that one case separately
+without erasing the original failure. The extended Chromium matrix is running, with
+desktop Mage/Ranger/Fighter and portrait Mage passed so far. WebKit follows in the
+same live local process `89450`. Afterward, run only the 12 repaired ability cases,
+the single desktop fixture navigation case and this single audio case, then finalize
+the source-aware acceptance record. No CI status or newer upstream work is a gate.
+
 The prior local sequence completed 11 WebKit repairs and all 9 Chromium extended
 journeys. Its old-source WebKit extended stage was deliberately interrupted before
 integration; there is no final JSON for that stage. The exact owned process tree was
