@@ -7,6 +7,13 @@ Date: 2026-11-03 (Asia/Jerusalem). Status: root-entry PR published; transient-ow
 Implementation is published in #275/#277; frozen implementation inputs are `4de79c1`
 (later documentation-only commits may advance the branch head).
 Independent Windows contract repair #276 is mirrored as a separate dependency commit.
+
+OpenSpec task 3.3 is complete: the consumer/selection audit covers all ordinary,
+dev, WebKit, telemetry, asset and extended owners. The current relevant-input hash
+matches the coverage ledger, all referenced files exist, and 1,469 retained,
+102 mapped and 65 added stage/profile identities are accounted for. Final runtime
+acceptance remains open under tasks 2.2, 3.1, 3.2 and 4.1/4.2.
+
 Routine self-hosted [run 41647380978](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41647380978) is executing frozen `04cf227` on
 `unraid-tactics-01`. Current queued supplemental [run 41657053991](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41657053991), qualification
 branch `a3799e3`, asserts source equivalence to `4de79c1` except its temporary
