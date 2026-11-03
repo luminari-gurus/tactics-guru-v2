@@ -36,7 +36,7 @@ jobs:
         run: |
           mkdir -p verification-receipts/issue-259-extended
           git rev-parse HEAD > verification-receipts/issue-259-extended/source.txt
-          git diff --name-only 03777810dde407eb2f083eb0f094d191f1a67320 HEAD > verification-receipts/issue-259-extended/candidate-diff.txt
+          git diff --name-only aca9709d220c9a7f5411d71347e303109a0b7d44 HEAD > verification-receipts/issue-259-extended/candidate-diff.txt
           test "$(cat verification-receipts/issue-259-extended/candidate-diff.txt)" = '.github/workflows/issue-259-extended-qualification.yml'
           node --input-type=module -e "import {sourceIdentity} from './scripts/verification-report.mjs';import {writeFileSync} from 'node:fs';writeFileSync('verification-receipts/issue-259-extended/source.json',JSON.stringify(sourceIdentity(process.cwd()),null,2));"
       - name: Build frozen gameplay inputs
@@ -60,14 +60,50 @@ jobs:
           PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/issue-259-extended/telemetry-development.json
         run: npm run test:telemetry -- --reporter=line,json --retries=0 --output verification-receipts/issue-259-extended/telemetry-development-artifacts
         timeout-minutes: 30
-      - name: Chromium extended journeys
+      - name: Chromium direct-entry and history isolation
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/issue-259-extended/isolation-chromium.json
+        run: npx --no-install playwright test tests/battle-persistence.spec.ts -g 'testing routes:' --reporter=line,json --retries=0 --output verification-receipts/issue-259-extended/isolation-chromium-artifacts
+        timeout-minutes: 15
+      - name: WebKit direct-entry and history isolation
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/issue-259-extended/isolation-webkit.json
+        run: npx --no-install playwright test -c playwright.device-acceptance.config.ts tests/battle-persistence.spec.ts -g 'testing routes:' --reporter=line,json --retries=0 --output verification-receipts/issue-259-extended/isolation-webkit-artifacts
+        timeout-minutes: 15
+      - name: Build qualified prefix from unchanged successful prerequisites
+        id: prefix
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run build:bundle -- --base=/prototype/
+        timeout-minutes: 5
+      - name: Chromium prefix direct-entry isolation
+        if: ${{ !cancelled() && steps.prefix.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_BASE_PATH: /prototype/
+          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/issue-259-extended/prefix-isolation-chromium.json
+        run: npx --no-install playwright test tests/battle-persistence.spec.ts -g 'testing routes:' --reporter=line,json --retries=0 --output verification-receipts/issue-259-extended/prefix-isolation-chromium-artifacts
+        timeout-minutes: 15
+      - name: WebKit prefix direct-entry isolation
+        if: ${{ !cancelled() && steps.prefix.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_BASE_PATH: /prototype/
+          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/issue-259-extended/prefix-isolation-webkit.json
+        run: npx --no-install playwright test -c playwright.device-acceptance.config.ts tests/battle-persistence.spec.ts -g 'testing routes:' --reporter=line,json --retries=0 --output verification-receipts/issue-259-extended/prefix-isolation-webkit-artifacts
+        timeout-minutes: 15
+      - name: Restore qualified root before extended journeys
+        id: restore
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run build:bundle
+        timeout-minutes: 5
+      - name: Chromium extended journeys
+        if: ${{ !cancelled() && steps.restore.outcome == 'success' }}
         env:
           PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/issue-259-extended/chromium.json
         run: npm run test:extended -- --reporter=line,json --retries=0 --output verification-receipts/issue-259-extended/chromium-artifacts
         timeout-minutes: 50
       - name: WebKit extended journeys
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.restore.outcome == 'success' }}
         env:
           PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/issue-259-extended/webkit.json
         run: npm run test:extended:webkit -- --reporter=line,json --retries=0 --output verification-receipts/issue-259-extended/webkit-artifacts
