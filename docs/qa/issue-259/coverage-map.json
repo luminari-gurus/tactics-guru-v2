@@ -1,30 +1,31 @@
 {
+  "previousLedger": "coverage-map-pre-mobile.json",
   "before": {
-    "commit": "41eda1d0c9dae1128b202ce6e066a24569a05bb2",
-    "inputHash": "43cd0d15588817aaabe535c5f7e2f30f0d318bd368dd94ae906820edef069efd"
+    "commit": "33332814ff2254bcde66eff11d707ebd6028f51b",
+    "inputHash": "af78a168fb79aec662fdfefce96c6dbb8329873f8702674776ea314a9e5d99df"
   },
   "after": {
-    "parentCommit": "ffbdde0f02abbfc3cc041ec49d1570a98e575d9b",
-    "selectionInputHash": "b119b07df9f304fda386de5d0bc00621f961c89b8264898b34719e9ad06299e8",
-    "currentInputHash": "323dd89060f10cba469ed574812af0df3f391689860fc10dab59ff097caffad8"
+    "parentCommit": "c5e2da77a275b832f1bf23ee8fdb464b2a652a38",
+    "selectionInputHash": "fc03dc1f0ff3b68f6525c35b79d82c72638b053dc3b5b64771d19f8752d2be7d",
+    "currentInputHash": "fc03dc1f0ff3b68f6525c35b79d82c72638b053dc3b5b64771d19f8752d2be7d"
   },
   "conditions": "Selection only, locked Playwright 1.64.1, Windows x64, one worker and zero retries. Full captures remain in ignored tmp/issue-259. Existing approved 23 matrix reductions remain unchanged.",
   "counts": {
     "chromium": {
-      "before": 853,
-      "after": 898
+      "before": 955,
+      "after": 1006
     },
     "fixtures": {
-      "before": 87,
-      "after": 75
+      "before": 105,
+      "after": 93
     },
     "placement-dev": {
       "before": 6,
       "after": 6
     },
     "webkit-acceptance": {
-      "before": 100,
-      "after": 120
+      "before": 158,
+      "after": 182
     },
     "webkit-exploration": {
       "before": 105,
@@ -63,17 +64,18 @@
       "after": 9
     },
     "playwright.abilities.config.ts": {
-      "before": 42,
-      "after": 42
+      "before": 60,
+      "after": 60
     },
     "playwright.setup-smoke.config.ts": {
       "before": 2,
       "after": 2
     }
   },
-  "retainedIds": 1469,
+  "retainedIds": 1665,
   "retainedObligations": [
     "Existing persistence, corruption, exact backup/raw export, stale reset/removal, legal terminal, replay, floor, item and actual history/BFCache cases keep their titles/IDs and now use root game entries.",
+    "The new main radial preference reload case retains its ID and preference assertions, expects a fresh transient battle and removes its direct-route saved Continue assumption. Added radial boundary cases prove all three testing game owners preserve primary/backup/handoff bytes through real actions, restart, reload and actual Back, and a menu-owned radial battle preserves exact accepted state across Continue.",
     "The unchanged-ID custom later-ability fixture cases now reset after asserting accepted replay commands; fictional zz_* abilities have no production save contract. Production learned-ability persistence remains in menu-owned extended journeys.",
     "The unchanged-ID rejected-capacity/active-item fixture reload reconstructs its explicit fresh active boundary; saved active RNG/ownership is covered by menu item and run/dungeon reload cases.",
     "New isolation cases cover all seven direct/diagnostic families, storage conditions, forged intents, exact primary/backup/handoff sentinels, actions, restart, synthetic visibility/pagehide cleanup and fresh reload. Existing actual BFCache cases remain on persistent root play.",
@@ -121,6 +123,8 @@
     {"stage":"chromium","file":"battle-persistence.spec.ts","title":"testing routes: fresh play never accesses corrupt saved games","cases":[{"profile":"desktop","id":"8352ba8e75a15b46318d-b416ddbdd91ab5907829"},{"profile":"mobile-portrait","id":"8352ba8e75a15b46318d-ce792c43a9226680ea1f"},{"profile":"mobile-landscape","id":"8352ba8e75a15b46318d-942d41633f66678cc74a"}]},
     {"stage":"chromium","file":"battle-persistence.spec.ts","title":"testing routes: fresh play never accesses backup-only saved games","cases":[{"profile":"desktop","id":"8352ba8e75a15b46318d-18cd41a77fbb0b43db24"},{"profile":"mobile-portrait","id":"8352ba8e75a15b46318d-dd4a8b9c53a78e673501"},{"profile":"mobile-landscape","id":"8352ba8e75a15b46318d-f2aac0a1b2f5156ee688"}]},
     {"stage":"chromium","file":"battle-persistence.spec.ts","title":"testing routes: fresh play never accesses unavailable saved games","cases":[{"profile":"desktop","id":"8352ba8e75a15b46318d-89e4f21bc61dec33eace"},{"profile":"mobile-portrait","id":"8352ba8e75a15b46318d-e5a0e12b97db9e6d5699"},{"profile":"mobile-landscape","id":"8352ba8e75a15b46318d-12565df00087e1f9d9b7"}]},
+    {"stage":"chromium","file":"battle-persistence.spec.ts","title":"radial testing routes preserve saved games through actions restart reload and Back","cases":[{"profile":"desktop","id":"8352ba8e75a15b46318d-bde9768707919ac7ac6c"},{"profile":"mobile-portrait","id":"8352ba8e75a15b46318d-e964293fc2bcf4054043"},{"profile":"mobile-landscape","id":"8352ba8e75a15b46318d-96257814a15ed36d62d1"}]},
+    {"stage":"chromium","file":"battle-radial.spec.ts","title":"radial menu battle preserves its accepted state through Continue","cases":[{"profile":"desktop","id":"774245925642bfdca60a-491ecdcd76f45f3edea9"},{"profile":"mobile-portrait","id":"774245925642bfdca60a-f719cf617e9c8c094c3a"},{"profile":"mobile-landscape","id":"774245925642bfdca60a-c9125d3b9d0f006b7be9"}]},
     {"stage":"chromium","file":"dungeon.spec.ts","title":"menu dungeon restores Mage XP 0, caster level and exact active boundary","cases":[{"profile":"desktop","id":"e0f8639c387951b6a797-e58a6b62c5d3a2f70c10"},{"profile":"mobile-portrait","id":"e0f8639c387951b6a797-3c8e370c7ad98f8c49b5"},{"profile":"mobile-landscape","id":"e0f8639c387951b6a797-a0524d7298a17fccdcdf"}]},
     {"stage":"chromium","file":"dungeon.spec.ts","title":"menu dungeon restores Mage XP 60, caster level and exact active boundary","cases":[{"profile":"desktop","id":"e0f8639c387951b6a797-a2f1eb85738522835cdd"},{"profile":"mobile-portrait","id":"e0f8639c387951b6a797-85c35d75d238cc4479ef"},{"profile":"mobile-landscape","id":"e0f8639c387951b6a797-06dc6217d6876c247d82"}]},
     {"stage":"chromium","file":"dungeon.spec.ts","title":"menu dungeon restores Mage XP 180, caster level and exact active boundary","cases":[{"profile":"desktop","id":"e0f8639c387951b6a797-5d573a8efe569551fa49"},{"profile":"mobile-portrait","id":"e0f8639c387951b6a797-bebe573d8a4ba0a06fa7"},{"profile":"mobile-landscape","id":"e0f8639c387951b6a797-15dfee60a82f2616b7fd"}]},
@@ -131,6 +135,8 @@
     {"stage":"webkit-acceptance","file":"battle-persistence.spec.ts","title":"testing routes: fresh play never accesses corrupt saved games","cases":[{"profile":"acceptance-webkit-portrait","id":"8352ba8e75a15b46318d-574a0d5d23ac73bfe661"},{"profile":"acceptance-webkit-landscape","id":"8352ba8e75a15b46318d-6afa3babbe4125bbb6ab"}]},
     {"stage":"webkit-acceptance","file":"battle-persistence.spec.ts","title":"testing routes: fresh play never accesses backup-only saved games","cases":[{"profile":"acceptance-webkit-portrait","id":"8352ba8e75a15b46318d-536b80aa955d95ae67f9"},{"profile":"acceptance-webkit-landscape","id":"8352ba8e75a15b46318d-38d0c8822a68708b43f3"}]},
     {"stage":"webkit-acceptance","file":"battle-persistence.spec.ts","title":"testing routes: fresh play never accesses unavailable saved games","cases":[{"profile":"acceptance-webkit-portrait","id":"8352ba8e75a15b46318d-c261f8c7f2279a93cf91"},{"profile":"acceptance-webkit-landscape","id":"8352ba8e75a15b46318d-2e93b02f40ddb18d936a"}]},
+    {"stage":"webkit-acceptance","file":"battle-persistence.spec.ts","title":"radial testing routes preserve saved games through actions restart reload and Back","cases":[{"profile":"acceptance-webkit-portrait","id":"8352ba8e75a15b46318d-483a6b1d84909b6a0e01"},{"profile":"acceptance-webkit-landscape","id":"8352ba8e75a15b46318d-4de37c11ff58c383b94c"}]},
+    {"stage":"webkit-acceptance","file":"battle-radial.spec.ts","title":"radial menu battle preserves its accepted state through Continue","cases":[{"profile":"acceptance-webkit-portrait","id":"774245925642bfdca60a-80986218340928594478"},{"profile":"acceptance-webkit-landscape","id":"774245925642bfdca60a-72b0442b0d9b385cbd78"}]},
     {"stage":"webkit-acceptance","file":"main-menu.spec.ts","title":"main menu: reward claim advances exactly once and survives pending/claimed reload","cases":[{"profile":"acceptance-webkit-portrait","id":"6584249e185c6ba36dd3-61e5c0a19ba7755909b6"},{"profile":"acceptance-webkit-landscape","id":"6584249e185c6ba36dd3-fa03c4f0e58a3e2d6f1f"}]},
     {"stage":"webkit-acceptance","file":"main-menu.spec.ts","title":"main menu: real item use, equip and unequip preserve ownership/stats across reload","cases":[{"profile":"acceptance-webkit-portrait","id":"6584249e185c6ba36dd3-0eb6b26d92bf708ec4cd"},{"profile":"acceptance-webkit-landscape","id":"6584249e185c6ba36dd3-f093b05391946d954461"}]},
     {"stage":"webkit-acceptance","file":"main-menu.spec.ts","title":"main menu: corruption preserves bytes, exports raw data and requires reviewed removal before saving","cases":[{"profile":"acceptance-webkit-portrait","id":"6584249e185c6ba36dd3-85ce43e4518bf0a57db3"},{"profile":"acceptance-webkit-landscape","id":"6584249e185c6ba36dd3-544203bebe03f828f430"}]},

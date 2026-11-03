@@ -1,9 +1,11 @@
+import { test as baseTest } from '@playwright/test';
+import { walkDungeon } from './helpers/dungeonTraversal';
 import { expect, test, type Page, installRailControls } from './helpers/forceRailControls';
 import { readFileSync } from 'node:fs';
 import { BATTLE_STORAGE_KEYS as keys } from '../src/persistence/battleStorage';
 import { decodeBattleSave, encodeBattleSave } from '../src/domain/saveEnvelope';
 import { standaloneCatalog as catalog } from './helpers/playerPolicy';
-import { confirmRestart, playCommand, playerDecision, readSession } from './helpers/battlePolicy';
+import { confirmRestart, playCommand, playerDecision, readSession, combatSkin } from './helpers/battlePolicy';
 import { BattleSession } from '../src/app/BattleSession';
 import { previewMovement } from '../src/domain/grid';
 import { RULE_BOUNDS } from '../src/domain/constants';
@@ -482,3 +484,64 @@ test.describe('browser history with BFCache enabled',()=>{
     expect(errors).toEqual([]);
   });
 });
+
+// Exercise Radial inside this file's existing real BFCache harness.
+const radialTest=baseTest.extend({context:async({context},use)=>{
+  await context.addInitScript(()=>{
+    (globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';
+    try {localStorage.setItem('tactics-guru:combat-controls','radial');} catch { /* private mode */ }
+  });
+  await use(context);
+}});
+radialTest('radial testing routes preserve saved games through actions restart reload and Back',async({page,isMobile})=>{
+    const families={battle:keys,run:RUN_STORAGE_KEYS,dungeon:DUNGEON_KEYS};
+    const values:Record<string,string>={'radial-unrelated':'preserve'};
+    for(const mode of ['battle','run','dungeon'] as const)for(const slot of ['primary','backup'] as const)values[families[mode][slot]]=menuFixture(mode);
+    await page.goto('./');
+    await page.evaluate(values=>{for(const [key,text]of Object.entries(values))localStorage.setItem(key,text);sessionStorage.setItem('tactics-guru:menu-new-dungeon-review','radial review');},values);
+    const progressKeys=Object.values(families).flatMap(slots=>Object.values(slots));
+    const expected={...values,'tactics-guru:menu-new-dungeon-review':'radial review'};
+    await page.addInitScript(progressKeys=>{
+      const local=window.localStorage,session=window.sessionStorage;
+      const get=Storage.prototype.getItem,set=Storage.prototype.setItem,remove=Storage.prototype.removeItem,clear=Storage.prototype.clear;
+      const watched=new Set([...progressKeys,'tactics-guru:menu-new-dungeon-review']),calls:string[]=[];
+      window.testingSaveAudit={calls,snapshot:()=>Object.fromEntries([...progressKeys,'radial-unrelated'].map(key=>[key,get.call(local,key)]).concat([['tactics-guru:menu-new-dungeon-review',get.call(session,'tactics-guru:menu-new-dungeon-review')]]))};
+      Storage.prototype.getItem=function(key){if(watched.has(String(key)))calls.push(`read:${key}`);return get.call(this,key);};
+      Storage.prototype.setItem=function(key,value){if(watched.has(String(key)))calls.push(`write:${key}`);set.call(this,key,value);};
+      Storage.prototype.removeItem=function(key){if(watched.has(String(key)))calls.push(`remove:${key}`);remove.call(this,key);};
+      Storage.prototype.clear=function(){calls.push('clear');clear.call(this);};
+      const draw=crypto.getRandomValues.bind(crypto);
+      crypto.getRandomValues=((array:ArrayBufferView<ArrayBuffer>)=>{if(array instanceof Uint32Array&&array.length===1){array[0]=28;return array;}return draw(array);}) as typeof crypto.getRandomValues;
+    },progressKeys);
+    const audit=async()=>{
+      expect(await page.evaluate(()=>window.testingSaveAudit.calls)).toEqual([]);
+      expect(await page.evaluate(()=>window.testingSaveAudit.snapshot())).toEqual(expected);
+      await expect(page.getByRole('button',{name:/Continue saved|Save recovery|Play unsaved/})).toHaveCount(0);
+    };
+    for(const mode of ['battle','run','dungeon'] as const){
+      await page.goto(`./${mode}`);
+      if(mode==='run'){await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();}
+      if(mode==='dungeon'){await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await walkDungeon(page,undefined,isMobile?'touch':'keyboard');}
+      await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await expect.poll(()=>combatSkin(page)).toBe('radial');
+      const fresh=(await readSession(page)).state;
+      await page.getByRole('button',{name:'End turn',exact:true}).click();
+      await expect.poll(async()=>(await readSession(page)).state.commandCount).toBeGreaterThan(fresh.commandCount);
+      await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await audit();
+      if(mode==='battle'){
+        await page.goto('./map');await page.goBack({waitUntil:'commit'});
+        await expect.poll(async()=>(await readSession(page))?.state).toEqual(fresh);await audit();
+      }
+      await page.locator('#fit-restart').click();
+      if(mode==='battle')await expect.poll(async()=>(await readSession(page))?.state.seed).toBe(2);
+      else await expect(page.locator(mode==='run'?'#run-start-encounter':'#dungeon-map')).toBeVisible();
+      await audit();await page.reload();
+      if(mode==='battle'){await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect((await readSession(page)).state).toEqual(fresh);}
+      else await expect(mode==='run'?page.locator('#run-start'):page.getByRole('button',{name:'Start new dungeon',exact:true})).toBeVisible();
+      await audit();
+    }
+    await page.getByRole('link',{name:'Main menu',exact:true}).click();
+    expect(await page.evaluate(()=>window.testingSaveAudit.snapshot())).toEqual(expected);
+    await page.getByRole('button',{name:'Continue',exact:true}).click();await page.getByRole('dialog').getByRole('link',{name:'Dungeon',exact:true}).click();
+    await expect(page.locator('#dungeon-screen')).toContainText('Floor 1');
+    expect(await page.evaluate(()=>window.testingSaveAudit.snapshot())).toEqual(expected);
+  });

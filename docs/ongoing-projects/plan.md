@@ -12,11 +12,35 @@ resolved, and both TypeScript scopes pass. #276's literal merge tree with curren
 main is clean; its focused one-line change needs no merge commit. #274 remains unmerged.
 
 **New integration work is required before completion.** The new radial browser suite
-contains a direct-route Continue assumption, and the new default mobile controls need
-save-isolation and persistent-menu proof. Audit/reconcile these consumers and selection
-against literal current main, retain both Rail/Radial behavior, and qualify the combined
-tree locally. Do not wait for CI. Preserve old-source evidence with its actual inputs;
-it is not final proof of the new shared controls.
+contained a direct-route Continue assumption; it now retains preference assertions while
+checking a fresh testing battle. New radial cases prove all three testing game owners
+preserve primary/backup/handoff bytes through actions, restart, reload and actual Back,
+and a menu-launched radial battle preserves its accepted state through Continue.
+These cases and the preference repair pass **9/9 Chromium** (`run-BD716F`, `run-N7pPI6`)
+and **4/4 WebKit** (`run-jV4sa0`), one worker/zero retries. Current full units pass
+**1,148/1,148**, both TypeScript scopes pass, both root/prefix build integrations pass,
+and all **28** batch/selection contracts pass. Logs are `tmp/issue-259/mobile-integration-*`.
+
+Literal-main capture `selection-main-3333281.json` and current capture
+`selection-mobile-integration.json` reconcile **1,665 retained**, **102 mapped** and
+**75 added** stage/profile IDs in the refreshed [ledger](../qa/issue-259/coverage-map.json).
+The [prior ledger](../qa/issue-259/coverage-map-pre-mobile.json) is preserved unchanged.
+Current routine discovery: Chromium **1,006**, fixtures **93**, placement **6**, WebKit
+acceptance **182**, exploration **120**, health **25**, telemetry **36 per mode**,
+assets **78 per mode**; dedicated encounters/items/abilities/smoke are **24/9/60/2**.
+The nine-batch partition, 23 approved reductions and both nine-case extended matrices
+remain intact. No original execution was silently removed.
+
+Remaining integration qualification runs locally on frozen inputs. It covers both control
+skins and all game owners: menu/safety, root/prefix isolation, radial interactions,
+legal run outcomes/reloads, dungeon/lifecycle and both extended matrices, dev fixtures,
+proof input, health, configured telemetry, asset audio/collector modes and a fresh
+performance capture. Reuse is limited by dependency comparison: save codecs, domain,
+content, storage owners, recovery UI, menu-return guards and their pure fixtures are
+unchanged from the earlier tested candidate. The merged `BattleScene.begin` input/render
+implementation is identical to main; the feature changes only admission/session setup.
+Unchanged map/placement and noninteractive visual/resource checks retain their prior
+evidence. Preserve all original failures and incomplete runs; do not wait for CI.
 
 The prior local sequence completed 11 WebKit repairs and all 9 Chromium extended
 journeys. Its old-source WebKit extended stage was deliberately interrupted before
