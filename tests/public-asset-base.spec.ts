@@ -101,6 +101,15 @@ for (const scene of ['battle', 'proof', 'content-smoke'] as const) {
 }
 
 for (const route of ['battle', 'run', 'dungeon']) for (const backend of ['Web Audio', 'HTML5']) test(`${backend} ${route} audio loads at the base and plays a committed move`, async ({ page }) => {
+  // This workload qualifies audio/base delivery, not random-layout pursuit. Use
+  // the existing legal Fighter journey's initial floor for deterministic travel.
+  if(route==='dungeon')await page.addInitScript(()=>{
+    const draw=crypto.getRandomValues.bind(crypto);
+    crypto.getRandomValues=((array:ArrayBufferView<ArrayBuffer>)=>{
+      if(array instanceof Uint32Array&&array.length===1){array[0]=28;return array;}
+      return draw(array);
+    }) as typeof crypto.getRandomValues;
+  });
   if (backend === 'HTML5') await page.addInitScript(() => {
     Object.defineProperty(window, 'AudioContext', { value: undefined });
     Object.defineProperty(window, 'webkitAudioContext', { value: undefined });

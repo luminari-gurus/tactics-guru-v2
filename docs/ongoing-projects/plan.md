@@ -2,6 +2,44 @@
 
 Date: 2026-11-03 (Asia/Jerusalem). Status: root-entry PR published; transient-owner/UI/coverage chunk in progress.
 
+### Current qualification checkpoint
+
+Implementation is published in #275/#277; current feature branch head is `aca9709`.
+Independent Windows contract repair #276 is mirrored as a separate dependency commit.
+Routine self-hosted run **41647380978** is executing frozen `04cf227` on
+`unraid-tactics-01`. Current queued supplemental run is **41651717195**, qualification
+branch `c28fa7a`, asserting source equivalence to `aca9709` except its temporary
+workflow. It covers changed telemetry, root/prefix isolation/history and both extended
+engines. Earlier queued runs 41647577545/41648868922 were cancelled before execution.
+
+Root and prefix isolation/history are **50/50 passing** across Chromium/WebKit;
+configured production/development telemetry are **72/72 passing**. The local four-mode
+asset matrix is complete but not clean: root preview 78 passed; root dev 74 passed,
+3 production-only skips, 1 initial navigation timeout; prefix preview 77 passed,
+1 random-layout navigator cycle; prefix dev 74 passed, 3 production-only skips,
+1 random-layout navigator cycle. Logs/results are in `tmp/issue-259/assets-*` and
+`assets-matrix-results.json`; receipts are `run-MuzPXV`, `run-fDSIuw`, `run-Ws4PGN`,
+`run-rEFYv8` respectively. No failure was erased or retried automatically.
+
+The two random-layout failures reached the existing test navigator's 400-step limit.
+Only the asset audio workload is pinned to legal seed 28 in
+`tests/public-asset-base.spec.ts`; its purpose is audio/base delivery, while random
+new-layout proof remains separate. Both backends/all profiles/four modes pass
+`-g 'dungeon audio loads'` (24 cases): `run-txgI9W`, `run-pZttSi`, `run-etW6zc`,
+`run-2dUq2y`, 6/6 each, zero skips/flakes/retries. All four asset discoveries still
+select the same 78 IDs/profiles. This is scoped repair evidence; the original failed
+full-file mode runs remain failed. No draft #274 code was cherry-picked.
+The first dev navigation was traced separately: the unchanged collector case passed
+in 14.3s; the trace records a 6.5s dev-server wait for preferences CSS before Phaser
+startup. It does not establish the timeout's cause or a product fix. Diagnostic trace
+is `verification-receipts/issue-259-dev-load-diagnostic`; it is not performance evidence.
+
+Next: finish the scoped audio checks, publish that fixture repair, align queued
+qualification, inspect final self-hosted artifacts, account for supplements and prior
+failures, then clean the trigger and finalize PR #277. The ignored local scripts and
+receipts support continuation. `%TEMP%/tactics-259-baseline` now hosts the temporary
+qualification branch; its current head is not the earlier literal-parent comparison.
+
 - Issue: [#259](https://github.com/luminari-gurus/tactics-guru-v2/issues/259).
 - Owner: `moshehbenavraham`; [pickup comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/259#issuecomment-6603160055).
 - Entry branch / PR: [`work/issue-259-testing-route-save-isolation`](https://github.com/luminari-gurus/tactics-guru-v2/tree/work/issue-259-testing-route-save-isolation), [#275](https://github.com/luminari-gurus/tactics-guru-v2/pull/275), pushed `ffbdde0`.
