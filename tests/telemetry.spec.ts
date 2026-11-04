@@ -60,7 +60,7 @@ test('mocked ingestion sees accepted run, rewards, completion and continue witho
       }
       for (const hero of (await snapshot()).items.run.party) {
         const now = await snapshot();
-        if (hero.hp === 0 || hero.hp === hero.maxHp || !now.items.ownership.consumables.length) continue;
+        if (hero.hp === 0 || hero.hp === hero.maxHp || !now.items.ownership.consumables.some((stack: { itemId: string }) => stack.itemId === 'item:healing_draught')) continue;
         await page.locator('[id="target-item:healing_draught"]').selectOption(hero.heroId);
         await page.getByRole('button', { name: 'Use Healing Draught', exact: true }).click(); await page.locator('#item-confirm').click();
       }
