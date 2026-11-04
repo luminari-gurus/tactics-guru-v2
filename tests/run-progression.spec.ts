@@ -130,6 +130,7 @@ test('testing routes: an earned combat draught stays in the transient authored r
  await expect(page.getByRole('button',{name:'Claim Healing Draught',exact:true})).toBeVisible();
  await prepare(page);
  await page.locator('#run-start-encounter').click();
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  expect(await fight(page,false,true)).toBe(true);
  expect((await snapshot(page)).items.ownership.consumables).toEqual([]);
  const attempts=()=>page.evaluate(()=>(window as unknown as Record<string, unknown>).__draughtSaveAttempts);
