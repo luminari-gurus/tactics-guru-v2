@@ -279,10 +279,13 @@ export function acceptDungeonBattle(s: DungeonState, battle: BattleState): Dunge
   const awarded = party.map(h => awardHero(h, HERO_PROGRESSION.awards[f.descriptor.encounters[selected].selection.kind], dungeonContent.catalog));
   return advance(s, { floors, party: awarded, phase: f.completed === 2 ? 'ready' : 'reward', offer: f.completed === 2 ? null : dungeonOffer(next), activeBattle: null, battlefield: null });
 }
-export type DungeonItemCommand = ItemCommand | (ReturnType<typeof dungeonBoundary> & { readonly type: 'discardEquipment'; readonly instanceId: string });
+export type DungeonItemCommand = ItemCommand | (ReturnType<typeof dungeonBoundary> & (
+  { readonly type: 'discardEquipment'; readonly instanceId: string } |
+  { readonly type: 'declineReward'; readonly offerId: string }
+));
 export function dungeonItem(s: DungeonState, command: DungeonItemCommand): DungeonResult {
   const keys = ['type','runId','revision','itemRevision','encounterId','boundaryId'];
-  if (!hasShape(command, [...keys,'instanceId']) && !hasShape(command, [...keys,'offerId','itemId']) && !hasShape(command, [...keys,'itemId','heroId']) && !hasShape(command, [...keys,'instanceId','heroId','slot'])) return fail('invalidCommand');
+  if (!hasShape(command, [...keys,'instanceId']) && !hasShape(command, [...keys,'offerId','itemId']) && !hasShape(command, [...keys,'offerId']) && !hasShape(command, [...keys,'itemId','heroId']) && !hasShape(command, [...keys,'instanceId','heroId','slot'])) return fail('invalidCommand');
   const b = dungeonBoundary(s);
   if (Object.entries(b).some(([key, value]) => command[key as keyof typeof b] !== value)) return fail('staleBoundary');
   if (s.phase !== 'ready' && s.phase !== 'reward') return fail('wrongContext');
@@ -294,15 +297,20 @@ export function dungeonItem(s: DungeonState, command: DungeonItemCommand): Dunge
       assignments: s.ownership.assignments.filter(assignment => assignment.instanceId !== command.instanceId),
     } });
   }
-  if (command.type === 'claimReward') {
-    if (!s.offer || command.offerId !== s.offer.id) return fail('invalidOffer');
-    const ordinal = s.offer.options.findIndex(o => o.itemId === command.itemId);
-    if (ordinal < 0) return fail('invalidItem');
-    const granted = grantOwnedItem(s.ownership, dungeonContent.items[command.itemId], `${s.offer.id}:option:${ordinal}`);
-    if (!granted) return fail('capacity');
+  if (command.type === 'claimReward' || command.type === 'declineReward') {
+    if (!hasShape(command, command.type === 'claimReward' ? [...keys,'offerId','itemId'] : [...keys,'offerId'])) return fail('invalidCommand');
+    if (s.phase !== 'reward' || !s.offer || command.offerId !== s.offer.id) return fail('invalidOffer');
+    let ownership = s.ownership;
+    if (command.type === 'claimReward') {
+      const ordinal = s.offer.options.findIndex(o => o.itemId === command.itemId);
+      if (ordinal < 0) return fail('invalidItem');
+      const granted = grantOwnedItem(ownership, dungeonContent.items[command.itemId], `${s.offer.id}:option:${ordinal}`);
+      if (!granted) return fail('capacity');
+      ownership = granted;
+    }
     const floors = [...s.floors], f = currentFloor(s);
     if (f.exploration.version === 'exploration-v2') floors[s.depth-1] = {...f,exploration:{...f.exploration,active:null}};
-    return advance(s, { floors, ownership: granted, phase: 'ready', offer: null });
+    return advance(s, { floors, ownership, phase: 'ready', offer: null });
   }
   const result = changePreparation(s.ownership, s.party, { ...command }, dungeonContent.catalog, dungeonContent.items);
   return result.ok ? advance(s, { ownership: result.ownership, party: result.party }) : result;
