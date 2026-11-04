@@ -270,6 +270,40 @@ async function confirmMenuItem(page:Page) {await page.locator('#item-confirm').c
 async function activateMenuItem(page:Page,name:string,touch:boolean) {
  const button=page.getByRole('button',{name,exact:true});if(touch)await button.tap();else await button.click();
 }
+test('main menu: a stale run tab waits for the save lock and preserves both newer slots', async ({page,context,isMobile}) => {
+  await openMenuRunItems(page,preparedSnapshot());
+  const stale=await context.newPage();
+  await stale.goto('./?game=run');
+  await stale.locator('#run-continue').click();
+  const use=async (tab:Page, hero:string)=>{
+    await tab.getByRole('combobox',{name:'Healing Draught target'}).selectOption(hero);
+    await activateMenuItem(tab,'Use Healing Draught',isMobile);
+    await confirmMenuItem(tab);
+  };
+  await use(page,'fighter');
+  await expect(page.locator('#run-item-status')).toHaveText('Run saved on this device');
+  const slots=()=>page.evaluate(keys=>[localStorage.getItem(keys.primary),localStorage.getItem(keys.backup)],RUN_STORAGE_KEYS);
+  const saved=await slots();
+  await page.evaluate(key=>{
+    void navigator.locks.request(key,()=>new Promise<void>(resolve=>{
+      window.addEventListener('release-run-test-lock',()=>resolve(),{once:true});
+      document.body.dataset.testRunLock='held';
+    }));
+  },RUN_STORAGE_KEYS.primary);
+  await expect(page.locator('body')).toHaveAttribute('data-test-run-lock','held');
+  try {
+    await use(stale,'ranger');
+    await expect.poll(()=>stale.evaluate(async key=>(await navigator.locks.query()).pending?.some(lock=>lock.name===key),RUN_STORAGE_KEYS.primary)).toBe(true);
+    expect(await slots()).toEqual(saved);
+  } finally { await page.evaluate(()=>window.dispatchEvent(new Event('release-run-test-lock'))); }
+  await expect(stale.locator('#run-item-status')).toContainText('another tab changed the run save');
+  expect(await slots()).toEqual(saved);
+  await stale.getByRole('button',{name:'Save recovery',exact:true}).click();
+  await expect(stale.getByRole('button',{name:'Export unsaved run'})).toBeVisible();
+  await stale.getByRole('dialog').getByRole('button',{name:'Continue saved run'}).click();
+  expect(await menuItemReport(stale)).toEqual(await menuItemReport(page));
+  await stale.close();
+});
 test('main menu: reward claim advances exactly once and survives pending/claimed reload', async ({ page }, info) => {
   const seed = Array.from({ length: 100 }, (_, i) => i).find(s => rewardSnapshot(s).items.offer!.options.some(o => o.itemId === 'item:healing_draught'))!;
   await openMenuRunItems(page,rewardSnapshot(seed)); const pending = (await menuItemReport(page)).snapshot;

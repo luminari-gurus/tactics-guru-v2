@@ -13,11 +13,11 @@ import { mountRunItems } from '../ui/runItems';
 import { BattleScene, type RunBattleHost } from '../phaser/BattleScene';
 import { createGame } from '../phaser/start';
 import { diagnosticsSnapshot } from '../diagnostics/browser';
-import { createRunStorage, type RunLoadResult } from '../persistence/runStorage';
+import { createRunStorage, serializeBrowserRunWrite, type RunLoadResult } from '../persistence/runStorage';
 import { mountBattleLayout } from '../ui/battleLayout';
 
 const storage=appEntry.persistent?createRunStorage(context):null,initial=storage?.load();
-const controller = new RunItemSession(initial?.ok && initial.selected ? initial.selected.state : freshRunSnapshot(crypto.randomUUID(), 13, context), context,storage);
+const controller = new RunItemSession(initial?.ok && initial.selected ? initial.selected.state : freshRunSnapshot(crypto.randomUUID(), 13, context), context,storage,serializeBrowserRunWrite);
 const container = document.querySelector<HTMLElement>('#game')!;
 const panel = document.querySelector<HTMLElement>('#fit-panel')!;
 const status = document.querySelector<HTMLElement>('#fit-status')!;
@@ -72,9 +72,11 @@ function startBattle() {
  evidence();
 }
 function replace(review:RunLoadResult) {
- if(controller.replace(review,crypto.randomUUID(),(controller.snapshot.items.run.seed+1)>>>0)) {
-  startup=false;stopBattle();render();screen.querySelector<HTMLElement>('h1')?.focus();
- } else {if(!playing)render();showRecovery();}
+ controller.queueWrite(()=>{
+  if(controller.replace(review,crypto.randomUUID(),(controller.snapshot.items.run.seed+1)>>>0)) {
+   startup=false;stopBattle();render();screen.querySelector<HTMLElement>('h1')?.focus();
+  } else {if(!playing)render();showRecovery();}
+ });
 }
 function requestNew() {
  if(!live || dialogs.open)return;
@@ -99,6 +101,13 @@ function showRecovery() {
   [...screen.querySelectorAll<HTMLButtonElement>('button')].find(button=>button.textContent==='Save recovery')?.focus();
  };
  const review=controller.inspect(),choices:DialogChoice[]=[];
+ if(!startup && controller.hasUnsavedProgress)choices.push({id:'run-export-current',label:'Export unsaved run',run:()=>{
+  const encoded=controller.exportCurrent();
+  if(!encoded.ok)return;
+  const url=URL.createObjectURL(new Blob([encoded.text],{type:'application/json'}));
+  const link=document.createElement('a');link.href=url;link.download='tactics-guru-run-unsaved.json';
+  link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);closeRecovery();
+ }});
  for(const [index,{slot,text}] of controller.recoveryTexts(review).entries()) {
   choices.push({id:`run-export-${slot}-${index}`,label:`Export ${slot} save`,run:()=>{
    const url=URL.createObjectURL(new Blob([JSON.stringify({slot,text})],{type:'application/json'}));
@@ -106,13 +115,13 @@ function showRecovery() {
   }});
   if(review.ok && 'text' in review.inspection[slot] && review.inspection[slot].text===text)choices.push({id:`run-remove-${slot}`,label:`Remove ${slot} save`,run:()=>{
    dialogs.showChoices('Remove reviewed save?',`Export first if needed. Remove the reviewed ${slot} bytes?`,[
-    {id:'run-confirm-remove',label:'Remove reviewed save',run:()=>{controller.remove(slot,review);showRecovery();}},
+    {id:'run-confirm-remove',label:'Remove reviewed save',run:()=>controller.queueWrite(()=>{controller.remove(slot,review);showRecovery();})},
     {id:'run-cancel-remove',label:'Cancel',run:()=>showRecovery()},
    ]);
   }});
  }
- if((startup || controller.isUnsavedOnly) && review.ok && review.selected)choices.push({id:'run-recover-continue',label:'Continue saved run',run:()=>continueRun(review)});
- choices.push({id:'run-retry-save',label:startup?'Retry storage':'Retry saving',run:()=>{if(!startup)controller.save();showRecovery();}},
+ if((startup || controller.isUnsavedOnly || controller.hasSaveConflict) && review.ok && review.selected)choices.push({id:'run-recover-continue',label:'Continue saved run',run:()=>continueRun(review)});
+ choices.push({id:'run-retry-save',label:startup?'Retry storage':'Retry saving',run:()=>{if(startup)showRecovery();else controller.requestSave(showRecovery);}},
   {id:'run-close-recovery',label:'Close',run:closeRecovery});
  const message=review.ok?`primary: ${review.inspection.primary.status}. backup: ${review.inspection.backup.status}. ${controller.status}`:`Storage ${review.kind}. Your run can continue unsaved.`;
  dialogs.showChoices('Run save recovery',message,choices,closeRecovery);

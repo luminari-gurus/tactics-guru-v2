@@ -27,6 +27,7 @@ export type RunLoadResult = StorageFailure | {
   readonly selected: { readonly slot: RunStorageSlot; readonly state: RunSnapshot } | null;
 };
 export type RunWriteResult = { readonly ok: true } | SaveFailure | StorageFailure
+  | { readonly ok: false; readonly reason: 'changed' }
   | { readonly ok: false; readonly reason: 'recoveryRequired'; readonly inspection: RunStorageInspection };
 export type RunRemoveResult = { readonly ok: true }
   | { readonly ok: false; readonly reason: 'invalidSlot' }
@@ -55,6 +56,7 @@ function attempt<T>(operation: StorageFailure['operation'], slot: RunStorageSlot
 
 /** Storage effects only: no session hydration, autosave, or automatic repair. */
 export function createRunStorage(context: RunSaveContext, provider: RunStorageProvider = browserStorage) {
+  let lastSavedText: string | undefined;
   function acquire() {
     const result = attempt('acquire', undefined, provider);
     if (!result.ok) return result;
@@ -84,7 +86,7 @@ export function createRunStorage(context: RunSaveContext, provider: RunStoragePr
     return { ok: true, inspection, selected };
   }
 
-  function save(state: unknown): RunWriteResult {
+  function save(state: unknown, expectedPrimary?: string | null): RunWriteResult {
     const encoded = encodeRunSave(state, context);
     if (!encoded.ok) return encoded;
     const storage = acquire();
@@ -97,6 +99,8 @@ export function createRunStorage(context: RunSaveContext, provider: RunStoragePr
     if (inspection.primary.status === 'invalid' || inspection.backup.status === 'invalid') {
       return { ok: false, reason: 'recoveryRequired', inspection };
     }
+    if (expectedPrimary !== undefined && inspection.primary.status !== 'unavailable' && inspection.primary.text !== expectedPrimary)
+      return {ok:false,reason:'changed'};
     // A known primary is the current recovery point. A sole backup is never replaced.
     // First save seeds a recovery point before attempting primary publication.
     let backupText = inspection.primary.status === 'valid' ? inspection.primary.text
@@ -123,6 +127,7 @@ export function createRunStorage(context: RunSaveContext, provider: RunStoragePr
       if (!backup.ok) return backup;
     }
     const primary = attempt('write', 'primary', () => storage.value.setItem(RUN_STORAGE_KEYS.primary, encoded.text));
+    if (primary.ok) lastSavedText = encoded.text;
     return primary.ok ? { ok: true } : primary;
   }
 
@@ -140,5 +145,14 @@ export function createRunStorage(context: RunSaveContext, provider: RunStoragePr
     return removed.ok ? { ok: true } : { ...removed, expectedText };
   }
 
-  return { load, save, removeSlot };
+  return { load, save, removeSlot, lastSavedText: () => lastSavedText };
+}
+
+/** Every browser run mutation shares this origin-scoped lock, including recovery and replacement. */
+export function serializeBrowserRunWrite(task: () => void, unavailable: () => void) {
+  try {
+    const locks = navigator.locks;
+    if (!locks) { unavailable(); return; }
+    void locks.request(RUN_STORAGE_KEYS.primary, task).catch(unavailable);
+  } catch { unavailable(); }
 }
