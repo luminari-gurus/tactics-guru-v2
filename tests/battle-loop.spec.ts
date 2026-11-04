@@ -37,7 +37,8 @@ test('enemy danger inspection toggles without changing battle state or saves', a
 
 test('undo and compound plan use the live HUD without bypassing review',async({page})=>{
   test.setTimeout(90000);await page.goto('./battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-  const activate=async(selector:string)=>{const element=page.locator(selector);if(await page.evaluate(()=>navigator.maxTouchPoints>0))await element.tap();else {await element.focus();await element.press('Enter');}};
+  const touch=test.info().project.use.hasTouch===true;
+  const activate=async(selector:string)=>{const element=page.locator(selector);if(touch)await element.tap();else {await element.focus();await element.press('Enter');}};
   const initial=await session(page),actor=initial.state.units.find(u=>u.id===initial.state.initiative[initial.state.activeIndex])!;
   const reach=previewMovement(initial.state,actor.id,catalog);if(!reach.ok)throw Error(reach.reason);
   const cell=reach.cells.find(c=>c.cost>0)!.cell;
@@ -71,7 +72,7 @@ test('undo and compound plan use the live HUD without bypassing review',async({p
   expect((await session(page)).state).toEqual(before.state);
   await activate('#battle-party');await activate('#inspection-close');
   await expect(page.locator('#battle-review')).toBeEnabled();
-  if(!(await page.evaluate(()=>navigator.maxTouchPoints>0))){
+  if(!touch){
     const viewport=page.viewportSize()!;await page.setViewportSize({width:320,height:700});
     await expect(page.locator('#battle-review')).toBeEnabled();await page.setViewportSize(viewport);
   }
