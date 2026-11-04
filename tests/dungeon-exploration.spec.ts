@@ -429,11 +429,13 @@ test('maximum-size saved floor renders and accepts a step after reload', async (
  await page.goto('./?game=dungeon'); await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
  await page.reload(); await continueSavedDungeon(page);
  const map=page.locator('#dungeon-map'); await expect(map.locator('[data-cell]')).toHaveCount(36*36);
+ await map.evaluate(grid=>{const state={grid,removed:false};(window as unknown as {__floorMount:typeof state}).__floorMount=state;new MutationObserver(records=>{if(records.some(record=>[...record.removedNodes].some(node=>node===grid || node.contains(grid))))state.removed=true;}).observe(document.querySelector('#dungeon-screen')!,{childList:true,subtree:true});});
  const before=await dungeonSnapshot(page), floor=before.floors[4], layout=floorMap(floor.descriptor);
  const destination=neighbors(floor.position,layout.width).find(n=>layout.cells[n]&&!floor.exploration.pois.some(p=>poiCell(p,layout.width)===n));
  if(destination===undefined) throw Error('No safe step on maximum floor');
  await walkDungeon(page,destination,isMobile?'touch':'keyboard');
  const after=await dungeonSnapshot(page);expect(after.floors[4].position).toBe(destination);
+ expect(await page.evaluate(()=>(window as unknown as {__floorMount:{removed:boolean}}).__floorMount.removed)).toBe(false);
  await page.reload(); await continueSavedDungeon(page); expect(await dungeonSnapshot(page)).toEqual(after);
 });
 

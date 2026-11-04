@@ -97,7 +97,11 @@ export class DungeonMap {
     const list=el('ul');list.setAttribute('aria-label','Discovered places');
     const entries=[...(showUpstairs?[{id:'stairs-up',cell:f.descriptor.upstairs,label:'Upstairs',status:'Available'}]:[]),...f.exploration.pois.map(p=>({id:p.id,cell:poiCell(p,map.width),label:`${dungeonEncounterLabel(s,p.encounterSlot)} · ${biome.label} · Floor ${s.depth}`,status:cleared.includes(p.encounterSlot)?'Cleared':s.phase==='ready'?'Available':s.phase==='reward'?'Reward pending':s.phase==='battle'?'In battle':'Unavailable after defeat'})),...(showDownstairs?[{id:'stairs-down',cell:f.descriptor.downstairs,label:'Downstairs',status:'Unlocked'}]:[])];
     for(const p of entries)if(f.exploration.revealed.includes(p.cell)){const row=el('li',`${p.label} · row ${Math.floor(p.cell/map.width)+1}, column ${p.cell%map.width+1} · ${p.status}${f.exploration.visited.includes(p.cell)?' · Visited':''}`);row.dataset.poiId=p.id;list.append(row);}
-    this.root.replaceChildren(heading,label,el('p','● Player · M encounter (including guardian) · ✓ cleared · ↑ upstairs (floor 2+) · ↓ downstairs (all encounters cleared). Enemies move when you move. Tap adjacent cells or use direction controls.'),grid,directions,feedback,list);
+    const legend=el('p','● Player · M encounter (including guardian) · ✓ cleared · ↑ upstairs (floor 2+) · ↓ downstairs (all encounters cleared). Enemies move when you move. Tap adjacent cells or use direction controls.');
+    if(this.root.children.length===7 && this.root.children[3]===grid) {
+      // Keep the large grid connected so movement does not reconstruct its layout tree.
+      for(const [index,node] of [[0,heading],[1,label],[2,legend],[4,directions],[5,feedback],[6,list]] as const) this.root.children[index].replaceWith(node);
+    } else this.root.replaceChildren(heading,label,legend,grid,directions,feedback,list);
     this.paintArt();
     if(focused)this.root.querySelector<HTMLElement>(`#${focused}`)?.focus({preventScroll:true});
   }
