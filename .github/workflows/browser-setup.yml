@@ -33,6 +33,11 @@ jobs:
         env:
           PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184-base/chromium.json
         run: npx --no-install playwright test tests/main-menu.spec.ts --project=mobile-landscape -g 'dungeon departure after rejected movement retains unsaved play warning' --repeat-each=20 --workers=1 --retries=0 --reporter=line,json --output=verification-receipts/issue184-base/artifacts
+      - name: Compare exact-base Shaman journey
+        if: ${{ !cancelled() }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184-base/shaman.json
+        run: npx --no-install playwright test tests/dungeon.spec.ts --project=desktop -g 'Shaman production journey uses Hex' --workers=1 --retries=0 --reporter=line,json --output=verification-receipts/issue184-base/shaman-artifacts
       - uses: actions/upload-artifact@v4
         if: always()
         with:
