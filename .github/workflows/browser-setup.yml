@@ -8,6 +8,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   browser-setup:
+    if: github.ref != 'refs/heads/work/issue-184-overworld-generation'
     runs-on: [self-hosted, tactics-browser]
     timeout-minutes: 20
     steps:
@@ -89,11 +90,10 @@ jobs:
           if-no-files-found: warn
   issue184-verify:
     if: github.ref == 'refs/heads/work/issue-184-overworld-generation'
-    needs: browser-setup
-    runs-on: [self-hosted, tactics-browser]
+    # Caller-authorized hosted verification for PR #279.
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     steps:
-      - run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
@@ -103,7 +103,7 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
-      - run: npm run setup:browsers && npm run check:browsers
+      - run: npm run setup:browsers:linux && npm run check:browsers
       - name: Record source and runtime
         run: |
           mkdir -p verification-receipts/issue184
