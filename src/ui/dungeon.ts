@@ -22,6 +22,8 @@ export function renderDungeon(root: HTMLElement, session: DungeonSession, dialog
     before=el('div');before.dataset.dungeonPart='before';after=el('div');after.dataset.dungeonPart='after';
     root.replaceChildren(before,mapView.root,after);
   }
+  // Rebuild the host-owned footer on every render while keeping the map mounted.
+  for (const child of [...root.children]) if (child !== before && child !== mapView.root && child !== after) child.remove();
   before.replaceChildren(title,el('p',floor.completed === 3 ? 'All encounters cleared. Walk to the stairs to continue.' : 'Walk onto any uncleared enemy to start its encounter. Clear all three encounters to unlock the stairs.'),status);
   after.replaceChildren();
   const button = (label: string, run: () => void, disabled = false, id?: string) => {
