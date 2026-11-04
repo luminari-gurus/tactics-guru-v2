@@ -244,7 +244,7 @@ test('review: in-flow Continue resumes an ongoing backup battle after legal defe
  await page.getByRole('button',{name:'Save recovery',exact:true}).click();
  await page.getByRole('dialog').getByRole('button',{name:'Remove primary save',exact:true}).click();
  await page.getByRole('dialog').getByRole('button',{name:'Remove reviewed save',exact:true}).click();
- if(await page.getByRole('dialog').isVisible())await page.getByRole('dialog').getByRole('button',{name:/^(Close|Cancel)$/}).click();
+ await page.locator('#run-close-recovery').click();
  await page.getByRole('button',{name:'Continue saved run',exact:true}).click();
  await page.clock.install();await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
  await page.getByRole('dialog').getByRole('button',{name:'Continue',exact:true}).click({force:true});
@@ -329,7 +329,7 @@ for(const exit of ['Cancel','Escape','Export'] as const)test(`review repair: sta
 test('review repair: deleting both loaded slots starts a fresh playable run',async({page})=>{
  await start(page);const old=await snapshot(page);await page.reload();await page.locator('#run-recovery').click();
  for(const slot of ['primary','backup']){await page.locator('#run-remove-'+slot).click();await page.locator('#run-confirm-remove').click();}
- expect(await page.evaluate(keys=>Object.values(keys).map(k=>localStorage.getItem(k)),RUN_STORAGE_KEYS)).toEqual([null,null]);
+ await expect.poll(()=>page.evaluate(keys=>Object.values(keys).map(k=>localStorage.getItem(k)),RUN_STORAGE_KEYS)).toEqual([null,null]);
  await page.locator('#run-close-recovery').click();await page.locator('#run-start').click();
  await expect(page.locator('#run-start-encounter')).toBeVisible();const fresh=await snapshot(page);
  expect(fresh.items.run.id).not.toBe(old.items.run.id);expect(fresh.items.run.seed).toBe((old.items.run.seed+1)>>>0);

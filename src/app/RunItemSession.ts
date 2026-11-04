@@ -174,13 +174,14 @@ export class RunItemSession {
     if (this.disposed || !this.storage) return;
     this.unsavedOnly = true; this.review = null; this.startNew();
   }
-  queueWrite(task:()=>void) {
+  queueWrite(task:()=>void, unavailable?:()=>void) {
     const guarded = () => { if (!this.disposed) task(); };
     if (!this.storage || !this.serializeWrite) { guarded(); return; }
     this.serializeWrite(guarded, () => {
       if (this.disposed) return;
       this.progressSaved = false;
       this.report('Progress unsaved: exclusive save access unavailable. Open Save recovery to export.');
+      unavailable?.();
     });
   }
   requestSave(done?:()=>void) {

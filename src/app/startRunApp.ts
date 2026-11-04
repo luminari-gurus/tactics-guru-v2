@@ -71,15 +71,19 @@ function startBattle() {
  engine.scene.remove('battle');engine.scene.add('battle',scene,true);
  evidence();
 }
+let replacementPending=false;
 function replace(review:RunLoadResult) {
+ if(replacementPending)return;
+ replacementPending=true;
  controller.queueWrite(()=>{
+  replacementPending=false;
   if(controller.replace(review,crypto.randomUUID(),(controller.snapshot.items.run.seed+1)>>>0)) {
    startup=false;stopBattle();render();screen.querySelector<HTMLElement>('h1')?.focus();
   } else {if(!playing)render();showRecovery();}
- });
+ },()=>{replacementPending=false;});
 }
 function requestNew() {
- if(!live || dialogs.open)return;
+ if(!live || dialogs.open || replacementPending)return;
  if(!storage){
   if(startup)controller.startNew();
   else controller.restart(crypto.randomUUID(),(controller.snapshot.items.run.seed+1)>>>0);
@@ -173,7 +177,9 @@ function renderActions() {
  if(run.phase==='battle' && !snapshot.activeBattle) actions.append(button('Start encounter',startBattle,'run-start-encounter'));
  else if(run.phase==='victory' || run.phase==='defeat') {
   items.querySelector('h1')!.textContent=run.phase==='victory'?'Run victory':'Run defeat';
-  actions.append(button('Start new run',()=>storage?replace(controller.inspect()):requestNew(),'run-new'));
+  actions.append(button('Start new run',()=>{
+   if(!replacementPending){if(storage)replace(controller.inspect());else requestNew();}
+  },'run-new'));
  }
   actions.append(nav.cloneNode(true), dungeonNav.cloneNode(true), menuReturnLink(() => !startup && controller.hasUnsavedProgress, showRecovery));mountTelemetryPreferences(actions);
 }
