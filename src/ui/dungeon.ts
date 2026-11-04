@@ -49,9 +49,10 @@ export function renderDungeon(root: HTMLElement, session: DungeonSession, dialog
     if('quantity'in entry){
       row.append(button(`Use ${def.label}`,()=>{
         const hero=s.party.find(h=>h.heroId===select.value);
-        const preview=hero&&preparationItemTarget(def,hero,s.party);
-        if(!hero||!preview?.ok)return;
-        review(`Use ${def.label} on ${hero.heroId}? ${hero.heroId} will have ${preview.hp}/${hero.maxHp} HP.`,
+        if(!hero)return;
+        const preview=preparationItemTarget(def,hero,s.party);
+        const result=preview.ok?`${hero.heroId} will have ${preview.hp}/${hero.maxHp} HP.`:`${hero.heroId} cannot use this item (${preview.reason}).`;
+        review(`Use ${def.label} on ${hero.heroId}? ${result}`,
           {...dungeonBoundary(s),type:'useItem',itemId:def.id,heroId:hero.heroId});
       },!select.value||!['ready','reward'].includes(s.phase)));
     }
