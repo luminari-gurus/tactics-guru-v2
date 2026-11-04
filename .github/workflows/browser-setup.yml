@@ -7,6 +7,38 @@ concurrency:
   group: tactics-browser-exclusive
   cancel-in-progress: false
 jobs:
+  issue184-exact-base:
+    if: github.ref == 'refs/heads/work/issue-184-overworld-generation'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fbf82420b82674dc5f57397d68b0a50c8bf485c0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npx --no-install playwright install --with-deps chromium
+      - name: Record baseline identity
+        run: |
+          mkdir -p verification-receipts/issue184-base
+          git rev-parse HEAD > verification-receipts/issue184-base/source.txt
+          uname -a > verification-receipts/issue184-base/host.txt
+          npx --no-install playwright --version > verification-receipts/issue184-base/playwright.txt
+      - name: Repeat exact-base unsaved-play test
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184-base/chromium.json
+        run: npx --no-install playwright test tests/main-menu.spec.ts --project=mobile-landscape -g 'dungeon departure after rejected movement retains unsaved play warning' --repeat-each=20 --workers=1 --retries=0 --reporter=line,json --output=verification-receipts/issue184-base/artifacts
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue184-base-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/issue184-base/
+          retention-days: 30
+          if-no-files-found: warn
   browser-setup:
     if: github.ref != 'refs/heads/work/issue-184-overworld-generation'
     runs-on: [self-hosted, tactics-browser]
