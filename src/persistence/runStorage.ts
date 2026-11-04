@@ -99,8 +99,25 @@ export function createRunStorage(context: RunSaveContext, provider: RunStoragePr
     }
     // A known primary is the current recovery point. A sole backup is never replaced.
     // First save seeds a recovery point before attempting primary publication.
-    const backupText = inspection.primary.status === 'valid' ? inspection.primary.text
+    let backupText = inspection.primary.status === 'valid' ? inspection.primary.text
       : inspection.backup.status === 'missing' ? encoded.text : null;
+    if (inspection.primary.status === 'valid' && inspection.primary.state.activeBattle?.draughts) backupText = null;
+    // encodeRunSave has already validated the snapshot and its ownership.
+    const saved = state as RunSnapshot;
+    if (saved.activeBattle?.draughts) {
+      const { items } = saved;
+      const compatible = (slot: SlotInspection): slot is Extract<SlotInspection,{status:'valid'}> => slot.status === 'valid' &&
+        !slot.state.activeBattle?.draughts && slot.state.items.run.id === items.run.id &&
+        slot.state.items.run.encounterIndex === items.run.encounterIndex;
+      if (compatible(inspection.primary)) backupText = inspection.primary.text;
+      else if (compatible(inspection.backup)) backupText = null;
+      else {
+        // An older reader can restart this encounter with the original party and inventory.
+        const checkpoint = encodeRunSave({items, activeBattle:null, battlefield:null}, context);
+        if (!checkpoint.ok) return checkpoint;
+        backupText = checkpoint.text;
+      }
+    }
     if (backupText !== null) {
       const backup = attempt('write', 'backup', () => storage.value.setItem(RUN_STORAGE_KEYS.backup, backupText));
       if (!backup.ok) return backup;

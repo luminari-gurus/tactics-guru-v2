@@ -18,6 +18,7 @@ import { hasShape } from './validation';
 
 export const RUN_SAVE_KIND = 'tactics-guru:run-snapshot';
 export const RUN_SAVE_FORMAT = 8;
+const DRAUGHT_RUN_SAVE_FORMAT = 9;
 export const RUN_SAVE_MAX_CODE_UNITS = 32_768;
 /** Trusted validated definitions. Always pass the immutable BASE catalog. */
 export interface RunSaveContext {
@@ -76,7 +77,8 @@ function identity(context: RunSaveContext) {
 export function encodeRunSave(input: unknown, context: RunSaveContext): { readonly ok: true; readonly text: string } | SaveFailure {
   const read = readRunSnapshot(input, context);
   if (!read.ok) return read;
-  const body = { kind: RUN_SAVE_KIND, format: RUN_SAVE_FORMAT, identity: identity(context), payload: read.state };
+  const format = read.state.activeBattle?.draughts ? DRAUGHT_RUN_SAVE_FORMAT : RUN_SAVE_FORMAT;
+  const body = { kind: RUN_SAVE_KIND, format, identity: identity(context), payload: read.state };
   const text = canonical({ ...body, digest: hashJson(body) });
   return text.length > RUN_SAVE_MAX_CODE_UNITS ? { ok: false, reason: 'tooLarge' } : { ok: true, text };
 }
@@ -91,7 +93,7 @@ export function decodeRunSave(text: string, context: RunSaveContext): RunSnapsho
   const expected = identity(context);
   const previous = input.format === 7 && expected.items === itemCatalogIdentity(itemCatalog);
   if (previous) expected.items = previousItemCatalogIdentity;
-  if (input.kind !== RUN_SAVE_KIND || !(previous || input.format === RUN_SAVE_FORMAT) || input.identity.content !== expected.content ||
+  if (input.kind !== RUN_SAVE_KIND || !(previous || input.format === RUN_SAVE_FORMAT || input.format === DRAUGHT_RUN_SAVE_FORMAT) || input.identity.content !== expected.content ||
     input.identity.items !== expected.items || input.identity.encounters !== expected.encounters) return { ok: false, reason: 'incompatible' };
   if(hasShape(input.payload,['items','activeBattle','battlefield']) &&
     hasShape(input.payload.battlefield,['encounterId','kind','mapId','mapHash','layoutSeed','biome','generatorVersion','profileVersion']) &&
@@ -99,6 +101,7 @@ export function decodeRunSave(text: string, context: RunSaveContext): RunSnapsho
   const read = readRunSnapshot(input.payload, previous ? { ...context, items: previousItemCatalog } : context);
   if (!read.ok) return read;
   if (previous && (read.state.items.offer?.version === 2 || read.state.activeBattle?.draughts)) return { ok: false, reason: 'incompatible' };
+  if (input.format === DRAUGHT_RUN_SAVE_FORMAT && !read.state.activeBattle?.draughts) return { ok: false, reason: 'invalidState' };
   const body = { kind: RUN_SAVE_KIND, format: input.format, identity: expected, payload: read.state };
   return hashJson(body) === input.digest ? read : { ok: false, reason: 'corrupt' };
 }

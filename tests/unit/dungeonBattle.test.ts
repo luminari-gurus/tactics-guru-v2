@@ -17,6 +17,7 @@ import { dispatch, replayCommandSequence } from '../../src/domain/turns';
 import { LEGACY_ENCOUNTER_POLICY } from '../../src/domain/dungeonEncounters';
 import { priorDungeonEnvelope } from '../helpers/dungeonFixtures';
 import { freshExploration } from '../../src/domain/exploration';
+import { createDungeonStorage } from '../../src/persistence/dungeonStorage';
 
 it('saves a battle draught with its heal, replays it and settles stock on either outcome', () => {
   const base = freshDungeon('draught-test', 13);
@@ -33,6 +34,14 @@ it('saves a battle draught with its heal, replays it and settles stock on either
   expect(step.after.rng).toEqual(before.rng);
   expect(dispatch(step.after, use, built.catalog)).toEqual({ ok: false, reason: 'alreadyActed' });
   const updated = acceptDungeonBattle(started.state, step.after); assert(updated.ok);
+  const bytes = new Map<string,string>();
+  const storage = createDungeonStorage(()=>({getItem:key=>bytes.get(key)??null,setItem:(key,value)=>{bytes.set(key,value);},removeItem:key=>{bytes.delete(key);}}));
+  expect(storage.save(started.state).ok).toBe(true);
+  const checkpoint = storage.inspect().backup.text!;
+  expect(JSON.parse(checkpoint)).toMatchObject({format:10,payload:{phase:'ready',activeBattle:null}});
+  expect(storage.save(updated.state).ok).toBe(true);
+  expect(storage.inspect().backup.text).toBe(checkpoint);
+  expect(JSON.parse(storage.inspect().primary.text!).format).toBe(11);
   expect(updated.state.ownership).toEqual(ready.ownership);
   const wire = encodeDungeon(updated.state); assert(wire.ok);
   const resumed = decodeDungeon(wire.text); assert(resumed.ok && resumed.state.activeBattle);

@@ -71,6 +71,11 @@ it('commits the last draught once, retries the exact failed write and continues 
   expect(readRunSnapshot({...run.snapshot,activeBattle:{...used.after,draughts}},runContext).ok).toBe(false);
  failWrite=false;
  expect(run.save().ok).toBe(true);
+ const checkpoint=data.get(RUN_STORAGE_KEYS.backup)!;
+ expect(JSON.parse(checkpoint)).toMatchObject({format:8,payload:{activeBattle:null}});
+ expect(JSON.parse(data.get(RUN_STORAGE_KEYS.primary)!).format).toBe(9);
+ expect(run.save().ok).toBe(true);
+ expect(data.get(RUN_STORAGE_KEYS.backup)).toBe(checkpoint);
  expect(decodeRunSave(data.get(RUN_STORAGE_KEYS.primary)!,runContext)).toEqual({ok:true,state:run.snapshot});
  const restoredRun=new RunItemSession(entry,runContext,storage);
  expect(restoredRun.continue(restoredRun.inspect())).toBe(true);
@@ -82,6 +87,8 @@ it('commits the last draught once, retries the exact failed write and continues 
  expect(replayCommandSequence(continuation.snapshot,continuation.commands,restored.catalog)).toEqual({ok:true,state:restored.state,events:continuation.events});
  expect(restoredRun.snapshot.items.ownership.consumables).toEqual([]);
  expect(restoredRun.snapshot.items.run.phase).toBe('defeat');
+ expect(JSON.parse(data.get(RUN_STORAGE_KEYS.primary)!).format).toBe(8);
+ expect(data.get(RUN_STORAGE_KEYS.backup)).toBe(checkpoint);
  expect(restoredRun.startEncounter()).toBeNull();
 });
 it('constructs all survivor subsets with fresh flags/RNG and carried HP, rejects invalid starts',()=>{
