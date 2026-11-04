@@ -119,6 +119,24 @@ describe('dungeon floors', () => {
     const itemId=s.offer!.options.find(o=>dungeonContent.items[o.itemId].kind==='equipment')!.itemId;
     const before=JSON.stringify(s);expect(dungeonItem(s,{...dungeonBoundary(s),type:'claimReward',offerId:s.offer!.id,itemId})).toEqual({ok:false,reason:'capacity'});expect(JSON.stringify(s)).toBe(before);
   });
+  it('can leave a saved reward boundary when both consumable stacks are full', () => {
+    const consumables = (['item:healing_draught', 'item:revive_kit'] as const).map(itemId => ({itemId, quantity:9}));
+    const reward = Array.from({length:24}, (_,seed)=>win(freshDungeon('capped-rewards',seed)))
+      .find(state=>state.offer?.options.every(option=>consumables.some(stack=>stack.itemId===option.itemId)));
+    assert(reward?.offer);
+    const candidate = {...reward, ownership:{...reward.ownership,consumables}};
+    const wire = encodeDungeon(candidate);
+    assert(wire.ok);
+    const state = good(decodeDungeon(wire.text));
+    const boundary = dungeonBoundary(state), offerId = state.offer!.id;
+    for(const {itemId} of state.offer!.options)
+      expect(dungeonItem(state,{...boundary,type:'claimReward',offerId,itemId})).toEqual({ok:false,reason:'capacity'});
+    const decline = {...boundary,type:'declineReward',offerId} as const;
+    const next = good(dungeonItem(state,decline));
+    expect(next).toMatchObject({phase:'ready',offer:null,ownership:state.ownership});
+    expect(dungeonItem(next,decline)).toEqual({ok:false,reason:'staleBoundary'});
+    expect(startDungeonBattle(atEncounter(next)).ok).toBe(true);
+  });
   it('owns saved reward data instead of retaining caller mutation aliases', () => {
     const original=win(fresh()),input=JSON.parse(JSON.stringify(original)),checked=good(readDungeon(input));
     input.offer.options[0].quantity=9;
