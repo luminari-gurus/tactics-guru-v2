@@ -7,6 +7,7 @@ import { menuFixture, terminalMenuBattle, rewardRunFixture } from './helpers/men
 import { BATTLE_STORAGE_KEYS } from '../src/persistence/battleStorage';
 import { RUN_STORAGE_KEYS } from '../src/persistence/runStorage';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
+import { readSession, reviewDraught } from './helpers/battlePolicy';
 const keys={battle:BATTLE_STORAGE_KEYS,run:RUN_STORAGE_KEYS,dungeon:DUNGEON_KEYS};
 
 test('main menu: repeated scene selectors use the first value throughout startup',async({page})=>{
@@ -265,10 +266,48 @@ async function openMenuRunItems(page:Page,snapshot:RunSnapshot) {
 async function reloadMenuRunItems(page:Page) {
  await page.reload();await page.locator('#run-continue').click();await expect(page.locator('#run-item-status')).toBeVisible();
 }
-async function confirmMenuItem(page:Page) {await page.locator('#item-confirm').click();await expect(page.locator('dialog')).not.toBeVisible();}
+async function confirmMenuItem(page:Page, waitForSave=true) {
+ await page.locator('#item-confirm').click();
+ await expect(page.locator('dialog')).not.toBeVisible();
+ if(waitForSave)await expect(page.locator('#run-item-status')).not.toHaveText('Saving run…');
+}
 async function activateMenuItem(page:Page,name:string,touch:boolean) {
  const button=page.getByRole('button',{name,exact:true});if(touch)await button.tap();else await button.click();
 }
+test('main menu: a stale run tab waits for the save lock and preserves both newer slots', async ({page,context,isMobile}) => {
+  await openMenuRunItems(page,preparedSnapshot());
+  const stale=await context.newPage();
+  await stale.goto('./?game=run');
+  await stale.locator('#run-continue').click();
+  const use=async (tab:Page, hero:string, waitForSave=true)=>{
+    await tab.getByRole('combobox',{name:'Healing Draught target'}).selectOption(hero);
+    await activateMenuItem(tab,'Use Healing Draught',isMobile);
+    await confirmMenuItem(tab,waitForSave);
+  };
+  await use(page,'fighter');
+  await expect(page.locator('#run-item-status')).toHaveText('Run saved on this device');
+  const slots=()=>page.evaluate(keys=>[localStorage.getItem(keys.primary),localStorage.getItem(keys.backup)],RUN_STORAGE_KEYS);
+  const saved=await slots();
+  await page.evaluate(key=>{
+    void navigator.locks.request(key,()=>new Promise<void>(resolve=>{
+      window.addEventListener('release-run-test-lock',()=>resolve(),{once:true});
+      document.body.dataset.testRunLock='held';
+    }));
+  },RUN_STORAGE_KEYS.primary);
+  await expect(page.locator('body')).toHaveAttribute('data-test-run-lock','held');
+  try {
+    await use(stale,'ranger',false);
+    await expect.poll(()=>stale.evaluate(async key=>(await navigator.locks.query()).pending?.some(lock=>lock.name===key),RUN_STORAGE_KEYS.primary)).toBe(true);
+    expect(await slots()).toEqual(saved);
+  } finally { await page.evaluate(()=>window.dispatchEvent(new Event('release-run-test-lock'))); }
+  await expect(stale.locator('#run-item-status')).toContainText('another tab changed the run save');
+  expect(await slots()).toEqual(saved);
+  await stale.getByRole('button',{name:'Save recovery',exact:true}).click();
+  await expect(stale.getByRole('button',{name:'Export unsaved run'})).toBeVisible();
+  await stale.getByRole('dialog').getByRole('button',{name:'Continue saved run'}).click();
+  expect(await menuItemReport(stale)).toEqual(await menuItemReport(page));
+  await stale.close();
+});
 test('main menu: reward claim advances exactly once and survives pending/claimed reload', async ({ page }, info) => {
   const seed = Array.from({ length: 100 }, (_, i) => i).find(s => rewardSnapshot(s).items.offer!.options.some(o => o.itemId === 'item:healing_draught'))!;
   await openMenuRunItems(page,rewardSnapshot(seed)); const pending = (await menuItemReport(page)).snapshot;
@@ -281,6 +320,7 @@ test('main menu: reward claim advances exactly once and survives pending/claimed
     if (await page.locator('dialog').isVisible()) await page.keyboard.press('Escape');
   }
   await expect(page.getByRole('heading', { name: 'Party items', exact: true })).toBeVisible();
+  await expect(page.locator('#run-item-status')).toHaveText('Run saved on this device');
   const claimed = (await menuItemReport(page)).snapshot;
   expect(claimed.items.run.encounterIndex).toBe(1); expect(claimed.items.itemRevision).toBe(1);
   expect(claimed.items.ownership.consumables).toEqual([{ itemId: 'item:healing_draught', quantity: 1 }]);
@@ -331,6 +371,39 @@ test('main menu: claim and use a Revive Kit before the next run encounter', asyn
   const battle = JSON.parse((await page.locator('#game').getAttribute('data-session'))!).state;
   expect(battle.units.find((unit: { defId: string }) => unit.defId === 'mage')?.hp).toBe(3);
 });
+for (const skin of ['rail', 'radial'] as const) test('main menu: an earned Healing Draught spends the active turn action and survives Continue (' + skin + ')', async ({ page, isMobile }) => {
+  await page.addInitScript(value => { (window as unknown as Record<string, unknown>).__tacticsGuruCombatControls = value; }, skin);
+  await openMenuRunItems(page, rewardSnapshot(123));
+  await activateMenuItem(page, 'Claim Healing Draught', isMobile); await confirmMenuItem(page);
+  await page.locator('#run-start-encounter').click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  const before = (await readSession(page)).state;
+  const actor = before.units.find(unit => unit.id === before.initiative[before.activeIndex])!;
+  const button = page.locator('#battle-draught');
+  await reviewDraught(page);
+  await expect(page.getByRole('dialog')).toContainText('heal 6 HP');
+  await expect(page.getByRole('dialog')).toContainText('0 left after use');
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog')).not.toBeVisible();
+  if (!isMobile) await expect(button).toBeFocused();
+  expect((await readSession(page)).state).toEqual(before);
+  await reviewDraught(page);
+  const confirm = page.locator('#battle-draught-confirm');
+  if (isMobile) await confirm.tap(); else { await confirm.focus(); await page.keyboard.press('Enter'); }
+  await expect(page.getByRole('dialog')).not.toBeVisible();
+  await expect(button).toBeDisabled();
+  await expect(button).toHaveText('Healing Draught ×0 · None left');
+  const after = (await readSession(page)).state;
+  expect(after.commandCount).toBe(before.commandCount + 1);
+  expect(after.rng).toEqual(before.rng);
+  expect(after.activeIndex).toBe(before.activeIndex);
+  expect(after.units.find(unit => unit.id === actor.id)).toEqual({ ...actor, hp: actor.hp + 6, hasActed: true });
+  await expect(page.locator('#battle-persistence')).toContainText('Run saved on this device');
+  await page.reload(); await page.locator('#run-continue').click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  expect((await readSession(page)).state).toEqual(after);
+  await expect(button).toBeDisabled();
+});
 test('main menu: corruption preserves bytes, exports raw data and requires reviewed removal before saving', async ({ page }) => {
   await openMenuRunItems(page,preparedSnapshot());
   const backup = await page.evaluate(key => localStorage.getItem(key), RUN_STORAGE_KEYS.backup);
@@ -347,12 +420,31 @@ test('main menu: corruption preserves bytes, exports raw data and requires revie
   await page.getByRole('button', { name: 'Save recovery', exact: true }).click();
   await page.getByRole('button', { name: 'Remove primary save' }).click();
   await page.getByRole('button', { name: 'Remove reviewed save' }).click();
-  expect(await page.evaluate(key => localStorage.getItem(key), RUN_STORAGE_KEYS.primary)).toBeNull();
+  await expect.poll(()=>page.evaluate(key => localStorage.getItem(key), RUN_STORAGE_KEYS.primary)).toBeNull();
   await page.locator('#run-close-recovery').click();
   await page.getByRole('button', { name: 'Save recovery', exact: true }).click();
   await page.getByRole('button', { name: 'Retry saving' }).click();
   await expect(page.locator('#run-item-status')).toContainText('Run saved');
   const saved = (await menuItemReport(page)).snapshot; await reloadMenuRunItems(page); expect((await menuItemReport(page)).snapshot).toEqual(saved);
+});
+test('main menu: reviewed removal of a primary corrupted during play permits retry', async ({ page }) => {
+  await openMenuRunItems(page,preparedSnapshot());
+  const use=page.getByRole('button',{name:'Use Healing Draught',exact:true});
+  await use.click();await confirmMenuItem(page);
+  await expect(page.locator('#run-item-status')).toHaveText('Run saved on this device');
+  await page.evaluate(key=>localStorage.setItem(key,'corrupt during play'),RUN_STORAGE_KEYS.primary);
+  await page.getByRole('combobox',{name:'Healing Draught target'}).selectOption('ranger');
+  await use.click();await confirmMenuItem(page);
+  await expect(page.locator('#run-item-status')).toContainText('needs recovery');
+  const accepted=await menuItemReport(page);
+  await page.getByRole('button',{name:'Save recovery',exact:true}).click();
+  await page.getByRole('button',{name:'Remove primary save',exact:true}).click();
+  await page.locator('#run-confirm-remove').click();
+  await expect(page.locator('#battle-dialog-message')).toContainText('primary: missing');
+  await page.locator('#run-retry-save').click();
+  await expect(page.locator('#run-item-status')).toHaveText('Run saved on this device');
+  await reloadMenuRunItems(page);
+  expect(await menuItemReport(page)).toEqual(accepted);
 });
 test('main menu: stale recovery review refuses changed bytes', async ({ page }) => {
   await openMenuRunItems(page,preparedSnapshot());

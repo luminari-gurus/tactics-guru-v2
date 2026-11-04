@@ -3,6 +3,8 @@ import { HERO_IDS } from '../content/constants';
 import { ITEM_BOUNDS, type ItemCatalog, type ItemId, type ItemOwnership, type EquipmentSlot, type ItemDef } from '../content/itemTypes';
 import type { ContentCatalog, HeroId } from '../content/types';
 import { isIntegerIn } from './rng';
+import { HEALING_DRAUGHT_ID } from '../content/items';
+import { draughtsSpent, type DraughtLedger } from './draughts';
 import { readRewardOffer, type RewardOffer, type RewardClaimIntent } from './rewards';
 import { readRunState, runBoundaryId, transitionRun, type RunDefinition, type RunState, type RunEvent } from './run';
 import { hasShape, isDenseArray } from './validation';
@@ -147,11 +149,17 @@ export function preparationItemTarget(def: ItemDef, target: RunState['party'][nu
 }
 
 /** Returns a new ownership only when all requested units are owned. */
-export function spendConsumable(ownership: ItemOwnership, itemId: ItemId, quantity: number): ItemOwnership | null {
+function spendConsumable(ownership: ItemOwnership, itemId: ItemId, quantity: number): ItemOwnership | null {
   const stack = ownership.consumables.find(s => s.itemId === itemId);
   if (!stack || !isIntegerIn(quantity, { min: 1, max: stack.quantity })) return null;
   const remaining = stack.quantity - quantity;
   return { ...ownership, consumables: ownership.consumables.flatMap(s => s !== stack ? [s] : remaining ? [{ ...s, quantity: remaining }] : []) };
+}
+
+/** Caller has already admitted the battle against this encounter's owned stock. */
+export function settleDraughts(ownership: ItemOwnership, ledger: DraughtLedger | undefined): ItemOwnership | null {
+  const spent = ledger ? draughtsSpent(ledger) : 0;
+  return spent ? spendConsumable(ownership, HEALING_DRAUGHT_ID, spent) : ownership;
 }
 
 export function changePreparation(ownership: ItemOwnership, party: RunState['party'], command: Record<string, unknown>,

@@ -2,10 +2,13 @@ import { HERO_IDS } from './constants';
 import type { ItemCatalog } from './itemTypes';
 import { validateItems } from './validateItems';
 
+export const HEALING_DRAUGHT_ID = 'item:healing_draught';
+export const HEALING_DRAUGHT_HP = 6;
+
 const previousItems = {
-  'item:healing_draught': {
-    id: 'item:healing_draught', label: 'Healing Draught', kind: 'consumable',
-    eligibleHeroes: HERO_IDS, context: 'betweenEncounters', effect: { kind: 'restoreHp', amount: 6 },
+  [HEALING_DRAUGHT_ID]: {
+    id: HEALING_DRAUGHT_ID, label: 'Healing Draught', kind: 'consumable',
+    eligibleHeroes: HERO_IDS, context: 'betweenEncounters', effect: { kind: 'restoreHp', amount: HEALING_DRAUGHT_HP },
   },
   'item:warding_charm': {
     id: 'item:warding_charm', label: 'Warding Charm', kind: 'equipment', slot: 'charm',
@@ -28,7 +31,7 @@ export const previousItemCatalog = checked(previousItems);
 /** Separate from battleCatalog: item changes must not invalidate single-battle saves. */
 export const itemCatalog = checked({
   ...previousItems,
-  'item:healing_draught': { ...previousItems['item:healing_draught'], context: 'preparationAndCombat' },
+  [HEALING_DRAUGHT_ID]: { ...previousItems[HEALING_DRAUGHT_ID], context: 'preparationAndCombat' },
   'item:revive_kit': {
     id: 'item:revive_kit', label: 'Revive Kit', kind: 'consumable', eligibleHeroes: HERO_IDS,
     context: 'betweenEncounters', effect: { kind: 'revive', percent: 35 },

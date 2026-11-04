@@ -4,6 +4,35 @@ import { activeSnapshot, preparedSnapshot, rewardSnapshot, runContext } from '..
 import { createRunStorage, RUN_STORAGE_KEYS } from '../../src/persistence/runStorage';
 import { freshRunSnapshot } from '../../src/domain/runBattle';
 const unavailable = () => createRunStorage(runContext, () => null);
+it('can retry after reviewed removal of a primary corrupted during play', () => {
+  const data = new Map<string,string>();
+  const storage = createRunStorage(runContext,()=>({getItem:key=>data.get(key)??null,
+    setItem:(key,value)=>{data.set(key,value);},removeItem:key=>{data.delete(key);}}));
+  const run = new RunItemSession(preparedSnapshot(),runContext,storage);
+  assert(run.save().ok);
+  data.set(RUN_STORAGE_KEYS.primary,'corrupt');
+  expect(run.save()).toMatchObject({ok:false,reason:'recoveryRequired'});
+  assert(run.remove('primary',run.inspect()));
+  expect(run.save()).toEqual({ok:true});
+  const restored=storage.load();assert(restored.ok);
+  expect(restored.selected?.state).toEqual(run.snapshot);
+});
+it('refuses a stale session write without replacing either saved slot', () => {
+  const data = new Map<string,string>();
+  const provider = () => ({getItem:(key:string)=>data.get(key)??null,
+    setItem:(key:string,value:string)=>{data.set(key,value);}, removeItem:(key:string)=>{data.delete(key);}});
+  const initial = preparedSnapshot(), firstStorage = createRunStorage(runContext,provider);
+  assert(firstStorage.save(initial).ok);
+  const first = new RunItemSession(initial,runContext,firstStorage);
+  const second = new RunItemSession(initial,runContext,createRunStorage(runContext,provider));
+  assert(first.continue(first.inspect())); assert(second.continue(second.inspect()));
+  assert(first.dispatch({...first.boundary(),type:'useItem',itemId:'item:healing_draught',heroId:'fighter'}).ok);
+  const latest = [...data];
+  assert(second.dispatch({...second.boundary(),type:'useItem',itemId:'item:healing_draught',heroId:'ranger'}).ok);
+  expect(second.save()).toMatchObject({ok:false,reason:'changed'});
+  expect(second.hasUnsavedProgress).toBe(true);
+  expect([...data]).toEqual(latest);
+});
 it('commits claim once, rejects stale review and preserves accepted state after storage failure', () => {
   const s = new RunItemSession(rewardSnapshot(), runContext, unavailable());
   const command = { ...s.boundary(), type: 'claimReward' as const, offerId: s.snapshot.items.offer!.id, itemId: s.snapshot.items.offer!.options[0].itemId };

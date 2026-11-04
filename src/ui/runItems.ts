@@ -57,14 +57,14 @@ export function mountRunItems(root: HTMLElement, session: RunItemSession, dialog
           } });
           choices.push({ id: `remove-${slot}`, label: `Remove ${slot} save`, run: () => {
             dialogs.showChoices('Remove saved data?', `Remove the reviewed ${slot} run save? Export it first if needed.`, [
-              { id: 'remove-confirm', label: 'Remove reviewed save', run: () => { session.remove(slot, load); focus(); } },
+              { id: 'remove-confirm', label: 'Remove reviewed save', run: () => session.queueWrite(() => { session.remove(slot, load); focus(); }) },
               { id: 'remove-cancel', label: 'Cancel', run: focus },
             ], focus);
           } });
         }
       }
     }
-    choices.push({ id: 'retry-save', label: 'Retry saving', run: () => { session.save(); focus(); } },
+    choices.push({ id: 'retry-save', label: 'Retry saving', run: () => session.requestSave(focus) },
       { id: 'recovery-cancel', label: 'Cancel', run: focus });
     const message = load.ok ? ['primary', 'backup'].map(slot => `${slot}: ${load.inspection[slot as 'primary' | 'backup'].status}`).join('. ')
       : `Storage ${load.kind}. Play can continue unsaved.`;

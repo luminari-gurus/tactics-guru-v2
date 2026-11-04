@@ -9,15 +9,15 @@ import { previewMove } from '../domain/grid';
 import { previewAbility } from '../domain/combat';
 import { previewTacticalPlan } from '../domain/tacticalPlan';
 import { undoRecordedMove } from '../domain/movementUndo';
-import { BASE_REPLAY_FORMAT_VERSION, REPLAY_FORMAT_VERSION, RULE_BOUNDS } from '../domain/constants';
+import { BASE_REPLAY_FORMAT_VERSION, DRAUGHT_REPLAY_FORMAT_VERSION, REPLAY_FORMAT_VERSION, RULE_BOUNDS } from '../domain/constants';
 import { planEnemyTurn } from '../domain/ai';
-import { createBattle, dispatch } from '../domain/turns';
+import { createBattle, dispatch, previewDraught } from '../domain/turns';
 import type { BattleEvent, BattleState, Command, Replay, ReplayCommand } from '../domain/types';
 
 export type SessionPhase = 'player' | 'enemy' | 'presenting' | 'ended' | 'error' | 'disposed';
 export type AcceptedState = (state: BattleState) => void;
 export interface Presentation { readonly before: BattleState; readonly after: BattleState; readonly events: readonly BattleEvent[]; readonly token: number }
-export type ActionPreview = ReturnType<typeof previewMove> | ReturnType<typeof previewAbility> | ReturnType<typeof previewCommand>;
+export type ActionPreview = ReturnType<typeof previewMove> | ReturnType<typeof previewAbility> | ReturnType<typeof previewCommand> | ReturnType<typeof previewDraught>;
 function freeze<T>(value: T): T {
   if (value && typeof value === 'object' && !Object.isFrozen(value)) {
     Object.values(value).forEach(freeze); Object.freeze(value);
@@ -67,12 +67,18 @@ export class BattleSession {
   get pendingPlan() { return this.plan; }
   get canUndoMove() { return this.phase === 'player' && this.lastMove !== null && !this.undoUsedThisTurn && this.current.commandCount < RULE_BOUNDS.commandCount.max - 2; }
   get events(): readonly BattleEvent[] { return [...this.resolvedEvents]; }
-  get replay(): (Replay & {readonly battlefield?:BattlefieldDescriptor}) | null { return this.resumed ? null : freeze({format:this.commands.some(c=>c.type==='undoMove')?REPLAY_FORMAT_VERSION:BASE_REPLAY_FORMAT_VERSION, versions:this.initial.versions, initial:this.initial, commands:[...this.commands],...(this.battlefield?{battlefield:this.battlefield}:{})}); }
+  get replay(): (Replay & {readonly battlefield?:BattlefieldDescriptor}) | null {
+    if (this.resumed) return null;
+    const format = this.initial.draughts ? DRAUGHT_REPLAY_FORMAT_VERSION :
+      this.commands.some(c=>c.type==='undoMove') ? REPLAY_FORMAT_VERSION : BASE_REPLAY_FORMAT_VERSION;
+    return freeze({format, versions:this.initial.versions, initial:this.initial, commands:[...this.commands],...(this.battlefield?{battlefield:this.battlefield}:{})});
+  }
   get continuation() { return this.resumed ? freeze({snapshot:this.initial, ...(this.battlefield?{battlefield:this.battlefield}:{}), commands:[...this.commands], events:[...this.resolvedEvents]}) : null; }
   private decisionPhase(): SessionPhase { return this.current.outcome !== 'ongoing' ? 'ended' : this.active.side === 'enemy' ? 'enemy' : 'player'; }
   preview(command: Command): ActionPreview {
     if (command.type === 'move') return previewMove(this.current, command, this.catalog);
     if (command.type === 'useAbility') return previewAbility(this.current, command, this.catalog);
+    if (command.type === 'drinkDraught') return previewDraught(this.current, command, this.catalog);
     return previewCommand(this.current, command, this.catalog);
   }
   prepare(command: Command): ActionPreview {
