@@ -91,7 +91,7 @@ jobs:
     if: github.ref == 'refs/heads/work/issue-184-overworld-generation'
     needs: browser-setup
     runs-on: [self-hosted, tactics-browser]
-    timeout-minutes: 45
+    timeout-minutes: 120
     steps:
       - run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
       - uses: actions/checkout@v4
@@ -118,6 +118,18 @@ jobs:
       - name: Record build identity
         if: ${{ steps.build.outcome == 'success' }}
         run: find dist -type f -print0 | sort -z | xargs -0 sha256sum > verification-receipts/issue184/build.sha256
+      - name: Affected domain and storage units
+        run: npm run test:unit -- tests/unit/dungeon.test.ts tests/unit/exploration.test.ts tests/unit/overworldMap.test.ts tests/unit/dungeonBattle.test.ts
+      - name: Dungeon and saved-route Chromium consumers
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/chromium-consumers.json
+        run: npx --no-install playwright test tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts tests/dungeon-lifecycle.spec.ts tests/main-menu.spec.ts --grep-invert 'maximum-size' --workers=1 --retries=0 --reporter=line,json --output=verification-receipts/issue184/chromium-consumer-artifacts
+      - name: Dungeon WebKit exploration consumers
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/webkit-consumers.json
+        run: npx --no-install playwright test -c playwright.exploration.config.ts --grep-invert 'maximum-size' --workers=1 --retries=0 --reporter=line,json --output=verification-receipts/issue184/webkit-consumer-artifacts
       - name: Maximum-floor Chromium behavior and timing
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         env:
