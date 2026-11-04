@@ -32,13 +32,18 @@ async function start(page:Page){
  expect(drawable!.height).toBeGreaterThanOrEqual(page.viewportSize()!.height*0.3-1);
 }
 async function ready(page:Page){await expect.poll(async()=>await page.locator('#game').getAttribute('data-phase')??'boundary',{timeout:15000}).toMatch(/player|ended|boundary/);}
-async function fight(page:Page,wait=false){
+async function fight(page:Page,wait=false,useDraught=false){
+ let drank=false;
  for(let i=0;i<500;i++){
   await ready(page);const current=await snapshot(page);if(current.items.run.phase!=='battle')break;
   const battle=await readSession(page);expect(battle.phase).toBe('player');const catalog=runBattleCatalog(current.items,runContext)!;
-  await playCommand(page,wait?{type:'endTurn',unitId:battle.state.initiative[battle.state.activeIndex]}:playerDecision(battle.state,catalog));
+  const unitId=battle.state.initiative[battle.state.activeIndex];
+  if(useDraught && !drank && battle.state.draughts && await page.locator('#battle-draught').isEnabled()) {
+   await playCommand(page,{type:'drinkDraught',unitId});drank=true;
+  } else await playCommand(page,wait?{type:'endTurn',unitId}:playerDecision(battle.state,catalog));
  }
  await expect(page.locator('#run-screen')).toBeVisible();
+ return drank;
 }
 async function prepare(page:Page){
  const current=await snapshot(page),offer=current.items.offer!;
@@ -49,11 +54,6 @@ async function prepare(page:Page){
   const now=await snapshot(page);if(now.items.ownership.assignments.some(a=>a.instanceId===equipment.instanceId))continue;
   const def=runContext.items[equipment.itemId];const hero=now.items.run.party.find(h=>h.hp>0 && def.eligibleHeroes.includes(h.heroId));
   if(hero){await page.locator(`[id="target-${equipment.instanceId}"]`).selectOption(hero.heroId);await page.getByRole('button',{name:`Equip ${def.label}`,exact:true}).click();await page.locator('#item-confirm').click();}
- }
- for(const hero of (await snapshot(page)).items.run.party){
-  const now=await snapshot(page);if(hero.hp===0 || hero.hp===hero.maxHp || !now.items.ownership.consumables.length)continue;
-  await page.locator('[id="target-item:healing_draught"]').selectOption(hero.heroId);
-  await page.getByRole('button',{name:'Use Healing Draught',exact:true}).click();await page.locator('#item-confirm').click();
  }
 }
 test('run battle undo survives reload and a legal terminal journey',async({page,isMobile})=>{
@@ -66,7 +66,7 @@ test('run battle undo survives reload and a legal terminal journey',async({page,
  await page.locator('#run-new').click();await expect(page.locator('#run-start-encounter')).toBeVisible();
 });
 test('legal run outcomes, earned rewards, terminal resume and fresh restart',async({page})=>{
- test.setTimeout(300000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await start(page);await page.locator('#battle-sound').click();const records=[];
+ test.setTimeout(300000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await start(page);await page.locator('#battle-sound').click();const records=[];let usedDraught=false;
  for(let index=0;index<3;index++){
   // Each encounter constructs a fresh shared renderer; prior selections cannot leak.
   const board=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
@@ -89,7 +89,7 @@ test('legal run outcomes, earned rewards, terminal resume and fresh restart',asy
   const beforeBob=await snapshot(page);
   await page.screenshot({path:test.info().outputPath(`encounter-${index+1}-active-bob.png`)});
   expect(await snapshot(page)).toEqual(beforeBob);
-  await fight(page);
+  usedDraught=(await fight(page,false,true))||usedDraught;
   await expect(page.locator('#game')).not.toHaveAttribute('data-battle-report');if(index===0)await page.screenshot({path:test.info().outputPath('run-reward.png')});const current=await snapshot(page);expect(index===2?['victory','defeat']:['reward','defeat']).toContain(current.items.run.phase);expect(current.items.run.encounterIndex).toBe(index);
   const record=JSON.parse((await page.locator('#game').getAttribute('data-run-battle-record'))!);const replay=replayRunBattle(record.replay,record.entry,runContext);expect(replay.ok).toBe(true);if(replay.ok){expect(replay.state).toEqual(record.state);expect(replay.events).toEqual(record.events);}records.push(record);
   if(current.items.run.phase==='defeat')break;
@@ -102,10 +102,42 @@ test('legal run outcomes, earned rewards, terminal resume and fresh restart',asy
   }
  }
  const final=await snapshot(page);await expect(page.getByRole('heading',{name:final.items.run.phase==='victory'?'Run victory':'Run defeat',exact:true})).toBeVisible();
+ expect(usedDraught).toBe(true);
+ expect(final.items.ownership.consumables.some(stack=>stack.itemId==='item:healing_draught')).toBe(false);
  await page.screenshot({path:test.info().outputPath('run-terminal.png')});
  writeFileSync(test.info().outputPath('run-records.json'),JSON.stringify(records,null,2));
  await page.reload();await page.locator('#run-continue').click();expect(await snapshot(page)).toEqual(final);
  await page.locator('#run-new').dblclick();const fresh=await snapshot(page);expect(fresh.items.run.seed).toBe(14);expect(fresh.items.run.id).not.toBe(final.items.run.id);expect(fresh.items.ownership).toEqual({consumables:[],equipment:[],assignments:[]});expect(fresh.items.run.party.every(h=>h.hp===runContext.catalog.heroes[h.heroId].stats.maxHp)).toBe(true);
+ expect(errors).toEqual([]);
+});
+test('testing routes: an earned combat draught stays in the transient authored run',async({page})=>{
+ test.setTimeout(300000);
+ const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+ await page.addInitScript(()=>{
+  const get=Storage.prototype.getItem,set=Storage.prototype.setItem,remove=Storage.prototype.removeItem;
+  const saved=(key:string)=>key.startsWith('tactics-guru:phaser:')||key==='tactics-guru:menu-new-dungeon-review';
+  const attempts:string[]=[];
+  (window as unknown as Record<string, unknown>).__draughtSaveAttempts=attempts;
+  Storage.prototype.getItem=function(key){if(saved(key)){attempts.push('read');throw Error('Testing route read saved gameplay');}return get.call(this,key);};
+  Storage.prototype.setItem=function(key,value){if(saved(key)){attempts.push('write');throw Error('Testing route wrote saved gameplay');}set.call(this,key,value);};
+  Storage.prototype.removeItem=function(key){if(saved(key)){attempts.push('remove');throw Error('Testing route removed saved gameplay');}remove.call(this,key);};
+ });
+ await page.goto('./run');
+ await page.locator('#run-start').click();
+ await page.locator('#run-start-encounter').click();
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ await fight(page);
+ await expect(page.getByRole('button',{name:'Claim Healing Draught',exact:true})).toBeVisible();
+ await prepare(page);
+ await page.locator('#run-start-encounter').click();
+ expect(await fight(page,false,true)).toBe(true);
+ expect((await snapshot(page)).items.ownership.consumables).toEqual([]);
+ const attempts=()=>page.evaluate(()=>(window as unknown as Record<string, unknown>).__draughtSaveAttempts);
+ expect(await attempts()).toEqual([]);
+ await page.reload();
+ await expect(page.locator('#run-start')).toBeVisible();
+ await expect(page.locator('#run-continue')).toHaveCount(0);
+ expect(await attempts()).toEqual([]);
  expect(errors).toEqual([]);
 });
 test('legal defeat reload, native keyboard restart and isolated single-battle save',async({page})=>{

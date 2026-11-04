@@ -19,7 +19,7 @@ export type SaveDecoded = { readonly ok: true; readonly state: BattleState } | S
 /** Pure prototype: caller supplies a trusted immutable catalog, never a storage/session object. */
 export function encodeBattleSave(input: unknown, catalog: ContentCatalog): SaveEncoded {
   const read = readBattleState(input, catalog);
-  if (!read.ok || read.state.mapId.length > SAVE_MAX_MAP_ID_CODE_UNITS) return { ok: false, reason: 'invalidState' };
+  if (!read.ok || read.state.draughts || read.state.mapId.length > SAVE_MAX_MAP_ID_CODE_UNITS) return { ok: false, reason: 'invalidState' };
   const body = { kind: SAVE_KIND, format: SAVE_FORMAT_VERSION, payload: read.state };
   const text = canonical({ ...body, digest: hashJson(body) });
   return text.length > SAVE_MAX_CODE_UNITS ? { ok: false, reason: 'tooLarge' } : { ok: true, text };
@@ -41,7 +41,7 @@ export function decodeBattleSave(text: string, catalog: ContentCatalog): SaveDec
   // The existing reader checks exact shapes, dense bounded arrays, safe integers, IDs and invariants,
   // and returns an owned copy. Never canonicalize arbitrary nested input before this check.
   const read = readBattleState(payload, catalog);
-  if (!read.ok || read.state.mapId.length > SAVE_MAX_MAP_ID_CODE_UNITS) return { ok: false, reason: 'invalidState' };
+  if (!read.ok || read.state.draughts || read.state.mapId.length > SAVE_MAX_MAP_ID_CODE_UNITS) return { ok: false, reason: 'invalidState' };
   const body = { kind: SAVE_KIND, format: SAVE_FORMAT_VERSION, payload: read.state };
   if (hashJson(body) !== input.digest) return { ok: false, reason: 'corrupt' };
   return { ok: true, state: read.state };

@@ -11,6 +11,7 @@ import { contentVersion } from '../../src/domain/battle';
 import { createRun, deriveRunSeed, transitionRun, runBoundaryId } from '../../src/domain/run';
 import { emptyItemOwnership } from '../../src/domain/items';
 import { previewSupportAbility } from '../../src/domain/combat';
+import { DRAUGHT_REPLAY_FORMAT_VERSION } from '../../src/domain/constants';
 
 it.each(['active', 'reward'])('loads the exact pre-consumable run %s save and preserves its pending offer or battle', phase => {
   const text = readFileSync(`tests/fixtures/saves/issue-172/run-${phase}.json`, 'utf8');
@@ -96,12 +97,23 @@ it('admits only spent bounded Second Wind healing and carries it through run com
   const completed=completeRunBattle(snapshot,won,runContext);assert(completed.ok);
   expect(completed.state.items.run.party[0].hp).toBe(9);expect(completed.state.items.run.party[2].hp).toBe(0);
   expect(completed.state.items.run.party[0]).not.toHaveProperty('secondWindUsed');
+  let nextTurn=used.state;
+  do {
+    const advance=dispatch(nextTurn,{type:'endTurn',unitId:nextTurn.initiative[nextTurn.activeIndex]},created.catalog);
+    assert(advance.ok);nextTurn=advance.state;
+  } while(nextTurn.initiative[nextTurn.activeIndex]!==1);
+  const combined=dispatch(nextTurn,{type:'drinkDraught',unitId:1},created.catalog);assert(combined.ok);
+  const both={...snapshot,activeBattle:combined.state};
+  expect(readRunSnapshot(both,runContext).ok).toBe(true);
+  expect(combined.state.units[0]).toMatchObject({hp:15,secondWindUsed:true});
+  const {draughts:_,...withoutSpend}=combined.state;
+  expect(readRunSnapshot({...both,activeBattle:withoutSpend},runContext).ok).toBe(false);
   const old=JSON.stringify({...JSON.parse(encoded.text),format:3});expect(decodeRunSave(old,runContext)).toEqual({ok:false,reason:'incompatible'});
   // Canonical entry replay follows legal turn ends to the Fighter before healing.
   let live=created.state;const commands:import('../../src/domain/types').Command[]=[];const events:import('../../src/domain/types').BattleEvent[]=[];
   while(live.initiative[live.activeIndex]!==1){const c={type:'endTurn',unitId:live.initiative[live.activeIndex]} as const;const r=dispatch(live,c,created.catalog);assert(r.ok);commands.push(c);events.push(...r.events);live=r.state;}
   const r=dispatch(live,command,created.catalog);assert(r.ok);commands.push(command);events.push(...r.events);
-  const replay=replayRunBattle({format:live.format,versions:live.versions,initial:created.state,commands,battlefield:created.battlefield},items,runContext);assert(replay.ok);
+  const replay=replayRunBattle({format:DRAUGHT_REPLAY_FORMAT_VERSION,versions:live.versions,initial:created.state,commands,battlefield:created.battlefield},items,runContext);assert(replay.ok);
   expect(replay.state).toEqual(r.state);expect(replay.events).toEqual(events);
 });
 

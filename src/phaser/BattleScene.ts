@@ -15,6 +15,7 @@ import { BattleSaveControls } from '../ui/persistence';
 import { menuReturnLink } from '../ui/menuReturn';
 import { track } from '../telemetry/telemetry';
 import { hoverPreview } from '../ui/targetPreview';
+import { previewDraught } from '../domain/turns';
 import { BattleSelection } from '../ui/battleSelection';
 import { BattleRadial, clientPointFromCanvas } from '../ui/battleRadial';
 import { resolveCombatControlsSkin, watchCombatControls, type CombatSkin } from '../ui/combatControls';
@@ -258,6 +259,21 @@ export class BattleScene extends Phaser.Scene {
       action:a=>{board.resetPicking();hovered=null;selection.setAction(a);refresh();},
       plan:()=>{if(session.phase==='player' && !dialogs.open){board.resetPicking();hovered=null;selection.startPlan();refresh();}},
       undo:()=>{if(session.phase==='player' && !dialogs.open)void present(session.undoMove());},
+      draught:()=>{
+        if(!live || !ready || dialogs.open || session.phase!=='player')return;
+        const reviewed = session.state;
+        const command = {type:'drinkDraught',unitId:session.active.id} as const;
+        const preview = previewDraught(reviewed, command, catalog);
+        if(!preview.ok)return;
+        const name = unitFeedback(session, session.active).name;
+        dialogs.showChoices('Drink Healing Draught?',
+          `${name} will heal ${preview.healing} HP to ${preview.hp} HP. Uses one action and one draught. ${preview.remaining - 1} left after use.`, [
+            {id:'battle-draught-cancel',label:'Cancel',run:()=>{}},
+            {id:'battle-draught-confirm',label:'Drink',run:()=>{
+              if(live && !document.hidden && session.state===reviewed && session.prepare(command).ok)void present(session.confirm());
+            }},
+          ],()=>{});
+      },
       danger:()=>{if(session.phase==='player' && !dialogs.open){selection.toggleDanger();refresh();}},
       target:cell=>{board.resetPicking();hovered=null;select(cell);},confirm,cancel,inspect,inspectTarget:inspect,
       log:lines=>{

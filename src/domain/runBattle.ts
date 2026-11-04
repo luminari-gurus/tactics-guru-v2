@@ -2,9 +2,11 @@ import { hasShape } from './validation';
 import { sameBattlefield } from './battlefield';
 import { readBattleState, readReplay } from './battle';
 import { canonical } from './contentIdentity';
+import { DRAUGHT_REPLAY_FORMAT_VERSION } from './constants';
+import { enterWithDraughts } from './draughts';
 import { createBattle, replayCommandSequence } from './turns';
 import { createRun, describeRunBattle, runBoundaryId, transitionRun } from './run';
-import { emptyItemOwnership, readRunItems } from './items';
+import { emptyItemOwnership, readRunItems, settleDraughts } from './items';
 import { createRewardOffer } from './rewards';
 import { readRunSnapshot, runBattleCatalog, resolveRunBattlefield, type RunSaveContext, type RunSnapshot } from './runSaveEnvelope';
 import type { BattleState } from './types';
@@ -20,7 +22,7 @@ export function createRunBattle(input: unknown, context: RunSaveContext) {
   if(!resolved?.ok)return {ok:false,reason:'invalidRun'} as const;
   const created = createBattle(resolved.map.id, entry.seed, catalog);
   if (!created.ok) return created;
-  const checked = readBattleState({ ...created.state, units: created.state.units.map(unit => unit.side === 'player'
+  const checked = readBattleState({ ...created.state, ...enterWithDraughts(read.state.ownership), units: created.state.units.map(unit => unit.side === 'player'
     ? { ...unit, hp: entry.party.find(hero => hero.heroId === unit.defId)!.hp } : unit) }, catalog);
   return checked.ok ? { ...checked, catalog, battlefield:resolved.descriptor } : checked;
 }
@@ -32,8 +34,12 @@ export function replayRunBattle(input: unknown, entry: unknown, context: RunSave
   if(!hasShape(input,['format','versions','initial','commands','battlefield']) || !sameBattlefield(input.battlefield,created.battlefield))return {ok:false,reason:'invalidReplay'} as const;
   const {battlefield: _,...record}=input;
   const read = readReplay(record, created.catalog);
-  if (!read.ok || canonical(read.replay.initial) !== canonical(created.state)) return { ok: false, reason: 'invalidReplay' } as const;
-  return replayCommandSequence(created.state,read.replay.commands,created.catalog);
+  if (!read.ok) return read;
+  // Previously recorded encounters had no inventory capability even when their owner had a stack.
+  const { draughts, ...withoutDraughts } = created.state;
+  const initial = read.replay.format === DRAUGHT_REPLAY_FORMAT_VERSION ? created.state : withoutDraughts;
+  if (canonical(read.replay.initial) !== canonical(initial)) return { ok: false, reason: 'invalidReplay' } as const;
+  return replayCommandSequence(initial,read.replay.commands,created.catalog);
 }
 
 export function freshRunSnapshot(id: string, seed: number, context: RunSaveContext): RunSnapshot {
@@ -46,13 +52,15 @@ export function freshRunSnapshot(id: string, seed: number, context: RunSaveConte
 export function completeRunBattle(snapshot: RunSnapshot, battle: BattleState, context: RunSaveContext) {
   const read = readRunSnapshot({ ...snapshot, activeBattle: battle }, context);
   if (!read.ok || battle.outcome === 'ongoing') return { ok: false, reason: 'invalidState' } as const;
+  const ownership = settleDraughts(snapshot.items.ownership, battle.draughts);
+  if (!ownership) return { ok: false, reason: 'invalidState' } as const;
   const run = snapshot.items.run;
   const next = transitionRun(run, { type: 'completeBattle', runId: run.id, revision: run.revision,
     encounterId: run.encounters[run.encounterIndex], boundaryId: runBoundaryId(run),
     outcome: battle.outcome === 'playerWin' ? 'victory' : 'defeat',
     ...(battle.units.some(u=>u.secondWindUsed)?{secondWindUsed:true as const}:{}),
     party: run.party.map(hero => ({ ...hero, hp: battle.units.find(u => u.side === 'player' && u.defId === hero.heroId)?.hp ?? 0 })) },
-    context.definition, context.catalog);
+    context.definition, context.catalog, battle.draughts);
   if (!next.ok) return next;
-  return readRunSnapshot({ items: { ...snapshot.items, run: next.state, offer: createRewardOffer(next.state, context.items) }, activeBattle: null, battlefield:null }, context);
+  return readRunSnapshot({ items: { ...snapshot.items, ownership, run: next.state, offer: createRewardOffer(next.state, context.items) }, activeBattle: null, battlefield:null }, context);
 }

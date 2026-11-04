@@ -7,6 +7,7 @@ import { menuFixture, terminalMenuBattle, rewardRunFixture } from './helpers/men
 import { BATTLE_STORAGE_KEYS } from '../src/persistence/battleStorage';
 import { RUN_STORAGE_KEYS } from '../src/persistence/runStorage';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
+import { readSession, reviewDraught } from './helpers/battlePolicy';
 const keys={battle:BATTLE_STORAGE_KEYS,run:RUN_STORAGE_KEYS,dungeon:DUNGEON_KEYS};
 
 test('main menu: repeated scene selectors use the first value throughout startup',async({page})=>{
@@ -327,6 +328,38 @@ test('main menu: claim and use a Revive Kit before the next run encounter', asyn
   await expect(page.locator('#game')).toHaveAttribute('data-session', /"defId":"mage"/);
   const battle = JSON.parse((await page.locator('#game').getAttribute('data-session'))!).state;
   expect(battle.units.find((unit: { defId: string }) => unit.defId === 'mage')?.hp).toBe(3);
+});
+for (const skin of ['rail', 'radial'] as const) test('main menu: an earned Healing Draught spends the active turn action and survives Continue (' + skin + ')', async ({ page, isMobile }) => {
+  await page.addInitScript(value => { (window as unknown as Record<string, unknown>).__tacticsGuruCombatControls = value; }, skin);
+  await openMenuRunItems(page, rewardSnapshot(123));
+  await activateMenuItem(page, 'Claim Healing Draught', isMobile); await confirmMenuItem(page);
+  await page.locator('#run-start-encounter').click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  const before = (await readSession(page)).state;
+  const actor = before.units.find(unit => unit.id === before.initiative[before.activeIndex])!;
+  const button = page.locator('#battle-draught');
+  await reviewDraught(page);
+  await expect(page.getByRole('dialog')).toContainText('heal 6 HP');
+  await expect(page.getByRole('dialog')).toContainText('0 left after use');
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog')).not.toBeVisible();
+  if (!isMobile) await expect(button).toBeFocused();
+  expect((await readSession(page)).state).toEqual(before);
+  await reviewDraught(page);
+  const confirm = page.locator('#battle-draught-confirm');
+  if (isMobile) await confirm.tap(); else { await confirm.focus(); await page.keyboard.press('Enter'); }
+  await expect(page.getByRole('dialog')).not.toBeVisible();
+  await expect(button).toBeDisabled();
+  await expect(button).toHaveText('Healing Draught ×0 · None left');
+  const after = (await readSession(page)).state;
+  expect(after.commandCount).toBe(before.commandCount + 1);
+  expect(after.rng).toEqual(before.rng);
+  expect(after.activeIndex).toBe(before.activeIndex);
+  expect(after.units.find(unit => unit.id === actor.id)).toEqual({ ...actor, hp: actor.hp + 6, hasActed: true });
+  await page.reload(); await page.locator('#run-continue').click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  expect((await readSession(page)).state).toEqual(after);
+  await expect(button).toBeDisabled();
 });
 test('main menu: corruption preserves bytes, exports raw data and requires reviewed removal before saving', async ({ page }) => {
   await openMenuRunItems(page,preparedSnapshot());

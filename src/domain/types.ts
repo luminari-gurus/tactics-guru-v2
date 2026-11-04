@@ -1,6 +1,7 @@
 import type { AbilityId, CellPosition, EnemyId, HeroId, MapId } from '../content/types';
 import type { RngState } from './rng';
-import type { RNG_VERSION, RULES_VERSION, STATE_FORMAT_VERSION, BASE_REPLAY_FORMAT_VERSION, REPLAY_FORMAT_VERSION } from './constants';
+import type { RNG_VERSION, RULES_VERSION, STATE_FORMAT_VERSION, BASE_REPLAY_FORMAT_VERSION, REPLAY_FORMAT_VERSION, DRAUGHT_REPLAY_FORMAT_VERSION } from './constants';
+import type { DraughtLedger } from './draughts';
 export interface Versions {
   readonly rules: typeof RULES_VERSION;
   readonly rng: typeof RNG_VERSION;
@@ -32,11 +33,13 @@ export interface BattleState {
   readonly units: readonly UnitState[]; readonly initiative: readonly number[];
   readonly activeIndex: number; readonly round: number;
   readonly outcome: 'ongoing' | 'playerWin' | 'playerLoss'; readonly commandCount: number;
+  readonly draughts?: DraughtLedger;
 }
 /** Ability identities are syntactic intent; validated content defines available profiles. */
 export type { AbilityId } from '../content/types';
 export type Command =
   | { readonly type: 'move'; readonly unitId: number; readonly to: CellPosition }
+  | { readonly type: 'drinkDraught'; readonly unitId: number }
   | { readonly type: 'useAbility'; readonly unitId: number; readonly abilityId: AbilityId;
       readonly target: { readonly unitId: number } | { readonly cell: CellPosition } | { readonly missileTargets: readonly number[] } }
   | { readonly type: 'endTurn'; readonly unitId: number };
@@ -44,7 +47,7 @@ export type RejectionReason = 'malformedCommand' | 'invalidState' | 'battleOver'
   'unitDefeated' | 'notActiveUnit' | 'alreadyMoved' | 'outOfBounds' | 'sameCell' | 'notWalkable' |
   'occupied' | 'unreachable' | 'alreadyActed' | 'unknownAbility' | 'abilityNotOwned' |
   'wrongTargetKind' | 'missingTarget' | 'targetDefeated' | 'sameSide' | 'outOfRange' | 'blockedLos' | 'wrongMissileCount' | 'targetsTooFarApart' |
-  'fullHealth' | 'useExhausted' | 'selfTargetRequired' | 'tauntedTargetRequired' | 'alreadyImmobilized' | 'immobilized' | 'ineligibleAlly' | 'immune';
+  'fullHealth' | 'useExhausted' | 'selfTargetRequired' | 'tauntedTargetRequired' | 'alreadyImmobilized' | 'immobilized' | 'ineligibleAlly' | 'immune' | 'noDraught';
 export type Rejection = { readonly ok: false; readonly reason: RejectionReason };
 export type CommandPreview = { readonly ok: true; readonly command: Command } | Rejection;
 /** Events are data contracts, not implementations of combat or turn flow. */
@@ -71,6 +74,6 @@ export type CommandResult = { readonly ok: true; readonly state: BattleState; re
 export type ReplayCommand = Command | {readonly type:'undoMove';readonly unitId:number};
 /** Initial boundary + accepted intents; replayBattle (turns.ts) re-executes them. */
 export interface Replay {
-  readonly format: typeof BASE_REPLAY_FORMAT_VERSION | typeof REPLAY_FORMAT_VERSION; readonly versions: Versions;
+  readonly format: typeof BASE_REPLAY_FORMAT_VERSION | typeof REPLAY_FORMAT_VERSION | typeof DRAUGHT_REPLAY_FORMAT_VERSION; readonly versions: Versions;
   readonly initial: BattleState; readonly commands: readonly ReplayCommand[];
 }

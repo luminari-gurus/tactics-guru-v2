@@ -31,7 +31,7 @@ export function decodeDungeon(text: string): DungeonResult {
     const body = { kind: input.kind, format: input.format, identity: input.identity, payload: input.payload };
     if (input.digest !== hashJson(body)) return { ok: false, reason: 'digest' };
     const read = readDungeon(input.payload, previous ? previousItemCatalog : undefined);
-    if (previous && read.ok && read.state.offer?.version === 2) return { ok: false, reason: 'incompatible' };
+    if (previous && read.ok && (read.state.offer?.version === 2 || read.state.activeBattle?.draughts)) return { ok: false, reason: 'incompatible' };
     return read;
   } catch { return { ok: false, reason: 'invalidJson' }; }
 }

@@ -434,6 +434,7 @@ test('keyboard-only movement, attack confirmation and Wait use the shared decisi
   const enact=async(command:Command)=>{
     const s=await session(page);
     if(command.type==='endTurn'){await page.locator('#battle-next').focus();await page.keyboard.press('Enter');return;}
+    if(command.type==='drinkDraught')throw Error('Standalone battle does not supply draughts');
     const action=command.type==='move'?'move':command.abilityId==='ability:basic_attack'?'basic':'signature';
     await page.locator(`[data-action="${action}"]`).focus();await page.keyboard.press('Enter');
     const cell=command.type==='move'?command.to:s.state.units.find(u=>u.id===('unitId' in command.target?command.target.unitId:'missileTargets' in command.target?command.target.missileTargets[0]:-1))!.cell;

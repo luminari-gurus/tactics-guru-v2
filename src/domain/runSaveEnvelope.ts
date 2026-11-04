@@ -1,6 +1,7 @@
 import { HERO_PROGRESSION } from '../content/progression';
 import { itemCatalog, previousItemCatalog } from '../content/items';
 import { encounterHpLimit } from './effects';
+import { draughtHealing, matchesDraughtStock } from './draughts';
 import { RULES_VERSION, RNG_VERSION } from './constants';
 import type { BattlefieldEncounter } from '../content/battlefieldTypes';
 import { resolveBattlefield, sameBattlefield, type BattlefieldDescriptor } from './battlefield';
@@ -61,9 +62,10 @@ export function readRunSnapshot(input: unknown, context: RunSaveContext): RunSna
   const catalog = runBattleCatalog(items, context);
   if (!catalog) return invalid;
   const battle = readBattleState(input.activeBattle, catalog);
-  if (!battle.ok || battle.state.mapId !== resolved.map.id ||
+  if (!battle.ok || !matchesDraughtStock(battle.state.draughts, items.ownership) || battle.state.mapId !== resolved.map.id ||
     battle.state.seed !== deriveRunSeed(items.run.seed, 'encounter', items.run.encounterIndex)) return invalid;
-  if (battle.state.units.some(u => u.side === 'player' && u.hp > encounterHpLimit(u,items.run.party.find(h => h.heroId === u.defId)!.hp,catalog))) return invalid;
+  if (battle.state.units.some(u => u.side === 'player' && u.hp > encounterHpLimit(u,items.run.party.find(h => h.heroId === u.defId)!.hp,catalog,
+    draughtHealing(battle.state.draughts,u.defId)))) return invalid;
   return { ok: true, state: { items, activeBattle: battle.state, battlefield:resolved.descriptor } };
 }
 
@@ -96,7 +98,7 @@ export function decodeRunSave(text: string, context: RunSaveContext): RunSnapsho
     input.payload.battlefield.kind==='generated' && (input.payload.battlefield.biome!=='desert' || input.payload.battlefield.generatorVersion!==1 || input.payload.battlefield.profileVersion!=='desert-v1')) return {ok:false,reason:'incompatible'};
   const read = readRunSnapshot(input.payload, previous ? { ...context, items: previousItemCatalog } : context);
   if (!read.ok) return read;
-  if (previous && read.state.items.offer?.version === 2) return { ok: false, reason: 'incompatible' };
+  if (previous && (read.state.items.offer?.version === 2 || read.state.activeBattle?.draughts)) return { ok: false, reason: 'incompatible' };
   const body = { kind: RUN_SAVE_KIND, format: input.format, identity: expected, payload: read.state };
   return hashJson(body) === input.digest ? read : { ok: false, reason: 'corrupt' };
 }
