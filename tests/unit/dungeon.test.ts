@@ -536,6 +536,15 @@ describe('authoritative unsaved departure state',()=>{
 });
 
 describe('versioned floor dimensions', () => {
+  it('keeps shared cached geometry immutable and keyed by generator and size', () => {
+    const a=floorDescriptor(19,2), first=floorMap(a);
+    expect(Object.isFrozen(first)).toBe(true);expect(Object.isFrozen(first.cells)).toBe(true);
+    expect(() => { (first.cells as number[])[0]=1; }).toThrow();
+    expect(floorMap(a)).toBe(first);
+    const other={...a,generator:a.generator === 'arena-v1' ? 'sector-graph-v1' as const : 'arena-v1' as const};
+    expect(floorMap(other).type).toBe(a.generator === 'arena-v1' ? 'sector-graph' : 'arena');expect(floorMap(other)).not.toBe(first);
+    expect(floorMap(a).cells[0]).toBe(0);
+  });
   it('grows new floors deterministically while preserving legacy floor geometry', () => {
     for (const [depth,size] of [[1,20],[2,24],[3,28],[4,32],[5,36],[20,36]] as const) {
       const descriptor = floorDescriptor(19,depth), map = floorMap(descriptor);

@@ -64,23 +64,28 @@ function rememberAdmission(key: string) {
 /** Only resolved geometry is evicted. Durable descriptors/completion never enter this cache. */
 export class FloorCache {
   private maps = new Map<string, GeneratedMap>();
+  constructor(private readonly capacity = 3) {}
   get size() { return this.maps.size; }
   resolve(seed: number, generator: FloorDescriptor['generator'] = 'rooms-v1', size = 20): GeneratedMap {
     const key = `${seed}:${generator}:${size}`;
     let map = this.maps.get(key);
-    if (!map) map = generateMap(seed, generator === 'rooms-v1' ? 'rooms' : generator === 'arena-v1' ? 'arena' : 'sector-graph', size);
+    if (!map) {
+      const generated = generateMap(seed, generator === 'rooms-v1' ? 'rooms' : generator === 'arena-v1' ? 'arena' : 'sector-graph', size);
+      map = Object.freeze({ ...generated, cells: Object.freeze([...generated.cells]) });
+    }
     this.maps.delete(key); this.maps.set(key, map);
-    if (this.maps.size > 3) this.maps.delete(this.maps.keys().next().value!);
+    if (this.maps.size > this.capacity) this.maps.delete(this.maps.keys().next().value!);
     return map;
   }
 }
 export const floorSize = (depth: number) => 20 + 4 * Math.min(depth - 1, 4);
-export const floorMap = (descriptor: FloorDescriptor, cache = new FloorCache()) => cache.resolve(descriptor.seed, descriptor.generator, descriptor.size ?? 20);
+const sharedFloorCache = new FloorCache(8);
+export const floorMap = (descriptor: FloorDescriptor, cache = sharedFloorCache) => cache.resolve(descriptor.seed, descriptor.generator, descriptor.size ?? 20);
 /** Prior saves contain no per-slot geometry. Keep their fixed facts cheap until battle entry. */
 function legacyEncounterPlans(depth: number): FloorDescriptor['encounters'] {
   return [0,1,2].map(slot=>({selection:legacyDungeonEncounter(depth,slot),battlefield:null}));
 }
-function floorGeometry(seed: number, depth: number, biome: FloorDescriptor['biome'], cache = new FloorCache(), generator: FloorDescriptor['generator'] = depth === 1 ? 'rooms-v1' : dungeonSeed(seed, depth, 'floor') % 4 === 0 ? 'arena-v1' : 'sector-graph-v1'): Omit<FloorDescriptor, 'encounters'> {
+function floorGeometry(seed: number, depth: number, biome: FloorDescriptor['biome'], cache = sharedFloorCache, generator: FloorDescriptor['generator'] = depth === 1 ? 'rooms-v1' : dungeonSeed(seed, depth, 'floor') % 4 === 0 ? 'arena-v1' : 'sector-graph-v1'): Omit<FloorDescriptor, 'encounters'> {
   const floorSeed = dungeonSeed(seed, depth, 'floor'), size = generator === 'rooms-v1' ? 20 : floorSize(depth), map = cache.resolve(floorSeed, generator, size);
   return { depth, seed: floorSeed, template: DUNGEON_TEMPLATE, generator, ...(generator === 'rooms-v1' ? {} : {size}), biome,
     mapHash: hashJson(map), upstairs: map.cells.indexOf(1), downstairs: map.cells.lastIndexOf(1) };
