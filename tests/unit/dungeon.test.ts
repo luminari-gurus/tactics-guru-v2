@@ -36,6 +36,13 @@ it.each(['active', 'reward'])('loads the exact pre-consumable dungeon %s save an
   const current = encodeDungeon(read.state); assert(current.ok);
   expect(JSON.parse(current.text).format).toBe(10);
   expect(decodeDungeon(current.text)).toEqual(read);
+  if (phase === 'reward') {
+    const offer = read.state.offer!; expect(offer.version).toBe(1);
+    const claimed = dungeonItem(read.state, { ...dungeonBoundary(read.state), type: 'claimReward',
+      offerId: offer.id, itemId: offer.options[0].itemId });
+    assert(claimed.ok); expect(claimed.state.phase).toBe('ready');
+    expect(claimed.state.offer).toBeNull();
+  }
   expect(decodeDungeon(JSON.stringify({ ...previous, digest: `sha256:${'0'.repeat(64)}` }))).toEqual({ ok: false, reason: 'digest' });
 });
 function win(s: DungeonState) {

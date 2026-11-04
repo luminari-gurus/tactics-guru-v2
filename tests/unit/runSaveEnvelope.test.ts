@@ -12,6 +12,7 @@ import { createRun, deriveRunSeed, transitionRun, runBoundaryId } from '../../sr
 import { emptyItemOwnership } from '../../src/domain/items';
 import { previewSupportAbility } from '../../src/domain/combat';
 import { DRAUGHT_REPLAY_FORMAT_VERSION } from '../../src/domain/constants';
+import { RunItemSession } from '../../src/app/RunItemSession';
 
 it.each(['active', 'reward'])('loads the exact pre-consumable run %s save and preserves its pending offer or battle', phase => {
   const text = readFileSync(`tests/fixtures/saves/issue-172/run-${phase}.json`, 'utf8');
@@ -22,6 +23,13 @@ it.each(['active', 'reward'])('loads the exact pre-consumable run %s save and pr
   const current = encodeRunSave(read.state, runContext); assert(current.ok);
   expect(JSON.parse(current.text).format).toBe(8);
   expect(decodeRunSave(current.text, runContext)).toEqual(read);
+  if (phase === 'reward') {
+    const run = new RunItemSession(read.state, runContext, null);
+    const offer = run.snapshot.items.offer!; expect(offer.version).toBe(1);
+    const claimed = run.dispatch({ ...run.boundary(), type: 'claimReward', offerId: offer.id, itemId: offer.options[0].itemId });
+    assert(claimed.ok); expect(claimed.state.run.phase).toBe('battle');
+    expect(claimed.state.offer).toBeNull();
+  }
   expect(decodeRunSave(JSON.stringify({ ...previous, digest: `sha256:${'0'.repeat(64)}` }), runContext)).toEqual({ ok: false, reason: 'corrupt' });
 });
 

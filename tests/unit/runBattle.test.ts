@@ -41,8 +41,14 @@ it('commits the last draught once, retries the exact failed write and continues 
  expect(run.snapshot.activeBattle).toEqual(before);
  expect(dispatch(before,{...command,unitId:64},battle.catalog)).toEqual({ok:false,reason:'unknownUnit'});
  expect(dispatch(before,{...command,target:{unitId:actor.id}},battle.catalog)).toEqual({ok:false,reason:'malformedCommand'});
+ const enemy=before.units.find(unit=>unit.side==='enemy')!;
+ const enemyUse={...command,unitId:enemy.id};
+ expect(dispatch(before,enemyUse,battle.catalog)).toEqual({ok:false,reason:'notActiveUnit'});
+ expect(dispatch({...before,activeIndex:before.initiative.indexOf(enemy.id)},enemyUse,battle.catalog)).toEqual({ok:false,reason:'noDraught'});
  const full={...before,units:before.units.map(u=>u.id===actor.id?{...u,hp:battle.catalog.heroes[actor.defId].stats.maxHp}:u)};
  expect(previewDraught(full,command,battle.catalog)).toEqual({ok:false,reason:'fullHealth'});
+ const nearlyFull={...full,units:full.units.map(unit=>unit.id===actor.id?{...unit,hp:unit.hp-2}:unit)};
+ expect(previewDraught(nearlyFull,command,battle.catalog)).toMatchObject({ok:true,healing:2,hp:battle.catalog.heroes[actor.defId].stats.maxHp});
  const priorRaw=data.get(RUN_STORAGE_KEYS.primary)!;
  failWrite=true;
  expect(battle.prepare(command).ok).toBe(true);
