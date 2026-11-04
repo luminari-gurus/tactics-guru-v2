@@ -6,7 +6,7 @@ import { dungeonBoundary, currentFloor, clearedDungeonSlots, FloorCache, type Du
 import type { DungeonSession } from '../app/DungeonSession';
 import { ITEM_BOUNDS } from '../content/itemTypes';
 import type { HeroId } from '../content/types';
-import { projectOwnedCatalog } from '../domain/items';
+import { preparationItemTarget, projectOwnedCatalog } from '../domain/items';
 import { BattleDialogs } from './dialogs';
 import './dungeon.css';
 export const dungeonElement = <K extends keyof HTMLElementTagNameMap>(tag: K, text = '') => { const n = document.createElement(tag); n.textContent = text; return n; };
@@ -39,10 +39,22 @@ export function renderDungeon(root: HTMLElement, session: DungeonSession, dialog
   if(!s.ownership.consumables.length&&!s.ownership.equipment.length)inventory.append(el('p','No owned items yet.'));
   for(const entry of [...s.ownership.consumables,...s.ownership.equipment]){
     const def=dungeonContent.items[entry.itemId],row=el('div'),select=el('select');select.setAttribute('aria-label',`${def.label} target`);
-    for(const h of s.party){const o=el('option',h.heroId);o.value=h.heroId;o.disabled=h.hp===0||!def.eligibleHeroes.includes(h.heroId)||def.kind==='consumable'&&h.hp===h.maxHp;select.append(o);}
+    for(const h of s.party){
+      const preview=preparationItemTarget(def,h,s.party);
+      const o=el('option',preview.ok?h.heroId:`${h.heroId} (${preview.reason})`);
+      o.value=h.heroId;o.disabled=!preview.ok;select.append(o);
+    }
     select.value=[...select.options].find(o=>!o.disabled)?.value??'';
     row.append(el('p',`${def.label}${'quantity'in entry?` ×${entry.quantity}`:''}`),select);
-    if('quantity'in entry){row.append(button(`Use ${def.label}`,()=>review(`Use ${def.label}?`,{...dungeonBoundary(s),type:'useItem',itemId:def.id,heroId:select.value as HeroId}),!select.value||!['ready','reward'].includes(s.phase)));}
+    if('quantity'in entry){
+      row.append(button(`Use ${def.label}`,()=>{
+        const hero=s.party.find(h=>h.heroId===select.value);
+        const preview=hero&&preparationItemTarget(def,hero,s.party);
+        if(!hero||!preview?.ok)return;
+        review(`Use ${def.label} on ${hero.heroId}? ${hero.heroId} will have ${preview.hp}/${hero.maxHp} HP.`,
+          {...dungeonBoundary(s),type:'useItem',itemId:def.id,heroId:hero.heroId});
+      },!select.value||!['ready','reward'].includes(s.phase)));
+    }
     else{row.dataset.instanceId=entry.instanceId;const instanceId=entry.instanceId,assignment=s.ownership.assignments.find(a=>a.instanceId===instanceId);
       row.append(button(assignment?`Unequip ${def.label}`:`Equip ${def.label}`,()=>review(`${assignment?'Unequip':'Equip'} ${def.label}?`,{...dungeonBoundary(s),type:assignment?'unequipItem':'equipItem',instanceId,heroId:assignment?.heroId??select.value as HeroId,slot:'charm'}),(!assignment&&!select.value)||!['ready','reward'].includes(s.phase)));}
     if('instanceId'in entry){

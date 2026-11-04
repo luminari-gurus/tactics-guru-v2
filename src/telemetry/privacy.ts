@@ -1,10 +1,10 @@
 import type { Exception } from '@posthog/core/error-tracking';
-import { events } from './telemetry';
+import { events, rewardChoices } from './telemetry';
 export interface CaptureResult { uuid: string; event: string; timestamp?: Date; properties: Record<string, unknown>; $set?: Record<string, unknown> }
 const allowed: Record<string, readonly unknown[]> = {
   visibility: ['visible','hidden'],
   route: ['battle','run','map'], phase: ['entry','player','enemy','presenting','ended','error','disposed','battle','reward','victory','defeat'],
-  encounter: [0,1,2], outcome: ['victory','defeat'], choice: ['healing_draught','warding_charm','aiming_charm'],
+  encounter: [0,1,2], outcome: ['victory','defeat'], choice: rewardChoices,
   operation: ['read','write','remove','reset'],
   failure: ['application_load','scene_load','battle_resolution','encounter_start','run_boundary','save_read','save_write','save_remove','save_reset','runtime_error','unhandled_rejection','verification'],
 };

@@ -1,5 +1,5 @@
 import { levelUpFeedback } from '../domain/progression';
-import { track, reportFailure, setTelemetryContext } from '../telemetry/telemetry';
+import { track, reportFailure, rewardChoices, setTelemetryContext } from '../telemetry/telemetry';
 import { applyItemCommand, type ItemCommand, type ItemFailure } from '../domain/items';
 import { BattleSession } from './BattleSession';
 import { completeRunBattle, freshRunSnapshot } from '../domain/runBattle';
@@ -148,7 +148,8 @@ export class RunItemSession {
     this.battle?.dispose(); this.battle = null;
     const encounter = this.current.items.run.encounterIndex;
     this.current = { items: result.state, activeBattle: null, battlefield:null };
-    if (command.type === 'claimReward') track('reward_chosen', { route: 'run', encounter, phase: 'reward', choice: command.itemId.replace('item:', '') as 'healing_draught' | 'warding_charm' | 'aiming_charm' }, `${this.current.items.run.id}:${encounter}`);
+    if (command.type === 'claimReward') track('reward_chosen', { route: 'run', encounter, phase: 'reward',
+      choice: rewardChoices.find(choice => `item:${choice}` === command.itemId) }, `${this.current.items.run.id}:${encounter}`);
     this.review = null;
     this.save();
     return { ...result, state: this.snapshot.items };

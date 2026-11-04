@@ -57,7 +57,7 @@ test('Mage legal progression journey earns level three uses Frost Snare and mult
   for(let i=0;i<20;i++) {
    const s=await snapshot(page),command=journeyPreparation(s);if(!command)break;
    if(command.type==='claimReward')await page.getByRole('button',{name:`Claim ${dungeonContent.items[command.itemId].label}`,exact:true}).click();
-   else if(command.type==='useItem'){await page.getByRole('combobox',{name:'Healing Draught target',exact:true}).selectOption(command.heroId);await page.getByRole('button',{name:'Use Healing Draught',exact:true}).click();}
+   else if(command.type==='useItem'){const label=dungeonContent.items[command.itemId].label;await page.getByRole('combobox',{name:`${label} target`,exact:true}).selectOption(command.heroId);await page.getByRole('button',{name:`Use ${label}`,exact:true}).click();}
    else if(command.type==='equipItem'){const row=page.locator(`[data-instance-id="${command.instanceId}"]`);await row.locator('select').selectOption(command.heroId);const item=s.ownership.equipment.find(e=>e.instanceId===command.instanceId)!;await row.getByRole('button',{name:`Equip ${dungeonContent.items[item.itemId].label}`,exact:true}).click();}
    else throw Error('Unexpected preparation command');await page.locator('#dungeon-item-confirm').click();
   }
@@ -109,7 +109,7 @@ test('Ranger legal progression journey earns level three uses Mark and Pin and r
   for(let i=0;i<20;i++) {
    const s=await snapshot(page),command=journeyPreparation(s);if(!command)break;
    if(command.type==='claimReward')await page.getByRole('button',{name:`Claim ${dungeonContent.items[command.itemId].label}`,exact:true}).click();
-   else if(command.type==='useItem'){await page.getByRole('combobox',{name:'Healing Draught target',exact:true}).selectOption(command.heroId);await page.getByRole('button',{name:'Use Healing Draught',exact:true}).click();}
+   else if(command.type==='useItem'){const label=dungeonContent.items[command.itemId].label;await page.getByRole('combobox',{name:`${label} target`,exact:true}).selectOption(command.heroId);await page.getByRole('button',{name:`Use ${label}`,exact:true}).click();}
    else if(command.type==='equipItem'){const row=page.locator(`[data-instance-id="${command.instanceId}"]`);await row.locator('select').selectOption(command.heroId);const item=s.ownership.equipment.find(e=>e.instanceId===command.instanceId)!;await row.getByRole('button',{name:`Equip ${dungeonContent.items[item.itemId].label}`,exact:true}).click();}
    else throw Error('Unexpected preparation command');await page.locator('#dungeon-item-confirm').click();
   }
@@ -121,9 +121,9 @@ test('Ranger legal progression journey earns level three uses Mark and Pin and r
 
 test('Fighter legal progression journey earns level three uses both abilities and resumes',async({page,isMobile})=>{
  test.setTimeout(600000);page.setDefaultTimeout(10000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
- const witness=fighterJourney(28);expect(witness.healed&&witness.taunted).toBe(true);
+ const witness=fighterJourney(50);expect(witness.healed&&witness.taunted).toBe(true);
  // Canonical unplayed level-1 seed, with no fabricated progression, inventory or combat boundary.
- await seed(page,freshDungeon('fighter-production-journey',28));
+ await seed(page,freshDungeon('fighter-production-journey',witness.seed));
  const records:unknown[]=[];let healed=false,taunted=false;
  for(let depth=1;depth<=witness.state.depth;depth++) {
   for(let slot=0;slot<3;slot++) {
@@ -164,7 +164,7 @@ test('Fighter legal progression journey earns level three uses both abilities an
    for(let i=0;i<20;i++) {
     const s=await snapshot(page),command=journeyPreparation(s);if(!command)break;
     if(command.type==='claimReward')await page.getByRole('button',{name:`Claim ${dungeonContent.items[command.itemId].label}`,exact:true}).click();
-    else if(command.type==='useItem'){await page.getByRole('combobox',{name:'Healing Draught target',exact:true}).selectOption(command.heroId);await page.getByRole('button',{name:'Use Healing Draught',exact:true}).click();}
+    else if(command.type==='useItem'){const label=dungeonContent.items[command.itemId].label;await page.getByRole('combobox',{name:`${label} target`,exact:true}).selectOption(command.heroId);await page.getByRole('button',{name:`Use ${label}`,exact:true}).click();}
     else if(command.type==='equipItem'){const row=page.locator(`[data-instance-id="${command.instanceId}"]`);await row.locator('select').selectOption(command.heroId);const item=s.ownership.equipment.find(e=>e.instanceId===command.instanceId)!;await row.getByRole('button',{name:`Equip ${dungeonContent.items[item.itemId].label}`,exact:true}).click();}
     else throw Error('Unexpected preparation command');
     await page.locator('#dungeon-item-confirm').click();
@@ -174,6 +174,6 @@ test('Fighter legal progression journey earns level three uses both abilities an
  }
  const final=await snapshot(page);expect(final.floors.map(f=>f.completed)).toEqual([3,2]);expect(final.phase).toBe('defeat');expect(final.party.find(h=>h.heroId==='fighter')!.level).toBeGreaterThanOrEqual(3);expect(healed).toBe(true);expect(taunted).toBe(true);expect(errors).toEqual([]);
  expect(final.party).toEqual(witness.state.party);
- writeFileSync(test.info().outputPath('fighter-production-journey.json'),JSON.stringify({seed:28,records,final,healed,taunted}));await page.screenshot({path:test.info().outputPath('fighter-terminal-journey.png'),fullPage:true});
+ writeFileSync(test.info().outputPath('fighter-production-journey.json'),JSON.stringify({seed:witness.seed,records,final,healed,taunted}));await page.screenshot({path:test.info().outputPath('fighter-terminal-journey.png'),fullPage:true});
 });
 

@@ -305,6 +305,29 @@ test('main menu: real item use, equip and unequip preserve ownership/stats acros
   await page.getByRole('button', { name: 'Unequip Warding Charm' }).click(); await confirmMenuItem(page);
   expect((await menuItemReport(page)).snapshot.items.ownership.assignments).toEqual([]);
 });
+test('main menu: claim and use a Revive Kit before the next run encounter', async ({ page, isMobile }) => {
+  const seed = Array.from({ length: 100 }, (_, i) => i).find(s => rewardSnapshot(s).items.offer!.options.some(o => o.itemId === 'item:revive_kit'))!;
+  await openMenuRunItems(page, rewardSnapshot(seed));
+  await activateMenuItem(page, 'Claim Revive Kit', isMobile); await confirmMenuItem(page);
+  const targets = page.getByRole('combobox', { name: 'Revive Kit target' });
+  await expect(targets).toHaveValue('mage');
+  await expect(targets.locator('option', { hasText: 'Fighter (still standing)' })).toBeDisabled();
+  const use = page.getByRole('button', { name: 'Use Revive Kit', exact: true });
+  if (isMobile) await use.tap();
+  else { await use.focus(); await page.keyboard.press('Enter'); }
+  await expect(page.getByRole('dialog')).toContainText('Mage will have 3/11 HP');
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog')).not.toBeVisible();
+  expect((await menuItemReport(page)).snapshot.items.run.party[2].hp).toBe(0);
+  await activateMenuItem(page, 'Use Revive Kit', isMobile); await confirmMenuItem(page);
+  await expect(use).toHaveCount(0);
+  await reloadMenuRunItems(page);
+  expect((await menuItemReport(page)).snapshot.items.run.party[2].hp).toBe(3);
+  await page.locator('#run-start-encounter').click();
+  await expect(page.locator('#game')).toHaveAttribute('data-session', /"defId":"mage"/);
+  const battle = JSON.parse((await page.locator('#game').getAttribute('data-session'))!).state;
+  expect(battle.units.find((unit: { defId: string }) => unit.defId === 'mage')?.hp).toBe(3);
+});
 test('main menu: corruption preserves bytes, exports raw data and requires reviewed removal before saving', async ({ page }) => {
   await openMenuRunItems(page,preparedSnapshot());
   const backup = await page.evaluate(key => localStorage.getItem(key), RUN_STORAGE_KEYS.backup);

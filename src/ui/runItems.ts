@@ -2,7 +2,7 @@ import type { HeroId } from '../content/types';
 import type { ItemDef } from '../content/itemTypes';
 import type { ItemCommand } from '../domain/items';
 import { progressionLabel } from '../domain/progression';
-import { projectItemCatalog } from '../domain/items';
+import { preparationItemTarget, projectItemCatalog } from '../domain/items';
 import type { RunItemSession } from '../app/RunItemSession';
 import type { RunLoadResult } from '../persistence/runStorage';
 import { BattleDialogs, type DialogChoice } from './dialogs';
@@ -14,7 +14,8 @@ const element = <K extends keyof HTMLElementTagNameMap>(tag: K, text = '') => {
 const heroLabel = (id: HeroId) => id[0].toUpperCase() + id.slice(1);
 const encounterLabel = (id: string) => id.split(':').at(-1)!.split('_').map(word => word[0].toUpperCase() + word.slice(1)).join(' ');
 const effect = (def: ItemDef) => def.effect.kind === 'restoreHp' ? `Restore ${def.effect.amount} HP` :
-  `+${def.effect.amount} ${def.effect.stat === 'armorClass' ? 'armor class' : 'accuracy'}`;
+  def.effect.kind === 'revive' ? `Revive a fallen hero at ${def.effect.percent}% HP (rounded down, minimum 1)` :
+    `+${def.effect.amount} ${def.effect.stat === 'armorClass' ? 'armor class' : 'accuracy'}`;
 /** Mount once per flow, dispose before replacement. Caller owns the sole modal instance. */
 export function mountRunItems(root: HTMLElement, session: RunItemSession, dialogs: BattleDialogs,
   host?: { continueRun: (load: RunLoadResult) => void; recover: () => void }) {
@@ -108,9 +109,8 @@ export function mountRunItems(root: HTMLElement, session: RunItemSession, dialog
     const targets = (def: ItemDef, id: string) => {
       const select = element('select'); select.id = id; select.setAttribute('aria-label', `${def.label} target`);
       for (const hero of run.party) {
-        const max = hero.maxHp;
-        const reason = hero.hp === 0 ? 'defeated' : !def.eligibleHeroes.includes(hero.heroId) ? 'ineligible' :
-          def.kind === 'consumable' && hero.hp === max ? 'full HP' : '';
+        const preview = preparationItemTarget(def, hero, run.party);
+        const reason = preview.ok ? '' : preview.reason;
         const option = element('option', `${heroLabel(hero.heroId)}${reason ? ` (${reason})` : ''}`);
         option.value = hero.heroId; option.disabled = !!reason; select.append(option);
       }
@@ -121,11 +121,16 @@ export function mountRunItems(root: HTMLElement, session: RunItemSession, dialog
     for (const stack of ownership.consumables) {
       const def = session.context.items[stack.itemId], row = element('div');
       const select = targets(def, `target-${def.id}`);
-      const use = button(`Use ${def.label}`, () => review(`Use ${def.label} on ${select.selectedOptions[0]?.text}?`,
-        { ...session.boundary(), type: 'useItem', itemId: def.id, heroId: select.value as HeroId }));
+      const use = button(`Use ${def.label}`, () => {
+        const hero = run.party.find(h => h.heroId === select.value);
+        const preview = hero && preparationItemTarget(def, hero, run.party);
+        if (!hero || !preview?.ok) return;
+        review(`Use ${def.label} on ${heroLabel(hero.heroId)}? ${heroLabel(hero.heroId)} will have ${preview.hp}/${hero.maxHp} HP.`,
+          { ...session.boundary(), type: 'useItem', itemId: def.id, heroId: hero.heroId });
+      });
       use.disabled = select.disabled;
       row.append(element('p', `${def.label} ×${stack.quantity} · ${effect(def)}`), select, use);
-      if (!select.value) row.append(element('p', 'No eligible living target with missing HP.'));
+      if (!select.value) row.append(element('p', def.effect.kind === 'revive' ? 'No eligible fallen hero.' : 'No eligible living target with missing HP.'));
       inventory.append(row);
     }
     for (const instance of ownership.equipment) {

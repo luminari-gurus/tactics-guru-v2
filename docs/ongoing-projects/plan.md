@@ -2,6 +2,12 @@
 
 Planned on 2026-11-04 from `origin/main` at `fbf82420b82674dc5f57397d68b0a50c8bf485c0`. Owner `@moshehbenavraham`. Branch `branch/issue-172-combat-consumables-revival`. [Issue #172](https://github.com/luminari-gurus/tactics-guru-v2/issues/172)
 
+## Handoff and delivery order
+
+- **Preparation and rewards** are implemented on the issue branch. The shared preparation reducer drives eligibility and exact HP in both reviews. New offers use reward version 2. The exact previous run format 7 and dungeon format 9 are accepted, including version 1 pending choices. New writes use run format 8 and dungeon format 10. The four wire fixtures in `tests/fixtures/saves/issue-172` were encoded before the change on `434031e`. Earlier unsupported dungeon formats still use the existing recovery path.
+- **Combat use** will be stacked on the preparation PR. The next change owns the pure battle command, the encounter-scoped draught ledger and terminal settlement, replay admission, and one item control shared by Rail and Radial. Existing active battles without a ledger continue with their original capability. Keep that case distinct from a new battle that began with owned stock and spent its last draught.
+- **Verification in progress.** Initial focused production build passed. The new revival interactions passed all six Chromium and five WebKit profile cases on Windows emulation. The first full unit run retained two timing-sensitive failures (`battleAudioInventory` and `measureFitPreview`) and a changed Fighter witness outcome. The new reward pool intentionally changes future offers, so the Fighter terminal-defeat witness moved from seed 28 to seed 50 to retain six legal battles, level three, both abilities, and exact replay. Recheck the adjusted witness and timing cases on the final slice source. Final source/build receipts, additional browser checks, and full regression are pending.
+
 ## Outcome
 
 Use an owned Healing Draught as a battle action and revive a fallen party member in preparation with an owned Revive Kit. Both work in authored runs and dungeons, including the main menu’s saved journeys. Direct testing routes use the same game rules and keep their progress in memory. An isolated standalone battle has no party inventory. The existing item catalog, preparation controls, and reward flow from #77–#79 are the starting points.

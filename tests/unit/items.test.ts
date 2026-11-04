@@ -6,16 +6,17 @@ import { validateItems } from '../../src/content/validateItems';
 const copy = () => structuredClone(itemCatalog) as Record<string, any>;
 const draught = 'item:healing_draught';
 
-it('validates the three reviewed entries through the runtime validator', () => {
+it('validates the four reviewed entries through the runtime validator', () => {
   const read = validateItems(itemCatalog);
   expect(read.ok).toBe(true);
-  expect(Object.keys(itemCatalog)).toHaveLength(3);
+  expect(Object.keys(itemCatalog)).toHaveLength(4);
   expect(itemCatalog[draught].effect).toEqual({ kind: 'restoreHp', amount: 6 });
+  expect(itemCatalog['item:revive_kit'].effect).toEqual({ kind: 'revive', percent: 35 });
   expect(itemCatalog['item:warding_charm'].effect).toEqual({ kind: 'statBonus', stat: 'armorClass', amount: 1 });
   expect(itemCatalog['item:aiming_charm'].effect).toEqual({ kind: 'statBonus', stat: 'accuracy', amount: 1 });
   for (const item of Object.values(itemCatalog)) {
     expect(item.eligibleHeroes).toEqual(['fighter', 'ranger', 'mage']);
-    expect(item.context).toBe('betweenEncounters');
+    expect(item.context).toBe(item.id === draught ? 'preparationAndCombat' : 'betweenEncounters');
   }
 });
 
@@ -35,6 +36,9 @@ describe('invalid catalog data is rejected with located errors', () => {
     ['empty heroes', c => { c[draught].eligibleHeroes = []; }],
     ['sparse heroes', c => { c[draught].eligibleHeroes = Array(1); }],
     ['battle context', c => { c[draught].context = 'battle'; }],
+    ['revival in combat', c => { c['item:revive_kit'].context = 'preparationAndCombat'; }],
+    ['combat equipment', c => { c['item:warding_charm'].context = 'preparationAndCombat'; }],
+    ['invalid revive percent', c => { c['item:revive_kit'].effect.percent = 101; }],
     ['unknown effect', c => { c[draught].effect.kind = 'revive'; }],
     ['extra effect', c => { c[draught].effect.extra = 1; }],
     ['wrong slot', c => { c['item:warding_charm'].slot = 'weapon'; }],

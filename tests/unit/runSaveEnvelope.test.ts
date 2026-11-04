@@ -2,6 +2,7 @@ import { combatStats } from '../../src/domain/effects';
 import { progressHero } from '../../src/domain/progression';
 import { createRunBattle, completeRunBattle, replayRunBattle } from '../../src/domain/runBattle';
 import { assert, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { activeSnapshot, preparedSnapshot, rewardSnapshot, runContext } from '../helpers/runItemFixtures';
 import { decodeRunSave, encodeRunSave, readRunSnapshot, runBattleCatalog, resolveRunBattlefield, RUN_SAVE_MAX_CODE_UNITS } from '../../src/domain/runSaveEnvelope';
 import { createBattle, dispatch } from '../../src/domain/turns';
@@ -10,6 +11,18 @@ import { contentVersion } from '../../src/domain/battle';
 import { createRun, deriveRunSeed, transitionRun, runBoundaryId } from '../../src/domain/run';
 import { emptyItemOwnership } from '../../src/domain/items';
 import { previewSupportAbility } from '../../src/domain/combat';
+
+it.each(['active', 'reward'])('loads the exact pre-consumable run %s save and preserves its pending offer or battle', phase => {
+  const text = readFileSync(`tests/fixtures/saves/issue-172/run-${phase}.json`, 'utf8');
+  const previous = JSON.parse(text);
+  expect(previous.format).toBe(7);
+  const read = decodeRunSave(text, runContext); assert(read.ok);
+  expect(read.state).toEqual(previous.payload);
+  const current = encodeRunSave(read.state, runContext); assert(current.ok);
+  expect(JSON.parse(current.text).format).toBe(8);
+  expect(decodeRunSave(current.text, runContext)).toEqual(read);
+  expect(decodeRunSave(JSON.stringify({ ...previous, digest: `sha256:${'0'.repeat(64)}` }), runContext)).toEqual({ ok: false, reason: 'corrupt' });
+});
 
 it('roundtrips enemy healing and active Weakened in a controlled run roster without relaxing hero-entry HP',()=>{
   const prepared=preparedSnapshot(),encounterId=prepared.items.run.encounters[prepared.items.run.encounterIndex];

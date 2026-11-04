@@ -38,7 +38,7 @@ it('completes production Shaman Hex and healing through the real session with ex
 });
 
 it('retains a legal six-battle Fighter level-three witness with healing, Taunt and exact terminal replay',()=>{
-  const witness=fighterJourney(28);
+  const witness=fighterJourney(50);
   expect({phase:witness.state.phase,healed:witness.healed,taunted:witness.taunted,depth:witness.depth,slot:witness.slot})
     .toEqual({phase:'defeat',healed:true,taunted:true,depth:2,slot:2});
   expect(witness.records).toHaveLength(6);
@@ -240,7 +240,7 @@ it('uses the same scaled catalog for inspection, attack preview, AI, actual dama
 });
 
 it('plays a legal full-floor witness with existing rewards and carried party HP', () => {
-  const witness=dungeonJourney(43);expect(witness.won).toBe(true);
+  const witness=dungeonJourney(5);expect(witness.won).toBe(true);
   console.info(JSON.stringify({seed:witness.seed,battles:witness.battles.map(b=>({biome:b.selection.policy===LEGACY_ENCOUNTER_POLICY?'grassland':b.selection.biome,kind:b.selection.kind,commands:b.commands,party:b.party}))}));
   expect(witness.state.depth).toBe(1);expect(witness.state.floors.every(f=>f.completed===3)).toBe(true);
 },120000);

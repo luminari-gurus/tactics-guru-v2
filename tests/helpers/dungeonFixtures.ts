@@ -66,7 +66,7 @@ export function dungeonCapacityFixture(policy: DungeonEncounterPolicy = DUNGEON_
     const equipment=Array.from({length:6},(_,i)=>({instanceId:`${base.id}:floor:${Math.floor(i/2)+1}:reward:${i%2}:option:0`,itemId:'item:warding_charm' as const}));
     const candidate:DungeonState={...base,revision:100,depth:4,floors,phase:'reward',ownership:{consumables:[],equipment,assignments:[{heroId:'fighter',slot:'charm',instanceId:equipment[0].instanceId}]}};
     const offer=dungeonOffer(candidate);
-    if(offer.options.every(o=>o.itemId!=='item:healing_draught'))return checkedDungeon(readDungeon({...atEncounter(candidate,0),offer}));
+    if(offer.options.every(o=>dungeonContent.items[o.itemId].kind==='equipment'))return checkedDungeon(readDungeon({...atEncounter(candidate,0),offer}));
   }
   throw Error('No two-charm capacity fixture');
 }
@@ -93,8 +93,14 @@ export const atDownstairs = (s: DungeonState) => atCell(s,s.floors[s.depth-1].de
 /** Deliberate existing reward/equipment/healing choices, shared by pure witness search and UI play. */
 export function journeyPreparation(s: DungeonState): DungeonItemCommand | null {
   const boundary = dungeonBoundary(s);
+  const fallen = s.party.find(h=>h.hp===0);
+  const kit = 'item:revive_kit';
+  if (['ready','reward'].includes(s.phase) && fallen && s.party.some(h=>h.hp>0) && s.ownership.consumables.some(c=>c.itemId===kit))
+    return {...boundary,type:'useItem',itemId:kit,heroId:fallen.heroId};
   if (s.offer) return { ...boundary, type:'claimReward', offerId:s.offer.id,
-    itemId:s.offer.options.find(o=>o.itemId==='item:healing_draught')?.itemId??s.offer.options[0].itemId };
+    itemId:s.offer.options.find(o=>o.itemId===(fallen?kit:'item:healing_draught'))?.itemId??
+      s.offer.options.find(o=>o.itemId==='item:healing_draught')?.itemId??
+      s.offer.options.find(o=>dungeonContent.items[o.itemId].kind==='equipment')?.itemId??s.offer.options[0].itemId };
   if (s.phase !== 'ready') return null;
   const hero = s.party.find(h=>h.hp>0&&!s.ownership.assignments.some(a=>a.heroId===h.heroId));
   const item = s.ownership.equipment.find(e=>!s.ownership.assignments.some(a=>a.instanceId===e.instanceId));
