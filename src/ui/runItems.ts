@@ -123,9 +123,10 @@ export function mountRunItems(root: HTMLElement, session: RunItemSession, dialog
       const select = targets(def, `target-${def.id}`);
       const use = button(`Use ${def.label}`, () => {
         const hero = run.party.find(h => h.heroId === select.value);
-        const preview = hero && preparationItemTarget(def, hero, run.party);
-        if (!hero || !preview?.ok) return;
-        review(`Use ${def.label} on ${heroLabel(hero.heroId)}? ${heroLabel(hero.heroId)} will have ${preview.hp}/${hero.maxHp} HP.`,
+        if (!hero) return;
+        const preview = preparationItemTarget(def, hero, run.party), name = heroLabel(hero.heroId);
+        const result = preview.ok ? `${name} will have ${preview.hp}/${hero.maxHp} HP.` : `${name} cannot use this item (${preview.reason}).`;
+        review(`Use ${def.label} on ${name}? ${result}`,
           { ...session.boundary(), type: 'useItem', itemId: def.id, heroId: hero.heroId });
       });
       use.disabled = select.disabled;
