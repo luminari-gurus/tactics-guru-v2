@@ -330,7 +330,7 @@ test('an earned Healing Draught survives dungeon Continue and settles once after
  await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
  let used=false;
  for(let i=0;i<500;i++){
-  await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||(await readSession(page)).phase==='player';}).toBe(true);
+  await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||await page.locator('#game').getAttribute('data-phase')==='player';}).toBe(true);
   const current=await snapshot(page);if(current.phase!=='battle')break;
   const before=(await readSession(page)).state, actor=before.units.find(u=>u.id===before.initiative[before.activeIndex])!;
   const button=page.locator('#battle-draught');
