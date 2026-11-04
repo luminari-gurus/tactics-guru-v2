@@ -126,7 +126,7 @@ export function dungeonBattle(s: DungeonState) {
   const catalog = { ...projected, maps: { ...projected.maps, [map.id]: map } };
   const created = createBattle(map.id, dungeonSeed(s.seed, s.depth, 'battle', slot), catalog);
   if (!created.ok) return null;
-  const checked = readBattleState({ ...created.state, ...enterWithDraughts(s.ownership), units: created.state.units.map(u => u.side === 'player'
+  const checked = readBattleState({ ...created.state, ...enterWithDraughts(s.ownership, dungeonContent.items), units: created.state.units.map(u => u.side === 'player'
     ? { ...u, hp: s.party.find(h => h.heroId === u.defId)!.hp } : u) }, catalog);
   return checked.ok ? { state: checked.state, catalog, battlefield: resolved.descriptor, selection: plan.selection } : null;
 }
@@ -221,7 +221,7 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
   if (state.phase === 'battle') {
     const battle = dungeonBattle(state);
     const read = battle && readBattleState(state.activeBattle, battle.catalog);
-    if (!battle || !read?.ok || !matchesDraughtStock(read.state.draughts, state.ownership) || !sameBattlefield(state.battlefield, battle.battlefield) ||
+    if (!battle || !read?.ok || !matchesDraughtStock(read.state.draughts, state.ownership, items) || !sameBattlefield(state.battlefield, battle.battlefield) ||
       read.state.seed !== battle.state.seed || read.state.mapId !== battle.state.mapId ||
       read.state.units.some(u => u.side === 'player' && u.hp > encounterHpLimit(u,party.find(h => h.heroId === u.defId)!.hp,battle.catalog,
         draughtHealing(read.state.draughts,u.defId)))) return fail('invalidBattle');

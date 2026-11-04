@@ -11,6 +11,7 @@ import { dispatch, previewDraught, replayBattle, replayCommandSequence } from '.
 import { encodeBattleSave } from '../../src/domain/saveEnvelope';
 import { decodeRunSave, readRunSnapshot } from '../../src/domain/runSaveEnvelope';
 import { BASE_REPLAY_FORMAT_VERSION } from '../../src/domain/constants';
+import { previousItemCatalog } from '../../src/content/items';
 
 function memory(fail?: (key:string)=>void) {
  const data = new Map<string,string>();
@@ -88,6 +89,8 @@ it('constructs all survivor subsets with fresh flags/RNG and carried HP, rejects
   expect(created.state.commandCount).toBe(0);expect(created.state.round).toBe(1);
  }
  expect(createRunBattle({...freshRunSnapshot('fresh',1,runContext).items,run:{bad:1}},runContext).ok).toBe(false);
+ const preparationOnly=createRunBattle(preparedSnapshot().items,{...runContext,items:previousItemCatalog});
+ assert(preparationOnly.ok);expect(preparationOnly.state.draughts).toBeUndefined();
  expect(JSON.stringify(runContext.catalog)).toBe(original);
 });
 it('run-specific replay rejects altered HP/initiative/seed and preserves exact continuation',()=>{

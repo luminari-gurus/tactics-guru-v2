@@ -22,7 +22,7 @@ export function createRunBattle(input: unknown, context: RunSaveContext) {
   if(!resolved?.ok)return {ok:false,reason:'invalidRun'} as const;
   const created = createBattle(resolved.map.id, entry.seed, catalog);
   if (!created.ok) return created;
-  const checked = readBattleState({ ...created.state, ...enterWithDraughts(read.state.ownership), units: created.state.units.map(unit => unit.side === 'player'
+  const checked = readBattleState({ ...created.state, ...enterWithDraughts(read.state.ownership, context.items), units: created.state.units.map(unit => unit.side === 'player'
     ? { ...unit, hp: entry.party.find(hero => hero.heroId === unit.defId)!.hp } : unit) }, catalog);
   return checked.ok ? { ...checked, catalog, battlefield:resolved.descriptor } : checked;
 }

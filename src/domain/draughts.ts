@@ -1,5 +1,5 @@
 import { HERO_IDS } from '../content/constants';
-import { ITEM_BOUNDS, type ItemOwnership } from '../content/itemTypes';
+import { ITEM_BOUNDS, type ItemCatalog, type ItemOwnership } from '../content/itemTypes';
 import { HEALING_DRAUGHT_HP, HEALING_DRAUGHT_ID } from '../content/items';
 import type { HeroId } from '../content/types';
 import { isIntegerIn } from './rng';
@@ -12,10 +12,15 @@ export interface DraughtLedger {
   readonly used: Readonly<Record<HeroId, number>>;
 }
 
-const stockAtEntry = (ownership: ItemOwnership) => ownership.consumables.find(stack => stack.itemId === HEALING_DRAUGHT_ID)?.quantity ?? 0;
+function stockAtEntry(ownership: ItemOwnership, items: ItemCatalog): number {
+  const draught = items[HEALING_DRAUGHT_ID];
+  if (draught?.context !== 'preparationAndCombat' || draught.effect.amount !== HEALING_DRAUGHT_HP ||
+    draught.eligibleHeroes.length !== HERO_IDS.length) return 0;
+  return ownership.consumables.find(stack => stack.itemId === HEALING_DRAUGHT_ID)?.quantity ?? 0;
+}
 
-export function enterWithDraughts(ownership: ItemOwnership): Pick<BattleState, 'draughts'> {
-  const stock = stockAtEntry(ownership);
+export function enterWithDraughts(ownership: ItemOwnership, items: ItemCatalog): Pick<BattleState, 'draughts'> {
+  const stock = stockAtEntry(ownership, items);
   return stock ? { draughts: { stock, used: { fighter: 0, ranger: 0, mage: 0 } } } : {};
 }
 
@@ -27,9 +32,9 @@ export function draughtHealing(ledger: DraughtLedger | undefined, hero: HeroId):
   return (ledger?.used[hero] ?? 0) * HEALING_DRAUGHT_HP;
 }
 
-export function matchesDraughtStock(ledger: DraughtLedger | undefined, ownership: ItemOwnership): boolean {
+export function matchesDraughtStock(ledger: DraughtLedger | undefined, ownership: ItemOwnership, items: ItemCatalog): boolean {
   // Previous active snapshots omit the capability. Their stock is still carried into the next encounter.
-  return ledger === undefined || ledger.stock === stockAtEntry(ownership);
+  return ledger === undefined || ledger.stock === stockAtEntry(ownership, items);
 }
 
 export function isDraughtLedger(input: unknown, units: readonly UnitState[], commandCount: number, round: number): input is DraughtLedger {
