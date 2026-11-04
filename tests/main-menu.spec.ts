@@ -194,15 +194,18 @@ test('main menu: unsaved run still warns after a rejected reward command',async(
   Storage.prototype.setItem=function(key,value){if(String(key).includes(':run:'))throw new DOMException('full','QuotaExceededError');original.call(this,key,value);};
  },{key:keys.run.primary,text});
  await page.goto('./?game=run');await page.getByRole('button',{name:'Continue saved run',exact:true}).click();
- const claim=page.getByRole('button',{name:/^Claim /}).first();
+ const claim=page.getByRole('button',{name:'Claim Healing Draught',exact:true});
  await expect(claim).toBeVisible();await claim.click();await page.locator('#item-confirm').click();
  await expect(page.locator('#run-item-status')).toContainText(/unsaved/i);
- const action=page.getByRole('button',{name:/^(Use|Equip) /}).first();
- await expect(action).toBeVisible();
- const select=page.locator('#run-screen select').first();
- if(await select.count())await select.evaluate(node=>{const target=node as HTMLSelectElement;const mage=[...target.options].find(option=>option.value==='mage');if(mage){mage.disabled=false;target.value='mage';}});
- await action.click({force:true});await page.locator('#item-confirm').click();
+ const select=page.getByRole('combobox',{name:'Healing Draught target',exact:true});
+ const mage=select.locator('option[value="mage"]');await expect(mage).toBeDisabled();
+ await mage.evaluate(option=>{const target=option as HTMLOptionElement;target.disabled=false;target.selected=true;});
+ const before=await menuItemReport(page);
+ await page.getByRole('button',{name:'Use Healing Draught',exact:true}).click();
+ await expect(page.getByRole('dialog')).toContainText('Mage cannot use this item (defeated).');
+ await page.locator('#item-confirm').click();
  await expect(page.locator('#run-item-status')).toContainText('Nothing changed');
+ expect(await menuItemReport(page)).toEqual(before);
  page.once('dialog',dialog=>dialog.dismiss());await page.getByRole('link',{name:'Main menu',exact:true}).last().click();
  await expect(page.getByRole('dialog')).toContainText('Run save recovery');
 });
@@ -304,6 +307,29 @@ test('main menu: real item use, equip and unequip preserve ownership/stats acros
   expect((await menuItemReport(page)).snapshot).toEqual(equipped);
   await page.getByRole('button', { name: 'Unequip Warding Charm' }).click(); await confirmMenuItem(page);
   expect((await menuItemReport(page)).snapshot.items.ownership.assignments).toEqual([]);
+});
+test('main menu: claim and use a Revive Kit before the next run encounter', async ({ page, isMobile }) => {
+  const seed = Array.from({ length: 100 }, (_, i) => i).find(s => rewardSnapshot(s).items.offer!.options.some(o => o.itemId === 'item:revive_kit'))!;
+  await openMenuRunItems(page, rewardSnapshot(seed));
+  await activateMenuItem(page, 'Claim Revive Kit', isMobile); await confirmMenuItem(page);
+  const targets = page.getByRole('combobox', { name: 'Revive Kit target' });
+  await expect(targets).toHaveValue('mage');
+  await expect(targets.locator('option', { hasText: 'Fighter (still standing)' })).toBeDisabled();
+  const use = page.getByRole('button', { name: 'Use Revive Kit', exact: true });
+  if (isMobile) await use.tap();
+  else { await use.focus(); await page.keyboard.press('Enter'); }
+  await expect(page.getByRole('dialog')).toContainText('Mage will have 3/11 HP');
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog')).not.toBeVisible();
+  expect((await menuItemReport(page)).snapshot.items.run.party[2].hp).toBe(0);
+  await activateMenuItem(page, 'Use Revive Kit', isMobile); await confirmMenuItem(page);
+  await expect(use).toHaveCount(0);
+  await reloadMenuRunItems(page);
+  expect((await menuItemReport(page)).snapshot.items.run.party[2].hp).toBe(3);
+  await page.locator('#run-start-encounter').click();
+  await expect(page.locator('#game')).toHaveAttribute('data-session', /"defId":"mage"/);
+  const battle = JSON.parse((await page.locator('#game').getAttribute('data-session'))!).state;
+  expect(battle.units.find((unit: { defId: string }) => unit.defId === 'mage')?.hp).toBe(3);
 });
 test('main menu: corruption preserves bytes, exports raw data and requires reviewed removal before saving', async ({ page }) => {
   await openMenuRunItems(page,preparedSnapshot());

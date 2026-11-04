@@ -1,4 +1,5 @@
 import { HERO_PROGRESSION } from '../content/progression';
+import { itemCatalog, previousItemCatalog } from '../content/items';
 import { encounterHpLimit } from './effects';
 import { RULES_VERSION, RNG_VERSION } from './constants';
 import type { BattlefieldEncounter } from '../content/battlefieldTypes';
@@ -8,14 +9,14 @@ import type { ItemCatalog } from '../content/itemTypes';
 import { contentVersion, readBattleState } from './battle';
 import { canonical, hashJson } from './contentIdentity';
 import { projectItemCatalog, readRunItems, type RunItems } from './items';
-import { itemCatalogIdentity } from './rewards';
+import { itemCatalogIdentity, previousItemCatalogIdentity } from './rewards';
 import { deriveRunSeed, type RunDefinition } from './run';
 import type { BattleState } from './types';
 import type { SaveFailure } from './saveEnvelope';
 import { hasShape } from './validation';
 
 export const RUN_SAVE_KIND = 'tactics-guru:run-snapshot';
-export const RUN_SAVE_FORMAT = 7;
+export const RUN_SAVE_FORMAT = 8;
 export const RUN_SAVE_MAX_CODE_UNITS = 32_768;
 /** Trusted validated definitions. Always pass the immutable BASE catalog. */
 export interface RunSaveContext {
@@ -86,13 +87,16 @@ export function decodeRunSave(text: string, context: RunSaveContext): RunSnapsho
     !hasShape(input.identity, ['content', 'items', 'encounters']) || typeof input.digest !== 'string' ||
     !/^sha256:[0-9a-f]{64}$/.test(input.digest)) return { ok: false, reason: 'invalidEnvelope' };
   const expected = identity(context);
-  if (input.kind !== RUN_SAVE_KIND || input.format !== RUN_SAVE_FORMAT || input.identity.content !== expected.content ||
+  const previous = input.format === 7 && expected.items === itemCatalogIdentity(itemCatalog);
+  if (previous) expected.items = previousItemCatalogIdentity;
+  if (input.kind !== RUN_SAVE_KIND || !(previous || input.format === RUN_SAVE_FORMAT) || input.identity.content !== expected.content ||
     input.identity.items !== expected.items || input.identity.encounters !== expected.encounters) return { ok: false, reason: 'incompatible' };
   if(hasShape(input.payload,['items','activeBattle','battlefield']) &&
     hasShape(input.payload.battlefield,['encounterId','kind','mapId','mapHash','layoutSeed','biome','generatorVersion','profileVersion']) &&
     input.payload.battlefield.kind==='generated' && (input.payload.battlefield.biome!=='desert' || input.payload.battlefield.generatorVersion!==1 || input.payload.battlefield.profileVersion!=='desert-v1')) return {ok:false,reason:'incompatible'};
-  const read = readRunSnapshot(input.payload, context);
+  const read = readRunSnapshot(input.payload, previous ? { ...context, items: previousItemCatalog } : context);
   if (!read.ok) return read;
-  const body = { kind: RUN_SAVE_KIND, format: RUN_SAVE_FORMAT, identity: expected, payload: read.state };
+  if (previous && read.state.items.offer?.version === 2) return { ok: false, reason: 'incompatible' };
+  const body = { kind: RUN_SAVE_KIND, format: input.format, identity: expected, payload: read.state };
   return hashJson(body) === input.digest ? read : { ok: false, reason: 'corrupt' };
 }

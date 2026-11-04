@@ -88,7 +88,7 @@ export function readRunItems(input: unknown, definition: RunDefinition, base: Co
   if (!owned.ok) return owned;
   let offer: RewardOffer | null = null;
   if (run.state.phase === 'reward') {
-    const read = readRewardOffer(input.offer, run.state, items);
+    const read = readRewardOffer(input.offer, run.state.pendingReward, items);
     if (!read.ok) return failure('invalidItems');
     offer = read.offer;
   } else if (input.offer !== null) return failure('invalidItems');
@@ -131,29 +131,50 @@ export function applyItemCommand(input: unknown, command: unknown, context: unkn
   return changed.ok ? finish({ ...run, party: changed.party }, changed.ownership, state.offer, changed.events) : changed;
 }
 
+/** The same eligibility and projected HP are used by preparation review and resolution. */
+export function preparationItemTarget(def: ItemDef, target: RunState['party'][number], party: RunState['party']):
+  { readonly ok: true; readonly hp: number } | { readonly ok: false; readonly reason: string } {
+  if (!def.eligibleHeroes.includes(target.heroId)) return { ok: false, reason: 'ineligible' };
+  if (def.effect.kind === 'revive') {
+    if (target.hp > 0) return { ok: false, reason: 'still standing' };
+    if (!party.some(hero => hero.hp > 0)) return { ok: false, reason: 'party defeated' };
+    return { ok: true, hp: Math.max(1, Math.floor(target.maxHp * def.effect.percent / 100)) };
+  }
+  if (target.hp === 0) return { ok: false, reason: 'defeated' };
+  if (def.effect.kind !== 'restoreHp') return { ok: true, hp: target.hp };
+  if (target.hp === target.maxHp) return { ok: false, reason: 'full HP' };
+  return { ok: true, hp: Math.min(target.maxHp, target.hp + def.effect.amount) };
+}
+
+/** Returns a new ownership only when all requested units are owned. */
+export function spendConsumable(ownership: ItemOwnership, itemId: ItemId, quantity: number): ItemOwnership | null {
+  const stack = ownership.consumables.find(s => s.itemId === itemId);
+  if (!stack || !isIntegerIn(quantity, { min: 1, max: stack.quantity })) return null;
+  const remaining = stack.quantity - quantity;
+  return { ...ownership, consumables: ownership.consumables.flatMap(s => s !== stack ? [s] : remaining ? [{ ...s, quantity: remaining }] : []) };
+}
+
 export function changePreparation(ownership: ItemOwnership, party: RunState['party'], command: Record<string, unknown>,
   base: ContentCatalog, items: ItemCatalog): { readonly ok: true; readonly party: RunState['party']; readonly ownership: ItemOwnership; readonly events: readonly ItemEvent[] } | ItemFailure {
   const common = ['type', 'runId', 'revision', 'encounterId', 'boundaryId', 'itemRevision'];
   const finish = (party: RunState['party'], ownership: ItemOwnership, events: readonly ItemEvent[]) => ({ ok: true as const, party, ownership, events });
   if (!heroId(command.heroId)) return failure('invalidTarget');
   const target = party.find(h => h.heroId === command.heroId)!;
-  if (target.hp === 0) return failure('invalidTarget');
   if (command.type === 'useItem' && hasShape(command, [...common, 'itemId', 'heroId'])) {
     if (!knownItem(command.itemId, items)) return failure('invalidCommand');
-    const def = items[command.itemId], stack = ownership.consumables.find(s => s.itemId === command.itemId);
-    if (def.kind !== 'consumable' || !def.eligibleHeroes.includes(target.heroId)) return failure('invalidTarget');
-    if (!stack) return failure('notOwned');
-    const maxHp = target.maxHp;
-    if (target.hp === maxHp) return failure('invalidTarget');
-    const nextRun = { party: party.map(h => h.heroId === target.heroId ? { ...h, hp: Math.min(maxHp, h.hp + def.effect.amount) } : h) };
-    const consumables = ownership.consumables.flatMap(s => s.itemId !== def.id ? [s] : s.quantity === 1 ? [] : [{ ...s, quantity: s.quantity - 1 }]);
-    return finish(nextRun.party, { ...ownership, consumables }, [{ type: 'itemUsed', itemId: def.id }]);
+    const def = items[command.itemId];
+    if (def.kind !== 'consumable') return failure('invalidTarget');
+    const preview = preparationItemTarget(def, target, party);
+    if (!preview.ok) return failure('invalidTarget');
+    const remaining = spendConsumable(ownership, def.id, 1);
+    if (!remaining) return failure('notOwned');
+    return finish(party.map(h => h === target ? { ...h, hp: preview.hp } : h), remaining, [{ type: 'itemUsed', itemId: def.id }]);
   }
   if ((command.type === 'equipItem' || command.type === 'unequipItem') && hasShape(command, [...common, 'instanceId', 'heroId', 'slot'])) {
     const instance = ownership.equipment.find(e => e.instanceId === command.instanceId);
     if (!instance) return failure('notOwned');
     const def = items[instance.itemId];
-    if (def.kind !== 'equipment' || def.slot !== command.slot || !def.eligibleHeroes.includes(target.heroId)) return failure('invalidTarget');
+    if (def.kind !== 'equipment' || def.slot !== command.slot || !preparationItemTarget(def, target, party).ok) return failure('invalidTarget');
     const existing = ownership.assignments.find(a => a.instanceId === instance.instanceId);
     if ((command.type === 'equipItem' && existing) || (command.type === 'unequipItem' && existing?.heroId !== target.heroId)) return failure('invalidTarget');
     const assignments = ownership.assignments.filter(a => a.heroId !== target.heroId);

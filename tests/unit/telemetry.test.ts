@@ -45,6 +45,12 @@ it('emits reward only after acceptance and telemetry failure cannot change the b
   expect(() => { session.save(); track('app_entered'); reportFailure('save_read'); }).not.toThrow();
   expect(session.snapshot).toEqual(saved);
 });
+it('allows the fixed Revive Kit choice while removing arbitrary item and party details', () => {
+  const input = { uuid: 'reward', event: 'reward_chosen', properties: { choice: 'revive_kit', party: ['mage'] } };
+  expect(sanitizeEvent(input, '', '', false)?.properties).toMatchObject({ choice: 'revive_kit' });
+  expect(sanitizeEvent(input, '', '', false)?.properties).not.toHaveProperty('party');
+  expect(sanitizeEvent({ ...input, properties: { choice: 'private-custom-item' } }, '', '', false)?.properties).not.toHaveProperty('choice');
+});
 it('single battle startup and continue emit once despite repeated activation', () => {
   const event = vi.fn(); bindTelemetry({ event, error() {} });
   const data = new Map<string,string>();

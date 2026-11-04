@@ -23,5 +23,5 @@
 
 ## Workflow follow-up
 
-- Implementation was authorized by the caller on 2026-11-03. Current progress, source identities, qualification jobs and retained failures are recorded in `docs/ongoing-projects/plan.md`.
+- Implementation was authorized by the caller on 2026-11-03. Progress, source identities, qualification jobs and retained failures are recorded in the [issue #259 handoff](../../../docs/ongoing-projects/issue-259-testing-route-save-isolation-plan.md).
 - Merge/deployment and closing related #176/#270 work are outside this request. Archive/sync the completed OpenSpec change through the repository's normal post-merge workflow.
