@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { freshDungeon, stepDungeon, readDungeon, startDungeonBattle, acceptDungeonBattle, travelDungeon, currentFloor } from '../../src/domain/dungeon';
 import { encounterPois, freshExploration, neighbors, poiCell, readExploration, reveal } from '../../src/domain/exploration';
 import { generateMap } from '../../src/map/generate';
@@ -9,6 +9,7 @@ import { atEncounter, atCell, atStairApproach, dungeonCapacityFixture, priorDung
 import { LEGACY_ENCOUNTER_POLICY } from '../../src/domain/dungeonEncounters';
 import { DungeonSession } from '../../src/app/DungeonSession';
 import { createDungeonStorage, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
+import * as dungeonStorage from '../../src/persistence/dungeonStorage';
 const fresh=()=>freshDungeon('exploration-test',13);
 const command=(s:ReturnType<typeof fresh>,destination:number)=>({id:s.id,depth:s.depth,revision:s.revision,destination});
 const legacy=(s:ReturnType<typeof fresh>)=>priorDungeonPayload(s, 1);
@@ -112,5 +113,20 @@ describe('movement onto stairs',()=>{
   const arrival=session.snapshot;expect(arrival.depth).toBe(2);
   expect(session.continue(session.inspect())).toBe(true);expect(session.snapshot).toEqual(arrival);
   session.save();expect(session.snapshot).toEqual(arrival);session.dispose();expect(session.step(entry)).toBe(false);
+ });
+ it('publishes transient descent and ascent without constructing save storage',()=>{
+  const acquire=vi.spyOn(dungeonStorage,'createDungeonStorage').mockImplementation(()=>{throw Error('Unexpected save provider');});
+  try {
+   const before=atStairApproach(cleared()),session=new DungeonSession(before,null);
+   expect(session.step(command(before,currentFloor(before).descriptor.downstairs))).toBe(true);
+   const second=session.snapshot,approach=atStairApproach(second,'ascend');expect(second.depth).toBe(2);
+   expect(session.step(command(second,currentFloor(approach).position))).toBe(true);
+   expect(session.step(command(session.snapshot,currentFloor(second).descriptor.upstairs))).toBe(true);
+   expect(session.snapshot.depth).toBe(1);expect(session.snapshot.party).toEqual(before.party);expect(session.snapshot.ownership).toEqual(before.ownership);
+   expect(session.hasUnsavedProgress).toBe(false);expect(session.status).toContain('resets on reload');
+   expect(session.restart('testing-restart',14)).toBe(true);expect(session.snapshot).toEqual(freshDungeon('testing-restart',14));
+   expect(session.save()).toBe(false);expect(()=>session.inspect()).toThrow('no save storage');expect(acquire).not.toHaveBeenCalled();
+   session.dispose();expect(session.step(command(before,0))).toBe(false);expect(session.restart('disposed',15)).toBe(false);
+  } finally {acquire.mockRestore();}
  });
 });

@@ -2,6 +2,7 @@ import { reportFailure } from '../telemetry/telemetry';
 import '../style.css';
 import { diagnosticsSnapshot, measurements } from '../diagnostics/browser';
 import { mountBattleLayout } from '../ui/battleLayout';
+import { appEntry } from './entry';
 
 const container = document.querySelector<HTMLElement>('#game')!;
 const statusLabel = document.querySelector<HTMLElement>('#fit-status')!;
@@ -62,7 +63,7 @@ window.addEventListener('unhandledrejection', () => showError('The scene encount
 
 try {
   const { startProof } = await import('../phaser/start');
-  restart = startProof(setStatus, showError);
+  restart = startProof(setStatus, showError, appEntry.persistent);
 } catch {
   showError('Could not load or start Phaser');
 }

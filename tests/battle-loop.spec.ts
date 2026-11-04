@@ -8,7 +8,7 @@ import { enemyThreats } from '../src/domain/threat';
 import { displayName } from '../src/ui/hud';
 
 test('enemy danger inspection toggles without changing battle state or saves', async ({page}) => {
-  await page.goto('./battle');
+  await page.goto('./?game=battle');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   let current=await session(page), assessment=enemyThreats(current.state,catalog);
   for(let i=0;i<12 && assessment.ok && assessment.threats.length===0;i++){
@@ -102,7 +102,7 @@ test('default Move initializes once per usable player turn and preserves explici
   // Overrides, a full actor cycle and seeded restarts share one cumulative budget.
   // Keep individual actions bounded while allowing software-rendered desktop CI.
   test.setTimeout(90000);page.setDefaultTimeout(5000);
-  await page.goto('./battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await page.goto('./?game=battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const move=page.locator('#battle-move'),target=page.locator('#battle-target');
   await expect(move).toHaveAttribute('aria-pressed','true');await expect(move).toBeEnabled();
   const initial=await session(page),actor=initial.state.units.find(u=>u.id===initial.state.initiative[initial.state.activeIndex])!;
@@ -178,7 +178,7 @@ test('clearing the native movement destination clears intent and preview without
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
   // Phaser and its tweens must start on the same clock that this case pauses.
   await page.clock.install();
-  await page.goto('./battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await page.goto('./?game=battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const target=page.locator('#battle-target'),review=page.locator('#battle-review');
   const initial=await session(page),saved=await page.evaluate(()=>JSON.stringify(localStorage));
   await chooseNativeDestination(target,1);
@@ -214,7 +214,7 @@ test('clearing the native movement destination clears intent and preview without
 for(const dismissal of ['Cancel','Escape'] as const){
   test(`movement confirmation ${dismissal} resets destination and permits native same-destination retry`,async({page})=>{
     const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
-    await page.goto('./battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    await page.goto('./?game=battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
     const target=page.locator('#battle-target'),review=page.locator('#battle-review');
     const initial=await session(page),saved=await page.evaluate(()=>JSON.stringify(localStorage));
     await chooseNativeDestination(target,1);
@@ -280,7 +280,7 @@ for(const [seed,outcome] of [[1,'playerLoss'],[2,'playerWin']] as const){
   test(`complete legal authored battle seed ${seed} reaches ${outcome} through controls and replays`,async({page,isMobile})=>{
     test.setTimeout(180000);const errors:string[]=[];
     page.on('pageerror',e=>errors.push(e.message));
-    await page.goto('./battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    await page.goto('./?game=battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
     if(seed===2){await page.getByRole('button',{name:'Restart battle',exact:true}).click();await confirmRestart(page);await expect.poll(async()=> (await session(page)).state.seed).toBe(2);}
     await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
     await playUndo(page,catalog,isMobile);
@@ -332,7 +332,7 @@ for(const [seed,outcome] of [[1,'playerLoss'],[2,'playerWin']] as const){
 
 test('keyboard selection, confirmation lock, touch and restart discard old gestures and previews',async({page})=>{
   await page.clock.install();
-  await page.goto('./battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await page.goto('./?game=battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');
   const saved=await page.evaluate(()=>JSON.stringify(localStorage));
   const initial=await session(page),actor=initial.state.units.find(u=>u.id===initial.state.initiative[initial.state.activeIndex])!;
@@ -426,7 +426,7 @@ test('real touch previews a board move, modal backdrop captures it, and suspend 
 });
 
 test('keyboard-only movement, attack confirmation and Wait use the shared decision flow',async({page})=>{
-  await page.goto('./battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await page.goto('./?game=battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   await page.locator('#fit-restart').focus();await page.keyboard.press('Enter');
   await page.locator('#save-confirm-reset').focus();await page.keyboard.press('Enter');
   await expect.poll(async()=> (await session(page)).state.seed).toBe(2);
@@ -460,7 +460,7 @@ test('keyboard-only movement, attack confirmation and Wait use the shared decisi
 
 test('restart during initial enemy animation discards the old run and its callbacks',async({page})=>{
   const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
-  await page.goto('./battle');await expect(page.getByRole('status')).toHaveText('Battle ready');
+  await page.goto('./?game=battle');await expect(page.getByRole('status')).toHaveText('Battle ready');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
   // An enemy end-turn commit advances initiative before its presentation completes.
   const first=await session(page),command=first.replay.commands.at(-1);
@@ -479,7 +479,7 @@ test('battle diagnostics record real selection, gestures and movement and reset 
   const errors:string[]=[];
   page.on('pageerror',e=>errors.push(e.message));
   page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
-  await page.goto('./battle');
+  await page.goto('./?game=battle');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   await page.waitForFunction(()=>window.fitDiagnostics().frames.count>=5);
   const before=await session(page);
@@ -571,7 +571,7 @@ test('live actor, inspection and cancellation remain independent of pending inte
 test('accepted rail and dock preserve drawable floors, readable controls and focus at five sizes',async({page},info)=>{
   test.setTimeout(90000);
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
-  await page.goto('./battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await page.goto('./?game=battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const measurements=[];
   for(const [width,height] of [[1280,720],[412,915],[915,412],[320,568],[568,320]]){
     await page.setViewportSize({width,height});

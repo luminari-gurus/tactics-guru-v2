@@ -1,4 +1,5 @@
 import { consumeEntryIntent } from './routes';
+import { appEntry } from './entry';
 import { menuReturnLink } from '../ui/menuReturn';
 import { DungeonMap, dungeonBiomeLabel, dungeonEncounterLabel } from '../ui/dungeonMap';
 import '../style.css';
@@ -16,7 +17,7 @@ function newSeed(previous?: number) {
  const seed=crypto.getRandomValues(new Uint32Array(1))[0];
  return seed===previous ? (seed+1)>>>0 : seed;
 }
-const storage=createDungeonStorage(),session=new DungeonSession(freshDungeon(crypto.randomUUID(),newSeed()),storage),cache=new FloorCache();
+const storage=appEntry.persistent?createDungeonStorage():null,session=new DungeonSession(freshDungeon(crypto.randomUUID(),newSeed()),storage),cache=new FloorCache();
 const screen=el('main');screen.id='dungeon-screen';screen.dataset.boot='loading';document.body.append(screen);
 const shell=document.querySelector<HTMLElement>('#battle-shell')!,panel=document.querySelector<HTMLElement>('#fit-panel')!,container=document.querySelector<HTMLElement>('#game')!,status=document.querySelector<HTMLElement>('#fit-status')!,controls=document.querySelector<HTMLElement>('#battle-controls')!,restart=document.querySelector<HTMLButtonElement>('#fit-restart')!,persistence=document.querySelector<HTMLElement>('#battle-persistence')!;
 let live=true,playing=false,startup=true,host:RunBattleHost|null=null;
@@ -33,19 +34,26 @@ function render(){
  shell.hidden=true;panel.hidden=true;screen.hidden=false;
  if(startup){
   const title=el('h1','Dungeon floors');title.tabIndex=-1;
-  screen.replaceChildren(title,el('p','Continuing floors with deterministic battles, all encounters required for descent and backtracking. Saves stay on this device.'));
+  screen.replaceChildren(title,el('p','Continuing floors with deterministic battles, all encounters required for descent and backtracking.'+(storage?' Saves stay on this device.':'')));
+  if(storage){
   const review=session.inspect(),valid=review.primary.status==='valid'||review.backup.status==='valid';
   const resume=button('Continue saved dungeon',()=>{if(session.continue(review)){startup=false;render();if(session.snapshot.activeBattle)start();}});resume.disabled=!valid;
   screen.append(resume,button('Start new dungeon',requestNew),button('Save recovery',recovery));
   const unsaved=button('Play unsaved dungeon',()=>{startup=false;session.playUnsaved();render();});
   screen.append(el('p','Unsaved play permits battles; floor travel is blocked until progress can be saved.'),unsaved);
+  }else screen.append(el('p','Testing dungeon. Progress resets on reload.'),button('Start new dungeon',requestNew));
   const link=el('a','Three-battle scenario');link.href=`${import.meta.env.BASE_URL}run`;screen.append(link);
- }else renderDungeon(screen,session,dialogs,{start,recover:recovery,restart:requestNew},cache,mapView);
+ }else renderDungeon(screen,session,dialogs,{start,recover:storage?recovery:undefined,restart:requestNew},cache,mapView);
+ if(!storage&&!startup)screen.append(el('p','Testing dungeon. Progress resets on reload.'));
  screen.append(menuReturnLink(() => !startup && session.hasUnsavedProgress, recovery));
  mountTelemetryPreferences(screen);
 }
 function requestNew(){
  if(dialogs.open||!live)return;
+ if(!storage){
+  if(startup)session.save();else session.restart(crypto.randomUUID(),newSeed(session.snapshot.seed));
+  startup=false;stop();render();screen.querySelector<HTMLElement>('h1')?.focus();return;
+ }
  const review=session.inspect();
  dialogs.showChoices('Start new dungeon?','Replace only this device’s dungeon save with a full party and empty inventory? Export saved progress first if needed.',[
   {id:'dungeon-confirm-new',label:'Start new dungeon',run:()=>{if(session.replace(review,crypto.randomUUID(),newSeed(session.snapshot.seed))){startup=false;stop();render();screen.querySelector<HTMLElement>('h1')?.focus();if(session.hasUnsavedProgress)recovery();}else recovery();}},
@@ -53,7 +61,7 @@ function requestNew(){
  ]);
 }
 function recovery(){
- if(!live)return;const review=session.inspect(),choices:DialogChoice[]=[];
+ if(!live||!storage)return;const review=session.inspect(),choices:DialogChoice[]=[];
  const close=()=>{if(!playing)render();screen.querySelector<HTMLElement>('h1')?.focus();};
  for(const [i,value] of session.exports(review).entries())choices.push({id:`dungeon-export-${i}`,label:`Export ${value.label}`,run:()=>{const url=URL.createObjectURL(new Blob([value.text],{type:'application/json'}));const a=el('a');a.href=url;a.download=`tactics-guru-dungeon-${i}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);close();}});
  for(const slot of ['primary','backup'] as const){
@@ -72,7 +80,7 @@ function start(){
  const state=session.snapshot,title=`Dungeon · Floor ${state.depth} · ${dungeonBiomeLabel(state)} · ${dungeonEncounterLabel(state,state.floors[state.depth-1].exploration.active ?? state.floors[state.depth-1].completed)}`;
  document.querySelector<HTMLElement>('#battle-heading h1')!.textContent=title;
  document.querySelector<HTMLElement>('#board-caption')!.textContent='Tap to select · Drag to pan · Wheel/pinch to zoom · Arrows and Enter to select';
- restart.textContent='Start new dungeon';persistence.hidden=false;persistence.replaceChildren(button('Save recovery',recovery),el('span',session.status), menuReturnLink(() => session.hasUnsavedProgress, recovery));
+ restart.textContent='Start new dungeon';persistence.hidden=false;persistence.replaceChildren(...(storage?[button('Save recovery',recovery)]:[]),el('span',session.status), menuReturnLink(() => session.hasUnsavedProgress, recovery));
  document.querySelectorAll<HTMLElement>('#fit-panel > details').forEach(n=>n.hidden=true);
  host={catalog:battle.catalog,session:battle,dialogs,sound,modalTransition:()=>{},ended:()=>{if(!live||!playing)return;stop();render();screen.querySelector<HTMLElement>('h1')?.focus();},restart:requestNew};
  engine.scene.remove('battle');engine.scene.add('battle',new BattleScene(value=>{status.textContent=value==='ready'?'Battle ready':value==='loading'?'Loading':'Error';container.dataset.ready=String(value==='ready');restart.disabled=value!=='ready';},message=>{status.textContent=`Error: ${message}. Reload to retry.`;status.setAttribute('role','alert');restart.disabled=false;},host),true);
@@ -86,7 +94,7 @@ render();
 const engine=createGame([],true);
 whenGameReady(engine,()=>{screen.dataset.boot='ready';});
 
-const entryIntent=consumeEntryIntent();
+const entryIntent=storage?consumeEntryIntent():null;
 if(entryIntent==='new'){
  let approved: { primary?: { status?: string; text?: string | null }; backup?: { status?: string; text?: string | null } } | null=null;
  try {

@@ -1,433 +1,471 @@
-# Issue #263: Reliable WebKit boot after dungeon reload
+# Issue #259: Isolate testing routes from saved games
 
-Started: 2026-11-01 (Asia/Jerusalem). Status: implementation qualified; supplemental review, repair and ordered merge complete.
+Date: 2026-11-04 (Asia/Jerusalem). Status: implementation, supplemental review and local acceptance complete.
 
-**Original follow-up branch:** `branch/verification-proof-cleanup-route`, stacked
-on selector PR #266 (`branch/verify-map-disposer-coverage`). PR #266 is stacked on
-runtime PR #265 at `1dfc3a6`. The runtime repair branch is
-`branch/issue-263-patched-webkit-runtime`, stacked on diagnostic PR #264 at
-`6ee7a5c`. Candidate changes pin Playwright 1.64.1 (three
-packages only), retain the old effective screen behavior with `screen: undefined`
-in the existing device project definitions, and preserve other branches' browser
-caches during setup with `--no-remove`. Viewports, touch, DPR, project IDs, test
-selection, assertions and retry/timeout limits remain part of the proof.
+## Final handoff
 
-**Outcome / files / proof:** repair the failing Linux WebKit networking runtime
-through its official stable browser package. Owners are package.json/lock and the
-five existing device-bearing Playwright configs. The official candidate contains
-libsoup 3.6.6 versus observed 3.6.5. First prove install/build/types, actual device
-input compatibility and unchanged selection, then the same qualified prefix
-without debug and the full original acceptance inventory. Keep all failed old
-runtime runs. Native-memory-defect attribution remains an inference; no external
-security reproducer is part of this work. Game rules, saves, hosting and arbitrary
-native-library replacements are outside this candidate.
+Supplemental review fixed root-query run telemetry and aligned repeated `scene`
+selectors with first-value startup (`c656df7`). Fresh testing battles now use a
+per-battle outcome key (`bfd9151`), so the same deterministic fight after reload
+reports its own completion. The runtime changes are limited to route selection
+and transient telemetry; the previous save, combat, lifecycle and extended
+journey evidence remains applicable to unchanged inputs.
 
-## Supplemental review and merge closeout
+The [#275 review](https://github.com/luminari-gurus/tactics-guru-v2/pull/275)
+and [#277 review](https://github.com/luminari-gurus/tactics-guru-v2/pull/277)
+record fresh units, builds, root/prefix Chromium, WebKit and configured telemetry
+receipts. The cold development failures remain recorded; the affected desktop
+run-entry assertion passed on a prepared server with unchanged test limits. The
+production reproduction failed before `bfd9151` and passed after it. Cloudflare
+preview succeeded for `bfd9151`; the documentation-only `fe9056e` preview failed
+without a diagnostic in the GitHub check. Retain that failure separately from
+the local production build and browser results.
 
-The caller now authorizes comprehensive supplemental review, repair of every
-substantiated review finding, and end-to-end Git management and merging of
-#264 → #265 → #266 → #267. This supersedes the original unmerged handoff below.
-Using OpenSpec change `issue-263-webkit-reload-boot` and the ablation skill.
+Issue #259 is implemented and qualified for review. Entry foundation [#275](https://github.com/luminari-gurus/tactics-guru-v2/pull/275) is based on main; isolation [#277](https://github.com/luminari-gurus/tactics-guru-v2/pull/277) is stacked on it. Independent test fixes [#276](https://github.com/luminari-gurus/tactics-guru-v2/pull/276) and [#278](https://github.com/luminari-gurus/tactics-guru-v2/pull/278) remain separately reviewable and are mirrored in the feature. No merge, release tag or deployment is part of this handoff.
 
-**Complete on 2026-11-02.** All four PRs were reviewed, merged in order onto
-main and checked after publication. Each tree and both ordered parents match
-its pre-merge prediction:
+All four issue criteria are covered:
 
-- #264: `7a56059d6d71623d97f48a23bf9719f0cc4881fc`.
-- #265: `54dc46c34d685bb881c9c7ada80a9dec521054af`.
-- #266: `84664ec59701209f0126f6cdffadf80ca8575dc8`.
-- #267: `d94cd6345dd3a9d6d5663f88135bc5c460d9c942`.
+- **Saved journeys survive testing:** exact primary/backup/handoff bytes are preserved through normal play, restart, reload and Back at root and prefix, with Rail and Radial. Current isolation covers 60 Chromium/WebKit executions. Menu persistence/recovery/new-game/item cases pass 140/140.
+- **Testing always starts fresh:** direct battle/run/dungeon/map and supported diagnostics ignore forged persistent selectors. Reload and restart use fresh memory state; legal transient dungeon floor clearing, descent and return work.
+- **No saved-progress access in testing:** entry capability is resolved once; testing battle uses BattleSession directly, and testing run/dungeon receive null storage. Browser spies and failing-provider unit tests prove no game-slot or menu-handoff acquisition/read/write/remove/clear. Combat-control and privacy preferences retain their separate behavior.
+- **Persistence proof belongs to menu play:** saved regressions use root game entries, with retained corruption/backup/raw export/stale-review/replay/lifecycle coverage. The new radial reload assumption and fixture preference baselines are corrected. The [coverage ledger](../qa/issue-259/coverage-map.json) accounts for 1,665 retained, 102 mapped and 75 added stage/profile identities; the earlier ledger remains archived.
 
-#263 remained open after diagnostics and closed when repair #265 merged.
-All review threads are resolved. The four completed local/remote branch refs
-were removed after proving their tips are ancestors of main and no remaining
-open PR uses them. Remote deletion was atomic and guarded by exact-tip leases.
-The checkout is now `main`; local/origin parity was verified. PR evidence links
-are pinned to merged history. The separate historical runner-diagnosis branch,
-worktree and raw recovery evidence remain preserved. OpenSpec is 11/11 complete;
-no implementation, review or merge work remains. No manual deployment, release
-tag or OpenSpec archive is part of this closeout.
+Validation uses Node 24.22.1, locked Playwright 1.64.1, Chromium 156.0.8078.4 and WebKit 27.2 on local Windows, one worker and zero retries. Current checks include 1,148 units, both TypeScript scopes, both root/prefix build integrations, all 28 selection/batch contracts, 18 clean source/build-consistent performance captures, menus, both control skins, root/prefix isolation, legal run/dungeon/reload/lifecycle, dev fixtures, audio/collector and all 18 extended progression journeys. The nine-batch partition and 23 approved profile reductions are preserved. Playwright emulation satisfies device acceptance; no physical-device claim is made.
 
-**Outcome / non-goals / files / proof:** review all four exact diffs, prior
-reviews and affected consumers; repair confirmed defects, publish the review,
-then merge in order and prove trees, parents, issue closure and remote parity.
-The only code repair is the Chromium project in the generated startup contract,
-`tests/tooling/browser-diagnostics.test.mjs`. Preserve application behavior,
-diagnostic helper, assertions and existing acceptance limits. No deployment,
-release tag, unrelated issue work or repeated full regression is needed.
+The full original CI run remains failed and all interrupted runs remain incomplete. Qualification combines recorded unchanged-input evidence with bounded local repairs; it is not a clean current full-suite rerun. Application/runtime and shared-fixture sources are unchanged from frozen 7e6d709 after the test-only repairs. Final test input hash is 515b6881876d905c6aa8b4f74ce41aec8a3422f448333d5c1934d765f910cea2. Source/build manifests, exact selected IDs and reports remain under ignored tmp/issue-259 and verification-receipts. The original 583 MB CI artifact passed its published SHA-256 check.
 
-The existing P2 finding on #264 is reproduced: an override-only browser cache
-causes the contract to request a missing default headless shell despite a valid
-`PLAYWRIGHT_CHROMIUM_EXECUTABLE`. Commit `d90a294` selects full Chromium and
-forwards that override only to its Chromium project. Both diagnostic contracts
-pass with an override-only cache on Playwright 1.63.0 and 1.64.1; the startup
-contract also passes with default selection. WebKit stays independent. The
-existing review thread is answered and resolved. No additional actionable code
-defect was found by the supplemental review.
+Final focused outcomes: the original fixture stage retained 80 passes/13 failures; 11 repaired ability cases passed in run-vwZLtO, and the two remaining desktop functional cases passed in run-zBOPpX against a prepared dev server with the same tests/timeouts (exact failed ID set reconciled). Cold dev-server navigation/reload timeouts remain recorded; their cause and cold-start performance are not claimed fixed. The single audio follow-up passes in run-dz9HX5. Original failed reports are preserved. Extended Chromium passes 9/9 in run-yW4OMm and WebKit 9/9 in run-Zdzd8P, with no skips/flakes/retries.
 
-Fresh review independently verifies all 194 existing canonical evidence payload
-hashes and the complete full-artifact SHA-256. Its actual reports account for
-19 passing stages, 1,440 browser passes, twelve intentional skips, one worker,
-zero retries and no missing/duplicated case IDs. The original native failures
-are read back from their base64 startup attachments in the retained ZIP.
-The only later code owners versus `e3e9ebf` are the already qualified selector,
-cleanup fixture and now-qualified diagnostic contract. Application, helper,
-ordinary specs, assets, dependencies and browser configs still match.
+The temporary full-run trigger is removed. Qualification-only workflows live outside the implementation PRs. The prior #263 plan remains byte-for-byte intact, SHA-256 28a7610d304e3db8604c144f9a691e01a496d2a0002f5b416e9d286fc92fd104. All OpenSpec tasks are complete; archive/sync follows the normal post-merge workflow. The notes below are historical evidence and superseded checkpoints, retained for audit and continuation.
 
-Merge commits preserved the dependent ancestry without rewriting published
-history. The contract fix was carried through every branch. Live reviews, branch
-rules and exact base/head were rechecked before each merge; each remaining PR
-was retargeted to main after its parent merged. The source-bound merge and
-cleanup receipt is retained in QA. Required recovery evidence is preserved.
+## Historical implementation and qualification notes
 
-## Original implementation handoff (before merge authorization)
 
-Updated 2026-11-02 (Asia/Jerusalem). **Implementation, functional acceptance and
-PR/Git handoff are complete; no CI, browser or download process
-from this goal is live.**
+Main advanced to `3333281` by merging #273 while final local checks were running.
+The entry foundation now incorporates it in `6a886b8` (21 route/menu units pass).
+The dependent branch integrates that foundation, retaining both mobile controls and
+the save capability; four overlapping import/config/documentation conflicts were
+resolved, and both TypeScript scopes pass. #276's literal merge tree with current
+main is clean; its focused one-line change needs no merge commit. #274 remains unmerged.
 
-Review order, with independently published chunks:
+**New integration work is required before completion.** The new radial browser suite
+contained a direct-route Continue assumption; it now retains preference assertions while
+checking a fresh testing battle. New radial cases prove all three testing game owners
+preserve primary/backup/handoff bytes through actions, restart, reload and actual Back,
+and a menu-launched radial battle preserves its accepted state through Continue.
+These cases and the preference repair pass **9/9 Chromium** (`run-BD716F`, `run-N7pPI6`)
+and **4/4 WebKit** (`run-jV4sa0`), one worker/zero retries. Current full units pass
+**1,148/1,148**, both TypeScript scopes pass, both root/prefix build integrations pass,
+and all **28** batch/selection contracts pass. Logs are `tmp/issue-259/mobile-integration-*`.
 
-1. [PR #264](https://github.com/luminari-gurus/tactics-guru-v2/pull/264): bounded
-   failure diagnostics; tested diagnostic code `495d08d`, integrated with main as
-   `cdc39cf`. This PR does not close #263.
-2. [PR #265](https://github.com/luminari-gurus/tactics-guru-v2/pull/265): supported
-   Playwright 1.64.1 runtime repair, tested clean code `e3e9ebf`. It owns #263's
-   Development/closing association.
-3. [PR #266](https://github.com/luminari-gurus/tactics-guru-v2/pull/266): the
-   independently found dev-selector omission, tested `c508d6e`.
-4. [PR #267](https://github.com/luminari-gurus/tactics-guru-v2/pull/267): the
-   independently found cleanup-fixture route error, tested `9a8e577`.
+Literal-main capture `selection-main-3333281.json` and current capture
+`selection-mobile-integration.json` reconcile **1,665 retained**, **102 mapped** and
+**75 added** stage/profile IDs in the refreshed [ledger](../qa/issue-259/coverage-map.json).
+The [prior ledger](../qa/issue-259/coverage-map-pre-mobile.json) is preserved unchanged.
+Current routine discovery: Chromium **1,006**, fixtures **93**, placement **6**, WebKit
+acceptance **182**, exploration **120**, health **25**, telemetry **36 per mode**,
+assets **78 per mode**; dedicated encounters/items/abilities/smoke are **24/9/60/2**.
+The nine-batch partition, 23 approved reductions and both nine-case extended matrices
+remain intact. No original execution was silently removed.
 
-The active checkout is `branch/verification-proof-cleanup-route`. All four PRs
-were verified open, non-draft and mergeable. Main is `78a3f75`; #256's menu work
-is integrated. #263 remains open and assigned to `moshehbenavraham`. The original
-native branch link became a closing reference on #264 when that PR opened; it
-was moved to #265 so diagnostic-only merge cannot close the issue.
+Remaining integration qualification runs locally on frozen inputs. It covers both control
+skins and all game owners: menu/safety, root/prefix isolation, radial interactions,
+legal run outcomes/reloads, dungeon/lifecycle and both extended matrices, dev fixtures,
+proof input, health, configured telemetry, asset audio/collector modes and a fresh
+performance capture. Reuse is limited by dependency comparison: save codecs, domain,
+content, storage owners, recovery UI, menu-return guards and their pure fixtures are
+unchanged from the earlier tested candidate. The merged `BattleScene.begin` input/render
+implementation is identical to main; the feature changes only admission/session setup.
+Unchanged map/placement and noninteractive visual/resource checks retain their prior
+evidence. Preserve all original failures and incomplete runs; do not wait for CI.
+The task-specific runner is `tmp/issue-259/current-qualification.mjs`. It retains
+source and build identities, exact per-stage discovery, logs and incremental outcomes
+under `tmp/issue-259/current-qualification/`. It guards builds with the completed full
+unit/content checks and fresh typecheck, records performance before other browser
+work, serializes every browser stage at one worker/zero retries, preserves failures,
+and runs both complete extended matrices after restoring the root bundle.
 
-**Cause and minimal repair.** Ordinary qualified runs 41349975828 and
-41356666822 captured native `WebKit encountered an internal error` failures for
-the new document's entry/static dependencies, before application initialization.
-Both old bundles contain libsoup 3.6.5; the official 1.64.1 WebKit 2370 GTK/WPE
-bundles contain 3.6.6. The owning observed fault is native networking before
-entry execution. Attribution to the exact upstream memory defect remains an
-inference, not a native-stack or external-security-reproducer claim. The repair
-changes the supported runtime and necessary device compatibility; application
-rules, saves, assertions, timeouts, budgets and retries are unchanged.
+Integration checkpoint at frozen `7e6d709`: clean/consistent source and build pass
+all **18** performance captures; menus pass **84/84 Chromium + 56/56 WebKit**;
+root Rail isolation passes **15/15 Chromium**. Full radial Chromium retains **100
+passed, 3 native-touch-only desktop skips, 2 failed**; WebKit retains **54 passed,
+6 Chromium-CDP-only skips**. Both failures are the same test's setup: synthetic mouse
+Plan activation after a touch gesture. Literal `3333281` reproduces both failures
+(`main-radial-resize-test.log`, baseline receipt `run-OU8YrY`). The local sequence was
+stopped during WebKit isolation for a single-browser-job baseline comparison; that
+unfinished stage remains incomplete in `current-qualification/interrupted.json`.
 
-**Completed proof:**
+Independent [PR #278](https://github.com/luminari-gurus/tactics-guru-v2/pull/278),
+`16cd804`, uses a native tap on touch profiles and retains every assertion/limit.
+It passes **3/3 Chromium + 2/2 WebKit** on literal-main application inputs, and the
+mirrored feature commit `ab49cba` passes the same **5/5** against the unchanged served
+integration bundle. Production code is unchanged. These scoped passes repair the two
+failed case/profile obligations; the original radial run remains failed. Main-baseline
+worktree now hosts this test-fix branch; do not treat its head as literal `3333281`.
 
-- Clean `e3e9ebf` locked install, browser preflight, content/build and both type
-  scopes pass. Qualified run 41361259848 passes 90 ordinary prefix cases and
-  60 traced stair repetitions, with zero skips/retries. Its inventories confirm
-  fixed libsoup 3.6.6 on the actual qualified runner.
-- Full run [41362013777](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41362013777),
-  job 125015648051, passes all 19 configured stages at clean `e3e9ebf`.
-  Artifact 13110492448 contains 585,086,035 bytes; the complete local archive
-  matches API SHA-256
-  `d9556fe6dd8a807940f324fbb27234579b44f9be491c3fbfebc0f6c693707865`.
-  Selected ZIP entries passed CRC checks. A failed initial transfer was resumed;
-  no test run was restarted or relabeled.
-- Full reports prove 1,440 browser passes, zero unexpected/flaky outcomes or
-  retries, and twelve intentional mode-specific skips with passing counterparts.
-  WebKit exploration is 99/99, exactly 33 per profile. All twelve stair
-  input/profile cases pass reload restoration, arrival and lock assertions.
-  WebKit acceptance is 94/94. All 1,103 units, both type scopes, both build-header
-  integration cases, root/prefix builds, fixtures, health bars, telemetry modes,
-  asset modes and root restoration pass.
-- The isolated 18-sample proof performance capture passes its existing evaluator
-  with no capture failures or metric violations. Legacy non-gating dungeon
-  code-size/WebKit frame advisories remain in QA and owner-deferred #127 work;
-  this does not claim all dungeon FPS budgets or a performance improvement.
-- All 18 legal extended journeys pass: nine Chromium and nine WebKit, covering
-  Mage/Ranger/Fighter and all three profiles, with no failures/skips/retries.
-  Two-engine real-Phaser setup smoke also passes 2/2 on `e3e9ebf`.
-- Runtime before/after discovery preserves all 1,541 cases across 15 inventories.
-  Six actual-browser profile probes preserve viewport/effective screen/touch/DPR.
-  The new dev selector adds exactly three disposer cases with no omissions and
-  fourteen other inventories unchanged; all six affected dev cases and 38
-  verification contracts pass. Both diagnostic contracts and 20 timing/reporter/
-  process contracts also pass.
-- The corrected cleanup fixture passes both real-browser preview/dev contracts:
-  rendered canvas, deliberate 20-second interruption, complete owned-process
-  cleanup and fresh same-port recovery. Its original menu/canvas failures remain
-  retained. `cleanup-source.json.gz` records the known build-link input: preview
-  reuses clean `e3e9ebf`, all 115 build-file hashes match, and dev's dirty metadata
-  flag was not consumed by these lifecycle assertions. The artifact link is now
-  locally excluded; tracked tested code is unchanged.
+Resume only uncompleted local stages with `current-qualification-resume.mjs`, keeping
+the original results immutable and recording reused successful stages separately.
+The root bundle is still the exact clean `7e6d709` build. The only relevant edit since
+that run is the isolated radial test body; other case inputs and runtime code are
+unchanged. Do not rerun passing matrices or label the original failed run clean.
 
-**Source-aware reuse.** The full run really executed `e3e9ebf` with its original
-three-case dev selector. The final tracked application/public files, build
-configuration, package/lock files and ordinary specs are unchanged. The only
-later verification owners are the selector and synthetic cleanup fixture, each
-freshly qualified above. `final-source-equivalence.json.gz` and the exact skip
-mapping account for that union under verification-policy.md. No later Git
-build-info identity is claimed as a newly built bundle, exact-byte cache result
-or new performance measurement.
+Latest bounded checkpoint: root WebKit isolation **10/10** and legal run/outcome,
+reward/reload/stale-cache checks **9/9 Chromium + 4/4 WebKit** pass at `ddfb19f`.
+Dungeon Chromium retains **9 passes / 3 failures**: its read-only startup check still
+expected empty local storage although the merged Rail fixture deliberately writes
+the combat-controls preference. Literal main reproduces `Expected 0 / Received 1`
+(`main-dungeon-readonly-before.log`). The repaired check compares the exact fixture
+baseline, rejecting every unexpected entry. After that fix, one baseline WebKit run
+exposed the already-recorded 400-step random-layout navigator cycle; this non-entropy
+workload now uses the existing legal seed, with separate random-layout coverage retained.
+All **3 Chromium + 3 WebKit** repaired cases pass on the feature inputs, and both type
+scopes pass. This directly blocking consumer repair is committed in #277 as `9a695dc`.
+The unfinished WebKit dungeon stage and both earlier failures remain recorded.
 
-All detailed source/build/browser/mode identities, hashes, raw reports, failed
-and incomplete attempts, baseline comparisons and remaining limitations are in
-[QA](../qa/issue-263/README.md) and its evidence manifest. This includes the
-original 60-second missing-screen failure, the earlier heading-only failure,
-old-runtime successful controls, traced budget failures and corrected probes.
-The original archive hash is
-`9f8726d2adcb007beeb6ece633d3bc6dba83b8467fb0d62de2849fba047b61dc`.
+Final local work is limited to the remaining save-isolation consumers: the other
+WebKit dungeon cases, affected lifecycle and dev fixtures, audio/collector behavior
+at both bases/modes, prefix isolation and the two explicitly required extended matrices.
+Completed menus, root isolation, legal run, radial and performance evidence is reused.
+Unchanged map/placement, noninteractive visual/resource, health and telemetry contracts
+retain their recorded evidence; this is not a new qualification of the parent mobile
+controls feature. The preliminary extra proof-input/health/telemetry reruns are unnecessary
+for the #259 delta and will not expand this task. No additional test-repair workstream
+is opened. The existing requirement/coverage ledger remains the completion boundary.
+The direct local command sequence records incremental outcomes in
+`tmp/issue-259/remaining-local-results.json`; no CI wait is required.
 
-**Completed workflow:** OpenSpec `issue-263-webkit-reload-boot` is 9/9 complete.
-Evidence/handoff and final PR descriptions are published. Git/remote parity,
-issue ownership/closure links, clean worktrees and review readiness are verified.
-Review the stack in the order above.
-At this original handoff, merging was not yet authorized. The later authorization
-above controls the current review/merge work. Deployment, release tagging and
-OpenSpec archiving remain separate; do not close #263 before its repair merges
-or repeat qualified tests for prose-only follow-ups. Preserve #257/#258 separately
-unless evidence establishes their cause.
+The remaining WebKit dungeon subset passes **9/9**; with the separately repaired
+startup case, all 12 selected dungeon obligations are covered. Lifecycle passes
+**6/6 Chromium + 6/6 WebKit**. The dev-fixture stage retains **80 passes / 13 failures**:
+one initial `page.goto` load timeout, plus 12 executions of two ability-test assertions
+that still expected `{}` instead of the Rail fixture preference. The ability checks
+now use the same exact preference-only baseline as the dungeon check, retaining the
+no-unexpected-entry guarantee and all state/replay/action assertions. Typecheck passes.
+Only the affected 12 cases and the one desktop navigation case need a focused follow-up
+after the active sequence. No production startup cause is claimed fixed, and the
+original failed fixture report remains intact (`run-tnMhYj`). This test-only edit does
+not affect the active asset, prefix, lifecycle or extended consumers; no sequence is
+restarted and no timeout is raised.
 
-Useful local evidence is `/tmp/tactics-issue263-evidence/`; the audited full ZIP
-is `full-41362013777.zip`, with extracted selected reports in `full-41362013777/`.
-Current functional checkouts are `/tmp/tactics-issue263-candidate` (`e3e9ebf`)
-and `/tmp/tactics-issue263-map-verification` (`9a8e577`). Both browser and transfer
-exec handles are terminal. The executed audit helper is
-`tmp/issue263/audit-full-candidate.py`; its result was checked against raw
-summary, case attempts, skip guards, recovery/stair witnesses and performance
-evaluation. Historical CI branch `branch/issue-263-runner-diagnosis` is at
-`3f93ce3` in `tmp/issue263-runner-worktree`; do not redispatch it as completion
-verification. Use native Git for Windows checkout/commit/worktrees and WSL
-network Git from the primary repository; Windows worktree pointers are invalid
-to WSL Git.
+Current local run: prefix isolation passes **18/18 Chromium + 12/12 WebKit** and
+the root bundle is restored. Root dev, prefix preview and prefix dev audio/collector/menu
+subsets pass **27/27 each**. Root preview retains **26 passes / 1 failure**, a Web Audio
+battle completion check on mobile portrait (`run-fCug6z`); check that one case separately
+without erasing the original failure. The extended Chromium matrix is running, with
+desktop Mage/Ranger/Fighter and portrait Mage passed so far. WebKit follows in the
+same live local process `89450`. Afterward, run only the 12 repaired ability cases,
+the single desktop fixture navigation case and this single audio case, then finalize
+the source-aware acceptance record. No CI status or newer upstream work is a gate.
 
-Pickup metadata: original base `a8b87c199fb2ae171a9bb72961ac7114622c4d60`,
-[pickup comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/263#issuecomment-6562475276),
-original native association `LB_kwDPAAAAAW6Z0HjOAQNTDQ`. The previous
-[Goblin Shaman plan](issue-166-goblin-shaman-plan.md) remains byte-for-byte
-preserved: raw SHA-256
-`aee5f94a745a9424eb26bcec41ca2900e823152d4f4eabc93ceba975fa5b02a1`,
-Git blob `0bb94476c1db94b1fc3ffcd21696e8718125bb26`; its three specific backlinks
-were updated. The original pickup/acceptance plan below is historical context,
-not a replacement for this current handoff.
+The prior local sequence completed 11 WebKit repairs and all 9 Chromium extended
+journeys. Its old-source WebKit extended stage was deliberately interrupted before
+integration; there is no final JSON for that stage. The exact owned process tree was
+stopped and `local-final-interrupted.json` records why. Process `49853` and all of its
+browser/server children have exited. Reopen affected task gates until the merged
+consumer audit and local qualification are complete.
 
-## Selection and available work
+### Prior qualification evidence (before the mobile-controls merge)
 
-This section records the initial 2026-11-01 pickup snapshot; current ownership,
-branches and implementation status are in the handoff above.
+**Caller execution update:** do not wait for CI; run needed checks locally. Remaining
+acceptance now uses the matching locked local browsers and a fresh ordinary root build,
+with one worker and zero retries. This changes execution capacity, not test/profile
+coverage or any substantive acceptance gate. Existing CI jobs continue in the background
+and are not dependencies for finishing this work; observation cell `g15:297` was stopped.
 
-Reviewed all **33 open issues and four open PRs**, including issue bodies,
-ownership, dependencies, active branches, relevant comments and unfinished
-OpenSpec performance-qualification work. REST pagination and GraphQL agree on the
-issue count; GraphQL has no next page. Repository, organization and authenticated
-user Projects v2 inventories each contain zero projects; no open issue has project
-membership or an existing linked branch at this pickup snapshot. No additional
-project draft items were exposed by those inventories. The `ready for work` label
-was not an eligibility filter, and #263 has only `bug`.
+Local final qualification is running through ignored
+`tmp/issue-259/local-final-qualification.ps1` (process session `49853`). It records
+source identity, browser preflight, a fresh build and bundle hashes, then runs the
+remaining WebKit acceptance repairs (2), WebKit exploration repairs (9), Chromium
+extended journeys (9) and WebKit extended journeys (9). Independent stages retain
+their own results/failures in `tmp/issue-259/local-final-*`; no passing Chromium repair
+case or unaffected full-regression stage is repeated. Original failed/incomplete runs
+remain retained. Inspect these local reports before closing either remaining task.
+The matching Chromium/WebKit preflight passes (`run-6pQVGG`); content validation,
+both TypeScript scopes and the fresh root build pass. The served build embeds
+`75fe65a`, `dirty: true`: build-time content validation normalized two generated
+snapshot files' line endings, with zero logical diff. Those task-generated changes
+were restored; no production/test logic changed. Actual bundle hashes are retained
+in `local-final-build.json`, and functional qualification uses those served bytes.
+Local WebKit repairs are **11/11 passing**: acceptance **2/2** (`run-bUDRuz`) and
+exploration **9/9** (`run-iW6Y4o`). Combined with Chromium `run-OWih7J` **12/12**,
+all 23 scoped repair executions pass. The independent report audit verifies exact
+selected IDs, one worker, zero retries/skips/flakes/global errors, unchanged current
+input hash and unchanged served bundle bytes (`local-final-audit.json`). Extended
+Chromium now passes **9/9** (`run-7PH40S`, 22.9 minutes), with exact selected IDs,
+zero skips/flakes/retries/global errors and unchanged served bytes verified by the
+same audit. **Only the 9 WebKit extended journeys remain pending**; the local process
+is executing them without a CI wait.
 
-**Chose #263 for immediate reliability and delivery value.** It was unassigned,
-has a concrete recurring failure across WebKit desktop/portrait/landscape, and
-blocks acceptance of the main-menu work. A reported 60-second stall survived an
-existing readiness mitigation. Diagnosing it now also improves the quality of
-future save/lifecycle verification. This is a priority judgment, not a claim that
-the issue has a P1 label or that its cause is already known.
+Implementation is published in #275/#277; frozen runtime inputs are `4de79c1`.
+Final test/collector-description inputs are `30dc8ac`; cleanup `e168f43` changes only
+documentation and removes the temporary trigger. Subsequent documentation commits
+may advance the branch head. The scoped repairs below are being validated separately.
+Independent Windows contract repair #276 is mirrored as a separate dependency commit.
 
-The rest of the backlog was considered as follows:
+OpenSpec tasks 1–3 are complete (7/9 total): the consumer/selection audit covers all ordinary,
+dev, WebKit, telemetry, asset and extended owners. The current relevant-input hash
+matches the coverage ledger, all referenced files exist, and 1,469 retained,
+102 mapped and 65 added stage/profile identities are accounted for. Final aggregate
+runtime/source acceptance and publication cleanup remain open under tasks 4.1/4.2.
 
-- #257 and #258 are the closest alternatives: older runner-readiness and route
-  module-load failures. Their original reports lack the decisive underlying
-  exception/request evidence. Compare symptoms during #263, but do not assume a
-  shared cause or silently expand this issue into all startup failures.
-- #167 is the strongest next high-priority combat feature; #168/#169 follow with
-  charge/stacking or typed-damage/Graveyard policy. #170 is an epic and #171 needs
-  hazard-ordering coordination. They remain useful after the current boot blocker.
-- #172/#173/#174/#175 have real gameplay value but still need bounded item,
-  acquisition, reward or currency decisions. #176 needs record-boundary policy;
-  #184 needs generation-equivalence/determinism decisions. #261/#262 need visibility
-  or visual-treatment decisions. #185 explicitly defers implementation until its
-  class-stat mapping is resolved. None outranks the observed reliability defect now.
-- #178/#179/#180/#181/#182 are independent lower-priority presentation, history,
-  audio or developer-tool work. Their readiness labels do not establish greater
-  urgency than a failing boot/continuation path.
-- #85/#128/#153/#161/#162/#200/#208/#219/#254 already belong to `dubstylee`.
-  #153 has PR #256 and #254 has PR #260. #208 is blocked on isolated runner
-  capacity; #200 is baseline acceptance, not unclaimed tooling implementation.
-  #161/#162 are incremental/umbrella work with delivered consumers. Preserve those
-  owners and their actual open criteria, including any stale bookkeeping.
-- #259 is explicitly blocked by #153/#256 and changes persistence policy; taking
-  it now would mix a separate behavior change into unresolved menu integration.
-  #199 is the DevOps epic, with child work already implemented or separately owned.
-  Outstanding #127 OpenSpec performance qualification is retained as existing work,
-  rather than used to launch another unrelated performance campaign.
-- PR #237 is a separate design-only combat UI draft. PR #12 is an unselected
-  release/SSH draft with explicit operator boundaries. Neither is a new pickup.
+Additional current-source proof: main-menu **84/84 Chromium** (`run-OCCQCn`) and
+**56/56 WebKit** (`run-5GHKRG`) pass, including native input, new-game revalidation,
+failed-write recovery and the moved item cases. Old-format recovery/export passes
+**9/9 Chromium** (`run-ge51Jl`) and **9/9 WebKit** (`run-JHoTSg`) for all three save
+families. Focused desktop legal run/reward/replay, saved floor travel/reload/backtracking,
+cached-run stale writer, presentation restart and visibility interruption pass **5/5**
+(`run-on4ll5`). These preview runs reuse the last ordinary root bundle: `src`, `public`,
+Vite/package inputs and menu/helper files are unchanged from its `aca9709` inputs;
+later implementation changes are asset-fixture setup and documentation.
 
-## Evidence and implementation boundary
+Documentation audit checked 109 local links across 13 changed Markdown files with
+no missing targets. The preserved #263 plan still hashes to
+`28a7610d304e3db8604c144f9a691e01a496d2a0002f5b416e9d286fc92fd104`.
+Collector functional cold/warm proof includes the passing traced dev case; that trace
+is not used for performance/budget acceptance. Original asset-matrix failures remain
+retained, and qualified aggregate/extended/performance gates are still required.
 
-The following is the original planning baseline, retained with its acceptance
-requirements. PR #256 has since merged into main and the artifacts have been
-recovered; use the current handoff and QA for implementation state.
+Routine self-hosted [run 41647380978](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41647380978) completed **failed** at frozen `04cf227` on
+`unraid-tactics-01`. Background supplemental [run 41657053991](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41657053991), qualification
+branch `a3799e3`, asserts source equivalence to `4de79c1` except its temporary
+workflow. It covers changed telemetry, repaired audio workloads/collector controls,
+root/prefix isolation/history and both extended engines. Earlier queued runs
+41647577545/41648868922/41651717195 were cancelled before execution.
 
-The issue reports [run 41320149918](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41320149918)
-at **`9b543cbafecf1cce48f966ff1d8998a46a7ae32d`**, with a desktop-WebKit `wasd`
-stairs reload timeout after 60 seconds, 98 passing exploration cases and the
-other 18 stages passing. Earlier portrait/landscape failures are recorded on the
-issue. The Actions API confirms this exact run SHA, failed conclusion and an
-unexpired `full-verify-41320149918-1` artifact (ID `13093858052`, about 590 MB).
-Detailed failure claims above come from the issue; this planning pass has not
-downloaded/reanalyzed the full artifact or reproduced the failure.
+Full-run triage retains all 12 unexpected executions: Chromium 885 passed, 6 owning-mode
+skips, 7 failed; WebKit acceptance 118 passed, 2 failed; root dev assets 73 passed,
+3 production-only skips, 2 failed; prefix dev assets 74 passed, 3 skips, 1 failed.
+WebKit exploration passes 120/120. All other routine stages, including 18 untraced
+performance samples, completed successfully. Reports were recovered with ZIP entry CRC
+verification under `verification-receipts/ci/41647380978/reports`; the complete archive
+also passes SHA-256 verification. Artifact `13251420700` is 583,252,554 bytes, digest
+`df5b926cfbfcdaf7b41e81dd41fe11e891ced5c98d94d53ac1508b4a439c43b4`.
 
-Read the exact failing revision and the current PR #256 branch before diagnosis;
-the inspected current PR head is `c2e3c56f9752789bc77bf05946d4852c83d6cbc0`.
-Main does not yet contain its `whenGameReady`, `data-boot` or shared Continue wait.
-Use isolated diagnostic checkouts of the failing revision, literal main and the
-integration candidate. Keep this branch based on main; do not import the whole
-menu PR or change another owner's branch. If the defect needs menu-only code,
-record that dependency and carry the smallest repair through reviewable integration.
-Recheck those refs at implementation time because both PRs are active.
+Scoped repairs published as `30dc8ac`: the run defeat regression still expected saved Continue
+after following an intentional testing link. It now checks unchanged primary/backup
+bytes through direct battle/run entries and returns through Main menu → Continue for
+exact saved state. The new transient dungeon case must tolerate a not-yet-mounted
+battle session while polling readiness on touch devices. Two save/input dungeon cases
+also reached the existing random-layout navigator cycle; pin only those workloads to
+the established legal seed fixture, retaining independent fresh-layout proof. No
+production route/domain behavior, assertions, retry count or timeout is relaxed.
+The collector's stale descriptive `warmStorage` metadata is corrected to match its
+already-tested preservation behavior; historical captures remain unmodified.
+All four repaired cases now pass across the three Chromium profiles: **12/12**,
+zero skips/flakes/retries (`run-OWih7J`, `tmp/issue-259/ci-repairs-chromium.log`).
+Both TypeScript scopes and strict OpenSpec validation pass. The unchanged runtime
+bundle is reused; only these test bodies and collector description changed.
+The runtime report/selection audit matches all **1,550** full-run browser stage IDs
+exactly (`tmp/issue-259/full-ci-audit.json`). Its 12 skips are the six preview placement
+executions (covered in dev) and six dev-only production-hint executions (covered in
+preview); none is a missing owning-mode obligation. Qualified scoped repair
+[run 41680229366](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41680229366)
+is queued behind the current supplemental/extended job on the same exclusive lock.
+Its verification-only branch `branch/issue-259-repair-qualification` at `b9366a1`
+differs from candidate `30dc8ac` only by its workflow, asserted before execution.
+It builds the exact candidate and runs Chromium 12, WebKit acceptance 2 and WebKit
+exploration 9 repaired cases (23 total), one worker/zero retries, retaining independent
+stage failures and source/browser/results artifacts. This workflow is outside #277.
+The temporary `.github/full-verify-request` is removed. Its deletion otherwise triggers
+another full capture; this docs/trigger-only cleanup uses `[skip ci]` to avoid that
+duplicate run. Source-bound qualification still runs at the immutable candidates above,
+and the original full failure remains retained. No application/test/config input changes
+with this cleanup, and neither remaining task is marked complete yet.
 
-The traced boot path is `index.html`'s module entry → static entry imports and
-route selection in `src/main.ts` → dynamic `startDungeonApp` import and its static
-dependencies → session/screen construction → Phaser startup → saved continuation.
-`startDungeonApp.ts` imports `BattleScene` and `phaser/start.ts`, whose static graph
-imports Phaser and other scenes. A missing dungeon screen narrows the observation
-to before its append; it does **not** identify a specific import, engine bug,
-network failure, clock issue or save defect. The main catch handles rejected
-imports, while a promise that never settles may leave the original Loading shell.
-Dungeon telemetry is intentionally disabled, and `reportFailure` without a bound
-sink is insufficient evidence capture for this case.
+Root and prefix isolation/history are **50/50 passing** across Chromium/WebKit;
+configured production/development telemetry are **72/72 passing**. The local four-mode
+asset matrix is complete but not clean: root preview 78 passed; root dev 74 passed,
+3 production-only skips, 1 initial navigation timeout; prefix preview 77 passed,
+1 random-layout navigator cycle; prefix dev 74 passed, 3 production-only skips,
+1 random-layout navigator cycle. Logs/results are in `tmp/issue-259/assets-*` and
+`assets-matrix-results.json`; receipts are `run-MuzPXV`, `run-fDSIuw`, `run-Ws4PGN`,
+`run-rEFYv8` respectively. No failure was erased or retried automatically.
 
-**Outcome:** identify and fix the cause of WebKit's post-reload boot stall; retain
-saved progress and normal recovery; pass WebKit exploration in a complete
-full-verification run across all three WebKit profiles, as #263 requires.
+The two random-layout failures reached the existing test navigator's 400-step limit.
+Only the asset audio workload is pinned to legal seed 28 in
+`tests/public-asset-base.spec.ts`; its purpose is audio/base delivery, while random
+new-layout proof remains separate. Both backends/all profiles/four modes pass
+`-g 'dungeon audio loads'` (24 cases): `run-txgI9W`, `run-pZttSi`, `run-etW6zc`,
+`run-2dUq2y`, 6/6 each, zero skips/flakes/retries. All four asset discoveries still
+select the same 78 IDs/profiles. This is scoped repair evidence; the original failed
+full-file mode runs remain failed. No draft #274 code was cherry-picked.
+The first dev navigation was traced separately: the unchanged collector case passed
+in 14.3s; the trace records a 6.5s dev-server wait for preferences CSS before Phaser
+startup. It does not establish the timeout's cause or a product fix. Diagnostic trace
+is `verification-receipts/issue-259-dev-load-diagnostic`; it is not performance evidence.
 
-**Non-goals:** menu design, testing-route save isolation (#259), enemy behavior,
-combat/content changes, save-format migration, new telemetry collection, a new
-boot framework, dependency upgrades without a demonstrated cause, or deployment.
+Supplemental job steps through both root/prefix isolation matrices, both configured
+telemetry modes, all audio/collector modes and restored-root build have passed.
+The same live job `126058161857` is executing Chromium extended journeys; WebKit
+extended journeys follow. Scoped repair run `41680229366` remains queued behind it.
+No local browser/server process remains active, and no qualification run was restarted.
+The bounded observation cell `g15:293` ended normally after 15 minutes; that is an
+observation deadline, not a stopped CI run. Poll these same run IDs before acting.
 
-## Ablation: smallest complete approach
+Current source audit traces every #259 criterion to the implementation and its proof:
 
-- Keep browser-side failure evidence installed before navigation: failed requests,
-  HTTP failures, page/console errors, boot milestones and a bounded shell snapshot.
-  Install it outside the suspect route graph where necessary; late diagnostics
-  inside a module that never executes cannot distinguish this failure.
-- Reuse existing Playwright attachments, tracing, diagnostics/build identity and
-  verification receipts. Record only bounded allowlisted paths/status/timing and
-  sanitized errors; do not attach arbitrary storage, full URLs with query secrets,
-  save payloads or unrestricted console dumps. Synthetic-save hashes can prove
-  retention without exposing player data. Add runtime diagnostics only if the
-  reproduced failure demonstrates a persistent consumer for them.
-- Retain the current recovery message and save-preservation contract. Select the
-  code fix from evidence: network/module evaluation, initialization lifecycle,
-  engine readiness or a test-clock interaction remain hypotheses. If it is a
-  harness defect, repair that cause and prove production reload still works.
-- Drop timeout increases, automatic reload/import retries, skipped assertions,
-  profile removal, duplicate startup paths, global telemetry enablement and general
-  performance cleanup as proposed solutions. They do not establish root cause.
-- Keep full qualification because #263 explicitly requires it. Use focused cases
-  during diagnosis; one successful repetition or an old passing full run cannot
-  establish this issue's acceptance.
+- **Saved games unchanged after testing:** the five storage-condition journeys in
+  [battle-persistence.spec.ts](../../tests/battle-persistence.spec.ts) compare exact
+  primary/backup/handoff bytes through all seven entry families and real actions,
+  restart, reload, cleanup and history, then return to menu Continue. The repaired
+  run defeat journey also checks exact saved state after testing-link navigation.
+- **Testing always fresh:** [routes.ts](../../src/app/routes.ts) makes direct paths
+  and supported diagnostics transient regardless of forged intents; standalone
+  testing uses a fresh `BattleSession`, and run/dungeon hosts construct fresh memory
+  state. Existing isolation, reload/restart and random-new-layout cases prove these
+  boundaries across root/prefix, engines and profiles.
+- **No saved-game access:** hosts pass absent storage before provider construction;
+  owner save/inspect/export/recovery paths guard that absence. Browser spies cover
+  all progress keys and the menu handoff; owner units fail on provider acquisition.
+  Non-game preferences keep their existing separate behavior.
+- **Persistence regression coverage retained under menu ownership:** saved cases now
+  use root game entries, the moved item/ability obligations are reconciled in the
+  [coverage ledger](../qa/issue-259/coverage-map.json), and all 1,550 full-run browser
+  execution IDs match discovery. Menu negative recovery/new-game, replay, lifecycle,
+  BFCache and old-format raw export evidence is retained above.
 
-**Files:** likely owners are `src/main.ts`, `src/app/startDungeonApp.ts`,
-`src/phaser/start.ts`, `tests/dungeon-exploration.spec.ts` and
-`tests/helpers/dungeonTraversal.ts`. Inspect `src/app/startBattleApp.ts`,
-`src/app/startRunApp.ts`, `src/phaser/BattleScene.ts`, `src/diagnostics/browser.ts`,
-`index.html` and `vite.config.ts` as transitive consumers or diagnostic seams;
-edit only owners justified by the identified cause. Extend existing boot,
-loading/lifecycle and relevant unit tests rather than adding a parallel harness.
-Record resulting evidence under `docs/qa/issue-263/README.md` during implementation;
-update owning boot/lifecycle documentation and this plan with the actual result.
+This source audit found no further production change. Final acceptance still requires
+the remaining repaired and extended local executions above, with source/build/browser
+identities and failures reconciled before closing tasks 4.1/4.2. Pending CI is no longer
+a gate under the caller's execution update.
+`origin/main` remains `d8692f9`; #273/#274 remain unmerged independent drafts. The
+ignored local scripts and receipts support continuation. `%TEMP%/tactics-259-baseline`
+hosts the temporary extended-qualification branch; `%TEMP%/tactics-259-repairs` hosts
+the repair-qualification branch. Neither workflow belongs in an implementation PR.
 
-## Implementation sequence and proof
+- Issue: [#259](https://github.com/luminari-gurus/tactics-guru-v2/issues/259).
+- Owner: `moshehbenavraham`; [pickup comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/259#issuecomment-6603160055).
+- Entry branch / PR: [`work/issue-259-testing-route-save-isolation`](https://github.com/luminari-gurus/tactics-guru-v2/tree/work/issue-259-testing-route-save-isolation), [#275](https://github.com/luminari-gurus/tactics-guru-v2/pull/275), pushed `ffbdde0`.
+- Active dependent branch: `branch/issue-259-transient-gameplay`, implementation `6c8280f`, [PR #277](https://github.com/luminari-gurus/tactics-guru-v2/pull/277) against #275. Verification request `04cf227` adds only a temporary trigger.
+- Base: current `origin/main`, `d8692f94cb652eb6fbb6f4fa2a9330ad57c3d4dd`.
+- Planning method: [ablation](../../.agents/skills/ablation/SKILL.md), with [OpenSpec proposal](../../openspec/changes/issue-259-testing-route-save-isolation/proposal.md), [design](../../openspec/changes/issue-259-testing-route-save-isolation/design.md), [contract](../../openspec/changes/issue-259-testing-route-save-isolation/specs/game-save-scope/spec.md), and [implementation tasks](../../openspec/changes/issue-259-testing-route-save-isolation/tasks.md).
+- Previous plan: [#263 archive](issue-263-webkit-reload-boot-plan.md), preserved byte-for-byte; SHA-256 `28a7610d304e3db8604c144f9a691e01a496d2a0002f5b416e9d286fc92fd104`.
 
-1. **Preserve and diagnose.** Recover the original artifact, failing trace/report,
-   test identity and screenshot before runs expire. Record source/build/browser,
-   runner, base path/server mode, cache, worker/retry settings and host conditions.
-   Attach bounded diagnostics before the first navigation and preserve every failed
-   attempt. Distinguish entry-script fetch, module evaluation/route import, dungeon
-   mount, Phaser READY and Continue/save admission. Check clock state across reload
-   without presuming it caused this failure. Compare exact failing source and
-   literal main under matching conditions where attribution is needed.
-2. **Reproduce and fix the owning cause.** Start with desktop-WebKit `wasd` and
-   portrait `compass`, then all four stair inputs on all three WebKit profiles.
-   Use one worker, no retries and a recorded finite repeat count (initially five
-   per affected case), with cold contexts and warm/repeated reloads. If repeats
-   pass without capturing the cause, retain the uncertainty and refine the
-   specific diagnostic boundary; do not mark the issue fixed. Add a causal
-   regression witness and apply the smallest evidenced fix. Preserve original
-   assertions and input, save, RNG and floor-travel semantics.
-3. **Prove continuation and shared consumers.** Verify saved dungeon Continue,
-   stair descent/ascent and inert arrival, exact reload state, corrupt/unavailable
-   save recovery and a legal battle continuation. Trace any changed shared entry,
-   engine or lifecycle code through standalone battle, run, proof, map and menu
-   consumers. Check root/prefix and preview/dev where the changed boundary is used.
-   Include hidden-page/BFCache/audio initialization when lifecycle ownership changes.
-   Injected request failures prove recovery, not reproduction of the original bug.
-4. **Qualify and hand off.** Run the full inventory on the final integration
-   candidate; require the complete WebKit exploration matrix without post-reload
-   boot timeouts. Retain all prior failures, skips and incomplete runs separately.
-   Publish a focused implementation PR with cause, regression proof, integration
-   dependency, source-bound results and limitations. Use `Closes #263` only when
-   both issue criteria hold. Cross-reference #257/#258 only to the extent evidence
-   establishes a relationship; their separate acceptance is not waived.
+## Selection and backlog review
 
-## Verification commands and acceptance
+Reviewed all **34 open issues**, their bodies/labels/assignees, relevant comments, all **four open PRs**, remote branches, native issue dependencies/branch associations, and local OpenSpec work. REST pagination had no next page; GraphQL independently reported `totalCount: 34` and `hasNextPage: false`. Selection was not restricted to `ready for work`. GitHub Projects/draft work-items could not be audited: the credential lacks `read:project`. No claim is made about inaccessible project-only work.
 
-Planning/publication is **documentation-only** under
-[verification-policy.md](../verification-policy.md): validate links, paths,
-commands/config selection, archive bytes, diff scope, assignment, native branch
-association and local/remote commit parity. No runtime fix or browser execution
-is claimed by this plan commit.
+**Why #259 wins:** it has concrete acceptance criteria, no competing branch/PR or assignee at pickup, and an already merged prerequisite. #153 is closed; menu PR #256 merged as `78a3f75`, #269's save safeguards as `1f1c37e`, and randomized new-dungeon layouts #272 as `d8692f9`. All are in the selected base. It protects existing player progress and settles the route/storage boundary explicitly referenced by #270 before records instrumentation is added. This has greater immediate enabling value than independent convenience features and less diagnosis uncertainty than intermittent startup investigations.
 
-Focused implementation commands, from a supported Node/npm environment:
+The full backlog was accounted for as follows; these are selection dispositions, not changes to other owners' scope or labels:
+
+- **#259 — selected.** Promoted from unlabeled readiness to exact `ready for work`, assigned to the authenticated caller, and claimed by comment after a fresh state check.
+- **#176, #270 — strong subsequent records candidates.** Overlapping storage/UI and stats work should be coordinated. #270 explicitly requires isolation of dedicated routes; records, active-time policy, retention and ranking are outside this plan.
+- **#179, #181 — independent lower-priority presentation/export candidates.** Useful bounded work, with less enabling value than the persistence boundary; their remaining export-history/tutorial/pace choices still need planning.
+- **#172 — existing ready candidate.** Combat healing/revival remains useful but adds action/supply/content policy and cross-mode item behavior; it does not unblock the selected route boundary.
+- **#184 — existing ready candidate.** Generator selection, deterministic bounded execution, compatibility and optional rot.js adoption need evaluation before durable-floor integration. Its larger design uncertainty lowers its rank here.
+- **#167, #168, #169, #171 — mechanics candidates requiring coordinated consumer slices.** #161 is owned and explicitly retains the remaining push/charge/typed-damage/hazard contracts. Its open parent/foundation label alone is not treated as a blocker; the actual missing contracts and shared ownership require coordination.
+- **#170, #173, #174, #175 — broader content/equipment/reward/exploration work.** Biome packs must be split; acquisition, currency/upgrades and trap contracts remain interdependent. They are not a single bounded next implementation.
+- **#178, #180, #182 — optional lower-priority rotation/music/editor adaptations.** Each requires selecting its intended behavior or delivery scope first.
+- **#185, #261, #262 — explicit unresolved progression/visibility/visual choices.** Preserve these as desired work without silently selecting formulas, sight rules, rendering treatment or dependencies.
+- **#85, #128, #161, #162 — already assigned to `dubstylee`.** Release operation/acceptance, analytics and remaining shared ability/effect acceptance are not reclaimed. The #161/#162 comments distinguish merged consumer slices from the still-open umbrella criteria.
+- **#199, #200, #208, #219 — DevOps epic/owned acceptance work.** #200 already has implemented timing tooling; #208 retains its separate capacity blocker; #219 records implementation/integration rather than unclaimed fresh coding. No readiness is inferred from stale epic checklist rows.
+- **#254 — assigned and implemented in merged #260.** Its still-open tracker and remaining remote branches are not a new chase/block task; local OpenSpec shows 7/7 tasks complete.
+- **#257, #258, #268 — valid unresolved diagnostic/bug candidates.** Historical loading failures and the existing #268 investigation branch require source-bound causal evidence. The merged #263 runtime repair does not prove every separate symptom resolved. Do not combine or close them based on visual similarity or passing repetitions.
+- **#271 — assigned, active draft PR #273.** Design draft #237 is reference work; #273 is not available for duplicate implementation.
+
+The other open PRs are #274 (dungeon entropy fixtures, potentially overlapping test helpers) and #12 (unselected deployment alternative). Neither is a prerequisite to cherry-pick. Recheck #273/#274 and current main before implementation; integrate merged changes normally. Local OpenSpec's incomplete #153 checklist is historical planning state, not a second unclaimed menu feature.
+
+## Outcome and non-goals
+
+**Outcome:** a menu-launched saved battle, run or dungeon remains unchanged after any testing-route visit or play. Direct testing entries always start fresh and never inspect, hydrate, write, remove or clear saved progress. Main-menu save/recovery behavior remains available with its current protections.
+
+**Non-goals:** no Hall of Records or stats implementation (#176/#270), save migration/key changes, combat or enemy-policy changes, new renderer/router/storage framework, dependency adoption, production operation, CI-capacity change, or unrelated backlog cleanup. Existing privacy/audio preferences are separate from saved-game state and retain their current behavior.
+
+## Observed owners and affected files
+
+- `src/main.ts`, `src/app/routes.ts`, `src/ui/mainMenu.ts`: route dispatch, one-shot entry requests and menu URLs. Today menu play navigates to the same paths as testing.
+- `src/app/startBattleApp.ts`, `src/phaser/start.ts`, `src/phaser/BattleScene.ts`, `src/ui/persistence.ts`, `src/app/BattlePersistence.ts`: standalone startup currently installs durable persistence and recovery controls.
+- `src/app/startRunApp.ts`, `src/app/RunItemSession.ts`, `src/app/startDungeonApp.ts`, `src/app/DungeonSession.ts`, `src/ui/dungeon.ts`, `src/ui/menuReturn.ts`: unconditional storage construction, accepted-state writes, save UI and departure behavior. `src/app/menuSaves.ts` and existing `src/persistence/*Storage.ts` remain the durable owners, reused without format changes.
+- `vite.config.ts`: emitted preload script has its own path classifier; it must recognize persistent root modes while preserving lightweight menu boot and existing diagnostics.
+- Existing route/session/storage units; `tests/main-menu.spec.ts`, `tests/battle-persistence.spec.ts`, `tests/run-progression.spec.ts`, `tests/dungeon*.spec.ts`, `tests/helpers/menuFixtures.ts`, `tests/helpers/dungeonTraversal.ts`, `tests/helpers/run*`, and their actual consumers. Save assumptions also occur in ability, effects, battle/audio, asset and telemetry fixtures; inspect each call site before choosing its new entry scope.
+- `scripts/measure-fit-controls.ts`, `tests/public-asset-base.spec.ts`: collector warm reload currently removes game saves; transient testing must instead reset by reload while preserving sentinels and the HTTP cache.
+- `playwright*.config.ts`, `scripts/verification-selection.mjs` and selection contracts only where moved/new cases require changes; `docs/main-menu.md`, `docs/dungeon.md`, persistence documentation and `docs/verification-policy.md` for changed route/coverage guidance.
+
+This is an ownership map, not a requirement to edit every listed file. Retain a file change only when a traced behavior or proof needs it.
+
+## Implementation sequence
+
+1. **Establish the entry capability.** Resolve route and persistence scope together. Bare base renders the menu. Menu games use closed root URLs such as `/?game=dungeon&entry=new`; consuming `entry` retains `game` so reload stays in the persistent flow. Add a menu-game URL builder; retain direct testing URL construction. Explicit root `scene=battle|proof|content-smoke` remains diagnostic/transient, including when parameters conflict. Direct paths cannot opt into persistence with `entry` or `game`. Cover `/` and `/prototype/`, trailing slash, unknown and conflicting values. Align emitted preloads and update route documentation with this change.
+2. **Keep one gameplay implementation with optional persistence.** Start direct standalone battle through the existing pure `BattleSession` without constructing `BattlePersistence` or save controls. Run/dungeon owners accept persistence explicitly absent; accepted domain transitions still execute, but no save provider, serialization, hydration, review, clear or write runs. For transient dungeon travel, publish the legal candidate without a durable commit; persistent play retains save-before-publish. Preserve restart seed policy, randomized new-dungeon layouts, RNG/replay and stale-callback cleanup. Add focused owner tests alongside this change.
+3. **Scope UI and new-game safeguards.** Persistent root play retains Continue/recovery, backup/export, stale review, failed-write recovery and unsaved-departure safeguards. Preserve all #269 empty/changed/backup-only new-game checks inside that flow. Transient play has fresh controls, normal restart and an honest resets-on-reload indication, with no saved-game prompts or menu-review handoff access. Retain inspect/log/sound and Main menu navigation. Add menu/transient browser cases and update the relevant mode docs with this change.
+4. **Move persistence proof to menu play.** Remove direct testing-route persistence regression expectations. Rehome their meaningful assertions to persistent menu journeys using current helpers; do not simply delete corruption, backup, reload, terminal, item/reward, floor, stale-write, BFCache or replay coverage. Keep non-save gameplay cases on testing routes. Add save-access spies and exact primary/backup sentinels for every direct entry family; distinguish application accesses from harness setup/assertion reads. Cover missing/valid/corrupt/backup-only/unavailable storage and ignored entry parameters.
+5. **Reconcile shared consumers and qualify.** Update affected authored/dev/ability/item fixtures, WebKit acceptance/exploration, extended journeys, telemetry and root/prefix assets. Remove collector save-clearing for transient captures and prove its cold/warm workload still works. Capture before/after selected IDs, map moved/removed cases to retained obligations, and update only necessary selectors/contracts. Run the final qualified full matrix and affected legal extended journeys on frozen source/build inputs. Publish an implementation PR with source-bound results and limitations; a closing reference belongs only after every issue criterion passes.
+
+## Ablation decisions
+
+- **Keep** the root entry capability: a one-shot `entry` flag is consumed and cannot retain persistent identity through reload; allowing durable play on direct paths violates #259.
+- **Simplify** to full-page root-query navigation and current hosts. An SPA router, session-wide eligibility marker, alternate save namespace and second gameplay engine solve no requirement here.
+- **Keep** an explicit transient mode in the session owners. The current dungeon `playUnsaved()` path intentionally blocks stairs; using it would leave testing incomplete. A fake-success store would misrepresent durability and still exercise save machinery.
+- **Keep** existing save safety and move its tests: isolation does not authorize dropping main-menu corruption, recovery, backup or lifecycle acceptance.
+- **Drop** speculative migrations, generic storage abstractions, records accumulators, broad test-framework refactors, new dependencies and incidental issue closeouts. Existing formats and test tools meet the requested boundary.
+- **Keep** full final regression because the change crosses shared save admission, entry/lifecycle behavior and many fixture consumers. Use focused checks during iteration; do not repeatedly rerun green full matrices for prose changes.
+
+## Proof and acceptance mapping
+
+1. **Menu save unchanged after testing:** create/continue real menu progress, retain primary/backup bytes for all three families and unrelated sentinels, exercise every testing entry, then return to menu Continue and compare exact state. Include actions, restart, reload, visibility and history lifecycle boundaries.
+2. **Testing always fresh:** with each storage condition, assert no Continue/recovery and no hydration; a reload/restart resets progress. Preserve the supported seed/random-layout policy rather than requiring every new random dungeon to have identical geometry. Verify legal transient battle/run play and dungeon descent/ascent.
+3. **No saved-state access:** instrument the browser storage accessor/method boundaries for progress keys and save-review handoffs before boot; fail on any application access in direct routes, explicit scene diagnostics and forged entry combinations. Pure owner tests use a provider that fails on acquisition. Non-game preferences are checked separately rather than silently forbidden.
+4. **Persistence regressions belong to menu flow:** preserve meaningful negative/continuation assertions under menu entries, remove old direct-route persistence expectations, run menu save tests and record before/after test/coverage mapping. Preserve menu new-game safeguards from #269 and existing saved floor/seed identities from #272.
+
+Implementation iteration commands (discover browser selections with `--list` first):
 
 ```sh
-npm ci
+npm run test:unit -- tests/unit/routes.test.ts tests/unit/menuSaves.test.ts tests/unit/battlePersistence.test.ts tests/unit/RunItemSession.test.ts tests/unit/dungeon.test.ts tests/unit/exploration.test.ts
 npm run build
-npx --no-install playwright test -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts --project=desktop-webkit -g 'stairs travel once per entry with wasd' --repeat-each=5 --retries=0
-npx --no-install playwright test -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'stairs travel once per entry' --retries=0
-npx --no-install playwright test tests/dungeon-exploration.spec.ts tests/dungeon-lifecycle.spec.ts tests/dungeon.spec.ts --retries=0
+npx --no-install playwright test tests/main-menu.spec.ts tests/battle-persistence.spec.ts tests/run-progression.spec.ts tests/dungeon.spec.ts tests/dungeon-lifecycle.spec.ts --list
+npx --no-install playwright test tests/main-menu.spec.ts tests/battle-persistence.spec.ts tests/run-progression.spec.ts tests/dungeon.spec.ts tests/dungeon-lifecycle.spec.ts --retries=0
+npx --no-install playwright test -c playwright.device-acceptance.config.ts --list
+npx --no-install playwright test -c playwright.exploration.config.ts --list
+npm run test:build
 npm run verify:full -- --list
 ```
 
-Discover each selection with `--list` before execution and record exact test IDs.
-Add only the existing consumer-specific checks the diagnosed patch needs; select
-unit owners after identifying the cause. Both TypeScript scopes/content validation
-are included in `npm run build`. Preserve build-input identity and separate
-preview/dev, root/prefix and configured telemetry results.
+Extend the existing owner tests for the changed boundary. Build includes content validation and both TypeScript scopes. Apply the existing discovery comparison contracts to selection changes; new/removed IDs need explicit mappings, not an unchanged-count claim.
 
-**Final tier: full regression**, required explicitly by #263 and potentially by
-the shared startup/lifecycle seam. `npm run verify:full` accounts for all 19 stages;
-the current source also has separate extended dungeon journeys via
-`npm run test:extended` and `npm run test:extended:webkit`. Account for those
-consumers when a shared boot change reaches them. On self-hosted Actions use the
-existing `issue-200-baseline.yml` `capture` workflow and complete serial receipt
-ledger where appropriate, with exact source/build identity and all stages present.
-Do not substitute a partial green rerun for the issue's complete full-run gate.
-Re-inventory selection against the final integrated source.
+**Final tier: full regression**, under [verification-policy.md](../verification-policy.md), plus affected `npm run test:extended` and `npm run test:extended:webkit` legal progression journeys. Account for all routine stages, dev fixtures, placement, both WebKit matrices, health bars, configured production/development telemetry and root/prefix asset modes. Run prefix/preview/dev modes using the policy's commands; PowerShell must use environment-variable assignments rather than pasted POSIX prefixes. Preserve exact source/build/browser/config identities, one worker, zero blanket retries, artifacts and all failures/skips/incomplete outcomes. Reuse only unchanged relevant inputs with provenance; a focused pass cannot erase an earlier failed full run.
 
-Keep `[self-hosted, tactics-browser]`, `tactics-browser-exclusive`, one browser
-worker and serial GPU/performance use. No automatic GitHub-hosted fallback.
-Playwright desktop and emulated portrait/landscape satisfy device acceptance under
-AGENTS.md; physical hardware is not required or claimed. Preserve useful prior
-evidence only when its relevant inputs are unchanged and provenance is available.
+Browser CI stays on qualified `[self-hosted, tactics-browser]` capacity with the `tactics-browser-exclusive` lock and no automatic hosted fallback. Playwright desktop and mobile portrait/landscape emulation satisfy acceptance under AGENTS.md. The local declared physical capability is Android; physical testing is neither required nor claimed. Queue/offline capacity is a scheduling risk, not a reason to weaken acceptance.
 
-## Planning validation
+## Planning validation and publication (historical, `41eda1d`)
 
-Planning validation: full-stage discovery lists 19 stages; direct installed
-Playwright CLI discovery selects five repetitions of the desktop-WebKit `wasd`
-case, all 12 WebKit stairs cases, and 99 Chromium cases across the three named
-dungeon files. These checks discover selection without starting servers or
-browsers; they do not reproduce the defect or qualify runtime behavior. Archive
-SHA-256 and Git blob match the previous root plan. Local-link/path validation,
-`git diff --check` and final branch/assignment/remote readback complete publication.
+The planning commit was documentation-only. Its checks covered strict OpenSpec validation, local links/paths, command/config ownership, archive bytes, `git diff --check`, task-only scope, issue ownership/readiness/comment, native Development branch association, and local/remote parity. No app build, runtime fix, gameplay test or implementation acceptance was claimed by that planning publication.
+
+Planning checks completed against unchanged application/test/config inputs from the base above: strict OpenSpec validation passes; the existing full-stage discovery lists 19 stages. Direct installed Playwright CLI discovery selects 237 cases in the five focused files, 100 WebKit acceptance cases in five files, and 105 WebKit exploration cases in three files. These are baseline selection checks using Playwright 1.64.1 and Node 24.22.1 on Windows, not executed browser tests or final implementation counts. Local npm/openspec shims were absent from PATH; planning used the cached OpenSpec 1.14.1 CLI and installed Playwright CLI through Node without altering application dependencies.
+
+The previous plan is preserved at the archive path above. Related #176/#270 are context only and are not assigned or given closing links.
+
+## Implementation handoff (2026-11-03)
+
+- Authorization: caller approved implementation, autonomous repairs, commits, pushes and focused PRs. No merge/deployment requested.
+- Main remains `d8692f9`; #273 and #274 were rechecked and remain independent drafts. Neither was cherry-picked.
+- Delivery split: publish the root entry/menu/preload chunk first, then stack the transient-owner/UI/coverage change. The first chunk enables durable root URLs while legacy direct owners still exist; it must not close #259 or claim isolation. Final full/extended qualification applies to the completed stack.
+- Implemented one self-contained `resolveAppEntry` policy shared by application routing and the emitted preloader, plus `menuGameHref`. Menu actions now use root game URLs. Existing destination safeguards and save formats remain unchanged.
+- Extended route units cover root/prefix, trailing slash, supported/unknown/duplicate selectors, diagnostic precedence, forged testing parameters and one-shot intent consumption. Existing menu tests now use persistent root journeys and check reload. Build integration executes the emitted preloader at both bases.
+- Baseline selected IDs captured before edits in ignored `tmp/issue-259/selection-before.json` at clean `41eda1d`. After restoring the lockfile, a detached literal `41eda1d` worktree at `%TEMP%/tactics-259-baseline` supplied `selection-before-locked.json`; it uses a junction to the same locked `node_modules`. Stage counts: Chromium 853, fixtures 87, placement 6, WebKit acceptance 100/exploration 105, health 25, telemetry production/development 36 each, asset modes 78 each. Separate encounter/item/ability/smoke configs captured too. Deep comparison with `selection-entry.json` confirms all 15 selections and effective device settings unchanged; no cases were removed or added in this chunk.
+- Environment correction: installed Playwright was 1.63.0 despite the lockfile requiring 1.64.1. Initial focused units (21) and build integrations (2) passed on the mismatched install; initial build failed at existing `screen` config types. These are preliminary results, not locked-dependency acceptance. Ran `npm ci` to restore the lockfile (0 audit findings); repeat invalidated checks on 1.64.1. npm itself was absent from PATH, so an isolated temporary npm CLI/shim lives under `%TEMP%/tactics-259-tools`; no app dependency/config change was made for this setup. A first browser preflight failed for missing binaries; installation and preflight must match the restored lockfile.
+- Locked-dependency validation: `node node_modules/vitest/vitest.mjs run tests/unit/routes.test.ts tests/unit/menuSaves.test.ts` passed 21 tests; `npm run build` passed 223 content tests, both TypeScript scopes and production build; `npm run test:build` passed both root/prefix builds and emitted-preloader assertions. Browser preflight passed Chromium 156.0.8078.4 (revision 1248) and WebKit 27.2 (2370), Playwright 1.64.1, Node 24.22.1, Windows x64; receipt `verification-receipts/browser-environment/run-BkKGp5/environment.json`. Existing Vite native-config advisory and large Phaser chunk warning remain.
+- Browser evidence uses the repository Playwright wrapper, one worker, zero retries, untraced preview builds; no physical device claim. Initial `node scripts/browser-test.mjs tests/main-menu.spec.ts` retained 66 passes/3 failures in `verification-receipts/browser-runs/run-AoDT2L/results.json`: the newly added battle reload check incorrectly compared a pre-enemy fixture against a post-enemy save. Corrected only the three-mode fixture/reload block to seed on menu entry and compare the settled save; `... -g 'Continue resumes'` passed 9/9 in `run-baYPQZ`. The other 60 original Chromium cases are reused unchanged, covering all 69 obligations without claiming a clean rerun of the first suite. `... -c playwright.device-acceptance.config.ts tests/main-menu.spec.ts` passed 46/46 (`run-k4x0PY`). Root menu asset/navigation passed 3/3 (`run-moFba9`). No app bug or acceptance assertion was removed to obtain these passes.
+- Prefix validation: `vite build --base=/prototype/` followed by `PLAYWRIGHT_BASE_PATH=/prototype/ node scripts/browser-test.mjs tests/main-menu.spec.ts tests/public-asset-base.spec.ts -g 'Continue resumes|New Game starts immediately|changed dungeon save|stale Continue|menu public artwork'` passed 21/21 (`run-cIbKCZ`). The root bundle was restored afterward. PowerShell supplied the environment assignment; unchanged successful content/type prerequisites were reused for these bundle steps.
+- Test/source hashes are recorded in ignored `tmp/issue-259/entry-source.json`; all receipts above are local retained evidence. OpenSpec tasks 1.1/1.2 are complete. Full-regression and extended journeys have not run and remain required for the finished isolation stack.
+- Entry PR #275 is open for review, without a closing reference. Runtime/test inputs are the tested inputs above; its final changes after verification are documentation/task tracking only.
+- Dependent chunk now resolves `appEntry` once, passes the capability to standalone battle, and supplies `null` storage to transient run/dungeon owners. Testing restart discards only memory; persistent reset/recovery and failed-travel guards remain. Save controls/review handoffs are guarded by storage eligibility. Battle telemetry lifecycle events are retained independently of saves. The collector's warm reload no longer removes game slots.
+- Iteration: the existing 132 owner tests passed after introducing optional storage. Two additional transient tests pass (complete legal run/replay/restart and dungeon descent/ascent without storage-factory acquisition). The updated build passes content/type/bundle checks. Initial desktop isolation journey passes 5/5 (`verification-receipts/browser-runs/run-3nWegI/results.json`), each exercising seven direct/diagnostic entry families with forged parameters, actions, restart, synthetic visibility/pagehide cleanup and reload against exact primary/backup/handoff sentinels. These are iteration results, not final acceptance; actual history/BFCache and full engine/device coverage remain required.
+- Save cases now use root `game` entries across battle/run/dungeon, effects, audio, health bars, procedural grids, lifecycle/BFCache, telemetry and extended journeys. Item fixture durability/recovery moved into five real menu-run cases; direct item/ability fixtures now keep only memory and reset on reload. Learned-ability save proof remains in the menu-owned extended Mage/Ranger/Fighter journeys, with a new menu dungeon XP 0/60/180/600 exact caster/active-boundary corpus. Fictional `zz_*` abilities retain immediate command/replay proof and have no production save contract.
+- The transient legal dungeon browser case passed a complete first floor, descent and return (`run-KBzO8y`, desktop). Its first attempt (`run-DCzA7w`) failed after 400 steps chasing one specific moving enemy; using the existing nearest-encounter traversal and Fighter seed-28 policy resolved the test-helper misuse. No domain movement rule or timeout was relaxed. The four menu caster cases pass (`run-H52nis`). Four moved item cases pass in `run-60uXcb`; the fifth initially expected the fixture's null-provider word `unavailable` for an actual denied browser getter. It correctly reports `Storage security`; its corrected exact classification passes in `run-oTBoS7`.
+- Dev fixture iteration `run-yTSHGQ` retained 16 passes/1 first-navigation timeout. Matched focused diagnostic runs of the same original picker case passed at parent `ffbdde0` (21.2s, `%TEMP%/tactics-259-baseline/verification-receipts/browser-runs/run-ldxrNV`) and current source (19.1s, `run-6BW9jS`). Neither reproduces that timeout; its cause is not claimed fixed or attributed to this change. Earlier mixed dev/root-item iteration `run-XLhGAx` was interrupted after startup timeouts and a host-specific recovery-summary assertion; error contexts remain, but no final JSON exists and it is incomplete. The final inventory must retain these outcomes and run the actual owning modes.
+- Final fast checks: all **1,122 unit tests pass** (`tmp/issue-259/all-units.json`), both build integrations pass (`tmp/issue-259/build-integration.log`), both TypeScript scopes/content/root build pass. The selection tooling run retained **27 passes/1 pre-existing CRLF parser failure** (`tmp/issue-259/selection-contracts.log`); literal `ffbdde0` reproduces that exact failure. Fixed independently in [PR #276](https://github.com/luminari-gurus/tactics-guru-v2/pull/276), commit `aa3cfc7`, mirrored here as `ae7dfc1`. All 23 batch contracts pass on that repair; the formerly failing contract also passes on this branch. Put bundled Git's `usr/bin` on PATH for the existing real POSIX-shell guard assertions on Windows; no assertion/runner/timeout/skip was removed.
+- [Coverage ledger](../qa/issue-259/coverage-map.json) accounts for 1,469 unchanged stage/project IDs, 102 moved/renamed prior IDs and 65 added executions across the 15 captures. Current routine counts: Chromium **898**, dev fixtures **75**, placement **6**, WebKit acceptance **120** and exploration **120**, health **25**, telemetry **36 per mode**, assets **78 per mode**. Dedicated encounter/item/ability/smoke configs are **24/9/42/2**. These are discovery counts, not completed runtime results. Existing nine-batch exact partition, all extended profiles and the 23 approved matrix reductions passed discovery contracts; no test file or fixture consumer is left unassigned.
+- Final routine regression is running on frozen `04cf227` in [self-hosted run 41647380978](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41647380978). Host disposition, locked setup, both browser preflights and exact full/batch discovery succeeded before the 19-stage execution started. The three historical PR-only workflow gates skip this unrelated branch; those skips are not runtime coverage.
+- Required extended journeys are queued behind the same exclusive lock in [run 41647577545](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41647577545), verification-only branch `branch/issue-259-extended-qualification` at `4b372a3`. It differs from candidate `04cf227` only by its temporary workflow; that exact diff is asserted before execution. It builds the same gameplay inputs, runs both existing extended commands with one worker/zero retries, continues independent engines after a failure, and retains source/browser/results artifacts. This workflow is not part of either implementation PR and must not be merged into the product branches.
+- Review follow-up found telemetry's separate pathname-only classifier labels `/?game=run` as battle. A real configured production assertion reproduced `Expected run / Received battle` (`run-rmt8Ji`). `startTelemetry` now uses the existing shared route policy and preserves the disabled menu/dungeon taxonomy. The same existing ingestion case asserts the actual `app_entered` route. This is a required consumer repair, with no new event/schema or selection change.
+- Telemetry follow-up: 23 route/telemetry units and both root/prefix build integrations pass. Configured production **36/36** (`run-0YbuHD`) and development **36/36** (`run-02Orv4`) pass with no skips/flakes/retries, retaining the synthetic-error sanitization assertions. Both telemetry discoveries still select exactly the prior 36 IDs/effective profiles. Routine run `04cf227` remains valid gameplay evidence but cannot qualify this changed telemetry path; source-bound supplemental qualification is required. No original full-run failure or incomplete result may be erased by supplements.
+- Strengthened the five existing isolation journeys with accepted battle actions followed by actual Back navigation in the existing BFCache-enabled harness. They require exact fresh state and unchanged primary/backup/handoff bytes after return. All **15 Chromium** profiles/cases (`run-yloL62`) and **10 WebKit** (`run-7Xd3FS`) pass. Earlier full-file desktop persistence coverage also passed **26/26** (`run-wA5Jh9`), including the retained actual cached-document/stale-writer cases. Prefix isolation and asset-mode checks follow; the case IDs/matrix remain unchanged.
+- Superseded queued extended run `41647577545` was cancelled before execution. Replacement [run 41648868922](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41648868922), qualification branch `bfa6c3f`, asserts equivalence to telemetry candidate `0377781` and adds both configured telemetry suites plus changed units/build integrations ahead of the extended journeys. Align this queued branch once more with the stronger history proof before it executes. All supplemental work stays on the same `tactics-browser-exclusive` lock; its temporary workflow is never part of the implementation PR.
+- Next: inspect both final runs/artifacts, diagnose any failures without retries/limit changes, reconcile all acceptance gates, update PR #277 with source-bound results, and remove `.github/full-verify-request` from the implementation branch before review handoff. Do not merge or tag/release/deploy. Task checkboxes close only when their complete proof is retained.
 
 ## Estimate for my implementation
 
-**6–10 hours of my elapsed working time after implementation starts**: roughly
-2–4 hours to recover evidence/reproduce/isolate the cause, 1–2 hours for the repair
-and causal regression, and 3–4 hours for focused integration checks, full serial
-qualification and evidence/PR handoff (some work overlaps). The latest reported
-full capture itself occupied about 2 hours 24 minutes, so qualification is a
-material part of this estimate.
+**8–12 hours of my elapsed working time after implementation starts**, including code, test migration, qualification and an implementation PR: about 3–5 hours for entry/session/UI changes and focused tests, 2–3 hours for cross-suite fixture migration and coverage accounting, and 2–3 hours for serial full/extended verification and evidence review, with some overlap.
 
-Allow **12–16 hours** if the intermittent stall needs a new causal witness,
-menu integration moves substantially, or an engine-level repair is required.
-Runner queue/offline waits, external review, merge and deployment are excluded.
-This is my execution estimate, not a human engineer estimate or a guaranteed
-deadline. Until a causal witness exists, the diagnostic portion is uncertain.
+The historical #263 full run took about 2 hours 24 minutes, so serial qualification is a material part of this estimate, not an instant final check. Allow **12–16 hours** if merged #273/#274 changes materially affect integration or a genuine regression needs diagnosis. Runner queue/offline time, external review, merge and deployment are excluded. This is my execution estimate, not a human engineer estimate or a guaranteed deadline.

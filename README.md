@@ -27,21 +27,21 @@ carry your surviving party into the next encounter.
 This repository is the playable **v2 prototype**. The header is promotional art;
 the game uses illustrated portraits, compact sprites and isometric tile boards.
 
-**[Play a battle](https://tactics-guru-v2.pages.dev/battle) · [Enter the dungeon](https://tactics-guru-v2.pages.dev/dungeon) · [Run locally](#run-locally) · [Explore the architecture](#how-it-fits-together) · [Browse the docs](#project-guide)**
+**[Play a battle](https://tactics-guru-v2.pages.dev/?game=battle) · [Enter the dungeon](https://tactics-guru-v2.pages.dev/?game=dungeon) · [Run locally](#run-locally) · [Explore the architecture](#how-it-fits-together) · [Browse the docs](#project-guide)**
 
 ## Choose your adventure
 
 - **[Main menu](https://tactics-guru-v2.pages.dev/) — `/`**<br>
   Continue a saved journey, start a new dungeon, or open Records and Settings.
   Continue offers a mode choice when several saves exist; recovery never removes saves.
-- **[Standalone battle](https://tactics-guru-v2.pages.dev/battle) — `/battle`**<br>
+- **[Standalone battle](https://tactics-guru-v2.pages.dev/?game=battle) — `/?game=battle`**<br>
   Fight the authored 12×12 Forest Ruins encounter with a level-1 party, enemy AI,
   attack previews, combat feedback and a saved battle you can continue.
-- **[Three-encounter run](https://tactics-guru-v2.pages.dev/run) — `/run`**<br>
+- **[Three-encounter run](https://tactics-guru-v2.pages.dev/?game=run) — `/?game=run`**<br>
   Play two seeded Desert battles followed by the authored Ruined Approach finale.
   Carry HP, XP and equipment between encounters; choose an item after each of the
   first two victories. The third victory completes the run.
-- **[Dungeon floors](https://tactics-guru-v2.pages.dev/dungeon) — `/dungeon`**<br>
+- **[Dungeon floors](https://tactics-guru-v2.pages.dev/?game=dungeon) — `/?game=dungeon`**<br>
   Explore Rooms layouts with fog of discovery, encounter markers and stairs.
   Floors alternate Forest and Desert after a seeded first biome. Each has a normal
   encounter, an elite or vault encounter, and a goblin guardian encounter. Clear the
@@ -92,10 +92,15 @@ Sound starts off; **Enable sound** turns on battle cues.
 
 ### Pick up where you left off
 
-Standalone battles, runs and dungeons keep **separate browser-local saves**, with
+Menu-launched battles, runs and dungeons keep **separate browser-local saves**, with
 primary/backup slots and recovery controls. Accepted progress and active battles
 can survive reload; hovering and unconfirmed actions are not saved. Saves belong
 to this browser and origin, with no account or cloud sync.
+
+Direct `/battle`, `/run`, `/dungeon`, `/map` and explicit scene diagnostics are
+testing entries. They start fresh without reading or changing game saves, retain
+normal gameplay in memory, and reset on reload. Return to the main menu to Continue
+a saved journey. Audio and privacy preferences remain separate.
 
 Save readers validate content and rules versions. Incompatible or damaged data
 is retained for recovery/export instead of silently resetting progress. Export an

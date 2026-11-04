@@ -21,9 +21,12 @@ engine chunks. Menu inspection imports validators/content through `menuSaves.ts`
 and a side-effect-free run context, without importing app hosts. It creates no
 sessions, RNG or writes and never exposes save bytes in DOM.
 
-Menu actions use full-page navigation. The closed-set `entry` parameter is removed
-from history before use and consumed once. Battle/run/dungeon destinations inspect
-again and use existing Continue/recovery owners. New Game starts immediately when
+Menu actions use full-page navigation to the configured base root with a closed
+`game=battle|run|dungeon` selector, for example `/?game=dungeon&entry=new` or
+`/prototype/?game=run&entry=continue`. The closed-set `entry` parameter is removed
+from history before use and consumed once; `game` remains so reload retains the
+saved-game owner. Battle/run/dungeon destinations inspect again and use existing
+Continue/recovery owners. New Game starts immediately when
 both dungeon save slots are empty. Otherwise it asks for confirmation over the
 menu. The dungeon rechecks the reviewed saves before replacement and requests
 confirmation again if they changed. If a confirmed replacement clears slots but
@@ -40,5 +43,17 @@ battle dialogs offer a Main menu button inside the modal.
 
 The `main-menu.spec.ts` suite belongs to the default three-profile Chromium matrix
 and the existing two-profile iPhone WebKit acceptance stage. Serial batch selection
-includes it exactly once per Chromium project. Existing test identities are retained
-while battle navigation changes to `/battle`; explicit root scene diagnostics remain.
+includes it exactly once per Chromium project. Saved-game browser regressions use
+the root selector, including the item fixture's moved durability cases. `/map`
+remains inspection. Supported
+explicit root `scene` diagnostics take precedence over `game`. The first `scene`
+value controls both route resolution and scene startup; later values are ignored.
+Unknown or duplicate
+`game` values render the menu. Direct paths cannot select a persistent entry through
+query parameters. `/battle`, `/run`, `/dungeon`, `/map` and supported explicit
+scene diagnostics start fresh without inspecting or changing any saved-game slot
+or menu-review handoff. Testing run/dungeon owners have no storage object;
+standalone testing battles use `BattleSession` directly. Testing can still play,
+restart and travel floors, and resets on reload. Save/recovery and unsaved-departure
+controls belong to persistent root play. Audio and privacy preferences keep their
+independent behavior.

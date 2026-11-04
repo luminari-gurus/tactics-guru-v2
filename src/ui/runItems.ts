@@ -141,6 +141,8 @@ export function mountRunItems(root: HTMLElement, session: RunItemSession, dialog
       if (!assignment) row.append(select);
       row.append(equip); inventory.append(row);
     }
+    root.replaceChildren(title, description, status, element('p', unavailable || 'Items may be used now, before the next battle starts.'), party, rewards, inventory);
+    if (session.storage) {
     const persistence = element('section'); persistence.setAttribute('aria-label', 'Run save');
     persistence.append(button('Continue saved run', () => {
       const load = session.inspect();
@@ -150,7 +152,8 @@ export function mountRunItems(root: HTMLElement, session: RunItemSession, dialog
         { id: 'continue-cancel', label: 'Cancel', run: focus },
       ], focus);
     }), button('Save recovery', () => recover()));
-    root.replaceChildren(title, description, status, element('p', unavailable || 'Items may be used now, before the next battle starts.'), party, rewards, inventory, persistence);
+    root.append(persistence);
+    }
   };
   session.onChange = render;
   render();

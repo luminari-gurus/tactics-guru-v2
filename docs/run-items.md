@@ -1,5 +1,11 @@
 # Run items and reward offers
 
+Persistent item/reward progress uses the menu-owned root run or dungeon entry.
+Direct testing entries and the item/ability dev fixtures keep progress in memory
+and reset on reload. The same command validation, ownership, projected stats and
+replay rules apply in both scopes. Item save/recovery browser assertions live in
+the main-menu suite; direct fixtures cover input, layout and fresh sessions.
+
 [Issue #77](https://github.com/luminari-gurus/tactics-guru-v2/issues/77), branch `work/issue-77-reward-catalog`, base `220d40f0ad179a7ffe5a4e3c67188b99718e722e`. Caller `dubstylee` approved [the OpenSpec plan](../openspec/changes/issue-77-reward-catalog/proposal.md) at `4b719e0` on 2026-10-14. The following historical issue references describe the original reviewed slice; current values and integration are described below.
 
 Current source audit: `b343ab02ae033a57f8c5f613f07883764f0752c0`. The [run session](../src/app/RunItemSession.ts) integrates reward claims, preparation controls, equipment projection and saved continuation; [dungeon session](../src/app/DungeonSession.ts) also uses the item contract. See [run contract](run-contract.md) and [dungeon](dungeon.md). The detailed #77/#78 handoffs and QA below retain their original historical scope.

@@ -136,7 +136,7 @@ await withPreview(options, async signal => {
       collectorSha256,
       host: { platform: platform(), release: release(), arch: arch(), cpu: cpus()[0]?.model, node: process.version },
       conditions: { ...collectorConditions(options), scene: options.scene, route: target.route, sceneUrl: target.url,
-        warmStorage: 'four v2 save slots cleared in collector-owned context; HTTP cache preserved; fresh-start, not saved resume' },
+        warmStorage: 'saved games and HTTP cache preserved; transient reload starts fresh without saved resume' },
       buildFiles: options.remote ? null : await buildFiles('dist'),
       failures,
       failedCapture,

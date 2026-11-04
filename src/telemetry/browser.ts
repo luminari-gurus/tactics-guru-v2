@@ -1,4 +1,5 @@
 import { bindTelemetry, reportFailure, track, setTelemetryContext, telemetryContext, type Context, type Failure } from './telemetry';
+import { classifyRoute } from '../app/routes';
 
 const OPT_OUT = 'tactics-guru:telemetry-opt-out';
 export function collectionAllowed(env: Record<string, unknown>, signals: { automated: boolean; dnt: boolean; optedOut: boolean; local?: boolean }): boolean {
@@ -35,9 +36,9 @@ export function startTelemetry() {
     const env = import.meta.env;
     if (!collectionAllowed(env, { automated: navigator.webdriver, local: ['localhost','127.0.0.1','[::1]'].includes(location.hostname), dnt: navigator.doNotTrack === '1' || (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl === true,
       optedOut: localStorage.getItem(OPT_OUT) === 'true' })) return;
+    const route = classifyRoute(location.pathname, location.search, env.BASE_URL);
+    if(route==='menu'||route==='dungeon')return;
     accepting = true;
-    const base = new URL(env.BASE_URL, location.origin).pathname.replace(/\/$/, '');
-    const route = location.pathname.replace(/\/$/,'') === base + '/run' ? 'run' : location.pathname.replace(/\/$/,'') === base + '/map' ? 'map' : 'battle';
     const context: Context = { route, phase: 'entry' };
     setTelemetryContext({ ...context, visibility: document.hidden ? 'hidden' : 'visible' });
     document.addEventListener('visibilitychange', () => setTelemetryContext({ visibility: document.hidden ? 'hidden' : 'visible' }));
