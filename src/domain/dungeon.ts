@@ -79,7 +79,7 @@ export class FloorCache {
   }
 }
 export const floorSize = (depth: number) => 20 + 4 * Math.min(depth - 1, 4);
-const sharedFloorCache = new FloorCache(8);
+const sharedFloorCache = new FloorCache(256);
 export const floorMap = (descriptor: FloorDescriptor, cache = sharedFloorCache) => cache.resolve(descriptor.seed, descriptor.generator, descriptor.size ?? 20);
 /** Prior saves contain no per-slot geometry. Keep their fixed facts cheap until battle entry. */
 function legacyEncounterPlans(depth: number): FloorDescriptor['encounters'] {

@@ -1,0 +1,10 @@
+Before: source commit 35b0b955bf5feb5678432d1f4c10226c3a6c8d5f, clean relevant inputs.
+After: same commit plus uncommitted storage/geometry cache edits, hashes below; docs are not runtime inputs.
+Host: Darwin arm64; Node v26.12.1; Playwright 1.64.1; desktop-webkit; worker 1; retries 0; root production preview; local host workload not independently controlled.
+Command: npx --no-install playwright test -c playwright.exploration.config.ts --project=desktop-webkit -g 'maximum-size floor step responsiveness|cold progression-format Continue'
+All hashes below use SHA-256; build output was recreated with npm run build after source edits.
+aface151d04ca054519e4082e3b77e9af6bdce79a3a8282accb61b23c7e87d32  src/domain/dungeon.ts
+b18d7993ee6be74c7b57ab7041e430dc456025a50a14ac6efd402e3faad14a1a  src/domain/dungeonSaveEnvelope.ts
+f5366409fb17bc044cca868443fdbd42e9f30b51ba24988f5416830bf9f0045d  src/persistence/dungeonStorage.ts
+9542828b7de5480d70138c594b4c54ab043809862828117ef31e99e315a2a854  tests/dungeon-exploration.spec.ts
+e4768389a179a65df5f04502dab87e8875b465b939e55493d5820a7dc99a74ed  package-lock.json

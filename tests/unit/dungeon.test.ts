@@ -140,6 +140,17 @@ describe('dungeon persistence',()=>{
     expect(store.remove('primary','old').ok).toBe(false);expect(store.remove('primary','corrupt').ok).toBe(true);expect(store.inspect().backup.status).toBe('valid');
     expect(m.getItem('tactics-guru:phaser:run:primary:v1')).toBe('old-run');
   });
+  it('does not share inspected state across cached reads and detects changed bytes',()=>{
+    const m=memory(),store=createDungeonStorage(()=>m),state=fresh();expect(store.save(state).ok).toBe(true);
+    const first=store.inspect().primary;if(first.status!=='valid')throw Error('Expected valid save');
+    (first.state.party[0] as {hp:number}).hp=0;
+    const again=store.inspect().primary;if(again.status!=='valid')throw Error('Expected valid save');
+    expect(again.state).toEqual(state);
+    m.setItem(DUNGEON_KEYS.primary,'corrupt');expect(store.inspect().primary.status).toBe('invalid');
+    const replacement=encodeDungeon(freshDungeon('replacement',20));if(!replacement.ok)throw Error(replacement.reason);
+    m.setItem(DUNGEON_KEYS.primary,replacement.text);const changed=store.inspect().primary;
+    expect(changed.status).toBe('valid');if(changed.status==='valid')expect(changed.state.id).toBe('replacement');
+  });
   it('does not publish travel on quota failure and can explicitly recover',()=>{
     const m=memory(),store=createDungeonStorage(()=>m),s=atStairApproach(clearFloor(fresh()));expect(store.save(s).ok).toBe(true);
     const session=new DungeonSession(s,store),before=session.snapshot;const write=m.setItem;
