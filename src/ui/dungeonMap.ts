@@ -20,6 +20,7 @@ export class DungeonMap {
   private live = true;
   private state: DungeonState | null = null;
   private map: GeneratedMap | null = null;
+  private grid: HTMLDivElement | null = null;
   private readonly abort = new AbortController();
   private readonly treatment = createMapArt(() => { if (this.live) this.paintArt(); });
   constructor(private readonly move: (destination: number) => void, private readonly locked: () => boolean) {
@@ -50,7 +51,7 @@ export class DungeonMap {
     const label = el('label','Map art '), select=el('select');select.id='dungeon-art';select.setAttribute('aria-label','Map art');
     for (const style of ART_STYLES) { const o=el('option',style.label);o.value=style.id;select.append(o); } select.value=this.art;
     select.onchange=()=>{this.art=select.value as ArtStyle;this.paintArt();};label.append(select);
-    const grid=el('div');grid.id='dungeon-map';grid.tabIndex=0;grid.setAttribute('role','application');grid.setAttribute('aria-label',`Floor ${s.depth} map. Player row ${Math.floor(f.position/map.width)+1}, column ${f.position%map.width+1}. Arrow or WASD keys move one cell.`);
+    const grid=this.grid ?? el('div');this.grid=grid;grid.id='dungeon-map';grid.tabIndex=0;grid.setAttribute('role','application');grid.setAttribute('aria-label',`Floor ${s.depth} map. Player row ${Math.floor(f.position/map.width)+1}, column ${f.position%map.width+1}. Arrow or WASD keys move one cell.`);
     grid.style.minWidth = `${map.width * 12}px`;
     grid.style.gridTemplateColumns = `repeat(${map.width}, minmax(12px, 1fr))`;
     grid.style.gridTemplateRows = `repeat(${map.height}, minmax(12px, 1fr))`;
@@ -58,17 +59,29 @@ export class DungeonMap {
     const showUpstairs=s.depth>1, showDownstairs=f.completed===3;
     const cleared=clearedDungeonSlots(f);
     const pois=new Map([...f.exploration.pois].sort((a,b)=>Number(cleared.includes(b.encounterSlot))-Number(cleared.includes(a.encounterSlot))).map(p=>[poiCell(p,map.width),p]));
-    for(let i=0;i<map.width*map.height;i++) {
-      const cell=el('span');cell.dataset.cell=String(i);cell.setAttribute('aria-hidden','true');
-      const visible=f.exploration.revealed.includes(i), open=map.cells[i]===1;
-      cell.className=visible?open?'explore-open':'explore-wall':'explore-hidden';
-      if(visible){cell.dataset.terrain=treated.terrain[i];
-        if(showUpstairs&&i===f.descriptor.upstairs)cell.textContent='↑';
-        if(showDownstairs&&i===f.descriptor.downstairs)cell.textContent='↓';
-        const p=pois.get(i);if(p){if(!cleared.includes(p.encounterSlot))cell.textContent='M';else if(!(showUpstairs&&i===f.descriptor.upstairs)&&!(showDownstairs&&i===f.descriptor.downstairs))cell.textContent='✓';cell.dataset.poi=p.id;}
-      }
-      if(i===f.position){cell.textContent='●';cell.dataset.player='true';}
-      grid.append(cell);
+    const total=map.width*map.height;
+    if (grid.children.length !== total) {
+      const fragment=document.createDocumentFragment();
+      for(let i=0;i<total;i++) {const cell=el('span');cell.dataset.cell=String(i);cell.setAttribute('aria-hidden','true');fragment.append(cell);}
+      grid.replaceChildren(fragment);
+    }
+    const revealed=new Set(f.exploration.revealed);
+    for(let i=0;i<total;i++) {
+      const cell=grid.children[i] as HTMLElement;
+      const visible=revealed.has(i), open=map.cells[i]===1;
+      const className=visible?open?'explore-open':'explore-wall':'explore-hidden';
+      if(cell.className!==className)cell.className=className;
+      let text='', poi: string | undefined;
+      if(visible){
+        const terrain=treated.terrain[i];if(cell.dataset.terrain!==terrain)cell.dataset.terrain=terrain;
+        if(showUpstairs&&i===f.descriptor.upstairs)text='↑';
+        if(showDownstairs&&i===f.descriptor.downstairs)text='↓';
+        const p=pois.get(i);if(p){if(!cleared.includes(p.encounterSlot))text='M';else if(!(showUpstairs&&i===f.descriptor.upstairs)&&!(showDownstairs&&i===f.descriptor.downstairs))text='✓';poi=p.id;}
+      } else if(cell.dataset.terrain!==undefined) {delete cell.dataset.terrain;cell.style.backgroundImage='';}
+      if(i===f.position)text='●';
+      if(cell.textContent!==text)cell.textContent=text;
+      if(poi===undefined){if(cell.dataset.poi!==undefined)delete cell.dataset.poi;}else if(cell.dataset.poi!==poi)cell.dataset.poi=poi;
+      if(i===f.position){if(cell.dataset.player!=='true')cell.dataset.player='true';}else if(cell.dataset.player!==undefined)delete cell.dataset.player;
     }
     grid.onclick=e=>{if(this.locked()||document.hidden)return;const cell=(e.target as HTMLElement).closest<HTMLElement>('[data-cell]');if(!cell)return;const destination=Number(cell.dataset.cell);if(neighbors(f.position,map.width,map.height).includes(destination)){this.move(destination);}else {feedback.textContent='Choose an adjacent cell or use the direction controls.';}};
     const feedback=el('p',`Player cell ${f.position} · Revealed ${f.exploration.revealed.length}/${map.width * map.height} · Visited ${f.exploration.visited.length}. `);feedback.id='dungeon-map-feedback';feedback.setAttribute('role','status');
