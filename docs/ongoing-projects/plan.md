@@ -22,6 +22,12 @@ Planned on 2026-11-04 from `origin/main` at `fbf82420b82674dc5f57397d68b0a50c8bf
 
 ## Outcome
 
+### Review follow-up
+
+- #280 now supports a confirmed, revision-bound decline at the dungeon reward boundary. A unit reproduces the two capped consumable choices and proves the next encounter remains reachable. All six focused browser profiles passed cancellation, confirmation, reload and entry.
+- #281 serializes run mutations with a shared browser lock and compares the current primary with the last observed bytes. Conflicts preserve both slots and offer export or Continue. Explicit removal adopts the missing primary only after comparing the reviewed bytes under the lock. Both run and dungeon ledger saves have separate format versions and retain preparation-readable checkpoints. Literal #280 readers rejected the old mislabeled ledger data and accepted both new backups. A rollback during an encounter can return to the checkpoint. The older build needs explicit removal of the incompatible primary before it can resume saving.
+- The frozen review run at `2209ccd` passed 1,162 units, both type scopes, two build integrations and 28 selection contracts. It passed 129 dungeon browser cases per engine, nine dev fixtures and both 42-case telemetry modes. Its run/menu stages recorded 151 Chromium and 86 WebKit passes plus 12 failures. Preserve those reports. The queued replacement guard and recovery synchronization at `6ad8f38` recovered the failed selections in 18 Chromium and four WebKit cases. At `08c5df7`, the reviewed corruption-removal repair passed the focused units and 12 Chromium and eight WebKit cases. The remaining passing browser evidence is reused because the later edits affect only repeated replacement and explicit removal. The clean `08c5df7` Windows root index hashes to `a47f914af4fd9c348f8e6145e443c8919cfe1a840f347b284052d86c29953c6f`. Source-bound reports are retained in `tmp/issue-172/review-final-*`, `review-recovery-*` and `review-corruption-*`.
+
 Use an owned Healing Draught as a battle action and revive a fallen party member in preparation with an owned Revive Kit. Both work in authored runs and dungeons, including the main menu’s saved journeys. Direct testing routes use the same game rules and keep their progress in memory. An isolated standalone battle has no party inventory. The existing item catalog, preparation controls, and reward flow from #77–#79 are the starting points.
 
 ## Proposed rules and non-goals
