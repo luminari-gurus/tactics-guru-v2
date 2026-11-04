@@ -43,6 +43,7 @@ async function fight(page:Page,wait=false,useDraught=false){
   } else await playCommand(page,wait?{type:'endTurn',unitId}:playerDecision(battle.state,catalog));
  }
  await expect(page.locator('#run-screen')).toBeVisible();
+ await expect(page.locator('#run-item-status')).not.toHaveText('Saving run…');
  return drank;
 }
 async function prepare(page:Page){
@@ -55,6 +56,7 @@ async function prepare(page:Page){
   const def=runContext.items[equipment.itemId];const hero=now.items.run.party.find(h=>h.hp>0 && def.eligibleHeroes.includes(h.heroId));
   if(hero){await page.locator(`[id="target-${equipment.instanceId}"]`).selectOption(hero.heroId);await page.getByRole('button',{name:`Equip ${def.label}`,exact:true}).click();await page.locator('#item-confirm').click();}
  }
+ await expect(page.locator('#run-item-status')).not.toHaveText('Saving run…');
 }
 test('run battle undo survives reload and a legal terminal journey',async({page,isMobile})=>{
  test.setTimeout(300000);await start(page);const entry=await snapshot(page);
@@ -107,7 +109,7 @@ test('legal run outcomes, earned rewards, terminal resume and fresh restart',asy
  await page.screenshot({path:test.info().outputPath('run-terminal.png')});
  writeFileSync(test.info().outputPath('run-records.json'),JSON.stringify(records,null,2));
  await page.reload();await page.locator('#run-continue').click();expect(await snapshot(page)).toEqual(final);
- await page.locator('#run-new').dblclick();const fresh=await snapshot(page);expect(fresh.items.run.seed).toBe(14);expect(fresh.items.run.id).not.toBe(final.items.run.id);expect(fresh.items.ownership).toEqual({consumables:[],equipment:[],assignments:[]});expect(fresh.items.run.party.every(h=>h.hp===runContext.catalog.heroes[h.heroId].stats.maxHp)).toBe(true);
+ await page.locator('#run-new').dblclick();await expect(page.locator('#run-start-encounter')).toBeVisible();const fresh=await snapshot(page);expect(fresh.items.run.seed).toBe(14);expect(fresh.items.run.id).not.toBe(final.items.run.id);expect(fresh.items.ownership).toEqual({consumables:[],equipment:[],assignments:[]});expect(fresh.items.run.party.every(h=>h.hp===runContext.catalog.heroes[h.heroId].stats.maxHp)).toBe(true);
  expect(errors).toEqual([]);
 });
 test('testing routes: an earned combat draught stays in the transient authored run',async({page})=>{
@@ -156,7 +158,9 @@ test('legal defeat reload, native keyboard restart and isolated single-battle sa
 test('accepted player presentation reload preserves exact boundary without old cues',async({page})=>{
  await start(page);await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});
  await page.clock.install();await page.clock.pauseAt(new Date(Date.now()+1000));await page.locator('#battle-review').click({force:true});
- await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');const committed=await snapshot(page);
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
+ await expect(page.locator('#battle-persistence')).toContainText('Run saved on this device');
+ const committed=await snapshot(page);
  await page.reload();await page.clock.resume();await page.locator('#run-continue').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  expect((await readSession(page)).state).toEqual(committed.activeBattle);expect((await readSession(page)).events).toEqual([]);expect(await page.evaluate(()=>window.fitDiagnostics().battleAudio?.lastToken)).toBe(0);
  await expect(page.locator('#battle-move')).toBeDisabled();await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','false');
@@ -177,6 +181,7 @@ test('enemy presentation reload resumes the same commands and RNG as an uninterr
   }
   const boundary=await readSession(page);expect(boundary.phase).toBe('presenting');const last=boundary.replay!.commands.at(-1)!;expect(boundary.state.units.find(u=>u.id===last.unitId)!.side).toBe('enemy');
   expect((await readSession(control)).state).toEqual(boundary.state);
+  await expect(page.locator('#battle-persistence')).toContainText('Run saved on this device');
   await page.reload();await page.clock.resume();await page.locator('#run-continue').click();await control.clock.resume();
   for(const p of [page,control])await expect(p.locator('#game')).toHaveAttribute('data-phase','player');
   const resumed=await readSession(page),uninterrupted=await readSession(control);expect(resumed.state).toEqual(uninterrupted.state);
@@ -223,6 +228,7 @@ test('cached run return cannot overwrite either slot of a newer replacement',asy
  await page.goto(new URL('map',baseURL).href);await expect(page.locator('#map-grid span')).toHaveCount(400);
  const replacement=await context.newPage();await replacement.goto('/?game=run');
  await replacement.locator('#run-start').click();await replacement.locator('#run-confirm-new').click();
+ await expect(replacement.locator('#run-item-status')).toHaveText('Run saved on this device');
  const fresh=await snapshot(replacement);expect(fresh.items.run.id).not.toBe(first);expect(fresh.items.run.seed).toBe(14);
  const stored=()=>page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),RUN_STORAGE_KEYS);
  const before=await stored();await replacement.close();await page.goBack({waitUntil:'commit'});
@@ -335,8 +341,11 @@ test('review repair: deleting both loaded slots starts a fresh playable run',asy
 
 for(const choice of ['continue','replace'] as const)test(`review repair: recovered storage preserves unsaved bytes until explicit ${choice}`,async({page})=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
- await page.goto('/?game=run');await page.locator('#run-start').click();await page.reload();
+ await page.goto('/?game=run');await page.locator('#run-start').click();
+ await expect(page.locator('#run-item-status')).toHaveText('Run saved on this device');
+ await page.reload();
  await page.locator('#run-start').click();await page.locator('#run-confirm-new').click();
+ await expect(page.locator('#run-item-status')).toHaveText('Run saved on this device');
  const saved=await snapshot(page);expect(saved.items.run.seed).toBe(14);
  const bytes=await page.evaluate(keys=>Object.values(keys).map(k=>localStorage.getItem(k)),RUN_STORAGE_KEYS);
  await page.addInitScript(keys=>{

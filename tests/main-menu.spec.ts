@@ -266,7 +266,11 @@ async function openMenuRunItems(page:Page,snapshot:RunSnapshot) {
 async function reloadMenuRunItems(page:Page) {
  await page.reload();await page.locator('#run-continue').click();await expect(page.locator('#run-item-status')).toBeVisible();
 }
-async function confirmMenuItem(page:Page) {await page.locator('#item-confirm').click();await expect(page.locator('dialog')).not.toBeVisible();}
+async function confirmMenuItem(page:Page, waitForSave=true) {
+ await page.locator('#item-confirm').click();
+ await expect(page.locator('dialog')).not.toBeVisible();
+ if(waitForSave)await expect(page.locator('#run-item-status')).not.toHaveText('Saving run…');
+}
 async function activateMenuItem(page:Page,name:string,touch:boolean) {
  const button=page.getByRole('button',{name,exact:true});if(touch)await button.tap();else await button.click();
 }
@@ -275,10 +279,10 @@ test('main menu: a stale run tab waits for the save lock and preserves both newe
   const stale=await context.newPage();
   await stale.goto('./?game=run');
   await stale.locator('#run-continue').click();
-  const use=async (tab:Page, hero:string)=>{
+  const use=async (tab:Page, hero:string, waitForSave=true)=>{
     await tab.getByRole('combobox',{name:'Healing Draught target'}).selectOption(hero);
     await activateMenuItem(tab,'Use Healing Draught',isMobile);
-    await confirmMenuItem(tab);
+    await confirmMenuItem(tab,waitForSave);
   };
   await use(page,'fighter');
   await expect(page.locator('#run-item-status')).toHaveText('Run saved on this device');
@@ -292,7 +296,7 @@ test('main menu: a stale run tab waits for the save lock and preserves both newe
   },RUN_STORAGE_KEYS.primary);
   await expect(page.locator('body')).toHaveAttribute('data-test-run-lock','held');
   try {
-    await use(stale,'ranger');
+    await use(stale,'ranger',false);
     await expect.poll(()=>stale.evaluate(async key=>(await navigator.locks.query()).pending?.some(lock=>lock.name===key),RUN_STORAGE_KEYS.primary)).toBe(true);
     expect(await slots()).toEqual(saved);
   } finally { await page.evaluate(()=>window.dispatchEvent(new Event('release-run-test-lock'))); }
@@ -316,6 +320,7 @@ test('main menu: reward claim advances exactly once and survives pending/claimed
     if (await page.locator('dialog').isVisible()) await page.keyboard.press('Escape');
   }
   await expect(page.getByRole('heading', { name: 'Party items', exact: true })).toBeVisible();
+  await expect(page.locator('#run-item-status')).toHaveText('Run saved on this device');
   const claimed = (await menuItemReport(page)).snapshot;
   expect(claimed.items.run.encounterIndex).toBe(1); expect(claimed.items.itemRevision).toBe(1);
   expect(claimed.items.ownership.consumables).toEqual([{ itemId: 'item:healing_draught', quantity: 1 }]);
@@ -393,6 +398,7 @@ for (const skin of ['rail', 'radial'] as const) test('main menu: an earned Heali
   expect(after.rng).toEqual(before.rng);
   expect(after.activeIndex).toBe(before.activeIndex);
   expect(after.units.find(unit => unit.id === actor.id)).toEqual({ ...actor, hp: actor.hp + 6, hasActed: true });
+  await expect(page.locator('#battle-persistence')).toContainText('Run saved on this device');
   await page.reload(); await page.locator('#run-continue').click();
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   expect((await readSession(page)).state).toEqual(after);
@@ -414,7 +420,7 @@ test('main menu: corruption preserves bytes, exports raw data and requires revie
   await page.getByRole('button', { name: 'Save recovery', exact: true }).click();
   await page.getByRole('button', { name: 'Remove primary save' }).click();
   await page.getByRole('button', { name: 'Remove reviewed save' }).click();
-  expect(await page.evaluate(key => localStorage.getItem(key), RUN_STORAGE_KEYS.primary)).toBeNull();
+  await expect.poll(()=>page.evaluate(key => localStorage.getItem(key), RUN_STORAGE_KEYS.primary)).toBeNull();
   await page.locator('#run-close-recovery').click();
   await page.getByRole('button', { name: 'Save recovery', exact: true }).click();
   await page.getByRole('button', { name: 'Retry saving' }).click();

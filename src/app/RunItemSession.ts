@@ -39,7 +39,7 @@ export class RunItemSession {
   onChange: (() => void) | null = null;
   constructor(initial: unknown, readonly context: RunSaveContext,
     readonly storage: ReturnType<typeof createRunStorage> | null = createRunStorage(context),
-    private readonly serializeWrite: (task:()=>void, unavailable:()=>void)=>void = task=>task()) {
+    private readonly serializeWrite?: (task:()=>void, unavailable:()=>void)=>void) {
     const read = readRunSnapshot(initial, context);
     if (!read.ok) throw Error('Invalid run snapshot');
     this.current = read.state;
@@ -176,7 +176,7 @@ export class RunItemSession {
   }
   queueWrite(task:()=>void) {
     const guarded = () => { if (!this.disposed) task(); };
-    if (!this.storage) { guarded(); return; }
+    if (!this.storage || !this.serializeWrite) { guarded(); return; }
     this.serializeWrite(guarded, () => {
       if (this.disposed) return;
       this.progressSaved = false;
@@ -186,6 +186,7 @@ export class RunItemSession {
   requestSave(done?:()=>void) {
     const snapshot = this.current;
     this.progressSaved = false;
+    if (this.storage && this.serializeWrite && !this.unsavedOnly) this.report('Saving run…');
     this.queueWrite(() => {
       if (this.current === snapshot) this.save();
       done?.();
