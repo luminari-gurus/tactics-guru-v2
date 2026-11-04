@@ -1,0 +1,3 @@
+# Exact-base Chromium comparison
+
+[Run 41846983925](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41846983925) checked out exact base `fbf82420b82674dc5f57397d68b0a50c8bf485c0` and repeated the mobile-landscape unsaved-play departure case 20 times on hosted Ubuntu. Eighteen passed and two failed with the same expected “Movement refused” and actual unsaved-play message seen in run 41826891419. Both failure contexts show a battle active after the initial movement. This establishes that the observed test failure also occurs on the exact base; the test depends on random dungeon movement remaining outside battle.
