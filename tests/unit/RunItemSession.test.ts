@@ -4,6 +4,19 @@ import { activeSnapshot, preparedSnapshot, rewardSnapshot, runContext } from '..
 import { createRunStorage, RUN_STORAGE_KEYS } from '../../src/persistence/runStorage';
 import { freshRunSnapshot } from '../../src/domain/runBattle';
 const unavailable = () => createRunStorage(runContext, () => null);
+it('can retry after reviewed removal of a primary corrupted during play', () => {
+  const data = new Map<string,string>();
+  const storage = createRunStorage(runContext,()=>({getItem:key=>data.get(key)??null,
+    setItem:(key,value)=>{data.set(key,value);},removeItem:key=>{data.delete(key);}}));
+  const run = new RunItemSession(preparedSnapshot(),runContext,storage);
+  assert(run.save().ok);
+  data.set(RUN_STORAGE_KEYS.primary,'corrupt');
+  expect(run.save()).toMatchObject({ok:false,reason:'recoveryRequired'});
+  assert(run.remove('primary',run.inspect()));
+  expect(run.save()).toEqual({ok:true});
+  const restored=storage.load();assert(restored.ok);
+  expect(restored.selected?.state).toEqual(run.snapshot);
+});
 it('refuses a stale session write without replacing either saved slot', () => {
   const data = new Map<string,string>();
   const provider = () => ({getItem:(key:string)=>data.get(key)??null,

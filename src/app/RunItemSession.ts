@@ -254,7 +254,7 @@ export class RunItemSession {
     if (!removed.ok) reportFailure('save_remove', { route: 'run' });
     else {
       this.progressSaved = false;
-      if (slot === 'primary' && value.text === this.expectedPrimary) this.expectedPrimary = null;
+      if (slot === 'primary') this.expectedPrimary = null;
     }
     this.report(removed.ok ? 'Save removed. Retry saving when recovery is complete.' : 'Removal refused: saved data changed or storage failed. Review again.');
     return removed.ok;

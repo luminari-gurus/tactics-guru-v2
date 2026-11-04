@@ -427,6 +427,25 @@ test('main menu: corruption preserves bytes, exports raw data and requires revie
   await expect(page.locator('#run-item-status')).toContainText('Run saved');
   const saved = (await menuItemReport(page)).snapshot; await reloadMenuRunItems(page); expect((await menuItemReport(page)).snapshot).toEqual(saved);
 });
+test('main menu: reviewed removal of a primary corrupted during play permits retry', async ({ page }) => {
+  await openMenuRunItems(page,preparedSnapshot());
+  const use=page.getByRole('button',{name:'Use Healing Draught',exact:true});
+  await use.click();await confirmMenuItem(page);
+  await expect(page.locator('#run-item-status')).toHaveText('Run saved on this device');
+  await page.evaluate(key=>localStorage.setItem(key,'corrupt during play'),RUN_STORAGE_KEYS.primary);
+  await page.getByRole('combobox',{name:'Healing Draught target'}).selectOption('ranger');
+  await use.click();await confirmMenuItem(page);
+  await expect(page.locator('#run-item-status')).toContainText('needs recovery');
+  const accepted=await menuItemReport(page);
+  await page.getByRole('button',{name:'Save recovery',exact:true}).click();
+  await page.getByRole('button',{name:'Remove primary save',exact:true}).click();
+  await page.locator('#run-confirm-remove').click();
+  await expect(page.locator('#battle-dialog-message')).toContainText('primary: missing');
+  await page.locator('#run-retry-save').click();
+  await expect(page.locator('#run-item-status')).toHaveText('Run saved on this device');
+  await reloadMenuRunItems(page);
+  expect(await menuItemReport(page)).toEqual(accepted);
+});
 test('main menu: stale recovery review refuses changed bytes', async ({ page }) => {
   await openMenuRunItems(page,preparedSnapshot());
   await page.getByRole('button', { name: 'Save recovery', exact: true }).click();
