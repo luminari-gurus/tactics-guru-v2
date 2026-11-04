@@ -1,0 +1,4527 @@
+{
+  "config": {
+    "argv": [
+      "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+      "/home/runner/work/tactics-guru-v2/tactics-guru-v2/node_modules/.bin/playwright",
+      "test",
+      "-c",
+      "playwright.exploration.config.ts",
+      "--grep-invert",
+      "maximum-size",
+      "--workers=1",
+      "--retries=0",
+      "--reporter=line,json",
+      "--output=verification-receipts/issue184/webkit-consumer-artifacts"
+    ],
+    "configFile": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/playwright.exploration.config.ts",
+    "rootDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "ci": {
+        "commitHref": "https://github.com/luminari-gurus/tactics-guru-v2/commit/f51d73ae9e39ba3c73932efd21be025e37b05034",
+        "commitHash": "f51d73ae9e39ba3c73932efd21be025e37b05034",
+        "buildHref": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41826891419"
+      },
+      "gitCommit": {
+        "shortHash": "f51d73a",
+        "hash": "f51d73ae9e39ba3c73932efd21be025e37b05034",
+        "subject": "Run issue 184 verification on hosted Ubuntu",
+        "body": "Run issue 184 verification on hosted Ubuntu\n",
+        "author": {
+          "name": "Brian Williams",
+          "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+          "time": 1793794176000
+        },
+        "committer": {
+          "name": "Brian Williams",
+          "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+          "time": 1793794176000
+        },
+        "branch": "HEAD"
+      },
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/verification-receipts/issue184/webkit-consumer-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/luminari-gurus/tactics-guru-v2/commit/f51d73ae9e39ba3c73932efd21be025e37b05034",
+            "commitHash": "f51d73ae9e39ba3c73932efd21be025e37b05034",
+            "buildHref": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41826891419"
+          },
+          "gitCommit": {
+            "shortHash": "f51d73a",
+            "hash": "f51d73ae9e39ba3c73932efd21be025e37b05034",
+            "subject": "Run issue 184 verification on hosted Ubuntu",
+            "body": "Run issue 184 verification on hosted Ubuntu\n",
+            "author": {
+              "name": "Brian Williams",
+              "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+              "time": 1793794176000
+            },
+            "committer": {
+              "name": "Brian Williams",
+              "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+              "time": 1793794176000
+            },
+            "branch": "HEAD"
+          },
+          "actualWorkers": 1
+        },
+        "id": "desktop-webkit",
+        "name": "desktop-webkit",
+        "testDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests",
+        "testIgnore": [
+          "**/dungeon-extended.spec.ts",
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/dungeon-exploration.spec.ts",
+          "**/dungeon.spec.ts",
+          "**/dungeon-lifecycle.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/verification-receipts/issue184/webkit-consumer-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/luminari-gurus/tactics-guru-v2/commit/f51d73ae9e39ba3c73932efd21be025e37b05034",
+            "commitHash": "f51d73ae9e39ba3c73932efd21be025e37b05034",
+            "buildHref": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41826891419"
+          },
+          "gitCommit": {
+            "shortHash": "f51d73a",
+            "hash": "f51d73ae9e39ba3c73932efd21be025e37b05034",
+            "subject": "Run issue 184 verification on hosted Ubuntu",
+            "body": "Run issue 184 verification on hosted Ubuntu\n",
+            "author": {
+              "name": "Brian Williams",
+              "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+              "time": 1793794176000
+            },
+            "committer": {
+              "name": "Brian Williams",
+              "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+              "time": 1793794176000
+            },
+            "branch": "HEAD"
+          },
+          "actualWorkers": 1
+        },
+        "id": "portrait-webkit",
+        "name": "portrait-webkit",
+        "testDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests",
+        "testIgnore": [
+          "**/dungeon-extended.spec.ts",
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/dungeon-exploration.spec.ts",
+          "**/dungeon.spec.ts",
+          "**/dungeon-lifecycle.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/verification-receipts/issue184/webkit-consumer-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/luminari-gurus/tactics-guru-v2/commit/f51d73ae9e39ba3c73932efd21be025e37b05034",
+            "commitHash": "f51d73ae9e39ba3c73932efd21be025e37b05034",
+            "buildHref": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41826891419"
+          },
+          "gitCommit": {
+            "shortHash": "f51d73a",
+            "hash": "f51d73ae9e39ba3c73932efd21be025e37b05034",
+            "subject": "Run issue 184 verification on hosted Ubuntu",
+            "body": "Run issue 184 verification on hosted Ubuntu\n",
+            "author": {
+              "name": "Brian Williams",
+              "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+              "time": 1793794176000
+            },
+            "committer": {
+              "name": "Brian Williams",
+              "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+              "time": 1793794176000
+            },
+            "branch": "HEAD"
+          },
+          "actualWorkers": 1
+        },
+        "id": "landscape-webkit",
+        "name": "landscape-webkit",
+        "testDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests",
+        "testIgnore": [
+          "**/dungeon-extended.spec.ts",
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/dungeon-exploration.spec.ts",
+          "**/dungeon.spec.ts",
+          "**/dungeon-lifecycle.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/verification-receipts/issue184/webkit-consumer-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/luminari-gurus/tactics-guru-v2/commit/f51d73ae9e39ba3c73932efd21be025e37b05034",
+            "commitHash": "f51d73ae9e39ba3c73932efd21be025e37b05034",
+            "buildHref": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41826891419"
+          },
+          "gitCommit": {
+            "shortHash": "f51d73a",
+            "hash": "f51d73ae9e39ba3c73932efd21be025e37b05034",
+            "subject": "Run issue 184 verification on hosted Ubuntu",
+            "body": "Run issue 184 verification on hosted Ubuntu\n",
+            "author": {
+              "name": "Brian Williams",
+              "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+              "time": 1793794176000
+            },
+            "committer": {
+              "name": "Brian Williams",
+              "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+              "time": 1793794176000
+            },
+            "branch": "HEAD"
+          },
+          "actualWorkers": 1
+        },
+        "name": "desktop-webkit",
+        "testDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests",
+        "snapshotDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests",
+        "testIgnore": [
+          "**/dungeon-extended.spec.ts",
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/dungeon-exploration.spec.ts",
+          "**/dungeon.spec.ts",
+          "**/dungeon-lifecycle.spec.ts"
+        ],
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://127.0.0.1:4173/",
+          "launchOptions": {},
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.2 Safari/605.1.15",
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "deviceScaleFactor": 2,
+          "isMobile": false,
+          "hasTouch": false,
+          "defaultBrowserType": "webkit"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "desktop-webkit"
+      },
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/verification-receipts/issue184/webkit-consumer-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/luminari-gurus/tactics-guru-v2/commit/f51d73ae9e39ba3c73932efd21be025e37b05034",
+            "commitHash": "f51d73ae9e39ba3c73932efd21be025e37b05034",
+            "buildHref": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41826891419"
+          },
+          "gitCommit": {
+            "shortHash": "f51d73a",
+            "hash": "f51d73ae9e39ba3c73932efd21be025e37b05034",
+            "subject": "Run issue 184 verification on hosted Ubuntu",
+            "body": "Run issue 184 verification on hosted Ubuntu\n",
+            "author": {
+              "name": "Brian Williams",
+              "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+              "time": 1793794176000
+            },
+            "committer": {
+              "name": "Brian Williams",
+              "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+              "time": 1793794176000
+            },
+            "branch": "HEAD"
+          },
+          "actualWorkers": 1
+        },
+        "name": "portrait-webkit",
+        "testDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests",
+        "snapshotDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests",
+        "testIgnore": [
+          "**/dungeon-extended.spec.ts",
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/dungeon-exploration.spec.ts",
+          "**/dungeon.spec.ts",
+          "**/dungeon-lifecycle.spec.ts"
+        ],
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://127.0.0.1:4173/",
+          "launchOptions": {},
+          "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.2 Mobile/15E148 Safari/604.1",
+          "viewport": {
+            "width": 390,
+            "height": 664
+          },
+          "deviceScaleFactor": 3,
+          "isMobile": true,
+          "hasTouch": true,
+          "defaultBrowserType": "webkit"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "portrait-webkit"
+      },
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/verification-receipts/issue184/webkit-consumer-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/luminari-gurus/tactics-guru-v2/commit/f51d73ae9e39ba3c73932efd21be025e37b05034",
+            "commitHash": "f51d73ae9e39ba3c73932efd21be025e37b05034",
+            "buildHref": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41826891419"
+          },
+          "gitCommit": {
+            "shortHash": "f51d73a",
+            "hash": "f51d73ae9e39ba3c73932efd21be025e37b05034",
+            "subject": "Run issue 184 verification on hosted Ubuntu",
+            "body": "Run issue 184 verification on hosted Ubuntu\n",
+            "author": {
+              "name": "Brian Williams",
+              "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+              "time": 1793794176000
+            },
+            "committer": {
+              "name": "Brian Williams",
+              "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+              "time": 1793794176000
+            },
+            "branch": "HEAD"
+          },
+          "actualWorkers": 1
+        },
+        "name": "landscape-webkit",
+        "testDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests",
+        "snapshotDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests",
+        "testIgnore": [
+          "**/dungeon-extended.spec.ts",
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/dungeon-exploration.spec.ts",
+          "**/dungeon.spec.ts",
+          "**/dungeon-lifecycle.spec.ts"
+        ],
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://127.0.0.1:4173/",
+          "launchOptions": {},
+          "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.2 Mobile/15E148 Safari/604.1",
+          "viewport": {
+            "width": 844,
+            "height": 390
+          },
+          "deviceScaleFactor": 3,
+          "isMobile": true,
+          "hasTouch": true,
+          "defaultBrowserType": "webkit"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "landscape-webkit"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "line"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run preview -- --base=/ --port 4173 --strictPort",
+      "url": "http://127.0.0.1:4173/",
+      "reuseExistingServer": false
+    }
+  },
+  "suites": [
+    {
+      "title": "dungeon-exploration.spec.ts",
+      "file": "dungeon-exploration.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "map markers respect stair availability, discovery and saved floor state",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5065,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:29:40.358Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-cb5e352e61b66a34ff1e",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 20,
+          "column": 1
+        },
+        {
+          "title": "stairs remain visible under cleared saved markers and live markers stay visible",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2233,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:29:45.513Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-211ada1f9f39c3ff6c9b",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 71,
+          "column": 1
+        },
+        {
+          "title": "stairs travel once per entry with arrows, stay on arrival and restore, and respect locks",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 240000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4014,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:29:47.758Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-665f1a53a56d255de9e1",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 88,
+          "column": 66
+        },
+        {
+          "title": "stairs travel once per entry with wasd, stay on arrival and restore, and respect locks",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 240000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4148,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:29:51.781Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-42ae9e47bf9365c9d793",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 88,
+          "column": 66
+        },
+        {
+          "title": "stairs travel once per entry with compass, stay on arrival and restore, and respect locks",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 240000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4364,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:29:55.943Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-357e3321275fbfe8d16b",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 88,
+          "column": 66
+        },
+        {
+          "title": "stairs travel once per entry with cell, stay on arrival and restore, and respect locks",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 240000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4499,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:30:00.319Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-ff1a8f5801732b108097",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 88,
+          "column": 66
+        },
+        {
+          "title": "diamond compass directions, focus, touch targets and unavailable states",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4224,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:30:04.831Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-8a42db886a0a6f972163",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 133,
+          "column": 1
+        },
+        {
+          "title": "compass keeps keyboard focus when movement disables the activated direction",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2164,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:30:09.067Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-b25a3c40623686767f51",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 199,
+          "column": 1
+        },
+        {
+          "title": "real traversal, art independence, keyboard locks, active battle and exact reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4541,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:30:11.241Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-1b152ed7750103414601",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 217,
+          "column": 1
+        },
+        {
+          "title": "pre-progression dungeon remains incompatible and exportable",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1012,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:30:15.797Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-732058995f9791d6a290",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 248,
+          "column": 1
+        },
+        {
+          "title": "cold progression-format Continue retains a long saved history within the startup budget",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6749,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:30:16.819Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-646c0a4dcad43e722d1b",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 257,
+          "column": 1
+        },
+        {
+          "title": "map input stays inert while hidden and retains discovery through resize and failed art",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 948,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:30:23.578Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-88c050ba73dad6db3ccf",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 273,
+          "column": 1
+        },
+        {
+          "title": "records route transfer and map responsiveness against established budgets",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4100,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:30:24.534Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-9072ef8682627634d9e4",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 280,
+          "column": 1
+        },
+        {
+          "title": "forest saved kinds, scaled inspection and reload use actual selected definitions",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 14332,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:30:28.644Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-9f963b1418c0aed9c855",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 303,
+          "column": 49
+        },
+        {
+          "title": "desert saved kinds, scaled inspection and reload use actual selected definitions",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11120,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:30:42.986Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-c102b97a5fecca9413e2",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 303,
+          "column": 49
+        },
+        {
+          "title": "exploration cells stay square across viewport sizes and art styles",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3586,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:30:54.117Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-43e5f89eca05027d31c0",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 342,
+          "column": 2
+        },
+        {
+          "title": "dungeon enemies move only after a player step and persist across reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 8766,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:30:57.712Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-87bb22fac4aab2d5325a",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 357,
+          "column": 1
+        },
+        {
+          "title": "walking onto a guardian before other enemies starts and resumes its own encounter",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3194,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:31:06.490Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-2dadedf0b83a9331726f",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 374,
+          "column": 1
+        },
+        {
+          "title": "chase follows the previous cell while block targets the resulting cell",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2200,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:31:09.698Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-1ca8931a9b9aa546cffa",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 393,
+          "column": 1
+        },
+        {
+          "title": "map markers respect stair availability, discovery and saved floor state",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4403,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:35:07.700Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-6161dc915efd650aeb62",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 20,
+          "column": 1
+        },
+        {
+          "title": "stairs remain visible under cleared saved markers and live markers stay visible",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1923,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:35:12.191Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-6aa3abf93875e1133d3b",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 71,
+          "column": 1
+        },
+        {
+          "title": "stairs travel once per entry with arrows, stay on arrival and restore, and respect locks",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 240000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3452,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:35:14.125Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-d72ee4cf582ca36f6f24",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 88,
+          "column": 66
+        },
+        {
+          "title": "stairs travel once per entry with wasd, stay on arrival and restore, and respect locks",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 240000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3643,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:35:17.588Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-3559763abe8eb4b33c56",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 88,
+          "column": 66
+        },
+        {
+          "title": "stairs travel once per entry with compass, stay on arrival and restore, and respect locks",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 240000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3767,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:35:21.253Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-6ba4014b7c050c1172de",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 88,
+          "column": 66
+        },
+        {
+          "title": "stairs travel once per entry with cell, stay on arrival and restore, and respect locks",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 240000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3713,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:35:25.030Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-aa6941c5335a86812c91",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 88,
+          "column": 66
+        },
+        {
+          "title": "diamond compass directions, focus, touch targets and unavailable states",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3558,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:35:28.755Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-dde4d4ce1f57950affdc",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 133,
+          "column": 1
+        },
+        {
+          "title": "compass keeps keyboard focus when movement disables the activated direction",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1645,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:35:32.321Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-94cf8020fe7792d0e218",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 199,
+          "column": 1
+        },
+        {
+          "title": "real traversal, art independence, keyboard locks, active battle and exact reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2934,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:35:33.975Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-fc74882dec830df71acc",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 217,
+          "column": 1
+        },
+        {
+          "title": "pre-progression dungeon remains incompatible and exportable",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 791,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:35:36.919Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-0bc1f14a38d1d1b779da",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 248,
+          "column": 1
+        },
+        {
+          "title": "cold progression-format Continue retains a long saved history within the startup budget",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6593,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:35:37.718Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-d5a4931d0c5ae3af4af7",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 257,
+          "column": 1
+        },
+        {
+          "title": "map input stays inert while hidden and retains discovery through resize and failed art",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 896,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:35:44.320Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-40a05054aedeaecad72f",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 273,
+          "column": 1
+        },
+        {
+          "title": "records route transfer and map responsiveness against established budgets",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3240,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:35:45.224Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-7cfa3eada21fa9cee0e1",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 280,
+          "column": 1
+        },
+        {
+          "title": "forest saved kinds, scaled inspection and reload use actual selected definitions",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11204,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:35:48.475Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-218df0b758834feafce5",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 303,
+          "column": 49
+        },
+        {
+          "title": "desert saved kinds, scaled inspection and reload use actual selected definitions",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11002,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:35:59.688Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-3d9e40004d16768001f1",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 303,
+          "column": 49
+        },
+        {
+          "title": "exploration cells stay square across viewport sizes and art styles",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3689,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:36:10.701Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-2d29df47977f3c2433d3",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 342,
+          "column": 2
+        },
+        {
+          "title": "dungeon enemies move only after a player step and persist across reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6035,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:36:14.400Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-a65ab486d5f03bb0a972",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 357,
+          "column": 1
+        },
+        {
+          "title": "walking onto a guardian before other enemies starts and resumes its own encounter",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2412,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:36:20.444Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-8ce66b953be141d1efec",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 374,
+          "column": 1
+        },
+        {
+          "title": "chase follows the previous cell while block targets the resulting cell",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2023,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:36:22.865Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-8dce0addd53448e9f982",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 393,
+          "column": 1
+        },
+        {
+          "title": "map markers respect stair availability, discovery and saved floor state",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4496,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:39:52.472Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-ded2b7dcd00cd9ceb25b",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 20,
+          "column": 1
+        },
+        {
+          "title": "stairs remain visible under cleared saved markers and live markers stay visible",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2100,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:39:57.057Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-4c08367619c664debd45",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 71,
+          "column": 1
+        },
+        {
+          "title": "stairs travel once per entry with arrows, stay on arrival and restore, and respect locks",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 240000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3644,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:39:59.166Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-cca51647aaad07cbd326",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 88,
+          "column": 66
+        },
+        {
+          "title": "stairs travel once per entry with wasd, stay on arrival and restore, and respect locks",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 240000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3609,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:40:02.823Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-70940af3db484d2a6777",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 88,
+          "column": 66
+        },
+        {
+          "title": "stairs travel once per entry with compass, stay on arrival and restore, and respect locks",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 240000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3868,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:40:06.452Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-1c69d6a6994b58645334",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 88,
+          "column": 66
+        },
+        {
+          "title": "stairs travel once per entry with cell, stay on arrival and restore, and respect locks",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 240000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3950,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:40:10.333Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-1da335ba3e3ab939dd53",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 88,
+          "column": 66
+        },
+        {
+          "title": "diamond compass directions, focus, touch targets and unavailable states",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3484,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:40:14.290Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-087a6327748674ce514e",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 133,
+          "column": 1
+        },
+        {
+          "title": "compass keeps keyboard focus when movement disables the activated direction",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1842,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:40:17.785Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-beb080990c12ead06e3e",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 199,
+          "column": 1
+        },
+        {
+          "title": "real traversal, art independence, keyboard locks, active battle and exact reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2730,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:40:19.637Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-3185bc26a2ed5fdc7771",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 217,
+          "column": 1
+        },
+        {
+          "title": "pre-progression dungeon remains incompatible and exportable",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 784,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:40:22.381Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-cf6d1de3f6bc6cd99572",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 248,
+          "column": 1
+        },
+        {
+          "title": "cold progression-format Continue retains a long saved history within the startup budget",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6602,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:40:23.176Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-696455ff97d32675f41d",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 257,
+          "column": 1
+        },
+        {
+          "title": "map input stays inert while hidden and retains discovery through resize and failed art",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 861,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:40:29.788Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-4ed54d40d027e640734b",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 273,
+          "column": 1
+        },
+        {
+          "title": "records route transfer and map responsiveness against established budgets",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3325,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:40:30.656Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-8f79198eeaf16a205881",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 280,
+          "column": 1
+        },
+        {
+          "title": "forest saved kinds, scaled inspection and reload use actual selected definitions",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11131,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:40:33.990Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-ffe3cba426e800889844",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 303,
+          "column": 49
+        },
+        {
+          "title": "desert saved kinds, scaled inspection and reload use actual selected definitions",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 10669,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:40:45.131Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-e287c8d3d9ed8c5b02b2",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 303,
+          "column": 49
+        },
+        {
+          "title": "exploration cells stay square across viewport sizes and art styles",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3579,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:40:55.811Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-d9356717df3b73fbd5c9",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 342,
+          "column": 2
+        },
+        {
+          "title": "dungeon enemies move only after a player step and persist across reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6187,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:40:59.399Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-503ccbb8415b189e7417",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 357,
+          "column": 1
+        },
+        {
+          "title": "walking onto a guardian before other enemies starts and resumes its own encounter",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2555,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:41:05.595Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-fa8077986443d1f443c4",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 374,
+          "column": 1
+        },
+        {
+          "title": "chase follows the previous cell while block targets the resulting cell",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1988,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:41:08.159Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-0b0dd1c2bc97359b398a",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 393,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "dungeon-lifecycle.spec.ts",
+      "file": "dungeon-lifecycle.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "battle previous-format recovery preserves and exports both original slots",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 901,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:31:11.920Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-3b88d5c9bc78a9fff4c2",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 20,
+          "column": 56
+        },
+        {
+          "title": "run previous-format recovery preserves and exports both original slots",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1033,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:31:12.827Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-d68fd8321f79ee6273c2",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 20,
+          "column": 56
+        },
+        {
+          "title": "dungeon previous-format recovery preserves and exports both original slots",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1117,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:31:13.868Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-5bfb63ba6bbe16ce527d",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 20,
+          "column": 56
+        },
+        {
+          "title": "restart during accepted presentation discards old callbacks and history",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2818,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:31:14.993Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-1b423d12d787c46ec923",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 52,
+          "column": 1
+        },
+        {
+          "title": "legal enemy defeat boundary resumes once and a confirmed new dungeon resets it",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2692,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:31:17.819Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-0f85422b99ba5f6aa530",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 64,
+          "column": 1
+        },
+        {
+          "title": "run navigation reaches the base-aware dungeon entry and returns to existing modes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1116,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:31:20.518Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-dd2395fbc2ec08859ac6",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 76,
+          "column": 1
+        },
+        {
+          "title": "visibility interruption finishes an accepted terminal presentation exactly once",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2069,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:31:21.643Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-b0402643173154b738b1",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 82,
+          "column": 1
+        },
+        {
+          "title": "battle previous-format recovery preserves and exports both original slots",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 750,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:36:24.907Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-e215ebf77f3b75f86540",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 20,
+          "column": 56
+        },
+        {
+          "title": "run previous-format recovery preserves and exports both original slots",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 844,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:36:25.665Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-f068b8b10c76d3d1b457",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 20,
+          "column": 56
+        },
+        {
+          "title": "dungeon previous-format recovery preserves and exports both original slots",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 993,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:36:26.516Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-2768ee00f51abf961ad5",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 20,
+          "column": 56
+        },
+        {
+          "title": "restart during accepted presentation discards old callbacks and history",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2419,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:36:27.518Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-ae826d8ee87c238ed5a3",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 52,
+          "column": 1
+        },
+        {
+          "title": "legal enemy defeat boundary resumes once and a confirmed new dungeon resets it",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2131,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:36:29.945Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-4939693a3b634a4ea87c",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 64,
+          "column": 1
+        },
+        {
+          "title": "run navigation reaches the base-aware dungeon entry and returns to existing modes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 947,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:36:32.085Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-efc68ba6300d4d3d843d",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 76,
+          "column": 1
+        },
+        {
+          "title": "visibility interruption finishes an accepted terminal presentation exactly once",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1899,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:36:33.042Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-2a962233fcb4d7cbb9c2",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 82,
+          "column": 1
+        },
+        {
+          "title": "battle previous-format recovery preserves and exports both original slots",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 749,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:41:10.167Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-b2553693741ab492654f",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 20,
+          "column": 56
+        },
+        {
+          "title": "run previous-format recovery preserves and exports both original slots",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 905,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:41:10.921Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-d6bca5327f28cae251bf",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 20,
+          "column": 56
+        },
+        {
+          "title": "dungeon previous-format recovery preserves and exports both original slots",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 959,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:41:11.831Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-7e6d5e0ba1a42d5be1e3",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 20,
+          "column": 56
+        },
+        {
+          "title": "restart during accepted presentation discards old callbacks and history",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2360,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:41:12.798Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-909bb2080f9ee77199c8",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 52,
+          "column": 1
+        },
+        {
+          "title": "legal enemy defeat boundary resumes once and a confirmed new dungeon resets it",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2334,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:41:15.167Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-9568daca899b9f8cf86d",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 64,
+          "column": 1
+        },
+        {
+          "title": "run navigation reaches the base-aware dungeon entry and returns to existing modes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 995,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:41:17.510Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-150388b08c202f4419c5",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 76,
+          "column": 1
+        },
+        {
+          "title": "visibility interruption finishes an accepted terminal presentation exactly once",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1817,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:41:18.512Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "dc51ed921d1e48686c08-f57dd11f651b1ff3e148",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 82,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "dungeon.spec.ts",
+      "file": "dungeon.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "menu dungeon restores Mage XP 0, caster level and exact active boundary",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2623,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:31:23.755Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-6632853ae0ae520e0b0e",
+          "file": "dungeon.spec.ts",
+          "line": 20,
+          "column": 73
+        },
+        {
+          "title": "menu dungeon restores Mage XP 60, caster level and exact active boundary",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2204,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:31:26.392Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-049a6ea5f5ef67a90e4a",
+          "file": "dungeon.spec.ts",
+          "line": 20,
+          "column": 73
+        },
+        {
+          "title": "menu dungeon restores Mage XP 180, caster level and exact active boundary",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2114,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:31:28.608Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-a8d88c43fe50d87dfc93",
+          "file": "dungeon.spec.ts",
+          "line": 20,
+          "column": 73
+        },
+        {
+          "title": "menu dungeon restores Mage XP 600, caster level and exact active boundary",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2113,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:31:30.730Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-1cde8db73f3c89eb73bc",
+          "file": "dungeon.spec.ts",
+          "line": 20,
+          "column": 73
+        },
+        {
+          "title": "testing dungeon legally clears a floor, descends and backtracks without accessing saves",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 300000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 97018,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:31:32.851Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-0e26bb3b2b9f6c922700",
+          "file": "dungeon.spec.ts",
+          "line": 37,
+          "column": 1
+        },
+        {
+          "title": "new dungeons use fresh layouts across reloads and saved dungeons retain theirs",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1671,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:33:09.877Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-6eb06f0a63973f820e15",
+          "file": "dungeon.spec.ts",
+          "line": 78,
+          "column": 1
+        },
+        {
+          "title": "Shaman production journey uses Hex and ally healing, reloads Weakened and replays a complete legal battle",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 57606,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:33:11.556Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-53595ee0b717ca28199e",
+          "file": "dungeon.spec.ts",
+          "line": 100,
+          "column": 1
+        },
+        {
+          "title": "automatic stairs preserve healed Fighter carry and fresh battle resources",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3478,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:34:09.181Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-6922933b32b49cc5971d",
+          "file": "dungeon.spec.ts",
+          "line": 161,
+          "column": 1
+        },
+        {
+          "title": "dungeon battle undo survives reload and a legal defeat journey",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 300000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 22744,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:34:12.681Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-95c8a9854e1f196763ae",
+          "file": "dungeon.spec.ts",
+          "line": 181,
+          "column": 1
+        },
+        {
+          "title": "read-only entry, keyboard new dungeon, real action and active resume",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3371,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:34:35.432Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-0cb5322cba211c298b03",
+          "file": "dungeon.spec.ts",
+          "line": 209,
+          "column": 1
+        },
+        {
+          "title": "legal reward and guardian boundaries, travel reload, backtracking and isolated saves",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 15117,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:34:38.812Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-f1a134ad0ad2b47709e1",
+          "file": "dungeon.spec.ts",
+          "line": 234,
+          "column": 1
+        },
+        {
+          "title": "corrupt bytes stay exportable and uncertain travel requires explicit recovery",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4682,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:34:53.940Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-9638d305518ab068e7e2",
+          "file": "dungeon.spec.ts",
+          "line": 261,
+          "column": 1
+        },
+        {
+          "title": "confirmed charm discard frees full capacity without cancelling or duplicating the pending reward",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4445,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:34:58.629Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-cabba556d5014e70b17d",
+          "file": "dungeon.spec.ts",
+          "line": 275,
+          "column": 1
+        },
+        {
+          "title": "hero progression commits once, heals at a threshold and survives inspection and reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4103,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:35:03.083Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-01e6e82cc7b74a341804",
+          "file": "dungeon.spec.ts",
+          "line": 300,
+          "column": 1
+        },
+        {
+          "title": "menu dungeon restores Mage XP 0, caster level and exact active boundary",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1872,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:36:34.958Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-1dc976d7a1a00a891a84",
+          "file": "dungeon.spec.ts",
+          "line": 20,
+          "column": 73
+        },
+        {
+          "title": "menu dungeon restores Mage XP 60, caster level and exact active boundary",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1784,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:36:36.836Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-f152adcdd88977ec6458",
+          "file": "dungeon.spec.ts",
+          "line": 20,
+          "column": 73
+        },
+        {
+          "title": "menu dungeon restores Mage XP 180, caster level and exact active boundary",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1792,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:36:38.628Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-c8a6aeaedd370f1d13f7",
+          "file": "dungeon.spec.ts",
+          "line": 20,
+          "column": 73
+        },
+        {
+          "title": "menu dungeon restores Mage XP 600, caster level and exact active boundary",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1838,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:36:40.427Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-4980d253ab60bd210bc4",
+          "file": "dungeon.spec.ts",
+          "line": 20,
+          "column": 73
+        },
+        {
+          "title": "testing dungeon legally clears a floor, descends and backtracks without accessing saves",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 300000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 81888,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:36:42.275Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-5a0549f23b4731d1d434",
+          "file": "dungeon.spec.ts",
+          "line": 37,
+          "column": 1
+        },
+        {
+          "title": "new dungeons use fresh layouts across reloads and saved dungeons retain theirs",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1506,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:38:04.170Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-09cfe04511cc7f7efe27",
+          "file": "dungeon.spec.ts",
+          "line": 78,
+          "column": 1
+        },
+        {
+          "title": "Shaman production journey uses Hex and ally healing, reloads Weakened and replays a complete legal battle",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 52387,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:38:05.682Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-0223fd54c1e70f72c4bc",
+          "file": "dungeon.spec.ts",
+          "line": 100,
+          "column": 1
+        },
+        {
+          "title": "automatic stairs preserve healed Fighter carry and fresh battle resources",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3885,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:38:58.079Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-c6c694a25b6c8ee8a2d8",
+          "file": "dungeon.spec.ts",
+          "line": 161,
+          "column": 1
+        },
+        {
+          "title": "dungeon battle undo survives reload and a legal defeat journey",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 300000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 21509,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:39:01.975Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-378ecb3f780f6209073a",
+          "file": "dungeon.spec.ts",
+          "line": 181,
+          "column": 1
+        },
+        {
+          "title": "read-only entry, keyboard new dungeon, real action and active resume",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2841,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:39:23.494Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-c056b36fb79532b0e230",
+          "file": "dungeon.spec.ts",
+          "line": 209,
+          "column": 1
+        },
+        {
+          "title": "legal reward and guardian boundaries, travel reload, backtracking and isolated saves",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 14009,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:39:26.343Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-f95bfd7ffc61e09a8430",
+          "file": "dungeon.spec.ts",
+          "line": 234,
+          "column": 1
+        },
+        {
+          "title": "corrupt bytes stay exportable and uncertain travel requires explicit recovery",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4223,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:39:40.360Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-08550af8352d098c959f",
+          "file": "dungeon.spec.ts",
+          "line": 261,
+          "column": 1
+        },
+        {
+          "title": "confirmed charm discard frees full capacity without cancelling or duplicating the pending reward",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3551,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:39:44.590Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-3f4594e6229b667b5ce9",
+          "file": "dungeon.spec.ts",
+          "line": 275,
+          "column": 1
+        },
+        {
+          "title": "hero progression commits once, heals at a threshold and survives inspection and reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3873,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:39:48.148Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-52345c5334f548fa7980",
+          "file": "dungeon.spec.ts",
+          "line": 300,
+          "column": 1
+        },
+        {
+          "title": "menu dungeon restores Mage XP 0, caster level and exact active boundary",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1851,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:41:20.344Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-90a52b27ecccdde5ec76",
+          "file": "dungeon.spec.ts",
+          "line": 20,
+          "column": 73
+        },
+        {
+          "title": "menu dungeon restores Mage XP 60, caster level and exact active boundary",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1796,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:41:22.201Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-0a0be56bd1289f9a5a57",
+          "file": "dungeon.spec.ts",
+          "line": 20,
+          "column": 73
+        },
+        {
+          "title": "menu dungeon restores Mage XP 180, caster level and exact active boundary",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1864,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:41:24.013Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-c85fe05b944e1b0fbef9",
+          "file": "dungeon.spec.ts",
+          "line": 20,
+          "column": 73
+        },
+        {
+          "title": "menu dungeon restores Mage XP 600, caster level and exact active boundary",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1850,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:41:25.884Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-7720a96c4df6ac7e786a",
+          "file": "dungeon.spec.ts",
+          "line": 20,
+          "column": 73
+        },
+        {
+          "title": "testing dungeon legally clears a floor, descends and backtracks without accessing saves",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 300000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 82634,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:41:27.741Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-cbda68b520c5cea355d8",
+          "file": "dungeon.spec.ts",
+          "line": 37,
+          "column": 1
+        },
+        {
+          "title": "new dungeons use fresh layouts across reloads and saved dungeons retain theirs",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1636,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:42:50.386Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-6b44ca2415d875f1ea86",
+          "file": "dungeon.spec.ts",
+          "line": 78,
+          "column": 1
+        },
+        {
+          "title": "Shaman production journey uses Hex and ally healing, reloads Weakened and replays a complete legal battle",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 52738,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:42:52.032Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-a28a999b44fcc4e036e9",
+          "file": "dungeon.spec.ts",
+          "line": 100,
+          "column": 1
+        },
+        {
+          "title": "automatic stairs preserve healed Fighter carry and fresh battle resources",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4092,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:43:44.779Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-42dc80c467af593a010b",
+          "file": "dungeon.spec.ts",
+          "line": 161,
+          "column": 1
+        },
+        {
+          "title": "dungeon battle undo survives reload and a legal defeat journey",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 300000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 21907,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:43:48.884Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-0fe4e0fe2408f9c61d61",
+          "file": "dungeon.spec.ts",
+          "line": 181,
+          "column": 1
+        },
+        {
+          "title": "read-only entry, keyboard new dungeon, real action and active resume",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3082,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:44:10.800Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-4455fe30842c975d1fa3",
+          "file": "dungeon.spec.ts",
+          "line": 209,
+          "column": 1
+        },
+        {
+          "title": "legal reward and guardian boundaries, travel reload, backtracking and isolated saves",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 14335,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:44:13.891Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-8c7bc753e4ad2be03076",
+          "file": "dungeon.spec.ts",
+          "line": 234,
+          "column": 1
+        },
+        {
+          "title": "corrupt bytes stay exportable and uncertain travel requires explicit recovery",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4402,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:44:28.234Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-be3369d1eecb4085d340",
+          "file": "dungeon.spec.ts",
+          "line": 261,
+          "column": 1
+        },
+        {
+          "title": "confirmed charm discard frees full capacity without cancelling or duplicating the pending reward",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4003,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:44:32.648Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-7cfb5c081302dea3b116",
+          "file": "dungeon.spec.ts",
+          "line": 275,
+          "column": 1
+        },
+        {
+          "title": "hero progression commits once, heals at a threshold and survives inspection and reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3992,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T12:44:36.659Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e0f8639c387951b6a797-c09fc72ff5d469301b57",
+          "file": "dungeon.spec.ts",
+          "line": 300,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-04T12:29:39.473Z",
+    "duration": 901321.164,
+    "expected": 120,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
