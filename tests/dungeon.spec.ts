@@ -272,6 +272,20 @@ test('corrupt bytes stay exportable and uncertain travel requires explicit recov
  expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe('broken save bytes');
 });
 
+test('declining a dungeon reward preserves inventory and allows the next encounter',async({page,isMobile})=>{
+ const initial=dungeonCapacityFixture();await seed(page,initial);
+ const decline=page.getByRole('button',{name:'Decline reward',exact:true});
+ const activate=async()=>{if(isMobile)await decline.tap();else await decline.press('Enter');};
+ await activate();await page.locator('#dungeon-item-cancel').click();
+ expect(await snapshot(page)).toEqual(initial);
+ await activate();await page.locator('#dungeon-item-confirm').click();
+ const next=await snapshot(page);
+ expect(next).toMatchObject({phase:'ready',offer:null,ownership:initial.ownership});
+ await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(next);
+ await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+});
+
 test('confirmed charm discard frees full capacity without cancelling or duplicating the pending reward',async({page,isMobile})=>{
  const initial=dungeonCapacityFixture();await seed(page,initial);
  const target=initial.ownership.equipment[0].instanceId;
