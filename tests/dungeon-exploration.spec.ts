@@ -426,7 +426,7 @@ test('maximum-size saved floor renders and accepts a step after reload', async (
  const base=freshDungeon('large-floor-browser',19);
  const floors=Array.from({length:5},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1),map=floorMap(descriptor);return {descriptor,position:descriptor.upstairs,completed:i===4?0:3,exploration:freshExploration(descriptor.seed,descriptor.upstairs,map)};});
  const state={...base,depth:5,floors}, encoded=encodeDungeon(state); if(!encoded.ok)throw Error(encoded.reason);
- await page.goto('dungeon'); await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
+ await page.goto('./?game=dungeon'); await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
  await page.reload(); await continueSavedDungeon(page);
  const map=page.locator('#dungeon-map'); await expect(map.locator('[data-cell]')).toHaveCount(36*36);
  const before=await dungeonSnapshot(page), floor=before.floors[4], layout=floorMap(floor.descriptor);
@@ -444,7 +444,7 @@ test('maximum-size floor step responsiveness meets the established budget', asyn
  const first=map.cells.findIndex((v,i)=>v===1&&!stairs.includes(i)&&neighbors(i,map.width).some(n=>map.cells[n]&&!stairs.includes(n)));
  const second=neighbors(first,map.width).find(n=>map.cells[n]&&!stairs.includes(n));if(first<0||second===undefined)throw Error('No safe timing pair');
  const state=atCell({...base,depth:5,floors},first),encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
- await page.goto('dungeon');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});await page.reload();await continueSavedDungeon(page);
+ await page.goto('./?game=dungeon');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});await page.reload();await continueSavedDungeon(page);
  const times:number[]=[];
  for(let i=0;i<20;i++)times.push(await page.evaluate(destination=>{const start=performance.now();document.querySelector<HTMLElement>(`#dungeon-map [data-cell="${destination}"]`)!.click();return performance.now()-start;},i%2===0?second:first));
  const frames=await page.evaluate(async({a,b})=>{const samples:number[]=[];let previous=await new Promise<number>(resolve=>requestAnimationFrame(resolve));for(let i=0;i<40;i++){document.querySelector<HTMLElement>(`#dungeon-map [data-cell="${i%2===0?b:a}"]`)!.click();const now=await new Promise<number>(resolve=>requestAnimationFrame(resolve));samples.push(now-previous);previous=now;}return samples;},{a:first,b:second});
