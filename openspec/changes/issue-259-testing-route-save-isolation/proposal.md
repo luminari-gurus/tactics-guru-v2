@@ -25,6 +25,6 @@ None. Canonical `battle-session` remains unchanged: its deterministic in-memory 
 
 Issue: #259. Owner: `moshehbenavraham`. Planned branch: `work/issue-259-testing-route-save-isolation`, from main `d8692f94cb652eb6fbb6f4fa2a9330ad57c3d4dd`.
 
-Owners include `src/main.ts`, `src/app/routes.ts`, the three application/session hosts, `BattleScene`, persistence controls, main-menu and dungeon UI, `vite.config.ts`, existing tests/helpers and verification selection, and `scripts/measure-fit-controls.ts`. The human implementation plan is `docs/ongoing-projects/plan.md`.
+Owners include `src/main.ts`, `src/app/routes.ts`, the three application/session hosts, `BattleScene`, persistence controls, main-menu and dungeon UI, `vite.config.ts`, existing tests/helpers and verification selection, and `scripts/measure-fit-controls.ts`. See the [human implementation plan](../../../docs/ongoing-projects/issue-259-testing-route-save-isolation-plan.md).
 
 No dependency, save migration, record subsystem, combat rule, deployment or runner-capacity change is proposed. #270 explicitly references this route boundary; #176/#270 implementation remains separate. Current draft PRs #273/#274 remain independent and were rechecked before implementation. Implementation progress and evidence are tracked in tasks.md and the human plan.
