@@ -71,10 +71,20 @@ to classify additional cases without reviewing their assertions. Current approve
 scope is nine canonical startup/asset cases and five explicit-viewport layout
 cases. Other routine interactions retain their matrix. The three extended progression journeys retain their matrix in the explicit extended commands.
 
+Full regression also applies three reviewed stage filters that do not use those
+tags: configured production and development telemetry run on desktop Chromium
+only; root-dev, prefix-preview and prefix-dev `public-asset-base.spec.ts` run on
+desktop only; and the health-bar config keeps iPhone WebKit only. Telemetry has
+no device branches. Asset-base/server-mode resolution does not depend on device;
+root-preview Chromium still runs that spec on all three profiles, including the
+`hasTouch` sound tap and dungeon walk. Chromium health-bar cases remain in the
+default suite.
+
 `npm run test:verification-batches` also checks real selection discovery, exact
 removed-to-retained mappings and negative selection/device drift. Batch discovery
 must still partition the canonical default set exactly. Special configs/modes
-retain their prior sets. The [issue #203 plan](../openspec/changes/issue-203-browser-coverage/design.md)
+retain their prior sets except those three reviewed full-regression filters.
+The [issue #203 plan](../openspec/changes/issue-203-browser-coverage/design.md)
 and QA evidence in `docs/qa/issue-203/` describe the classification and measurements.
 
 ```sh
@@ -148,10 +158,10 @@ PR readiness selects the applicable rows under the change matrix.
 | Placement failure/retry | `PLAYWRIGHT_SERVER_MODE=dev npx --no-install playwright test tests/overworld-map.spec.ts -g 'controlled placement failure preserves complete state and supports retry'` | Three Chromium profiles; preview skips are not coverage. |
 | WebKit battle/run acceptance | `npx --no-install playwright test -c playwright.device-acceptance.config.ts` | Config's selected battle-loop, persistence, run-progression, audio and radial hold/tap/cancel/End turn cases, iPhone portrait/landscape. |
 | WebKit dungeon/exploration | `npx --no-install playwright test -c playwright.exploration.config.ts` | Dungeon, exploration, lifecycle files; desktop and two mobile orientations. |
-| Health-bar device matrix | `npx --no-install playwright test -c playwright.health-bars.config.ts` | Health-bar file, three Chromium and two WebKit profiles. Account for existing Chromium overlap; no silent removal. |
-| Configured production telemetry | `npm run test:telemetry` | `telemetry.spec.ts`; dedicated instrumented build in `tmp/issue128-dist`, all three Chromium profiles. |
-| Configured development telemetry | `PLAYWRIGHT_TELEMETRY_DEV=true npm run test:telemetry` | Dedicated dev-server environment; distinct from production evidence. |
-| Root/prefix asset behavior | `npx --no-install playwright test tests/public-asset-base.spec.ts` | Run root preview, prefixed preview and corresponding dev modes for full regression or affected build/base changes; recipe below. |
+| Health-bar device matrix | `npx --no-install playwright test -c playwright.health-bars.config.ts` | Health-bar file, iPhone portrait and landscape WebKit. Chromium desktop and Pixel coverage stays in the default suite; do not reintroduce those duplicate projects. |
+| Configured production telemetry | `npm run test:telemetry` | `telemetry.spec.ts`; dedicated instrumented build in `tmp/issue128-dist`. Full regression selects desktop Chromium only. Focused runs without `--project` still discover all three profiles. |
+| Configured development telemetry | `PLAYWRIGHT_TELEMETRY_DEV=true npm run test:telemetry` | Dedicated dev-server environment; distinct from production evidence. Full regression is likewise desktop-only. |
+| Root/prefix asset behavior | `npx --no-install playwright test tests/public-asset-base.spec.ts` | Root preview in the default Chromium suite keeps all three profiles. Full regression runs root-dev, prefix-preview and prefix-dev on desktop only; recipe below. |
 | Performance capture | `npm run measure:fit` | Isolated production proof-scene collector; this is not a substitute for runtime budget assertions in browser tests. Required for affected performance work and release qualification, not every docs/UI-copy edit. |
 
 The routine default browser files (all included by the default config) are grouped here
@@ -180,7 +190,8 @@ and ability fixtures reset on reload, with learned-ability persistence retained
 in the menu dungeon corpus and extended journeys. Collector cold/warm coverage
 preserves game slots instead of clearing them. Issue #259's source-bound coverage
 [mapping](qa/issue-259/coverage-map.json) records moved/renamed/added IDs; the existing 23 approved device-matrix
-reductions remain unchanged.
+reductions remain unchanged. The additional full-regression desktop-only telemetry/assets
+filters and health-bar Chromium overlap removal are enforced by the live selection contract.
 Honor meaningful engine/mode skips (for example Chromium CDP-only input checks
 and production-only resource hints); record reasons, and run the owning mode.
 
@@ -205,10 +216,10 @@ projects and assertions. The old individual config entry points remain supported
 `npm run verify:full` executes the complete inventory sequentially: tooling,
 all fast units (including content), both type scopes, root/prefix build integrations,
 then the root bundle and default Chromium,
-combined fixtures, dev map placement/cleanup, both WebKit configs, health bars, production and
-dev telemetry, root dev assets, isolated performance capture, prefix build/assets
-in preview and dev, then root-build restoration. Root preview assets already run
-in the default Chromium suite. The 19 stages validate ordinary content and both
+combined fixtures, dev map placement/cleanup, both WebKit configs, iPhone health bars, production and
+dev telemetry on desktop, root dev assets on desktop, isolated performance capture, prefix build/assets
+in preview and dev on desktop, then root-build restoration. Root preview assets already run
+in the default Chromium suite on all three profiles. The 19 stages validate ordinary content and both
 type scopes once before any ordinary bundle. Prefix and restored-root bundles
 reuse those successful prerequisites; neither is executed after unit/content or
 type failure. Independent dev suites and build integrations continue. Configured
@@ -239,9 +250,9 @@ Root preview uses the ordinary build. For prefix checks:
 
 ```sh
 npm run build -- --base=/prototype/
-PLAYWRIGHT_BASE_PATH=/prototype/ npx --no-install playwright test tests/public-asset-base.spec.ts
-PLAYWRIGHT_BASE_PATH=/prototype/ PLAYWRIGHT_SERVER_MODE=dev npx --no-install playwright test tests/public-asset-base.spec.ts
-PLAYWRIGHT_SERVER_MODE=dev npx --no-install playwright test tests/public-asset-base.spec.ts
+PLAYWRIGHT_BASE_PATH=/prototype/ npx --no-install playwright test tests/public-asset-base.spec.ts --project=desktop
+PLAYWRIGHT_BASE_PATH=/prototype/ PLAYWRIGHT_SERVER_MODE=dev npx --no-install playwright test tests/public-asset-base.spec.ts --project=desktop
+PLAYWRIGHT_SERVER_MODE=dev npx --no-install playwright test tests/public-asset-base.spec.ts --project=desktop
 # Restore the root production build before other root-preview suites:
 npm run build
 ```
