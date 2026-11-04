@@ -35,9 +35,9 @@ export const stages = [
     { env: { PLAYWRIGHT_SERVER_MODE: 'dev' } }),
   npm('performance', ['run', 'measure:fit'], { needs: ['build-root'] }),
   bundle('build-prefix', ['--', '--base=/prototype/']),
-  browser('assets-prefix-preview', ['tests/public-asset-base.spec.ts', '--project=desktop'],
+  browser('assets-prefix-preview', ['-c', 'playwright.prefix-assets.config.ts'],
     { needs: ['build-prefix'], env: { PLAYWRIGHT_BASE_PATH: '/prototype/' } }),
-  browser('assets-prefix-dev', ['tests/public-asset-base.spec.ts', '--project=desktop'],
+  browser('assets-prefix-dev', ['-c', 'playwright.prefix-assets.config.ts'],
     { env: { PLAYWRIGHT_BASE_PATH: '/prototype/', PLAYWRIGHT_SERVER_MODE: 'dev' } }),
   // Restore even after prefix failures; never leave an accidentally prefixed dist.
   bundle('restore-root'),

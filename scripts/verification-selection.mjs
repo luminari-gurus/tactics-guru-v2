@@ -11,9 +11,9 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const reporter = fileURLToPath(import.meta.url);
 const json = value => JSON.stringify(value, (_, entry) => entry instanceof RegExp ? { source: entry.source, flags: entry.flags } : entry, 2) + '\n';
 export const desktopOnlyStages = new Set([
-  'telemetry-production', 'telemetry-development',
-  'assets-root-dev', 'assets-prefix-preview', 'assets-prefix-dev',
+  'telemetry-production', 'telemetry-development', 'assets-root-dev',
 ]);
+export const prefixTouchStages = new Set(['assets-prefix-preview', 'assets-prefix-dev']);
 function withoutProjectFilters(args) {
   const remaining = [];
   for (let i = 0; i < args.length; i++) {
@@ -54,18 +54,18 @@ export function discoverSelection(args = [], env = {}, cwd = root) {
 export function captureSelections({ allProfiles = false } = {}) {
   const capture = (args, env) => {
     if (!allProfiles) return discoverSelection(args, env);
-    // A temporary discovery-only config removes project-level grepInvert. CLI
-    // --project filters are also stripped so desktop-only stages keep a full
-    // Chromium control. CLI grep flags do not override project-level grepInvert
-    // in Playwright. No app/test flag or persistent configuration bypass is
-    // introduced.
+    // A temporary discovery-only config removes project-level grep/grepInvert.
+    // CLI --project filters are also stripped so desktop-only and prefix-touch
+    // stages keep a full Chromium control. CLI grep flags do not override
+    // project-level grepInvert in Playwright. No app/test flag or persistent
+    // configuration bypass is introduced.
     const directory = mkdtempSync(join(tmpdir(), 'tactics-selection-control-'));
     try {
       const selected = args.indexOf('-c');
       const config = resolve(root, selected >= 0 ? args[selected + 1] : 'playwright.config.ts');
       const remaining = selected >= 0 ? args.filter((_, i) => i !== selected && i !== selected + 1) : args;
       const control = join(directory, 'control.config.ts');
-      writeFileSync(control, `import base from ${JSON.stringify(config)};\nexport default { ...base, testDir: ${JSON.stringify(resolve(root, 'tests'))}, projects: base.projects.map(({ grepInvert, ...project }) => project) };\n`);
+      writeFileSync(control, `import base from ${JSON.stringify(config)};\nexport default { ...base, testDir: ${JSON.stringify(resolve(root, 'tests'))}, projects: base.projects.map(({ grepInvert, grep, ...project }) => project) };\n`);
       return discoverSelection([...withoutProjectFilters(remaining), '-c', control], env);
     } finally { rmSync(directory, { recursive: true, force: true }); }
   };
@@ -108,10 +108,18 @@ export function compareSelections(before, after) {
     const candidate = after.selections[stage];
     assert.equal(candidate.workers, original.workers, 'Changed worker policy');
     const desktopOnly = desktopOnlyStages.has(stage);
+    const prefixTouch = prefixTouchStages.has(stage);
     if (desktopOnly) {
       assert.ok(candidate.tests.every(test => test.project === 'desktop'), 'Desktop-only stage selected a non-desktop project');
       assert.deepEqual([...new Set(original.projects.map(project => project.name))].sort(),
         ['desktop', 'mobile-landscape', 'mobile-portrait'], 'Desktop-only control lost a Chromium profile');
+    } else if (prefixTouch) {
+      assert.deepEqual([...new Set(original.projects.map(project => project.name))].sort(),
+        ['desktop', 'mobile-portrait'], 'Prefix-touch control lost a retained Chromium profile');
+      assert.deepEqual([...new Set(candidate.projects.map(project => project.name))].sort(),
+        ['desktop', 'mobile-portrait'], 'Changed prefix-touch projects');
+      assert.ok(candidate.tests.every(test => test.project === 'desktop' || test.project === 'mobile-portrait'),
+        'Prefix-touch stage selected an unexpected project');
     } else {
       assert.deepEqual(candidate.projects.map(p => p.name), original.projects.map(p => p.name), 'Changed projects');
     }
@@ -121,16 +129,20 @@ export function compareSelections(before, after) {
         assert.ok(desktopOnly && project.name !== 'desktop', 'Changed projects');
         continue;
       }
-      assert.deepEqual({ ...next, grepInvert: null }, { ...project, grepInvert: null }, 'Changed effective project configuration');
+      assert.deepEqual({ ...next, grepInvert: null, grep: null }, { ...project, grepInvert: null, grep: null }, 'Changed effective project configuration');
       const expected = project.name === 'mobile-portrait' ? { source: '@canonical', flags: '' }
         : project.name === 'mobile-landscape' ? { source: '@canonical|@fixed-viewport', flags: '' } : project.grepInvert;
       assert.deepEqual(next.grepInvert, expected, 'Unexpected selection filter');
+      const expectedGrep = prefixTouch && project.name === 'mobile-portrait' ? { source: '@touch-audio', flags: '' } : project.grep;
+      assert.deepEqual(next.grep, expectedGrep, 'Unexpected project grep');
     }
     const old = unique(original.tests), remaining = unique(candidate.tests);
     for (const test of original.tests) {
       const tag = classification(test);
+      const touchAudio = (test.tags ?? []).includes('@touch-audio');
       const desktopReduced = desktopOnly && test.project !== 'desktop';
-      const reduced = desktopReduced || stage === 'chromium' && (tag === '@canonical' && test.project.startsWith('mobile-')
+      const prefixReduced = prefixTouch && test.project === 'mobile-portrait' && !touchAudio;
+      const reduced = desktopReduced || prefixReduced || stage === 'chromium' && (tag === '@canonical' && test.project.startsWith('mobile-')
         || tag === '@fixed-viewport' && test.project === 'mobile-landscape');
       const retained = remaining.get(identity(test));
       if (!reduced) {
@@ -140,7 +152,7 @@ export function compareSelections(before, after) {
         continue;
       }
       assert.ok(!retained, 'Approved reduction still selected');
-      const targetProject = desktopReduced || tag === '@canonical' ? 'desktop' : 'mobile-portrait';
+      const targetProject = desktopReduced || prefixReduced || tag === '@canonical' ? 'desktop' : 'mobile-portrait';
       const target = candidate.tests.find(row => row.project === targetProject && row.file === test.file
         && JSON.stringify(row.titlePath) === JSON.stringify(test.titlePath));
       assert.ok(target, 'Missing retained coverage counterpart');
@@ -152,10 +164,12 @@ export function compareSelections(before, after) {
         assert.deepEqual(effective(test.project), effective(targetProject), 'Non-equivalent fixed viewport devices');
         effectiveUse = effective(targetProject);
       }
-      mappings.push({ stage, removed: test, retained: target, classification: desktopReduced ? 'desktop-only' : tag,
+      mappings.push({ stage, removed: test, retained: target,
+        classification: desktopReduced ? 'desktop-only' : prefixReduced ? 'prefix-touch' : tag,
         reason: desktopReduced ? (stage.startsWith('telemetry')
           ? 'Telemetry ingestion/opt-in has no touch, orientation or viewport branches; desktop coverage retained in both dedicated modes'
           : 'Asset-base/server-mode resolution does not depend on device; root-preview chromium retains all three profiles including hasTouch branches')
+          : prefixReduced ? 'Prefixed asset-base/server-mode resolution does not depend on device; @touch-audio cases stay on Pixel portrait'
           : tag === '@canonical' ? 'Resource failure/delay assertions have no touch, density, orientation or backend-specific behavior; exhaustive desktop coverage retained'
           : 'Identical Pixel configuration and explicit viewport set before navigation', ...(effectiveUse ? { effectiveUse } : {}) });
     }

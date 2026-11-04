@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { captureSelections, compareSelections, discoverSelection, desktopOnlyStages } from '../../scripts/verification-selection.mjs';
+import { captureSelections, compareSelections, discoverSelection, desktopOnlyStages, prefixTouchStages } from '../../scripts/verification-selection.mjs';
 import { createPlan, exactCoverage } from '../../scripts/verification-batches.mjs';
 
 let before, after;
@@ -13,11 +13,19 @@ test('real discoveries preserve every retained ID and special mode, with exactly
   assert.equal(comparison.mappings.filter(row => row.effectiveUse?.hasTouch).length, 5);
   const desktopOnly = comparison.mappings.filter(row => row.classification === 'desktop-only');
   assert.equal(desktopOnly.filter(row => row.stage.startsWith('telemetry')).length, 56);
-  assert.equal(desktopOnly.filter(row => row.stage.startsWith('assets')).length, 156);
-  assert.equal(desktopOnly.length, 212);
+  assert.equal(desktopOnly.filter(row => row.stage === 'assets-root-dev').length, 52);
+  assert.equal(desktopOnly.length, 108);
+  assert.equal(comparison.mappings.filter(row => row.classification === 'prefix-touch').length, 46);
   for (const stage of desktopOnlyStages) {
     assert.ok(after.selections[stage].tests.every(row => row.project === 'desktop'));
     assert.ok(after.selections[stage].tests.length > 0);
+  }
+  for (const stage of prefixTouchStages) {
+    const tests = after.selections[stage].tests;
+    assert.deepEqual([...new Set(tests.map(row => row.project))].sort(), ['desktop', 'mobile-portrait']);
+    const portrait = tests.filter(row => row.project === 'mobile-portrait');
+    assert.equal(portrait.length, 3);
+    assert.ok(portrait.every(row => row.tags.includes('@touch-audio')));
   }
 });
 
