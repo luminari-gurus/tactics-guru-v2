@@ -1,4 +1,5 @@
-import { test as base, type BrowserContext, type Page } from '@playwright/test';
+import { type BrowserContext, type Page } from '@playwright/test';
+import { test as base } from './coreGraphics';
 export { expect } from '@playwright/test';
 export type { Page, BrowserContext, Locator } from '@playwright/test';
 
