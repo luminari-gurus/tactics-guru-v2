@@ -40,8 +40,18 @@ and keep the original UI, save/reload and caster assertions on every prior profi
 No retained assertions, product performance limits, retries or case timeouts changed.
 
 Verification before publication: 15 core/orchestration contracts, 30 real
-selection/batching contracts and both TypeScript scopes passed. Full ordinary-PR
-CI and matched affected-profile execution will be attached to the PR after running.
+selection/batching contracts and both TypeScript scopes passed. The initial default-entry CI run passed in 4 minutes 21 seconds including setup
+and upload. [Final public-menu core CI](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42048854431)
+passed in **3 minutes 48 seconds**, including setup and upload: all 1,170 units,
+both build integrations/types, bundle, 15 core/tooling contracts and all seven
+E2E journeys passed. Queue time was 1 minute 45 seconds, for 5 minutes 33 seconds
+from trigger to completion. The [core timing receipt](core-timings.json) records
+tested merge/source identity, counts, per-stage timings, conditions and raw hashes.
+Later evidence-only documentation changes reuse this functional result with
+unchanged relevant source, tests, helpers, configs, assets and dependencies.
+Local process/reporter contracts passed 17 tests, with three Linux-only cleanup
+checks explicitly skipped on macOS. Their underlying cleanup implementation did
+not change; qualified Linux jobs retain their actual cleanup results.
 
 ## Bounded matched execution
 
@@ -51,3 +61,27 @@ the same qualified VM; keep caches, browser lockfile and worker/retry policy
 consistent and record limitations. The workflow executes only the XP browser
 cases in Chromium and WebKit, retaining durable JSON and failure traces. Its
 ordinary setup/boot qualification remains the default `suite=setup` behavior.
+
+### Matched result
+
+[Baseline run](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42048414716)
+at `637ab92` passed all 24 XP cases; [candidate run](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42048483145)
+at `96b14aa` passed all 12 retained cases. Both ran sequentially on
+`unraid-tactics-02`, Node 24.22.2, with identical lockfile hash, browser toolchain,
+one worker and zero retries. No XP failures, skips or flaky outcomes occurred.
+
+The measured browser step fell from **125s to 66s (47.2%)**; summed Playwright
+report durations fell from **122.89s to 63.33s (48.47%)**. These are observed bounds
+for this subset on persistent caches with host load not independently controlled;
+they do not establish a whole-regression speedup. Setup/build/diagnostics remain
+separate. [Compact timing receipts](progression-timings.json) retain source,
+counts, report hashes, commands' step walls and measurement limitations. Raw logs,
+JSON and traces remain in the two workflow artifacts for seven days.
+
+The diagnostics harness deliberately creates a failing fake-browser fixture to
+verify failure receipts survive ordinary cleanup, then checks recovery. Its
+intentional control reports are retained separately from passing XP results.
+
+The measured XP configs/tests and runtime inputs are unchanged after `96b14aa`;
+`63607ef` changes only the unrelated core journey choice, its contract and docs.
+Reusing the matched XP measurement for that source is bounded to those inputs.

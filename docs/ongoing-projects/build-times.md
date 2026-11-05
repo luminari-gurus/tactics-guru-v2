@@ -74,3 +74,22 @@ special configs, and removes the XP 60/600 browser permutations. XP 0/180 retain
 the real absent/present ability gate, exact restore and UI integration on all
 former profiles. Exact before/after coverage mapping and matched Chromium/WebKit
 execution are recorded in `docs/qa/minimal-default-e2e/`.
+
+
+## Default suite and migrated progression result
+
+The default command now selects seven core journeys, including the public menu
+New Game action. `test:regression` explicitly owns the previous broad selection;
+special configs/full qualification preserve their prior cases except the twelve
+redundant XP executions now covered by fast units. Exact device/test ID mapping
+is in [minimal-default evidence](../qa/minimal-default-e2e/README.md).
+
+The final default-entry PR run passed in **3 minutes 48 seconds active job time**
+including setup/upload (1 minute 45 seconds queued; 5 minutes 33 seconds total).
+All 1,170 units, both build integrations/type scopes and seven E2E journeys passed,
+with no skips or flakes. The matched XP browser comparison passed 24 baseline
+and 12 retained cases; its measured browser step decreased from 125s to 66s.
+The PR contains compact, source-bound timing/coverage receipts. This verifies the
+implemented ordinary build/verification path; review and merge of the stacked PRs
+are still pending. Broad and extended qualification remain explicit, not routine
+build prerequisites.

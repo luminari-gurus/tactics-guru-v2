@@ -1,0 +1,71 @@
+{
+  "run": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42048854431",
+  "head": "63607ef9c9a5c1bfbbf16e48875a99d56439dca7",
+  "testedMerge": "de96d2130e0b4e1d9de06743b10d4f38fffd628a",
+  "dirty": "",
+  "node": "v24.22.1",
+  "jobSeconds": 228.0,
+  "queueSeconds": 105.0,
+  "verificationMs": 208654,
+  "browserStats": {
+    "startTime": "2026-11-05T14:53:25.273Z",
+    "duration": 130913.98,
+    "expected": 7,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "stages": [
+    {
+      "id": "tooling",
+      "status": "passed",
+      "durationMs": 5809.539958
+    },
+    {
+      "id": "units",
+      "status": "passed",
+      "durationMs": 61631.02951099999
+    },
+    {
+      "id": "typecheck",
+      "status": "passed",
+      "durationMs": 1359.9098660000018
+    },
+    {
+      "id": "build-integration",
+      "status": "passed",
+      "durationMs": 7209.967066000012
+    },
+    {
+      "id": "bundle",
+      "status": "passed",
+      "durationMs": 987.230012
+    },
+    {
+      "id": "journeys",
+      "status": "passed",
+      "durationMs": 131637.73197
+    }
+  ],
+  "reports": {
+    "units": {
+      "numTotalTests": 1170,
+      "numPassedTests": 1170,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    "build-integration": {
+      "numTotalTests": 2,
+      "numPassedTests": 2,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    }
+  },
+  "conditions": "Persistent qualified VM 01; browser caches and unrelated shared host load not independently controlled. VM 02 ran a separate bounded progression comparison during part of this run.",
+  "rawHashes": {
+    "summary.json": "414b3d5c8d1e2db5c483d1c1215c7d5812322a305dd8c9d6106594e70224a2d5",
+    "journeys.json": "05fafc8f0c971f31316ee3b37bfe82c5804b78f0be38bfd30499d198ebc8f62f",
+    "units.json": "96a3bc250df07d5724284f8e9fe0ff11d95062abacace6b72e55f84e2e3ec7ec",
+    "build-integration.json": "567ae9357e42d6b2944acf073c97afa42f7787d5ea60b5325b21f251eeb39b9f"
+  }
+}
