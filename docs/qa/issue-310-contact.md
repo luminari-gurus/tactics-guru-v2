@@ -5,8 +5,12 @@
 A live marker holds its position when an accepted cardinal player step ends next
 to it. The next step onto that marker enters its own battle before enemy movement.
 Held cells stay reserved against other live markers. Outside contact range the
-existing passive/chase/block behavior is unchanged. The shared overworld movement
-implementation, combat rules, save format and battle RNG are unchanged.
+existing passive/chase/block rules still apply. Holding the passive wanderer
+skips its movement RNG draw, so later wandering follows a shifted deterministic
+stream even after the player leaves contact range. Encounter order and progression
+outcomes can therefore differ from the base for the same dungeon seed. The saved
+movement RNG still resumes exactly. The shared overworld movement implementation,
+combat rules, save format and battle RNG are unchanged.
 
 Affected consumers: `stepDungeon` through `DungeonSession.step`, map WASD/arrows,
 compass and adjacent-cell inputs, dungeon save/Continue, encounter slot selection,
@@ -18,6 +22,13 @@ both the unit witness and the extended browser journey. After demonstrating both
 earned abilities, the witness now issues legal Wait turns through defeat rather
 than playing unrelated later floors. Level, ability, exact replay, resumed state,
 movement-block expiry and terminal cleanup assertions remain unchanged.
+
+Seed 68 is a fixed acceptance witness, not evidence that every seed reaches both
+ability unlocks. [Follow-up #316](https://github.com/luminari-gurus/tactics-guru-v2/issues/316)
+tracks separating focused staged ability cases from earned-progression coverage
+and evaluating bounded deterministic seed selection. This PR retains its legal
+earned-progression journey and all assertions rather than substituting a staged
+fight for that acceptance gate.
 
 ## Source and environment
 
@@ -121,3 +132,16 @@ module changed (no top-level behavior, dependencies or other exports changed).
 The Mage browser and unit witness are rerun; shared fixture consumers remain
 covered by fresh ordinary fast units. The run-save change only adjusts its
 explicit timeout. No older Mage pass is reused for the new waiting policy.
+
+## Review follow-up
+
+The follow-up to reviewed head `418dfa6` clarifies movement RNG effects, records
+the seed-resilience follow-up above, and moves the run-save timeout explanation
+above its test declaration. The test body, assertions and 20-second timeout are
+identical after removing that relocated comment; every other application/test
+input is unchanged. The source hash manifest records the new comment placement.
+Existing functional evidence is reused for these unchanged inputs, including
+[418dfa6 ordinary PR verification](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42075865469)
+and the [418dfa6 floor-clear rerun](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42076764193).
+The separate run-save budget repair is called out in the PR description and
+retained in commit `c3be661`; it is not a consequence of encounter holding.
