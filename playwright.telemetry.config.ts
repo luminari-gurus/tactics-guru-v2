@@ -1,5 +1,5 @@
 import { defineConfig } from '@playwright/test';
-import base from './playwright.config';
+import base from './playwright.regression.config';
 const development = process.env.PLAYWRIGHT_TELEMETRY_DEV === 'true';
 export default defineConfig({
   ...base,

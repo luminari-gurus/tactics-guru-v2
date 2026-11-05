@@ -7,6 +7,15 @@ on:
         type: choice
         options: [tactics-browser-01, tactics-browser-02]
         default: tactics-browser-01
+      suite:
+        description: Browser setup or bounded progression migration measurement
+        type: choice
+        options: [setup, progression]
+        default: setup
+      source_ref:
+        description: Optional exact source commit for a matched baseline measurement
+        type: string
+        default: ''
 permissions:
   contents: read
 concurrency:
@@ -22,6 +31,7 @@ jobs:
         run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
       - uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.source_ref || github.sha }}
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -34,6 +44,26 @@ jobs:
       - run: node --test tests/tooling/browser-diagnostics.test.mjs
       - run: npm run build
       - run: npm run test:browser-smoke -- --diagnostics
+        if: inputs.suite != 'progression'
+      - name: Measure retained progression UI boundaries in Chromium and WebKit
+        if: inputs.suite == 'progression'
+        run: |
+          mkdir -p verification-receipts/progression
+          node --input-type=module <<'JS'
+          import { execFileSync } from 'node:child_process';
+          import { readFileSync, writeFileSync } from 'node:fs';
+          import { createHash } from 'node:crypto';
+          writeFileSync('verification-receipts/progression/source.json', JSON.stringify({
+            commit: execFileSync('git', ['rev-parse', 'HEAD'], {encoding:'utf8'}).trim(),
+            node: process.version, runner: process.env.RUNNER_NAME,
+            lockSha256: createHash('sha256').update(readFileSync('package-lock.json')).digest('hex'),
+            conditions: 'Persistent qualified runner; caches and unrelated background work not independently controlled'
+          }, null, 2));
+          JS
+          config=playwright.regression.config.ts
+          if test ! -f "$config"; then config=playwright.config.ts; fi
+          npm run test:browser -- -c "$config" tests/dungeon.spec.ts -g 'menu dungeon restores Mage XP' --diagnostics
+          npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon.spec.ts -g 'menu dungeon restores Mage XP' --diagnostics
       - uses: actions/upload-artifact@v4
         if: always()
         with:

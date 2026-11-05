@@ -64,7 +64,7 @@ export function captureSelections({ allProfiles = false } = {}) {
     const directory = mkdtempSync(join(tmpdir(), 'tactics-selection-control-'));
     try {
       const selected = args.indexOf('-c');
-      const config = resolve(root, defaultMatrix || selected < 0 ? 'playwright.config.ts'
+      const config = resolve(root, defaultMatrix || selected < 0 ? 'playwright.regression.config.ts'
         : args[selected + 1]);
       const remaining = selected >= 0 ? args.filter((_, i) => i !== selected && i !== selected + 1) : args;
       const files = defaultMatrix ? ['tests/public-asset-base.spec.ts'] : withoutProjectFilters(remaining);

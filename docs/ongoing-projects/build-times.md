@@ -10,8 +10,9 @@ older epic #199's fifteen-minute target for ordinary PR feedback.
 Starting source: `61d8814` on main. The historic full serial capture in
 `docs/qa/issue-200/serial-baseline-2026-10-23/` took about 159.6 minutes and retained
 failures; its unit stage took 35.17 seconds. Those are different source/selection
-inputs from current main and do not establish a current speedup. Current default
-Playwright discovery selects 1,036 cases. Rendering/GPU tests still use one worker.
+inputs from current main and do not establish a current speedup. At the start, default
+Playwright discovery selected 1,036 cases. The default is now seven core journeys;
+the explicit broad compatibility selection is 1,030 after the XP migration. Rendering/GPU tests still use one worker.
 
 ## Incremental delivery
 
@@ -63,7 +64,13 @@ identity, conditions and hashes. Local CPU checks also passed, while local brows
 launches failed because required binaries were absent; Linux CI supplies browser
 proof.
 
-The next additive unit-coverage PR covers exact active Mage restoration at seven
-XP boundaries, learned ability/caster projection, no historical event replay and
-rejection of forged progression fields. The browser parameter loop remains until
-its smaller UI witness and affected-profile measurement are separately qualified.
+PR #289 adds exact active Mage restoration at seven XP boundaries, learned
+ability/caster projection, no historical event replay and rejection of forged
+progression fields. Its complete ordinary-PR CI passed in 3 minutes 38 seconds.
+
+The next increment makes the seven journeys the default for `npm test` and direct
+Playwright, preserves broad diagnostics through `test:regression` and explicit
+special configs, and removes the XP 60/600 browser permutations. XP 0/180 retain
+the real absent/present ability gate, exact restore and UI integration on all
+former profiles. Exact before/after coverage mapping and matched Chromium/WebKit
+execution are recorded in `docs/qa/minimal-default-e2e/`.

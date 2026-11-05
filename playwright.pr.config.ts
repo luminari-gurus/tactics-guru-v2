@@ -1,5 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
-import base from './playwright.config';
+import base from './playwright.regression.config';
 
 // Explicit allowlists keep new regression cases from silently growing PR latency.
 // Reuse the original journeys and assertions; the broad configs remain available.

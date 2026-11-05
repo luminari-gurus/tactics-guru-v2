@@ -20,9 +20,9 @@ export const stages = [
   npm('typecheck', ['run', 'typecheck']),
   npm('build-integration', ['run', 'test:build']),
   bundle('build-root'),
-  preview('chromium'),
+  preview('chromium', ['-c', 'playwright.regression.config.ts']),
   browser('fixtures', ['-c', 'playwright.fixtures.config.ts']),
-  browser('placement-dev', ['tests/overworld-map.spec.ts', '-g',
+  browser('placement-dev', ['-c', 'playwright.regression.config.ts', 'tests/overworld-map.spec.ts', '-g',
     'controlled placement failure preserves complete state and supports retry|direct map disposer is idempotent and detaches listeners'],
     { env: { PLAYWRIGHT_SERVER_MODE: 'dev' } }),
   preview('webkit-acceptance', ['-c', 'playwright.device-acceptance.config.ts']),
@@ -31,7 +31,7 @@ export const stages = [
   browser('telemetry-production', ['-c', 'playwright.telemetry.config.ts', '--project=desktop']),
   browser('telemetry-development', ['-c', 'playwright.telemetry.config.ts', '--project=desktop'],
     { env: { PLAYWRIGHT_TELEMETRY_DEV: 'true' } }),
-  browser('assets-root-dev', ['tests/public-asset-base.spec.ts', '--project=desktop'],
+  browser('assets-root-dev', ['-c', 'playwright.regression.config.ts', 'tests/public-asset-base.spec.ts', '--project=desktop'],
     { env: { PLAYWRIGHT_SERVER_MODE: 'dev' } }),
   npm('performance', ['run', 'measure:fit'], { needs: ['build-root'] }),
   bundle('build-prefix', ['--', '--base=/prototype/']),
@@ -81,7 +81,7 @@ export function stageEnvironment(stage, directory, inherited = process.env) {
 
 export function main(args = process.argv.slice(2)) {
   if (args.length && !(args.length === 1 && args[0] === '--list')) {
-    throw new Error('Usage: npm run verify:full [-- --list] (filters belong on npm test or test:fixtures)');
+    throw new Error('Usage: npm run verify:full [-- --list] (filters belong on test:regression or test:fixtures)');
   }
   if (args[0] === '--list') { console.log(JSON.stringify(stages, null, 2)); return 0; }
   const directory = resolve('tmp/verification', `full-${new Date().toISOString().replaceAll(':', '-')}-${process.pid}`);

@@ -1,5 +1,5 @@
 import { defineConfig } from '@playwright/test';
-import base from './playwright.config';
+import base from './playwright.regression.config';
 
 // These source-entry fixtures share one dev server and the unchanged device matrix.
 export default defineConfig({

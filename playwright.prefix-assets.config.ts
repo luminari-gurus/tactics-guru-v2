@@ -1,5 +1,5 @@
 import { defineConfig } from '@playwright/test';
-import base from './playwright.config';
+import base from './playwright.regression.config';
 
 // Prefixed asset modes: all cases on desktop, touch-audio cases also on Pixel portrait.
 export default defineConfig({

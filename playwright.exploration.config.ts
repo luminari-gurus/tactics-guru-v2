@@ -1,5 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
-import base from './playwright.config';
+import base from './playwright.regression.config';
 export default defineConfig({ ...base,
   testMatch: ['**/dungeon-exploration.spec.ts','**/dungeon.spec.ts','**/dungeon-lifecycle.spec.ts'],
   outputDir: 'test-results-webkit',
