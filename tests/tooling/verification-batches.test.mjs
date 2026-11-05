@@ -246,10 +246,10 @@ test('browser acceptance rejects missing final reports, narrowed coverage, skips
   }
 });
 
-test('workflow stays manual, exclusive, serial, failure-preserving and pinned to the dispatched SHA', () => {
+test('workflow stays manual, serial, failure-preserving and pinned to the dispatched SHA', () => {
   const workflow = readFileSync(new URL('../../.github/workflows/issue-200-baseline.yml', import.meta.url), 'utf8').replaceAll('\r\n', '\n');
   assert.match(workflow, /workflow_dispatch:/); assert.doesNotMatch(workflow, /pull_request:|ubuntu-latest|ubuntu-24/);
-  assert.match(workflow, /group: tactics-browser-exclusive/); assert.match(workflow, /max-parallel: 1/);
+  assert.match(workflow, /max-parallel: 1/);
   assert.match(workflow, /fail-fast: false/); assert.match(workflow, /ref: \$\{\{ github.sha \}\}/);
   assert.match(workflow, /65m npm run verify:batches/); assert.doesNotMatch(workflow, /100m/);
   assert.match(workflow, /github.run_attempt/); assert.match(workflow, /name: Serial verification aggregate/);
@@ -267,5 +267,28 @@ test('workflow stays manual, exclusive, serial, failure-preserving and pinned to
       writeFileSync(join(directory, 'issue208-unsafe-host'), 'unsafe');
       assert.equal(spawnSync('sh', ['-c', guard], options).status, 1);
     } finally { rmSync(directory, { recursive: true, force: true }); }
+  }
+});
+
+test('browser workflows share a non-cancelling lock for the selected VM', () => {
+  const runner = "${{ inputs.runner || 'tactics-browser-01' }}";
+  const validate = workflow => {
+    assert.match(workflow, /options: \[tactics-browser-01, tactics-browser-02\]/);
+    assert.match(workflow, /default: tactics-browser-01/);
+    const concurrency = workflow.split('\nconcurrency:\n')[1]?.split(/\n\S/)[0];
+    assert.ok(concurrency, 'workflow-level concurrency is required');
+    assert.ok(concurrency.includes('  group: tactics-browser-' + runner));
+    assert.match(concurrency, /cancel-in-progress: false/);
+    const targets = [...workflow.matchAll(/^    runs-on: (.+)$/gm)].map(match => match[1]);
+    assert.ok(targets.length > 0, 'at least one runner target is required');
+    for (const target of targets) assert.equal(target, '[self-hosted, tactics-browser, "' + runner + '"]');
+  };
+  for (const file of ['browser-setup.yml', 'issue-200-baseline.yml', 'issue-219-process-cleanup.yml']) {
+    const workflow = readFileSync(new URL('../../.github/workflows/' + file, import.meta.url), 'utf8').replaceAll('\r\n', '\n');
+    validate(workflow);
+    assert.throws(() => validate(workflow.replace('group: tactics-browser-' + runner, 'group: tactics-browser-exclusive')));
+    assert.throws(() => validate(workflow.replace('cancel-in-progress: false', 'cancel-in-progress: true')));
+    assert.throws(() => validate(workflow.replace('[self-hosted, tactics-browser, "' + runner + '"]', '[self-hosted, tactics-browser]')));
+    assert.throws(() => validate(workflow.replace('group: tactics-browser-' + runner, "group: tactics-browser-${{ inputs.runner || 'tactics-browser-02' }}")));
   }
 });
