@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { discoverSelection } from '../../scripts/verification-selection.mjs';
 import { stages, validateReport } from '../../scripts/verify-pr.mjs';
 
@@ -36,6 +37,22 @@ test('ordinary Playwright discovery and the PR alias have identical bounded sele
   const ordinary = discoverSelection();
   const explicit = discoverSelection(['-c', 'playwright.pr.config.ts']);
   assert.deepEqual(ordinary, explicit);
+});
+
+test('every shared browser workflow preserves pending checks without concurrent execution', () => {
+  const validate = workflow => {
+    const concurrency = workflow.split('\nconcurrency:\n')[1]?.split(/\n\S/)[0];
+    assert.match(concurrency, /^  group: tactics-browser-/m);
+    assert.match(concurrency, /^  queue: max$/m);
+    assert.match(concurrency, /^  cancel-in-progress: false$/m);
+  };
+  for (const file of ['pr-verification.yml', 'browser-setup.yml', 'issue-200-baseline.yml', 'issue-219-process-cleanup.yml']) {
+    const workflow = readFileSync(new URL('../../.github/workflows/' + file, import.meta.url), 'utf8');
+    validate(workflow);
+    assert.throws(() => validate(workflow.replace('queue: max', 'queue: single')));
+    assert.throws(() => validate(workflow.replace('  queue: max\n', '')));
+    assert.throws(() => validate(workflow.replace('cancel-in-progress: false', 'cancel-in-progress: true')));
+  }
 });
 
 test('explicit regression matrices retain both UI progression witnesses on every former device', () => {
