@@ -1,0 +1,35 @@
+name: PR verification
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: tactics-browser-tactics-browser-01
+  cancel-in-progress: false
+jobs:
+  verify:
+    # Never execute untrusted fork code on a persistent self-hosted machine.
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: [self-hosted, tactics-browser, tactics-browser-01]
+    timeout-minutes: 10
+    steps:
+      - name: Check host disposition
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run setup:browsers
+      - run: npm run verify:pr
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pr-verification-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/pr/
+          retention-days: 14
+          if-no-files-found: warn

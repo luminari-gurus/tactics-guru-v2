@@ -1,5 +1,42 @@
 # Verification tiers and evidence reuse
 
+## Ordinary PR feedback: under ten minutes
+
+`npm run verify:pr` is the default automated PR check: all fast units (including
+content), both TypeScript scopes, both root/prefix build integrations, one ordinary
+production bundle, and seven explicitly selected E2E journeys. It validates content
+and types once before bundling. `npm run test:pr -- --list` shows the browser list;
+`npm run test:pr -- <filters>` runs focused browser feedback after a successful build.
+The command records per-stage logs, unit/browser JSON and a source-bound summary
+under `verification-receipts/pr/`. Failures stop the command before dependent work.
+Owned-process cleanup uses the existing timing runner, including on interruption.
+
+The self-hosted `PR verification` workflow has a ten-minute **active job** budget,
+including dependency/browser setup and artifact upload. The command has an
+eight-minute budget and the browser phase a five-minute cap. Queue time depends
+on runner availability and is separate. A timeout is a failed check, never proof
+that the target was met. Measure successful job durations before claiming success.
+
+| Profile | Core use cases |
+| --- | --- |
+| Desktop Chromium (5) | Phaser boot/resize; recoverable missing engine chunk; complete winning battle with replay/reload; run undo/reload/terminal outcome; dungeon creation/action/resume |
+| Pixel touch portrait (1) | Real board touch, modal capture and suspend/resume |
+| iPhone WebKit (1) | Dungeon creation, real action and active-battle resume |
+
+These are the existing tests with their original assertions and timeouts. An exact
+discovery contract prevents accidental expansion or loss of the seven selections.
+At introduction, the broad default config selects 1,036 cases (353 desktop, 344
+portrait, 339 landscape); this PR lane selects seven. This is a selection count,
+not a measured runtime speedup or equivalent full-regression coverage.
+
+The broad configs, `npm test`, `verify:full`, telemetry and extended journeys retain
+their existing selections and remain explicit regression/qualification tools.
+Passing the fast lane is ordinary feedback; affected engine/input/save boundaries
+and explicit issue acceptance gates still use the change matrix below. A green PR
+check does not claim that those additional obligations ran. The incremental
+[build-time plan](ongoing-projects/build-times.md) tracks moving detailed rule and
+failure permutations into unit coverage before reducing those regression suites.
+
 This is the selection contract from #201, with explicit commands added by #202.
 Select checks by the behavior and
 consumers affected, not by a dependency version, lockfile edit or merge step alone.
