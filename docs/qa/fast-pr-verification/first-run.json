@@ -1,0 +1,58 @@
+{
+  "run": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42045268094",
+  "head": "c3765fced7f08ee3999e97969da6a145abf103c5",
+  "testedMerge": "ba75248ea4a87fe6108298e447b6c8dda0ca1606",
+  "dirty": "",
+  "runner": "unraid-tactics-01",
+  "node": "v24.22.1",
+  "jobSeconds": 226,
+  "queueSeconds": 2,
+  "verificationMs": 206006,
+  "conditions": "Persistent qualified runner; caches and unrelated background workloads not independently controlled",
+  "stages": [
+    {
+      "id": "tooling",
+      "status": "passed",
+      "durationMs": 3296.117543
+    },
+    {
+      "id": "units",
+      "status": "passed",
+      "durationMs": 54333.776986
+    },
+    {
+      "id": "typecheck",
+      "status": "passed",
+      "durationMs": 1370.055969000001
+    },
+    {
+      "id": "build-integration",
+      "status": "passed",
+      "durationMs": 7358.703818000009
+    },
+    {
+      "id": "bundle",
+      "status": "passed",
+      "durationMs": 991.2258809999912
+    },
+    {
+      "id": "journeys",
+      "status": "passed",
+      "durationMs": 138643.72691
+    }
+  ],
+  "browserStats": {
+    "startTime": "2026-11-05T14:29:23.180Z",
+    "duration": 137721.591,
+    "expected": 7,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "rawHashes": {
+    "summary.json": "9c5bba3e1786a1c913d4bd5e79a65ee35919c11627e1d22ed113b6fc10c76ccb",
+    "journeys.json": "f24fd293dc4a7c90686740b761615186a4789e4b048c45f3e9d8b32c91a2c9ae",
+    "units.json": "28cd645b708e7008b1e75a4fd69363bb6262ba0f5959472aae62718456c3b92e",
+    "build-integration.json": "633ada05c57175278deec8d9a88ee6d4d4b8b545497004de7cdbd0db6a627684"
+  }
+}

@@ -45,4 +45,25 @@ Playwright discovery selects 1,036 cases. Rendering/GPU tests still use one work
   traceable. No blanket retries, suppressed failures or relaxed product budgets.
 - Full and extended qualification remain explicit, independently reported work.
 
-The first lane's measurement and CI link will be recorded here after execution.
+## First successful measurement
+
+[PR #288 CI run](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42045268094)
+completed successfully on 2026-11-05 in **3 minutes 46 seconds active job time**,
+including setup and upload; queue time was about two seconds. The verification
+command took 206.01 seconds, including 54.33 seconds for 1,163 units and 138.64
+seconds for seven browser journeys. Both build integrations and type scopes passed;
+no browser skips, failures or flaky outcomes occurred. The tested merge was
+`ba75248ea4a87fe6108298e447b6c8dda0ca1606` for PR head `c3765fc`, with a clean tree.
+
+This is one successful ordinary-PR observation on the persistent qualified runner,
+not a cold-cache guarantee or a comparable full-regression speedup. Raw reports
+and logs are retained in the run's Actions artifact for fourteen days; a compact
+[measurement receipt](../qa/fast-pr-verification/first-run.json) records timings,
+identity, conditions and hashes. Local CPU checks also passed, while local browser
+launches failed because required binaries were absent; Linux CI supplies browser
+proof.
+
+The next additive unit-coverage PR covers exact active Mage restoration at seven
+XP boundaries, learned ability/caster projection, no historical event replay and
+rejection of forged progression fields. The browser parameter loop remains until
+its smaller UI witness and affected-profile measurement are separately qualified.
