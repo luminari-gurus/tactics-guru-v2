@@ -2,6 +2,11 @@ name: Issue 200 resumable serial verification
 on:
   workflow_dispatch:
     inputs:
+      runner:
+        description: Qualified VM (requires its unique runner label)
+        type: choice
+        options: [tactics-browser-01, tactics-browser-02]
+        default: tactics-browser-01
       mode:
         description: Bounded qualification, partial artifact pilot, or serial capture
         type: choice
@@ -32,7 +37,9 @@ permissions:
   contents: read
   actions: read
 concurrency:
-  group: tactics-browser-exclusive
+  # Reserve one VM across job boundaries; the other VM remains available.
+  # Push-triggered full verification has no inputs and uses VM 01.
+  group: tactics-browser-${{ inputs.runner || 'tactics-browser-01' }}
   cancel-in-progress: false
 env:
   SERIAL_MODE: ${{ inputs.mode }}
@@ -41,7 +48,7 @@ env:
 jobs:
   qualify:
     if: github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode == 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-200-verification-timings' || github.ref == 'refs/heads/work/issue-208-serial-batches')
-    runs-on: [self-hosted, tactics-browser]
+    runs-on: [self-hosted, tactics-browser, "${{ inputs.runner || 'tactics-browser-01' }}"]
     timeout-minutes: 25
     steps:
       - name: Check host disposition before qualification
@@ -79,7 +86,7 @@ jobs:
           if-no-files-found: warn
   prepare:
     if: github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches')
-    runs-on: [self-hosted, tactics-browser]
+    runs-on: [self-hosted, tactics-browser, "${{ inputs.runner || 'tactics-browser-01' }}"]
     timeout-minutes: 35
     outputs:
       matrix: ${{ steps.prepare.outputs.matrix }}
@@ -119,7 +126,7 @@ jobs:
   batch:
     needs: prepare
     if: always() && !cancelled() && needs.prepare.outputs.matrix != ''
-    runs-on: [self-hosted, tactics-browser]
+    runs-on: [self-hosted, tactics-browser, "${{ inputs.runner || 'tactics-browser-01' }}"]
     timeout-minutes: 85
     strategy:
       fail-fast: false
@@ -167,7 +174,7 @@ jobs:
     name: Serial verification aggregate
     needs: [prepare, batch]
     if: always() && github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches')
-    runs-on: [self-hosted, tactics-browser]
+    runs-on: [self-hosted, tactics-browser, "${{ inputs.runner || 'tactics-browser-01' }}"]
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -199,7 +206,7 @@ jobs:
 
   full-verify:
     if: github.repository == 'luminari-gurus/tactics-guru-v2' && (github.event_name == 'push' || inputs.extra_job == 'full-verify')
-    runs-on: [self-hosted, tactics-browser]
+    runs-on: [self-hosted, tactics-browser, "${{ inputs.runner || 'tactics-browser-01' }}"]
     timeout-minutes: 420
     # Push and extra_job=full-verify do not set inputs.mode=capture; discover requires it.
     env:
@@ -238,3 +245,4 @@ jobs:
             tmp/verification/
           retention-days: 30
           if-no-files-found: warn
+
