@@ -17,7 +17,7 @@ jobs:
         run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
       - uses: actions/checkout@v4
         with:
-          ref: a94019fb50cb96563058e54a1d9b0e89712d8d08
+          ref: 814947669b5bf5018795ffcdad7d8a8bd01c076e
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -36,6 +36,8 @@ jobs:
         run: npm run test:browser -- -c playwright.regression.config.ts tests/dungeon-exploration.spec.ts -g 'closing on each|chase follows|dungeon enemies move|walking onto a guardian' --diagnostics
       - name: WebKit contact, movement and pursuit across desktop and both touch orientations
         run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'closing on each|chase follows|dungeon enemies move|walking onto a guardian' --diagnostics
+      - name: Legal Mage progression after encounter ordering change
+        run: npm run test:browser -- -c playwright.extended.config.ts tests/dungeon-extended.spec.ts -g 'Mage legal progression' --project=desktop --diagnostics
       - name: Legal dungeon floor clear, descent and backtrack
         run: npm run test:browser -- -c playwright.regression.config.ts tests/dungeon.spec.ts -g 'testing dungeon legally clears a floor' --project=desktop --diagnostics
       - uses: actions/upload-artifact@v4
