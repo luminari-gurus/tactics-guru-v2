@@ -24,6 +24,7 @@ jobs:
         with:
           node-version: '24'
           cache: npm
+      - run: node --test tests/tooling/risk-gate.test.mjs
       - run: npm ci
       - run: npm run setup:browsers
       - run: npm run verify:pr
