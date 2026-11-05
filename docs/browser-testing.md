@@ -149,11 +149,24 @@ smoke report must contain both setup projects with zero retries or skips. This
 direct qualification does not require merging the PR or adding an automatic
 trigger to the persistent runner.
 
-The `tactics-browser-exclusive` concurrency group serializes browser jobs across
-refs. Reuse that exact group in future timing workflows on this repository, and
-keep unrelated host workloads idle during measurement. A single host starts with
-one browser job; extra runner registrations on it do not create independent GPUs.
-Do not assume 3–4 shards until #208 establishes actual isolated capacity.
+Browser setup, baseline and process-cleanup workflows now select a qualified VM
+using `runner`: `tactics-browser-01` (default) or `tactics-browser-02`. Both retain
+`self-hosted` and `tactics-browser` requirements. An administrator must add each
+unique custom label only to its corresponding VM before dispatch; names are not
+labels. Missing labels leave jobs queued. Qualify each VM separately.
+
+The shared per-runner concurrency group reserves the selected VM across job
+boundaries; independent runs selecting different VMs may execute concurrently.
+Use the same selection and group in future workflows on these runners. Retain
+one runner service per VM and separate workspaces and browser/tool caches. The
+serial baseline stays on one VM to preserve its runner provenance checks; it
+does not shard across the VMs. See [serial verification](serial-verification.md)
+for pending-run cancellation behavior and setup requirements.
+
+The VMs use separately pinned CPU cores and dedicated RAM. Shared storage,
+network and other host resources can still affect timings, so coordinate and
+record background load for performance measurements. Extra runner registrations
+on one VM do not create independent capacity.
 
 Re-run qualification on the self-hosted machine before collecting #200's baseline.
 The previous hosted CI smoke results remain historical setup evidence; they do
@@ -175,6 +188,7 @@ PR #210 is merged. `unraid-tactics-01` passed setup, diagnostics retention,
 Chromium/WebKit preflight and both Phaser smoke cases in
 [run 39717745142](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39717745142).
 This clears the provisioning blocker; it is not a full regression or timing baseline.
-PR #209's manual timing workflow uses `[self-hosted, tactics-browser]`,
-`tactics-browser-exclusive`, the same service-account cache, and no privileged
-OS installation or hosted fallback. See [timing qualification/capture](verification-timings.md).
+PR #209 originally used `[self-hosted, tactics-browser]` and the global
+`tactics-browser-exclusive` group. The current per-VM selection replaces that
+group while retaining no privileged OS installation or hosted fallback. See [timing qualification/capture](verification-timings.md).
+

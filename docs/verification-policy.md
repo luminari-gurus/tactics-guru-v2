@@ -329,9 +329,19 @@ execution for PR #214. `issue-202-verification.yml` is scoped to that PR, uses o
 Ubuntu job and retains browser reports; migrate to qualified self-hosted capacity
 later. This exception does not reroute #200/#207 or enable general hosted CI. Qualify the actual host under #207 before #200's baseline. Start with
 one browser job at a time, `workers: 1`, and idle unrelated host workloads for
-performance captures. Use the shared `tactics-browser-exclusive` concurrency group
-when adding workflows on that runner; other repositories/host workloads require
-separate coordination. Multiple agents/containers sharing one GPU are not isolated
+performance captures. The browser setup, baseline and process-cleanup workflows select one qualified
+VM with the unique `tactics-browser-01` or `tactics-browser-02` label, in addition
+to `self-hosted` and `tactics-browser`. They share a per-runner concurrency group,
+`tactics-browser-${{ inputs.runner || 'tactics-browser-01' }}`, across workflows.
+Use this same group and selection when adding workflows on those VMs. Baseline
+jobs must stay on the selected VM because receipts require matching runner
+identity. Provision the unique labels before dispatch; runner names are not
+labels. Independent runs may select different VMs, but each VM has one runner
+service and separate workspace/cache storage. The VMs have separately pinned
+CPU cores and dedicated RAM allocations; shared storage, network and host-level
+resources may still affect timing. Coordinate unrelated host workloads and
+record conditions for performance comparisons. Other repositories/host workloads
+require separate coordination. Multiple agents/containers sharing one GPU are not isolated
 capacity. #208 sizes shards from measured available hosts and reports queue/setup
 as well as execution time. No hosted workflow is introduced by this policy.
 
@@ -339,3 +349,4 @@ as well as execution time. No hosted workflow is introduced by this policy.
 and removes repeated ordinary aggregate validation. #200 supplies timing/provenance
 tooling; #203 changes the matrix; #204/#205 reduce repeated setup. Until merged, those proposed commands/optimizations
 are not available and their benefits must not be claimed.
+

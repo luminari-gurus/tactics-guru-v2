@@ -1,14 +1,22 @@
 name: Browser setup smoke
 on:
   workflow_dispatch:
+    inputs:
+      runner:
+        description: Qualified VM (requires its unique runner label)
+        type: choice
+        options: [tactics-browser-01, tactics-browser-02]
+        default: tactics-browser-01
 permissions:
   contents: read
 concurrency:
-  group: tactics-browser-exclusive
+  # Reserve one VM across job boundaries; the other VM remains available.
+  # Push-triggered full verification has no inputs and uses VM 01.
+  group: tactics-browser-${{ inputs.runner || 'tactics-browser-01' }}
   cancel-in-progress: false
 jobs:
   browser-setup:
-    runs-on: [self-hosted, tactics-browser]
+    runs-on: [self-hosted, tactics-browser, "${{ inputs.runner || 'tactics-browser-01' }}"]
     timeout-minutes: 20
     steps:
       - name: Check host disposition before browser setup
@@ -39,7 +47,7 @@ jobs:
   issue254-verify:
     if: github.ref == 'refs/heads/work/issue-254-dungeon-enemy-behaviors'
     needs: browser-setup
-    runs-on: [self-hosted, tactics-browser]
+    runs-on: [self-hosted, tactics-browser, "${{ inputs.runner || 'tactics-browser-01' }}"]
     timeout-minutes: 360
     steps:
       - run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
@@ -87,3 +95,4 @@ jobs:
           path: verification-receipts/issue254/
           retention-days: 30
           if-no-files-found: warn
+
