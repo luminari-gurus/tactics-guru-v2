@@ -68,7 +68,7 @@ PR #289 adds exact active Mage restoration at seven XP boundaries, learned
 ability/caster projection, no historical event replay and rejection of forged
 progression fields. Its complete ordinary-PR CI passed in 3 minutes 38 seconds.
 
-The next increment makes the seven journeys the default for `npm test` and direct
+PR #290 makes the seven journeys the default for `npm test` and direct
 Playwright, preserves broad diagnostics through `test:regression` and explicit
 special configs, and removes the XP 60/600 browser permutations. XP 0/180 retain
 the real absent/present ability gate, exact restore and UI integration on all
@@ -90,8 +90,8 @@ All 1,170 units, both build integrations/type scopes and seven E2E journeys pass
 with no skips or flakes. The matched XP browser comparison passed 24 baseline
 and 12 retained cases; its measured browser step decreased from 125s to 66s.
 The PR contains compact, source-bound timing/coverage receipts. This verifies the
-implemented ordinary build/verification path; review and merge of the stacked PRs
-are still pending. Broad and extended qualification remain explicit, not routine
+implemented ordinary build/verification path. PRs #288–#290 merged on 2026-11-05.
+Broad and extended qualification remain explicit, not routine
 build prerequisites.
 
 
@@ -106,4 +106,22 @@ run passed all 1,170 units and seven core E2E cases, with one minute queued
 (5m07s total). A fresh broad-profile XP recheck passed all 12 cases without core
 setup and measured a 69s phase against the 125s baseline. All four browser
 workflows also preserve pending runs with the shared VM lock and `queue: max`.
-Integration still awaits the caller's merge decision.
+Integration completed on 2026-11-05 at main `d350bb6`. Its tree exactly matches
+approved #290 head `0207610`, with #289's head included in its ancestry. The
+passing current-head PR runs were #288 `42057412982`, #289 `42057452222`, and
+#290 `42058786520`; these are reused pre-merge results, not new main executions.
+
+## Continued rule migration
+
+The [browser-to-unit inventory](browser-rule-coverage.md) maps combat, progression,
+dungeon/run, persistence, audio and device boundaries to their existing fast
+coverage and retained browser obligations. The next additive increment covers
+nine XP boundaries for the development ability-picker fixture, including its
+synthetic level-two action, exact HUD choice inputs, legal missile counts,
+cancellation/spent-action locks and fresh transient reconstruction. It changes
+no browser selection. Fixture-loop reduction needs its own retained UI witnesses,
+exact discovery comparison and matched browser timing before removal.
+
+Cold dependency/browser setup measurement remains open; existing successful
+under-ten-minute observations use persistent caches. See the inventory for the
+bounded follow-up and its acceptance evidence.
