@@ -1,0 +1,46 @@
+name: Issue 310 floor verification without diagnostic tracing
+on:
+  push:
+    branches: [qa/310-floor-contact]
+permissions:
+  contents: read
+concurrency:
+  group: tactics-browser-tactics-browser-01
+  queue: max
+  cancel-in-progress: false
+jobs:
+  contact:
+    runs-on: [self-hosted, tactics-browser, tactics-browser-01]
+    timeout-minutes: 25
+    steps:
+      - name: Check host disposition
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: 418dfa6f1d37ebc7bf52b3656369c91bd8997576
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run setup:browsers
+      - name: Record exact source
+        run: |
+          mkdir -p verification-receipts/issue310
+          git rev-parse HEAD > verification-receipts/issue310/source.txt
+          node --version >> verification-receipts/issue310/source.txt
+          sha256sum package-lock.json >> verification-receipts/issue310/source.txt
+      - run: npm run build
+      - name: Legal dungeon floor clear, descent and backtrack
+        run: npm run test:browser -- -c playwright.regression.config.ts tests/dungeon.spec.ts -g 'testing dungeon legally clears a floor' --project=desktop
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue310-contact-${{ github.run_id }}
+          path: |
+            verification-receipts/
+            test-results/
+            test-results-webkit/
+          retention-days: 14
+          if-no-files-found: warn
