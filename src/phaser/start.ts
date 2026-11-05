@@ -4,7 +4,8 @@ import { ContentSmokeScene } from './ContentSmokeScene';
 import { BattleScene, type BattleVariant } from './BattleScene';
 
 export function startProof(status: (state: 'loading' | 'ready' | 'error') => void, error: (message: string) => void, persistent = false, variant?: BattleVariant): () => void {
-  const sceneName = new URLSearchParams(location.search).get('scene');
+  // A map variant route (e.g. /qbert) is always a battle; diagnostic scene queries never apply.
+  const sceneName = variant ? null : new URLSearchParams(location.search).get('scene');
   const scene = sceneName === 'content-smoke' ? new ContentSmokeScene(status, error)
     : sceneName === 'proof' ? new FitScene(status, error) : new BattleScene(status, error, undefined, persistent, variant);
   const game = createGame(scene, scene instanceof BattleScene);
