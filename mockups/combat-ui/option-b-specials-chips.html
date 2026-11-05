@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Option B · On-board special chips</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="reviewer">
+    <div>
+      <h1>B · On-board special chips</h1>
+      <small>Tap a target. Legal specials appear as chips on the board with a forecast. Tap a chip, then Go. No special slot in the bar.</small>
+    </div>
+    <nav class="b-alt-nav">
+      <a href="option-b.html?state=picker">Chevron</a> ·
+      <a href="option-b-specials-target.html">Target-first</a> ·
+      <a href="option-b-specials-segment.html">Segment</a> ·
+      <a href="option-b-specials-chips.html" aria-current="page">Board chips</a>
+    </nav>
+    <a href="index.html">All options</a>
+    <a href="option-b-specials-chips.html?export=1">Export view</a>
+  </header>
+  <main class="stage b-stage">
+    <section class="board-photo b-board" aria-label="Battlefield">
+      <img class="scene" src="assets/board.png" alt="Forest Ruins board">
+      <div class="chip float-chip">
+        <img src="assets/fighter.png" alt="Fighter">
+        <div>
+          <p class="eyebrow">Round 1 · Your turn</p>
+          <h2>Fighter</h2>
+          <p class="hp">HP 18/18</p>
+          <div class="health"><span style="width:100%"></span></div>
+          <p class="meta">AC 14 · Accuracy +4 · Move ready · Action ready</p>
+        </div>
+      </div>
+      <div class="target-ring" aria-hidden="true"></div>
+      <div class="board-chips" role="group" aria-label="Specials for this target">
+        <button type="button" aria-pressed="true">
+          <strong>Guarded Strike</strong>
+          <span>Last used · 55% · 5 dmg</span>
+        </button>
+        <button type="button">
+          <strong>Extended Strike</strong>
+          <span>65% · 5 dmg · range OK</span>
+        </button>
+      </div>
+    </section>
+    <footer class="bar chips-bar" aria-label="Combat actions">
+      <div>
+        <p class="smart">Specials live on the target, not in the bar</p>
+        <p class="meta">Far Shot has no chip — no legal preview. 1 / 2 select a chip. Single-special units get one chip.</p>
+        <p class="hotkey">Enter confirms Go</p>
+      </div>
+      <div class="verbs">
+        <button type="button"><strong>Move</strong><span>Reachable</span></button>
+        <button type="button"><strong>Attack</strong><span>Melee</span></button>
+        <button type="button"><strong>Wait</strong><span>End turn</span></button>
+      </div>
+      <button class="gold go">Go</button>
+    </footer>
+  </main>
+  <script src="export.js"></script>
+</body>
+</html>

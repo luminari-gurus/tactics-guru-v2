@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Option A · Direct board + action wheel</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="reviewer">
+    <div>
+      <h1>Option A · Direct board + wheel</h1>
+      <small>Tap the board. Confirm in place. No side panel, dropdowns, or modal.</small>
+    </div>
+    <a href="index.html">All options</a>
+    <a href="option-a.html?export=1">Export view</a>
+  </header>
+  <main class="stage a-stage">
+    <div class="a-top">
+      <div class="chip">
+        <img src="assets/fighter.png" alt="Fighter">
+        <div>
+          <p class="eyebrow">Round 1 · Your turn</p>
+          <h2>Fighter</h2>
+          <p class="hp">HP 18/18 · AC 14 · +4</p>
+          <div class="health"><span style="width:100%"></span></div>
+        </div>
+        <div class="pills" style="margin-left:auto">
+          <span class="pill">Move ready</span>
+          <span class="pill">Action ready</span>
+        </div>
+      </div>
+    </div>
+    <section class="board-photo a-board" aria-label="Battlefield">
+      <img class="scene" src="assets/board.png" alt="Forest Ruins board">
+      <div class="wheel" aria-label="Contextual action wheel">
+        <button class="spoke spoke-n">Attack</button>
+        <button class="spoke spoke-e">Strike</button>
+        <button class="spoke spoke-s">Inspect</button>
+        <button class="spoke spoke-w" aria-pressed="true">Move</button>
+        <div class="wheel-core">Act</div>
+      </div>
+      <span class="path-dot" style="left:42%;top:54%"></span>
+      <span class="path-dot" style="left:46%;top:58%"></span>
+      <button class="gold move-chip">Move here · 2 cost</button>
+    </section>
+    <button class="a-end">End turn</button>
+    <p class="hint-strip">
+      <span>Tap a teal tile or an enemy. The wheel is only for switching verbs.</span>
+      <span>Overflow · log · sound · restart</span>
+    </p>
+  </main>
+  <script src="export.js"></script>
+</body>
+</html>
