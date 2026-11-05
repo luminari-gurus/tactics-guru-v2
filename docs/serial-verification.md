@@ -23,9 +23,11 @@ Push-triggered full verification has no dispatch inputs and selects VM 01.
 `max-parallel: 1`, one Playwright worker and `fail-fast: false` keep browser jobs
 serial without starving later jobs
 after an ordinary test failure. Manual runs are not automatically superseded;
-cancel an obsolete run explicitly. No automatic PR jobs need cancellation. GitHub concurrency retains at most one
-pending run per group: a newer queued run can replace an older pending run even
-with `cancel-in-progress: false`. This does not cancel an already-running run.
+cancel an obsolete run explicitly. Automatic PR verification shares the selected
+VM reservation. All four browser workflows use `queue: max` with
+`cancel-in-progress: false`: up to 100 waiting runs are preserved rather than a
+new arrival replacing the pending run. Beyond that documented queue bound, new
+runs are canceled. This preserves serialization, not a queue-time guarantee.
 
 Before using this workflow, an administrator must add `tactics-browser-01` only
 to VM 01 and `tactics-browser-02` only to VM 02, alongside the shared labels, and
