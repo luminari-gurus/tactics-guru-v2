@@ -1,0 +1,111 @@
+name: Auto-merge low-risk PRs
+
+# Merges an open PR labeled `risk:low` once the `PR verification` workflow's
+# `verify` job has passed on the PR's current head commit.
+#
+# Triggers:
+#   - workflow_run: PR verification finished (label was already on the PR)
+#   - pull_request_target labeled: label added after verification already passed
+#
+# Safety:
+#   - Never checks out or runs PR code; it only reads GitHub API state.
+#   - Same-repository branches only (PR verification skips forks, and a skipped
+#     job must never count as a pass).
+#   - Requires the `verify` job itself to have concluded `success` on the exact
+#     head SHA, and merges with --match-head-commit so a later push aborts it.
+#   - The PR author, and whoever last applied `risk:low`, must have the Maintain
+#     or Admin role on this repo.
+#   - Drafts and PRs with requested changes are not merged.
+
+on:
+  workflow_run:
+    workflows: ["PR verification"]
+    types: [completed]
+  pull_request_target:
+    types: [labeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+concurrency:
+  group: auto-merge-low-risk-${{ github.event.pull_request.number || github.event.workflow_run.head_sha }}
+  cancel-in-progress: false
+
+env:
+  LABEL: risk:low
+  VERIFY_WORKFLOW: pr-verification.yml
+  VERIFY_JOB: verify
+
+jobs:
+  merge:
+    if: >-
+      (github.event_name == 'pull_request_target' && github.event.label.name == 'risk:low') ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.event == 'pull_request' &&
+       github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Merge if eligible
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          EVENT: ${{ github.event_name }}
+          PR_FROM_LABEL: ${{ github.event.pull_request.number }}
+          RUN_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+
+          if [ "$EVENT" = "pull_request_target" ]; then
+            pr="$PR_FROM_LABEL"
+          else
+            pr=$(gh api "repos/$REPO/commits/$RUN_SHA/pulls" \
+              --jq "[.[] | select(.state == \"open\" and .head.sha == \"$RUN_SHA\")][0].number // empty")
+            if [ -z "$pr" ]; then
+              echo "No open PR has head $RUN_SHA; nothing to do."; exit 0
+            fi
+          fi
+
+          pr_json=$(gh api "repos/$REPO/pulls/$pr")
+          state=$(jq -r .state <<<"$pr_json")
+          draft=$(jq -r .draft <<<"$pr_json")
+          head_sha=$(jq -r .head.sha <<<"$pr_json")
+          head_repo=$(jq -r .head.repo.full_name <<<"$pr_json")
+          author=$(jq -r .user.login <<<"$pr_json")
+          has_label=$(jq --arg l "$LABEL" '[.labels[].name] | index($l) != null' <<<"$pr_json")
+
+          skip() { echo "PR #$pr not merged: $1"; exit 0; }
+          [ "$state" = "open" ] || skip "state is $state"
+          [ "$draft" = "false" ] || skip "draft"
+          [ "$has_label" = "true" ] || skip "missing $LABEL label"
+          [ "$head_repo" = "$REPO" ] || skip "head is from fork $head_repo"
+
+          is_maintainer() {
+            local role
+            role=$(gh api "repos/$REPO/collaborators/$1/permission" --jq .role_name 2>/dev/null || echo none)
+            [ "$role" = "admin" ] || [ "$role" = "maintain" ]
+          }
+          is_maintainer "$author" || skip "author $author is not a repo maintainer"
+
+          # Who last applied the label.
+          labeler=$(gh api "repos/$REPO/issues/$pr/events" --paginate \
+            --jq ".[] | select(.event == \"labeled\" and .label.name == \"$LABEL\") | .actor.login" \
+            | tail -n 1)
+          [ -n "$labeler" ] || skip "could not determine who applied $LABEL"
+          is_maintainer "$labeler" || skip "$LABEL was applied by $labeler, who is not a repo maintainer"
+
+          # Latest PR verification run for the exact head commit, and its verify job.
+          run_id=$(gh api "repos/$REPO/actions/workflows/$VERIFY_WORKFLOW/runs?head_sha=$head_sha&event=pull_request&per_page=20" \
+            --jq '.workflow_runs | sort_by(.run_number, .run_attempt) | last | .id // empty')
+          [ -n "$run_id" ] || skip "no PR verification run for $head_sha yet"
+          job_conclusion=$(gh api "repos/$REPO/actions/runs/$run_id/jobs" \
+            --jq "[.jobs[] | select(.name == \"$VERIFY_JOB\")][0].conclusion // \"missing\"")
+          [ "$job_conclusion" = "success" ] || skip "verify job is $job_conclusion (run $run_id)"
+
+          changes_requested=$(gh api "repos/$REPO/pulls/$pr/reviews" --paginate \
+            --jq '[.[] | select(.state != "COMMENTED")] | group_by(.user.login) | map(last) | map(select(.state == "CHANGES_REQUESTED")) | length')
+          [ "$changes_requested" = "0" ] || skip "changes requested"
+
+          echo "Merging PR #$pr at $head_sha (verify run $run_id passed)."
+          gh pr merge "$pr" --repo "$REPO" --merge --match-head-commit "$head_sha"
