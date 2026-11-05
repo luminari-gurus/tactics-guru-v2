@@ -17,7 +17,9 @@ import { generateMap } from '../src/map/generate';
 import type { Command, BattleEvent } from '../src/domain/types';
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
 
-for(const [xp,level,maxHp]of [[0,1,11],[60,2,15],[180,3,19],[600,5,27]])test(`menu dungeon restores Mage XP ${xp}, caster level and exact active boundary`,async({page})=>{
+// UI witnesses straddle the Frost Snare gate; exact XP/HP/caster projections and
+// forged save rejection live in dungeonProgressionBoundary.test.ts.
+for(const [xp,level,maxHp]of [[0,1,11],[180,3,19]])test(`menu dungeon restores Mage XP ${xp}, caster level and exact active boundary`,async({page})=>{
  // Explicit boundary fixture; earned progression is covered by the extended journeys.
  const fresh=freshDungeon(`menu-caster-${xp}`,190);
  const progressed={...fresh,party:fresh.party.map(hero=>progressHero(hero.heroId,xp,1,dungeonContent.catalog))};

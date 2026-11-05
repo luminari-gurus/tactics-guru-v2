@@ -279,6 +279,7 @@ test('browser workflows share a non-cancelling lock for the selected VM', () => 
     assert.ok(concurrency, 'workflow-level concurrency is required');
     assert.ok(concurrency.includes('  group: tactics-browser-' + runner));
     assert.match(concurrency, /cancel-in-progress: false/);
+    assert.match(concurrency, /queue: max/);
     const targets = [...workflow.matchAll(/^    runs-on: (.+)$/gm)].map(match => match[1]);
     assert.ok(targets.length > 0, 'at least one runner target is required');
     for (const target of targets) assert.equal(target, '[self-hosted, tactics-browser, "' + runner + '"]');
@@ -288,7 +289,19 @@ test('browser workflows share a non-cancelling lock for the selected VM', () => 
     validate(workflow);
     assert.throws(() => validate(workflow.replace('group: tactics-browser-' + runner, 'group: tactics-browser-exclusive')));
     assert.throws(() => validate(workflow.replace('cancel-in-progress: false', 'cancel-in-progress: true')));
+    assert.throws(() => validate(workflow.replace('queue: max', 'queue: single')));
+    assert.throws(() => validate(workflow.replace('  queue: max\n', '')));
     assert.throws(() => validate(workflow.replace('[self-hosted, tactics-browser, "' + runner + '"]', '[self-hosted, tactics-browser]')));
     assert.throws(() => validate(workflow.replace('group: tactics-browser-' + runner, "group: tactics-browser-${{ inputs.runner || 'tactics-browser-02' }}")));
   }
+});
+
+
+test('automatic PR checks retain the shared VM reservation and durable pending queue', () => {
+  const workflow = readFileSync(new URL('../../.github/workflows/pr-verification.yml', import.meta.url), 'utf8');
+  const concurrency = workflow.split('\nconcurrency:\n')[1]?.split(/\n\S/)[0];
+  assert.match(concurrency, /group: tactics-browser-tactics-browser-01/);
+  assert.match(concurrency, /queue: max/);
+  assert.match(concurrency, /cancel-in-progress: false/);
+  assert.match(workflow, /runs-on: \[self-hosted, tactics-browser, tactics-browser-01\]/);
 });

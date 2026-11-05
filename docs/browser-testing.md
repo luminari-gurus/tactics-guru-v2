@@ -64,9 +64,9 @@ and a live diagnostics snapshot. It does not change startup, gameplay or renderi
 
 ```sh
 # Run one focused test with durable receipts:
-npm run test:browser -- tests/boot.spec.ts --project=desktop -g 'boots a Phaser scene'
+npm run test:browser -- -c playwright.regression.config.ts tests/boot.spec.ts --project=desktop -g 'boots a Phaser scene'
 # Only for a focused failure reproduction:
-npm run test:browser -- tests/boot.spec.ts --project=desktop -g 'boots a Phaser scene' --diagnostics
+npm run test:browser -- -c playwright.regression.config.ts tests/boot.spec.ts --project=desktop -g 'boots a Phaser scene' --diagnostics
 ```
 
 Each invocation gets a unique directory under `verification-receipts/browser-runs/` with
@@ -81,7 +81,7 @@ Trace collection still adds overhead while the test runs; traced runs are not
 performance baselines. Open a retained trace with `npx --no-install playwright
 show-trace <trace.zip>`. Do not publish raw traces without inspecting their contents.
 The wrapper owns output/reporter/trace/retry CLI flags; use the direct Playwright
-CLI for other custom reporting workflows. `npm test` now runs only its selected cases; use `npm run test:fixtures` for the explicit dev fixtures from #202.
+CLI for other custom reporting workflows. `npm test` selects only the seven core journeys; use `npm run test:regression -- <filters>` for other production browser cases; use `npm run test:fixtures` for the explicit dev fixtures from #202.
 
 ## Compare an isolated failure against the exact base
 
@@ -97,7 +97,7 @@ CLI for other custom reporting workflows. `npm test` now runs only its selected 
    paths, for example:
 
    ```sh
-   PLAYWRIGHT_JSON_OUTPUT_FILE=verification-receipts/base-case/results.json npx --no-install playwright test tests/boot.spec.ts --project=desktop -g 'boots a Phaser scene' --retries=0 --trace=off --reporter=list,json --output=verification-receipts/base-case/artifacts
+   PLAYWRIGHT_JSON_OUTPUT_FILE=verification-receipts/base-case/results.json npx --no-install playwright test -c playwright.regression.config.ts tests/boot.spec.ts --project=desktop -g 'boots a Phaser scene' --retries=0 --trace=off --reporter=list,json --output=verification-receipts/base-case/artifacts
    ```
 
 4. Keep the original failure. If needed, repeat only that case with
@@ -161,7 +161,7 @@ Use the same selection and group in future workflows on these runners. Retain
 one runner service per VM and separate workspaces and browser/tool caches. The
 serial baseline stays on one VM to preserve its runner provenance checks; it
 does not shard across the VMs. See [serial verification](serial-verification.md)
-for pending-run cancellation behavior and setup requirements.
+for queue bounds, explicit cancellation and setup requirements.
 
 The VMs use separately pinned CPU cores and dedicated RAM. Shared storage,
 network and other host resources can still affect timings, so coordinate and

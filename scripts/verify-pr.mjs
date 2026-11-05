@@ -12,7 +12,7 @@ export const stages = [
   ['build-integration', ['run', 'test:build', '--', '--reporter=json']],
   // All unit/content validation and both type scopes have succeeded at this point.
   ['bundle', ['run', 'build:bundle']],
-  ['journeys', ['exec', '--no', '--', 'playwright', 'test', '-c', 'playwright.pr.config.ts', '--reporter=line,json']],
+  ['journeys', ['test', '--', '--reporter=line,json']],
 ];
 
 export function validateReport(id, report) {

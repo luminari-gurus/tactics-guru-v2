@@ -1,30 +1,3 @@
-import { defineConfig, devices } from '@playwright/test';
-
-// Focused asset-base checks can exercise the same consumers in dev and built preview.
-const basePath = process.env.PLAYWRIGHT_BASE_PATH ?? '/';
-const serverMode = process.env.PLAYWRIGHT_SERVER_MODE === 'dev' ? 'dev' : 'preview';
-const baseURL = `http://127.0.0.1:4173${basePath}`;
-
-export default defineConfig({
-  testDir: './tests',
-  testMatch: '**/*.spec.ts',
-  // Source-entry fixtures run under the explicit test:fixtures dev-server command.
-  testIgnore: ['**/dungeon-extended.spec.ts', '**/telemetry.spec.ts', '**/ability-picker.spec.ts', '**/authored-encounters.spec.ts', '**/run-items.spec.ts'],
-  // Phaser renderers share the host GPU; serialize to avoid headless boot contention.
-  workers: 1,
-  use: {
-    baseURL,
-    launchOptions: { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE },
-  },
-  webServer: {
-    command: `npm run ${serverMode} -- --base=${basePath} --port 4173 --strictPort`,
-    url: baseURL,
-    reuseExistingServer: false,
-  },
-  projects: [
-    // 1.64 forwards descriptor.screen; retain the former viewport-based screen.
-    { name: 'desktop', use: { ...devices['Desktop Chrome'], screen: undefined, channel: 'chromium' } },
-    { name: 'mobile-portrait', grepInvert: /@canonical/, use: { ...devices['Pixel 7'], screen: undefined, channel: 'chromium' } },
-    { name: 'mobile-landscape', grepInvert: /@canonical|@fixed-viewport/, use: { ...devices['Pixel 7'], screen: undefined, channel: 'chromium', viewport: { width: 915, height: 412 } } },
-  ],
-});
+// Ordinary browser feedback is intentionally limited to the core journeys.
+// Use test:regression for the explicit broad Chromium matrix.
+export { default } from './playwright.pr.config';
