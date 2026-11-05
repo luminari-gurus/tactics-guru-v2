@@ -231,7 +231,9 @@ export function mageJourney(seed:number) {
       const entry=state,built=dungeonBattle(state)!,battle=new BattleSession(built.catalog,state.activeBattle!,state.activeBattle!.seed,undefined,true,built.battlefield);
       for(let step=0;step<500&&battle.state.outcome==='ongoing';step++) {
         if(battle.phase==='enemy'){const p=battle.nextEnemy();if(!p)throw Error('Enemy stalled');battle.finishPresentation(p.token);continue;}
-        const command=mageDecision(battle.state,built.catalog,used.snare);if(!battle.prepare(command).ok)throw Error('Mage witness rejected');
+        // Once both earned abilities are witnessed, wait legally to a terminal
+        // defeat instead of adding unrelated floors to this bounded witness.
+        const command=used.snare&&used.missiles?{type:'endTurn' as const,unitId:battle.active.id}:mageDecision(battle.state,built.catalog,used.snare);if(!battle.prepare(command).ok)throw Error('Mage witness rejected');
         const p=battle.confirm();if(!p)throw Error('Mage witness stalled');battle.finishPresentation(p.token);
         if(command.type==='useAbility'&&command.abilityId==='ability:frost_snare')used.snare=true;
         if(p.events.filter(e=>e.type==='missileRolled').length>=2)used.missiles=true;

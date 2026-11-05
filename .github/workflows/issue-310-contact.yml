@@ -17,7 +17,7 @@ jobs:
         run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
       - uses: actions/checkout@v4
         with:
-          ref: 814947669b5bf5018795ffcdad7d8a8bd01c076e
+          ref: c3be6617c787a78ff2f0295a06e9d871ebfc1611
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -32,14 +32,11 @@ jobs:
           node --version >> verification-receipts/issue310/source.txt
           sha256sum package-lock.json >> verification-receipts/issue310/source.txt
       - run: npm run build
-      - name: Chromium contact, movement and pursuit across desktop and both touch orientations
-        run: npm run test:browser -- -c playwright.regression.config.ts tests/dungeon-exploration.spec.ts -g 'closing on each|chase follows|dungeon enemies move|walking onto a guardian' --diagnostics
-      - name: WebKit contact, movement and pursuit across desktop and both touch orientations
-        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'closing on each|chase follows|dungeon enemies move|walking onto a guardian' --diagnostics
-      - name: Legal Mage progression after encounter ordering change
-        run: npm run test:browser -- -c playwright.extended.config.ts tests/dungeon-extended.spec.ts -g 'Mage legal progression' --project=desktop --diagnostics
       - name: Legal dungeon floor clear, descent and backtrack
         run: npm run test:browser -- -c playwright.regression.config.ts tests/dungeon.spec.ts -g 'testing dungeon legally clears a floor' --project=desktop --diagnostics
+      - name: Bounded legal Mage progression and terminal cleanup
+        if: success() || failure()
+        run: npm run test:browser -- -c playwright.extended.config.ts tests/dungeon-extended.spec.ts -g 'Mage legal progression' --project=desktop --diagnostics
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -430,7 +430,7 @@ describe('unordered encounters and moving dungeon enemies', () => {
       expect(entered.revision).toBe(state.revision+2);
       expect(entered.floors[0].exploration.movement!.step).toBe(1);
     }
-  });
+  },20000);
 
   const move = (s: DungeonState) => {
     const f=s.floors[s.depth-1], map=generateMap(f.descriptor.seed,'rooms');

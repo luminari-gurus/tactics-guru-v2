@@ -1,0 +1,45 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> tactics-guru-v2@0.0.0 test:unit
+> vitest run tests/unit/dungeon.test.ts tests/unit/dungeonBattle.test.ts tests/unit/dungeonProgressionBoundary.test.ts tests/unit/dungeonEncounters.test.ts tests/unit/overworldMap.test.ts
+
+
+ RUN  v5.0.3 /workspace/scratch/71a48a2c2917/tactics-guru-v2
+
+ ❯ tests/unit/dungeonBattle.test.ts (16 tests | 1 failed) 38047ms
+   × finds a legal earned Mage Snare and multi-missile journey with exact replay and terminal cleanup 2578ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/unit/dungeonBattle.test.ts > finds a legal earned Mage Snare and multi-missile journey with exact replay and terminal cleanup
+AssertionError: expected { used: { snare: false, …(1) }, …(2) } to match object { used: { snare: true, …(1) }, …(1) }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "phase": "defeat",
+    "used": {
+-     "missiles": true,
+-     "snare": true,
++     "missiles": false,
++     "snare": false,
+    },
+  }
+
+ ❯ tests/unit/dungeonBattle.test.ts:122:83
+    120| it('finds a legal earned Mage Snare and multi-missile journey with exa…
+    121|   const journey=mageJourney(46);
+    122|   expect({used:journey.used,phase:journey.state.phase,party:journey.st…
+       |                                                                                   ^
+    123|   expect(journey.state.party.find(h=>h.heroId==='mage')!.level).toBeGr…
+    124|   expect(journey.records.some(r=>r.events.some(e=>e.type==='movementBl…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 4 passed (5)
+      Tests  1 failed | 178 passed (179)
+   Start at  17:04:30
+   Duration  60.76s (tests 95%, transform 4%, import 1%)
