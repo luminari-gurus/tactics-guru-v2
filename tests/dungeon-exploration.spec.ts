@@ -440,14 +440,18 @@ test('closing on each wandering encounter holds contact and saves the matching b
   const delta=target-approach;
   if(isMobile)await page.locator(`#dungeon-step-${delta===-20?'north':delta===20?'south':delta===1?'east':'west'}`).tap();
   else {await page.locator('#dungeon-map').focus();await page.keyboard.press(delta===-20?'w':delta===20?'s':delta===1?'d':'a');}
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const entered=await dungeonSnapshot(page);
   expect(entered.phase).toBe('battle');
   expect(entered.floors[0].position).toBe(target);
   expect(entered.floors[0].exploration.active).toBe(slot);
   expect(entered.activeBattle!.seed).toBe(dungeonSeed(state.seed,1,'battle',slot));
-  expect(entered.revision).toBe(state.revision+2);
+  // Automatic enemy opening turns can add revisions after the atomic entry.
+  expect(entered.revision).toBeGreaterThanOrEqual(state.revision+2);
+  expect(entered.floors[0].exploration.movement!.step).toBe(1);
   await expect(page.locator('#battle-party')).toBeVisible();
   await page.reload();await continueSavedDungeon(page);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   expect(await dungeonSnapshot(page)).toEqual(entered);
   await expect(page.locator('#battle-party')).toBeVisible();
  }
