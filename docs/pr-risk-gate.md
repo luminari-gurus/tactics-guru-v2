@@ -39,12 +39,24 @@ human comment or remove unrelated labels. Drafts are not assessed.
 ## Gate behavior
 
 - API-only `pull_request_target`; no checkout or execution of PR contents.
-- Open/reopen, synchronize and ready-for-review events invalidate old labels
-  and add pending when there is no valid current-head record. Draft-only PRs
-  remain untouched; converting a previously assessed PR to draft invalidates it.
-- A delayed synchronize event reads live state and does not intentionally clear
-  a completed assessment of a newer head. Concurrent label writes can still
-  cause a fail-closed pending state; the assessor must reconcile that state.
+- Open/reopen, synchronize and ready-for-review events add `risk:pending` when
+  there is no valid current-head record. This blocks eligibility while preserving
+  existing level labels and their trusted actor provenance. Only the assessor
+  replaces level labels. Draft-only PRs remain untouched; converting a previously
+  assessed PR to draft adds pending and never clears it in the gate.
+- A delayed synchronize event reads live state. If the assessor completes between
+  the gate's final pre-write read and its pending write, the gate re-reads and
+  reconciles its own pending write before exiting. It clears pending only for an
+  unchanged trusted exact-head record, a matching sole level label (no unknown
+  risk labels), and a trusted latest actor for that level. It never recreates a
+  level label as the Actions bot or relaxes labeler trust.
+- Recovery proceeds to normal merge checks in the same invocation, because
+  GITHUB_TOKEN label writes do not guarantee another workflow event. Completion
+  detected during the pre-write refresh also proceeds to those checks. If the
+  assessor finishes after recovery reads, its ordered publication clears pending
+  last. A subsequent real comment/label/CI event evaluates merge eligibility.
+  API failures or conflicting/untrusted evidence remain fail-closed and may need
+  a retry; this is not an atomic lock against arbitrary later metadata edits.
 - Only a sole `risk:low` risk label plus the exact current head's trusted low
   record admits consideration. Pending, high, medium, critical, and unknown
   risk labels block, including contradictory combinations.
@@ -79,7 +91,8 @@ never synthesize approval from their labels.
 
 Run `node --test tests/tooling/risk-gate.test.mjs`. These dependency-free tests
 execute the actual inline workflow script against a mocked GitHub API, including
-rapid pushes, late deliveries, stale writes, final-read/merge races, editor
+rapid pushes, late deliveries, assessor completion before/during/after pending
+invalidation (including same-run recovery), stale writes, final-read/merge races, editor
 impersonation, contradictory labels, drafts/forks, failures, CI association and
 both completion orders. They run as a separate PR verification step before
 package installation. They do not perform real merges and are not evidence of a

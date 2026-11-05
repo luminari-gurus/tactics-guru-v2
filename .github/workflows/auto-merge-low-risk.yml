@@ -84,9 +84,9 @@ jobs:
               const labels = pr.labels.map(l => l.name).filter(l => l.startsWith('risk:'));
               return labels.length === 1 && labels[0] === 'risk:low';
             };
-            const labeler = async number => {
+            const labeler = async (number, name = 'risk:low') => {
               const events = await page(github.rest.issues.listEvents, {issue_number: number});
-              return events.filter(e => e.event === 'labeled' && e.label?.name === 'risk:low')
+              return events.filter(e => e.event === 'labeled' && e.label?.name === name)
                 .sort((a, b) => a.id - b.id).at(-1)?.actor?.login;
             };
             const verification = async (sha, number, baseRef) => {
@@ -129,34 +129,63 @@ jobs:
               const baseRef = pr.base.ref;
               let record = await assessment(number);
               // Ignore event snapshot SHA: rapid pushes/out-of-order synchronize deliveries
-              // must invalidate the live head. A concurrent writer can still race label
-              // invalidation; that fails closed and requires the assessor to reconcile.
+              // must invalidate the live head. Pending blocks eligibility without destroying
+              // the assessor's level label or its trusted actor provenance.
               if (context.eventName === 'pull_request_target' &&
                   ['opened', 'reopened', 'synchronize', 'ready_for_review', 'converted_to_draft'].includes(context.payload.action) &&
                   (!record || record.sha !== sha || pr.draft)) {
                 // Refresh before writes to avoid clearing an assessment already published.
                 const fresh = await getPR(number);
                 const freshRecord = await assessment(number);
-                if (fresh.state !== 'open' || fresh.merged || fresh.head.sha !== sha ||
-                    (!fresh.draft && freshRecord?.sha === sha)) continue;
-                try { await github.rest.issues.getLabel({...repo, name: 'risk:pending'}); }
-                catch (error) {
-                  if (error.status !== 404) throw error;
-                  try { await github.rest.issues.createLabel({...repo, name: 'risk:pending', color: 'fbca04', description: 'Awaiting current-head risk assessment'}); }
-                  catch (createError) {
-                    if (createError.status !== 422) throw createError;
-                    await github.rest.issues.getLabel({...repo, name: 'risk:pending'});
+                if (fresh.state !== 'open' || fresh.merged || fresh.head.sha !== sha) continue;
+                if (!fresh.draft && freshRecord?.sha === sha) {
+                  // Completion raced the refresh. Evaluate it now instead of waiting
+                  // for an event that the assessor's token might not emit.
+                  pr = await getPR(number);
+                  record = freshRecord;
+                } else {
+                  try { await github.rest.issues.getLabel({...repo, name: 'risk:pending'}); }
+                  catch (error) {
+                    if (error.status !== 404) throw error;
+                    try { await github.rest.issues.createLabel({...repo, name: 'risk:pending', color: 'fbca04', description: 'Awaiting current-head risk assessment'}); }
+                    catch (createError) {
+                      if (createError.status !== 422) throw createError;
+                      await github.rest.issues.getLabel({...repo, name: 'risk:pending'});
+                    }
                   }
-                }
-                await github.rest.issues.addLabels({...repo, issue_number: number, labels: ['risk:pending']});
-                for (const name of riskLabels.filter(l => l !== 'risk:pending' && pr.labels.some(x => x.name === l))) {
-                  try { await github.rest.issues.removeLabel({...repo, issue_number: number, name}); }
+                  await github.rest.issues.addLabels({...repo, issue_number: number, labels: ['risk:pending']});
+                  // Never remove level labels here: an external assessor can finish
+                  // between freshRecord and addLabels. Removing its label would lose
+                  // both completion and trusted provenance (the gate cannot recreate it).
+                  // Reconcile our pending write in this invocation: GITHUB_TOKEN label
+                  // writes do not guarantee another workflow event.
+                  record = await assessment(number);
+                  pr = await getPR(number);
+                  const levelLabels = pr.labels.map(l => l.name)
+                    .filter(l => l.startsWith('risk:') && l !== 'risk:pending');
+                  if (!eligiblePR(pr) || pr.head.sha !== sha || pr.base.ref !== baseRef ||
+                      record?.sha !== sha || levelLabels.length !== 1 ||
+                      levelLabels[0] !== `risk:${record.level}`) continue;
+                  const actor = await labeler(number, `risk:${record.level}`);
+                  if (!await trusted(actor)) continue;
+                  const latest = await assessment(number);
+                  const current = await getPR(number);
+                  if (!sameAssessment(record, latest) || !eligiblePR(current) ||
+                      current.head.sha !== sha || current.base.ref !== baseRef ||
+                      current.labels.some(l => l.name.startsWith('risk:') &&
+                        !['risk:pending', `risk:${record.level}`].includes(l.name)) ||
+                      !current.labels.some(l => l.name === `risk:${record.level}`) ||
+                      await labeler(number, `risk:${record.level}`) !== actor || !await trusted(actor)) continue;
+                  try { await github.rest.issues.removeLabel({...repo, issue_number: number, name: 'risk:pending'}); }
                   catch (error) { if (error.status !== 404) throw error; }
+                  // Do not rely on our own label removal to trigger CI/merge evaluation.
+                  // All ordinary merge safeguards below still apply to fresh evidence.
+                  record = await assessment(number);
+                  pr = await getPR(number);
                 }
-                core.info(`PR #${number}: risk pending for ${sha}; awaiting reassessment.`);
-                continue;
               }
-              if (!eligiblePR(pr) || !hasOnlyLow(pr) || record?.sha !== sha || record.level !== 'low') continue;
+              if (!eligiblePR(pr) || pr.head.sha !== sha || pr.base.ref !== baseRef ||
+                  !hasOnlyLow(pr) || record?.sha !== sha || record.level !== 'low') continue;
               if (!await trusted(pr.user.login)) continue;
               const appliedBy = await labeler(number);
               if (!await trusted(appliedBy)) continue;
