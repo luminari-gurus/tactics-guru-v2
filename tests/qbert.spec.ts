@@ -8,7 +8,7 @@ async function report(page: Page) {
 const onPyramid = (c: { x: number; y: number }) => c.x >= 0 && c.y >= 0 && c.x + c.y <= 6;
 
 for (const search of ['', '?scene=proof', '?scene=content-smoke']) {
-  test(`/qbert${search} renders the Q*bert pyramid battle with the party on the apex`, async ({ page }) => {
+  test(`/qbert${search} renders the Q*bert pyramid battle with the party on the apex`, async ({ page }, info) => {
     const errors: string[] = [];
     page.on('pageerror', e => errors.push(e.message));
     await page.goto('./qbert' + search);
@@ -27,9 +27,11 @@ for (const search of ['', '?scene=proof', '?scene=content-smoke']) {
     for (const c of r.reachable) expect(onPyramid(c)).toBe(true);
     // Void cells are open air: a click on void cell (5,5), just below the pyramid, selects nothing.
     const voidPoint = { x: 0, y: 10 * 20 };
-    await page.mouse.click(r.transform.x + voidPoint.x * r.transform.scale, r.transform.y + voidPoint.y * r.transform.scale);
+    const at = { x: r.transform.x + voidPoint.x * r.transform.scale, y: r.transform.y + voidPoint.y * r.transform.scale };
+    // Native touch on touch profiles; mouse elsewhere.
+    if (info.project.use.hasTouch) await page.touchscreen.tap(at.x, at.y); else await page.mouse.click(at.x, at.y);
     expect((await report(page)).selected).toBeNull();
-    await page.screenshot({ path: test.info().outputPath('qbert.png') });
+    await page.screenshot({ path: info.outputPath('qbert.png') });
     expect(errors).toEqual([]);
   });
 }
