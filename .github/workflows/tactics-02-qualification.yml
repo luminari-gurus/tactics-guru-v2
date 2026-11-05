@@ -1,0 +1,70 @@
+name: Tactics 02 isolated qualification
+on:
+  push:
+    branches: [work/tactics-02-qualification-20261105]
+    paths: ['.github/workflows/tactics-02-qualification.yml']
+permissions:
+  contents: read
+concurrency:
+  group: tactics-02-qualification
+  cancel-in-progress: false
+jobs:
+  prepare:
+    if: github.repository == 'luminari-gurus/tactics-guru-v2' && github.ref == 'refs/heads/work/tactics-02-qualification-20261105'
+    runs-on: [self-hosted, linux, x64, tactics-02-qualification]
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Assert dedicated host and user
+        run: |
+          test "$RUNNER_NAME" = unraid-tactics-02
+          test "$(id -un)" = actions
+          test "$(uname -m)" = x86_64
+          test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Verify source identity
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git log -1 --format='%H %s'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install lockfile dependencies
+        run: npm ci
+        timeout-minutes: 10
+      - name: Record administrator command and preparation receipt
+        run: |
+          mkdir -p verification-receipts/tactics-02
+          NODE_PATH="$(node -p 'process.execPath')"
+          PLAYWRIGHT_CLI="$(realpath node_modules/playwright/cli.js)"
+          test -f "$NODE_PATH"
+          test -f "$PLAYWRIGHT_CLI"
+          printf 'sudo %q %q install-deps chromium webkit\n' "$NODE_PATH" "$PLAYWRIGHT_CLI" | tee verification-receipts/tactics-02/admin-command.txt
+          {
+            printf 'Runner: %s\nUser: %s\nSource: %s\n' "$RUNNER_NAME" "$(id -un)" "$GITHUB_SHA"
+            printf 'Node: %s\nPlaywright CLI: %s\n' "$NODE_PATH" "$PLAYWRIGHT_CLI"
+            node --version
+            node "$PLAYWRIGHT_CLI" --version
+            cat /etc/os-release
+            sha256sum package-lock.json
+          } | tee verification-receipts/tactics-02/preparation.txt
+          {
+            echo 'Preparation complete. Administrator must run this command on unraid-tactics-02 before browser qualification:'
+            echo '~~~bash'
+            cat verification-receipts/tactics-02/admin-command.txt
+            echo '~~~'
+            echo 'No browser smoke checks have run yet.'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tactics-02-preparation-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/tactics-02/
+          retention-days: 7
+          if-no-files-found: warn
