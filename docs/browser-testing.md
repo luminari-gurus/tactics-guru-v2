@@ -64,9 +64,9 @@ and a live diagnostics snapshot. It does not change startup, gameplay or renderi
 
 ```sh
 # Run one focused test with durable receipts:
-npm run test:browser -- tests/boot.spec.ts --project=pr-desktop -g 'boots a Phaser scene'
+npm run test:browser -- -c playwright.regression.config.ts tests/boot.spec.ts --project=desktop -g 'boots a Phaser scene'
 # Only for a focused failure reproduction:
-npm run test:browser -- tests/boot.spec.ts --project=pr-desktop -g 'boots a Phaser scene' --diagnostics
+npm run test:browser -- -c playwright.regression.config.ts tests/boot.spec.ts --project=desktop -g 'boots a Phaser scene' --diagnostics
 ```
 
 Each invocation gets a unique directory under `verification-receipts/browser-runs/` with
