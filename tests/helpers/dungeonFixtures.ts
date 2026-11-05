@@ -263,3 +263,15 @@ export function healedFighterBoundary() {
   }
   throw Error('Missing healed Fighter boundary');
 }
+
+/** Two real cardinal steps into a live encounter; only the starting position is staged. */
+export function dungeonContactApproach(slot: number, seed = 13) {
+  const base = freshDungeon(`contact-${slot}-${seed}`, seed), floor = base.floors[0];
+  const map = generateMap(floor.descriptor.seed, 'rooms'), target = poiCell(floor.exploration.pois[slot]);
+  const live = new Set(floor.exploration.pois.map(poiCell));
+  for (const approach of neighbors(target).filter(cell => map.cells[cell] && !live.has(cell))) {
+    const from = neighbors(approach).find(cell => map.cells[cell] && !live.has(cell) && !neighbors(target).includes(cell));
+    if (from !== undefined) return { state: atCell(base, from), approach, target };
+  }
+  throw Error('No two-step contact approach');
+}
