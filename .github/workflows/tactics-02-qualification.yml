@@ -7,11 +7,11 @@ permissions:
   contents: read
 concurrency:
   group: tactics-02-qualification
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   prepare:
     if: github.repository == 'luminari-gurus/tactics-guru-v2' && github.ref == 'refs/heads/work/tactics-02-qualification-20261105'
-    runs-on: [self-hosted, linux, x64, tactics-02-qualification]
+    runs-on: [tactics-02-qualification]
     timeout-minutes: 20
     defaults:
       run:
