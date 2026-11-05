@@ -52,25 +52,30 @@ export function discoverSelection(args = [], env = {}, cwd = root) {
 }
 
 export function captureSelections({ allProfiles = false } = {}) {
-  const capture = (args, env) => {
+  const capture = (args, env, { defaultMatrix = false } = {}) => {
     if (!allProfiles) return discoverSelection(args, env);
     // A temporary discovery-only config removes project-level grep/grepInvert.
-    // CLI --project filters are also stripped so desktop-only and prefix-touch
-    // stages keep a full Chromium control. CLI grep flags do not override
-    // project-level grepInvert in Playwright. No app/test flag or persistent
-    // configuration bypass is introduced.
+    // CLI --project filters are also stripped so desktop-only stages keep a full
+    // Chromium control. Prefix-touch stages compare against the default
+    // three-profile matrix scoped to public-asset-base.spec.ts, because the
+    // prefix config has already dropped mobile-landscape. CLI grep flags do
+    // not override project-level grepInvert in Playwright. No app/test flag or
+    // persistent configuration bypass is introduced.
     const directory = mkdtempSync(join(tmpdir(), 'tactics-selection-control-'));
     try {
       const selected = args.indexOf('-c');
-      const config = resolve(root, selected >= 0 ? args[selected + 1] : 'playwright.config.ts');
+      const config = resolve(root, defaultMatrix || selected < 0 ? 'playwright.config.ts'
+        : args[selected + 1]);
       const remaining = selected >= 0 ? args.filter((_, i) => i !== selected && i !== selected + 1) : args;
+      const files = defaultMatrix ? ['tests/public-asset-base.spec.ts'] : withoutProjectFilters(remaining);
       const control = join(directory, 'control.config.ts');
       writeFileSync(control, `import base from ${JSON.stringify(config)};\nexport default { ...base, testDir: ${JSON.stringify(resolve(root, 'tests'))}, projects: base.projects.map(({ grepInvert, grep, ...project }) => project) };\n`);
-      return discoverSelection([...withoutProjectFilters(remaining), '-c', control], env);
+      return discoverSelection([...files, '-c', control], env);
     } finally { rmSync(directory, { recursive: true, force: true }); }
   };
   const selections = Object.fromEntries(stages.filter(stage => stage.browser).map(stage => [stage.id,
-    capture(stage.args.slice(stage.args.indexOf('test') + 1), stage.env)]));
+    capture(stage.args.slice(stage.args.indexOf('test') + 1), stage.env,
+      { defaultMatrix: prefixTouchStages.has(stage.id) })]));
   for (const config of ['playwright.encounters.config.ts', 'playwright.run-items.config.ts', 'playwright.abilities.config.ts', 'playwright.setup-smoke.config.ts']) {
     selections[config] = capture(['-c', config]);
   }
@@ -115,7 +120,7 @@ export function compareSelections(before, after) {
         ['desktop', 'mobile-landscape', 'mobile-portrait'], 'Desktop-only control lost a Chromium profile');
     } else if (prefixTouch) {
       assert.deepEqual([...new Set(original.projects.map(project => project.name))].sort(),
-        ['desktop', 'mobile-portrait'], 'Prefix-touch control lost a retained Chromium profile');
+        ['desktop', 'mobile-landscape', 'mobile-portrait'], 'Prefix-touch control lost a Chromium profile');
       assert.deepEqual([...new Set(candidate.projects.map(project => project.name))].sort(),
         ['desktop', 'mobile-portrait'], 'Changed prefix-touch projects');
       assert.ok(candidate.tests.every(test => test.project === 'desktop' || test.project === 'mobile-portrait'),
@@ -126,7 +131,8 @@ export function compareSelections(before, after) {
     for (const project of original.projects) {
       const next = candidate.projects.find(p => p.name === project.name);
       if (!next) {
-        assert.ok(desktopOnly && project.name !== 'desktop', 'Changed projects');
+        assert.ok(desktopOnly && project.name !== 'desktop'
+          || prefixTouch && project.name === 'mobile-landscape', 'Changed projects');
         continue;
       }
       assert.deepEqual({ ...next, grepInvert: null, grep: null }, { ...project, grepInvert: null, grep: null }, 'Changed effective project configuration');
@@ -141,7 +147,8 @@ export function compareSelections(before, after) {
       const tag = classification(test);
       const touchAudio = (test.tags ?? []).includes('@touch-audio');
       const desktopReduced = desktopOnly && test.project !== 'desktop';
-      const prefixReduced = prefixTouch && test.project === 'mobile-portrait' && !touchAudio;
+      const prefixReduced = prefixTouch && (test.project === 'mobile-landscape'
+        || test.project === 'mobile-portrait' && !touchAudio);
       const reduced = desktopReduced || prefixReduced || stage === 'chromium' && (tag === '@canonical' && test.project.startsWith('mobile-')
         || tag === '@fixed-viewport' && test.project === 'mobile-landscape');
       const retained = remaining.get(identity(test));
@@ -152,7 +159,7 @@ export function compareSelections(before, after) {
         continue;
       }
       assert.ok(!retained, 'Approved reduction still selected');
-      const targetProject = desktopReduced || prefixReduced || tag === '@canonical' ? 'desktop' : 'mobile-portrait';
+      const targetProject = desktopReduced || prefixReduced && !touchAudio || tag === '@canonical' ? 'desktop' : 'mobile-portrait';
       const target = candidate.tests.find(row => row.project === targetProject && row.file === test.file
         && JSON.stringify(row.titlePath) === JSON.stringify(test.titlePath));
       assert.ok(target, 'Missing retained coverage counterpart');

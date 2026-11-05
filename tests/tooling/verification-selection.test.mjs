@@ -15,13 +15,22 @@ test('real discoveries preserve every retained ID and special mode, with exactly
   assert.equal(desktopOnly.filter(row => row.stage.startsWith('telemetry')).length, 56);
   assert.equal(desktopOnly.filter(row => row.stage === 'assets-root-dev').length, 52);
   assert.equal(desktopOnly.length, 108);
-  assert.equal(comparison.mappings.filter(row => row.classification === 'prefix-touch').length, 46);
+  const prefixTouchMappings = comparison.mappings.filter(row => row.classification === 'prefix-touch');
+  assert.equal(prefixTouchMappings.filter(row => row.removed.project === 'mobile-landscape').length, 52);
+  assert.equal(prefixTouchMappings.filter(row => row.removed.project === 'mobile-portrait').length, 46);
+  assert.equal(prefixTouchMappings.length, 98);
+  assert.ok(prefixTouchMappings.filter(row => row.removed.project === 'mobile-landscape'
+    && (row.removed.tags ?? []).includes('@touch-audio')).every(row => row.retained.project === 'mobile-portrait'));
+  assert.ok(prefixTouchMappings.filter(row => !(row.removed.tags ?? []).includes('@touch-audio'))
+    .every(row => row.retained.project === 'desktop'));
   for (const stage of desktopOnlyStages) {
     assert.ok(after.selections[stage].tests.every(row => row.project === 'desktop'));
     assert.ok(after.selections[stage].tests.length > 0);
   }
   for (const stage of prefixTouchStages) {
     const tests = after.selections[stage].tests;
+    assert.deepEqual([...new Set(before.selections[stage].projects.map(row => row.name))].sort(),
+      ['desktop', 'mobile-landscape', 'mobile-portrait']);
     assert.deepEqual([...new Set(tests.map(row => row.project))].sort(), ['desktop', 'mobile-portrait']);
     const portrait = tests.filter(row => row.project === 'mobile-portrait');
     assert.equal(portrait.length, 3);

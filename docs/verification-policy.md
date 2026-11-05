@@ -84,9 +84,12 @@ it only includes the battle sound-tap and dungeon-walk audio cases on Pixel
 portrait under `/prototype/`.
 
 `npm run test:verification-batches` also checks real selection discovery, exact
-removed-to-retained mappings and negative selection/device drift. Batch discovery
-must still partition the canonical default set exactly. Special configs/modes
-retain their prior sets except those three reviewed full-regression filters.
+removed-to-retained mappings and negative selection/device drift. Prefix-touch
+comparison uses the default three-profile Chromium matrix scoped to
+`public-asset-base.spec.ts`, so dropped Pixel landscape executions map to their
+desktop or portrait counterparts. Batch discovery must still partition the
+canonical default set exactly. Special configs/modes retain their prior sets
+except those three reviewed full-regression filters.
 The [issue #203 plan](../openspec/changes/issue-203-browser-coverage/design.md)
 and QA evidence in `docs/qa/issue-203/` describe the classification and measurements.
 
