@@ -1,4 +1,4 @@
-export type AppRoute = 'menu' | 'battle' | 'run' | 'dungeon' | 'map';
+export type AppRoute = 'menu' | 'battle' | 'run' | 'dungeon' | 'map' | 'qbert';
 export type EntryIntent = 'continue' | 'new' | 'recovery';
 export type GameMode = 'battle' | 'run' | 'dungeon';
 export interface AppEntry { route: AppRoute; persistent: boolean }
@@ -6,7 +6,7 @@ export interface AppEntry { route: AppRoute; persistent: boolean }
 export function resolveAppEntry(pathname: string, search = '', base = '/'): AppEntry {
   const root = base.replace(/\/+$/, '');
   const path = pathname.replace(/\/+$/, '');
-  for (const route of ['battle', 'run', 'dungeon', 'map'] as const) {
+  for (const route of ['battle', 'run', 'dungeon', 'map', 'qbert'] as const) {
     if (path === `${root}/${route}`) return { route, persistent: false };
   }
   if (path === root) {

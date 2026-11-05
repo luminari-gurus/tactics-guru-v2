@@ -1,12 +1,12 @@
 import Phaser from 'phaser';
 import { FitScene } from './FitScene';
 import { ContentSmokeScene } from './ContentSmokeScene';
-import { BattleScene } from './BattleScene';
+import { BattleScene, type BattleVariant } from './BattleScene';
 
-export function startProof(status: (state: 'loading' | 'ready' | 'error') => void, error: (message: string) => void, persistent = false): () => void {
+export function startProof(status: (state: 'loading' | 'ready' | 'error') => void, error: (message: string) => void, persistent = false, variant?: BattleVariant): () => void {
   const sceneName = new URLSearchParams(location.search).get('scene');
   const scene = sceneName === 'content-smoke' ? new ContentSmokeScene(status, error)
-    : sceneName === 'proof' ? new FitScene(status, error) : new BattleScene(status, error, undefined, persistent);
+    : sceneName === 'proof' ? new FitScene(status, error) : new BattleScene(status, error, undefined, persistent, variant);
   const game = createGame(scene, scene instanceof BattleScene);
   if (scene instanceof BattleScene) {
     window.addEventListener('pagehide', () => {
