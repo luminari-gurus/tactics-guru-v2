@@ -12,6 +12,7 @@ permissions:
 concurrency:
   # Share the selected VM's reservation with the other browser workflows.
   group: tactics-browser-${{ inputs.runner || 'tactics-browser-01' }}
+  queue: max
   cancel-in-progress: false
 jobs:
   browser-setup:
