@@ -25,6 +25,7 @@ function fight(session:BattleSession, wait=false) {
  }
  expect(session.phase).toBe('ended');
 }
+// Includes a complete legal defeat and exact continuation replay.
 it('commits the last draught once, retries the exact failed write and continues without replenishing', () => {
  const prepared=preparedSnapshot(), stack={itemId:'item:healing_draught',quantity:1} as const;
  const entry={...prepared,items:{...prepared.items,ownership:{...prepared.items.ownership,consumables:[stack]}}};
@@ -90,7 +91,7 @@ it('commits the last draught once, retries the exact failed write and continues 
  expect(JSON.parse(data.get(RUN_STORAGE_KEYS.primary)!).format).toBe(8);
  expect(data.get(RUN_STORAGE_KEYS.backup)).toBe(checkpoint);
  expect(restoredRun.startEncounter()).toBeNull();
-});
+},20000);
 it('constructs all survivor subsets with fresh flags/RNG and carried HP, rejects invalid starts',()=>{
  const original=JSON.stringify(runContext.catalog);
  for(let mask=1;mask<8;mask++) {

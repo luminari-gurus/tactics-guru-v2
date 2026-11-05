@@ -346,9 +346,15 @@ function moveDungeonEnemies(s: DungeonState, previousPlayer: number): DungeonSta
   const exploration = movableExploration(f.exploration, f.descriptor.seed, f.completed, s.phase);
   const map = applyBiome(generateMap(f.descriptor.seed,'rooms'), f.descriptor.biome === 'forest-v1' ? 'forest' : f.descriptor.biome === 'desert-v1' ? 'desert' : 'grassland');
   const player = {id:'player' as const,kind:'player' as const,x:f.position % 20,y:Math.floor(f.position / 20)};
+  // A cardinal approach commits the encounter to contact range. Otherwise a
+  // same-speed wanderer/pursuer can step diagonally away on every approach.
+  // Reserve held cells as well: inactive markers are ignored by stepMovement's
+  // occupancy check (normally they represent cleared encounters).
+  const held = exploration.pois.filter(p => !cleared.includes(p.encounterSlot) && neighbors(f.position).includes(poiCell(p)));
+  const stationary = [...cleared, ...held.map(p => p.encounterSlot)];
   const moved = stepMovement({world:{map,placementVersion:'markers-v1',markers:[player,...exploration.pois]},behaviors:DEFAULT_BEHAVIORS,
-    rng:exploration.movement!.rng,step:exploration.movement!.step}, cleared.map(i=>`enemy-${i+1}` as 'enemy-1'|'enemy-2'|'enemy-3'),
-    [...(s.depth > 1 ? [f.descriptor.upstairs] : []), ...(f.completed === 3 ? [f.descriptor.downstairs] : [])], previousPlayer);
+    rng:exploration.movement!.rng,step:exploration.movement!.step}, stationary.map(i=>`enemy-${i+1}` as 'enemy-1'|'enemy-2'|'enemy-3'),
+    [...held.map(poiCell), ...(s.depth > 1 ? [f.descriptor.upstairs] : []), ...(f.completed === 3 ? [f.descriptor.downstairs] : [])], previousPlayer);
   const pois = exploration.pois.map((p,i)=>({...p,x:moved.world.markers[i+1].x,y:moved.world.markers[i+1].y}));
   const floors = [...s.floors];
   floors[s.depth-1] = {...f,exploration:{...exploration,pois,movement:{rng:moved.rng,step:moved.step}}};

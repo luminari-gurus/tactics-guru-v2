@@ -1,4 +1,4 @@
-import { atEncounter, atDownstairs, atStairApproach, atCell } from '../helpers/dungeonFixtures';
+import { atEncounter, atDownstairs, atStairApproach, atCell, dungeonContactApproach } from '../helpers/dungeonFixtures';
 import { freshExploration, movableExploration, neighbors, poiCell } from '../../src/domain/exploration';
 import { generateMap } from '../../src/map/generate';
 import { applyBiome } from '../../src/map/biomes';
@@ -411,6 +411,27 @@ describe('confirmed dungeon charm disposal',()=>{
 });
 
 describe('unordered encounters and moving dungeon enemies', () => {
+  it.each([0,1,2])('holds slot %i in contact range and enters its battle on the next step across save/reload', slot => {
+    for (let seed=0;seed<20;seed++) {
+      const {state,approach,target}=dungeonContactApproach(slot,seed);
+      const step=(s:DungeonState,destination:number)=>good(stepDungeon(s,{id:s.id,depth:s.depth,revision:s.revision,destination}));
+      const adjacent=step(state,approach), floor=adjacent.floors[0];
+      expect(adjacent.phase).toBe('ready');
+      expect(poiCell(floor.exploration.pois[slot])).toBe(target);
+      expect(new Set(floor.exploration.pois.map(poiCell)).size).toBe(3);
+      expect(floor.exploration.movement!.step).toBe(1);
+      expect(adjacent.revision).toBe(state.revision+1);
+      const encoded=encodeDungeon(adjacent);assert(encoded.ok);
+      const restored=decodeDungeon(encoded.text);assert(restored.ok);
+      const entered=step(restored.state,target);
+      expect(entered.phase).toBe('battle');
+      expect(entered.floors[0].exploration.active).toBe(slot);
+      expect(entered.activeBattle!.seed).toBe(dungeonSeed(state.seed,1,'battle',slot));
+      expect(entered.revision).toBe(state.revision+2);
+      expect(entered.floors[0].exploration.movement!.step).toBe(1);
+    }
+  },20000);
+
   const move = (s: DungeonState) => {
     const f=s.floors[s.depth-1], map=generateMap(f.descriptor.seed,'rooms');
     const destination=neighbors(f.position).find(n=>map.cells[n]&&!f.exploration.pois.some(p=>poiCell(p)===n&&!clearedDungeonSlots(f).includes(p.encounterSlot)));

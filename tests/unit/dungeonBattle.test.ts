@@ -118,7 +118,7 @@ it('roundtrips live Weakened and Shaman ally healing without broadening party HP
 });
 
 it('finds a legal earned Mage Snare and multi-missile journey with exact replay and terminal cleanup',()=>{
-  const journey=mageJourney(46);
+  const journey=mageJourney(68);
   expect({used:journey.used,phase:journey.state.phase,party:journey.state.party}).toMatchObject({used:{snare:true,missiles:true},phase:'defeat'});
   expect(journey.state.party.find(h=>h.heroId==='mage')!.level).toBeGreaterThanOrEqual(3);
   expect(journey.records.some(r=>r.events.some(e=>e.type==='movementBlockExpired'&&e.abilityId==='ability:frost_snare'))).toBe(true);

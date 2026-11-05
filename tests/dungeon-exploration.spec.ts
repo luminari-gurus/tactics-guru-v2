@@ -12,7 +12,7 @@ import { readSession,playCommand } from './helpers/battlePolicy';
 import { installRailControls } from './helpers/forceRailControls';
 import { playerDecision } from './helpers/playerPolicy';
 import { dungeonBattle } from '../src/domain/dungeon';
-import { atCell, atStairApproach, dungeonCapacityFixture, priorDungeonEnvelope } from './helpers/dungeonFixtures';
+import { atCell, atStairApproach, dungeonCapacityFixture, priorDungeonEnvelope, dungeonContactApproach } from './helpers/dungeonFixtures';
 import { LEGACY_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
 import { freshExploration, movableExploration } from '../src/domain/exploration';
 import { encodeDungeon, utf8Bytes } from '../src/domain/dungeonSaveEnvelope';
@@ -419,5 +419,40 @@ test('chase follows the previous cell while block targets the resulting cell', a
   expect(poiCell(after.floors[0].exploration.pois[slot])).toBe(selected.expected);
   await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();
   expect(await dungeonSnapshot(page)).toEqual(after);
+ }
+});
+
+
+test('closing on each wandering encounter holds contact and saves the matching battle', async ({page,isMobile})=>{
+ for(const slot of [0,1,2]) {
+  const {state,approach,target}=dungeonContactApproach(slot);
+  const encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
+  await page.goto('./?game=dungeon');
+  await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
+  await page.reload();await continueSavedDungeon(page);
+  await walkDungeon(page,approach,isMobile?'touch':'keyboard');
+  const adjacent=await dungeonSnapshot(page);
+  expect(adjacent.phase).toBe('ready');
+  expect(poiCell(adjacent.floors[0].exploration.pois[slot])).toBe(target);
+  await page.reload();await continueSavedDungeon(page);
+  expect(await dungeonSnapshot(page)).toEqual(adjacent);
+  // Use the reported WASD input on desktop, and the real compass tap on mobile.
+  const delta=target-approach;
+  if(isMobile)await page.locator(`#dungeon-step-${delta===-20?'north':delta===20?'south':delta===1?'east':'west'}`).tap();
+  else {await page.locator('#dungeon-map').focus();await page.keyboard.press(delta===-20?'w':delta===20?'s':delta===1?'d':'a');}
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const entered=await dungeonSnapshot(page);
+  expect(entered.phase).toBe('battle');
+  expect(entered.floors[0].position).toBe(target);
+  expect(entered.floors[0].exploration.active).toBe(slot);
+  expect(entered.activeBattle!.seed).toBe(dungeonSeed(state.seed,1,'battle',slot));
+  // Automatic enemy opening turns can add revisions after the atomic entry.
+  expect(entered.revision).toBeGreaterThanOrEqual(state.revision+2);
+  expect(entered.floors[0].exploration.movement!.step).toBe(1);
+  await expect(page.locator('#battle-party')).toBeVisible();
+  await page.reload();await continueSavedDungeon(page);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  expect(await dungeonSnapshot(page)).toEqual(entered);
+  await expect(page.locator('#battle-party')).toBeVisible();
  }
 });

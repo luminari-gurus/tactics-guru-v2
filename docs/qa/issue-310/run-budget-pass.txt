@@ -1,0 +1,17 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> tactics-guru-v2@0.0.0 test:unit
+> vitest run tests/unit/runBattle.test.ts -t commits the last draught
+
+
+ RUN  v5.0.3 /workspace/scratch/71a48a2c2917/tactics-guru-v2
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 9 skipped (10)
+   Start at  17:28:41
+   Duration  11.25s (tests 70%, transform 28%, import 2%)
+
+  Transform  transforming modules took 3.03s · 28% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
