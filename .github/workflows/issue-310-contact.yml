@@ -1,0 +1,50 @@
+name: Issue 310 contact verification
+on:
+  push:
+    branches: [qa/310-dungeon-contact]
+permissions:
+  contents: read
+concurrency:
+  group: tactics-browser-tactics-browser-02
+  queue: max
+  cancel-in-progress: false
+jobs:
+  contact:
+    runs-on: [self-hosted, tactics-browser, tactics-browser-02]
+    timeout-minutes: 25
+    steps:
+      - name: Check host disposition
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: a94019fb50cb96563058e54a1d9b0e89712d8d08
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run setup:browsers
+      - name: Record exact source
+        run: |
+          mkdir -p verification-receipts/issue310
+          git rev-parse HEAD > verification-receipts/issue310/source.txt
+          node --version >> verification-receipts/issue310/source.txt
+          sha256sum package-lock.json >> verification-receipts/issue310/source.txt
+      - run: npm run build
+      - name: Chromium contact, movement and pursuit across desktop and both touch orientations
+        run: npm run test:browser -- -c playwright.regression.config.ts tests/dungeon-exploration.spec.ts -g 'closing on each|chase follows|dungeon enemies move|walking onto a guardian' --diagnostics
+      - name: WebKit contact, movement and pursuit across desktop and both touch orientations
+        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'closing on each|chase follows|dungeon enemies move|walking onto a guardian' --diagnostics
+      - name: Legal dungeon floor clear, descent and backtrack
+        run: npm run test:browser -- -c playwright.regression.config.ts tests/dungeon.spec.ts -g 'testing dungeon legally clears a floor' --project=desktop --diagnostics
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue310-contact-${{ github.run_id }}
+          path: |
+            verification-receipts/
+            test-results/
+            test-results-webkit/
+          retention-days: 14
+          if-no-files-found: warn
