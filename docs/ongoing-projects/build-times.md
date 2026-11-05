@@ -93,3 +93,17 @@ The PR contains compact, source-bound timing/coverage receipts. This verifies th
 implemented ordinary build/verification path; review and merge of the stacked PRs
 are still pending. Broad and extended qualification remain explicit, not routine
 build prerequisites.
+
+
+## Readiness follow-up
+
+A later unchanged-input run failed its first five-second battle readiness check;
+the failure and GPU stall trace remain recorded. Functional core projects now
+record a bounded same-browser graphics capability setup before opening the app;
+product deadlines, cold-start qualification and zero retries are retained. The
+repaired runs passed in **3m42s** and **4m07s** including setup/upload. The latest
+run passed all 1,170 units and seven core E2E cases, with one minute queued
+(5m07s total). A fresh broad-profile XP recheck passed all 12 cases without core
+setup and measured a 69s phase against the 125s baseline. All four browser
+workflows also preserve pending runs with the shared VM lock and `queue: max`.
+Integration still awaits the caller's merge decision.

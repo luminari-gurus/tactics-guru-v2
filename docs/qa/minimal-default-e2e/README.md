@@ -41,14 +41,14 @@ No retained assertions, product performance limits, retries or case timeouts cha
 
 Verification before publication: 15 core/orchestration contracts, 30 real
 selection/batching contracts and both TypeScript scopes passed. The initial default-entry CI run passed in 4 minutes 21 seconds including setup
-and upload. [Final public-menu core CI](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42048854431)
+and upload. [Pre-qualification public-menu core CI](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42048854431)
 passed in **3 minutes 48 seconds**, including setup and upload: all 1,170 units,
 both build integrations/types, bundle, 15 core/tooling contracts and all seven
 E2E journeys passed. Queue time was 1 minute 45 seconds, for 5 minutes 33 seconds
 from trigger to completion. The [core timing receipt](core-timings.json) records
 tested merge/source identity, counts, per-stage timings, conditions and raw hashes.
-Later evidence-only documentation changes reuse this functional result with
-unchanged relevant source, tests, helpers, configs, assets and dependencies.
+This result describes its tested source; the later failed run and qualified
+recovery below remain separate evidence.
 Local process/reporter contracts passed 17 tests, with three Linux-only cleanup
 checks explicitly skipped on macOS. Their underlying cleanup implementation did
 not change; qualified Linux jobs retain their actual cleanup results.
@@ -82,9 +82,8 @@ The diagnostics harness deliberately creates a failing fake-browser fixture to
 verify failure receipts survive ordinary cleanup, then checks recovery. Its
 intentional control reports are retained separately from passing XP results.
 
-The measured XP configs/tests and runtime inputs are unchanged after `96b14aa`;
-`63607ef` changes only the unrelated core journey choice, its contract and docs.
-Reusing the matched XP measurement for that source is bounded to those inputs.
+Between `96b14aa` and `63607ef`, the measured XP inputs stayed unchanged. The
+later fixture change is covered by the post-helper recheck below.
 
 
 ## Preserved final-head startup failure and recovery scope
@@ -112,3 +111,30 @@ workflows. This fixes issue `tg-build-cv0`: default single-pending behavior can
 cancel an older queued PR/manual check when another arrives. Queue guards cover
 all workflows and reject missing/single queue settings. See the official
 [GitHub concurrency contract](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency).
+
+
+### Qualified recovery and final source
+
+[Core recovery 42051973913](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42051973913)
+passed in **3m42s**, including setup and upload. Its [graphics receipts](graphics-recovery.json)
+record successful green pixels in the actual desktop, touch and WebKit browsers.
+The latest [core check 42052446383](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42052446383)
+at head `8f9f6ea` passed in **4m07s active** plus **1m queued** (5m07s total):
+all 1,170 units, two build integrations, both type scopes, 16 fast tooling guards
+and seven journeys passed with no skips, failures or retries. Its
+[compact receipt](latest-core-check.json) retains per-stage and graphics data.
+These passing recoveries do not relabel the earlier failed run as passing.
+
+[Post-helper XP recheck 42052722995](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42052722995)
+passed all 12 retained XP cases on VM02, with **zero core graphics receipts**,
+verifying that the broad profile path does not run the new qualification. Its
+browser step took **69s** versus the source-bound baseline's 125s (44.8% observed
+reduction); the earlier 66s result remains a separate source/observation. See
+[recheck receipts](regression-helper-recheck.json). A preceding checkout-only
+attempt used an abbreviated SHA and ran no application tests; the successful
+retry uses the full commit SHA and does not hide that setup failure.
+
+The final evidence commit changes documentation only. Functional evidence is
+reused from `8f9f6ea` with unchanged application, helper, selection, dependency,
+asset and build inputs; automatic final-head checks are separately visible on
+PR #290. No merge is performed without the pending caller decision.

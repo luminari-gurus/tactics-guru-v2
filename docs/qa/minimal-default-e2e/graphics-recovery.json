@@ -1,0 +1,122 @@
+{
+  "run": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42051973913",
+  "head": "ba225adbfa8d017b3a52f184d6524ab692b9bab0",
+  "testedMerge": "2b212dca05199c0a8583cc859b18f21709255690",
+  "jobSeconds": 222,
+  "durationMs": 204897,
+  "stats": {
+    "startTime": "2026-11-05T15:10:11.766Z",
+    "duration": 135548.625,
+    "expected": 7,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "graphics": [
+    {
+      "project": "pr-webkit",
+      "browser": "27.2",
+      "passed": true,
+      "startedAt": "2026-11-05T15:12:21.482Z",
+      "graphics": {
+        "mode": "webgl",
+        "contextMs": 32,
+        "elapsedMs": 359,
+        "pixel": [
+          0,
+          255,
+          0,
+          255
+        ]
+      },
+      "elapsedMs": 604.1612220000001
+    },
+    {
+      "project": "pr-desktop",
+      "browser": "156.0.8078.4",
+      "passed": true,
+      "startedAt": "2026-11-05T15:11:36.300Z",
+      "graphics": {
+        "mode": "webgl",
+        "contextMs": 1514.3999999910593,
+        "elapsedMs": 1516.3999999910593,
+        "pixel": [
+          0,
+          255,
+          0,
+          255
+        ]
+      },
+      "elapsedMs": 1674.1803570000002
+    },
+    {
+      "project": "pr-desktop",
+      "browser": "156.0.8078.4",
+      "passed": true,
+      "startedAt": "2026-11-05T15:10:14.182Z",
+      "graphics": {
+        "mode": "webgl",
+        "contextMs": 2653.5,
+        "elapsedMs": 2655.0999999940395,
+        "pixel": [
+          0,
+          255,
+          0,
+          255
+        ]
+      },
+      "elapsedMs": 2819.1563479999995
+    },
+    {
+      "project": "pr-touch",
+      "browser": "156.0.8078.4",
+      "passed": true,
+      "startedAt": "2026-11-05T15:12:11.037Z",
+      "graphics": {
+        "mode": "webgl",
+        "contextMs": 1353.4000000059605,
+        "elapsedMs": 1355.5,
+        "pixel": [
+          0,
+          255,
+          0,
+          255
+        ]
+      },
+      "elapsedMs": 1519.4113620000003
+    }
+  ],
+  "originalFailure": "42050203033 remains failed; this is qualified functional recovery, not cold-start certification",
+  "stages": [
+    {
+      "id": "tooling",
+      "status": "passed",
+      "durationMs": 4709.8118939999995
+    },
+    {
+      "id": "units",
+      "status": "passed",
+      "durationMs": 53960.809693999996
+    },
+    {
+      "id": "typecheck",
+      "status": "passed",
+      "durationMs": 1424.2059850000005
+    },
+    {
+      "id": "build-integration",
+      "status": "passed",
+      "durationMs": 7394.30043599999
+    },
+    {
+      "id": "bundle",
+      "status": "passed",
+      "durationMs": 1129.2720120000013
+    },
+    {
+      "id": "journeys",
+      "status": "passed",
+      "durationMs": 136264.049581
+    }
+  ]
+}

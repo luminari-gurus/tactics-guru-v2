@@ -29,15 +29,18 @@
       "scripts/verification-vitest-reporter.mjs": "3035def2c034cc534dd060d08ace1a3f6843d053a41cbd2b88aea432ecc3fe58",
       "scripts/verify-full.mjs": "75e9ead89e31559a9b46e381fd3b208359bfb95882f769e07cab14282e63a084",
       "scripts/verify-pr.mjs": "6a33fb7413331d846c5463ee715bf938f067353a83c66597b463698dca49a692",
+      "tests/boot.spec.ts": "837148a58f222d54f55466b1adcbaf303a404521d45fb3e0f74feb81cfddebcf",
       "tests/dungeon.spec.ts": "bdc98081ae00b8824169f8e1662cac32117b7cd70e2d363cc1c1dd367f564dfb",
+      "tests/helpers/forceRailControls.ts": "5d1971dd33b82ad147235d31ade13a16deef0df6f2c568ffe8c7d066b147695f",
+      "tests/main-menu.spec.ts": "16b7c3e05b8f3c5e46a8a82863ae6e690a4ea98bd13845a0141ef2abcef3b647",
       "tests/unit/dungeonProgressionBoundary.test.ts": "a3b6059889b8c7ba1d33f6bc2607df132d3843670de62f21656434cbf35f9f4e",
       "tests/unit/progression.test.ts": "0d8095ca3c9c14f91232cfaca56c53f37b9f5181e6e8471f07184c27658aa9dd"
     }
   },
   "after": {
-    "commit": "63607ef9c9a5c1bfbbf16e48875a99d56439dca7",
+    "commit": "ba225adbfa8d017b3a52f184d6524ab692b9bab0",
     "dirty": false,
-    "inputHash": "5a69ff783a3a8d141e3a4374ce6c5dfd37829d016ce6f22971c500a7db11071e",
+    "inputHash": "ed1a9f28901d7586089611778c55235c148bf67b77c82df2a3fba67f6f25184d",
     "hashes": {
       "package-lock.json": "e4768389a179a65df5f04502dab87e8875b465b939e55493d5820a7dc99a74ed",
       "package.json": "85fa4e08f42e81657e6d139fbaa02dba5122dcd4075ed21f3a906c2cd55e7c0b",
@@ -65,7 +68,11 @@
       "scripts/verification-vitest-reporter.mjs": "3035def2c034cc534dd060d08ace1a3f6843d053a41cbd2b88aea432ecc3fe58",
       "scripts/verify-full.mjs": "986474268b408671ed3310fdcc3f1ea2146b92f31f7d0f0e2e9b8457874467d6",
       "scripts/verify-pr.mjs": "748ac91bd3a5e17b1b27023cd6bda4ad88353584a90f127b1b5e8320909d3ab3",
+      "tests/boot.spec.ts": "e25b91e098f96e7d5865e0330a54f18030c157e187e4daa104a20b9314038735",
       "tests/dungeon.spec.ts": "02bd9ecc6b46e9d9d433e0b3ac69251262d2495b6e0b61bea1e6e10e2424f5c4",
+      "tests/helpers/coreGraphics.ts": "b1e430362d9c1c7c1fa3728eb883cedb969666bfaefb2a87fc331c767a7b6327",
+      "tests/helpers/forceRailControls.ts": "4c180d2bf1553cdf0af9520bbfab7c13b5eac8c321374008e40fcc74d20fac50",
+      "tests/main-menu.spec.ts": "1f8bd1c8a97d1dbcdab8e413d2025433fa365beee43dc6f90ad0494872277861",
       "tests/unit/dungeonProgressionBoundary.test.ts": "a3b6059889b8c7ba1d33f6bc2607df132d3843670de62f21656434cbf35f9f4e",
       "tests/unit/progression.test.ts": "0d8095ca3c9c14f91232cfaca56c53f37b9f5181e6e8471f07184c27658aa9dd"
     }
@@ -356,8 +363,5 @@
       "retainedIdsSha256": "11bd672d2e3016f6f40e2404f7093c58d05f220845399d7391b1a9875dcf9a49"
     }
   },
-  "discoveryFilesSha256": {
-    "before": "0b0b9e481ff65c5ff670e325b519435ecbcc00d0f3d7c33c802b441d7f5414fa",
-    "after": "19f9cf9d1a314b17b30995b849755a5a1ba596d14401e94ed9c2ad774fd6af05"
-  }
+  "harnessBoundary": "coreGraphics qualifies only pr-* profiles; broad profile contexts are passed through unchanged. Post-helper XP recheck42052722995 passed all12 with zero core graphics receipts."
 }
