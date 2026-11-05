@@ -1,0 +1,106 @@
+{
+  "full": {
+    "sha256": "efa2e564e91e94e056ae2e3547de3fce6e2e082807958feb95b0f7de656d8052",
+    "counts": {
+      "numTotalTests": 1179,
+      "numPassedTests": 1176,
+      "numFailedTests": 3,
+      "numPendingTests": 0
+    },
+    "failed": [
+      {
+        "file": "authoredEncounters.test.ts",
+        "name": "encounter:forest_ruins survivor eligibility constructs a legal injured-party fixture and engagement route for subset 7",
+        "durationMs": 5218.297870999999,
+        "error": "Error: Test timed out in 5000ms."
+      },
+      {
+        "file": "runBattle.test.ts",
+        "name": "commits the last draught once, retries the exact failed write and continues without replenishing",
+        "durationMs": 10684.676451,
+        "error": "Error: Test timed out in 5000ms."
+      },
+      {
+        "file": "runRecoveryFixtures.test.ts",
+        "name": "reaches deterministic defeat and the exact preceding save through accepted commands",
+        "durationMs": 23315.186399,
+        "error": "Error: Test timed out in 20000ms."
+      }
+    ]
+  },
+  "candidateFocused": {
+    "sha256": "bbeb8b03a3cd7f202c1132882c0767f3cdacf03c61c8d34ecfe1dfa770390df3",
+    "counts": {
+      "numTotalTests": 63,
+      "numPassedTests": 2,
+      "numFailedTests": 3,
+      "numPendingTests": 58
+    },
+    "failed": [
+      {
+        "file": "authoredEncounters.test.ts",
+        "name": "encounter:forest_ruins survivor eligibility constructs a legal injured-party fixture and engagement route for subset 7",
+        "durationMs": 5562.073041,
+        "error": "Error: Test timed out in 5000ms."
+      },
+      {
+        "file": "runBattle.test.ts",
+        "name": "commits the last draught once, retries the exact failed write and continues without replenishing",
+        "durationMs": 8659.447387999999,
+        "error": "Error: Test timed out in 5000ms."
+      },
+      {
+        "file": "runRecoveryFixtures.test.ts",
+        "name": "reaches deterministic defeat and the exact preceding save through accepted commands",
+        "durationMs": 20618.943463,
+        "error": "Error: Test timed out in 20000ms."
+      }
+    ]
+  },
+  "baseFocused": {
+    "sha256": "9867d158ec96a697c90deeb7b4f85f9aea7de11348e87f0ec835d84a098614fc",
+    "counts": {
+      "numTotalTests": 63,
+      "numPassedTests": 3,
+      "numFailedTests": 2,
+      "numPendingTests": 58
+    },
+    "failed": [
+      {
+        "file": "runBattle.test.ts",
+        "name": "commits the last draught once, retries the exact failed write and continues without replenishing",
+        "durationMs": 5980.020392,
+        "error": "Error: Test timed out in 5000ms."
+      },
+      {
+        "file": "runRecoveryFixtures.test.ts",
+        "name": "reaches deterministic defeat and the exact preceding save through accepted commands",
+        "durationMs": 22041.135304,
+        "error": "Error: Test timed out in 20000ms."
+      }
+    ]
+  },
+  "unchangedTestHashes": {
+    "tests/unit/authoredEncounters.test.ts": "d382d2c81b99f6567a4460a231462dc0da406423ef0441fc32beeb94eebc4b31",
+    "tests/unit/runBattle.test.ts": "6f229cc88337153b43eb5f0d53058ac4404950b39f7ea7f1b92f283fac1641b2",
+    "tests/unit/runRecoveryFixtures.test.ts": "40da7a1175db5b3f57001e06c015072686ff15508d31721d15e1be1bdfcacd7c"
+  },
+  "base": "d350bb6247ad577b3e0b9c732dcf65d8918dfc8f",
+  "candidate": "22880221db24376cb5bc298c96f27aa78dafcc9f",
+  "node": "v24.22.1",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.39",
+  "focusedNewAndAdjacent": {
+    "passed": 27,
+    "failed": 0
+  },
+  "typecheck": "both scopes passed",
+  "defaultDiscovery": 7,
+  "notes": [
+    "Full candidate run failed; focused repair/comparison is not a clean full-suite result.",
+    "Two local timeout cases also timed out on the exact base. Forest subset 7 timed out on candidate but passed the focused base comparison; cause is unresolved.",
+    "Focused comparisons intentionally filtered 58 unrelated cases; two other matching encounter subsets passed on candidate and all three on base.",
+    "No retries or test deadlines changed. Qualified CI remains required.",
+    "Initial npm ci failed during PostHog archive ownership restoration; TAR_OPTIONS=--no-same-owner npm ci succeeded.",
+    "An initial nine-test draft failed because it used a resumed helper session; test composition was corrected to match the browser fixture fresh-session constructor."
+  ]
+}
