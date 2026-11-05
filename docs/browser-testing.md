@@ -161,7 +161,7 @@ Use the same selection and group in future workflows on these runners. Retain
 one runner service per VM and separate workspaces and browser/tool caches. The
 serial baseline stays on one VM to preserve its runner provenance checks; it
 does not shard across the VMs. See [serial verification](serial-verification.md)
-for pending-run cancellation behavior and setup requirements.
+for queue bounds, explicit cancellation and setup requirements.
 
 The VMs use separately pinned CPU cores and dedicated RAM. Shared storage,
 network and other host resources can still affect timings, so coordinate and

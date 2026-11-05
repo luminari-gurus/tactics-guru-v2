@@ -85,3 +85,30 @@ intentional control reports are retained separately from passing XP results.
 The measured XP configs/tests and runtime inputs are unchanged after `96b14aa`;
 `63607ef` changes only the unrelated core journey choice, its contract and docs.
 Reusing the matched XP measurement for that source is bounded to those inputs.
+
+
+## Preserved final-head startup failure and recovery scope
+
+The next evidence-only head run [42050203033](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42050203033)
+failed the first complete-battle case at its unchanged five-second player-ready
+assertion. The other six browser cases, all units, types and builds passed. The
+[compact failure receipt](initial-startup-failure.json) retains the failure and
+trace hash; the raw trace remains in that run's fourteen-day artifact. Trace
+warnings include GPU `ReadPixels` stalls during first startup. This observation
+is not proof of sole cause, nor a new product performance conclusion.
+
+Core functional profiles now qualify a real green pixel in the same browser
+process, once per browser instance, before opening an app page. Setup uses an
+isolated temporary context, a fifteen-second pixel deadline and durable
+`graphics-setup.json` receipts. No app cache or storage is warmed. The existing
+readiness assertions, retries and product budgets stay unchanged; setup time is
+included in the five-minute browser phase and eight-minute command budget.
+Cold player startup remains an explicit performance concern, not certified by
+these functional journeys. This follows the existing audio-suite setup boundary.
+Broad regression profiles yield their original contexts without graphics setup.
+
+The shared VM reservation also now uses `queue: max` in all four browser
+workflows. This fixes issue `tg-build-cv0`: default single-pending behavior can
+cancel an older queued PR/manual check when another arrives. Queue guards cover
+all workflows and reject missing/single queue settings. See the official
+[GitHub concurrency contract](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency).

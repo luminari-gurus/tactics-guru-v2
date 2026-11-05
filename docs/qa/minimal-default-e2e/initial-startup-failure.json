@@ -1,0 +1,64 @@
+{
+  "run": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42050203033",
+  "head": "5ae8e21060b7621e16bd18cdfb2455ee6a1b9293",
+  "testedMerge": "f62b3eda9d574ee30acd99d44ba84354cb4c2de0",
+  "status": "failed",
+  "stages": [
+    {
+      "id": "tooling",
+      "status": "passed",
+      "durationMs": 4414.556207
+    },
+    {
+      "id": "units",
+      "status": "passed",
+      "durationMs": 53324.252564999995
+    },
+    {
+      "id": "typecheck",
+      "status": "passed",
+      "durationMs": 1323.2329099999988
+    },
+    {
+      "id": "build-integration",
+      "status": "passed",
+      "durationMs": 7329.221717000008
+    },
+    {
+      "id": "bundle",
+      "status": "passed",
+      "durationMs": 974.5662940000038
+    },
+    {
+      "id": "journeys",
+      "status": "failed",
+      "durationMs": 76556.97544299999
+    }
+  ],
+  "browserStats": {
+    "startTime": "2026-11-05T14:59:44.682Z",
+    "duration": 75836.376,
+    "expected": 6,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  },
+  "failure": "First desktop complete-battle case failed its existing 5000ms player-ready assertion; main game remained data-ready=false with no player phase. Other six core cases passed.",
+  "traceSha256": "370a8a561706b74d5660a260a190a42b8bea1de3a1020a7b24ce692f9fb27cb2",
+  "gpuWarnings": [
+    {
+      "time": 7292.567,
+      "text": "[.WebGL-0x6f4009abc00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+    },
+    {
+      "time": 7386.036,
+      "text": "[.WebGL-0x6f4009abc00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+    },
+    {
+      "time": 7742.886,
+      "text": "[.WebGL-0x6f4009abc00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+    }
+  ],
+  "attribution": "No claim that the configuration change caused an application regression, or that GPU stalls alone explain the full delay. Relevant application/asset/dependency inputs were unchanged.",
+  "qualification": "Repair records same-browser graphics setup for functional core projects, following the existing audio-suite precedent. No retry or product-budget changes. Does not qualify cold player startup."
+}
