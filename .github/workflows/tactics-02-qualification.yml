@@ -7,9 +7,9 @@ permissions:
   contents: read
 concurrency:
   group: tactics-02-qualification
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
-  prepare:
+  qualify:
     if: github.repository == 'luminari-gurus/tactics-guru-v2' && github.ref == 'refs/heads/work/tactics-02-qualification-20261105'
     runs-on: [tactics-02-qualification]
     timeout-minutes: 20
@@ -38,33 +38,54 @@ jobs:
       - name: Install lockfile dependencies
         run: npm ci
         timeout-minutes: 10
-      - name: Record administrator command and preparation receipt
+      - name: Install browser binaries as the service user
+        run: npm run setup:browsers
+        timeout-minutes: 10
+      - name: Check Chromium and WebKit
+        run: npm run check:browsers
+      - name: Verify browser diagnostics tooling
+        run: node --test tests/tooling/browser-diagnostics.test.mjs
+      - name: Build production app with content and typechecks
+        run: npm run build
+      - name: Record qualification source and build
         run: |
           mkdir -p verification-receipts/tactics-02
-          NODE_PATH="$(node -p 'process.execPath')"
-          PLAYWRIGHT_CLI="$(realpath node_modules/playwright/cli.js)"
-          test -f "$NODE_PATH"
-          test -f "$PLAYWRIGHT_CLI"
-          printf 'sudo %q %q install-deps chromium webkit\n' "$NODE_PATH" "$PLAYWRIGHT_CLI" | tee verification-receipts/tactics-02/admin-command.txt
           {
             printf 'Runner: %s\nUser: %s\nSource: %s\n' "$RUNNER_NAME" "$(id -un)" "$GITHUB_SHA"
-            printf 'Node: %s\nPlaywright CLI: %s\n' "$NODE_PATH" "$PLAYWRIGHT_CLI"
             node --version
-            node "$PLAYWRIGHT_CLI" --version
+            npx --no-install playwright --version
             cat /etc/os-release
-            sha256sum package-lock.json
-          } | tee verification-receipts/tactics-02/preparation.txt
-          {
-            echo 'Preparation complete. Administrator must run this command on unraid-tactics-02 before browser qualification:'
-            echo '~~~bash'
-            cat verification-receipts/tactics-02/admin-command.txt
-            echo '~~~'
-            echo 'No browser smoke checks have run yet.'
-          } >> "$GITHUB_STEP_SUMMARY"
+            sha256sum package-lock.json playwright.setup-smoke.config.ts tests/boot.spec.ts
+          } | tee verification-receipts/tactics-02/environment.txt
+          find dist -type f -print0 | sort -z | xargs -0 sha256sum > verification-receipts/tactics-02/build.sha256
+          node --input-type=module <<'JS' > verification-receipts/tactics-02/browsers.json
+          import { chromium, webkit } from '@playwright/test';
+          const results = [];
+          for (const type of [chromium, webkit]) {
+            const browser = await type.launch(type === chromium ? { channel: 'chromium' } : {});
+            results.push({ engine: type.name(), version: browser.version(), executable: type.executablePath() });
+            await browser.close();
+          }
+          console.log(JSON.stringify(results, null, 2));
+          JS
+      - name: Run Chromium and WebKit Phaser smoke
+        run: npm run test:browser-smoke -- --diagnostics --workers=1
+      - name: Assert exactly two passing browser smoke cases
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import { readdirSync, readFileSync } from 'node:fs';
+          const roots = readdirSync('verification-receipts/browser-runs');
+          assert.equal(roots.length, 1);
+          const report = JSON.parse(readFileSync('verification-receipts/browser-runs/' + roots[0] + '/results.json', 'utf8'));
+          assert.equal(report.stats.expected, 2);
+          for (const key of ['unexpected', 'flaky', 'skipped']) assert.equal(report.stats[key], 0, key);
+          console.log('Two passed: Chromium desktop and WebKit iPhone emulation. No failures, retries, or skips.');
+          JS
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: tactics-02-preparation-${{ github.run_id }}-${{ github.run_attempt }}
-          path: verification-receipts/tactics-02/
+          name: tactics-02-qualification-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/
           retention-days: 7
           if-no-files-found: warn
