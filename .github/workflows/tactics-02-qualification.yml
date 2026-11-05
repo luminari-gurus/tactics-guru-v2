@@ -69,13 +69,16 @@ jobs:
           console.log(JSON.stringify(results, null, 2));
           JS
       - name: Run Chromium and WebKit Phaser smoke
-        run: npm run test:browser-smoke -- --diagnostics --workers=1
+        run: |
+          node --input-type=module -e "import {readdirSync,writeFileSync} from 'node:fs'; writeFileSync('verification-receipts/tactics-02/before-smoke.json', JSON.stringify(readdirSync('verification-receipts/browser-runs')));"
+          npm run test:browser-smoke -- --diagnostics --workers=1
       - name: Assert exactly two passing browser smoke cases
         run: |
           node --input-type=module <<'JS'
           import assert from 'node:assert/strict';
           import { readdirSync, readFileSync } from 'node:fs';
-          const roots = readdirSync('verification-receipts/browser-runs');
+          const before = JSON.parse(readFileSync('verification-receipts/tactics-02/before-smoke.json', 'utf8'));
+          const roots = readdirSync('verification-receipts/browser-runs').filter(name => !before.includes(name));
           assert.equal(roots.length, 1);
           const report = JSON.parse(readFileSync('verification-receipts/browser-runs/' + roots[0] + '/results.json', 'utf8'));
           assert.equal(report.stats.expected, 2);
