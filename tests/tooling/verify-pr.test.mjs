@@ -8,7 +8,7 @@ test('PR discovery contains exactly the seven core journeys on their intended de
   const cases = report.tests.map(row => [row.project, row.file, row.title]);
   const dungeon = 'read-only entry, keyboard new dungeon, real action and active resume';
   assert.deepEqual(cases.sort(), [
-    ['pr-desktop', 'boot.spec.ts', 'boots a Phaser scene and fits the viewport after resize'],
+    ['pr-desktop', 'main-menu.spec.ts', 'main menu: New Game starts immediately when no dungeon save exists'],
     ['pr-desktop', 'boot.spec.ts', 'missing engine chunk reports a recoverable startup error on battle'],
     ['pr-desktop', 'battle-loop.spec.ts', 'complete legal authored battle seed 2 reaches playerWin through controls and replays'],
     ['pr-desktop', 'dungeon.spec.ts', dungeon],

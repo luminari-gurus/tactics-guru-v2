@@ -1,7 +1,9 @@
 # Minimal default E2E and progression migration
 
 The ordinary `npm test`/Playwright entry point now selects the same seven core
-journeys as PR verification. Before this change it selected 1,036 Chromium cases.
+journeys as PR verification. The public menu New Game witness replaces the
+diagnostic proof-scene resize case in this core list; setup and broad configs
+still retain that diagnostic case. Before this change it selected 1,036 Chromium cases.
 `test:regression` explicitly selects the historical broad compatibility matrix;
 `verify:full` and each specialty config now import that matrix explicitly.
 
@@ -11,8 +13,8 @@ journeys as PR verification. Before this change it selected 1,036 Chromium cases
 | --- | --- | --- |
 | Combat, abilities, AI, turns, RNG and replay | `combat`, `abilities`, `abilityValidation`, `ai`, `turns`, `rng`, `battleSession`, `movementUndo`, `tacticalPlan` | Complete winning battle through real controls; replay and outcome reload |
 | Run state, rewards, inventory and persistence | `run`, `runBattle`, `RunItemSession`, `items`, `itemCommands`, `rewards`, `runStorage`, `runSaveEnvelope` | Run undo, active reload, terminal outcome, terminal reload and fresh restart |
-| Dungeon generation, exploration, progression and saves | `dungeon`, `dungeonBattle`, `dungeonEncounters`, `exploration`, `progression`, `dungeonProgressionBoundary`, `menuSaves` | Dungeon startup, keyboard action, exact active resume on Chromium and WebKit |
-| Input, geometry and display state | `input`, `picking`, `radialGesture`, `radialLabels`, `combatControls`, `healthBar`, `boardPresentation` | Real Pixel board touch, modal capture and suspend/resume; boot/viewport resize |
+| Dungeon generation, exploration, progression and saves | `dungeon`, `dungeonBattle`, `dungeonEncounters`, `exploration`, `progression`, `dungeonProgressionBoundary`, `menuSaves` | Public menu New Game, dungeon startup, keyboard action, exact active resume on Chromium and WebKit |
+| Input, geometry and display state | `input`, `picking`, `radialGesture`, `radialLabels`, `combatControls`, `healthBar`, `boardPresentation` | Real Pixel board touch, modal capture and suspend/resume; real production startup |
 | Content, assets, audio state and telemetry | Content/inventory/export tests, `audioState`, `battleAudio`, `battleCues`, `telemetry`; root/prefix real build integrations | Production boot and controlled missing-engine error; rendering/audio/telemetry specialty configs remain explicit compatibility tools |
 
 Unit names in the table refer to `tests/unit/<name>.test.ts`. This assigns key

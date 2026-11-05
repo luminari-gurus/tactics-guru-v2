@@ -19,11 +19,13 @@ that the target was met. Measure successful job durations before claiming succes
 
 | Profile | Core use cases |
 | --- | --- |
-| Desktop Chromium (5) | Phaser boot/resize; recoverable missing engine chunk; complete winning battle with replay/reload; run undo/reload/terminal outcome; dungeon creation/action/resume |
+| Desktop Chromium (5) | Public menu New Game; recoverable missing engine chunk; complete winning battle with replay/reload; run undo/reload/terminal outcome; dungeon creation/action/resume |
 | Pixel touch portrait (1) | Real board touch, modal capture and suspend/resume |
 | iPhone WebKit (1) | Dungeon creation, real action and active-battle resume |
 
-These are the existing tests with their original assertions and timeouts. An exact
+These are existing tests with their original assertions and timeouts. The public
+menu New Game journey replaces the diagnostic proof-scene resize check in routine
+feedback; explicit setup/regression configs still own the diagnostic check. An exact
 discovery contract prevents accidental expansion or loss of the seven selections.
 Before this migration, the broad default selected 1,036 cases (353 desktop, 344
 portrait, 339 landscape). Ordinary E2E now selects seven; the explicit broad

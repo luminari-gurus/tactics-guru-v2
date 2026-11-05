@@ -4,7 +4,7 @@ import base from './playwright.regression.config';
 // Explicit allowlists keep new regression cases from silently growing PR latency.
 // Reuse the original journeys and assertions; the broad configs remain available.
 export const desktopJourneys = [
-  'boots a Phaser scene and fits the viewport after resize',
+  'main menu: New Game starts immediately when no dungeon save exists',
   'missing engine chunk reports a recoverable startup error on battle',
   'complete legal authored battle seed 2 reaches playerWin through controls and replays',
   'run battle undo survives reload and a legal terminal journey',
@@ -15,7 +15,7 @@ const exactTitles = (titles: string[]) => new RegExp(`(?:${titles.join('|')})(?:
 
 export default defineConfig({
   ...base,
-  testMatch: ['**/boot.spec.ts', '**/battle-loop.spec.ts', '**/run-progression.spec.ts', '**/dungeon.spec.ts'],
+  testMatch: ['**/main-menu.spec.ts', '**/boot.spec.ts', '**/battle-loop.spec.ts', '**/run-progression.spec.ts', '**/dungeon.spec.ts'],
   testIgnore: [],
   workers: 1,
   retries: 0,
