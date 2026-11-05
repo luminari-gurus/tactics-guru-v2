@@ -1,0 +1,99 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> tactics-guru-v2@0.0.0 test:unit
+> vitest run
+
+
+ RUN  v5.0.3 /workspace/scratch/71a48a2c2917/tactics-guru-v2
+
+ ❯ tests/unit/issue310-search.tmp.test.ts (0 test)
+ ❯ tests/unit/dungeonBattle.test.ts (16 tests | 1 failed) 53532ms
+   × finds a legal earned Mage Snare and multi-missile journey with exact replay and terminal cleanup 3702ms
+ ❯ tests/unit/runBattle.test.ts (10 tests | 1 failed) 59151ms
+   × commits the last draught once, retries the exact failed write and continues without replenishing 5886ms
+ ❯ tests/unit/runRecoveryFixtures.test.ts (1 test | 1 failed) 23593ms
+   × reaches deterministic defeat and the exact preceding save through accepted commands 23590ms
+ ❯ tests/unit/dungeon.test.ts (62 tests | 1 failed) 85283ms
+   ❯ unordered encounters and moving dungeon enemies (11)
+     × holds slot 2 in contact range and enters its battle on the next step across save/reload 6889ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/unit/issue310-search.tmp.test.ts [ tests/unit/issue310-search.tmp.test.ts ]
+Error: Cannot find module '/workspace/scratch/71a48a2c2917/tactics-guru-v2/tests/unit/issue310-search.tmp.test.ts'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/unit/dungeon.test.ts > unordered encounters and moving dungeon enemies > holds slot 2 in contact range and enters its battle on the next step across save/reload
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/unit/dungeon.test.ts:414:19
+    412|
+    413| describe('unordered encounters and moving dungeon enemies', () => {
+    414|   it.each([0,1,2])('holds slot %i in contact range and enters its batt…
+       |                   ^
+    415|     for (let seed=0;seed<20;seed++) {
+    416|       const {state,approach,target}=dungeonContactApproach(slot,seed);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  tests/unit/dungeonBattle.test.ts > finds a legal earned Mage Snare and multi-missile journey with exact replay and terminal cleanup
+AssertionError: expected { used: { snare: false, …(1) }, …(2) } to match object { used: { snare: true, …(1) }, …(1) }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "phase": "defeat",
+    "used": {
+-     "missiles": true,
+-     "snare": true,
++     "missiles": false,
++     "snare": false,
+    },
+  }
+
+ ❯ tests/unit/dungeonBattle.test.ts:122:83
+    120| it('finds a legal earned Mage Snare and multi-missile journey with exa…
+    121|   const journey=mageJourney(68);
+    122|   expect({used:journey.used,phase:journey.state.phase,party:journey.st…
+       |                                                                                   ^
+    123|   expect(journey.state.party.find(h=>h.heroId==='mage')!.level).toBeGr…
+    124|   expect(journey.records.some(r=>r.events.some(e=>e.type==='movementBl…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  tests/unit/runBattle.test.ts > commits the last draught once, retries the exact failed write and continues without replenishing
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/unit/runBattle.test.ts:28:1
+     26|  expect(session.phase).toBe('ended');
+     27| }
+     28| it('commits the last draught once, retries the exact failed write and …
+       | ^
+     29|  const prepared=preparedSnapshot(), stack={itemId:'item:healing_draugh…
+     30|  const entry={...prepared,items:{...prepared.items,ownership:{...prepa…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  tests/unit/runRecoveryFixtures.test.ts > reaches deterministic defeat and the exact preceding save through accepted commands
+Error: Test timed out in 20000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/unit/runRecoveryFixtures.test.ts:8:1
+      6| import { canonical } from '../../src/domain/contentIdentity';
+      7|
+      8| it('reaches deterministic defeat and the exact preceding save through …
+       | ^
+      9|   const fixture = legalDefeatSaves();
+     10|   expect(legalDefeatSaves()).toEqual(fixture);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  5 failed | 61 passed (66)
+      Tests  4 failed | 1169 passed (1173)
+   Start at  17:08:48
+   Duration  87.15s (tests 95%, transform 2%, import 2%)
