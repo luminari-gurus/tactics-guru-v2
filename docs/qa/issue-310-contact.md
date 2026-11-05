@@ -14,14 +14,20 @@ and legal journey helpers that traverse moving markers. Dungeon-only holding
 changes the order in which a nearest-marker journey can encounter battles. Mage
 seed 46 no longer earns its intended abilities before defeat; seed 68 retains the
 same ability, level, replay, movement-block expiration and terminal assertions in
-both the unit witness and the extended browser journey.
+both the unit witness and the extended browser journey. After demonstrating both
+earned abilities, the witness now issues legal Wait turns through defeat rather
+than playing unrelated later floors. Level, ability, exact replay, resumed state,
+movement-block expiry and terminal cleanup assertions remain unchanged.
 
 ## Source and environment
 
 Base: `d350bb6247ad577b3e0b9c732dcf65d8918dfc8f`.
-Final functional/test source: `814947669b5bf5018795ffcdad7d8a8bd01c076e`, tree
+Contact/movement evidence source: `814947669b5bf5018795ffcdad7d8a8bd01c076e`, tree
 `bd812c199970955e02b3075896612b420924b7a2`.
-Subsequent documentation/evidence edits do not change functional inputs.
+Current test source: `c3be6617c787a78ff2f0295a06e9d871ebfc1611`, tree
+`5ee88915a2cf2b790dcf4764dca3361e85aa66ad`. Application source remains identical
+to the contact/movement evidence source; final evidence/documentation edits do
+not change functional inputs.
 
 Local Node 24.22.1, Linux x64, existing lockfile. Installation required
 `TAR_OPTIONS=--no-same-owner npm ci` because the PostHog CLI archive's ownership
@@ -71,13 +77,13 @@ device testing or performance qualification is claimed.
 
 ## Final verification
 
-The final-source ordinary PR workflow passed all six stages: tooling, all fast
+The contact/movement source ordinary PR workflow passed all six stages: tooling, all fast
 units, both type scopes, root/prefix build integrations, bundle, and all seven
-core browser journeys (no skips or retries). Results are linked in the PR description. The final-source ordinary PR workflow
+core browser journeys (no skips or retries). Results are linked in the PR description. That ordinary PR workflow
 is [42071870867](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42071870867).
-The final-source focused acceptance workflow is
+The contact/movement focused acceptance workflow is
 [42071935707](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42071935707).
-It checks out the exact functional/test commit above, with a workflow isolated on
+The workflows check out exact source commits, with a workflow isolated on
 a QA branch rather than added to the application PR.
 
 Focused browser scope: the new contact/save/reload journey for all three encounter
@@ -87,4 +93,31 @@ legal dungeon floor clear/descent/backtrack and the updated Mage level-three
 progression journey on desktop Chromium. The unit contact corpus covers all
 three slots across 20 seeds, including exact battle seed, revision and save decode.
 The extended Ranger/Fighter browser matrices are not rerun solely for the Mage
-seed correction; their legal pure-domain witnesses remain in the ordinary units.
+witness correction; their legal pure-domain witnesses remain in ordinary units.
+
+The original seven-battle Mage witness reached floor 3 but exceeded its 600-second
+browser budget in run 42071935707; the floor-clear step was skipped, not passed.
+The bounded replacement keeps the same timeout and all assertions, using only
+legal commands through the terminal boundary. Its pure test passes:
+[bounded Mage output](issue-310/bounded-mage-pass.txt).
+
+The documentation follow-up [PR run 42073577553](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42073577553)
+failed twice on the unchanged five-second run-save test (1,172 other tests passed
+in attempt 1). Its legal defeat/replay simulation also exceeds that budget on the
+literal base. That one long test now has an explicit 20-second budget; its
+assertions are untouched. The 20-seed contact cases also have a 20-second budget
+after the recorded local concurrent-run timeout. These are test execution limits,
+not gameplay performance budgets. The isolated run-save check passes with its
+explicit budget: [output](issue-310/run-budget-pass.txt).
+
+Current-test-source checks:
+- [Ordinary PR verification](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42075423623).
+- [Legal floor clear and bounded Mage acceptance](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42075476117).
+
+The 24 passing contact/movement browser cases are reused from 8149476. Their
+specifications, app source, fixtures, imports, configs, lockfile and assertions
+are unchanged. Only the separate `mageJourney` function in the shared fixture
+module changed (no top-level behavior, dependencies or other exports changed).
+The Mage browser and unit witness are rerun; shared fixture consumers remain
+covered by fresh ordinary fast units. The run-save change only adjusts its
+explicit timeout. No older Mage pass is reused for the new waiting policy.
