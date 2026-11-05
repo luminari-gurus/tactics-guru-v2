@@ -324,10 +324,11 @@ unaffected passing suites. Keep failures and incomplete runs explicit.
 ## Execution capacity and follow-up work
 
 Browser CI targets Brian's self-hosted runner, with no automatic GitHub-hosted
-fallback. On 2026-10-21 the caller explicitly authorized temporary GitHub-hosted
-execution for PR #214. `issue-202-verification.yml` is scoped to that PR, uses one
-Ubuntu job and retains browser reports; migrate to qualified self-hosted capacity
-later. This exception does not reroute #200/#207 or enable general hosted CI. Qualify the actual host under #207 before #200's baseline. Start with
+fallback. The temporary GitHub-hosted workflows for merged PRs #213, #214 and
+#215 have been retired, along with the PR #260-specific dungeon verification job.
+Their historical QA records and workflow runs remain unchanged. Those one-off
+exceptions do not enable general hosted CI. Qualify the actual host under #207
+before #200's baseline. Start with
 one browser job at a time, `workers: 1`, and idle unrelated host workloads for
 performance captures. The browser setup, baseline and process-cleanup workflows select one qualified
 VM with the unique `tactics-browser-01` or `tactics-browser-02` label, in addition
