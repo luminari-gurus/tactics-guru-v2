@@ -27,7 +27,7 @@ test('Mage legal progression journey earns level three uses Frost Snare and mult
   while((await snapshot(page)).phase==='battle'&&steps++<500) {
    await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||(await readSession(page)).phase==='player';}).toBe(true);
    const current=await snapshot(page);if(current.phase!=='battle')break;
-   const before=await readSession(page),built=dungeonBattle(current)!,command=mageDecision(before.state,built.catalog,used.snare);
+   const before=await readSession(page),built=dungeonBattle(current)!,command=used.snare&&used.missiles?{type:'endTurn' as const,unitId:before.state.initiative[before.state.activeIndex]}:mageDecision(before.state,built.catalog,used.snare);
    await playCommand(page,command);
    await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||(await readSession(page)).state.commandCount>before.state.commandCount;}).toBe(true);
    await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||(await readSession(page)).phase==='player';}).toBe(true);
