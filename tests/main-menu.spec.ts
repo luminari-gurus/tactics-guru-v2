@@ -235,16 +235,29 @@ test('main menu: unsaved return cancellation opens recovery and accepted leave r
 
 for(const path of ['unsaved play','failed replacement'] as const)test(`main menu: dungeon departure after rejected movement retains ${path} warning`,async({page})=>{
  if(path==='failed replacement')await page.addInitScript(()=>{const set=Storage.prototype.setItem;Storage.prototype.setItem=function(key,value){if(key.includes(':dungeon:'))throw new DOMException('full','QuotaExceededError');set.call(this,key,value);};});
+ // This checks departure after a rejected exploration command, not encounter
+ // placement. An arbitrary first compass step can enter a battle and hide the map.
+ if(path==='unsaved play')await page.addInitScript(()=>{
+  const draw=crypto.getRandomValues.bind(crypto);
+  crypto.getRandomValues=((array:ArrayBufferView<ArrayBuffer>)=>{
+   if(array instanceof Uint32Array&&array.length===1){array[0]=13;return array;}
+   return draw(array);
+  }) as typeof crypto.getRandomValues;
+ });
  await page.goto('./?game=dungeon');
  if(path==='unsaved play'){
   await page.getByRole('button',{name:'Play unsaved dungeon',exact:true}).click();
-  await page.locator('.dungeon-directions button:not(:disabled)').first().click();
+  const map=page.locator('#dungeon-map');await expect(map).toBeVisible();
+  const position=Number(await map.getAttribute('data-position'));
+  await page.getByRole('button',{name:'East',exact:true}).click();
+  await expect(map).toBeVisible();await expect(map).toHaveAttribute('data-position',String(position+1));
  }else{
   await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();
   await expect(page.getByRole('dialog')).toContainText('Dungeon save recovery');
   await page.locator('#dungeon-close-recovery').click();
  }
  const before=await page.locator('#game').getAttribute('data-dungeon-snapshot');
+ expect(JSON.parse(before!).phase).toBe('ready');await expect(page.locator('#dungeon-map')).toBeVisible();
  const blocked=await page.locator('.dungeon-directions button:disabled').first().getAttribute('aria-label');
  const arrows:Record<string,string>={North:'ArrowUp',East:'ArrowRight',South:'ArrowDown',West:'ArrowLeft'};
  await page.locator('#dungeon-map').press(arrows[blocked!]);

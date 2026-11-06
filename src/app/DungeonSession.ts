@@ -20,6 +20,9 @@ export class DungeonSession {
     if (!storage) this.status = 'Testing dungeon. Progress resets on reload.';
   }
   get snapshot() { return structuredClone(this.current); }
+  /** Commands need only copied scalar identity; keep the full state private. */
+  get spatialBoundary() { const {id,depth,revision}=this.current; return {id,depth,revision}; }
+  get phase() { return this.current.phase; }
   /** Durable progress is independent of transient command/recovery feedback. */
   get hasUnsavedProgress() { return this.storage !== null && (this.unsaved || !this.progressSaved); }
   private write(state: DungeonState) {

@@ -13,7 +13,28 @@
 #dungeon-screen ol { padding-left: 24px; }
 body:has(#dungeon-screen:not([hidden])) #battle-heading { display: none; }
 
-#dungeon-map { display: grid; grid-template-columns: repeat(20, minmax(0, 1fr)); grid-template-rows: repeat(20, minmax(0, 1fr)); width: min(100%, 480px); aspect-ratio: 1; gap: 1px; background: #0b1119; border: 2px solid #81917d; box-sizing: border-box; touch-action: manipulation; }
+#dungeon-map {
+  --dungeon-map-columns: 20;
+  --dungeon-map-rows: 20;
+  --dungeon-map-min-cell: 12px;
+  --dungeon-map-gap: 1px;
+  --dungeon-map-border: 2px;
+  display: grid;
+  grid-template-columns: repeat(var(--dungeon-map-columns), minmax(var(--dungeon-map-min-cell), 1fr));
+  grid-template-rows: repeat(var(--dungeon-map-rows), minmax(var(--dungeon-map-min-cell), 1fr));
+  width: min(100%, 480px);
+  /* Reserve the full border box so minimum-size tracks cannot overlap the compass. */
+  min-width: calc(var(--dungeon-map-columns) * var(--dungeon-map-min-cell) + (var(--dungeon-map-columns) - 1) * var(--dungeon-map-gap) + 2 * var(--dungeon-map-border));
+  max-width: none;
+  aspect-ratio: 1;
+  /* Keep layout independent without clipping focus or marker outlines. */
+  contain: size layout;
+  gap: var(--dungeon-map-gap);
+  background: #0b1119;
+  border: var(--dungeon-map-border) solid #81917d;
+  box-sizing: border-box;
+  touch-action: manipulation;
+}
 #dungeon-map span { display: flex; align-items: center; justify-content: center; min-width: 0; min-height: 0; font-size: clamp(10px, 2.8vw, 18px); background-size: cover; color: #ffe9a7; line-height: 1; }
 #dungeon-map .explore-open { background-color: #49624a; }
 #dungeon-map .explore-wall { background-color: #28352f; }
@@ -37,3 +58,5 @@ body:has(#dungeon-screen:not([hidden])) #battle-heading { display: none; }
 #dungeon-screen .dungeon-directions button:disabled { background: #262d2b; border-color: #657064; color: #9ba397; opacity: .55; }
 #dungeon-screen .dungeon-directions button:focus-visible { outline: 3px solid #f4cf70; outline-offset: 3px; }
 #dungeon-screen .dungeon-compass-center { grid-area: 2 / 2; place-self: center; width: 10px; height: 10px; transform: rotate(45deg); border: 1px solid #a2a58a; border-radius: 2px; background: #b2a070; pointer-events: none; }
+
+#dungeon-screen section[aria-label="Floor exploration"] { overflow-x: auto; }

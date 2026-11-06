@@ -1,5 +1,5 @@
 import { nextUint32, seedRng } from '../domain/rng';
-import { MAP_SIZE, validMapCells } from './generate';
+import { validMapCells } from './generate';
 import type { BiomeMap } from './biomes';
 
 export const PLACEMENT_VERSION = 'markers-v1';
@@ -24,12 +24,12 @@ export type PlacementResult =
 
 /** Four draws without replacement; terrain and battle RNG streams remain independent. */
 export function createOverworld(map: BiomeMap): PlacementResult {
-  if (map.width !== MAP_SIZE || map.height !== MAP_SIZE ||
+  if (
       !Number.isSafeInteger(map.seed) || map.seed < 0 || map.seed > 0xffffffff ||
-      !validMapCells(map.cells) || map.terrain.length !== map.cells.length ||
+      !validMapCells(map.cells, map.width, map.height, map.type === 'arena') || map.terrain.length !== map.cells.length ||
       !Array.from(map.cells).every((cell, i) =>
         (cell === 0 || cell === 1) && map.terrain[i] === `${map.biome}-${cell ? 'open' : 'blocked'}`)) {
-    return { ok: false, reason: 'The map must have a valid connected 20 by 20 terrain layout.' };
+    return { ok: false, reason: 'The map must have a valid connected terrain layout.' };
   }
   const candidates = map.cells.flatMap((cell, i) => cell === 1 ? [i] : []);
   let rng = seedRng((map.seed ^ 0x4d41524b) >>> 0);
@@ -38,7 +38,7 @@ export function createOverworld(map: BiomeMap): PlacementResult {
     rng = next.rng;
     const chosen = i + next.value % (candidates.length - i);
     [candidates[i], candidates[chosen]] = [candidates[chosen], candidates[i]];
-    return { id, kind: i === 0 ? 'player' : 'enemy', x: candidates[i] % MAP_SIZE, y: Math.floor(candidates[i] / MAP_SIZE) };
+    return { id, kind: i === 0 ? 'player' : 'enemy', x: candidates[i] % map.width, y: Math.floor(candidates[i] / map.width) };
   });
   return { ok: true, state: { map, placementVersion: PLACEMENT_VERSION, markers } };
 }

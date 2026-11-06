@@ -1,4 +1,4 @@
-import { decodeDungeon, encodeDungeon } from '../domain/dungeonSaveEnvelope';
+import { decodeDungeon, encodeDungeon, encodeDungeonWithState } from '../domain/dungeonSaveEnvelope';
 import type { DungeonState } from '../domain/dungeon';
 import type { RunStorageProvider } from './runStorage';
 export const DUNGEON_KEYS = { primary: 'tactics-guru:phaser:dungeon:primary:v1', backup: 'tactics-guru:phaser:dungeon:backup:v1' } as const;
@@ -14,6 +14,20 @@ export function bothDungeonSlotsMissing(review: DungeonInspection): boolean {
 export function createDungeonStorage(provider: RunStorageProvider = () => window.localStorage) {
   let uncertain = false;
   let lastWritten: string | undefined;
+  // Exact immutable bytes admit the same deterministic state. Keep private copies
+  // and clone on return so callers can never mutate a future inspection result.
+  const decoded = new Map<string, DungeonState>();
+  function read(text: string) {
+    let state = decoded.get(text);
+    if (!state) {
+      const result = decodeDungeon(text);
+      if (!result.ok) return result;
+      state = result.state;
+      decoded.set(text, state);
+      if (decoded.size > 2) decoded.delete(decoded.keys().next().value!);
+    }
+    return {ok: true as const, state: structuredClone(state)};
+  }
   const error = (e: unknown) => {
     try { return (e as { name?: string })?.name === 'QuotaExceededError' ? 'quota' : (e as { name?: string })?.name === 'SecurityError' ? 'security' : 'unavailable'; }
     catch { return 'unavailable'; }
@@ -24,15 +38,15 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
         const storage = provider(); if (!storage) return { status: 'unavailable', text: null };
         const text = storage.getItem(DUNGEON_KEYS[key]);
         if (text === null) return { status: 'missing', text };
-        const read = decodeDungeon(text);
-        return read.ok ? { status: 'valid', text, state: read.state } : { status: 'invalid', text, reason: read.reason };
+        const result = read(text);
+        return result.ok ? { status: 'valid', text, state: result.state } : { status: 'invalid', text, reason: result.reason };
       } catch { return { status: 'unavailable', text: null }; }
     };
     return { primary: slot('primary'), backup: slot('backup') };
   }
   function save(state: DungeonState, expectedPrimary?: string | null): DungeonWrite {
     if (uncertain) return { ok: false, reason: 'uncertainWrite' };
-    const encoded = encodeDungeon(state); if (!encoded.ok) return encoded;
+    const encoded = encodeDungeonWithState(state); if (!encoded.ok) return encoded;
     try {
       const storage = provider(); if (!storage) return { ok: false, reason: 'unavailable' };
       const old = inspect();
@@ -63,7 +77,14 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
       uncertain = true;
       storage.setItem(DUNGEON_KEYS.primary, encoded.text);
       if (storage.getItem(DUNGEON_KEYS.primary) !== encoded.text) return { ok: false, reason: 'uncertainWrite' };
-      uncertain = false; lastWritten = encoded.text; return { ok: true };
+      uncertain = false; lastWritten = encoded.text;
+      try {
+        decoded.clear();
+        const previous = old.primary.status === 'valid' ? old.primary : old.backup.status === 'valid' ? old.backup : null;
+        if (previous && backup === previous.text) decoded.set(previous.text, structuredClone(previous.state));
+        decoded.set(encoded.text, structuredClone(encoded.state));
+      } catch { decoded.clear(); } // A cache failure cannot change an already verified write.
+      return { ok: true };
     } catch (e) { return { ok: false, reason: error(e) }; }
   }
   function remove(slot: DungeonSlot, expected: string | null): DungeonWrite {
