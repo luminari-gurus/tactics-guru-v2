@@ -27,7 +27,7 @@ describe('base-aware menu routing', () => {
         }
       }
       for (const search of ['?game=map', '?game=unknown', '?game=', '?game=battle&game=run', '?game=run&game=run', '?scene=unknown', '?entry=new']) {
-        expect(resolveAppEntry(base, search, base)).toEqual({ route: 'menu', persistent: false });
+        expect(resolveAppEntry(base, search, base)).toEqual({ route: 'menu', persistent: false, ...(search.includes('game=') ? { redirectToMenu: true } : {}) });
       }
       expect(resolveAppEntry(base, '?game=run&scene=unknown', base)).toEqual({ route: 'run', persistent: true });
       expect(resolveAppEntry(base, '?game=run&scene=unknown&scene=proof', base)).toEqual({ route: 'run', persistent: true });
@@ -46,5 +46,11 @@ describe('base-aware menu routing', () => {
       const url = new URL(location.href);
       expect(resolveAppEntry(url.pathname, url.search, base)).toEqual({ route: 'dungeon', persistent: true });
     });
+  }
+});
+
+it('marks unknown paths for a base-aware menu redirect', () => {
+  for (const base of ['/', '/prototype/']) {
+    expect(resolveAppEntry(`${base}nonexistent`, '', base)).toEqual({ route: 'menu', persistent: false, redirectToMenu: true });
   }
 });

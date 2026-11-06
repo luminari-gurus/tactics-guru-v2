@@ -505,3 +505,10 @@ for (const mode of ['battle','run','dungeon'] as const) test(`temporary ${mode} 
  await page.goto(`./${mode}`);await link.click();
  await expect(page).toHaveURL(new RegExp(`\\?game=${mode}$`));
 });
+
+for (const route of ['nonexistent', '?game=zzz', '?game=run&game=battle']) test(`main menu: invalid entry ${route} returns to the root`, async ({ page }) => {
+ await page.goto('./'+route);
+ await expect(page).toHaveURL(new URL('./', test.info().project.use.baseURL!).href);
+ await expect(page.locator('[data-menu-action]')).toHaveCount(4);
+ await expect(page.locator('canvas')).toHaveCount(0);
+});

@@ -1,7 +1,7 @@
 export type AppRoute = 'menu' | 'battle' | 'run' | 'dungeon' | 'map' | 'qbert';
 export type EntryIntent = 'continue' | 'new' | 'recovery';
 export type GameMode = 'battle' | 'run' | 'dungeon';
-export interface AppEntry { route: AppRoute; persistent: boolean }
+export interface AppEntry { route: AppRoute; persistent: boolean; redirectToMenu?: true }
 /** Self-contained so the production preload script uses this exact policy too. */
 export function resolveAppEntry(pathname: string, search = '', base = '/'): AppEntry {
   const root = base.replace(/\/+$/, '');
@@ -19,7 +19,8 @@ export function resolveAppEntry(pathname: string, search = '', base = '/'): AppE
       return { route: games[0], persistent: true };
     }
   }
-  return { route: 'menu', persistent: false };
+  const invalid = path !== root || new URLSearchParams(search).has('game');
+  return { route: 'menu', persistent: false, ...(invalid ? { redirectToMenu: true as const } : {}) };
 }
 export function classifyRoute(pathname: string, search = '', base = '/'): AppRoute {
   return resolveAppEntry(pathname, search, base).route;
