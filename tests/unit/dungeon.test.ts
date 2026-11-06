@@ -703,6 +703,22 @@ describe('versioned floor dimensions', () => {
     expect(floorMap(other).type).toBe(a.generator === 'arena-v1' ? 'sector-graph' : 'arena');expect(floorMap(other)).not.toBe(first);
     expect(floorMap(a).cells[0]).toBe(0);
   });
+  it('rejects changed saved geometry after immutable floor facts are warm', () => {
+    const base=freshDungeon('warm-floor-facts',19);
+    const floors=Array.from({length:5},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1),map=floorMap(descriptor);return {descriptor,position:descriptor.upstairs,completed:3,exploration:freshExploration(descriptor.seed,descriptor.upstairs,map)};});
+    const state=good(readDungeon({...base,depth:5,floors}));
+    const encoded=encodeDungeon(state);assert(encoded.ok);
+    for(const patch of [{mapHash:'sha256:'+'0'.repeat(64)},{upstairs:state.floors[4].descriptor.upstairs+1},{downstairs:state.floors[4].descriptor.downstairs-1}]){
+      const altered={...state,floors:state.floors.map((floor,i)=>i===4?{...floor,descriptor:{...floor.descriptor,...patch}}:floor)};
+      expect(readDungeon(altered).ok).toBe(false);
+    }
+    expect(encodeDungeon(state)).toEqual(encoded);
+    const cache=new FloorCache(1), original=floorDescriptor(19,5,cache);
+    const map=cache.resolve(original.seed,original.generator,original.size);
+    floorDescriptor(19,4,cache);
+    expect(floorDescriptor(19,5,cache)).toEqual(original);
+    expect(cache.resolve(original.seed,original.generator,original.size)).not.toBe(map);
+  });
   it('grows new floors deterministically while preserving legacy floor geometry', () => {
     for (const [depth,size] of [[1,20],[2,24],[3,28],[4,32],[5,36],[20,36]] as const) {
       const descriptor = floorDescriptor(19,depth), map = floorMap(descriptor);

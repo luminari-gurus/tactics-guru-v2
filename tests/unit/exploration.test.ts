@@ -20,6 +20,37 @@ describe('exploration placement and validation',()=>{
   expect(()=>encounterPois(1,{...generateMap(1,'rooms'),cells:Array(400).fill(0)})).toThrow();
  });
  it('reveals exactly radius two through walls, with bounded sorted indices',()=>{expect(reveal(0)).toEqual([0,1,2,20,21,40]);expect(reveal(210)).toHaveLength(13);const s=fresh();expect(readDungeon(s)).toEqual({ok:true,state:s});});
+ it.each([20,24,28,32,36])('retains the reveal contract at every cell of a %i-column floor',size=>{
+  const cells=Array.from({length:size*size},(_,i)=>i);
+  for(const position of cells){
+   const expected=cells.filter(cell=>Math.abs(cell%size-position%size)+Math.abs(Math.floor(cell/size)-Math.floor(position/size))<=2);
+   expect(reveal(position,size)).toEqual(expected);
+  }
+ });
+ it('clips rectangular reveal edges without wrapping between rows',()=>{
+  expect(reveal(19,20,36)).toEqual([17,18,19,38,39,59]);
+  expect(reveal(700,20,36)).toEqual([660,680,681,700,701,702]);
+  expect(reveal(35,36,20)).toEqual([33,34,35,70,71,107]);
+  expect(reveal(684,36,20)).toEqual([612,648,649,684,685,686]);
+ });
+ it.each([
+  ['rooms',20,1,[112,192,168]],['rooms',20,19,[262,264,245]],['rooms',20,0xffffffff,[96,114,168]],
+  ['sector-graph',20,0,[194,223,144]],['sector-graph',24,19,[269,436,410]],
+  ['sector-graph',28,19,[580,148,705]],['sector-graph',32,19,[604,222,548]],['sector-graph',36,19,[255,486,1129]],
+  ['arena',20,0,[310,168,277]],['arena',24,19,[26,245,205]],['arena',36,19,[94,1206,1127]],
+ ] as const)('retains saved marker order for %s size %i seed %i',(type,size,seed,cells)=>{
+  const map=generateMap(seed,type,size);
+  expect(encounterPois(seed,map).map(p=>poiCell(p,size))).toEqual(cells);
+ });
+ it('revalidates changed geometry and returns independent legacy markers',()=>{
+  const map=generateMap(19,'sector-graph',36),position=map.cells.indexOf(1),input=freshExploration(map.seed,position,map);
+  const first=readExploration(input,map.seed,position,map)!;
+  (first.pois[0] as {x:number}).x=-1;
+  expect(input.pois[0].x).toBeGreaterThanOrEqual(0);
+  expect(readExploration(input,map.seed,position,map)).toEqual(input);
+  const changed={...map,cells:[...map.cells]};changed.cells[0]=1;
+  expect(()=>readExploration(input,map.seed,position,changed)).toThrow('Invalid exploration geometry');
+ });
  it.each(['duplicate','foreign','position','unsorted','missing-position','visited-hidden','blocked-visit','extra'])('rejects malformed %s without aliases',kind=>{
   const s=fresh(),f=currentFloor(s),x=JSON.parse(JSON.stringify(f.exploration));
   if(kind==='duplicate')x.pois[1]=x.pois[0];if(kind==='foreign')x.pois[0].id='foreign';if(kind==='position')x.pois[0].x=999;

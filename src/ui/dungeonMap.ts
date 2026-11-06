@@ -20,57 +20,93 @@ export class DungeonMap {
   private live = true;
   private state: DungeonState | null = null;
   private map: GeneratedMap | null = null;
-  private grid: HTMLDivElement | null = null;
+  private readonly heading = document.createElement('h2');
+  private readonly select = document.createElement('select');
+  private readonly grid = document.createElement('div');
+  private readonly feedback = document.createElement('p');
+  private readonly places = document.createElement('ul');
+  private readonly controls: { button: HTMLButtonElement; dx: number; dy: number }[] = [];
+  private readonly cells: HTMLSpanElement[] = [];
+  private readonly terrainCells = new Set<HTMLElement>();
+  private readonly fallbackCells = new Set<HTMLElement>();
+  private readonly placeRows = new Map<string, HTMLLIElement>();
   private visual: { map: GeneratedMap; biome: string; revealed: Set<number>; markers: number[] } | null = null;
   private readonly abort = new AbortController();
   private readonly treatment = createMapArt(() => { if (this.live) this.paintArt(); });
   constructor(private readonly move: (destination: number) => void, private readonly locked: () => boolean) {
+    const el = <K extends keyof HTMLElementTagNameMap>(tag:K,text='') => { const n=document.createElement(tag);n.textContent=text;return n; };
+    const signal = this.abort.signal;
     this.root.setAttribute('aria-label','Floor exploration');
+    const label = el('label','Map art ');
+    this.select.id='dungeon-art';this.select.setAttribute('aria-label','Map art');
+    for (const style of ART_STYLES) { const option=el('option',style.label);option.value=style.id;this.select.append(option); }
+    this.select.value=this.art;
+    this.select.addEventListener('change',()=>{this.art=this.select.value as ArtStyle;this.paintArt();},{signal});
+    label.append(this.select);
+    this.grid.id='dungeon-map';this.grid.tabIndex=0;this.grid.setAttribute('role','application');
+    this.grid.addEventListener('click',e=>{
+      if(!this.live||!this.state||!this.map||this.locked()||document.hidden||!(e.target instanceof Element))return;
+      const cell=e.target.closest<HTMLElement>('[data-cell]');if(!cell)return;
+      const destination=Number(cell.dataset.cell),floor=currentFloor(this.state);
+      if(neighbors(floor.position,this.map.width,this.map.height).includes(destination))this.move(destination);
+      else this.feedback.textContent='Choose an adjacent cell or use the direction controls.';
+    },{signal});
+    this.feedback.id='dungeon-map-feedback';this.feedback.setAttribute('role','status');
+    const directions=el('div');directions.className='dungeon-directions';directions.setAttribute('role','group');directions.setAttribute('aria-label','Move player');
+    for(const [name,dx,dy] of [['North',0,-1],['East',1,0],['South',0,1],['West',-1,0]] as const){
+      const button=el('button');button.id=`dungeon-step-${name.toLowerCase()}`;button.type='button';button.setAttribute('aria-label',name);
+      button.append(el('span',name[0]));
+      button.addEventListener('click',()=>this.step(dx+dy*(this.map?.width??20)),{signal});
+      this.controls.push({button,dx,dy});directions.append(button);
+    }
+    const center=el('span');center.className='dungeon-compass-center';center.setAttribute('aria-hidden','true');directions.append(center);
+    this.places.setAttribute('aria-label','Discovered places');
+    const legend=el('p','● Player · M encounter (including guardian) · ✓ cleared · ↑ upstairs (floor 2+) · ↓ downstairs (all encounters cleared). Enemies move when you move. Tap adjacent cells or use direction controls.');
+    this.root.append(this.heading,label,legend,this.grid,directions,this.feedback,this.places);
     this.root.addEventListener('keydown',e => {
       if (!(e.target instanceof HTMLElement) || e.target.id !== 'dungeon-map') return;
       const width = this.map?.width ?? 20;
       const offsets: Record<string,number> = { ArrowUp:-width,w:-width,ArrowRight:1,d:1,ArrowDown:width,s:width,ArrowLeft:-1,a:-1 };
       const delta = offsets[e.key]; if (delta === undefined) return;
       e.preventDefault(); if (!e.repeat) this.step(delta);
-    },{signal:this.abort.signal});
+    },{signal});
   }
   dispose() { this.live = false; this.abort.abort(); }
   render(state: DungeonState, map: GeneratedMap) { this.state = state; this.map = map; this.draw(); }
   private step(delta: number) {
-    if (!this.state || this.locked() || document.hidden) return;
+    if (!this.live || !this.state || this.locked() || document.hidden) return;
     const f = currentFloor(this.state), destination = f.position + delta;
     // Send an invalid sentinel at row wrap so authoritative rejection supplies feedback.
     this.move(neighbors(f.position, this.map?.width ?? 20, this.map?.height ?? 20).includes(destination) ? destination : -1);
   }
   private draw() {
     if (!this.live || !this.state || !this.map) return;
-    const focused = this.root.contains(document.activeElement) ? (document.activeElement as HTMLElement).id : '';
-    const s = this.state, f = currentFloor(s), map = this.map;
+    const focused = this.root.contains(document.activeElement) ? document.activeElement as HTMLElement : null;
+    const s = this.state, f = currentFloor(s), map = this.map, grid=this.grid;
     const biome = BIOMES.find(b => b.version === f.descriptor.biome)!;
-    const el = <K extends keyof HTMLElementTagNameMap>(tag:K,text='') => { const n=document.createElement(tag);n.textContent=text;return n; };
-    const heading = el('h2',`Explore ${biome.label} · Floor ${s.depth}`);
-    const label = el('label','Map art '), select=el('select');select.id='dungeon-art';select.setAttribute('aria-label','Map art');
-    for (const style of ART_STYLES) { const o=el('option',style.label);o.value=style.id;select.append(o); } select.value=this.art;
-    select.onchange=()=>{this.art=select.value as ArtStyle;this.paintArt();};label.append(select);
-    const grid=this.grid ?? el('div');this.grid=grid;grid.id='dungeon-map';grid.tabIndex=0;grid.setAttribute('role','application');grid.setAttribute('aria-label',`Floor ${s.depth} map. Player row ${Math.floor(f.position/map.width)+1}, column ${f.position%map.width+1}. Arrow or WASD keys move one cell.`);
+    const heading=`Explore ${biome.label} · Floor ${s.depth}`;
+    if(this.heading.textContent!==heading)this.heading.textContent=heading;
+    const label=`Floor ${s.depth} map. Player row ${Math.floor(f.position/map.width)+1}, column ${f.position%map.width+1}. Arrow or WASD keys move one cell.`;
+    if(grid.getAttribute('aria-label')!==label)grid.setAttribute('aria-label',label);
     for (const [property, value] of [['--dungeon-map-columns', String(map.width)], ['--dungeon-map-rows', String(map.height)]]) {
       if (grid.style.getPropertyValue(property) !== value) grid.style.setProperty(property, value);
     }
-    grid.dataset.position=String(f.position);grid.dataset.art=this.art;grid.dataset.biome=biome.id;
+    if(grid.dataset.position!==String(f.position))grid.dataset.position=String(f.position);
+    if(grid.dataset.biome!==biome.id)grid.dataset.biome=biome.id;
     const showUpstairs=s.depth>1, showDownstairs=f.completed===3;
     const cleared=clearedDungeonSlots(f);
     const pois=new Map([...f.exploration.pois].sort((a,b)=>Number(cleared.includes(b.encounterSlot))-Number(cleared.includes(a.encounterSlot))).map(p=>[poiCell(p,map.width),p]));
     const total=map.width*map.height;
-    let rebuild=grid.children.length!==total;
+    let rebuild=this.cells.length!==total||grid.children.length!==total;
     if (rebuild) {
-      const fragment=document.createDocumentFragment();
-      for(let i=0;i<total;i++) {const cell=el('span');cell.dataset.cell=String(i);cell.setAttribute('aria-hidden','true');fragment.append(cell);}
+      const fragment=document.createDocumentFragment();this.cells.length=0;this.terrainCells.clear();this.fallbackCells.clear();
+      for(let i=0;i<total;i++) {const cell=document.createElement('span');cell.dataset.cell=String(i);cell.setAttribute('aria-hidden','true');this.cells.push(cell);fragment.append(cell);}
       grid.replaceChildren(fragment);
     }
     const revealed=new Set(f.exploration.revealed), prior=this.visual;
     rebuild ||= !prior || prior.map!==map || prior.biome!==biome.id;
     const markers=[f.position,f.descriptor.upstairs,f.descriptor.downstairs,...f.exploration.pois.map(p=>poiCell(p,map.width))];
-    const dirty=new Set<number>();
+    const dirty=new Set<number>(),artDirty=new Set<HTMLElement>();
     if(rebuild) {for(let i=0;i<total;i++)dirty.add(i);}
     else if(prior) {
       for(const index of markers)dirty.add(index);
@@ -79,57 +115,60 @@ export class DungeonMap {
       for(const index of prior.revealed)if(!revealed.has(index))dirty.add(index);
     }
     for(const i of dirty) {
-      const cell=grid.children[i] as HTMLElement;
+      const cell=this.cells[i];
       const visible=revealed.has(i), open=map.cells[i]===1;
       const className=visible?open?'explore-open':'explore-wall':'explore-hidden';
       if(cell.className!==className)cell.className=className;
       let text='', poi: string | undefined;
       if(visible){
-        const terrain=`${biome.id}-${open?'open':'blocked'}`;if(cell.dataset.terrain!==terrain)cell.dataset.terrain=terrain;
+        const terrain=`${biome.id}-${open?'open':'blocked'}`;
+        if(cell.dataset.terrain!==terrain){cell.dataset.terrain=terrain;artDirty.add(cell);}
+        this.terrainCells.add(cell);
         if(showUpstairs&&i===f.descriptor.upstairs)text='↑';
         if(showDownstairs&&i===f.descriptor.downstairs)text='↓';
         const p=pois.get(i);if(p){if(!cleared.includes(p.encounterSlot))text='M';else if(!(showUpstairs&&i===f.descriptor.upstairs)&&!(showDownstairs&&i===f.descriptor.downstairs))text='✓';poi=p.id;}
-      } else if(cell.dataset.terrain!==undefined) {delete cell.dataset.terrain;cell.style.backgroundImage='';}
+      } else if(cell.dataset.terrain!==undefined) {
+        delete cell.dataset.terrain;cell.style.backgroundImage='';this.terrainCells.delete(cell);this.fallbackCells.delete(cell);
+      }
       if(i===f.position)text='●';
       if(cell.textContent!==text)cell.textContent=text;
       if(poi===undefined){if(cell.dataset.poi!==undefined)delete cell.dataset.poi;}else if(cell.dataset.poi!==poi)cell.dataset.poi=poi;
       if(i===f.position){if(cell.dataset.player!=='true')cell.dataset.player='true';}else if(cell.dataset.player!==undefined)delete cell.dataset.player;
     }
     this.visual={map,biome:biome.id,revealed,markers};
-    grid.onclick=e=>{if(this.locked()||document.hidden)return;const cell=(e.target as HTMLElement).closest<HTMLElement>('[data-cell]');if(!cell)return;const destination=Number(cell.dataset.cell);if(neighbors(f.position,map.width,map.height).includes(destination)){this.move(destination);}else {feedback.textContent='Choose an adjacent cell or use the direction controls.';}};
-    const feedback=el('p',`Player cell ${f.position} · Revealed ${f.exploration.revealed.length}/${map.width * map.height} · Visited ${f.exploration.visited.length}. `);feedback.id='dungeon-map-feedback';feedback.setAttribute('role','status');
-    const directions=el('div');directions.className='dungeon-directions';directions.setAttribute('role','group');directions.setAttribute('aria-label','Move player');
-    for(const [name,delta] of [['North',-map.width],['East',1],['South',map.width],['West',-1]] as const){
-      const button=el('button');button.id=`dungeon-step-${name.toLowerCase()}`;button.type='button';button.setAttribute('aria-label',name);
-      button.append(el('span',name[0]));
-      const destination=f.position+delta;
-      button.disabled=s.phase!=='ready'||!neighbors(f.position,map.width,map.height).includes(destination)||!map.cells[destination];
-      button.onclick=()=>this.step(delta);directions.append(button);
+    const adjacent=neighbors(f.position,map.width,map.height);
+    for(const {button,dx,dy} of this.controls){
+      const destination=f.position+dx+dy*map.width;
+      const disabled=s.phase!=='ready'||!adjacent.includes(destination)||!map.cells[destination];
+      if(button.disabled!==disabled)button.disabled=disabled;
     }
-    const center=el('span');center.className='dungeon-compass-center';center.setAttribute('aria-hidden','true');directions.append(center);
-    const list=el('ul');list.setAttribute('aria-label','Discovered places');
     const entries=[...(showUpstairs?[{id:'stairs-up',cell:f.descriptor.upstairs,label:'Upstairs',status:'Available'}]:[]),...f.exploration.pois.map(p=>({id:p.id,cell:poiCell(p,map.width),label:`${dungeonEncounterLabel(s,p.encounterSlot)} · ${biome.label} · Floor ${s.depth}`,status:cleared.includes(p.encounterSlot)?'Cleared':s.phase==='ready'?'Available':s.phase==='reward'?'Reward pending':s.phase==='battle'?'In battle':'Unavailable after defeat'})),...(showDownstairs?[{id:'stairs-down',cell:f.descriptor.downstairs,label:'Downstairs',status:'Unlocked'}]:[])];
-    for(const p of entries)if(f.exploration.revealed.includes(p.cell)){const row=el('li',`${p.label} · row ${Math.floor(p.cell/map.width)+1}, column ${p.cell%map.width+1} · ${p.status}${f.exploration.visited.includes(p.cell)?' · Visited':''}`);row.dataset.poiId=p.id;list.append(row);}
-    const legend=el('p','● Player · M encounter (including guardian) · ✓ cleared · ↑ upstairs (floor 2+) · ↓ downstairs (all encounters cleared). Enemies move when you move. Tap adjacent cells or use direction controls.');
-    if(this.root.children.length===7 && this.root.children[3]===grid) {
-      // Keep the large grid connected so movement does not reconstruct its layout tree.
-      for(const [index,node] of [[0,heading],[1,label],[2,legend],[4,directions],[5,feedback],[6,list]] as const) this.root.children[index].replaceWith(node);
-    } else this.root.replaceChildren(heading,label,legend,grid,directions,feedback,list);
-    this.paintArt();
-    if(focused)this.root.querySelector<HTMLElement>(`#${focused}`)?.focus({preventScroll:true});
+    const visiblePlaces=new Set<string>();let cursor=this.places.firstElementChild;
+    for(const p of entries)if(revealed.has(p.cell)){
+      let row=this.placeRows.get(p.id);
+      if(!row){row=document.createElement('li');row.dataset.poiId=p.id;this.placeRows.set(p.id,row);}
+      const text=`${p.label} · row ${Math.floor(p.cell/map.width)+1}, column ${p.cell%map.width+1} · ${p.status}${f.exploration.visited.includes(p.cell)?' · Visited':''}`;
+      if(row.textContent!==text)row.textContent=text;
+      if(row!==cursor)this.places.insertBefore(row,cursor);
+      cursor=row.nextElementSibling;visiblePlaces.add(p.id);
+    }
+    for(const [id,row] of this.placeRows)if(!visiblePlaces.has(id)){row.remove();this.placeRows.delete(id);}
+    // Movement only treats newly changed terrain. Style changes and image completion repaint the visible set.
+    this.paintArt(artDirty);
+    if(focused&&document.activeElement!==focused&&focused.isConnected)focused.focus({preventScroll:true});
   }
   /** Image completion changes pixels only; never detach active input or scroll targets. */
-  private paintArt() {
+  private paintArt(cells: Iterable<HTMLElement> = this.terrainCells) {
     if (!this.live || !this.state) return;
-    let fallback = false;
-    for (const cell of this.root.querySelectorAll<HTMLElement>('[data-terrain]')) {
+    for (const cell of cells) {
       const art = this.treatment(cell.dataset.terrain as Terrain, this.art);
       const background = art.url ? `url("${art.url}")` : '';
       if(cell.style.backgroundImage!==background)cell.style.backgroundImage=background;
-      fallback ||= Boolean(art.fallback);
+      if(art.fallback)this.fallbackCells.add(cell);else this.fallbackCells.delete(cell);
     }
-    const grid = this.root.querySelector<HTMLElement>('#dungeon-map'); if (grid) grid.dataset.art = this.art;
-    const feedback = this.root.querySelector<HTMLElement>('#dungeon-map-feedback'), f = currentFloor(this.state);
-    if (feedback) feedback.textContent = `Player cell ${f.position} · Revealed ${f.exploration.revealed.length}/${(this.map?.width ?? 20) * (this.map?.height ?? 20)} · Visited ${f.exploration.visited.length}. ${fallback ? 'Artwork loading or unavailable; Simple fallback.' : ''}`;
+    if(this.grid.dataset.art!==this.art)this.grid.dataset.art=this.art;
+    const f = currentFloor(this.state);
+    const feedback=`Player cell ${f.position} · Revealed ${f.exploration.revealed.length}/${(this.map?.width??20)*(this.map?.height??20)} · Visited ${f.exploration.visited.length}. ${this.fallbackCells.size ? 'Artwork loading or unavailable; Simple fallback.' : ''}`;
+    if(this.feedback.textContent!==feedback)this.feedback.textContent=feedback;
   }
 }

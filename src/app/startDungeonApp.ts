@@ -5,7 +5,7 @@ import { DungeonMap, dungeonBiomeLabel, dungeonEncounterLabel } from '../ui/dung
 import '../style.css';
 import { mountTelemetryPreferences } from '../telemetry/preferences';
 import { DungeonSession } from './DungeonSession';
-import { freshDungeon, FloorCache } from '../domain/dungeon';
+import { freshDungeon, FloorCache, type DungeonState } from '../domain/dungeon';
 import { bothDungeonSlotsMissing, createDungeonStorage } from '../persistence/dungeonStorage';
 import { dungeonElement as el, renderDungeon } from '../ui/dungeon';
 import { BattleDialogs, type DialogChoice } from '../ui/dialogs';
@@ -25,12 +25,12 @@ let deferredStart: (()=>void) | null = null;
 const sound={enabled:false};
 const dialogs=new BattleDialogs(()=>{host?.modalTransition();queueMicrotask(()=>deferredStart?.());},()=>requestNew(),()=>screen.querySelector<HTMLElement>('h1')?.focus());
 mountBattleLayout();window.fitDiagnostics=diagnosticsSnapshot;
-const mapView=new DungeonMap(destination=>{if(!live||playing||loading||loadError||dialogs.open)return;const s=session.snapshot;if(session.step({id:s.id,depth:s.depth,revision:s.revision,destination})&&session.snapshot.phase==='battle')start();},()=>!live||playing||loading||loadError||dialogs.open);
+const mapView=new DungeonMap(destination=>{if(!live||playing||loading||loadError||dialogs.open)return;if(session.step({...session.spatialBoundary,destination})&&session.phase==='battle')start();},()=>!live||playing||loading||loadError||dialogs.open);
 function button(label:string,run:()=>void){const n=el('button',label);n.type='button';n.onclick=run;return n;}
-function evidence(){container.dataset.dungeonSnapshot=JSON.stringify(session.snapshot);container.dataset.dungeonBattleRecord=JSON.stringify(session.completedBattle);}
+function evidence(state:DungeonState=session.snapshot){container.dataset.dungeonSnapshot=JSON.stringify(state);container.dataset.dungeonBattleRecord=JSON.stringify(session.completedBattle);}
 function stop(){loadGeneration++;deferredStart=null;loading=false;loadError=false;playing=false;host=null;engine?.scene.stop('battle');controls.hidden=true;container.style.visibility='hidden';}
 function render(){
- if(!live)return;evidence();
+ if(!live)return;const state=session.snapshot;evidence(state);
  if(playing){persistence.querySelector('span')!.textContent=session.status;return;}
  shell.hidden=true;panel.hidden=true;screen.hidden=false;
  if(loading){
@@ -50,7 +50,7 @@ function render(){
   }else screen.append(el('p','Testing dungeon. Progress resets on reload.'),button('Start new dungeon',requestNew));
   const link=el('a','Three-battle scenario');link.href=`${import.meta.env.BASE_URL}run`;screen.append(link);
  }else {
-  renderDungeon(screen,session,dialogs,{start,recover:storage?recovery:undefined,restart:requestNew},cache,mapView);
+  renderDungeon(screen,state,session,dialogs,{start,recover:storage?recovery:undefined,restart:requestNew},cache,mapView);
   if(loadError){
    const error=el('p',storage?'Could not load the encounter. Reload the page to try again, or open Save recovery.':'Could not load the encounter. Reload the page to try again, or start a new dungeon.');
    error.id='dungeon-load-error';error.tabIndex=-1;error.setAttribute('role','alert');

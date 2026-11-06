@@ -2,7 +2,7 @@ import { progressionLabel } from '../domain/progression';
 import { DungeonMap, dungeonBiomeLabel, dungeonEncounterLabel } from './dungeonMap';
 import { poiCell } from '../domain/exploration';
 import { dungeonContent } from '../content/dungeon';
-import { dungeonBoundary, currentFloor, clearedDungeonSlots, FloorCache, type DungeonItemCommand } from '../domain/dungeon';
+import { dungeonBoundary, currentFloor, clearedDungeonSlots, FloorCache, type DungeonItemCommand, type DungeonState } from '../domain/dungeon';
 import type { DungeonSession } from '../app/DungeonSession';
 import { ITEM_BOUNDS } from '../content/itemTypes';
 import type { HeroId } from '../content/types';
@@ -10,10 +10,10 @@ import { preparationItemTarget, projectOwnedCatalog } from '../domain/items';
 import { BattleDialogs } from './dialogs';
 import './dungeon.css';
 export const dungeonElement = <K extends keyof HTMLElementTagNameMap>(tag: K, text = '') => { const n = document.createElement(tag); n.textContent = text; return n; };
-export function renderDungeon(root: HTMLElement, session: DungeonSession, dialogs: BattleDialogs,
+export function renderDungeon(root: HTMLElement, s: DungeonState, session: DungeonSession, dialogs: BattleDialogs,
   actions: { start: () => void; recover?: () => void; restart: () => void }, cache: FloorCache, mapView: DungeonMap) {
   const focusId=(document.activeElement as HTMLElement|null)?.id;
-  const el = dungeonElement, s = session.snapshot, floor = currentFloor(s);
+  const el = dungeonElement, floor = currentFloor(s);
   const title = el('h1', s.phase === 'defeat' ? `Dungeon defeat · ${dungeonBiomeLabel(s)} · Floor ${s.depth}` : `Dungeon · Floor ${s.depth} · ${dungeonBiomeLabel(s)}`); title.tabIndex = -1;
   const status = el('p',session.status);status.className='dungeon-status';status.setAttribute('role','status');
   let before=root.querySelector<HTMLElement>(':scope > [data-dungeon-part="before"]');

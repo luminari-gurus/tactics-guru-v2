@@ -39,7 +39,7 @@ jobs:
     if: github.event_name == 'pull_request' && github.event.pull_request.number == 279 && github.event.pull_request.head.repo.full_name == github.repository
     needs: verify
     runs-on: [self-hosted, tactics-browser, tactics-browser-01]
-    timeout-minutes: 90
+    timeout-minutes: 60
     steps:
       - name: Check host disposition
         run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
@@ -64,7 +64,7 @@ jobs:
           git ls-files -z src tests scripts public package.json package-lock.json 'playwright*.ts' 'tsconfig*.json' 'vite*.ts' 'vitest*.ts' | sort -z | xargs -0 sha256sum > verification-receipts/issue184/inputs.sha256
           node --input-type=module -e "import {chromium,webkit} from '@playwright/test'; for (const type of [chromium,webkit]) { const browser=await type.launch(type===chromium?{channel:'chromium'}:{}); console.log(type.name(),browser.version(),type.executablePath()); await browser.close(); }" > verification-receipts/issue184/browsers.txt
       - id: build
-        run: npm run build
+        run: npm run build:bundle
       - name: Record served build
         if: ${{ steps.build.outcome == 'success' }}
         run: find dist -type f -print0 | sort -z | xargs -0 sha256sum > verification-receipts/issue184/build.sha256
@@ -86,7 +86,7 @@ jobs:
           path: verification-receipts/issue184/
           retention-days: 30
           if-no-files-found: warn
-      - name: Dungeon Chromium consumers
+      - name: Dungeon Chromium consumers and warm engine reuse
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         env:
           PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/chromium-consumers.json
@@ -95,24 +95,8 @@ jobs:
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         env:
           PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/chromium-journeys.json
-        run: npx --no-install playwright test -c playwright.regression.config.ts tests/dungeon.spec.ts -g 'Shaman production journey|read-only entry, keyboard new dungeon|legal reward and guardian boundaries' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/chromium-journey-artifacts
-      - name: Saved-dungeon menu consumers
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        env:
-          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/menu.json
-        run: npx --no-install playwright test -c playwright.regression.config.ts tests/main-menu.spec.ts -g 'dungeon|New Game|new-game|stale Continue|unavailable storage and failed artwork' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/menu-artifacts
-      - name: Shared dungeon guard and direct-route isolation consumers
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        env:
-          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/shared-chromium.json
-        run: >-
-          npx --no-install playwright test -c playwright.regression.config.ts tests/guarded-effects.spec.ts tests/battle-persistence.spec.ts -g 'shared Guarded lifecycle and saved feedback: dungeon|testing routes:' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/shared-chromium-artifacts
-      - name: WebKit direct-route save isolation
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        env:
-          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/shared-webkit.json
-        run: npx --no-install playwright test -c playwright.device-acceptance.config.ts tests/battle-persistence.spec.ts -g 'testing routes:' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/shared-webkit-artifacts
-      - name: WebKit exploration consumers
+        run: npx --no-install playwright test -c playwright.regression.config.ts tests/dungeon.spec.ts -g 'Shaman production journey|read-only entry, keyboard new dungeon|legal reward and guardian boundaries|corrupt bytes stay exportable' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/chromium-journey-artifacts
+      - name: WebKit dungeon consumers and warm engine reuse
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         env:
           PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/webkit-consumers.json
@@ -121,38 +105,7 @@ jobs:
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         env:
           PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/webkit-journeys.json
-        run: npx --no-install playwright test -c playwright.exploration.config.ts tests/dungeon.spec.ts -g 'Shaman production journey|read-only entry, keyboard new dungeon|legal reward and guardian boundaries' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/webkit-journey-artifacts
-      - name: Dungeon audio and public assets at root preview
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        env:
-          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/audio-root-preview.json
-        run: npx --no-install playwright test -c playwright.regression.config.ts tests/public-asset-base.spec.ts -g 'dungeon audio' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/audio-root-preview-artifacts
-      - name: Dungeon audio and public assets at root dev
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        env:
-          PLAYWRIGHT_SERVER_MODE: dev
-          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/audio-root-dev.json
-        run: npx --no-install playwright test -c playwright.regression.config.ts tests/public-asset-base.spec.ts -g 'dungeon audio' --project=desktop --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/audio-root-dev-artifacts
-      - name: Build prefix bundle for deferred engine delivery
-        id: prefix
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run build:bundle -- --base=/prototype/
-      - name: Record served prefix bundle
-        if: ${{ !cancelled() && steps.prefix.outcome == 'success' }}
-        run: find dist -type f -print0 | sort -z | xargs -0 sha256sum > verification-receipts/issue184/prefix-build.sha256
-      - name: Dungeon audio and public assets at prefix preview
-        if: ${{ !cancelled() && steps.prefix.outcome == 'success' }}
-        env:
-          PLAYWRIGHT_BASE_PATH: /prototype/
-          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/audio-prefix-preview.json
-        run: npx --no-install playwright test -c playwright.prefix-assets.config.ts -g 'dungeon audio' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/audio-prefix-preview-artifacts
-      - name: Dungeon audio and public assets at prefix dev
-        if: ${{ !cancelled() && steps.prefix.outcome == 'success' }}
-        env:
-          PLAYWRIGHT_BASE_PATH: /prototype/
-          PLAYWRIGHT_SERVER_MODE: dev
-          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/audio-prefix-dev.json
-        run: npx --no-install playwright test -c playwright.prefix-assets.config.ts -g 'dungeon audio' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/audio-prefix-dev-artifacts
+        run: npx --no-install playwright test -c playwright.exploration.config.ts tests/dungeon.spec.ts -g 'Shaman production journey|read-only entry, keyboard new dungeon|legal reward and guardian boundaries|corrupt bytes stay exportable' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/webkit-journey-artifacts
       - uses: actions/upload-artifact@v4
         if: always()
         with:

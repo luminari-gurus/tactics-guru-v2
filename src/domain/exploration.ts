@@ -19,7 +19,13 @@ export function neighbors(cell: number, width = 20, height = width): number[] {
   return [cell - width, cell + 1, cell + width, cell - 1].filter(n => n >= 0 && n < width * height && Math.abs(n % width - cell % width) + Math.abs(Math.floor(n / width) - Math.floor(cell / width)) === 1);
 }
 export function reveal(position: number, width = 20, height = width): number[] {
-  return Array.from({ length: width * height }, (_, i) => i).filter(i => Math.abs(i % width - position % width) + Math.abs(Math.floor(i / width) - Math.floor(position / width)) <= 2);
+  const x = position % width, y = Math.floor(position / width), cells: number[] = [];
+  // Visit only the radius-two diamond, retaining the saved row-major order.
+  for (let row = Math.max(0, y - 2); row <= Math.min(height - 1, y + 2); row++) {
+    const radius = 2 - Math.abs(row - y);
+    for (let column = Math.max(0, Math.ceil(x - radius)); column <= Math.min(width - 1, Math.floor(x + radius)); column++) cells.push(row * width + column);
+  }
+  return cells;
 }
 const union = (a: readonly number[], b: readonly number[]) => [...new Set([...a, ...b])].sort((a,b) => a-b);
 export function visit(exploration: Exploration, position: number, width = 20, height = width): Exploration {
@@ -28,7 +34,8 @@ export function visit(exploration: Exploration, position: number, width = 20, he
 export function encounterPois(seed: number, map: GeneratedMap = generateMap(seed, 'rooms')): EncounterPoi[] {
   if (!validMapCells(map.cells, map.width, map.height, map.type === 'arena')) throw Error('Invalid exploration geometry');
   const first = map.cells.indexOf(1), last = map.cells.lastIndexOf(1);
-  const candidates = map.cells.flatMap((cell,i) => cell && i !== first && i !== last ? [i] : []);
+  const candidates: number[] = [];
+  map.cells.forEach((cell,i) => { if (cell && i !== first && i !== last) candidates.push(i); });
   if (candidates.length < 3) throw Error('Insufficient encounter cells');
   let rng = seedRng(Number.parseInt(hashJson({ seed, policy: EXPLORATION_VERSION }).slice(-8),16));
   return [0,1,2].map(encounterSlot => {

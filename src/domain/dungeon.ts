@@ -62,6 +62,9 @@ function rememberAdmission(key: string) {
   admittedEncounters.delete(key); admittedEncounters.set(key, true);
   if (admittedEncounters.size > 128) admittedEncounters.delete(admittedEncounters.keys().next().value!);
 }
+// Register only maps frozen by FloorCache. Metadata is weakly held, never part
+// of the hashed map or supplied by a save, and cannot outlive the owned geometry.
+const floorGeometryFacts = new WeakMap<GeneratedMap, { value?: { mapHash: string; upstairs: number; downstairs: number } }>();
 /** Only resolved geometry is evicted. Durable descriptors/completion never enter this cache. */
 export class FloorCache {
   private maps = new Map<string, GeneratedMap>();
@@ -73,6 +76,7 @@ export class FloorCache {
     if (!map) {
       const generated = generateMap(seed, generator === 'rooms-v1' ? 'rooms' : generator === 'arena-v1' ? 'arena' : 'sector-graph', size);
       map = Object.freeze({ ...generated, cells: Object.freeze([...generated.cells]) });
+      floorGeometryFacts.set(map, {});
     }
     this.maps.delete(key); this.maps.set(key, map);
     if (this.maps.size > this.capacity) this.maps.delete(this.maps.keys().next().value!);
@@ -88,8 +92,11 @@ function legacyEncounterPlans(depth: number): FloorDescriptor['encounters'] {
 }
 function floorGeometry(seed: number, depth: number, biome: FloorDescriptor['biome'], cache = sharedFloorCache, generator: FloorDescriptor['generator'] = depth === 1 ? 'rooms-v1' : dungeonSeed(seed, depth, 'floor') % 4 === 0 ? 'arena-v1' : 'sector-graph-v1'): Omit<FloorDescriptor, 'encounters'> {
   const floorSeed = dungeonSeed(seed, depth, 'floor'), size = generator === 'rooms-v1' ? 20 : floorSize(depth), map = cache.resolve(floorSeed, generator, size);
+  const cached = floorGeometryFacts.get(map);
+  const facts = cached?.value ?? { mapHash: hashJson(map), upstairs: map.cells.indexOf(1), downstairs: map.cells.lastIndexOf(1) };
+  if (cached) cached.value = facts;
   return { depth, seed: floorSeed, template: DUNGEON_TEMPLATE, generator, ...(generator === 'rooms-v1' ? {} : {size}), biome,
-    mapHash: hashJson(map), upstairs: map.cells.indexOf(1), downstairs: map.cells.lastIndexOf(1) };
+    ...facts };
 }
 export function floorDescriptor(seed: number, depth: number, cache = new FloorCache(), policy: DungeonEncounterPolicy = DUNGEON_ENCOUNTER_POLICY): FloorDescriptor {
   const legacy = policy === LEGACY_ENCOUNTER_POLICY;

@@ -13,7 +13,7 @@ import { readSession,playCommand } from './helpers/battlePolicy';
 import { installRailControls } from './helpers/forceRailControls';
 import { playerDecision } from './helpers/playerPolicy';
 import { dungeonBattle } from '../src/domain/dungeon';
-import { atCell, atEncounter, atStairApproach, dungeonCapacityFixture, priorDungeonEnvelope, dungeonContactApproach } from './helpers/dungeonFixtures';
+import { atCell, atEncounter, atStairApproach, dungeonCapacityFixture, priorDungeonEnvelope, dungeonContactApproach, dungeonVictoryBoundary } from './helpers/dungeonFixtures';
 import { LEGACY_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
 import { freshExploration, movableExploration } from '../src/domain/exploration';
 import { encodeDungeon, utf8Bytes } from '../src/domain/dungeonSaveEnvelope';
@@ -471,13 +471,19 @@ test('maximum-size saved floor renders and accepts a step after reload', async (
  expect(horizontal.scrollLeft).toBeGreaterThan(0);
  expect(horizontal.lastColumnVisible,'The final column must be reachable by scrolling').toBe(true);
  await page.setViewportSize(viewport);
- await map.evaluate(grid=>{const state={grid,removed:false};(window as unknown as {__floorMount:typeof state}).__floorMount=state;new MutationObserver(records=>{if(records.some(record=>[...record.removedNodes].some(node=>node===grid || node.contains(grid))))state.removed=true;}).observe(document.querySelector('#dungeon-screen')!,{childList:true,subtree:true});});
+ await map.evaluate(grid=>{const state={grid,controls:[...document.querySelectorAll<HTMLElement>('#dungeon-art, .dungeon-directions button')],removed:false};(window as unknown as {__floorMount:typeof state}).__floorMount=state;new MutationObserver(records=>{if(records.some(record=>[...record.removedNodes].some(node=>node===grid || node.contains(grid))))state.removed=true;}).observe(document.querySelector('#dungeon-screen')!,{childList:true,subtree:true});});
  const before=await dungeonSnapshot(page), floor=before.floors[4], layout=floorMap(floor.descriptor);
  const destination=neighbors(floor.position,layout.width).find(n=>layout.cells[n]&&!floor.exploration.pois.some(p=>poiCell(p,layout.width)===n));
  if(destination===undefined) throw Error('No safe step on maximum floor');
  await walkDungeon(page,destination,isMobile?'touch':'keyboard');
  const after=await dungeonSnapshot(page);expect(after.floors[4].position).toBe(destination);
  expect(await page.evaluate(()=>(window as unknown as {__floorMount:{removed:boolean}}).__floorMount.removed)).toBe(false);
+ expect(await page.evaluate(()=>{const controls=(window as unknown as {__floorMount:{controls:HTMLElement[]}}).__floorMount.controls;return controls.length===5&&controls.every(control=>control.isConnected&&control===document.getElementById(control.id));})).toBe(true);
+ await expect(page.locator('#dungeon-map-feedback')).toContainText(`Player cell ${destination}`);
+ for(const [name,delta] of [['north',-layout.width],['east',1],['south',layout.width],['west',-1]] as const){
+  const enabled=neighbors(destination,layout.width).includes(destination+delta)&&Boolean(layout.cells[destination+delta]);
+  await expect(page.locator(`#dungeon-step-${name}`)).toBeEnabled({enabled});
+ }
  await assertLayout();
  await page.reload(); await continueSavedDungeon(page); expect(await dungeonSnapshot(page)).toEqual(after);
  await assertLayout();
@@ -687,4 +693,52 @@ test('adopting a recovered dungeon invalidates the pending encounter load',async
   expect(JSON.parse((await dungeonSlots(page)).primary!).payload).toEqual(stepped);
   await expect(page.locator('canvas')).toHaveCount(0);expect(errors).toEqual([]);
  }finally {release();}
+});
+
+test('a second dungeon encounter reuses the engine after a legal victory without reloading',async({page,isMobile})=>{
+ const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+ // The fixture reaches this ongoing battle through legal domain commands; the browser enacts its final attack.
+ const witness=dungeonVictoryBoundary(1,0);if(!witness)throw Error('Missing legal victory boundary');
+ const encoded=encodeDungeon(witness.snapshot);if(!encoded.ok)throw Error(encoded.reason);
+ await page.goto('./?game=dungeon');
+ await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
+ await page.reload();await continueSavedDungeon(page);
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ expect((await readSession(page)).state).toEqual(witness.snapshot.activeBattle);
+ await expect(page.locator('canvas')).toHaveCount(1);
+ const canvas=await page.locator('#game canvas').elementHandle();if(!canvas)throw Error('Missing initial battle canvas');
+ await playCommand(page,witness.command);
+ await expect(page.getByRole('heading',{name:'Choose one reward',exact:true})).toBeVisible();
+ const won=await dungeonSnapshot(page);
+ expect(won.phase).toBe('reward');expect(won.floors[0].completed).toBe(1);expect(won.activeBattle).toBeNull();
+ const decline=page.getByRole('button',{name:'Decline reward',exact:true});
+ if(isMobile)await decline.tap();else await decline.click();
+ await page.locator('#dungeon-item-confirm').click();
+ const ready=await dungeonSnapshot(page);
+ expect(ready.phase).toBe('ready');expect(ready.offer).toBeNull();expect(ready.ownership).toEqual(won.ownership);
+ const floor=ready.floors[0],next=floor.exploration.pois.find(p=>p.encounterSlot===1)!;
+ await walkDungeon(page,poiCell(next,floor.descriptor.size??20),isMobile?'touch':'keyboard');
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ const second=await dungeonSnapshot(page),session=await readSession(page);
+ expect(second.phase).toBe('battle');expect(second.id).toBe(witness.snapshot.id);
+ expect(second.floors[0].exploration.active).toBe(1);
+ expect(second.activeBattle!.seed).toBe(dungeonSeed(second.seed,second.depth,'battle',1));
+ expect(second.activeBattle!.seed).not.toBe(witness.snapshot.activeBattle!.seed);
+ expect(session.state).toEqual(second.activeBattle);
+ await expect(page.locator('canvas')).toHaveCount(1);
+ expect(await canvas.evaluate(node=>node.isConnected&&node===document.querySelector('#game canvas'))).toBe(true);
+ const command=playerDecision(session.state,dungeonBattle(second)!.catalog),beforeCommands=session.replay?.commands??session.continuation!.commands;
+ await playCommand(page,command);
+ await expect.poll(async()=>(await readSession(page)).state.commandCount).toBeGreaterThan(session.state.commandCount);
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ const after=await readSession(page),saved=await dungeonSnapshot(page);
+ // The HUD represents a single automatic missile by unitId, as in the Shaman journey.
+ const accepted=command.type==='useAbility'&&command.abilityId==='ability:magic_missile'&&'missileTargets' in command.target&&command.target.missileTargets.length===1
+  ?{...command,target:{unitId:command.target.missileTargets[0]}}:command;
+ expect((after.replay?.commands??after.continuation!.commands)[beforeCommands.length]).toEqual(accepted);
+ expect(after.state).toEqual(saved.activeBattle);
+ expect(JSON.parse((await dungeonSlots(page)).primary!).payload).toEqual(saved);
+ await expect(page.locator('canvas')).toHaveCount(1);
+ expect(await canvas.evaluate(node=>node.isConnected&&node===document.querySelector('#game canvas'))).toBe(true);
+ expect(errors).toEqual([]);
 });
