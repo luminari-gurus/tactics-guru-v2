@@ -27,6 +27,8 @@ body:has(#dungeon-screen:not([hidden])) #battle-heading { display: none; }
   min-width: calc(var(--dungeon-map-columns) * var(--dungeon-map-min-cell) + (var(--dungeon-map-columns) - 1) * var(--dungeon-map-gap) + 2 * var(--dungeon-map-border));
   max-width: none;
   aspect-ratio: 1;
+  /* Keep layout independent without clipping focus or marker outlines. */
+  contain: size layout;
   gap: var(--dungeon-map-gap);
   background: #0b1119;
   border: var(--dungeon-map-border) solid #81917d;

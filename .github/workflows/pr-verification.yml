@@ -39,7 +39,7 @@ jobs:
     if: github.event_name == 'pull_request' && github.event.pull_request.number == 279 && github.event.pull_request.head.repo.full_name == github.repository
     needs: verify
     runs-on: [self-hosted, tactics-browser, tactics-browser-01]
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - name: Check host disposition
         run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
@@ -68,16 +68,34 @@ jobs:
       - name: Record served build
         if: ${{ steps.build.outcome == 'success' }}
         run: find dist -type f -print0 | sort -z | xargs -0 sha256sum > verification-receipts/issue184/build.sha256
-      - name: Chromium warm maximum-floor movement
+      - name: Chromium initial, cold maximum and visible warm maximum budgets
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         env:
-          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/warm-chromium.json
-        run: npx --no-install playwright test -c playwright.regression.config.ts tests/dungeon-exploration.spec.ts -g 'warm maximum-size floor step responsiveness' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/warm-chromium-artifacts
-      - name: WebKit warm maximum-floor movement
+          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/maximum-chromium.json
+        run: npx --no-install playwright test -c playwright.regression.config.ts tests/dungeon-exploration.spec.ts -g 'maximum-size|records route transfer|cold progression-format' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/maximum-chromium-artifacts
+      - name: WebKit initial, cold maximum and visible warm maximum budgets
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         env:
-          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/warm-webkit.json
-        run: npx --no-install playwright test -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'warm maximum-size floor step responsiveness' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/warm-webkit-artifacts
+          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/maximum-webkit.json
+        run: npx --no-install playwright test -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'maximum-size|records route transfer|cold progression-format' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/maximum-webkit-artifacts
+      - name: Upload initial performance receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue184-performance-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/issue184/
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Chromium contained-grid layout and input
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/layout-chromium.json
+        run: npx --no-install playwright test -c playwright.regression.config.ts tests/dungeon-exploration.spec.ts -g 'exploration cells stay square|real traversal, art independence|map input stays inert while hidden|stairs travel once per entry with cell' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/layout-chromium-artifacts
+      - name: WebKit contained-grid layout and input
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/layout-webkit.json
+        run: npx --no-install playwright test -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'exploration cells stay square|real traversal, art independence|map input stays inert while hidden|stairs travel once per entry with cell' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/layout-webkit-artifacts
       - uses: actions/upload-artifact@v4
         if: always()
         with:
