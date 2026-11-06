@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './helpers/coreGraphics';
 
 for (const route of ['', '?scene=proof', '?scene=content-smoke', 'run']) {
   test(`missing engine chunk reports a recoverable startup error on ${route || 'battle'}`, { tag: '@canonical' }, async ({page}) => {

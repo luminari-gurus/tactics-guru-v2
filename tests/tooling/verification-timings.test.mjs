@@ -123,9 +123,9 @@ test('timed commands preserve selectors and explicit mode isolation from full ve
   assert.ok(command('build-integration').args.includes('test:build'));
 });
 
-test('preflight accounts for mixed-engine health checks and full Chromium versus headless collection', () => {
+test('preflight accounts for WebKit health checks and full Chromium versus headless collection', () => {
   const engines = id => enginesFor(stages.find(s => s.id === id));
-  assert.deepEqual(engines('health-bars'), ['chromium-headless', 'webkit']);
+  assert.deepEqual(engines('health-bars'), ['webkit']);
   assert.deepEqual(engines('performance'), ['chromium-headless']);
   assert.deepEqual(engines('webkit-exploration'), ['webkit']);
   assert.deepEqual(engines('fixtures'), ['chromium']);

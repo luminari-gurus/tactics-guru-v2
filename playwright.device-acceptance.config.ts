@@ -1,5 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
-import base from './playwright.config';
+import base from './playwright.regression.config';
 
 // Chromium functional coverage is retained with merged #124. This matrix adds
 // current WebKit persistence, legal outcomes/restarts, audio and full-run evidence.

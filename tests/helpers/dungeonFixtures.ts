@@ -66,7 +66,7 @@ export function dungeonCapacityFixture(policy: DungeonEncounterPolicy = DUNGEON_
     const equipment=Array.from({length:6},(_,i)=>({instanceId:`${base.id}:floor:${Math.floor(i/2)+1}:reward:${i%2}:option:0`,itemId:'item:warding_charm' as const}));
     const candidate:DungeonState={...base,revision:100,depth:4,floors,phase:'reward',ownership:{consumables:[],equipment,assignments:[{heroId:'fighter',slot:'charm',instanceId:equipment[0].instanceId}]}};
     const offer=dungeonOffer(candidate);
-    if(offer.options.every(o=>o.itemId!=='item:healing_draught'))return checkedDungeon(readDungeon({...atEncounter(candidate,0),offer}));
+    if(offer.options.every(o=>dungeonContent.items[o.itemId].kind==='equipment'))return checkedDungeon(readDungeon({...atEncounter(candidate,0),offer}));
   }
   throw Error('No two-charm capacity fixture');
 }
@@ -93,8 +93,14 @@ export const atDownstairs = (s: DungeonState) => atCell(s,s.floors[s.depth-1].de
 /** Deliberate existing reward/equipment/healing choices, shared by pure witness search and UI play. */
 export function journeyPreparation(s: DungeonState): DungeonItemCommand | null {
   const boundary = dungeonBoundary(s);
+  const fallen = s.party.find(h=>h.hp===0);
+  const kit = 'item:revive_kit';
+  if (['ready','reward'].includes(s.phase) && fallen && s.party.some(h=>h.hp>0) && s.ownership.consumables.some(c=>c.itemId===kit))
+    return {...boundary,type:'useItem',itemId:kit,heroId:fallen.heroId};
   if (s.offer) return { ...boundary, type:'claimReward', offerId:s.offer.id,
-    itemId:s.offer.options.find(o=>o.itemId==='item:healing_draught')?.itemId??s.offer.options[0].itemId };
+    itemId:s.offer.options.find(o=>o.itemId===(fallen?kit:'item:healing_draught'))?.itemId??
+      s.offer.options.find(o=>o.itemId==='item:healing_draught')?.itemId??
+      s.offer.options.find(o=>dungeonContent.items[o.itemId].kind==='equipment')?.itemId??s.offer.options[0].itemId };
   if (s.phase !== 'ready') return null;
   const hero = s.party.find(h=>h.hp>0&&!s.ownership.assignments.some(a=>a.heroId===h.heroId));
   const item = s.ownership.equipment.find(e=>!s.ownership.assignments.some(a=>a.instanceId===e.instanceId));
@@ -226,7 +232,9 @@ export function mageJourney(seed:number) {
       const entry=state,built=dungeonBattle(state)!,battle=new BattleSession(built.catalog,state.activeBattle!,state.activeBattle!.seed,undefined,true,built.battlefield);
       for(let step=0;step<500&&battle.state.outcome==='ongoing';step++) {
         if(battle.phase==='enemy'){const p=battle.nextEnemy();if(!p)throw Error('Enemy stalled');battle.finishPresentation(p.token);continue;}
-        const command=mageDecision(battle.state,built.catalog,used.snare);if(!battle.prepare(command).ok)throw Error('Mage witness rejected');
+        // Once both earned abilities are witnessed, wait legally to a terminal
+        // defeat instead of adding unrelated floors to this bounded witness.
+        const command=used.snare&&used.missiles?{type:'endTurn' as const,unitId:battle.active.id}:mageDecision(battle.state,built.catalog,used.snare);if(!battle.prepare(command).ok)throw Error('Mage witness rejected');
         const p=battle.confirm();if(!p)throw Error('Mage witness stalled');battle.finishPresentation(p.token);
         if(command.type==='useAbility'&&command.abilityId==='ability:frost_snare')used.snare=true;
         if(p.events.filter(e=>e.type==='missileRolled').length>=2)used.missiles=true;
@@ -257,4 +265,16 @@ export function healedFighterBoundary() {
     for(let i=0;i<20;i++){const command=journeyPreparation(state);if(!command)break;state=checkedDungeon(dungeonItem(state,command));}
   }
   throw Error('Missing healed Fighter boundary');
+}
+
+/** Two real cardinal steps into a live encounter; only the starting position is staged. */
+export function dungeonContactApproach(slot: number, seed = 13) {
+  const base = freshDungeon(`contact-${slot}-${seed}`, seed), floor = base.floors[0];
+  const map = floorMap(floor.descriptor), target = poiCell(floor.exploration.pois[slot], map.width);
+  const live = new Set(floor.exploration.pois.map(p => poiCell(p, map.width)));
+  for (const approach of neighbors(target, map.width, map.height).filter(cell => map.cells[cell] && !live.has(cell))) {
+    const from = neighbors(approach, map.width, map.height).find(cell => map.cells[cell] && !live.has(cell) && !neighbors(target, map.width, map.height).includes(cell));
+    if (from !== undefined) return { state: atCell(base, from), approach, target };
+  }
+  throw Error('No two-step contact approach');
 }

@@ -43,6 +43,8 @@ inputs and recorded source/build identity; preserve failures and incomplete runs
 Documentation-only changes do not require app/browser reruns. Browser CI uses the
 self-hosted runner with no automatic GitHub-hosted fallback.
 
+Eligible `risk:low` PRs auto-merge after `PR verification` passes for their current commit; [the workflow](.github/workflows/auto-merge-low-risk.yml) defines maintainer and safety checks.
+
 ## `/work-work-work`
 
 When the user submits `/work-work-work`, read and follow

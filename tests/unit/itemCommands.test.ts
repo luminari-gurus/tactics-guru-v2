@@ -144,7 +144,7 @@ describe('context, stale intents and atomic reward grant', () => {
     expect(JSON.stringify(s)).toBe(before);
   });
   it('grants equipment once, advances once and has stable option-derived identity', () => {
-    const s = freeze(reward()), before = JSON.stringify(s), cmd = intent(s, { type: 'claimReward', offerId: s.offer!.id, itemId: aim });
+    const s = freeze(reward(3)), before = JSON.stringify(s), cmd = intent(s, { type: 'claimReward', offerId: s.offer!.id, itemId: aim });
     const result = applyItemCommand(s, cmd, context(s), authoredRun, runCatalog, itemCatalog); assert(result.ok);
     expect(result.state.ownership).toEqual({ consumables: [], equipment: [{ instanceId: instance(), itemId: aim }], assignments: [] });
     expect(result.state.run).toMatchObject({ phase: 'battle', encounterIndex: 1, revision: 2, seed: s.run.seed, party: s.run.party });
@@ -159,7 +159,7 @@ describe('context, stale intents and atomic reward grant', () => {
     assert(a.ok && b.ok); expect(a).toEqual(b); expect(nextUint32(a.state.rng)).toEqual(nextUint32(b.state.rng));
   });
   it('preserves both sides of a failed grant or stale/invalid offer choice', () => {
-    const s = reward();
+    const s = reward(3);
     for (const fields of [{ type: 'claimReward', offerId: 'foreign', itemId: aim },
       { type: 'claimReward', offerId: s.offer!.id, itemId: potion },
       { type: 'claimReward', offerId: s.offer!.id, itemId: 'item:missing' }]) {
@@ -188,6 +188,23 @@ describe('context, stale intents and atomic reward grant', () => {
 });
 
 describe('healing and equipment operations', () => {
+  it('revives a fallen hero once at the projected rounded HP without changing equipment or progression', () => {
+    const itemId = 'item:revive_kit';
+    const s = withOwnership(prepared());
+    const ready = freeze({ ...s, run: { ...s.run, party: s.run.party.map(h => h.heroId === 'fighter' ? { ...h, hp: 0 } : h) },
+      ownership: { ...s.ownership, consumables: [...s.ownership.consumables, { itemId, quantity: 1 }],
+        assignments: [{ heroId: 'fighter', slot: 'charm', instanceId: instance() }] } } as RunItems);
+    expect(apply(ready, { type: 'useItem', itemId, heroId: 'ranger' })).toEqual({ ok: false, reason: 'invalidTarget' });
+    expect(apply(ready, use)).toEqual({ ok: false, reason: 'invalidTarget' });
+    const revive = { type: 'useItem', itemId, heroId: 'fighter' };
+    const next = accepted(apply(ready, revive));
+    expect(next.run.party[0]).toEqual({ ...ready.run.party[0], hp: 6 });
+    expect(next.ownership).toEqual({ ...ready.ownership, consumables: [{ itemId: potion, quantity: 2 }] });
+    expect(applyItemCommand(next, intent(ready, revive), context(next), authoredRun, runCatalog, itemCatalog)).toEqual({ ok: false, reason: 'staleBoundary' });
+    expect(apply(next, revive)).toEqual({ ok: false, reason: 'invalidTarget' });
+    const projected = projectItemCatalog(next, authoredRun, runCatalog, itemCatalog); assert(projected.ok);
+    expect(projected.catalog.heroes.fighter.stats.armorClass).toBe(runCatalog.heroes.fighter.stats.armorClass + 1);
+  });
   it('heals at reward and encounter preparation, caps HP and consumes exactly once', () => {
     for (const runState of [reward(), prepared()]) {
       const s = freeze(withOwnership(runState)), before = JSON.stringify(s);

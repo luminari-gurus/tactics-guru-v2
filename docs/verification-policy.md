@@ -1,5 +1,49 @@
 # Verification tiers and evidence reuse
 
+## Ordinary PR feedback: under ten minutes
+
+`npm run verify:pr` is the default automated PR check: all fast units (including
+content), both TypeScript scopes, both root/prefix build integrations, one ordinary
+production bundle, and seven explicitly selected E2E journeys. It validates content
+and types once before bundling. `npm run test:pr -- --list` shows the browser list;
+`npm run test:pr -- <filters>` runs focused browser feedback after a successful build.
+The command records per-stage logs, unit/browser JSON and a source-bound summary
+under `verification-receipts/pr/`. Failures stop the command before dependent work.
+Owned-process cleanup uses the existing timing runner, including on interruption.
+
+The self-hosted `PR verification` workflow has a ten-minute **active job** budget,
+including dependency/browser setup and artifact upload. The command has an
+eight-minute budget and the browser phase a five-minute cap. Queue time depends
+on runner availability and is separate. A timeout is a failed check, never proof
+that the target was met. Measure successful job durations before claiming success.
+
+| Profile | Core use cases |
+| --- | --- |
+| Desktop Chromium (5) | Public menu New Game; recoverable missing engine chunk; complete winning battle with replay/reload; run undo/reload/terminal outcome; dungeon creation/action/resume |
+| Pixel touch portrait (1) | Real board touch, modal capture and suspend/resume |
+| iPhone WebKit (1) | Dungeon creation, real action and active-battle resume |
+
+These are existing tests with their original assertions and timeouts. The public
+menu New Game journey replaces the diagnostic proof-scene resize check in routine
+feedback; explicit setup/regression configs still own the diagnostic check. An exact
+discovery contract prevents accidental expansion or loss of the seven selections.
+Before this migration, the broad default selected 1,036 cases (353 desktop, 344
+portrait, 339 landscape). Ordinary E2E now selects seven; the explicit broad
+regression matrix selects 1,030 after removing redundant XP 60/600 permutations. This is a selection count,
+not a measured runtime speedup or equivalent full-regression coverage.
+
+`npm test` and direct `playwright test` now use this same seven-journey selection.
+`npm run test:regression -- <filters>` explicitly selects the broad Chromium
+compatibility matrix; special configs and `verify:full` retain their explicit
+regression/qualification purpose. New cases do not automatically join the core
+allowlist. The Mage XP browser loop now retains XP 0 and 180 on all former profiles;
+seven fast unit boundaries cover exact progression/save projections.
+Passing the fast lane is ordinary feedback; affected engine/input/save boundaries
+and explicit issue acceptance gates still use the change matrix below. A green PR
+check does not claim that those additional obligations ran. The incremental
+[build-time plan](ongoing-projects/build-times.md) tracks moving detailed rule and
+failure permutations into unit coverage before reducing those regression suites.
+
 This is the selection contract from #201, with explicit commands added by #202.
 Select checks by the behavior and
 consumers affected, not by a dependency version, lockfile edit or merge step alone.
@@ -21,7 +65,7 @@ Contents: [tiers](#choose-a-tier), [change matrix](#pr-readiness-selection-by-ch
 | --- | --- | --- |
 | Iteration | While changing one behavior | Run the smallest affected unit/test file and relevant browser case; use file/project/title filters. Record failures. This is feedback, not PR acceptance. |
 | PR readiness | Final affected inputs are frozen | Apply the change matrix below, include transitive consumers and meaningful negative cases, verify the final build identity, and account for reused evidence. Include required device/engine cases. |
-| Full regression | Cross-cutting runtime/save/input changes, broad shared harness changes, major engine/compiler/browser compatibility changes with broad impact, affected consumers that remain unbounded after focused inspection, release qualification, or explicit issue/caller requirement | Account for every routine suite in the inventory, including dev-only checks and distinct telemetry builds. Run extended journeys when an explicit acceptance gate or the affected behavior requires them. Reuse qualifying existing evidence; run invalidated coverage. |
+| Full regression | Deliberate broad compatibility investigation, release qualification, or explicit issue/caller requirement | Account for every routine suite in the inventory, including dev-only checks and distinct telemetry builds. Run extended journeys when an explicit acceptance gate or the affected behavior requires them. Reuse qualifying existing evidence; run invalidated coverage. |
 
 Choose the union of affected checks for mixed changes. A dependency or browser
 upgrade does not automatically select full regression; inspect its actual changes
@@ -42,12 +86,12 @@ Check imports, callers, fixtures and config before choosing exact tests.
 | --- | --- |
 | Docs / agent instructions only | Check links, paths, command syntax and consistency with configs. Use test discovery for changed commands, filters or suite membership; prose-only policy changes need no application execution. Changes to actual test/config code use the applicable rows below. |
 | UI / layout / input | Affected UI/geometry units; both TypeScript scopes and production build; affected browser files with desktop keyboard/focus and portrait/landscape native touch. Include narrow layouts and relevant health-bar/WebKit configs. Preserve preparation, modal, resize and input-lock boundaries. Shared HUD/scene changes include standalone, run and dungeon consumers. |
-| Domain / combat / content rules | Affected domain/session/content units, both TypeScript scopes and build. Exercise affected abilities/commands through the real HUD and a complete legal battle or run journey; include save/replay consequences. Shared turn/RNG/command contracts require full unit and browser regression. Add dev encounter/item suites when their consumers change. |
-| Persistence / lifecycle | Relevant storage/envelope/session units, both TypeScript scopes and build; affected battle/run/dungeon reload, corruption, backup, stale-write, focus and actual BFCache cases. Include WebKit acceptance/exploration and legal complete journeys for affected routes. Shared save formats/admission or cross-route lifecycle changes require full regression. |
+| Domain / combat / content rules | Affected domain/session/content units, both TypeScript scopes and build. Exercise affected abilities/commands through the real HUD and a complete legal battle or run journey; include save/replay consequences. Shared turn/RNG/command changes require all units and the affected core journeys. Add a bounded browser witness only for an integration gap that units cannot prove. Add dev encounter/item suites when their consumers change. |
+| Persistence / lifecycle | Relevant storage/envelope/session units, both TypeScript scopes and build; affected battle/run/dungeon reload, corruption, backup, stale-write, focus and actual BFCache cases. Include WebKit acceptance/exploration and legal complete journeys for affected routes. Shared save formats/admission require all storage/envelope/session units and affected core resume journeys. Add bounded engine-specific lifecycle checks for changed browser behavior. |
 | Dependency / security patch | Use the [small dependency patch](#small-dependency-patches) checks when impact is bounded. Runtime, browser and engine changes also select the rows for their affected behavior. A lockfile edit is not a blanket full-regression trigger. |
 | Assets / build / loading | Affected content/inventory/export units and `buildHeaders.test.ts` (both root/prefix builds), both TypeScript scopes and production build; affected asset/base-path, loading/failure and boot cases in relevant modes. Include visual desktop/mobile checks for changed art and audio delivery/unlock for audio changes. Inspect build-size deltas; collect performance captures for changed performance behavior, a material delta that threatens a documented budget, or explicit release/performance qualification. Bounded toolchain patches use the dependency row. |
 | Telemetry | Telemetry units, both TypeScript scopes, ordinary unconfigured build behavior and dedicated configured production + development telemetry suites. Retain opt-out, disabled/failure behavior, error mapping and gameplay-independence assertions. Shared bootstrap/transport consumers expand selection. Never reuse an ordinary build as proof of the instrumented build. |
-| Test tooling / CI / selection | Relevant tooling contracts, config discovery and exact before/after selected test IDs; execute affected modes/engines on the qualified runner. Changed shared harness/project/selection behavior requires full regression of affected coverage, with explicit coverage mapping for any removed execution. A test-only edit can invalidate acceptance evidence. |
+| Test tooling / CI / selection | Relevant tooling contracts, config discovery and exact before/after selected test IDs; execute affected modes/engines on the qualified runner. Changed harness/project/selection behavior requires exact discovery across affected configs, core runtime checks and bounded changed UI/engine witnesses, with explicit coverage mapping for removed execution. Preserve unchanged optional matrices by discovery and relevant-input comparison. A test-only edit can invalidate acceptance evidence. |
 
 Use complete legal journeys, not mocked unit tests, as browser interaction proof.
 Retain touch/pointer, orientation, keyboard/focus, audio unlock and engine-specific
@@ -56,7 +100,7 @@ for touch-device or WebKit coverage when those behaviors are affected. The three
 
 ### Browser profile selection
 
-The default Chromium matrix keeps unclassified cases on desktop, native touch
+The broad Chromium matrix keeps unclassified cases on desktop, native touch
 portrait and native touch landscape. Only reviewed metadata narrows selection:
 
 - `@canonical`: desktop runs the complete device-independent resource failure or
@@ -71,10 +115,26 @@ to classify additional cases without reviewing their assertions. Current approve
 scope is nine canonical startup/asset cases and five explicit-viewport layout
 cases. Other routine interactions retain their matrix. The three extended progression journeys retain their matrix in the explicit extended commands.
 
+Full regression also applies reviewed stage filters beyond those tags: configured
+production and development telemetry run on desktop Chromium only; root-dev
+`public-asset-base.spec.ts` runs on desktop only; prefix-preview and prefix-dev
+use `playwright.prefix-assets.config.ts` so device-independent cases stay on
+desktop while `@touch-audio` cases also run on Pixel portrait; and the health-bar
+config keeps iPhone WebKit only. Telemetry has no device branches. Root-preview
+Chromium still runs `public-asset-base.spec.ts` on all three profiles, including
+the `hasTouch` sound tap and dungeon walk at `/`. Chromium health-bar cases
+remain in the broad regression suite. `@touch-audio` is not a broad-matrix grepInvert;
+it only includes the battle sound-tap and dungeon-walk audio cases on Pixel
+portrait under `/prototype/`.
+
 `npm run test:verification-batches` also checks real selection discovery, exact
-removed-to-retained mappings and negative selection/device drift. Batch discovery
-must still partition the canonical default set exactly. Special configs/modes
-retain their prior sets. The [issue #203 plan](../openspec/changes/issue-203-browser-coverage/design.md)
+removed-to-retained mappings and negative selection/device drift. Prefix-touch
+comparison uses the explicit three-profile Chromium regression matrix scoped to
+`public-asset-base.spec.ts`, so dropped Pixel landscape executions map to their
+desktop or portrait counterparts. Batch discovery must still partition the
+canonical broad set exactly. Special configs/modes retain their prior sets
+except those three reviewed full-regression filters.
+The [issue #203 plan](../openspec/changes/issue-203-browser-coverage/design.md)
 and QA evidence in `docs/qa/issue-203/` describe the classification and measurements.
 
 ```sh
@@ -140,21 +200,22 @@ PR readiness selects the applicable rows under the change matrix.
 | App and domain type boundaries | `npm run typecheck` | Both tsconfig scopes; also part of standalone build. |
 | Standalone production build | `npm run build` | Content validation, both typechecks and Vite; remains safe when run on its own, including prefix builds. |
 | Aggregate bundle step | `npm run build:bundle` | Internal to full verification after successful units/content and both type scopes. Creates the root, prefix or restored-root bundle without revalidating unchanged prerequisites. Use `npm run build` directly outside that guarded sequence. |
-| Default Chromium | `npx --no-install playwright test` | Routine default files, desktop + mobile portrait/landscape; the three long progression journeys are in the extended suite below. The dev-only placement case skips in preview and must run separately. |
+| Core E2E | `npm test` | Seven explicitly selected core journeys across desktop, Pixel touch and iPhone WebKit. |
+| Broad Chromium compatibility | `npm run test:regression` | Explicit regression files, desktop + mobile portrait/landscape; the three long progression journeys are in the extended suite below. The dev-only placement case skips in preview and must run separately. |
 | Extended progression journeys | `npm run test:extended` and `npm run test:extended:webkit` | Explicit, non-routine complete Mage, Ranger and Fighter progression journeys across three Chromium and three WebKit profiles; run when their full progression behavior needs certification. |
 | Authored encounter fixtures | `npm run test:fixtures -- authored-encounters.spec.ts` | `authored-encounters.spec.ts`, dev server, all three Chromium profiles. |
 | Ability-picker fixtures | `npm run test:fixtures -- ability-picker.spec.ts` | `ability-picker.spec.ts`, dev server, all three Chromium profiles. |
 | Run-item fixtures | `npm run test:fixtures -- run-items.spec.ts` | `run-items.spec.ts`, dev server, all three Chromium profiles. |
-| Placement failure/retry | `PLAYWRIGHT_SERVER_MODE=dev npx --no-install playwright test tests/overworld-map.spec.ts -g 'controlled placement failure preserves complete state and supports retry'` | Three Chromium profiles; preview skips are not coverage. |
+| Placement failure/retry | `PLAYWRIGHT_SERVER_MODE=dev npx --no-install playwright test -c playwright.regression.config.ts tests/overworld-map.spec.ts -g 'controlled placement failure preserves complete state and supports retry'` | Three Chromium profiles; preview skips are not coverage. |
 | WebKit battle/run acceptance | `npx --no-install playwright test -c playwright.device-acceptance.config.ts` | Config's selected battle-loop, persistence, run-progression, audio and radial hold/tap/cancel/End turn cases, iPhone portrait/landscape. |
 | WebKit dungeon/exploration | `npx --no-install playwright test -c playwright.exploration.config.ts` | Dungeon, exploration, lifecycle files; desktop and two mobile orientations. |
-| Health-bar device matrix | `npx --no-install playwright test -c playwright.health-bars.config.ts` | Health-bar file, three Chromium and two WebKit profiles. Account for existing Chromium overlap; no silent removal. |
-| Configured production telemetry | `npm run test:telemetry` | `telemetry.spec.ts`; dedicated instrumented build in `tmp/issue128-dist`, all three Chromium profiles. |
-| Configured development telemetry | `PLAYWRIGHT_TELEMETRY_DEV=true npm run test:telemetry` | Dedicated dev-server environment; distinct from production evidence. |
-| Root/prefix asset behavior | `npx --no-install playwright test tests/public-asset-base.spec.ts` | Run root preview, prefixed preview and corresponding dev modes for full regression or affected build/base changes; recipe below. |
+| Health-bar device matrix | `npx --no-install playwright test -c playwright.health-bars.config.ts` | Health-bar file, iPhone portrait and landscape WebKit. Chromium desktop and Pixel coverage stays in the broad regression suite; do not reintroduce those duplicate projects. |
+| Configured production telemetry | `npm run test:telemetry` | `telemetry.spec.ts`; dedicated instrumented build in `tmp/issue128-dist`. Full regression selects desktop Chromium only. Focused runs without `--project` still discover all three profiles. |
+| Configured development telemetry | `PLAYWRIGHT_TELEMETRY_DEV=true npm run test:telemetry` | Dedicated dev-server environment; distinct from production evidence. Full regression is likewise desktop-only. |
+| Root/prefix asset behavior | `npx --no-install playwright test -c playwright.regression.config.ts tests/public-asset-base.spec.ts` | Root preview in the broad Chromium suite keeps all three profiles. Full regression runs root-dev on desktop only, and prefix-preview/prefix-dev on desktop plus Pixel portrait `@touch-audio` cases; recipe below. |
 | Performance capture | `npm run measure:fit` | Isolated production proof-scene collector; this is not a substitute for runtime budget assertions in browser tests. Required for affected performance work and release qualification, not every docs/UI-copy edit. |
 
-The routine default browser files (all included by the default config) are grouped here
+The broad compatibility browser files (included by the explicit regression config) are grouped here
 so every browser file has an owner in the inventory:
 
 - Assets/boot/rendering: `assets.spec.ts`, `boot.spec.ts`, `content-loading.spec.ts`,
@@ -180,7 +241,9 @@ and ability fixtures reset on reload, with learned-ability persistence retained
 in the menu dungeon corpus and extended journeys. Collector cold/warm coverage
 preserves game slots instead of clearing them. Issue #259's source-bound coverage
 [mapping](qa/issue-259/coverage-map.json) records moved/renamed/added IDs; the existing 23 approved device-matrix
-reductions remain unchanged.
+reductions remain unchanged. The additional full-regression desktop-only telemetry/root-dev
+filters, prefix `@touch-audio` Pixel portrait retention, and health-bar Chromium overlap
+removal are enforced by the live selection contract.
 Honor meaningful engine/mode skips (for example Chromium CDP-only input checks
 and production-only resource hints); record reasons, and run the owning mode.
 
@@ -188,13 +251,14 @@ and production-only resource hints); record reasons, and run the owning mode.
 
 ```sh
 npm run test:unit -- tests/unit/grid.test.ts
-npx --no-install playwright test tests/boot.spec.ts --project=desktop -g 'boots a Phaser scene'
+npx --no-install playwright test -c playwright.regression.config.ts tests/boot.spec.ts --project=desktop -g 'boots a Phaser scene'
 # Verify selection without launching browsers or a server:
-npx --no-install playwright test tests/boot.spec.ts --project=desktop -g 'boots a Phaser scene' --list
+npx --no-install playwright test -c playwright.regression.config.ts tests/boot.spec.ts --project=desktop -g 'boots a Phaser scene' --list
 ```
 
-`npm test -- <filters>` forwards file, project and grep filters directly to
-Playwright with no lifecycle posttests. `npm run test:fixtures -- <filters>` does
+`npm test -- <filters>` narrows the seven core journeys. For other cases use
+`npm run test:regression -- <filters>`, which forwards file, project and grep
+filters without posttests. `npm run test:fixtures -- <filters>` does
 the same for the dev fixtures. Without filters, `test:fixtures` runs authored
 encounters, run items and ability-picker fixtures under one dev-server lifecycle, preserving all three
 projects and assertions. The old individual config entry points remain supported.
@@ -204,17 +268,17 @@ projects and assertions. The old individual config entry points remain supported
 
 `npm run verify:full` executes the complete inventory sequentially: tooling,
 all fast units (including content), both type scopes, root/prefix build integrations,
-then the root bundle and default Chromium,
-combined fixtures, dev map placement/cleanup, both WebKit configs, health bars, production and
-dev telemetry, root dev assets, isolated performance capture, prefix build/assets
-in preview and dev, then root-build restoration. Root preview assets already run
-in the default Chromium suite. The 19 stages validate ordinary content and both
+then the root bundle and broad Chromium,
+combined fixtures, dev map placement/cleanup, both WebKit configs, iPhone health bars, production and
+dev telemetry on desktop, root dev assets on desktop, isolated performance capture, prefix build/assets
+in preview and dev on desktop plus Pixel portrait `@touch-audio` cases, then root-build restoration. Root preview assets already run
+in the broad Chromium suite on all three profiles. The 19 stages validate ordinary content and both
 type scopes once before any ordinary bundle. Prefix and restored-root bundles
 reuse those successful prerequisites; neither is executed after unit/content or
 type failure. Independent dev suites and build integrations continue. Configured
 telemetry retains its separate build and validation because its flags differ.
 `npm run verify:full -- --list` displays the stage plan without executing it.
-Aggregate filters are rejected; use the focused commands instead.
+Aggregate filters are rejected; use the focused core or explicit regression commands instead.
 
 Each stage gets its own log, browser JSON report and artifact directory under
 `tmp/verification/full-<timestamp>-<pid>/`. `summary.json` is updated after every
@@ -239,9 +303,9 @@ Root preview uses the ordinary build. For prefix checks:
 
 ```sh
 npm run build -- --base=/prototype/
-PLAYWRIGHT_BASE_PATH=/prototype/ npx --no-install playwright test tests/public-asset-base.spec.ts
-PLAYWRIGHT_BASE_PATH=/prototype/ PLAYWRIGHT_SERVER_MODE=dev npx --no-install playwright test tests/public-asset-base.spec.ts
-PLAYWRIGHT_SERVER_MODE=dev npx --no-install playwright test tests/public-asset-base.spec.ts
+PLAYWRIGHT_BASE_PATH=/prototype/ npx --no-install playwright test -c playwright.prefix-assets.config.ts
+PLAYWRIGHT_BASE_PATH=/prototype/ PLAYWRIGHT_SERVER_MODE=dev npx --no-install playwright test -c playwright.prefix-assets.config.ts
+PLAYWRIGHT_SERVER_MODE=dev npx --no-install playwright test -c playwright.regression.config.ts tests/public-asset-base.spec.ts --project=desktop
 # Restore the root production build before other root-preview suites:
 npm run build
 ```
@@ -306,14 +370,25 @@ unaffected passing suites. Keep failures and incomplete runs explicit.
 ## Execution capacity and follow-up work
 
 Browser CI targets Brian's self-hosted runner, with no automatic GitHub-hosted
-fallback. On 2026-10-21 the caller explicitly authorized temporary GitHub-hosted
-execution for PR #214. `issue-202-verification.yml` is scoped to that PR, uses one
-Ubuntu job and retains browser reports; migrate to qualified self-hosted capacity
-later. This exception does not reroute #200/#207 or enable general hosted CI. Qualify the actual host under #207 before #200's baseline. Start with
+fallback. The temporary GitHub-hosted workflows for merged PRs #213, #214 and
+#215 have been retired, along with the PR #260-specific dungeon verification job.
+Their historical QA records and workflow runs remain unchanged. Those one-off
+exceptions do not enable general hosted CI. Qualify the actual host under #207
+before #200's baseline. Start with
 one browser job at a time, `workers: 1`, and idle unrelated host workloads for
-performance captures. Use the shared `tactics-browser-exclusive` concurrency group
-when adding workflows on that runner; other repositories/host workloads require
-separate coordination. Multiple agents/containers sharing one GPU are not isolated
+performance captures. The browser setup, baseline and process-cleanup workflows select one qualified
+VM with the unique `tactics-browser-01` or `tactics-browser-02` label, in addition
+to `self-hosted` and `tactics-browser`. They share a per-runner concurrency group,
+`tactics-browser-${{ inputs.runner || 'tactics-browser-01' }}`, across workflows.
+Use this same group and selection when adding workflows on those VMs. Baseline
+jobs must stay on the selected VM because receipts require matching runner
+identity. Provision the unique labels before dispatch; runner names are not
+labels. Independent runs may select different VMs, but each VM has one runner
+service and separate workspace/cache storage. The VMs have separately pinned
+CPU cores and dedicated RAM allocations; shared storage, network and host-level
+resources may still affect timing. Coordinate unrelated host workloads and
+record conditions for performance comparisons. Other repositories/host workloads
+require separate coordination. Multiple agents/containers sharing one GPU are not isolated
 capacity. #208 sizes shards from measured available hosts and reports queue/setup
 as well as execution time. No hosted workflow is introduced by this policy.
 
@@ -321,3 +396,4 @@ as well as execution time. No hosted workflow is introduced by this policy.
 and removes repeated ordinary aggregate validation. #200 supplies timing/provenance
 tooling; #203 changes the matrix; #204/#205 reduce repeated setup. Until merged, those proposed commands/optimizations
 are not available and their benefits must not be claimed.
+

@@ -1,0 +1,205 @@
+name: Auto-merge low-risk PRs
+
+# API-only trusted-base workflow. Never check out or execute pull-request code.
+# Risk labels are presentation; a trusted, exact-head assessment is mandatory.
+on:
+  workflow_run:
+    workflows: ["PR verification"]
+    types: [completed]
+  pull_request_target:
+    types: [opened, reopened, synchronize, ready_for_review, converted_to_draft, labeled, unlabeled]
+  issue_comment:
+    types: [created, edited, deleted]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: read
+
+# One group across all event families: workflow_run has no reliable PR number.
+# Queueing is an optimization only; every run reads live state and fails closed.
+concurrency:
+  group: auto-merge-low-risk-${{ github.repository }}
+  queue: max
+  cancel-in-progress: false
+
+jobs:
+  merge:
+    if: >-
+      github.event_name != 'issue_comment' || github.event.issue.pull_request
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Invalidate old risk and merge only an assessed head
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const repo = context.repo;
+            const fullName = `${repo.owner}/${repo.repo}`;
+            const marker = '<!-- tactics-guru-pr-risk -->';
+            const header = /^<!-- tactics-guru-pr-risk -->\r?\n<!-- tactics-guru-pr-risk:v1 head=([0-9a-f]{40}) level=(low|medium|high|critical) -->\r?\n/;
+            const riskLabels = ['risk:low', 'risk:medium', 'risk:high', 'risk:critical', 'risk:pending'];
+            const page = (method, args) => github.paginate(method, {...repo, per_page: 100, ...args});
+            const trusted = async login => {
+              if (!login) return false;
+              try {
+                const {data} = await github.rest.repos.getCollaboratorPermissionLevel({...repo, username: login});
+                return ['admin', 'maintain'].includes(data.role_name);
+              } catch (error) {
+                if (error.status === 404) return false;
+                throw error; // Permission/API failures must never admit a merge.
+              }
+            };
+            const getPR = async number => (await github.rest.pulls.get({...repo, pull_number: number})).data;
+            const eligiblePR = pr => pr.state === 'open' && !pr.merged && !pr.draft &&
+              pr.head.repo?.full_name === fullName;
+            const assessment = async number => {
+              const comments = await page(github.rest.issues.listComments, {issue_number: number});
+              const candidates = [];
+              for (const comment of comments.filter(c => c.body?.startsWith(marker))) {
+                if (await trusted(comment.user?.login)) candidates.push(comment);
+              }
+              // Duplicates or malformed task-owned comments require repair, not a guess.
+              if (candidates.length !== 1) return null;
+              const comment = candidates[0];
+              // REST user is the creator, not necessarily the editor: Write-role
+              // collaborators can edit somebody else's comment. Authenticate both.
+              const {node} = await github.graphql(`query($id: ID!) {
+                node(id: $id) { ... on IssueComment {
+                  body author { login } editor { login } lastEditedAt updatedAt
+                } }
+              }`, {id: comment.node_id});
+              if (!node || node.body !== comment.body || node.author?.login !== comment.user.login ||
+                  node.updatedAt !== comment.updated_at ||
+                  (node.lastEditedAt && !await trusted(node.editor?.login))) return null;
+              const match = header.exec(comment.body);
+              if (!match || comment.body.split('<!-- tactics-guru-pr-risk:v1').length !== 2) return null;
+              return {sha: match[1], level: match[2], actor: comment.user.login,
+                id: comment.id, updated: comment.updated_at, body: comment.body, editor: node.editor?.login ?? null};
+            };
+            const sameAssessment = (a, b) => a && b && a.id === b.id && a.body === b.body &&
+              a.updated === b.updated && a.actor === b.actor && a.editor === b.editor;
+            const hasOnlyLow = pr => {
+              const labels = pr.labels.map(l => l.name).filter(l => l.startsWith('risk:'));
+              return labels.length === 1 && labels[0] === 'risk:low';
+            };
+            const labeler = async (number, name = 'risk:low') => {
+              const events = await page(github.rest.issues.listEvents, {issue_number: number});
+              return events.filter(e => e.event === 'labeled' && e.label?.name === name)
+                .sort((a, b) => a.id - b.id).at(-1)?.actor?.login;
+            };
+            const verification = async (sha, number, baseRef) => {
+              const runs = await page(github.rest.actions.listWorkflowRuns, {
+                workflow_id: 'pr-verification.yml', head_sha: sha, event: 'pull_request'
+              });
+              const run = runs.filter(r => r.head_sha === sha && r.event === 'pull_request' &&
+                r.pull_requests?.some(p => p.number === number && p.base?.ref === baseRef))
+                .sort((a, b) => a.run_number - b.run_number || a.run_attempt - b.run_attempt).at(-1);
+              if (!run || run.status !== 'completed' || run.conclusion !== 'success') return null;
+              const jobs = await page(github.rest.actions.listJobsForWorkflowRun, {run_id: run.id, filter: 'latest'});
+              const verify = jobs.filter(j => j.name === 'verify');
+              if (verify.length !== 1 || verify[0].status !== 'completed' || verify[0].conclusion !== 'success') return null;
+              return `${run.id}:${run.run_attempt}`;
+            };
+            const changesRequested = async number => {
+              const reviews = await page(github.rest.pulls.listReviews, {pull_number: number});
+              const latest = new Map();
+              for (const review of reviews.sort((a, b) => a.id - b.id)) {
+                if (!['COMMENTED', 'PENDING'].includes(review.state)) latest.set(review.user.login, review.state);
+              }
+              return [...latest.values()].includes('CHANGES_REQUESTED');
+            };
+            let numbers;
+            if (context.eventName === 'workflow_run') {
+              const run = context.payload.workflow_run;
+              if (run.event !== 'pull_request') return;
+              numbers = (await page(github.rest.repos.listPullRequestsAssociatedWithCommit, {commit_sha: run.head_sha}))
+                .filter(pr => pr.state === 'open' && pr.head.sha === run.head_sha).map(pr => pr.number);
+            } else {
+              numbers = [context.payload.pull_request?.number ?? context.payload.issue?.number];
+            }
+            for (const number of numbers) {
+              let pr = await getPR(number);
+              if (pr.state !== 'open' || pr.merged || pr.head.repo?.full_name !== fullName) continue;
+              // Leave draft-only PRs untouched; a previously assessed draft must lose
+              // its old eligibility but is never reassessed or merged here.
+              if (pr.draft && !pr.labels.some(l => riskLabels.includes(l.name))) continue;
+              const sha = pr.head.sha;
+              const baseRef = pr.base.ref;
+              let record = await assessment(number);
+              // Ignore event snapshot SHA: rapid pushes/out-of-order synchronize deliveries
+              // must invalidate the live head. Pending blocks eligibility without destroying
+              // the assessor's level label or its trusted actor provenance.
+              if (context.eventName === 'pull_request_target' &&
+                  ['opened', 'reopened', 'synchronize', 'ready_for_review', 'converted_to_draft'].includes(context.payload.action) &&
+                  (!record || record.sha !== sha || pr.draft)) {
+                // Refresh before writes to avoid clearing an assessment already published.
+                const fresh = await getPR(number);
+                const freshRecord = await assessment(number);
+                if (fresh.state !== 'open' || fresh.merged || fresh.head.sha !== sha) continue;
+                if (!fresh.draft && freshRecord?.sha === sha) {
+                  // Completion raced the refresh. Evaluate it now instead of waiting
+                  // for an event that the assessor's token might not emit.
+                  pr = await getPR(number);
+                  record = freshRecord;
+                } else {
+                  try { await github.rest.issues.getLabel({...repo, name: 'risk:pending'}); }
+                  catch (error) {
+                    if (error.status !== 404) throw error;
+                    try { await github.rest.issues.createLabel({...repo, name: 'risk:pending', color: 'fbca04', description: 'Awaiting current-head risk assessment'}); }
+                    catch (createError) {
+                      if (createError.status !== 422) throw createError;
+                      await github.rest.issues.getLabel({...repo, name: 'risk:pending'});
+                    }
+                  }
+                  await github.rest.issues.addLabels({...repo, issue_number: number, labels: ['risk:pending']});
+                  // Never remove level labels here: an external assessor can finish
+                  // between freshRecord and addLabels. Removing its label would lose
+                  // both completion and trusted provenance (the gate cannot recreate it).
+                  // Reconcile our pending write in this invocation: GITHUB_TOKEN label
+                  // writes do not guarantee another workflow event.
+                  record = await assessment(number);
+                  pr = await getPR(number);
+                  const levelLabels = pr.labels.map(l => l.name)
+                    .filter(l => l.startsWith('risk:') && l !== 'risk:pending');
+                  if (!eligiblePR(pr) || pr.head.sha !== sha || pr.base.ref !== baseRef ||
+                      record?.sha !== sha || levelLabels.length !== 1 ||
+                      levelLabels[0] !== `risk:${record.level}`) continue;
+                  const actor = await labeler(number, `risk:${record.level}`);
+                  if (!await trusted(actor)) continue;
+                  const latest = await assessment(number);
+                  const current = await getPR(number);
+                  if (!sameAssessment(record, latest) || !eligiblePR(current) ||
+                      current.head.sha !== sha || current.base.ref !== baseRef ||
+                      current.labels.some(l => l.name.startsWith('risk:') &&
+                        !['risk:pending', `risk:${record.level}`].includes(l.name)) ||
+                      !current.labels.some(l => l.name === `risk:${record.level}`) ||
+                      await labeler(number, `risk:${record.level}`) !== actor || !await trusted(actor)) continue;
+                  try { await github.rest.issues.removeLabel({...repo, issue_number: number, name: 'risk:pending'}); }
+                  catch (error) { if (error.status !== 404) throw error; }
+                  // Do not rely on our own label removal to trigger CI/merge evaluation.
+                  // All ordinary merge safeguards below still apply to fresh evidence.
+                  record = await assessment(number);
+                  pr = await getPR(number);
+                }
+              }
+              if (!eligiblePR(pr) || pr.head.sha !== sha || pr.base.ref !== baseRef ||
+                  !hasOnlyLow(pr) || record?.sha !== sha || record.level !== 'low') continue;
+              if (!await trusted(pr.user.login)) continue;
+              const appliedBy = await labeler(number);
+              if (!await trusted(appliedBy)) continue;
+              const run = await verification(sha, number, pr.base.ref);
+              if (!run || await changesRequested(number)) continue;
+              // Recheck mutable evidence immediately before the SHA-conditional merge.
+              // GitHub cannot atomically lock comments/labels/reviews with a merge; branch
+              // protection remains authoritative. The sha parameter closes the push race.
+              record = await assessment(number).then(latest => sameAssessment(record, latest) ? latest : null);
+              if (!record || await labeler(number) !== appliedBy || await verification(sha, number, pr.base.ref) !== run || await changesRequested(number)) continue;
+              pr = await getPR(number);
+              if (!eligiblePR(pr) || pr.head.sha !== sha || pr.base.ref !== baseRef || !hasOnlyLow(pr) ||
+                  !await trusted(pr.user.login) || !await trusted(appliedBy)) continue;
+              const {data} = await github.rest.pulls.merge({...repo, pull_number: number, sha, merge_method: 'merge'});
+              if (!data.merged) throw new Error(`PR #${number} was not merged: ${data.message}`);
+              core.info(`Merged PR #${number} at assessed head ${sha} (verification ${run}).`);
+            }

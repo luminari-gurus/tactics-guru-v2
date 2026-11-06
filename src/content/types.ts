@@ -55,7 +55,8 @@ export type ShamanAbility = {
 );
 export type Ability = AttackAbility | MagicMissileAbility | FighterAbility | RangerAbility | FrostSnareAbility | ShamanAbility;
 export type EffectImmunity = 'weakened' | 'debuff';
-export type TerrainId = typeof FIRST_MAP_TERRAIN_IDS[number] | 'sand' | 'rock';
+/** `void` is open air: never walkable and never drawn (e.g. around the Q*bert pyramid). */
+export type TerrainId = typeof FIRST_MAP_TERRAIN_IDS[number] | 'sand' | 'rock' | 'void';
 
 /** Immutable baseline stats, not mutable battle HP. All numbers obey CONTENT_BOUNDS. */
 export interface UnitStats {

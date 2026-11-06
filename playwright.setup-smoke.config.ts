@@ -1,5 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
-import base from './playwright.config';
+import base from './playwright.regression.config';
 
 // Both engines must boot Phaser, not merely launch an empty browser.
 export default defineConfig({

@@ -12,7 +12,7 @@ import { readSession,playCommand } from './helpers/battlePolicy';
 import { installRailControls } from './helpers/forceRailControls';
 import { playerDecision } from './helpers/playerPolicy';
 import { dungeonBattle } from '../src/domain/dungeon';
-import { atCell, atStairApproach, dungeonCapacityFixture, priorDungeonEnvelope } from './helpers/dungeonFixtures';
+import { atCell, atStairApproach, dungeonCapacityFixture, priorDungeonEnvelope, dungeonContactApproach } from './helpers/dungeonFixtures';
 import { LEGACY_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
 import { freshExploration, movableExploration } from '../src/domain/exploration';
 import { encodeDungeon, utf8Bytes } from '../src/domain/dungeonSaveEnvelope';
@@ -429,6 +429,40 @@ test('maximum-size saved floor renders and accepts a step after reload', async (
  await page.goto('./?game=dungeon'); await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
  await page.reload(); await continueSavedDungeon(page);
  const map=page.locator('#dungeon-map'); await expect(map.locator('[data-cell]')).toHaveCount(36*36);
+ const assertLayout=async()=>{
+  const geometry=await map.evaluate(grid=>{
+   const bounds=grid.getBoundingClientRect(), region=grid.parentElement!;
+   const cells=[...grid.querySelectorAll<HTMLElement>('[data-cell]')].map(cell=>cell.getBoundingClientRect());
+   const controls=[...region.querySelectorAll<HTMLElement>('.dungeon-directions button')];
+   const screen=document.querySelector<HTMLElement>('#dungeon-screen')!;
+   return {
+    count:cells.length,
+    outside:cells.filter(cell=>cell.left<bounds.left-.1||cell.right>bounds.right+.1||cell.top<bounds.top-.1||cell.bottom>bounds.bottom+.1).length,
+    squareError:Math.max(...cells.map(cell=>Math.abs(cell.width-cell.height))),
+    overlappingControls:controls.filter(control=>{const button=control.getBoundingClientRect();return cells.some(cell=>Math.min(cell.right,button.right)-Math.max(cell.left,button.left)>.1&&Math.min(cell.bottom,button.bottom)-Math.max(cell.top,button.top)>.1);}).map(control=>control.id),
+    screenOverflow:screen.scrollWidth-screen.clientWidth,
+   };
+  });
+  expect(geometry.count).toBe(36*36);
+  expect(geometry.outside,'Every cell must fit inside the map border box').toBe(0);
+  expect(geometry.squareError).toBeLessThan(.1);
+  expect(geometry.overlappingControls,'The compass must not cover any map cell').toEqual([]);
+  expect(geometry.screenOverflow,'Only the exploration region should scroll horizontally').toBe(0);
+ };
+ await assertLayout();
+ const viewport=page.viewportSize()!;
+ await page.setViewportSize({width:320,height:740});
+ await assertLayout();
+ const horizontal=await map.evaluate(grid=>{
+  const region=grid.parentElement!;
+  region.scrollLeft=region.scrollWidth;
+  const last=grid.lastElementChild!.getBoundingClientRect(), bounds=region.getBoundingClientRect();
+  const result={scrollLeft:region.scrollLeft,lastColumnVisible:last.left>=bounds.left-.1&&last.right<=bounds.right+.1};
+  region.scrollLeft=0;return result;
+ });
+ expect(horizontal.scrollLeft).toBeGreaterThan(0);
+ expect(horizontal.lastColumnVisible,'The final column must be reachable by scrolling').toBe(true);
+ await page.setViewportSize(viewport);
  await map.evaluate(grid=>{const state={grid,removed:false};(window as unknown as {__floorMount:typeof state}).__floorMount=state;new MutationObserver(records=>{if(records.some(record=>[...record.removedNodes].some(node=>node===grid || node.contains(grid))))state.removed=true;}).observe(document.querySelector('#dungeon-screen')!,{childList:true,subtree:true});});
  const before=await dungeonSnapshot(page), floor=before.floors[4], layout=floorMap(floor.descriptor);
  const destination=neighbors(floor.position,layout.width).find(n=>layout.cells[n]&&!floor.exploration.pois.some(p=>poiCell(p,layout.width)===n));
@@ -436,7 +470,9 @@ test('maximum-size saved floor renders and accepts a step after reload', async (
  await walkDungeon(page,destination,isMobile?'touch':'keyboard');
  const after=await dungeonSnapshot(page);expect(after.floors[4].position).toBe(destination);
  expect(await page.evaluate(()=>(window as unknown as {__floorMount:{removed:boolean}}).__floorMount.removed)).toBe(false);
+ await assertLayout();
  await page.reload(); await continueSavedDungeon(page); expect(await dungeonSnapshot(page)).toEqual(after);
+ await assertLayout();
 });
 
 test('maximum-size floor step responsiveness meets the established budget', async ({page}) => {
@@ -455,4 +491,39 @@ test('maximum-size floor step responsiveness meets the established budget', asyn
  const p95=percentile(times,.95),frameP95=percentile(frames,.95);
  writeFileSync(test.info().outputPath('maximum-floor-step-performance.json'),JSON.stringify({idleFrames,times,p95,frames,frameP95,budgetMs:33.4,dimension:map.width},null,2));
  expect((await dungeonSnapshot(page)).floors[4].position).toBe(first);expect(p95).toBeLessThanOrEqual(33.4);expect(frameP95).toBeLessThanOrEqual(33.4);
+});
+
+test('closing on each wandering encounter holds contact and saves the matching battle', async ({page,isMobile})=>{
+ for(const slot of [0,1,2]) {
+  const {state,approach,target}=dungeonContactApproach(slot);
+  const encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
+  await page.goto('./?game=dungeon');
+  await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
+  await page.reload();await continueSavedDungeon(page);
+  await walkDungeon(page,approach,isMobile?'touch':'keyboard');
+  const adjacent=await dungeonSnapshot(page);
+  expect(adjacent.phase).toBe('ready');
+  expect(poiCell(adjacent.floors[0].exploration.pois[slot])).toBe(target);
+  await page.reload();await continueSavedDungeon(page);
+  expect(await dungeonSnapshot(page)).toEqual(adjacent);
+  // Use the reported WASD input on desktop, and the real compass tap on mobile.
+  const delta=target-approach;
+  if(isMobile)await page.locator(`#dungeon-step-${delta===-20?'north':delta===20?'south':delta===1?'east':'west'}`).tap();
+  else {await page.locator('#dungeon-map').focus();await page.keyboard.press(delta===-20?'w':delta===20?'s':delta===1?'d':'a');}
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const entered=await dungeonSnapshot(page);
+  expect(entered.phase).toBe('battle');
+  expect(entered.floors[0].position).toBe(target);
+  expect(entered.floors[0].exploration.active).toBe(slot);
+  expect(entered.activeBattle!.seed).toBe(dungeonSeed(state.seed,1,'battle',slot));
+  // Automatic enemy opening turns can add revisions after the atomic entry.
+  expect(entered.revision).toBeGreaterThanOrEqual(state.revision+2);
+  expect(entered.floors[0].exploration.movement!.step).toBe(1);
+  await expect(page.locator('#battle-party')).toBeVisible();
+  await page.reload();await continueSavedDungeon(page);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  expect(await dungeonSnapshot(page)).toEqual(entered);
+  await expect(page.locator('#battle-party')).toBeVisible();
+ }
+
 });

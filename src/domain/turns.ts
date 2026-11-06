@@ -8,6 +8,8 @@ import { moveUnit } from './grid';
 import { undoRecordedMove } from './movementUndo';
 import { isIntegerIn, rollDie, seedRng } from './rng';
 import type { BattleEvent, BattleState, Command, CommandResult, ReplayCommand, RejectionReason, UnitState } from './types';
+import { HEALING_DRAUGHT_HP } from '../content/items';
+import { draughtsSpent } from './draughts';
 
 export type InitiativeEntry = { readonly unitId: number; readonly side: UnitState['side']; readonly natural: number; readonly dexterity: number };
 /** Legacy TurnManager.gd:101-108: total, Dexterity, player side, lower ID. IDs are unique, so the order is total. */
@@ -78,8 +80,34 @@ export function endTurn(state: unknown, input: unknown, catalog: ContentCatalog)
 /** One entry point for every command; the type is read only after the shared intent check. */
 export function dispatch(state: unknown, input: unknown, catalog: ContentCatalog): CommandResult {
   const intent = previewCommand(state, input, catalog); if (!intent.ok) return intent;
+  if (intent.command.type === 'drinkDraught') {
+    const snapshot = state as BattleState; // Shared intent validation checked this exact snapshot and actor.
+    const preview = draughtEffect(snapshot, intent.command.unitId, catalog);
+    if (!preview.ok) return preview;
+    const { actor, healing, hp, ledger } = preview;
+    return { ok: true, state: { ...snapshot, commandCount: snapshot.commandCount + 1,
+      draughts: { ...ledger, used: { ...ledger.used, [actor.defId]: ledger.used[actor.defId] + 1 } },
+      units: snapshot.units.map(unit => unit.id === actor.id ? { ...unit, hp, hasActed: true } : unit) },
+      events: [{ type: 'healed', unitId: actor.id, healing, hp }] };
+  }
   const resolve = { move: moveUnit, useAbility: resolveAttack, endTurn }[intent.command.type];
   return resolve(state, intent.command, catalog);
+}
+
+function draughtEffect(state: BattleState, unitId: number, catalog: ContentCatalog) {
+  const actor = state.units.find(unit => unit.id === unitId)!;
+  if (actor.side !== 'player' || !state.draughts) return { ok: false, reason: 'noDraught' } as const;
+  const remaining = state.draughts.stock - draughtsSpent(state.draughts);
+  if (!remaining) return { ok: false, reason: 'noDraught' } as const;
+  if (actor.hasActed) return { ok: false, reason: 'alreadyActed' } as const;
+  const healing = Math.min(HEALING_DRAUGHT_HP, catalog.heroes[actor.defId].stats.maxHp - actor.hp);
+  if (!healing) return { ok: false, reason: 'fullHealth' } as const;
+  return { ok: true, kind: 'drinkDraught', actor, healing, hp: actor.hp + healing, remaining, ledger: state.draughts } as const;
+}
+
+export function previewDraught(state: BattleState, command: Extract<Command, { type: 'drinkDraught' }>, catalog: ContentCatalog) {
+  const intent = previewCommand(state, command, catalog);
+  return intent.ok ? draughtEffect(state, command.unitId, catalog) : intent;
 }
 export type ReplayRun = { readonly ok: true; readonly state: BattleState; readonly events: readonly BattleEvent[] } | Extract<ReplayRead, { ok: false }> |
   { readonly ok: false; readonly reason: 'invalidReplay'; readonly index: number; readonly rejection: RejectionReason };

@@ -1,5 +1,6 @@
 import { awardHero, progressHero, projectProgression, readProgressHero, type ProgressHero } from './progression';
 import { encounterHpLimit } from './effects';
+import { draughtHealing, type DraughtLedger } from './draughts';
 import { HERO_PROGRESSION, SHORT_RUN_KINDS } from '../content/progression';
 import { HERO_IDS } from '../content/constants';
 import type { ContentCatalog } from '../content/types';
@@ -125,7 +126,8 @@ export function describeRunBattle(state: RunState): RunBattleDescriptor | null {
 }
 
 /** Reference boundary reducer. Reward acknowledgement is NOT an inventory grant. */
-export function transitionRun(input: unknown, command: unknown, definition: RunDefinition, catalog: ContentCatalog): RunResult {
+/** Only the encounter owner may supply a draught ledger after admission against the battle and ownership. */
+export function transitionRun(input: unknown, command: unknown, definition: RunDefinition, catalog: ContentCatalog, acceptedDraughts?: DraughtLedger): RunResult {
   const read = readRunState(input, definition, catalog);
   if (!read.ok) return read;
   const state = read.state;
@@ -142,7 +144,7 @@ export function transitionRun(input: unknown, command: unknown, definition: RunD
     const projected=projectProgression(state.party,catalog);
     if(Object.hasOwn(command,'secondWindUsed') && (command.secondWindUsed!==true || !projected.abilities['ability:second_wind']))return {ok:false,reason:'invalidCommand'};
     if (!party || party.some((hero, i) => hero.hp > encounterHpLimit({defId:hero.heroId,
-      ...(hero.heroId==='fighter' && command.secondWindUsed===true?{secondWindUsed:true}:{})},state.party[i].hp,projected)) ||
+      ...(hero.heroId==='fighter' && command.secondWindUsed===true?{secondWindUsed:true}:{})},state.party[i].hp,projected,draughtHealing(acceptedDraughts,hero.heroId))) ||
       (command.outcome !== 'victory' && command.outcome !== 'defeat') || (command.outcome === 'victory') !== party.some(h => h.hp > 0))
       return { ok: false, reason: 'invalidCommand' };
     // Command progression must equal entry facts; completion only supplies final combat HP.

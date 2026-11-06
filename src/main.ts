@@ -3,8 +3,8 @@ import { startTelemetry } from './telemetry/browser';
 import { reportFailure } from './telemetry/telemetry';
 import { appEntry } from './app/entry';
 const { route } = appEntry;
-// Menu and dungeon have no approved collection taxonomy.
-if (route !== 'menu' && route !== 'dungeon') startTelemetry();
+// Menu, dungeon and the /qbert prototype have no approved collection taxonomy.
+if (route !== 'menu' && route !== 'dungeon' && route !== 'qbert') startTelemetry();
 try {
   if (route === 'menu') {
     const { startMainMenu } = await import('./ui/mainMenu');

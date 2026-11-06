@@ -1,0 +1,352 @@
+{
+  "base": "19529c5a47f48489e2c9e169af774ac9d37759a5",
+  "candidateSpecSha256": "ce88a767d5612a4aed49fb56a2d84f4c3b953502e84a89fe91b20088d6481923",
+  "unitSha256": "aa6106c98f652430b850e98b2e3dd5a01424e39e501fc68fa085a8cd8373f9bb",
+  "lockSha256": "e4768389a179a65df5f04502dab87e8875b465b939e55493d5820a7dc99a74ed",
+  "mappings": [
+    {
+      "config": "playwright.fixtures.config.ts",
+      "before": 93,
+      "after": 90,
+      "projects": [
+        {
+          "name": "desktop",
+          "use": {
+            "baseURL": "http://127.0.0.1:4173",
+            "launchOptions": {},
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Safari/537.36",
+            "viewport": {
+              "width": 1280,
+              "height": 720
+            },
+            "deviceScaleFactor": 1,
+            "isMobile": false,
+            "hasTouch": false,
+            "defaultBrowserType": "chromium",
+            "channel": "chromium"
+          },
+          "retries": 0,
+          "repeatEach": 1,
+          "grep": {
+            "source": ".*",
+            "flags": ""
+          },
+          "grepInvert": null
+        },
+        {
+          "name": "mobile-portrait",
+          "use": {
+            "baseURL": "http://127.0.0.1:4173",
+            "launchOptions": {},
+            "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36",
+            "viewport": {
+              "width": 412,
+              "height": 839
+            },
+            "deviceScaleFactor": 2.625,
+            "isMobile": true,
+            "hasTouch": true,
+            "defaultBrowserType": "chromium",
+            "channel": "chromium"
+          },
+          "retries": 0,
+          "repeatEach": 1,
+          "grep": {
+            "source": ".*",
+            "flags": ""
+          },
+          "grepInvert": {
+            "source": "@canonical",
+            "flags": ""
+          }
+        },
+        {
+          "name": "mobile-landscape",
+          "use": {
+            "baseURL": "http://127.0.0.1:4173",
+            "launchOptions": {},
+            "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36",
+            "viewport": {
+              "width": 915,
+              "height": 412
+            },
+            "deviceScaleFactor": 2.625,
+            "isMobile": true,
+            "hasTouch": true,
+            "defaultBrowserType": "chromium",
+            "channel": "chromium"
+          },
+          "retries": 0,
+          "repeatEach": 1,
+          "grep": {
+            "source": ".*",
+            "flags": ""
+          },
+          "grepInvert": {
+            "source": "@canonical|@fixed-viewport",
+            "flags": ""
+          }
+        }
+      ],
+      "removed": [
+        {
+          "removed": {
+            "id": "dc05b687c651765fa444-e92221c194e1670df603",
+            "project": "desktop",
+            "file": "ability-picker.spec.ts",
+            "title": "progression XP 600 gates learned fixture actions and resets on reload",
+            "titlePath": [
+              "ability-picker.spec.ts",
+              "progression XP 600 gates learned fixture actions and resets on reload"
+            ],
+            "tags": [],
+            "timeout": 30000,
+            "expectedStatus": "passed"
+          },
+          "retained": {
+            "id": "dc05b687c651765fa444-37789bba23173f435e32",
+            "project": "desktop",
+            "file": "ability-picker.spec.ts",
+            "title": "progression XP 180 gates learned fixture actions and resets on reload",
+            "titlePath": [
+              "ability-picker.spec.ts",
+              "progression XP 180 gates learned fixture actions and resets on reload"
+            ],
+            "tags": [],
+            "timeout": 30000,
+            "expectedStatus": "passed"
+          }
+        },
+        {
+          "removed": {
+            "id": "dc05b687c651765fa444-d3cb158cd25447fc7c73",
+            "project": "mobile-portrait",
+            "file": "ability-picker.spec.ts",
+            "title": "progression XP 600 gates learned fixture actions and resets on reload",
+            "titlePath": [
+              "ability-picker.spec.ts",
+              "progression XP 600 gates learned fixture actions and resets on reload"
+            ],
+            "tags": [],
+            "timeout": 30000,
+            "expectedStatus": "passed"
+          },
+          "retained": {
+            "id": "dc05b687c651765fa444-a860f0177bcf161297be",
+            "project": "mobile-portrait",
+            "file": "ability-picker.spec.ts",
+            "title": "progression XP 180 gates learned fixture actions and resets on reload",
+            "titlePath": [
+              "ability-picker.spec.ts",
+              "progression XP 180 gates learned fixture actions and resets on reload"
+            ],
+            "tags": [],
+            "timeout": 30000,
+            "expectedStatus": "passed"
+          }
+        },
+        {
+          "removed": {
+            "id": "dc05b687c651765fa444-1444dfa12e88374db8ab",
+            "project": "mobile-landscape",
+            "file": "ability-picker.spec.ts",
+            "title": "progression XP 600 gates learned fixture actions and resets on reload",
+            "titlePath": [
+              "ability-picker.spec.ts",
+              "progression XP 600 gates learned fixture actions and resets on reload"
+            ],
+            "tags": [],
+            "timeout": 30000,
+            "expectedStatus": "passed"
+          },
+          "retained": {
+            "id": "dc05b687c651765fa444-a96bcdd6295424ad7ea3",
+            "project": "mobile-landscape",
+            "file": "ability-picker.spec.ts",
+            "title": "progression XP 180 gates learned fixture actions and resets on reload",
+            "titlePath": [
+              "ability-picker.spec.ts",
+              "progression XP 180 gates learned fixture actions and resets on reload"
+            ],
+            "tags": [],
+            "timeout": 30000,
+            "expectedStatus": "passed"
+          }
+        }
+      ],
+      "retainedMetadataUnchanged": true
+    },
+    {
+      "config": "playwright.abilities.config.ts",
+      "before": 60,
+      "after": 57,
+      "projects": [
+        {
+          "name": "desktop",
+          "use": {
+            "baseURL": "http://127.0.0.1:4173",
+            "launchOptions": {},
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Safari/537.36",
+            "viewport": {
+              "width": 1280,
+              "height": 720
+            },
+            "deviceScaleFactor": 1,
+            "isMobile": false,
+            "hasTouch": false,
+            "defaultBrowserType": "chromium",
+            "channel": "chromium"
+          },
+          "retries": 0,
+          "repeatEach": 1,
+          "grep": {
+            "source": ".*",
+            "flags": ""
+          },
+          "grepInvert": null
+        },
+        {
+          "name": "mobile-portrait",
+          "use": {
+            "baseURL": "http://127.0.0.1:4173",
+            "launchOptions": {},
+            "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36",
+            "viewport": {
+              "width": 412,
+              "height": 839
+            },
+            "deviceScaleFactor": 2.625,
+            "isMobile": true,
+            "hasTouch": true,
+            "defaultBrowserType": "chromium",
+            "channel": "chromium"
+          },
+          "retries": 0,
+          "repeatEach": 1,
+          "grep": {
+            "source": ".*",
+            "flags": ""
+          },
+          "grepInvert": {
+            "source": "@canonical",
+            "flags": ""
+          }
+        },
+        {
+          "name": "mobile-landscape",
+          "use": {
+            "baseURL": "http://127.0.0.1:4173",
+            "launchOptions": {},
+            "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36",
+            "viewport": {
+              "width": 915,
+              "height": 412
+            },
+            "deviceScaleFactor": 2.625,
+            "isMobile": true,
+            "hasTouch": true,
+            "defaultBrowserType": "chromium",
+            "channel": "chromium"
+          },
+          "retries": 0,
+          "repeatEach": 1,
+          "grep": {
+            "source": ".*",
+            "flags": ""
+          },
+          "grepInvert": {
+            "source": "@canonical|@fixed-viewport",
+            "flags": ""
+          }
+        }
+      ],
+      "removed": [
+        {
+          "removed": {
+            "id": "dc05b687c651765fa444-e92221c194e1670df603",
+            "project": "desktop",
+            "file": "ability-picker.spec.ts",
+            "title": "progression XP 600 gates learned fixture actions and resets on reload",
+            "titlePath": [
+              "ability-picker.spec.ts",
+              "progression XP 600 gates learned fixture actions and resets on reload"
+            ],
+            "tags": [],
+            "timeout": 30000,
+            "expectedStatus": "passed"
+          },
+          "retained": {
+            "id": "dc05b687c651765fa444-37789bba23173f435e32",
+            "project": "desktop",
+            "file": "ability-picker.spec.ts",
+            "title": "progression XP 180 gates learned fixture actions and resets on reload",
+            "titlePath": [
+              "ability-picker.spec.ts",
+              "progression XP 180 gates learned fixture actions and resets on reload"
+            ],
+            "tags": [],
+            "timeout": 30000,
+            "expectedStatus": "passed"
+          }
+        },
+        {
+          "removed": {
+            "id": "dc05b687c651765fa444-d3cb158cd25447fc7c73",
+            "project": "mobile-portrait",
+            "file": "ability-picker.spec.ts",
+            "title": "progression XP 600 gates learned fixture actions and resets on reload",
+            "titlePath": [
+              "ability-picker.spec.ts",
+              "progression XP 600 gates learned fixture actions and resets on reload"
+            ],
+            "tags": [],
+            "timeout": 30000,
+            "expectedStatus": "passed"
+          },
+          "retained": {
+            "id": "dc05b687c651765fa444-a860f0177bcf161297be",
+            "project": "mobile-portrait",
+            "file": "ability-picker.spec.ts",
+            "title": "progression XP 180 gates learned fixture actions and resets on reload",
+            "titlePath": [
+              "ability-picker.spec.ts",
+              "progression XP 180 gates learned fixture actions and resets on reload"
+            ],
+            "tags": [],
+            "timeout": 30000,
+            "expectedStatus": "passed"
+          }
+        },
+        {
+          "removed": {
+            "id": "dc05b687c651765fa444-1444dfa12e88374db8ab",
+            "project": "mobile-landscape",
+            "file": "ability-picker.spec.ts",
+            "title": "progression XP 600 gates learned fixture actions and resets on reload",
+            "titlePath": [
+              "ability-picker.spec.ts",
+              "progression XP 600 gates learned fixture actions and resets on reload"
+            ],
+            "tags": [],
+            "timeout": 30000,
+            "expectedStatus": "passed"
+          },
+          "retained": {
+            "id": "dc05b687c651765fa444-a96bcdd6295424ad7ea3",
+            "project": "mobile-landscape",
+            "file": "ability-picker.spec.ts",
+            "title": "progression XP 180 gates learned fixture actions and resets on reload",
+            "titlePath": [
+              "ability-picker.spec.ts",
+              "progression XP 180 gates learned fixture actions and resets on reload"
+            ],
+            "tags": [],
+            "timeout": 30000,
+            "expectedStatus": "passed"
+          }
+        }
+      ],
+      "retainedMetadataUnchanged": true
+    }
+  ]
+}

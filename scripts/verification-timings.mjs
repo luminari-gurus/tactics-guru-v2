@@ -20,7 +20,7 @@ export function enginesFor(stage) {
   if (stage.id === 'performance') return ['chromium-headless'];
   if (!stage.browser) return [];
   const config = stage.args[stage.args.indexOf('-c') + 1];
-  if (config === 'playwright.health-bars.config.ts') return ['chromium-headless', 'webkit'];
+  if (config === 'playwright.health-bars.config.ts') return ['webkit'];
   if (['playwright.device-acceptance.config.ts', 'playwright.exploration.config.ts'].includes(config)) return ['webkit'];
   return ['chromium'];
 }

@@ -92,9 +92,9 @@ export function clearDefeatedControlEffects(units: readonly UnitState[], events:
   });
 }
 /** Aggregate readers retain encounter-entry bounds except for this bounded, spent heal. */
-export function encounterHpLimit(unit: {readonly defId:HeroId;readonly secondWindUsed?:true}, entryHp: number, catalog: ContentCatalog): number {
+export function encounterHpLimit(unit: {readonly defId:HeroId;readonly secondWindUsed?:true}, entryHp: number, catalog: ContentCatalog, draughtHp = 0): number {
   if (entryHp===0) return 0;
   const stats=catalog.heroes[unit.defId].stats;
   const heal=Object.values(catalog.abilities).find(a=>a.kind==='secondWind' && a.owners.includes(unit.defId));
-  return Math.min(stats.maxHp,entryHp+(unit.secondWindUsed && heal?.kind==='secondWind'?heal.healBase+stats.power:0));
+  return Math.min(stats.maxHp,entryHp+draughtHp+(unit.secondWindUsed && heal?.kind==='secondWind'?heal.healBase+stats.power:0));
 }

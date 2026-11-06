@@ -12,6 +12,7 @@ import { GUARDED_STRIKE_TRADEOFF } from '../content/constants';
 
 import { ownedAbilities, actionTargets, type Action } from './battleActions';
 import { mountCombatControlsPreference, type CombatSkin } from './combatControls';
+import { draughtsSpent } from '../domain/draughts';
 export const displayName = (id: string) => id.replace(/^ability:/,'').replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase());
 export function previewText(preview: ActionPreview): string {
   if (!preview.ok) return `Unavailable: ${displayName(preview.reason.replace(/([A-Z])/g,' $1'))}`;
@@ -90,7 +91,7 @@ export class BattleHud {
   private readonly actorRoot=document.querySelector<HTMLElement>('#battle-actor')!;
   private readonly abort=new AbortController();
   private readonly log:string[]=[];
-  constructor(private readonly session:BattleSession, callbacks:{action:(a:Action)=>void;target:(c:CellPosition|null)=>void;confirm:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void;inspect:()=>void;inspectTarget:(id:number)=>void;danger:()=>void;plan:()=>void;undo:()=>void;log:(lines:readonly string[])=>void}) {
+  constructor(private readonly session:BattleSession, callbacks:{action:(a:Action)=>void;target:(c:CellPosition|null)=>void;confirm:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void;inspect:()=>void;inspectTarget:(id:number)=>void;danger:()=>void;plan:()=>void;undo:()=>void;draught:()=>void;log:(lines:readonly string[])=>void}) {
     this.actorRoot.hidden=false;
     this.actorRoot.innerHTML=`<p id="battle-active" aria-live="polite"></p><div class="battle-identity"><div id="battle-portraits"></div><div><h2 id="battle-actor-name" aria-live="polite"></h2><p id="battle-hp"></p><div class="battle-health" aria-hidden="true"><span></span></div><p id="battle-stats"></p><p id="battle-status"></p></div></div><p id="battle-budgets"></p>`;
     for(const unit of session.state.units.filter((u,i,all)=>all.findIndex(v=>v.defId===u.defId)===i)) {
@@ -107,6 +108,10 @@ export class BattleHud {
       <label for="battle-ability">Ability</label><select id="battle-ability" aria-describedby="battle-ability-info battle-availability"></select><p id="battle-ability-info"></p><p id="battle-availability"></p><section class="battle-decision" aria-label="Target and action preview"><label for="battle-target">Target / destination</label><select id="battle-target"><option value="">Choose target</option></select><p id="battle-selection">Select a tile</p><p id="battle-target-info"></p><button id="battle-inspect-target" hidden>Inspect target</button><p id="battle-preview" aria-live="polite">Choose an action and target</p><div class="battle-commit"><button id="battle-review" disabled>Confirm action</button><button id="battle-cancel" disabled>Cancel action</button></div></section>
       <nav class="battle-tools" aria-label="Secondary battle tools"><button id="battle-plan">Plan move + ability</button><button id="battle-undo">Undo move</button><button id="battle-party">Inspect party</button><button id="battle-danger" aria-pressed="false" aria-describedby="battle-danger-info">Show enemy danger</button><button id="battle-log-open">Battle log</button><button id="battle-sound" aria-pressed="false" aria-describedby="battle-sound-status">Enable sound</button><button id="battle-sound-retry" hidden>Retry sound</button><details id="battle-overflow"><summary>More</summary></details></nav><p id="battle-danger-info">Danger shows living heroes reachable by an enemy attack or Weakening Hex on its next turn, assuming current positions and statuses; it does not predict enemy choice.</p><p id="battle-danger-results" aria-live="polite" aria-atomic="true"></p><p id="battle-sound-status" aria-live="polite">Sound off</p>`;
     const signal=this.abort.signal;
+    const draught = document.createElement('button');
+    draught.id = 'battle-draught'; draught.type = 'button'; draught.hidden = true;
+    draught.addEventListener('click', callbacks.draught, { signal });
+    this.root.querySelector('.battle-tools')!.prepend(draught);
     this.root.querySelector('#battle-sound')!.addEventListener('click',callbacks.sound,{signal});
     this.root.querySelector('#battle-sound-retry')!.addEventListener('click',callbacks.retrySound,{signal});
     this.root.querySelector('#battle-plan')!.addEventListener('click',callbacks.plan,{signal});
@@ -161,7 +166,7 @@ export class BattleHud {
     const overflow = this.root.querySelector('#battle-overflow');
     const tools = this.root.querySelector('.battle-tools');
     if (overflow && tools) {
-      for (const sel of ['#battle-party', '#battle-log-open', '#battle-sound', '#battle-sound-retry']) {
+      for (const sel of ['#battle-draught', '#battle-party', '#battle-log-open', '#battle-sound', '#battle-sound-retry']) {
         const node = this.root.querySelector(sel);
         if (!(node instanceof HTMLElement)) continue;
         if (skin === 'radial') overflow.append(node);
@@ -199,6 +204,16 @@ export class BattleHud {
     this.root.querySelector<HTMLButtonElement>('#battle-plan')!.disabled=!enabled || actor.hasMoved || actor.hasActed || !movement?.ok;
     this.root.querySelector<HTMLButtonElement>('#battle-undo')!.disabled=!s.canUndoMove;
     const info=unitFeedback(s,actor);
+    const draught = this.root.querySelector<HTMLButtonElement>('#battle-draught')!;
+    const ledger = s.state.draughts;
+    draught.hidden = !ledger;
+    if (ledger) {
+      const remaining = ledger.stock - draughtsSpent(ledger);
+      const reason = !remaining ? 'None left' : !enabled ? 'Wait for your turn' : actor.hasActed ? 'Action spent' :
+        actor.hp === info.def.stats.maxHp ? 'Full HP' : '';
+      draught.disabled = !!reason;
+      draught.textContent = `Healing Draught ×${remaining}${reason ? ` · ${reason}` : ''}`;
+    }
     this.actorRoot.querySelector('#battle-active')!.textContent=`${s.state.outcome==='ongoing'?'':s.state.outcome==='playerWin'?'Victory · ':'Defeat · '}Round ${s.state.round} · ${actor.side==='player'?'Your turn':'Enemy turn'}${s.phase==='presenting'?' · Resolving action (Animating)':s.phase==='error'?' · Battle stopped':''}`;
     this.actorRoot.querySelector('#battle-actor-name')!.textContent=info.name;
     this.actorRoot.querySelector('#battle-hp')!.textContent=`HP ${actor.hp}/${info.def.stats.maxHp}`;

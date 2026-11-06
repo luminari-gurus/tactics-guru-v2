@@ -214,13 +214,15 @@ npm run setup:browsers      # Chromium + WebKit; install once/update as needed
 npm run check:browsers
 npm run build
 npm run test:browser-smoke
-npm test                   # default Chromium matrix; not the full regression set
+npm test                   # seven core E2E journeys (requires a successful build)
+npm run verify:pr          # all units/types/build checks + seven E2E; ordinary PR command
 ```
 
 On Linux, `npm run setup:browsers:linux` also installs required system libraries.
-Use `npm test -- <filters>` for focused browser checks, `npm run test:fixtures`
-for the development fixture suites, and `npm run verify:full` for explicit full
-verification. Run browser workloads sequentially; the default tests serve the
+Use `npm test -- <filters>` to narrow the core journeys. For a specific case
+outside that allowlist use `npm run test:regression -- <filters>`, or the relevant
+explicit engine/fixture config. `npm run verify:full` remains an opt-in broad
+qualification command, not a prerequisite for ordinary PR feedback. Run browser workloads sequentially; the default tests serve the
 production build, while fixtures and telemetry have their own configurations.
 
 Browser coverage includes desktop, mobile portrait/landscape emulation and

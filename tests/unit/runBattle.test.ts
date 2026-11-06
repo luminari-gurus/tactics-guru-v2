@@ -7,7 +7,11 @@ import * as runStorage from '../../src/persistence/runStorage';
 import { preparedSnapshot, runContext } from '../helpers/runItemFixtures';
 import { playerDecision } from '../helpers/playerPolicy';
 import { planEnemyTurn } from '../../src/domain/ai';
-import { dispatch } from '../../src/domain/turns';
+import { dispatch, previewDraught, replayBattle, replayCommandSequence } from '../../src/domain/turns';
+import { encodeBattleSave } from '../../src/domain/saveEnvelope';
+import { decodeRunSave, readRunSnapshot } from '../../src/domain/runSaveEnvelope';
+import { BASE_REPLAY_FORMAT_VERSION } from '../../src/domain/constants';
+import { previousItemCatalog } from '../../src/content/items';
 
 function memory(fail?: (key:string)=>void) {
  const data = new Map<string,string>();
@@ -21,6 +25,73 @@ function fight(session:BattleSession, wait=false) {
  }
  expect(session.phase).toBe('ended');
 }
+// Includes a complete legal defeat and exact continuation replay.
+it('commits the last draught once, retries the exact failed write and continues without replenishing', () => {
+ const prepared=preparedSnapshot(), stack={itemId:'item:healing_draught',quantity:1} as const;
+ const entry={...prepared,items:{...prepared.items,ownership:{...prepared.items.ownership,consumables:[stack]}}};
+ const data=new Map<string,string>();let failWrite=false;
+ const storage=createRunStorage(runContext,()=>({getItem:k=>data.get(k)??null,
+  setItem:(k,v)=>{if(failWrite)throw Error('write blocked');data.set(k,v);},removeItem:k=>{data.delete(k);}}));
+ const run=new RunItemSession(entry,runContext,storage);
+ const battle=run.startEncounter();assert(battle);
+ while(battle.phase==='enemy'){const step=battle.nextEnemy();assert(step);battle.finishPresentation(step.token);}
+ const before=battle.state,actor=battle.active;assert(actor.side==='player');
+ const command={type:'drinkDraught',unitId:actor.id} as const;
+ const preview=previewDraught(before,command,battle.catalog);assert(preview.ok);
+ expect(preview).toMatchObject({healing:6,hp:actor.hp+6,remaining:1});
+ expect(run.snapshot.activeBattle).toEqual(before);
+ expect(dispatch(before,{...command,unitId:64},battle.catalog)).toEqual({ok:false,reason:'unknownUnit'});
+ expect(dispatch(before,{...command,target:{unitId:actor.id}},battle.catalog)).toEqual({ok:false,reason:'malformedCommand'});
+ const enemy=before.units.find(unit=>unit.side==='enemy')!;
+ const enemyUse={...command,unitId:enemy.id};
+ expect(dispatch(before,enemyUse,battle.catalog)).toEqual({ok:false,reason:'notActiveUnit'});
+ expect(dispatch({...before,activeIndex:before.initiative.indexOf(enemy.id)},enemyUse,battle.catalog)).toEqual({ok:false,reason:'noDraught'});
+ const full={...before,units:before.units.map(u=>u.id===actor.id?{...u,hp:battle.catalog.heroes[actor.defId].stats.maxHp}:u)};
+ expect(previewDraught(full,command,battle.catalog)).toEqual({ok:false,reason:'fullHealth'});
+ const nearlyFull={...full,units:full.units.map(unit=>unit.id===actor.id?{...unit,hp:unit.hp-2}:unit)};
+ expect(previewDraught(nearlyFull,command,battle.catalog)).toMatchObject({ok:true,healing:2,hp:battle.catalog.heroes[actor.defId].stats.maxHp});
+ const priorRaw=data.get(RUN_STORAGE_KEYS.primary)!;
+ failWrite=true;
+ expect(battle.prepare(command).ok).toBe(true);
+ const used=battle.confirm();assert(used);
+ expect(battle.confirm()).toBeNull();
+ expect(run.hasUnsavedProgress).toBe(true);expect(data.get(RUN_STORAGE_KEYS.primary)).toBe(priorRaw);
+ expect(used.after.rng).toEqual(before.rng);
+ expect(used.after.units.find(u=>u.id===actor.id)).toEqual({...actor,hp:preview.hp,hasActed:true});
+ expect(used.events).toEqual([{type:'healed',unitId:actor.id,hp:preview.hp,healing:6}]);
+ expect(run.snapshot.items.ownership.consumables).toEqual([stack]);
+ const replay=battle.replay!;
+ expect(replayRunBattle(replay,entry.items,runContext)).toEqual({ok:true,state:used.after,events:battle.events});
+ const {battlefield:__,...standaloneReplay}=replay;
+ expect(replayBattle(standaloneReplay,battle.catalog).ok).toBe(false);
+ expect(encodeBattleSave(used.after,battle.catalog).ok).toBe(false);
+ const {draughts:_,...legacyInitial}=replay.initial;
+ const legacy={...replay,format:BASE_REPLAY_FORMAT_VERSION,initial:legacyInitial,commands:replay.commands.filter(c=>c.type!=='drinkDraught')};
+ expect(replayRunBattle(legacy,entry.items,runContext).ok).toBe(true);
+ for(const draughts of [{stock:2,used:used.after.draughts!.used},{stock:1,used:{fighter:1,ranger:1,mage:0}},{stock:1,used:{fighter:0,ranger:0,mage:1}}])
+  expect(readRunSnapshot({...run.snapshot,activeBattle:{...used.after,draughts}},runContext).ok).toBe(false);
+ failWrite=false;
+ expect(run.save().ok).toBe(true);
+ const checkpoint=data.get(RUN_STORAGE_KEYS.backup)!;
+ expect(JSON.parse(checkpoint)).toMatchObject({format:8,payload:{activeBattle:null}});
+ expect(JSON.parse(data.get(RUN_STORAGE_KEYS.primary)!).format).toBe(9);
+ expect(run.save().ok).toBe(true);
+ expect(data.get(RUN_STORAGE_KEYS.backup)).toBe(checkpoint);
+ expect(decodeRunSave(data.get(RUN_STORAGE_KEYS.primary)!,runContext)).toEqual({ok:true,state:run.snapshot});
+ const restoredRun=new RunItemSession(entry,runContext,storage);
+ expect(restoredRun.continue(restoredRun.inspect())).toBe(true);
+ const restored=restoredRun.startEncounter();assert(restored);
+ expect(restored.state).toEqual(used.after);
+ expect(restored.prepare(command)).toEqual({ok:false,reason:'noDraught'});
+ fight(restored,true);
+ const continuation=restored.continuation!;
+ expect(replayCommandSequence(continuation.snapshot,continuation.commands,restored.catalog)).toEqual({ok:true,state:restored.state,events:continuation.events});
+ expect(restoredRun.snapshot.items.ownership.consumables).toEqual([]);
+ expect(restoredRun.snapshot.items.run.phase).toBe('defeat');
+ expect(JSON.parse(data.get(RUN_STORAGE_KEYS.primary)!).format).toBe(8);
+ expect(data.get(RUN_STORAGE_KEYS.backup)).toBe(checkpoint);
+ expect(restoredRun.startEncounter()).toBeNull();
+},20000);
 it('constructs all survivor subsets with fresh flags/RNG and carried HP, rejects invalid starts',()=>{
  const original=JSON.stringify(runContext.catalog);
  for(let mask=1;mask<8;mask++) {
@@ -32,6 +103,8 @@ it('constructs all survivor subsets with fresh flags/RNG and carried HP, rejects
   expect(created.state.commandCount).toBe(0);expect(created.state.round).toBe(1);
  }
  expect(createRunBattle({...freshRunSnapshot('fresh',1,runContext).items,run:{bad:1}},runContext).ok).toBe(false);
+ const preparationOnly=createRunBattle(preparedSnapshot().items,{...runContext,items:previousItemCatalog});
+ assert(preparationOnly.ok);expect(preparationOnly.state.draughts).toBeUndefined();
  expect(JSON.stringify(runContext.catalog)).toBe(original);
 });
 it('run-specific replay rejects altered HP/initiative/seed and preserves exact continuation',()=>{

@@ -35,11 +35,13 @@ export function validateItems(input: unknown): ItemValidation {
     if (!isDenseArray(heroes, 3) || heroes.length === 0 ||
       heroes.some(id => !HERO_IDS.some(hero => hero === id)) || new Set(heroes).size !== heroes.length)
       fail(`${path}.eligibleHeroes`, 'Expected unique known heroes, 1–3 entries.');
-    if (value.context !== 'betweenEncounters') fail(`${path}.context`, 'Expected betweenEncounters.');
     const effect = value.effect;
+    const restore = hasShape(effect, ['kind', 'amount']) && effect.kind === 'restoreHp' && isIntegerIn(effect.amount, ITEM_BOUNDS.healing);
+    if (value.context !== 'betweenEncounters' && !(value.context === 'preparationAndCombat' && value.kind === 'consumable' && restore))
+      fail(`${path}.context`, 'Combat item use requires a restoreHp consumable.');
     if (value.kind === 'consumable') {
-      if (!hasShape(effect, ['kind', 'amount']) || effect.kind !== 'restoreHp' || !isIntegerIn(effect.amount, ITEM_BOUNDS.healing))
-        fail(`${path}.effect`, 'Expected restoreHp amount 1–18.');
+      const revive = hasShape(effect, ['kind', 'percent']) && effect.kind === 'revive' && isIntegerIn(effect.percent, ITEM_BOUNDS.revivePercent);
+      if (!restore && !revive) fail(`${path}.effect`, 'Expected restoreHp amount 1–18 or revive percent 1–100.');
     } else if (value.kind === 'equipment') {
       if (value.slot !== 'charm') fail(`${path}.slot`, 'Expected charm slot.');
       if (!hasShape(effect, ['kind', 'stat', 'amount']) || effect.kind !== 'statBonus' ||
@@ -48,9 +50,7 @@ export function validateItems(input: unknown): ItemValidation {
     } else fail(`${path}.kind`, 'Expected consumable or equipment.');
     if (errors.length === before) {
       const item = value as unknown as ItemDef;
-      catalog[key as ItemId] = item.kind === 'consumable'
-        ? { ...item, eligibleHeroes: [...item.eligibleHeroes], effect: { ...item.effect } }
-        : { ...item, eligibleHeroes: [...item.eligibleHeroes], effect: { ...item.effect } };
+      catalog[key as ItemId] = { ...item, eligibleHeroes: [...item.eligibleHeroes], effect: { ...item.effect } } as ItemDef;
     }
   }
   return errors.length ? { ok: false, errors } : { ok: true, catalog };

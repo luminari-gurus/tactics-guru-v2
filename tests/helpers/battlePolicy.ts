@@ -41,10 +41,32 @@ export async function tapBoard(page:Page, cell:{x:number;y:number}) {
   else await page.mouse.click(point.x, point.y);
 }
 
+export async function reviewDraught(page: Page) {
+  const touch = test.info().project.use.hasTouch;
+  if (await combatSkin(page) === 'radial') {
+    const more = page.locator('#battle-overflow');
+    if (await more.getAttribute('open') === null) {
+      if (touch) await more.locator('summary').tap();
+      else await more.locator('summary').click();
+    }
+  }
+  const button = page.locator('#battle-draught');
+  if (touch) await button.tap();
+  else { await button.focus(); await page.keyboard.press('Enter'); }
+  await expect(page.getByRole('dialog')).toHaveAccessibleName('Drink Healing Draught?');
+}
+
 export async function playCommand(page:Page,command:Command){
   const skin=await combatSkin(page);
   if(command.type==='endTurn') {
     await page.getByRole('button',{name:skin==='radial'?'End turn':'Wait / End turn',exact:true}).click();
+    return;
+  }
+  if(command.type==='drinkDraught') {
+    await reviewDraught(page);
+    const confirm = page.locator('#battle-draught-confirm');
+    if (test.info().project.use.hasTouch) await confirm.tap();
+    else await confirm.click();
     return;
   }
   const snapshot=(await readSession(page)).state;

@@ -1,7 +1,7 @@
 /** Inclusive safe-integer limits enforced by runtime content validation. */
 export const CONTENT_BOUNDS = {
   mapWidth: { min: 1, max: 32 }, mapHeight: { min: 1, max: 32 },
-  coordinate: { min: 0, max: 31 }, elevation: { min: 0, max: 4 },
+  coordinate: { min: 0, max: 31 }, elevation: { min: 0, max: 6 },
   spawnId: { min: 1, max: 64 }, maxHp: { min: 1, max: 100 },
   move: { min: 1, max: 8 }, jump: { min: 0, max: 4 },
   accuracy: { min: -10, max: 20 }, armorClass: { min: 1, max: 30 },

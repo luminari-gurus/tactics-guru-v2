@@ -1,0 +1,41 @@
+{
+  "run": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42052722995",
+  "source": {
+    "commit": "ba225adbfa8d017b3a52f184d6524ab692b9bab0",
+    "node": "v24.22.2",
+    "runner": "unraid-tactics-02",
+    "lockSha256": "e4768389a179a65df5f04502dab87e8875b465b939e55493d5820a7dc99a74ed",
+    "conditions": "Persistent qualified runner; caches and unrelated background work not independently controlled"
+  },
+  "reports": [
+    {
+      "stats": {
+        "startTime": "2026-11-05T15:14:47.713Z",
+        "duration": 29998.801,
+        "expected": 6,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "sha256": "5d5dd8ab6ecf908aaf49c042f1fba84c0391d332f8233f53dbc54e8d31450295"
+    },
+    {
+      "stats": {
+        "startTime": "2026-11-05T15:14:08.895Z",
+        "duration": 37811.359,
+        "expected": 6,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "sha256": "d5fa8ba2bfced496f0e77da9b626df6aaa75940fd07325ed2dabf38d523a5cf3"
+    }
+  ],
+  "coreGraphicsReceipts": 0,
+  "failedCheckoutAttempt": {
+    "run": "42052148741",
+    "reason": "Operator supplied abbreviated ba225ad; checkout treated it as a branch. No app/build/test ran. Corrected to full40 SHA without code changes."
+  },
+  "stepSeconds": 69.0,
+  "summedReportMs": 67810.16
+}

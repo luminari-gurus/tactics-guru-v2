@@ -1,0 +1,367 @@
+{
+  "before": {
+    "commit": "637ab9224e33952ff0552d5734f05cdc7d2ea8e3",
+    "dirty": false,
+    "inputHash": "6e18c106bcd1e8e41a6c3b35eeff9c37398829149aef5c7a3a01e51b4436c58c",
+    "hashes": {
+      "package-lock.json": "e4768389a179a65df5f04502dab87e8875b465b939e55493d5820a7dc99a74ed",
+      "package.json": "ff321bf1564d100428901bf383d83187428cded749f5032ad69f7aeca0c5a8b2",
+      "playwright.abilities.config.ts": "e9c6097da1891021c181fc1b2e0eff224b93bbd107134c80a8a5e007ecac1cc6",
+      "playwright.config.ts": "bd83dc6dfe646e86bef0a53bae3ebecdb86ec91711243eee64da364f6aba3fa7",
+      "playwright.device-acceptance.config.ts": "6734f62b70fbebc2dab18622650082450ea5db5d506d62df13de89c7cadd530c",
+      "playwright.encounters.config.ts": "6dd21c1967cf0a3667061c9dcbc7c01513cb18f34bcd964dd25f1994bde5ac9c",
+      "playwright.exploration.config.ts": "aa6c0a9cc0a71de6d3864f3cdeef9d5b15be4f5f7fe5b5c8bddd5a0a0d706425",
+      "playwright.extended-webkit.config.ts": "f8f1c739f531d29f453e0574e0e13ea9be11511ff300b2d75dcaf979ca8f91b2",
+      "playwright.extended.config.ts": "0f2ce66f89191dc9aba7440f8b7ec12deb2e1e8e6ea3aaf3f6f5f1d961316de8",
+      "playwright.fixtures.config.ts": "e8f734f8520bf08840d0fa53fbba2a57603e46d15cfa00c1f263454e43db24c3",
+      "playwright.health-bars.config.ts": "e0a3d4eb33f57052cc5317eb917eb4ce21d1670354f9beebeef99855fae176aa",
+      "playwright.pr.config.ts": "62613a273e84a7ce0ae80213136acbe12045d2bf2e9bff094711436dd0d73706",
+      "playwright.prefix-assets.config.ts": "d1a1331a5975e5fc89d3499551179e8e6adde398e121326fb744a8ff3e6234df",
+      "playwright.run-items.config.ts": "33e9c62442c154bfdde12b6a7e5751c246c95dbcbac0f005becf4861af6e9130",
+      "playwright.setup-smoke.config.ts": "c282356754f488359a694df7830c17958f18fe8a1c6be100f026732c80fce031",
+      "playwright.telemetry.config.ts": "ea5d3eb8d8b45db558bb46f4a97c10b61edd60a4cc52f6f5f4498825dc81146d",
+      "scripts/verification-batches.mjs": "0bf177ea9e1c101abb310f38b2877e566f11badce06186bbc5d7df52300cd880",
+      "scripts/verification-playwright-reporter.mjs": "a70fac946463603873943972bf0339767a31d944bb08db23f110525c9004a767",
+      "scripts/verification-processes.mjs": "8fe0686ab4c1c552b2f58fb831e6c93620f0162a89f154aeef34140c6cfe8440",
+      "scripts/verification-report.mjs": "98ec700b32c7ffb405993e062a50681774dc506a979ee1b45c9fa5763897e7cb",
+      "scripts/verification-selection.mjs": "b42396f3cc4fed779cd15211c24f3e202f4fc5c305b5c1bb00571932692751f2",
+      "scripts/verification-timings.mjs": "98154d9f3d417fc662674ed2e0373e630ea764e3fd849c08f829e423495dfcd9",
+      "scripts/verification-vitest-reporter.mjs": "3035def2c034cc534dd060d08ace1a3f6843d053a41cbd2b88aea432ecc3fe58",
+      "scripts/verify-full.mjs": "75e9ead89e31559a9b46e381fd3b208359bfb95882f769e07cab14282e63a084",
+      "scripts/verify-pr.mjs": "6a33fb7413331d846c5463ee715bf938f067353a83c66597b463698dca49a692",
+      "tests/boot.spec.ts": "837148a58f222d54f55466b1adcbaf303a404521d45fb3e0f74feb81cfddebcf",
+      "tests/dungeon.spec.ts": "bdc98081ae00b8824169f8e1662cac32117b7cd70e2d363cc1c1dd367f564dfb",
+      "tests/helpers/forceRailControls.ts": "5d1971dd33b82ad147235d31ade13a16deef0df6f2c568ffe8c7d066b147695f",
+      "tests/main-menu.spec.ts": "16b7c3e05b8f3c5e46a8a82863ae6e690a4ea98bd13845a0141ef2abcef3b647",
+      "tests/unit/dungeonProgressionBoundary.test.ts": "a3b6059889b8c7ba1d33f6bc2607df132d3843670de62f21656434cbf35f9f4e",
+      "tests/unit/progression.test.ts": "0d8095ca3c9c14f91232cfaca56c53f37b9f5181e6e8471f07184c27658aa9dd"
+    }
+  },
+  "after": {
+    "commit": "ba225adbfa8d017b3a52f184d6524ab692b9bab0",
+    "dirty": false,
+    "inputHash": "ed1a9f28901d7586089611778c55235c148bf67b77c82df2a3fba67f6f25184d",
+    "hashes": {
+      "package-lock.json": "e4768389a179a65df5f04502dab87e8875b465b939e55493d5820a7dc99a74ed",
+      "package.json": "85fa4e08f42e81657e6d139fbaa02dba5122dcd4075ed21f3a906c2cd55e7c0b",
+      "playwright.abilities.config.ts": "e9c6097da1891021c181fc1b2e0eff224b93bbd107134c80a8a5e007ecac1cc6",
+      "playwright.config.ts": "dd96d18336f934936d07419b7a163a278ee602f904f6df3b51155cbdceab83d3",
+      "playwright.device-acceptance.config.ts": "d32e61a27935d4749ad508bbb4c8436023435dfe90f0ed825bc25df34c915e51",
+      "playwright.encounters.config.ts": "6dd21c1967cf0a3667061c9dcbc7c01513cb18f34bcd964dd25f1994bde5ac9c",
+      "playwright.exploration.config.ts": "5b34e5d4939820da7927b6e5b125c653eb7fab927a78a487807103513164551c",
+      "playwright.extended-webkit.config.ts": "f8f1c739f531d29f453e0574e0e13ea9be11511ff300b2d75dcaf979ca8f91b2",
+      "playwright.extended.config.ts": "1f10e568293ab139ce91a768a4b4c10cac865a54ed354cce46ad1458511577cc",
+      "playwright.fixtures.config.ts": "3b0b41ee50cbf2f7dc85c76422bbb39000b50b8d2b196a52dcbbc87ab96c2606",
+      "playwright.health-bars.config.ts": "2c7b5481dfa3c4306401e1bb2eec00f4c2f9541cbe118f2f695b97a515139954",
+      "playwright.pr.config.ts": "fe2af94628785aa3f980c78154134880500b86e924773ee3294cd67940529fde",
+      "playwright.prefix-assets.config.ts": "52ea571ca58bab4ed40b6c77fa90779ad3c075696382fdb69b3f4739c8c04c19",
+      "playwright.regression.config.ts": "bd83dc6dfe646e86bef0a53bae3ebecdb86ec91711243eee64da364f6aba3fa7",
+      "playwright.run-items.config.ts": "33e9c62442c154bfdde12b6a7e5751c246c95dbcbac0f005becf4861af6e9130",
+      "playwright.setup-smoke.config.ts": "081f110dbc9e2b463f3a60e3177063d9afedd033967fdcf64348715a5f6e4ad5",
+      "playwright.telemetry.config.ts": "2464e813db8e4436ab1c1bb69087c2c70a2c53ad9e928f7960ea8c967b323327",
+      "scripts/verification-batches.mjs": "0bf177ea9e1c101abb310f38b2877e566f11badce06186bbc5d7df52300cd880",
+      "scripts/verification-playwright-reporter.mjs": "a70fac946463603873943972bf0339767a31d944bb08db23f110525c9004a767",
+      "scripts/verification-processes.mjs": "8fe0686ab4c1c552b2f58fb831e6c93620f0162a89f154aeef34140c6cfe8440",
+      "scripts/verification-report.mjs": "98ec700b32c7ffb405993e062a50681774dc506a979ee1b45c9fa5763897e7cb",
+      "scripts/verification-selection.mjs": "7401e9c3cd023ceaed0a6d0869e8ebd9d251a660f0b1bcf332a8ea80d18755fa",
+      "scripts/verification-timings.mjs": "98154d9f3d417fc662674ed2e0373e630ea764e3fd849c08f829e423495dfcd9",
+      "scripts/verification-vitest-reporter.mjs": "3035def2c034cc534dd060d08ace1a3f6843d053a41cbd2b88aea432ecc3fe58",
+      "scripts/verify-full.mjs": "986474268b408671ed3310fdcc3f1ea2146b92f31f7d0f0e2e9b8457874467d6",
+      "scripts/verify-pr.mjs": "748ac91bd3a5e17b1b27023cd6bda4ad88353584a90f127b1b5e8320909d3ab3",
+      "tests/boot.spec.ts": "e25b91e098f96e7d5865e0330a54f18030c157e187e4daa104a20b9314038735",
+      "tests/dungeon.spec.ts": "02bd9ecc6b46e9d9d433e0b3ac69251262d2495b6e0b61bea1e6e10e2424f5c4",
+      "tests/helpers/coreGraphics.ts": "b1e430362d9c1c7c1fa3728eb883cedb969666bfaefb2a87fc331c767a7b6327",
+      "tests/helpers/forceRailControls.ts": "4c180d2bf1553cdf0af9520bbfab7c13b5eac8c321374008e40fcc74d20fac50",
+      "tests/main-menu.spec.ts": "1f8bd1c8a97d1dbcdab8e413d2025433fa365beee43dc6f90ad0494872277861",
+      "tests/unit/dungeonProgressionBoundary.test.ts": "a3b6059889b8c7ba1d33f6bc2607df132d3843670de62f21656434cbf35f9f4e",
+      "tests/unit/progression.test.ts": "0d8095ca3c9c14f91232cfaca56c53f37b9f5181e6e8471f07184c27658aa9dd"
+    }
+  },
+  "removed": [
+    {
+      "stage": "chromium",
+      "id": "e0f8639c387951b6a797-a2f1eb85738522835cdd",
+      "project": "desktop",
+      "file": "dungeon.spec.ts",
+      "title": "menu dungeon restores Mage XP 60, caster level and exact active boundary",
+      "titlePath": [
+        "dungeon.spec.ts",
+        "menu dungeon restores Mage XP 60, caster level and exact active boundary"
+      ],
+      "tags": [],
+      "timeout": 30000,
+      "expectedStatus": "passed",
+      "retainedUnits": "tests/unit/dungeonProgressionBoundary.test.ts",
+      "retainedUI": "Mage XP 0 and 180 on the same profile"
+    },
+    {
+      "stage": "chromium",
+      "id": "e0f8639c387951b6a797-263332c2d38ea8461a0c",
+      "project": "desktop",
+      "file": "dungeon.spec.ts",
+      "title": "menu dungeon restores Mage XP 600, caster level and exact active boundary",
+      "titlePath": [
+        "dungeon.spec.ts",
+        "menu dungeon restores Mage XP 600, caster level and exact active boundary"
+      ],
+      "tags": [],
+      "timeout": 30000,
+      "expectedStatus": "passed",
+      "retainedUnits": "tests/unit/dungeonProgressionBoundary.test.ts",
+      "retainedUI": "Mage XP 0 and 180 on the same profile"
+    },
+    {
+      "stage": "chromium",
+      "id": "e0f8639c387951b6a797-06dc6217d6876c247d82",
+      "project": "mobile-landscape",
+      "file": "dungeon.spec.ts",
+      "title": "menu dungeon restores Mage XP 60, caster level and exact active boundary",
+      "titlePath": [
+        "dungeon.spec.ts",
+        "menu dungeon restores Mage XP 60, caster level and exact active boundary"
+      ],
+      "tags": [],
+      "timeout": 30000,
+      "expectedStatus": "passed",
+      "retainedUnits": "tests/unit/dungeonProgressionBoundary.test.ts",
+      "retainedUI": "Mage XP 0 and 180 on the same profile"
+    },
+    {
+      "stage": "chromium",
+      "id": "e0f8639c387951b6a797-969ed76813a3c3a97c34",
+      "project": "mobile-landscape",
+      "file": "dungeon.spec.ts",
+      "title": "menu dungeon restores Mage XP 600, caster level and exact active boundary",
+      "titlePath": [
+        "dungeon.spec.ts",
+        "menu dungeon restores Mage XP 600, caster level and exact active boundary"
+      ],
+      "tags": [],
+      "timeout": 30000,
+      "expectedStatus": "passed",
+      "retainedUnits": "tests/unit/dungeonProgressionBoundary.test.ts",
+      "retainedUI": "Mage XP 0 and 180 on the same profile"
+    },
+    {
+      "stage": "chromium",
+      "id": "e0f8639c387951b6a797-85c35d75d238cc4479ef",
+      "project": "mobile-portrait",
+      "file": "dungeon.spec.ts",
+      "title": "menu dungeon restores Mage XP 60, caster level and exact active boundary",
+      "titlePath": [
+        "dungeon.spec.ts",
+        "menu dungeon restores Mage XP 60, caster level and exact active boundary"
+      ],
+      "tags": [],
+      "timeout": 30000,
+      "expectedStatus": "passed",
+      "retainedUnits": "tests/unit/dungeonProgressionBoundary.test.ts",
+      "retainedUI": "Mage XP 0 and 180 on the same profile"
+    },
+    {
+      "stage": "chromium",
+      "id": "e0f8639c387951b6a797-10870d8914d9d1e92c88",
+      "project": "mobile-portrait",
+      "file": "dungeon.spec.ts",
+      "title": "menu dungeon restores Mage XP 600, caster level and exact active boundary",
+      "titlePath": [
+        "dungeon.spec.ts",
+        "menu dungeon restores Mage XP 600, caster level and exact active boundary"
+      ],
+      "tags": [],
+      "timeout": 30000,
+      "expectedStatus": "passed",
+      "retainedUnits": "tests/unit/dungeonProgressionBoundary.test.ts",
+      "retainedUI": "Mage XP 0 and 180 on the same profile"
+    },
+    {
+      "stage": "webkit-exploration",
+      "id": "e0f8639c387951b6a797-049a6ea5f5ef67a90e4a",
+      "project": "desktop-webkit",
+      "file": "dungeon.spec.ts",
+      "title": "menu dungeon restores Mage XP 60, caster level and exact active boundary",
+      "titlePath": [
+        "dungeon.spec.ts",
+        "menu dungeon restores Mage XP 60, caster level and exact active boundary"
+      ],
+      "tags": [],
+      "timeout": 30000,
+      "expectedStatus": "passed",
+      "retainedUnits": "tests/unit/dungeonProgressionBoundary.test.ts",
+      "retainedUI": "Mage XP 0 and 180 on the same profile"
+    },
+    {
+      "stage": "webkit-exploration",
+      "id": "e0f8639c387951b6a797-1cde8db73f3c89eb73bc",
+      "project": "desktop-webkit",
+      "file": "dungeon.spec.ts",
+      "title": "menu dungeon restores Mage XP 600, caster level and exact active boundary",
+      "titlePath": [
+        "dungeon.spec.ts",
+        "menu dungeon restores Mage XP 600, caster level and exact active boundary"
+      ],
+      "tags": [],
+      "timeout": 30000,
+      "expectedStatus": "passed",
+      "retainedUnits": "tests/unit/dungeonProgressionBoundary.test.ts",
+      "retainedUI": "Mage XP 0 and 180 on the same profile"
+    },
+    {
+      "stage": "webkit-exploration",
+      "id": "e0f8639c387951b6a797-0a0be56bd1289f9a5a57",
+      "project": "landscape-webkit",
+      "file": "dungeon.spec.ts",
+      "title": "menu dungeon restores Mage XP 60, caster level and exact active boundary",
+      "titlePath": [
+        "dungeon.spec.ts",
+        "menu dungeon restores Mage XP 60, caster level and exact active boundary"
+      ],
+      "tags": [],
+      "timeout": 30000,
+      "expectedStatus": "passed",
+      "retainedUnits": "tests/unit/dungeonProgressionBoundary.test.ts",
+      "retainedUI": "Mage XP 0 and 180 on the same profile"
+    },
+    {
+      "stage": "webkit-exploration",
+      "id": "e0f8639c387951b6a797-7720a96c4df6ac7e786a",
+      "project": "landscape-webkit",
+      "file": "dungeon.spec.ts",
+      "title": "menu dungeon restores Mage XP 600, caster level and exact active boundary",
+      "titlePath": [
+        "dungeon.spec.ts",
+        "menu dungeon restores Mage XP 600, caster level and exact active boundary"
+      ],
+      "tags": [],
+      "timeout": 30000,
+      "expectedStatus": "passed",
+      "retainedUnits": "tests/unit/dungeonProgressionBoundary.test.ts",
+      "retainedUI": "Mage XP 0 and 180 on the same profile"
+    },
+    {
+      "stage": "webkit-exploration",
+      "id": "e0f8639c387951b6a797-f152adcdd88977ec6458",
+      "project": "portrait-webkit",
+      "file": "dungeon.spec.ts",
+      "title": "menu dungeon restores Mage XP 60, caster level and exact active boundary",
+      "titlePath": [
+        "dungeon.spec.ts",
+        "menu dungeon restores Mage XP 60, caster level and exact active boundary"
+      ],
+      "tags": [],
+      "timeout": 30000,
+      "expectedStatus": "passed",
+      "retainedUnits": "tests/unit/dungeonProgressionBoundary.test.ts",
+      "retainedUI": "Mage XP 0 and 180 on the same profile"
+    },
+    {
+      "stage": "webkit-exploration",
+      "id": "e0f8639c387951b6a797-4980d253ab60bd210bc4",
+      "project": "portrait-webkit",
+      "file": "dungeon.spec.ts",
+      "title": "menu dungeon restores Mage XP 600, caster level and exact active boundary",
+      "titlePath": [
+        "dungeon.spec.ts",
+        "menu dungeon restores Mage XP 600, caster level and exact active boundary"
+      ],
+      "tags": [],
+      "timeout": 30000,
+      "expectedStatus": "passed",
+      "retainedUnits": "tests/unit/dungeonProgressionBoundary.test.ts",
+      "retainedUI": "Mage XP 0 and 180 on the same profile"
+    }
+  ],
+  "unchangedStages": [
+    "fixtures",
+    "placement-dev",
+    "webkit-acceptance",
+    "health-bars",
+    "telemetry-production",
+    "telemetry-development",
+    "assets-root-dev",
+    "assets-prefix-preview",
+    "assets-prefix-dev",
+    "playwright.encounters.config.ts",
+    "playwright.run-items.config.ts",
+    "playwright.abilities.config.ts",
+    "playwright.setup-smoke.config.ts"
+  ],
+  "stageCounts": {
+    "chromium": {
+      "before": 1036,
+      "after": 1030,
+      "retainedIdsSha256": "17d6cdd4440cd49e61cbd4f76d42704f07730fc51dbea91d57949bde23f10b33"
+    },
+    "fixtures": {
+      "before": 93,
+      "after": 93,
+      "retainedIdsSha256": "4ae44bc9d71d1a0d7d8ec32f6fb1ed071ed5f7845a008b79dd086573932d5ac0"
+    },
+    "placement-dev": {
+      "before": 6,
+      "after": 6,
+      "retainedIdsSha256": "98224e198f28aba14964903b8a47bf5efd933bdd529ff4e5a3b08a0d0c808ceb"
+    },
+    "webkit-acceptance": {
+      "before": 196,
+      "after": 196,
+      "retainedIdsSha256": "1d582629af81a8e16fb2e5c00fc2760099ef0fc73ae162d82ca0a704b953704f"
+    },
+    "webkit-exploration": {
+      "before": 129,
+      "after": 123,
+      "retainedIdsSha256": "c79c6a01f856b20ab0b97240132c279db46cefc3223d9a66f93e0f11d7d57af3"
+    },
+    "health-bars": {
+      "before": 10,
+      "after": 10,
+      "retainedIdsSha256": "c722ea2fa68b037f317595f4401f72fca5c8ee8180f90ef685221e8a535f8f31"
+    },
+    "telemetry-production": {
+      "before": 14,
+      "after": 14,
+      "retainedIdsSha256": "f6a1caddb810cb69f199e3072c3a127853053e201ddabbbe7e27c3e5e7c5179c"
+    },
+    "telemetry-development": {
+      "before": 14,
+      "after": 14,
+      "retainedIdsSha256": "f6a1caddb810cb69f199e3072c3a127853053e201ddabbbe7e27c3e5e7c5179c"
+    },
+    "assets-root-dev": {
+      "before": 26,
+      "after": 26,
+      "retainedIdsSha256": "8cd1b8b77a6f89ec22e2ca1c71fd0a0ab305870c398754680796aaa1baccbc0a"
+    },
+    "assets-prefix-preview": {
+      "before": 29,
+      "after": 29,
+      "retainedIdsSha256": "c388a9ccf687a6216dcb2a7c15587d1830082afed90656b0fa3d50840e6fd4ca"
+    },
+    "assets-prefix-dev": {
+      "before": 29,
+      "after": 29,
+      "retainedIdsSha256": "c388a9ccf687a6216dcb2a7c15587d1830082afed90656b0fa3d50840e6fd4ca"
+    },
+    "playwright.encounters.config.ts": {
+      "before": 24,
+      "after": 24,
+      "retainedIdsSha256": "926a823997bc32cc1331f951db77d15263ede4d8d6dbcd388bdc6196939684c5"
+    },
+    "playwright.run-items.config.ts": {
+      "before": 9,
+      "after": 9,
+      "retainedIdsSha256": "0e437b9060557f40bdc9c79193dcc975dba2628fdc885936b84d2f6460aa1b0a"
+    },
+    "playwright.abilities.config.ts": {
+      "before": 60,
+      "after": 60,
+      "retainedIdsSha256": "5e39ab447fa974d2e15a928e32a0b23ca0ccba3f3bb76612461314a802ecba07"
+    },
+    "playwright.setup-smoke.config.ts": {
+      "before": 2,
+      "after": 2,
+      "retainedIdsSha256": "11bd672d2e3016f6f40e2404f7093c58d05f220845399d7391b1a9875dcf9a49"
+    }
+  },
+  "harnessBoundary": "coreGraphics qualifies only pr-* profiles; broad profile contexts are passed through unchanged. Post-helper XP recheck42052722995 passed all12 with zero core graphics receipts."
+}

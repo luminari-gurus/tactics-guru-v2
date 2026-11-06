@@ -27,6 +27,7 @@ export type RunLoadResult = StorageFailure | {
   readonly selected: { readonly slot: RunStorageSlot; readonly state: RunSnapshot } | null;
 };
 export type RunWriteResult = { readonly ok: true } | SaveFailure | StorageFailure
+  | { readonly ok: false; readonly reason: 'changed' }
   | { readonly ok: false; readonly reason: 'recoveryRequired'; readonly inspection: RunStorageInspection };
 export type RunRemoveResult = { readonly ok: true }
   | { readonly ok: false; readonly reason: 'invalidSlot' }
@@ -55,6 +56,7 @@ function attempt<T>(operation: StorageFailure['operation'], slot: RunStorageSlot
 
 /** Storage effects only: no session hydration, autosave, or automatic repair. */
 export function createRunStorage(context: RunSaveContext, provider: RunStorageProvider = browserStorage) {
+  let lastSavedText: string | undefined;
   function acquire() {
     const result = attempt('acquire', undefined, provider);
     if (!result.ok) return result;
@@ -84,7 +86,7 @@ export function createRunStorage(context: RunSaveContext, provider: RunStoragePr
     return { ok: true, inspection, selected };
   }
 
-  function save(state: unknown): RunWriteResult {
+  function save(state: unknown, expectedPrimary?: string | null): RunWriteResult {
     const encoded = encodeRunSave(state, context);
     if (!encoded.ok) return encoded;
     const storage = acquire();
@@ -97,15 +99,35 @@ export function createRunStorage(context: RunSaveContext, provider: RunStoragePr
     if (inspection.primary.status === 'invalid' || inspection.backup.status === 'invalid') {
       return { ok: false, reason: 'recoveryRequired', inspection };
     }
+    if (expectedPrimary !== undefined && inspection.primary.status !== 'unavailable' && inspection.primary.text !== expectedPrimary)
+      return {ok:false,reason:'changed'};
     // A known primary is the current recovery point. A sole backup is never replaced.
     // First save seeds a recovery point before attempting primary publication.
-    const backupText = inspection.primary.status === 'valid' ? inspection.primary.text
+    let backupText = inspection.primary.status === 'valid' ? inspection.primary.text
       : inspection.backup.status === 'missing' ? encoded.text : null;
+    if (inspection.primary.status === 'valid' && inspection.primary.state.activeBattle?.draughts) backupText = null;
+    // encodeRunSave has already validated the snapshot and its ownership.
+    const saved = state as RunSnapshot;
+    if (saved.activeBattle?.draughts) {
+      const { items } = saved;
+      const compatible = (slot: SlotInspection): slot is Extract<SlotInspection,{status:'valid'}> => slot.status === 'valid' &&
+        !slot.state.activeBattle?.draughts && slot.state.items.run.id === items.run.id &&
+        slot.state.items.run.encounterIndex === items.run.encounterIndex;
+      if (compatible(inspection.primary)) backupText = inspection.primary.text;
+      else if (compatible(inspection.backup)) backupText = null;
+      else {
+        // An older reader can restart this encounter with the original party and inventory.
+        const checkpoint = encodeRunSave({items, activeBattle:null, battlefield:null}, context);
+        if (!checkpoint.ok) return checkpoint;
+        backupText = checkpoint.text;
+      }
+    }
     if (backupText !== null) {
       const backup = attempt('write', 'backup', () => storage.value.setItem(RUN_STORAGE_KEYS.backup, backupText));
       if (!backup.ok) return backup;
     }
     const primary = attempt('write', 'primary', () => storage.value.setItem(RUN_STORAGE_KEYS.primary, encoded.text));
+    if (primary.ok) lastSavedText = encoded.text;
     return primary.ok ? { ok: true } : primary;
   }
 
@@ -123,5 +145,14 @@ export function createRunStorage(context: RunSaveContext, provider: RunStoragePr
     return removed.ok ? { ok: true } : { ...removed, expectedText };
   }
 
-  return { load, save, removeSlot };
+  return { load, save, removeSlot, lastSavedText: () => lastSavedText };
+}
+
+/** Every browser run mutation shares this origin-scoped lock, including recovery and replacement. */
+export function serializeBrowserRunWrite(task: () => void, unavailable: () => void) {
+  try {
+    const locks = navigator.locks;
+    if (!locks) { unavailable(); return; }
+    void locks.request(RUN_STORAGE_KEYS.primary, task).catch(unavailable);
+  } catch { unavailable(); }
 }

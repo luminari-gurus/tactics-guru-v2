@@ -10,7 +10,7 @@ describe('base-aware menu routing', () => {
         expect(resolveAppEntry(base, `?game=dungeon&scene=${scene}`, base)).toEqual({ route: 'battle', persistent: false });
       }
       expect(classifyRoute(base, '?scene=unknown', base)).toBe('menu');
-      for (const route of ['battle', 'run', 'dungeon', 'map'] as const) {
+      for (const route of ['battle', 'run', 'dungeon', 'map', 'qbert'] as const) {
         const href=routeHref(route,base);
         for (const search of ['', '?entry=continue', '?game=dungeon&entry=new', '?scene=proof&game=battle']) {
           expect(resolveAppEntry(href+'/', search,base)).toEqual({route,persistent:false});

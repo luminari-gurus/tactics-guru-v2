@@ -1,0 +1,98 @@
+{
+  "base": "19529c5a47f48489e2c9e169af774ac9d37759a5",
+  "method": "Same candidate tree; baseline substitutes only exact base spec bytes. Retained metadata and effective project settings compared exactly. No browser execution.",
+  "beforeSha256": "5342579c0486bbf7cff6a475ccb7526840e3ace168d39a1ea79b144b0e1b3a0c",
+  "afterSha256": "938e55e93b8ac4cac71515a72c6194396f4051a1cabe0a315be82692d7b3ea69",
+  "stages": [
+    {
+      "stage": "chromium",
+      "before": 1042,
+      "after": 1042,
+      "unchanged": true
+    },
+    {
+      "stage": "fixtures",
+      "before": 93,
+      "after": 90,
+      "unchanged": false
+    },
+    {
+      "stage": "placement-dev",
+      "before": 6,
+      "after": 6,
+      "unchanged": true
+    },
+    {
+      "stage": "webkit-acceptance",
+      "before": 196,
+      "after": 196,
+      "unchanged": true
+    },
+    {
+      "stage": "webkit-exploration",
+      "before": 126,
+      "after": 126,
+      "unchanged": true
+    },
+    {
+      "stage": "health-bars",
+      "before": 10,
+      "after": 10,
+      "unchanged": true
+    },
+    {
+      "stage": "telemetry-production",
+      "before": 14,
+      "after": 14,
+      "unchanged": true
+    },
+    {
+      "stage": "telemetry-development",
+      "before": 14,
+      "after": 14,
+      "unchanged": true
+    },
+    {
+      "stage": "assets-root-dev",
+      "before": 26,
+      "after": 26,
+      "unchanged": true
+    },
+    {
+      "stage": "assets-prefix-preview",
+      "before": 29,
+      "after": 29,
+      "unchanged": true
+    },
+    {
+      "stage": "assets-prefix-dev",
+      "before": 29,
+      "after": 29,
+      "unchanged": true
+    },
+    {
+      "stage": "playwright.encounters.config.ts",
+      "before": 24,
+      "after": 24,
+      "unchanged": true
+    },
+    {
+      "stage": "playwright.run-items.config.ts",
+      "before": 9,
+      "after": 9,
+      "unchanged": true
+    },
+    {
+      "stage": "playwright.abilities.config.ts",
+      "before": 60,
+      "after": 57,
+      "unchanged": false
+    },
+    {
+      "stage": "playwright.setup-smoke.config.ts",
+      "before": 2,
+      "after": 2,
+      "unchanged": true
+    }
+  ]
+}

@@ -53,10 +53,9 @@ export class DungeonMap {
     for (const style of ART_STYLES) { const o=el('option',style.label);o.value=style.id;select.append(o); } select.value=this.art;
     select.onchange=()=>{this.art=select.value as ArtStyle;this.paintArt();};label.append(select);
     const grid=this.grid ?? el('div');this.grid=grid;grid.id='dungeon-map';grid.tabIndex=0;grid.setAttribute('role','application');grid.setAttribute('aria-label',`Floor ${s.depth} map. Player row ${Math.floor(f.position/map.width)+1}, column ${f.position%map.width+1}. Arrow or WASD keys move one cell.`);
-    const minWidth=`${map.width * 12}px`, columns=`repeat(${map.width}, minmax(12px, 1fr))`, rows=`repeat(${map.height}, minmax(12px, 1fr))`;
-    if(grid.style.minWidth!==minWidth)grid.style.minWidth=minWidth;
-    if(grid.style.gridTemplateColumns!==columns)grid.style.gridTemplateColumns=columns;
-    if(grid.style.gridTemplateRows!==rows)grid.style.gridTemplateRows=rows;
+    for (const [property, value] of [['--dungeon-map-columns', String(map.width)], ['--dungeon-map-rows', String(map.height)]]) {
+      if (grid.style.getPropertyValue(property) !== value) grid.style.setProperty(property, value);
+    }
     grid.dataset.position=String(f.position);grid.dataset.art=this.art;grid.dataset.biome=biome.id;
     const showUpstairs=s.depth>1, showDownstairs=f.completed===3;
     const cleared=clearedDungeonSlots(f);

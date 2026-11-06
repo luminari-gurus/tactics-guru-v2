@@ -36,7 +36,9 @@ for (const route of ['', 'run']) test(`collector cold/warm ${route || 'battle'} 
 });
 
 for (const scene of ['battle', 'proof', 'content-smoke'] as const) {
-  test(`${scene} direct entry and refresh resolve public assets`, async ({ page, baseURL }) => {
+  test(`${scene} direct entry and refresh resolve public assets`, {
+    ...(scene === 'battle' ? { tag: '@touch-audio' } : {}),
+  }, async ({ page, baseURL }) => {
     const paths = new Map<string, number>(), errors: string[] = [];
     page.on('request', request => {
       const path = new URL(request.url()).pathname.replace(/\/assets\/[a-f0-9]{16}(?=\/(?:battle|proof)\/)/, '');
@@ -100,7 +102,10 @@ for (const scene of ['battle', 'proof', 'content-smoke'] as const) {
   });
 }
 
-for (const route of ['battle', 'run', 'dungeon']) for (const backend of ['Web Audio', 'HTML5']) test(`${backend} ${route} audio loads at the base and plays a committed move`, async ({ page }) => {
+for (const route of ['battle', 'run', 'dungeon']) for (const backend of ['Web Audio', 'HTML5']) {
+  test(`${backend} ${route} audio loads at the base and plays a committed move`, {
+    ...(route === 'dungeon' ? { tag: '@touch-audio' } : {}),
+  }, async ({ page }) => {
   // This workload qualifies audio/base delivery, not random-layout pursuit. Use
   // the existing legal Fighter journey's initial floor for deterministic travel.
   if(route==='dungeon')await page.addInitScript(()=>{
@@ -130,6 +135,7 @@ for (const route of ['battle', 'run', 'dungeon']) for (const backend of ['Web Au
   await expect.poll(() => page.evaluate(() => window.fitDiagnostics().battleAudio!.completed)).toBeGreaterThan(0);
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
 });
+}
 
 test('content fixture uses the base and still validates input', async ({ page, baseURL }) => {
   const fixtureURL = new URL('battle/content-fixture.json', baseURL!).href;

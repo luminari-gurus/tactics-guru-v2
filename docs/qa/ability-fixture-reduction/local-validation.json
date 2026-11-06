@@ -1,0 +1,28 @@
+{
+  "node": "v24.22.1",
+  "base": "19529c5a47f48489e2c9e169af774ac9d37759a5",
+  "units": {
+    "passed": 27,
+    "total": 27,
+    "failed": 0,
+    "pending": 0,
+    "reportSha256": "b77995a9682d717ec6d3b29aa7e486c72ac47aae2c0fd5deff31a8fe28f7353c"
+  },
+  "typecheck": {
+    "app": "passed",
+    "domain": "passed",
+    "logSha256": "4594117359b10c92691cf4e4c676394d6ec926cdc9e700c3f29d33f709288540"
+  },
+  "tooling": {
+    "passed": 7,
+    "total": 7,
+    "logSha256": "a85b098a3af8a9107121eb282db91aa5af660a2f9bb26dbaedc0dc16264043a3"
+  },
+  "iterationFailure": {
+    "toolingPassed": 6,
+    "toolingFailed": 1,
+    "reason": "Anchored grep selected no tests because Playwright matches the full title path; corrected to the unanchored progression XP filter before qualification.",
+    "logSha256": "9fc775070b44843451e85251d14031497dd2decd82d35e9407b0d9174a1cd3d0"
+  },
+  "dependencyCondition": "Reused local node_modules with exactly matching package-lock.json SHA256; qualified CI performs npm ci."
+}

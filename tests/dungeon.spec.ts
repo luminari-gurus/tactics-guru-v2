@@ -17,7 +17,9 @@ import { generateMap } from '../src/map/generate';
 import type { Command, BattleEvent } from '../src/domain/types';
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
 
-for(const [xp,level,maxHp]of [[0,1,11],[60,2,15],[180,3,19],[600,5,27]])test(`menu dungeon restores Mage XP ${xp}, caster level and exact active boundary`,async({page})=>{
+// UI witnesses straddle the Frost Snare gate; exact XP/HP/caster projections and
+// forged save rejection live in dungeonProgressionBoundary.test.ts.
+for(const [xp,level,maxHp]of [[0,1,11],[180,3,19]])test(`menu dungeon restores Mage XP ${xp}, caster level and exact active boundary`,async({page})=>{
  // Explicit boundary fixture; earned progression is covered by the extended journeys.
  const fresh=freshDungeon(`menu-caster-${xp}`,190);
  const progressed={...fresh,party:fresh.party.map(hero=>progressHero(hero.heroId,xp,1,dungeonContent.catalog))};
@@ -63,7 +65,7 @@ test('testing dungeon legally clears a floor, descends and backtracks without ac
   for(let i=0;i<20;i++){
    const s=await snapshot(page),command=journeyPreparation(s);if(!command)break;
    if(command.type==='claimReward')await page.getByRole('button',{name:`Claim ${dungeonContent.items[command.itemId].label}`,exact:true}).click();
-   else if(command.type==='useItem'){await page.getByRole('combobox',{name:'Healing Draught target',exact:true}).selectOption(command.heroId);await page.getByRole('button',{name:'Use Healing Draught',exact:true}).click();}
+   else if(command.type==='useItem'){const label=dungeonContent.items[command.itemId].label;await page.getByRole('combobox',{name:`${label} target`,exact:true}).selectOption(command.heroId);await page.getByRole('button',{name:`Use ${label}`,exact:true}).click();}
    else if(command.type==='equipItem'){const row=page.locator(`[data-instance-id="${command.instanceId}"]`);await row.locator('select').selectOption(command.heroId);const item=s.ownership.equipment.find(e=>e.instanceId===command.instanceId)!;await row.getByRole('button',{name:`Equip ${dungeonContent.items[item.itemId].label}`,exact:true}).click();}
    else throw Error('Unexpected preparation command');await page.locator('#dungeon-item-confirm').click();
   }
@@ -272,6 +274,20 @@ test('corrupt bytes stay exportable and uncertain travel requires explicit recov
  expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe('broken save bytes');
 });
 
+test('declining a dungeon reward preserves inventory and allows the next encounter',async({page,isMobile})=>{
+ const initial=dungeonCapacityFixture();await seed(page,initial);
+ const decline=page.getByRole('button',{name:'Decline reward',exact:true});
+ const activate=async()=>{if(isMobile)await decline.tap();else await decline.press('Enter');};
+ await activate();await page.locator('#dungeon-item-cancel').click();
+ expect(await snapshot(page)).toEqual(initial);
+ await activate();await page.locator('#dungeon-item-confirm').click();
+ const next=await snapshot(page);
+ expect(next).toMatchObject({phase:'ready',offer:null,ownership:initial.ownership});
+ await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(next);
+ await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+});
+
 test('confirmed charm discard frees full capacity without cancelling or duplicating the pending reward',async({page,isMobile})=>{
  const initial=dungeonCapacityFixture();await seed(page,initial);
  const target=initial.ownership.equipment[0].instanceId;
@@ -295,6 +311,63 @@ test('confirmed charm discard frees full capacity without cancelling or duplicat
  const prepared=await snapshot(page);expect(prepared.phase).toBe('ready');expect(prepared.ownership.equipment).toHaveLength(5);
  await walkDungeon(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  await expect(page.getByRole('button',{name:/^Discard /})).toHaveCount(0);
+});
+
+test('a claimed Revive Kit restores a fallen dungeon hero across Continue and next encounter',async({page,isMobile})=>{
+ const witness=dungeonVictoryBoundary(13);if(!witness)throw Error('Missing victory witness');
+ const {snapshot:entry,command}=witness;
+ const result=dispatch(entry.activeBattle,command,dungeonBattle(entry)!.catalog);if(!result.ok)throw Error(result.reason);
+ const victory=acceptDungeonBattle(entry,result.state);if(!victory.ok)throw Error(victory.reason);
+ expect(victory.state.party[2].hp).toBe(0);
+ await seed(page,victory.state);
+ const activate=async(name:string)=>{const button=page.getByRole('button',{name,exact:true});if(isMobile)await button.tap();else await button.click();};
+ await activate('Claim Revive Kit');await activate('Confirm');
+ await expect(page.getByRole('combobox',{name:'Revive Kit target'})).toHaveValue('mage');
+ await activate('Use Revive Kit');
+ await expect(page.getByRole('dialog')).toContainText('mage will have 3/11 HP');
+ await activate('Confirm');
+ expect((await snapshot(page)).ownership.consumables).toEqual([]);
+ await page.reload();await continueSavedDungeon(page);
+ expect((await snapshot(page)).party[2].hp).toBe(3);
+ await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ expect((await readSession(page)).state.units.find(u=>u.defId==='mage')?.hp).toBe(3);
+});
+
+test('an earned Healing Draught survives dungeon Continue and settles once after a legal battle',async({page,isMobile})=>{
+ test.setTimeout(180000);
+ const witness=dungeonVictoryBoundary(13);if(!witness)throw Error('Missing victory witness');
+ const won=dispatch(witness.snapshot.activeBattle,witness.command,dungeonBattle(witness.snapshot)!.catalog);if(!won.ok)throw Error(won.reason);
+ const victory=acceptDungeonBattle(witness.snapshot,won.state);if(!victory.ok)throw Error(victory.reason);
+ await seed(page,victory.state);
+ const claim=page.getByRole('button',{name:'Claim Healing Draught',exact:true});
+ if(isMobile)await claim.tap();else await claim.click();
+ await page.locator('#dungeon-item-confirm').click();
+ await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
+ let used=false;
+ for(let i=0;i<500;i++){
+  await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||await page.locator('#game').getAttribute('data-phase')==='player';}).toBe(true);
+  const current=await snapshot(page);if(current.phase!=='battle')break;
+  const before=(await readSession(page)).state, actor=before.units.find(u=>u.id===before.initiative[before.activeIndex])!;
+  const button=page.locator('#battle-draught');
+  if(!used&&await button.isEnabled()){
+   await playCommand(page,{type:'drinkDraught',unitId:actor.id});
+   await expect(button).toHaveText('Healing Draught ×0 · None left');
+   const accepted=(await readSession(page)).state;
+   expect(accepted.rng).toEqual(before.rng);
+   expect(accepted.units.find(u=>u.id===actor.id)!.hp).toBeGreaterThan(actor.hp);
+   await page.reload();await continueSavedDungeon(page);
+   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+   expect((await readSession(page)).state).toEqual(accepted);used=true;
+  } else await playCommand(page,playerDecision(before,dungeonBattle(current)!.catalog));
+ }
+ await expect(page.locator('#dungeon-screen')).toBeVisible();
+ expect(used).toBe(true);
+ const final=await snapshot(page);
+ expect(final.activeBattle).toBeNull();
+ expect(final.ownership.consumables).toEqual([]);
+ await page.reload();await continueSavedDungeon(page);
+ expect(await snapshot(page)).toEqual(final);
 });
 
 test('hero progression commits once, heals at a threshold and survives inspection and reload',async({page})=>{

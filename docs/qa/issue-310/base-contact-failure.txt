@@ -1,0 +1,58 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> tactics-guru-v2@0.0.0 test:unit
+> vitest run tests/unit/dungeon.test.ts -t holds slot
+
+
+ RUN  v5.0.3 /workspace/scratch/71a48a2c2917/tactics-guru-v2
+
+ ❯ tests/unit/dungeon.test.ts (62 tests | 2 failed | 59 skipped) 2395ms
+   ❯ unordered encounters and moving dungeon enemies (11)
+     × holds slot 0 in contact range and enters its battle on the next step across save/reload 133ms
+     × holds slot 1 in contact range and enters its battle on the next step across save/reload 129ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/unit/dungeon.test.ts > unordered encounters and moving dungeon enemies > holds slot 0 in contact range and enters its battle on the next step across save/reload
+AssertionError: expected 308 to be 288 // Object.is equality
+
+- Expected
++ Received
+
+- 288
++ 308
+
+ ❯ tests/unit/dungeon.test.ts:420:53
+    418|       const adjacent=step(state,approach), floor=adjacent.floors[0];
+    419|       expect(adjacent.phase).toBe('ready');
+    420|       expect(poiCell(floor.exploration.pois[slot])).toBe(target);
+       |                                                     ^
+    421|       expect(new Set(floor.exploration.pois.map(poiCell)).size).toBe(3…
+    422|       expect(floor.exploration.movement!.step).toBe(1);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/unit/dungeon.test.ts > unordered encounters and moving dungeon enemies > holds slot 1 in contact range and enters its battle on the next step across save/reload
+AssertionError: expected 307 to be 306 // Object.is equality
+
+- Expected
++ Received
+
+- 306
++ 307
+
+ ❯ tests/unit/dungeon.test.ts:420:53
+    418|       const adjacent=step(state,approach), floor=adjacent.floors[0];
+    419|       expect(adjacent.phase).toBe('ready');
+    420|       expect(poiCell(floor.exploration.pois[slot])).toBe(target);
+       |                                                     ^
+    421|       expect(new Set(floor.exploration.pois.map(poiCell)).size).toBe(3…
+    422|       expect(floor.exploration.movement!.step).toBe(1);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 1 passed | 59 skipped (62)
+   Start at  17:03:50
+   Duration  4.28s (tests 61%, transform 32%, import 6%)

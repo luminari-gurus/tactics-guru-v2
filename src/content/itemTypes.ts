@@ -6,14 +6,14 @@ interface ItemBase {
   readonly id: ItemId;
   readonly label: string;
   readonly eligibleHeroes: readonly HeroId[];
-  readonly context: 'betweenEncounters';
 }
-export interface ConsumableDef extends ItemBase {
-  readonly kind: 'consumable';
-  readonly effect: { readonly kind: 'restoreHp'; readonly amount: number };
-}
+export type ConsumableDef = ItemBase & { readonly kind: 'consumable' } & (
+  | { readonly context: 'betweenEncounters' | 'preparationAndCombat'; readonly effect: { readonly kind: 'restoreHp'; readonly amount: number } }
+  | { readonly context: 'betweenEncounters'; readonly effect: { readonly kind: 'revive'; readonly percent: number } }
+);
 export interface EquipmentDef extends ItemBase {
   readonly kind: 'equipment';
+  readonly context: 'betweenEncounters';
   readonly slot: EquipmentSlot;
   readonly effect: { readonly kind: 'statBonus'; readonly stat: 'accuracy' | 'armorClass'; readonly amount: number };
 }
@@ -23,6 +23,7 @@ export const ITEM_BOUNDS = {
   definitions: { min: 1, max: 32 },
   labelLength: { min: 1, max: 64 },
   healing: { min: 1, max: 18 },
+  revivePercent: { min: 1, max: 100 },
   bonus: { min: 1, max: 2 },
   stack: { min: 1, max: 9 },
   equipmentInstances: { min: 0, max: 6 },

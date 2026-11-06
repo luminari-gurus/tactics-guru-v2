@@ -1,16 +1,41 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { captureSelections, compareSelections, discoverSelection } from '../../scripts/verification-selection.mjs';
+import { captureSelections, compareSelections, discoverSelection, desktopOnlyStages, prefixTouchStages } from '../../scripts/verification-selection.mjs';
 import { createPlan, exactCoverage } from '../../scripts/verification-batches.mjs';
 
 let before, after;
-test('real discoveries preserve every retained ID and special mode, with exactly 23 mapped reductions', () => {
+test('real discoveries preserve every retained ID and special mode, with exactly 23 chromium and the approved desktop-only mappings', () => {
   before = captureSelections({ allProfiles: true });
   after = captureSelections();
   const comparison = compareSelections(before, after);
   assert.equal(comparison.beforeCount - comparison.afterCount, 23);
   assert.equal(comparison.mappings.filter(row => row.classification === '@canonical').length, 18);
   assert.equal(comparison.mappings.filter(row => row.effectiveUse?.hasTouch).length, 5);
+  const desktopOnly = comparison.mappings.filter(row => row.classification === 'desktop-only');
+  assert.equal(desktopOnly.filter(row => row.stage.startsWith('telemetry')).length, 56);
+  assert.equal(desktopOnly.filter(row => row.stage === 'assets-root-dev').length, 52);
+  assert.equal(desktopOnly.length, 108);
+  const prefixTouchMappings = comparison.mappings.filter(row => row.classification === 'prefix-touch');
+  assert.equal(prefixTouchMappings.filter(row => row.removed.project === 'mobile-landscape').length, 52);
+  assert.equal(prefixTouchMappings.filter(row => row.removed.project === 'mobile-portrait').length, 46);
+  assert.equal(prefixTouchMappings.length, 98);
+  assert.ok(prefixTouchMappings.filter(row => row.removed.project === 'mobile-landscape'
+    && (row.removed.tags ?? []).includes('@touch-audio')).every(row => row.retained.project === 'mobile-portrait'));
+  assert.ok(prefixTouchMappings.filter(row => !(row.removed.tags ?? []).includes('@touch-audio'))
+    .every(row => row.retained.project === 'desktop'));
+  for (const stage of desktopOnlyStages) {
+    assert.ok(after.selections[stage].tests.every(row => row.project === 'desktop'));
+    assert.ok(after.selections[stage].tests.length > 0);
+  }
+  for (const stage of prefixTouchStages) {
+    const tests = after.selections[stage].tests;
+    assert.deepEqual([...new Set(before.selections[stage].projects.map(row => row.name))].sort(),
+      ['desktop', 'mobile-landscape', 'mobile-portrait']);
+    assert.deepEqual([...new Set(tests.map(row => row.project))].sort(), ['desktop', 'mobile-portrait']);
+    const portrait = tests.filter(row => row.project === 'mobile-portrait');
+    assert.equal(portrait.length, 3);
+    assert.ok(portrait.every(row => row.tags.includes('@touch-audio')));
+  }
 });
 
 test('selection contract rejects missing, extra, duplicate, wrong-profile and device configuration drift', () => {
@@ -49,6 +74,23 @@ test('real nine-batch discovery partitions the entire reduced default selection'
   exactCoverage(expected, jobs.flatMap(job => job.stages.flatMap(stage => stage.expected)));
 });
 
+
+test('health-bars keeps iPhone WebKit; Chromium health coverage stays in the default suite', () => {
+  assert.ok(after);
+  assert.deepEqual(after.selections['health-bars'].projects.map(project => project.name),
+    ['health-iphone-portrait', 'health-iphone-landscape']);
+  const titles = [...new Set(after.selections['health-bars'].tests.map(row => row.title))].sort();
+  assert.ok(titles.length > 0);
+  for (const project of ['desktop', 'mobile-landscape', 'mobile-portrait']) {
+    const chromiumTitles = after.selections.chromium.tests
+      .filter(row => row.file === 'unit-health-bars.spec.ts' && row.project === project)
+      .map(row => row.title).sort();
+    assert.deepEqual(chromiumTitles, titles);
+  }
+  const assets = after.selections.chromium.tests.filter(row => row.file === 'public-asset-base.spec.ts');
+  assert.deepEqual([...new Set(assets.map(row => row.project))].sort(),
+    ['desktop', 'mobile-landscape', 'mobile-portrait']);
+});
 
 test('long progression journeys are excluded from routine selection and remain available on all extended profiles', () => {
   const titles = ['Mage legal progression', 'Ranger legal progression', 'Fighter legal progression'];

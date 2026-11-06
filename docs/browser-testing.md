@@ -64,9 +64,9 @@ and a live diagnostics snapshot. It does not change startup, gameplay or renderi
 
 ```sh
 # Run one focused test with durable receipts:
-npm run test:browser -- tests/boot.spec.ts --project=desktop -g 'boots a Phaser scene'
+npm run test:browser -- -c playwright.regression.config.ts tests/boot.spec.ts --project=desktop -g 'boots a Phaser scene'
 # Only for a focused failure reproduction:
-npm run test:browser -- tests/boot.spec.ts --project=desktop -g 'boots a Phaser scene' --diagnostics
+npm run test:browser -- -c playwright.regression.config.ts tests/boot.spec.ts --project=desktop -g 'boots a Phaser scene' --diagnostics
 ```
 
 Each invocation gets a unique directory under `verification-receipts/browser-runs/` with
@@ -81,7 +81,7 @@ Trace collection still adds overhead while the test runs; traced runs are not
 performance baselines. Open a retained trace with `npx --no-install playwright
 show-trace <trace.zip>`. Do not publish raw traces without inspecting their contents.
 The wrapper owns output/reporter/trace/retry CLI flags; use the direct Playwright
-CLI for other custom reporting workflows. `npm test` now runs only its selected cases; use `npm run test:fixtures` for the explicit dev fixtures from #202.
+CLI for other custom reporting workflows. `npm test` selects only the seven core journeys; use `npm run test:regression -- <filters>` for other production browser cases; use `npm run test:fixtures` for the explicit dev fixtures from #202.
 
 ## Compare an isolated failure against the exact base
 
@@ -97,7 +97,7 @@ CLI for other custom reporting workflows. `npm test` now runs only its selected 
    paths, for example:
 
    ```sh
-   PLAYWRIGHT_JSON_OUTPUT_FILE=verification-receipts/base-case/results.json npx --no-install playwright test tests/boot.spec.ts --project=desktop -g 'boots a Phaser scene' --retries=0 --trace=off --reporter=list,json --output=verification-receipts/base-case/artifacts
+   PLAYWRIGHT_JSON_OUTPUT_FILE=verification-receipts/base-case/results.json npx --no-install playwright test -c playwright.regression.config.ts tests/boot.spec.ts --project=desktop -g 'boots a Phaser scene' --retries=0 --trace=off --reporter=list,json --output=verification-receipts/base-case/artifacts
    ```
 
 4. Keep the original failure. If needed, repeat only that case with
@@ -149,11 +149,24 @@ smoke report must contain both setup projects with zero retries or skips. This
 direct qualification does not require merging the PR or adding an automatic
 trigger to the persistent runner.
 
-The `tactics-browser-exclusive` concurrency group serializes browser jobs across
-refs. Reuse that exact group in future timing workflows on this repository, and
-keep unrelated host workloads idle during measurement. A single host starts with
-one browser job; extra runner registrations on it do not create independent GPUs.
-Do not assume 3–4 shards until #208 establishes actual isolated capacity.
+Browser setup, baseline and process-cleanup workflows now select a qualified VM
+using `runner`: `tactics-browser-01` (default) or `tactics-browser-02`. Both retain
+`self-hosted` and `tactics-browser` requirements. An administrator must add each
+unique custom label only to its corresponding VM before dispatch; names are not
+labels. Missing labels leave jobs queued. Qualify each VM separately.
+
+The shared per-runner concurrency group reserves the selected VM across job
+boundaries; independent runs selecting different VMs may execute concurrently.
+Use the same selection and group in future workflows on these runners. Retain
+one runner service per VM and separate workspaces and browser/tool caches. The
+serial baseline stays on one VM to preserve its runner provenance checks; it
+does not shard across the VMs. See [serial verification](serial-verification.md)
+for queue bounds, explicit cancellation and setup requirements.
+
+The VMs use separately pinned CPU cores and dedicated RAM. Shared storage,
+network and other host resources can still affect timings, so coordinate and
+record background load for performance measurements. Extra runner registrations
+on one VM do not create independent capacity.
 
 Re-run qualification on the self-hosted machine before collecting #200's baseline.
 The previous hosted CI smoke results remain historical setup evidence; they do
@@ -175,6 +188,7 @@ PR #210 is merged. `unraid-tactics-01` passed setup, diagnostics retention,
 Chromium/WebKit preflight and both Phaser smoke cases in
 [run 39717745142](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/39717745142).
 This clears the provisioning blocker; it is not a full regression or timing baseline.
-PR #209's manual timing workflow uses `[self-hosted, tactics-browser]`,
-`tactics-browser-exclusive`, the same service-account cache, and no privileged
-OS installation or hosted fallback. See [timing qualification/capture](verification-timings.md).
+PR #209 originally used `[self-hosted, tactics-browser]` and the global
+`tactics-browser-exclusive` group. The current per-VM selection replaces that
+group while retaining no privileged OS installation or hosted fallback. See [timing qualification/capture](verification-timings.md).
+

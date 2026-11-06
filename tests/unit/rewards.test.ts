@@ -42,10 +42,7 @@ it('offers only at the two reward boundaries, with independently pinned seeds/op
   expect(createRewardOffer(defeat, itemCatalog)).toBeNull();
   for (const [state, index, seed] of [[first, 0, 1746306032], [second, 1, 2025501471]] as const) {
     const offer = createRewardOffer(state, itemCatalog)!;
-    expect(offer).toEqual({ version: 1, id: `attempt-1:reward:${index}`, seed,
-      catalogIdentity: itemCatalogIdentity(itemCatalog), options: [
-        { itemId: 'item:aiming_charm', quantity: 1 }, { itemId: 'item:warding_charm', quantity: 1 },
-      ] });
+    expect(offer).toMatchObject({ version: 2, id: `attempt-1:reward:${index}`, seed, catalogIdentity: itemCatalogIdentity(itemCatalog) });
     expect(offer.options.map(o => o.itemId)).toEqual(oracle(seed, Object.keys(itemCatalog)));
   }
 });
@@ -58,7 +55,7 @@ it('agrees with independent selection across seeds and returns catalog-derived l
     expect(new Set(offer.options.map(o => o.itemId)).size).toBe(2);
     offer.options.forEach(o => { observed.add(o.itemId); expect(itemCatalog[o.itemId].label).toBeTruthy(); });
   }
-  expect(observed.size).toBe(3);
+  expect(observed).toEqual(new Set(Object.keys(itemCatalog)));
 });
 
 it('uses canonical catalog/policy identity verified with Node SHA256', () => {
@@ -71,7 +68,7 @@ it('uses canonical catalog/policy identity verified with Node SHA256', () => {
   expect(itemCatalogIdentity({ ...itemCatalog, 'item:healing_draught': { ...itemCatalog['item:healing_draught'], label: 'New label' } })).not.toBe(hash);
 });
 
-it('adds a fourth fixture item without ID-specific generation or labels', () => {
+it('adds a fixture item without ID-specific generation or labels', () => {
   const checked = validateItems({ ...itemCatalog, 'item:fixture': { id: 'item:fixture', label: 'Fixture Tonic',
     kind: 'consumable', context: 'betweenEncounters', eligibleHeroes: ['mage'], effect: { kind: 'restoreHp', amount: 2 } } });
   if (!checked.ok) throw Error('invalid fixture');
@@ -94,7 +91,7 @@ it('round-trips owned offers without changing frozen inputs or RNG boundaries', 
   const before = JSON.stringify({ state, catalog }), offer = freeze(createRewardOffer(state, catalog)!);
   for (let i = 0; i < 3; i++) {
     expect(createRewardOffer(state, catalog)).toEqual(offer);
-    const restored = readRewardOffer(JSON.parse(JSON.stringify(offer)), state, catalog);
+    const restored = readRewardOffer(JSON.parse(JSON.stringify(offer)), state.pendingReward, catalog);
     expect(restored).toEqual({ ok: true, offer });
     if (restored.ok) { expect(restored.offer).not.toBe(offer); expect(restored.offer.options[0]).not.toBe(offer.options[0]); }
   }
@@ -104,7 +101,7 @@ it('round-trips owned offers without changing frozen inputs or RNG boundaries', 
 it('rejects altered, incompatible and stale stored offers', () => {
   const state = reward(), original = createRewardOffer(state, itemCatalog)!;
   const mutations: ((v: any) => void)[] = [
-    v => { v.version = 2; }, v => { v.id = 'attempt-2:reward:0'; }, v => { v.seed++; },
+    v => { v.version = 3; }, v => { v.version = 1; }, v => { v.id = 'attempt-2:reward:0'; }, v => { v.seed++; },
     v => { v.catalogIdentity = 'sha256:bad'; }, v => { v.extra = true; },
     v => { v.options.reverse(); }, v => { v.options.pop(); }, v => { v.options.push(v.options[0]); },
     v => { v.options[1] = v.options[0]; }, v => { v.options[0].itemId = 'item:missing'; },
@@ -113,11 +110,11 @@ it('rejects altered, incompatible and stale stored offers', () => {
   ];
   for (const mutate of mutations) {
     const input = structuredClone(original); mutate(input);
-    expect(readRewardOffer(input, state, itemCatalog)).toEqual({ ok: false, reason: 'invalidOffer' });
+    expect(readRewardOffer(input, state.pendingReward, itemCatalog)).toEqual({ ok: false, reason: 'invalidOffer' });
   }
-  for (const input of [null, [], {}, Object.create(null)]) expect(readRewardOffer(input, state, itemCatalog).ok).toBe(false);
-  expect(readRewardOffer(original, advance(state), itemCatalog).ok).toBe(false);
-  expect(readRewardOffer(original, victory(advance(state)), itemCatalog).ok).toBe(false);
+  for (const input of [null, [], {}, Object.create(null)]) expect(readRewardOffer(input, state.pendingReward, itemCatalog).ok).toBe(false);
+  expect(readRewardOffer(original, advance(state).pendingReward, itemCatalog).ok).toBe(false);
+  expect(readRewardOffer(original, victory(advance(state)).pendingReward, itemCatalog).ok).toBe(false);
 });
 
 it('rejects offer accessors/hidden fields/symbols without evaluating them', () => {
@@ -128,6 +125,6 @@ it('rejects offer accessors/hidden fields/symbols without evaluating them', () =
     if (decoration === 'accessor') Object.defineProperty(object, field, { enumerable: true, get() { throw Error('getter evaluated'); } });
     if (decoration === 'hidden') Object.defineProperty(object, 'extra', { value: 1 });
     if (decoration === 'symbol') object[Symbol('extra')] = 1;
-    expect(readRewardOffer(offer, reward(), itemCatalog).ok).toBe(false);
+    expect(readRewardOffer(offer, reward().pendingReward, itemCatalog).ok).toBe(false);
   }
 });
