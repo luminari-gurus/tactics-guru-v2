@@ -165,3 +165,12 @@ dialog button { touch-action: manipulation; }
 
 .battle-mode #battle-ability { width:100%; min-width:0; margin:4px 0; }
 .battle-mode #battle-ability-info { font-size:.8rem; overflow-wrap:anywhere; }
+
+/* At high browser zoom even a landscape viewport can be too narrow for a rail. */
+@media (max-width:480px) {
+  .battle-mode #battle-shell { grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(0,1fr) minmax(0,1fr); gap:8px; padding:8px; }
+  .battle-mode #battle-board-region { flex:1 1 0; min-height:0; }
+}
+@media (max-width:480px) and (max-height:340px) {
+  .battle-mode #battle-heading, .battle-mode #battle-board-caption { display:none; }
+}
