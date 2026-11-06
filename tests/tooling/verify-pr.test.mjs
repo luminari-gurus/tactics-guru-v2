@@ -69,6 +69,20 @@ test('explicit regression matrices retain both UI progression witnesses on every
   }
 });
 
+test('ability fixtures retain all three distinct picker states on every Chromium profile', () => {
+  for (const config of ['playwright.fixtures.config.ts', 'playwright.abilities.config.ts']) {
+    const selection = discoverSelection(['-c', config, 'tests/ability-picker.spec.ts', '-g', 'progression XP ']);
+    assert.equal(selection.tests.length, 9);
+    assert.deepEqual(selection.projects.map(project => project.name).sort(), ['desktop', 'mobile-landscape', 'mobile-portrait']);
+    for (const project of selection.projects) {
+      assert.deepEqual(selection.tests.filter(row => row.project === project.name).map(row => row.title).sort(),
+        [0, 60, 180].map(xp => `progression XP ${xp} gates learned fixture actions and resets on reload`).sort());
+      assert.equal(project.use.defaultBrowserType, 'chromium');
+      assert.equal(project.use.hasTouch, project.name !== 'desktop');
+    }
+  }
+});
+
 test('successful process exits cannot hide empty, skipped, failed or flaky coverage', () => {
   const stats = { expected: 7, unexpected: 0, flaky: 0, skipped: 0 };
   validateReport('journeys', { stats });
