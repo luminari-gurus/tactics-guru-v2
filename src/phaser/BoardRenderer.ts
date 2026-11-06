@@ -42,6 +42,8 @@ export class BoardRenderer {
   private readonly canopies: { tile: Tile; graphics: Phaser.GameObjects.Graphics }[] = [];
   private readonly surfaces: { tile: Tile; image: Phaser.GameObjects.Image }[] = [];
   private view: View = { x: 0, y: 0, scale: 1 };
+  // Layout constraints may temporarily clamp the camera; retain the last navigation intent.
+  private navigationView: View = { x: 0, y: 0, scale: 1 };
   private viewport = { width: 1, height: 1 };
   private region: BoardRegion = { x: 0, y: 0, width: 1, height: 1 };
   private fitScale = 1;
@@ -477,15 +479,14 @@ export class BoardRenderer {
     const layout = fitBoard(this.bounds, region);
     const viewportChanged = width !== this.viewport.width || height !== this.viewport.height;
     if(viewportChanged)this.resetPicking();
-    const zoom = this.view.scale / this.fitScale;
+    const zoom = Math.max(1, this.navigationView.scale / this.fitScale);
     this.viewport = { width, height };
     this.region = region;
     this.fitScale = layout.scale;
-    // Panel text/layout changes are not navigation: retain the camera, clamping
-    // only where the new available area or zoom limits require it. Real viewport
-    // changes still refit the board and preserve relative zoom.
+    // A temporary HUD expansion must not become a permanent zoom or pan.
+    // Reapply navigation intent on layout changes; a real viewport change refits it.
     const center={x:region.x+region.width/2,y:region.y+region.height/2};
-    this.applyView(viewportChanged ? {scale:layout.scale*zoom,x:center.x+(layout.x-center.x)*zoom,y:center.y+(layout.y-center.y)*zoom} : this.view);
+    this.applyView(viewportChanged ? {scale:layout.scale*zoom,x:center.x+(layout.x-center.x)*zoom,y:center.y+(layout.y-center.y)*zoom} : this.navigationView, viewportChanged);
   }
 
   /** A fresh battle is centered after its initial automatic turns settle the HUD. */
@@ -493,10 +494,11 @@ export class BoardRenderer {
     this.applyView(fitBoard(this.bounds, this.region));
   }
 
-  private applyView(view: View): void {
+  private applyView(view: View, navigation = true): void {
     const constrained=constrainView(view, this.bounds, this.region, this.fitScale);
     if(constrained.x!==this.view.x || constrained.y!==this.view.y || constrained.scale!==this.view.scale)this.resetPicking();
     this.view = constrained;
+    if (navigation) this.navigationView = constrained;
     this.root.setPosition(this.view.x, this.view.y).setScale(this.view.scale);
     this.layoutFeedback();
     for (const bar of this.healthBars.values()) bar.setScale(healthBarScale(this.view.scale));
