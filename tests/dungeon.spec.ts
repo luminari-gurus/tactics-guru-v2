@@ -1,7 +1,7 @@
 import { dungeonContent } from '../src/content/dungeon';
 import { walkDungeon, reenterDungeonStair, continueSavedDungeon } from './helpers/dungeonTraversal';
 import { atEncounter, atStairApproach } from './helpers/dungeonFixtures';
-import { expect,test,type Page } from './helpers/forceRailControls';
+import { expect,railTest as test,type Page } from './helpers/dungeonEntropy';
 import { writeFileSync } from 'node:fs';
 import { dungeonCapacityFixture, dungeonVictoryBoundary } from './helpers/dungeonFixtures';
 import { dungeonBattle, startDungeonBattle, acceptDungeonBattle, freshDungeon, type DungeonState } from '../src/domain/dungeon';
@@ -15,6 +15,8 @@ import { journeyPreparation, healedFighterBoundary, shamanJourney } from './help
 import { dispatch } from '../src/domain/turns';
 import { generateMap } from '../src/map/generate';
 import type { Command, BattleEvent } from '../src/domain/types';
+
+const fixedSeedTest = test.extend({ pinDungeonSeed: 28 });
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
 
 // UI witnesses straddle the Frost Snare gate; exact XP/HP/caster projections and
@@ -36,21 +38,17 @@ for(const [xp,level,maxHp]of [[0,1,11],[180,3,19]])test(`menu dungeon restores M
  if(missile.kind==='magicMissile')expect(missile.casterLevel).toBe(level);
 });
 
-test('testing dungeon legally clears a floor, descends and backtracks without accessing saves',async({page,isMobile})=>{
+fixedSeedTest('testing dungeon legally clears a floor, descends and backtracks without accessing saves',async({page,isMobile})=>{
  test.setTimeout(300000); // Three complete battles plus normal exploration and stair input.
  // Reuse the complete first floor of the existing legal Fighter journey.
- const seed=28,errors:string[]=[];let taunted=false;page.on('pageerror',error=>errors.push(error.message));
- await page.addInitScript(seed=>{
-  const draw=crypto.getRandomValues.bind(crypto);
-  crypto.getRandomValues=((array:ArrayBufferView<ArrayBuffer>)=>{
-   if(array instanceof Uint32Array&&array.length===1){array[0]=seed;return array;}return draw(array);
-  }) as typeof crypto.getRandomValues;
+ const errors:string[]=[];let taunted=false;page.on('pageerror',error=>errors.push(error.message));
+ await page.addInitScript(()=>{
   const get=Storage.prototype.getItem,set=Storage.prototype.setItem,remove=Storage.prototype.removeItem;
   const gameKey=(key:string)=>key.startsWith('tactics-guru:phaser:')||key==='tactics-guru:menu-new-dungeon-review';
   Storage.prototype.getItem=function(key){if(gameKey(key))throw Error('Testing saved-game read');return get.call(this,key);};
   Storage.prototype.setItem=function(key,value){if(gameKey(key))throw Error('Testing saved-game write');set.call(this,key,value);};
   Storage.prototype.removeItem=function(key){if(gameKey(key))throw Error('Testing saved-game removal');remove.call(this,key);};
- },seed);
+ });
  await page.goto('./dungeon');await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();
  for(let slot=0;slot<3;slot++){
   await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
@@ -78,16 +76,6 @@ test('testing dungeon legally clears a floor, descends and backtracks without ac
 });
 
 test('new dungeons use fresh layouts across reloads and saved dungeons retain theirs',async({page})=>{
- await page.addInitScript(()=>{
-  const original=crypto.getRandomValues.bind(crypto);
-  crypto.getRandomValues=((array:ArrayBufferView<ArrayBuffer>)=>{
-   if(array instanceof Uint32Array && array.length===1){
-    const next=Number(sessionStorage.getItem('test-dungeon-entropy')??'100');
-    sessionStorage.setItem('test-dungeon-entropy',String(next+1));array[0]=next;return array;
-   }
-   return original(array);
-  }) as typeof crypto.getRandomValues;
- });
  await page.goto('./?game=dungeon');
  await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();
  const first=await snapshot(page);
@@ -97,6 +85,17 @@ test('new dungeons use fresh layouts across reloads and saved dungeons retain th
  const second=await snapshot(page);
  expect(second.seed).not.toBe(first.seed);
  expect(generateMap(second.floors[0].descriptor.seed,'rooms').cells).not.toEqual(generateMap(first.floors[0].descriptor.seed,'rooms').cells);
+});
+test('play unsaved dungeon uses a fresh layout each visit and does not write a save',async({page})=>{
+ await page.goto('./?game=dungeon');
+ await page.getByRole('button',{name:'Play unsaved dungeon',exact:true}).click();
+ const first=await snapshot(page);
+ await page.reload();
+ await page.getByRole('button',{name:'Play unsaved dungeon',exact:true}).click();
+ const second=await snapshot(page);
+ expect(second.seed).not.toBe(first.seed);
+ expect(generateMap(second.floors[0].descriptor.seed,'rooms').cells).not.toEqual(generateMap(first.floors[0].descriptor.seed,'rooms').cells);
+ expect(await page.evaluate(()=>Object.keys(localStorage).filter(key=>key.includes(':dungeon:')))).toEqual([]);
 });
 
 test('Shaman production journey uses Hex and ally healing, reloads Weakened and replays a complete legal battle',async({page,isMobile},info)=>{
@@ -180,15 +179,9 @@ test('automatic stairs preserve healed Fighter carry and fresh battle resources'
 });
 async function seed(page:Page,s:DungeonState){const encoded=encodeDungeon(s);if(!encoded.ok)throw Error(encoded.reason);await page.goto('./?game=dungeon');await page.evaluate(({key,text})=>{localStorage.setItem(key,text);}, {key:DUNGEON_KEYS.primary,text:encoded.text});await page.reload();await continueSavedDungeon(page);}
 function fixture(slot:number){for(let seed=1;seed<=50;seed++){const f=dungeonVictoryBoundary(seed,slot);if(f)return f;}throw Error('No legal fixture');}
-test('dungeon battle undo survives reload and a legal defeat journey',async({page,isMobile})=>{
+fixedSeedTest('dungeon battle undo survives reload and a legal defeat journey',async({page,isMobile})=>{
  test.setTimeout(300000);
  // This case qualifies undo/reload/defeat; random-layout identity has its own case.
- await page.addInitScript(()=>{
-  const draw=crypto.getRandomValues.bind(crypto);
-  crypto.getRandomValues=((array:ArrayBufferView<ArrayBuffer>)=>{
-   if(array instanceof Uint32Array&&array.length===1){array[0]=28;return array;}return draw(array);
-  }) as typeof crypto.getRandomValues;
- });
  await page.goto('./?game=dungeon');
  await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();
  await walkDungeon(page,undefined,isMobile?'touch':'keyboard');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
@@ -208,13 +201,9 @@ test('dungeon battle undo survives reload and a legal defeat journey',async({pag
  await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();
  await expect(page.getByRole('heading',{name:/Dungeon · Floor 1/})).toBeVisible();
 });
-test('read-only entry, keyboard new dungeon, real action and active resume',async({page,isMobile})=>{
+fixedSeedTest('read-only entry, keyboard new dungeon, real action and active resume',async({page,isMobile})=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  // This witnesses startup/input/resume; fresh random layouts have separate coverage.
- await page.addInitScript(()=>{
-  const draw=crypto.getRandomValues.bind(crypto);
-  crypto.getRandomValues=((array:ArrayBufferView<ArrayBuffer>)=>{if(array instanceof Uint32Array&&array.length===1){array[0]=28;return array;}return draw(array);}) as typeof crypto.getRandomValues;
- });
  await page.goto('./?game=dungeon');
  await expect(page.getByRole('button',{name:'Continue saved dungeon',exact:true})).toBeDisabled();
  expect(await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage)))).toEqual({[COMBAT_CONTROLS_KEY]:'rail'});

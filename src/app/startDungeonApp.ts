@@ -5,7 +5,7 @@ import { DungeonMap, dungeonBiomeLabel, dungeonEncounterLabel } from '../ui/dung
 import '../style.css';
 import { mountTelemetryPreferences } from '../telemetry/preferences';
 import { DungeonSession } from './DungeonSession';
-import { freshDungeon, FloorCache } from '../domain/dungeon';
+import { freshDungeon, FloorCache, newDungeonSeed } from '../domain/dungeon';
 import { bothDungeonSlotsMissing, createDungeonStorage } from '../persistence/dungeonStorage';
 import { dungeonElement as el, renderDungeon } from '../ui/dungeon';
 import { BattleDialogs, type DialogChoice } from '../ui/dialogs';
@@ -14,8 +14,7 @@ import { createGame, whenGameReady } from '../phaser/start';
 import { mountBattleLayout } from '../ui/battleLayout';
 import { diagnosticsSnapshot } from '../diagnostics/browser';
 function newSeed(previous?: number) {
- const seed=crypto.getRandomValues(new Uint32Array(1))[0];
- return seed===previous ? (seed+1)>>>0 : seed;
+ return newDungeonSeed(()=>crypto.getRandomValues(new Uint32Array(1))[0],previous);
 }
 const storage=appEntry.persistent?createDungeonStorage():null,session=new DungeonSession(freshDungeon(crypto.randomUUID(),newSeed()),storage),cache=new FloorCache();
 const screen=el('main');screen.id='dungeon-screen';screen.dataset.boot='loading';document.body.append(screen);
