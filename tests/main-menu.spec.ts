@@ -492,3 +492,16 @@ test('main menu: unavailable storage remains playable with owned items', async (
   await expect(page.locator('dialog')).toContainText('Storage security');
   await page.keyboard.press('Escape');
 });
+
+for (const mode of ['battle','run','dungeon'] as const) test(`temporary ${mode} explains saved mode without creating a save`,async({page})=>{
+ await page.goto(`./${mode}`);
+ const link=page.getByRole('link',{name:`Open saved ${mode} mode`,exact:true});
+ await expect(link).toBeVisible();
+ await expect(link).toHaveAttribute('href',`/?game=${mode}`);
+ await expect(page.getByText('This is a temporary session.',{exact:false}).first()).toBeVisible();
+ expect(await page.evaluate(key=>localStorage.getItem(key),keys[mode].primary)).toBeNull();
+ await page.goto('./');
+ await expect(page.getByRole('button',{name:'Continue',exact:true})).toBeDisabled();
+ await page.goto(`./${mode}`);await link.click();
+ await expect(page).toHaveURL(new RegExp(`\\?game=${mode}$`));
+});

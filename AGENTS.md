@@ -34,6 +34,21 @@ specifications, and skills; historical wording alone does not reinstate them.
 Retain actual test failures and limitations, and describe emulation accurately
 without claiming that physical hardware was tested.
 
+## Small, incremental PRs
+
+Prefer small, focused PRs to minimize complexity, review burden, and regression
+risk. Split larger work into coherent increments that can each be reviewed,
+validated, and safely merged; avoid unrelated cleanup or refactors in the same PR.
+
+An issue may take multiple PRs to satisfy its acceptance criteria. State which
+criteria each PR addresses, record remaining work and dependencies on the issue,
+and keep the issue open until all acceptance criteria are met and verified.
+Use `Refs #<number>` for incremental PRs; reserve `Closes #<number>` for the PR
+that completes the issue. A complete, validated increment can be ready for review
+even while the broader issue remains open; use a draft when the increment itself
+is incomplete or blocked. Apply the verification policy to each PR's affected
+behavior without waiving the issue's remaining acceptance criteria.
+
 ## Verification scope
 
 Follow [docs/verification-policy.md](docs/verification-policy.md) for proportional
