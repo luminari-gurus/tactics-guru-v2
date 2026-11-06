@@ -13,9 +13,11 @@
 ## 3. Durable floors
 
 - [x] 3.1 Map all descriptor, cache, regeneration, exploration, placement, stairs and UI consumers; implement profile- and dimension-aware floor generation, indexing, placement, movement, rendering and durable resolution; validate the depth-size policy, existing rooms-v1 fixtures and unknown/mismatched or oversized versions.
-- [ ] 3.2 Verify legal placements, deterministic profile selection, battle RNG isolation, traversal, floor revisit and save/reload at initial and larger sizes with focused units and real dungeon browser journeys; document compatibility and rollback limits.
+- [x] 3.2 Verify legal placements, deterministic profile selection, battle RNG isolation, traversal, floor revisit and save/reload at initial and larger sizes with focused units and real dungeon browser journeys; document compatibility and rollback limits.
 
 ## 4. Integration qualification
 
-- [ ] 4.1 Measure production size, generation and rendering at initial and maximum floor dimensions against documented budgets on identified source and device profiles; retain failures and limitations.
-- [ ] 4.2 Apply verification-policy full regression where shared save/admission changes require it, including both type scopes, build, Chromium, WebKit and distinct modes; record source/build identity, skips and failures and run git diff --check.
+- [x] 4.1 Measure production size, generation and rendering at initial and maximum floor dimensions against documented budgets on identified source and device profiles; retain failures and limitations.
+- [x] 4.2 Apply verification-policy full regression where shared save/admission changes require it, including both type scopes, build, Chromium, WebKit and distinct modes; record source/build identity, skips and failures and run git diff --check.
+
+Qualification is recorded in [PR #279](https://github.com/luminari-gurus/tactics-guru-v2/pull/279) with exact tested sources and existing CI artifact links. It combines fresh affected checks with source-specific reuse under the verification policy; historical failed and interrupted aggregates retain their original status.

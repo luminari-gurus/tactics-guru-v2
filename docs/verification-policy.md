@@ -29,7 +29,9 @@ feedback; explicit setup/regression configs still own the diagnostic check. An e
 discovery contract prevents accidental expansion or loss of the seven selections.
 Before this migration, the broad default selected 1,036 cases (353 desktop, 344
 portrait, 339 landscape). Ordinary E2E now selects seven; the explicit broad
-regression matrix selects 1,030 after removing redundant XP 60/600 permutations. This is a selection count,
+regression matrix selects 1,075 cases (366 desktop, 357 portrait and 352 landscape),
+including the growing-floor and deferred-loading regressions. Redundant XP 60/600
+permutations remain removed. This is a selection count,
 not a measured runtime speedup or equivalent full-regression coverage.
 
 `npm test` and direct `playwright test` now use this same seven-journey selection.
