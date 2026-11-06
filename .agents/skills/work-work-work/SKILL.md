@@ -91,6 +91,10 @@ and stop before implementation; do not claim publication succeeded.
 ## Choose the planning scope
 
 Inspect the real code and acceptance criteria before choosing the planning path.
+Follow AGENTS.md's small, incremental PR guidance. When an issue needs multiple
+PRs, identify the current increment, map criteria to increments, and record the
+remaining work and dependencies on the issue. Keep each increment independently
+reviewable, verifiable, and safe to merge.
 Use a brief plan in chat when the change is small, localized and well understood,
 its acceptance criteria can be verified directly, and OpenSpec artifacts would
 add bulk without resolving meaningful design or requirements questions. Examples
@@ -176,9 +180,12 @@ repository default branch with `gh pr create`, honoring any repository template.
 Use a body file for multiline descriptions. Include the problem/result, issue
 link, planning path and approval (link the OpenSpec change when present), validation commands/results, and remaining
 limitations. Add `Closes #<number>` only if all acceptance criteria are verified.
-If blocked or incomplete, open a draft PR with `Refs #<number>` and explain the
-remaining work instead of claiming completion. Do not merge the PR, close the
-issue manually, or archive an OpenSpec change before merge.
+For a complete, validated increment that leaves issue criteria outstanding, open
+a ready-for-review PR with `Refs #<number>` and state the criteria addressed,
+remaining work, and dependencies. Keep the issue open until all criteria are met
+and verified. If the increment itself is blocked or incomplete, open a draft PR
+with `Refs #<number>` and explain what remains before it is ready. Do not merge
+the PR, close the issue manually, or archive an OpenSpec change before merge.
 
 Check for an existing PR for this branch before creation and reuse it on retries.
 Attach the PR to the task with the host's artifact tool when available. Return
