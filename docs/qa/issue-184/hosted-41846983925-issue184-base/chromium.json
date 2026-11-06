@@ -1,0 +1,1035 @@
+{
+  "config": {
+    "argv": [
+      "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+      "/home/runner/work/tactics-guru-v2/tactics-guru-v2/node_modules/.bin/playwright",
+      "test",
+      "tests/main-menu.spec.ts",
+      "--project=mobile-landscape",
+      "-g",
+      "dungeon departure after rejected movement retains unsaved play warning",
+      "--repeat-each=20",
+      "--workers=1",
+      "--retries=0",
+      "--reporter=line,json",
+      "--output=verification-receipts/issue184-base/artifacts"
+    ],
+    "configFile": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/playwright.config.ts",
+    "rootDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "ci": {
+        "commitHref": "https://github.com/luminari-gurus/tactics-guru-v2/commit/4a918a017ddf70b352776b9ba7e98aeab67cc287",
+        "commitHash": "4a918a017ddf70b352776b9ba7e98aeab67cc287",
+        "buildHref": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41846983925"
+      },
+      "gitCommit": {
+        "shortHash": "fbf8242",
+        "hash": "fbf82420b82674dc5f57397d68b0a50c8bf485c0",
+        "subject": "Merge pull request #277: Isolate testing gameplay from saved menu journeys",
+        "body": "Merge pull request #277: Isolate testing gameplay from saved menu journeys\n\nKeep testing play in memory, preserve menu save ownership and recovery, and emit a distinct outcome for each fresh testing battle.",
+        "author": {
+          "name": "Max aka Mosheh",
+          "email": "max@aiwithapex.com",
+          "time": 1793746997000
+        },
+        "committer": {
+          "name": "GitHub",
+          "email": "noreply@github.com",
+          "time": 1793746997000
+        },
+        "branch": "HEAD"
+      },
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/verification-receipts/issue184-base/artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/luminari-gurus/tactics-guru-v2/commit/4a918a017ddf70b352776b9ba7e98aeab67cc287",
+            "commitHash": "4a918a017ddf70b352776b9ba7e98aeab67cc287",
+            "buildHref": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41846983925"
+          },
+          "gitCommit": {
+            "shortHash": "fbf8242",
+            "hash": "fbf82420b82674dc5f57397d68b0a50c8bf485c0",
+            "subject": "Merge pull request #277: Isolate testing gameplay from saved menu journeys",
+            "body": "Merge pull request #277: Isolate testing gameplay from saved menu journeys\n\nKeep testing play in memory, preserve menu save ownership and recovery, and emit a distinct outcome for each fresh testing battle.",
+            "author": {
+              "name": "Max aka Mosheh",
+              "email": "max@aiwithapex.com",
+              "time": 1793746997000
+            },
+            "committer": {
+              "name": "GitHub",
+              "email": "noreply@github.com",
+              "time": 1793746997000
+            },
+            "branch": "HEAD"
+          },
+          "actualWorkers": 1
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests",
+        "testIgnore": [
+          "**/dungeon-extended.spec.ts",
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/verification-receipts/issue184-base/artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/luminari-gurus/tactics-guru-v2/commit/4a918a017ddf70b352776b9ba7e98aeab67cc287",
+            "commitHash": "4a918a017ddf70b352776b9ba7e98aeab67cc287",
+            "buildHref": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41846983925"
+          },
+          "gitCommit": {
+            "shortHash": "fbf8242",
+            "hash": "fbf82420b82674dc5f57397d68b0a50c8bf485c0",
+            "subject": "Merge pull request #277: Isolate testing gameplay from saved menu journeys",
+            "body": "Merge pull request #277: Isolate testing gameplay from saved menu journeys\n\nKeep testing play in memory, preserve menu save ownership and recovery, and emit a distinct outcome for each fresh testing battle.",
+            "author": {
+              "name": "Max aka Mosheh",
+              "email": "max@aiwithapex.com",
+              "time": 1793746997000
+            },
+            "committer": {
+              "name": "GitHub",
+              "email": "noreply@github.com",
+              "time": 1793746997000
+            },
+            "branch": "HEAD"
+          },
+          "actualWorkers": 1
+        },
+        "id": "mobile-portrait",
+        "name": "mobile-portrait",
+        "testDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests",
+        "testIgnore": [
+          "**/dungeon-extended.spec.ts",
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/verification-receipts/issue184-base/artifacts",
+        "repeatEach": 20,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/luminari-gurus/tactics-guru-v2/commit/4a918a017ddf70b352776b9ba7e98aeab67cc287",
+            "commitHash": "4a918a017ddf70b352776b9ba7e98aeab67cc287",
+            "buildHref": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41846983925"
+          },
+          "gitCommit": {
+            "shortHash": "fbf8242",
+            "hash": "fbf82420b82674dc5f57397d68b0a50c8bf485c0",
+            "subject": "Merge pull request #277: Isolate testing gameplay from saved menu journeys",
+            "body": "Merge pull request #277: Isolate testing gameplay from saved menu journeys\n\nKeep testing play in memory, preserve menu save ownership and recovery, and emit a distinct outcome for each fresh testing battle.",
+            "author": {
+              "name": "Max aka Mosheh",
+              "email": "max@aiwithapex.com",
+              "time": 1793746997000
+            },
+            "committer": {
+              "name": "GitHub",
+              "email": "noreply@github.com",
+              "time": 1793746997000
+            },
+            "branch": "HEAD"
+          },
+          "actualWorkers": 1
+        },
+        "id": "mobile-landscape",
+        "name": "mobile-landscape",
+        "testDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests",
+        "testIgnore": [
+          "**/dungeon-extended.spec.ts",
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": {},
+        "outputDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/verification-receipts/issue184-base/artifacts",
+        "repeatEach": 20,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/luminari-gurus/tactics-guru-v2/commit/4a918a017ddf70b352776b9ba7e98aeab67cc287",
+            "commitHash": "4a918a017ddf70b352776b9ba7e98aeab67cc287",
+            "buildHref": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41846983925"
+          },
+          "gitCommit": {
+            "shortHash": "fbf8242",
+            "hash": "fbf82420b82674dc5f57397d68b0a50c8bf485c0",
+            "subject": "Merge pull request #277: Isolate testing gameplay from saved menu journeys",
+            "body": "Merge pull request #277: Isolate testing gameplay from saved menu journeys\n\nKeep testing play in memory, preserve menu save ownership and recovery, and emit a distinct outcome for each fresh testing battle.",
+            "author": {
+              "name": "Max aka Mosheh",
+              "email": "max@aiwithapex.com",
+              "time": 1793746997000
+            },
+            "committer": {
+              "name": "GitHub",
+              "email": "noreply@github.com",
+              "time": 1793746997000
+            },
+            "branch": "HEAD"
+          },
+          "actualWorkers": 1
+        },
+        "name": "mobile-landscape",
+        "testDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests",
+        "snapshotDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests",
+        "testIgnore": [
+          "**/dungeon-extended.spec.ts",
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": "**/*.spec.ts",
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://127.0.0.1:4173/",
+          "launchOptions": {},
+          "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36",
+          "viewport": {
+            "width": 915,
+            "height": 412
+          },
+          "deviceScaleFactor": 2.625,
+          "isMobile": true,
+          "hasTouch": true,
+          "defaultBrowserType": "chromium",
+          "channel": "chromium"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "mobile-landscape"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "line"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run preview -- --base=/ --port 4173 --strictPort",
+      "url": "http://127.0.0.1:4173/",
+      "reuseExistingServer": false
+    }
+  },
+  "suites": [
+    {
+      "title": "main-menu.spec.ts",
+      "file": "main-menu.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "main menu: dungeon departure after rejected movement retains unsaved play warning",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1038,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T14:25:35.993Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6584249e185c6ba36dd3-1575e2b6feba0b7c9860",
+          "file": "main-menu.spec.ts",
+          "line": 219,
+          "column": 66
+        },
+        {
+          "title": "main menu: dungeon departure after rejected movement retains unsaved play warning",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1056,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T14:25:37.904Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6584249e185c6ba36dd3-45c6e806ef9e8c04da02",
+          "file": "main-menu.spec.ts",
+          "line": 219,
+          "column": 66
+        },
+        {
+          "title": "main menu: dungeon departure after rejected movement retains unsaved play warning",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1026,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T14:25:39.657Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6584249e185c6ba36dd3-942a8b9ef5295a138006",
+          "file": "main-menu.spec.ts",
+          "line": 219,
+          "column": 66
+        },
+        {
+          "title": "main menu: dungeon departure after rejected movement retains unsaved play warning",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1037,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T14:25:41.395Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6584249e185c6ba36dd3-c91d090da3043ee53a11",
+          "file": "main-menu.spec.ts",
+          "line": 219,
+          "column": 66
+        },
+        {
+          "title": "main menu: dungeon departure after rejected movement retains unsaved play warning",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 6265,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.dungeon-status')\nExpected substring: \u001b[32m\"Movement refused\"\u001b[39m\nReceived string:    \u001b[31m\"Playing unsaved. Floor travel requires saving; open Save recovery.\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" locator('.dungeon-status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.dungeon-status')\u001b[22m\n\u001b[2m    13 × locator resolved to <p role=\"status\" class=\"dungeon-status\">Playing unsaved. Floor travel requires saving; op…</p>\u001b[22m\n\u001b[2m       - unexpected value \"Playing unsaved. Floor travel requires saving; open Save recovery.\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.dungeon-status')\nExpected substring: \u001b[32m\"Movement refused\"\u001b[39m\nReceived string:    \u001b[31m\"Playing unsaved. Floor travel requires saving; open Save recovery.\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" locator('.dungeon-status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.dungeon-status')\u001b[22m\n\u001b[2m    13 × locator resolved to <p role=\"status\" class=\"dungeon-status\">Playing unsaved. Floor travel requires saving; op…</p>\u001b[22m\n\u001b[2m       - unexpected value \"Playing unsaved. Floor travel requires saving; open Save recovery.\"\u001b[22m\n\n    at /home/runner/work/tactics-guru-v2/tactics-guru-v2/tests/main-menu.spec.ts:234:48",
+                    "location": {
+                      "file": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests/main-menu.spec.ts",
+                      "column": 48,
+                      "line": 234
+                    },
+                    "snippet": "\u001b[0m \u001b[90m 232 |\u001b[39m  \u001b[36mconst\u001b[39m arrows\u001b[33m:\u001b[39m\u001b[33mRecord\u001b[39m\u001b[33m<\u001b[39m\u001b[33mstring\u001b[39m\u001b[33m,\u001b[39mstring\u001b[33m>=\u001b[39m{\u001b[33mNorth\u001b[39m\u001b[33m:\u001b[39m\u001b[32m'ArrowUp'\u001b[39m\u001b[33m,\u001b[39m\u001b[33mEast\u001b[39m\u001b[33m:\u001b[39m\u001b[32m'ArrowRight'\u001b[39m\u001b[33m,\u001b[39m\u001b[33mSouth\u001b[39m\u001b[33m:\u001b[39m\u001b[32m'ArrowDown'\u001b[39m\u001b[33m,\u001b[39m\u001b[33mWest\u001b[39m\u001b[33m:\u001b[39m\u001b[32m'ArrowLeft'\u001b[39m}\u001b[33m;\u001b[39m\n \u001b[90m 233 |\u001b[39m  \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'#dungeon-map'\u001b[39m)\u001b[33m.\u001b[39mpress(arrows[blocked\u001b[33m!\u001b[39m])\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 234 |\u001b[39m  \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'.dungeon-status'\u001b[39m))\u001b[33m.\u001b[39mtoContainText(\u001b[32m'Movement refused'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 235 |\u001b[39m  \u001b[36mconst\u001b[39m cancel\u001b[33m=\u001b[39mpage\u001b[33m.\u001b[39mwaitForEvent(\u001b[32m'dialog'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 236 |\u001b[39m  \u001b[36mconst\u001b[39m departure\u001b[33m=\u001b[39mpage\u001b[33m.\u001b[39mgetByRole(\u001b[32m'link'\u001b[39m\u001b[33m,\u001b[39m{name\u001b[33m:\u001b[39m\u001b[32m'Main menu'\u001b[39m\u001b[33m,\u001b[39mexact\u001b[33m:\u001b[39m\u001b[36mtrue\u001b[39m})\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 237 |\u001b[39m  \u001b[36mawait\u001b[39m (\u001b[36mawait\u001b[39m cancel)\u001b[33m.\u001b[39mdismiss()\u001b[33m;\u001b[39m\u001b[36mawait\u001b[39m departure\u001b[33m;\u001b[39m\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests/main-menu.spec.ts",
+                        "column": 48,
+                        "line": 234
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.dungeon-status')\nExpected substring: \u001b[32m\"Movement refused\"\u001b[39m\nReceived string:    \u001b[31m\"Playing unsaved. Floor travel requires saving; open Save recovery.\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" locator('.dungeon-status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.dungeon-status')\u001b[22m\n\u001b[2m    13 × locator resolved to <p role=\"status\" class=\"dungeon-status\">Playing unsaved. Floor travel requires saving; op…</p>\u001b[22m\n\u001b[2m       - unexpected value \"Playing unsaved. Floor travel requires saving; open Save recovery.\"\u001b[22m\n\n\n  232 |  const arrows:Record<string,string>={North:'ArrowUp',East:'ArrowRight',South:'ArrowDown',West:'ArrowLeft'};\n  233 |  await page.locator('#dungeon-map').press(arrows[blocked!]);\n> 234 |  await expect(page.locator('.dungeon-status')).toContainText('Movement refused');\n      |                                                ^\n  235 |  const cancel=page.waitForEvent('dialog');\n  236 |  const departure=page.getByRole('link',{name:'Main menu',exact:true}).click();\n  237 |  await (await cancel).dismiss();await departure;\n    at /home/runner/work/tactics-guru-v2/tactics-guru-v2/tests/main-menu.spec.ts:234:48"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T14:25:43.182Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/verification-receipts/issue184-base/artifacts/main-menu-main-menu-dungeo-43ed8-etains-unsaved-play-warning-mobile-landscape-repeat4/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests/main-menu.spec.ts",
+                    "column": 48,
+                    "line": 234
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "6584249e185c6ba36dd3-ac219961bf9855724cc2",
+          "file": "main-menu.spec.ts",
+          "line": 219,
+          "column": 66
+        },
+        {
+          "title": "main menu: dungeon departure after rejected movement retains unsaved play warning",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1071,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T14:25:50.194Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6584249e185c6ba36dd3-186c8b3e6a0a60a56af8",
+          "file": "main-menu.spec.ts",
+          "line": 219,
+          "column": 66
+        },
+        {
+          "title": "main menu: dungeon departure after rejected movement retains unsaved play warning",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1051,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T14:25:52.053Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6584249e185c6ba36dd3-04a30a61aad6155e4232",
+          "file": "main-menu.spec.ts",
+          "line": 219,
+          "column": 66
+        },
+        {
+          "title": "main menu: dungeon departure after rejected movement retains unsaved play warning",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 6015,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.dungeon-status')\nExpected substring: \u001b[32m\"Movement refused\"\u001b[39m\nReceived string:    \u001b[31m\"Playing unsaved. Floor travel requires saving; open Save recovery.\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" locator('.dungeon-status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.dungeon-status')\u001b[22m\n\u001b[2m    13 × locator resolved to <p role=\"status\" class=\"dungeon-status\">Playing unsaved. Floor travel requires saving; op…</p>\u001b[22m\n\u001b[2m       - unexpected value \"Playing unsaved. Floor travel requires saving; open Save recovery.\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.dungeon-status')\nExpected substring: \u001b[32m\"Movement refused\"\u001b[39m\nReceived string:    \u001b[31m\"Playing unsaved. Floor travel requires saving; open Save recovery.\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" locator('.dungeon-status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.dungeon-status')\u001b[22m\n\u001b[2m    13 × locator resolved to <p role=\"status\" class=\"dungeon-status\">Playing unsaved. Floor travel requires saving; op…</p>\u001b[22m\n\u001b[2m       - unexpected value \"Playing unsaved. Floor travel requires saving; open Save recovery.\"\u001b[22m\n\n    at /home/runner/work/tactics-guru-v2/tactics-guru-v2/tests/main-menu.spec.ts:234:48",
+                    "location": {
+                      "file": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests/main-menu.spec.ts",
+                      "column": 48,
+                      "line": 234
+                    },
+                    "snippet": "\u001b[0m \u001b[90m 232 |\u001b[39m  \u001b[36mconst\u001b[39m arrows\u001b[33m:\u001b[39m\u001b[33mRecord\u001b[39m\u001b[33m<\u001b[39m\u001b[33mstring\u001b[39m\u001b[33m,\u001b[39mstring\u001b[33m>=\u001b[39m{\u001b[33mNorth\u001b[39m\u001b[33m:\u001b[39m\u001b[32m'ArrowUp'\u001b[39m\u001b[33m,\u001b[39m\u001b[33mEast\u001b[39m\u001b[33m:\u001b[39m\u001b[32m'ArrowRight'\u001b[39m\u001b[33m,\u001b[39m\u001b[33mSouth\u001b[39m\u001b[33m:\u001b[39m\u001b[32m'ArrowDown'\u001b[39m\u001b[33m,\u001b[39m\u001b[33mWest\u001b[39m\u001b[33m:\u001b[39m\u001b[32m'ArrowLeft'\u001b[39m}\u001b[33m;\u001b[39m\n \u001b[90m 233 |\u001b[39m  \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'#dungeon-map'\u001b[39m)\u001b[33m.\u001b[39mpress(arrows[blocked\u001b[33m!\u001b[39m])\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 234 |\u001b[39m  \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'.dungeon-status'\u001b[39m))\u001b[33m.\u001b[39mtoContainText(\u001b[32m'Movement refused'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 235 |\u001b[39m  \u001b[36mconst\u001b[39m cancel\u001b[33m=\u001b[39mpage\u001b[33m.\u001b[39mwaitForEvent(\u001b[32m'dialog'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 236 |\u001b[39m  \u001b[36mconst\u001b[39m departure\u001b[33m=\u001b[39mpage\u001b[33m.\u001b[39mgetByRole(\u001b[32m'link'\u001b[39m\u001b[33m,\u001b[39m{name\u001b[33m:\u001b[39m\u001b[32m'Main menu'\u001b[39m\u001b[33m,\u001b[39mexact\u001b[33m:\u001b[39m\u001b[36mtrue\u001b[39m})\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 237 |\u001b[39m  \u001b[36mawait\u001b[39m (\u001b[36mawait\u001b[39m cancel)\u001b[33m.\u001b[39mdismiss()\u001b[33m;\u001b[39m\u001b[36mawait\u001b[39m departure\u001b[33m;\u001b[39m\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests/main-menu.spec.ts",
+                        "column": 48,
+                        "line": 234
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.dungeon-status')\nExpected substring: \u001b[32m\"Movement refused\"\u001b[39m\nReceived string:    \u001b[31m\"Playing unsaved. Floor travel requires saving; open Save recovery.\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" locator('.dungeon-status') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.dungeon-status')\u001b[22m\n\u001b[2m    13 × locator resolved to <p role=\"status\" class=\"dungeon-status\">Playing unsaved. Floor travel requires saving; op…</p>\u001b[22m\n\u001b[2m       - unexpected value \"Playing unsaved. Floor travel requires saving; open Save recovery.\"\u001b[22m\n\n\n  232 |  const arrows:Record<string,string>={North:'ArrowUp',East:'ArrowRight',South:'ArrowDown',West:'ArrowLeft'};\n  233 |  await page.locator('#dungeon-map').press(arrows[blocked!]);\n> 234 |  await expect(page.locator('.dungeon-status')).toContainText('Movement refused');\n      |                                                ^\n  235 |  const cancel=page.waitForEvent('dialog');\n  236 |  const departure=page.getByRole('link',{name:'Main menu',exact:true}).click();\n  237 |  await (await cancel).dismiss();await departure;\n    at /home/runner/work/tactics-guru-v2/tactics-guru-v2/tests/main-menu.spec.ts:234:48"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T14:25:53.818Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/verification-receipts/issue184-base/artifacts/main-menu-main-menu-dungeo-43ed8-etains-unsaved-play-warning-mobile-landscape-repeat7/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests/main-menu.spec.ts",
+                    "column": 48,
+                    "line": 234
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "6584249e185c6ba36dd3-a60b39ff4c96ca63129b",
+          "file": "main-menu.spec.ts",
+          "line": 219,
+          "column": 66
+        },
+        {
+          "title": "main menu: dungeon departure after rejected movement retains unsaved play warning",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 8,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1149,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T14:26:00.573Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6584249e185c6ba36dd3-5586485065e651105674",
+          "file": "main-menu.spec.ts",
+          "line": 219,
+          "column": 66
+        },
+        {
+          "title": "main menu: dungeon departure after rejected movement retains unsaved play warning",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1092,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T14:26:02.438Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6584249e185c6ba36dd3-b798f81ddb05683593a3",
+          "file": "main-menu.spec.ts",
+          "line": 219,
+          "column": 66
+        },
+        {
+          "title": "main menu: dungeon departure after rejected movement retains unsaved play warning",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 10,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1075,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T14:26:04.251Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6584249e185c6ba36dd3-91d45ccde665746bf39e",
+          "file": "main-menu.spec.ts",
+          "line": 219,
+          "column": 66
+        },
+        {
+          "title": "main menu: dungeon departure after rejected movement retains unsaved play warning",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 11,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1040,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T14:26:06.042Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6584249e185c6ba36dd3-34c098a51fcedcf38a68",
+          "file": "main-menu.spec.ts",
+          "line": 219,
+          "column": 66
+        },
+        {
+          "title": "main menu: dungeon departure after rejected movement retains unsaved play warning",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 12,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1087,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T14:26:07.837Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6584249e185c6ba36dd3-6840aa5919a96fc0538b",
+          "file": "main-menu.spec.ts",
+          "line": 219,
+          "column": 66
+        },
+        {
+          "title": "main menu: dungeon departure after rejected movement retains unsaved play warning",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 13,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1140,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T14:26:09.640Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6584249e185c6ba36dd3-efc93b7da169e4db4949",
+          "file": "main-menu.spec.ts",
+          "line": 219,
+          "column": 66
+        },
+        {
+          "title": "main menu: dungeon departure after rejected movement retains unsaved play warning",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 14,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1058,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T14:26:11.500Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6584249e185c6ba36dd3-3d527e7425ec40381479",
+          "file": "main-menu.spec.ts",
+          "line": 219,
+          "column": 66
+        },
+        {
+          "title": "main menu: dungeon departure after rejected movement retains unsaved play warning",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 15,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1072,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T14:26:13.283Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6584249e185c6ba36dd3-af7db87e7f3e07947d89",
+          "file": "main-menu.spec.ts",
+          "line": 219,
+          "column": 66
+        },
+        {
+          "title": "main menu: dungeon departure after rejected movement retains unsaved play warning",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 16,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1099,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T14:26:15.046Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6584249e185c6ba36dd3-087aad18ac08040d91dd",
+          "file": "main-menu.spec.ts",
+          "line": 219,
+          "column": 66
+        },
+        {
+          "title": "main menu: dungeon departure after rejected movement retains unsaved play warning",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 17,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1073,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T14:26:16.893Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6584249e185c6ba36dd3-68ad0ee8954db91b261b",
+          "file": "main-menu.spec.ts",
+          "line": 219,
+          "column": 66
+        },
+        {
+          "title": "main menu: dungeon departure after rejected movement retains unsaved play warning",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 18,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1069,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T14:26:18.685Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6584249e185c6ba36dd3-946f14d60d2ea3ab759e",
+          "file": "main-menu.spec.ts",
+          "line": 219,
+          "column": 66
+        },
+        {
+          "title": "main menu: dungeon departure after rejected movement retains unsaved play warning",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-landscape",
+              "projectName": "mobile-landscape",
+              "results": [
+                {
+                  "workerIndex": 19,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1035,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-04T14:26:20.457Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6584249e185c6ba36dd3-280ff6b360e6496f5e30",
+          "file": "main-menu.spec.ts",
+          "line": 219,
+          "column": 66
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-04T14:25:34.171Z",
+    "duration": 47568.449,
+    "expected": 18,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  }
+}

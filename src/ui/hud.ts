@@ -2,7 +2,8 @@ import type { Threat } from '../domain/threat';
 import { combatStats, guardedEffect, markSource, movementBlockSource, tauntSource, weakenedSource, weakenedImmune } from '../domain/effects';
 import { saveFaceCounts } from '../domain/combat';
 import type { CellPosition } from '../content/types';
-import type { BattleEvent, UnitState } from '../domain/types';
+import type { BattleEvent, UnitState, Command } from '../domain/types';
+import { previewTacticalPlan } from '../domain/tacticalPlan';
 import { previewMovement } from '../domain/grid';
 import { D20_SIDES, NATURAL_AUTO_MISS, NATURAL_CRITICAL } from '../domain/constants';
 import type { BattleSession, ActionPreview } from '../app/BattleSession';
@@ -10,7 +11,7 @@ import type { BattleAudioSnapshot } from '../phaser/BattleAudio';
 import { publicAssetUrl } from './publicAssetUrl';
 import { GUARDED_STRIKE_TRADEOFF } from '../content/constants';
 
-import { ownedAbilities, actionTargets, type Action } from './battleActions';
+import { ownedAbilities, actionCommand, actionTargets, type Action } from './battleActions';
 import { mountCombatControlsPreference, type CombatSkin } from './combatControls';
 import { draughtsSpent } from '../domain/draughts';
 export const displayName = (id: string) => id.replace(/^ability:/,'').replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase());
@@ -190,11 +191,11 @@ export class BattleHud {
     const labels={muted:'Sound off',loading:'Loading sound',unavailable:'Sound unavailable',hidden:'Sound paused while hidden',unlocking:'Unlocking sound',blocked:'Sound blocked',ready:'Sound on'};
     this.root.querySelector('#battle-sound-status')!.textContent=labels[snapshot.status]+(snapshot.error?`: ${snapshot.error}`:'');
   }
-  render(action:Action|null, selected:CellPosition|null, message:string, danger=false, threats:readonly Threat[] | null=null, planWaiting=false) {
+  render(action:Action|null, selected:CellPosition|null, message:string, danger=false, threats:readonly Threat[] | null=null, planWaiting=false, planMove:Extract<Command,{type:'move'}>|null=null) {
     // Hover refreshes only change the board. Rebuilding the live controls during
     // a pointer gesture can disturb native select interaction and scroll anchoring.
     const inputs = [this.session.state, this.session.phase, this.session.pending, this.session.pendingPlan,
-      this.session.error, action, selected?.x, selected?.y, message, danger, threats, planWaiting, this.skin];
+      this.session.error, action, selected?.x, selected?.y, message, danger, threats, planWaiting, planMove?.to.x, planMove?.to.y, this.skin];
     if (inputs.every((value, i) => Object.is(value, this.lastRender[i]))) return;
     this.lastRender = inputs;
     const s=this.session, enabled=s.phase==='player', actor=s.active;
@@ -264,7 +265,13 @@ export class BattleHud {
     this.root.querySelector('#battle-preview')!.textContent=s.error?`${s.phase==='error'?'Battle stopped':'Unavailable'}: ${s.error}`:message;
     const options: {cell:CellPosition;label:string}[]=[];
     if(enabled && action==='move') {if(movement?.ok) for(const c of movement.cells.filter(c=>c.cost>0)) options.push({cell:c.cell,label:`(${c.cell.x}, ${c.cell.y}) · cost ${c.cost}`});}
-    else if(enabled && action) for(const u of actionTargets(s,action)) options.push({cell:u.cell,label:unitLabel(s,u)});
+    else if(enabled && action) for(const u of actionTargets(s,action)) {
+      const command=actionCommand(s,action,u.cell);
+      const preview=command && (planMove && command.type==='useAbility'
+        ? previewTacticalPlan(s.state,planMove,command,s.catalog) : s.preview(command));
+      const reason=preview && !preview.ok ? ` · ${previewText(preview)}` : '';
+      options.push({cell:u.cell,label:`${unitLabel(s,u)}${reason}`});
+    }
     const selectedValue=selected?`${selected.x},${selected.y}`:'';
     const targetOptions=options.map(o=>new Option(o.label,`${o.cell.x},${o.cell.y}`));
     // Board inspection may select an illegal destination. Keep it visible with

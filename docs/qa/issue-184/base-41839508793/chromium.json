@@ -1,0 +1,286 @@
+{
+  "config": {
+    "argv": [
+      "/opt/hostedtoolcache/node/24.22.2/x64/bin/node",
+      "/home/runner/work/tactics-guru-v2/tactics-guru-v2/node_modules/.bin/playwright",
+      "test",
+      "tests/main-menu.spec.ts",
+      "--project=mobile-landscape",
+      "-g",
+      "dungeon departure after rejected movement retains unsaved play warning",
+      "--repeat-each=20",
+      "--workers=1",
+      "--retries=0",
+      "--reporter=line,json",
+      "--output=verification-receipts/issue184-base/artifacts"
+    ],
+    "configFile": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/playwright.config.ts",
+    "rootDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "ci": {
+        "commitHref": "https://github.com/luminari-gurus/tactics-guru-v2/commit/dc7abb8ef91063974cde9d452124821555dc517e",
+        "commitHash": "dc7abb8ef91063974cde9d452124821555dc517e",
+        "buildHref": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41839508793"
+      },
+      "gitCommit": {
+        "shortHash": "fbf8242",
+        "hash": "fbf82420b82674dc5f57397d68b0a50c8bf485c0",
+        "subject": "Merge pull request #277: Isolate testing gameplay from saved menu journeys",
+        "body": "Merge pull request #277: Isolate testing gameplay from saved menu journeys\n\nKeep testing play in memory, preserve menu save ownership and recovery, and emit a distinct outcome for each fresh testing battle.",
+        "author": {
+          "name": "Max aka Mosheh",
+          "email": "max@aiwithapex.com",
+          "time": 1793746997000
+        },
+        "committer": {
+          "name": "GitHub",
+          "email": "noreply@github.com",
+          "time": 1793746997000
+        },
+        "branch": "HEAD"
+      }
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/verification-receipts/issue184-base/artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/luminari-gurus/tactics-guru-v2/commit/dc7abb8ef91063974cde9d452124821555dc517e",
+            "commitHash": "dc7abb8ef91063974cde9d452124821555dc517e",
+            "buildHref": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41839508793"
+          },
+          "gitCommit": {
+            "shortHash": "fbf8242",
+            "hash": "fbf82420b82674dc5f57397d68b0a50c8bf485c0",
+            "subject": "Merge pull request #277: Isolate testing gameplay from saved menu journeys",
+            "body": "Merge pull request #277: Isolate testing gameplay from saved menu journeys\n\nKeep testing play in memory, preserve menu save ownership and recovery, and emit a distinct outcome for each fresh testing battle.",
+            "author": {
+              "name": "Max aka Mosheh",
+              "email": "max@aiwithapex.com",
+              "time": 1793746997000
+            },
+            "committer": {
+              "name": "GitHub",
+              "email": "noreply@github.com",
+              "time": 1793746997000
+            },
+            "branch": "HEAD"
+          }
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests",
+        "testIgnore": [
+          "**/dungeon-extended.spec.ts",
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/verification-receipts/issue184-base/artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/luminari-gurus/tactics-guru-v2/commit/dc7abb8ef91063974cde9d452124821555dc517e",
+            "commitHash": "dc7abb8ef91063974cde9d452124821555dc517e",
+            "buildHref": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41839508793"
+          },
+          "gitCommit": {
+            "shortHash": "fbf8242",
+            "hash": "fbf82420b82674dc5f57397d68b0a50c8bf485c0",
+            "subject": "Merge pull request #277: Isolate testing gameplay from saved menu journeys",
+            "body": "Merge pull request #277: Isolate testing gameplay from saved menu journeys\n\nKeep testing play in memory, preserve menu save ownership and recovery, and emit a distinct outcome for each fresh testing battle.",
+            "author": {
+              "name": "Max aka Mosheh",
+              "email": "max@aiwithapex.com",
+              "time": 1793746997000
+            },
+            "committer": {
+              "name": "GitHub",
+              "email": "noreply@github.com",
+              "time": 1793746997000
+            },
+            "branch": "HEAD"
+          }
+        },
+        "id": "mobile-portrait",
+        "name": "mobile-portrait",
+        "testDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests",
+        "testIgnore": [
+          "**/dungeon-extended.spec.ts",
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/verification-receipts/issue184-base/artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/luminari-gurus/tactics-guru-v2/commit/dc7abb8ef91063974cde9d452124821555dc517e",
+            "commitHash": "dc7abb8ef91063974cde9d452124821555dc517e",
+            "buildHref": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41839508793"
+          },
+          "gitCommit": {
+            "shortHash": "fbf8242",
+            "hash": "fbf82420b82674dc5f57397d68b0a50c8bf485c0",
+            "subject": "Merge pull request #277: Isolate testing gameplay from saved menu journeys",
+            "body": "Merge pull request #277: Isolate testing gameplay from saved menu journeys\n\nKeep testing play in memory, preserve menu save ownership and recovery, and emit a distinct outcome for each fresh testing battle.",
+            "author": {
+              "name": "Max aka Mosheh",
+              "email": "max@aiwithapex.com",
+              "time": 1793746997000
+            },
+            "committer": {
+              "name": "GitHub",
+              "email": "noreply@github.com",
+              "time": 1793746997000
+            },
+            "branch": "HEAD"
+          }
+        },
+        "id": "mobile-landscape",
+        "name": "mobile-landscape",
+        "testDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests",
+        "testIgnore": [
+          "**/dungeon-extended.spec.ts",
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": {},
+        "outputDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/verification-receipts/issue184-base/artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/luminari-gurus/tactics-guru-v2/commit/dc7abb8ef91063974cde9d452124821555dc517e",
+            "commitHash": "dc7abb8ef91063974cde9d452124821555dc517e",
+            "buildHref": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41839508793"
+          },
+          "gitCommit": {
+            "shortHash": "fbf8242",
+            "hash": "fbf82420b82674dc5f57397d68b0a50c8bf485c0",
+            "subject": "Merge pull request #277: Isolate testing gameplay from saved menu journeys",
+            "body": "Merge pull request #277: Isolate testing gameplay from saved menu journeys\n\nKeep testing play in memory, preserve menu save ownership and recovery, and emit a distinct outcome for each fresh testing battle.",
+            "author": {
+              "name": "Max aka Mosheh",
+              "email": "max@aiwithapex.com",
+              "time": 1793746997000
+            },
+            "committer": {
+              "name": "GitHub",
+              "email": "noreply@github.com",
+              "time": 1793746997000
+            },
+            "branch": "HEAD"
+          }
+        },
+        "name": "mobile-landscape",
+        "testDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests",
+        "snapshotDir": "/home/runner/work/tactics-guru-v2/tactics-guru-v2/tests",
+        "testIgnore": [
+          "**/dungeon-extended.spec.ts",
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": "**/*.spec.ts",
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://127.0.0.1:4173/",
+          "launchOptions": {},
+          "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36",
+          "viewport": {
+            "width": 915,
+            "height": 412
+          },
+          "deviceScaleFactor": 2.625,
+          "isMobile": true,
+          "hasTouch": true,
+          "defaultBrowserType": "chromium",
+          "channel": "chromium"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "mobile-landscape"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "line"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run preview -- --base=/ --port 4173 --strictPort",
+      "url": "http://127.0.0.1:4173/",
+      "reuseExistingServer": false
+    }
+  },
+  "suites": [],
+  "errors": [
+    {
+      "message": "Error: Timed out waiting 60000ms from config.webServer.",
+      "stack": "Error: Timed out waiting 60000ms from config.webServer."
+    }
+  ],
+  "stats": {
+    "startTime": "2026-11-04T13:36:56.114Z",
+    "duration": 60040.481,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

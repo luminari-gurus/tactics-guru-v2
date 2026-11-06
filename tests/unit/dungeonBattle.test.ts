@@ -1,7 +1,7 @@
 import { HERO_PROGRESSION } from '../../src/content/progression';
 import { progressHero } from '../../src/domain/progression';
 import { atEncounter } from '../helpers/dungeonFixtures';
-import { freshDungeon, floorDescriptor, startDungeonBattle, readDungeon } from '../../src/domain/dungeon';
+import { freshDungeon, floorDescriptor, floorMap, startDungeonBattle, readDungeon } from '../../src/domain/dungeon';
 import { guardedBoundary } from '../helpers/guardedBoundary';
 import { combatStats } from '../../src/domain/effects';
 import { assert,expect,it } from 'vitest';
@@ -262,8 +262,9 @@ it('uses the same scaled catalog for inspection, attack preview, AI, actual dama
   // Structural depth fixture isolates combat consumers; legal multi-floor play is covered separately.
   const floors = Array.from({length:10}, (_, i) => {
     const descriptor = floorDescriptor(base.seed, i + 1);
-    return { descriptor, completed: i === 9 ? 0 : 3, position: descriptor.upstairs, exploration: freshExploration(descriptor.seed, descriptor.upstairs) };
+    return { descriptor, completed: i === 9 ? 0 : 3, position: descriptor.upstairs, exploration: freshExploration(descriptor.seed, descriptor.upstairs, floorMap(descriptor)) };
   });
+  expect(readDungeon({...base,depth:10,floors}).ok).toBe(true);
   const built = dungeonBattle({...base, depth:10, floors})!, enemy = built.state.units.find(u=>u.side==='enemy'&&u.defId==='goblin_grunt')!, hero = built.state.units.find(u=>u.defId==='fighter')!;
   let hitSeed = 0; while (rollDie(seedRng(hitSeed),20).value !== 10) hitSeed++;
   const state: import('../../src/domain/types').BattleState = { ...built.state, rng:seedRng(hitSeed), activeIndex:built.state.initiative.indexOf(enemy.id), units:built.state.units.map(u=>u.id===enemy.id?{...u,cell:{x:4,y:0}}:u.id===hero.id?{...u,cell:{x:3,y:0}}:{...u,hp:0}) };

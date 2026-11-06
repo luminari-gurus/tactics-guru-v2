@@ -1,0 +1,740 @@
+{
+  "config": {
+    "argv": [
+      "/home/actions/actions-runner/_work/_tool/node/24.22.1/x64/bin/node",
+      "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/node_modules/.bin/playwright",
+      "test",
+      "-c",
+      "playwright.exploration.config.ts",
+      "-g",
+      "maximum-size",
+      "--workers=1",
+      "--retries=0",
+      "--reporter=line,json",
+      "--output=verification-receipts/issue184/webkit-artifacts"
+    ],
+    "configFile": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/playwright.exploration.config.ts",
+    "rootDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "ci": {
+        "commitHref": "https://github.com/luminari-gurus/tactics-guru-v2/commit/0b52fd319c362cae3e2345838859a4c99a9110b2",
+        "commitHash": "0b52fd319c362cae3e2345838859a4c99a9110b2",
+        "buildHref": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41717781565"
+      },
+      "gitCommit": {
+        "shortHash": "0b52fd31",
+        "hash": "0b52fd319c362cae3e2345838859a4c99a9110b2",
+        "subject": "Measure maximum floor frames on browser runner",
+        "body": "Measure maximum floor frames on browser runner\n",
+        "author": {
+          "name": "Brian Williams",
+          "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+          "time": 1793739620000
+        },
+        "committer": {
+          "name": "Brian Williams",
+          "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+          "time": 1793739620000
+        },
+        "branch": "HEAD"
+      },
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/issue184/webkit-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/luminari-gurus/tactics-guru-v2/commit/0b52fd319c362cae3e2345838859a4c99a9110b2",
+            "commitHash": "0b52fd319c362cae3e2345838859a4c99a9110b2",
+            "buildHref": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41717781565"
+          },
+          "gitCommit": {
+            "shortHash": "0b52fd31",
+            "hash": "0b52fd319c362cae3e2345838859a4c99a9110b2",
+            "subject": "Measure maximum floor frames on browser runner",
+            "body": "Measure maximum floor frames on browser runner\n",
+            "author": {
+              "name": "Brian Williams",
+              "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+              "time": 1793739620000
+            },
+            "committer": {
+              "name": "Brian Williams",
+              "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+              "time": 1793739620000
+            },
+            "branch": "HEAD"
+          },
+          "actualWorkers": 1
+        },
+        "id": "desktop-webkit",
+        "name": "desktop-webkit",
+        "testDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests",
+        "testIgnore": [
+          "**/dungeon-extended.spec.ts",
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/dungeon-exploration.spec.ts",
+          "**/dungeon.spec.ts",
+          "**/dungeon-lifecycle.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/issue184/webkit-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/luminari-gurus/tactics-guru-v2/commit/0b52fd319c362cae3e2345838859a4c99a9110b2",
+            "commitHash": "0b52fd319c362cae3e2345838859a4c99a9110b2",
+            "buildHref": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41717781565"
+          },
+          "gitCommit": {
+            "shortHash": "0b52fd31",
+            "hash": "0b52fd319c362cae3e2345838859a4c99a9110b2",
+            "subject": "Measure maximum floor frames on browser runner",
+            "body": "Measure maximum floor frames on browser runner\n",
+            "author": {
+              "name": "Brian Williams",
+              "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+              "time": 1793739620000
+            },
+            "committer": {
+              "name": "Brian Williams",
+              "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+              "time": 1793739620000
+            },
+            "branch": "HEAD"
+          },
+          "actualWorkers": 1
+        },
+        "id": "portrait-webkit",
+        "name": "portrait-webkit",
+        "testDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests",
+        "testIgnore": [
+          "**/dungeon-extended.spec.ts",
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/dungeon-exploration.spec.ts",
+          "**/dungeon.spec.ts",
+          "**/dungeon-lifecycle.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/issue184/webkit-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/luminari-gurus/tactics-guru-v2/commit/0b52fd319c362cae3e2345838859a4c99a9110b2",
+            "commitHash": "0b52fd319c362cae3e2345838859a4c99a9110b2",
+            "buildHref": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41717781565"
+          },
+          "gitCommit": {
+            "shortHash": "0b52fd31",
+            "hash": "0b52fd319c362cae3e2345838859a4c99a9110b2",
+            "subject": "Measure maximum floor frames on browser runner",
+            "body": "Measure maximum floor frames on browser runner\n",
+            "author": {
+              "name": "Brian Williams",
+              "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+              "time": 1793739620000
+            },
+            "committer": {
+              "name": "Brian Williams",
+              "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+              "time": 1793739620000
+            },
+            "branch": "HEAD"
+          },
+          "actualWorkers": 1
+        },
+        "id": "landscape-webkit",
+        "name": "landscape-webkit",
+        "testDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests",
+        "testIgnore": [
+          "**/dungeon-extended.spec.ts",
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/dungeon-exploration.spec.ts",
+          "**/dungeon.spec.ts",
+          "**/dungeon-lifecycle.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/issue184/webkit-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/luminari-gurus/tactics-guru-v2/commit/0b52fd319c362cae3e2345838859a4c99a9110b2",
+            "commitHash": "0b52fd319c362cae3e2345838859a4c99a9110b2",
+            "buildHref": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41717781565"
+          },
+          "gitCommit": {
+            "shortHash": "0b52fd31",
+            "hash": "0b52fd319c362cae3e2345838859a4c99a9110b2",
+            "subject": "Measure maximum floor frames on browser runner",
+            "body": "Measure maximum floor frames on browser runner\n",
+            "author": {
+              "name": "Brian Williams",
+              "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+              "time": 1793739620000
+            },
+            "committer": {
+              "name": "Brian Williams",
+              "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+              "time": 1793739620000
+            },
+            "branch": "HEAD"
+          },
+          "actualWorkers": 1
+        },
+        "name": "desktop-webkit",
+        "testDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests",
+        "snapshotDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests",
+        "testIgnore": [
+          "**/dungeon-extended.spec.ts",
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/dungeon-exploration.spec.ts",
+          "**/dungeon.spec.ts",
+          "**/dungeon-lifecycle.spec.ts"
+        ],
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://127.0.0.1:4173/",
+          "launchOptions": {},
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.2 Safari/605.1.15",
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "deviceScaleFactor": 2,
+          "isMobile": false,
+          "hasTouch": false,
+          "defaultBrowserType": "webkit"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "desktop-webkit"
+      },
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/issue184/webkit-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/luminari-gurus/tactics-guru-v2/commit/0b52fd319c362cae3e2345838859a4c99a9110b2",
+            "commitHash": "0b52fd319c362cae3e2345838859a4c99a9110b2",
+            "buildHref": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41717781565"
+          },
+          "gitCommit": {
+            "shortHash": "0b52fd31",
+            "hash": "0b52fd319c362cae3e2345838859a4c99a9110b2",
+            "subject": "Measure maximum floor frames on browser runner",
+            "body": "Measure maximum floor frames on browser runner\n",
+            "author": {
+              "name": "Brian Williams",
+              "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+              "time": 1793739620000
+            },
+            "committer": {
+              "name": "Brian Williams",
+              "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+              "time": 1793739620000
+            },
+            "branch": "HEAD"
+          },
+          "actualWorkers": 1
+        },
+        "name": "portrait-webkit",
+        "testDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests",
+        "snapshotDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests",
+        "testIgnore": [
+          "**/dungeon-extended.spec.ts",
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/dungeon-exploration.spec.ts",
+          "**/dungeon.spec.ts",
+          "**/dungeon-lifecycle.spec.ts"
+        ],
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://127.0.0.1:4173/",
+          "launchOptions": {},
+          "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.2 Mobile/15E148 Safari/604.1",
+          "viewport": {
+            "width": 390,
+            "height": 664
+          },
+          "deviceScaleFactor": 3,
+          "isMobile": true,
+          "hasTouch": true,
+          "defaultBrowserType": "webkit"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "portrait-webkit"
+      },
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/issue184/webkit-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/luminari-gurus/tactics-guru-v2/commit/0b52fd319c362cae3e2345838859a4c99a9110b2",
+            "commitHash": "0b52fd319c362cae3e2345838859a4c99a9110b2",
+            "buildHref": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/41717781565"
+          },
+          "gitCommit": {
+            "shortHash": "0b52fd31",
+            "hash": "0b52fd319c362cae3e2345838859a4c99a9110b2",
+            "subject": "Measure maximum floor frames on browser runner",
+            "body": "Measure maximum floor frames on browser runner\n",
+            "author": {
+              "name": "Brian Williams",
+              "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+              "time": 1793739620000
+            },
+            "committer": {
+              "name": "Brian Williams",
+              "email": "brian@mac-mini-m5-pro.barred-mixolydian.ts.net",
+              "time": 1793739620000
+            },
+            "branch": "HEAD"
+          },
+          "actualWorkers": 1
+        },
+        "name": "landscape-webkit",
+        "testDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests",
+        "snapshotDir": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests",
+        "testIgnore": [
+          "**/dungeon-extended.spec.ts",
+          "**/telemetry.spec.ts",
+          "**/ability-picker.spec.ts",
+          "**/authored-encounters.spec.ts",
+          "**/run-items.spec.ts"
+        ],
+        "testMatch": [
+          "**/dungeon-exploration.spec.ts",
+          "**/dungeon.spec.ts",
+          "**/dungeon-lifecycle.spec.ts"
+        ],
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://127.0.0.1:4173/",
+          "launchOptions": {},
+          "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.2 Mobile/15E148 Safari/604.1",
+          "viewport": {
+            "width": 844,
+            "height": 390
+          },
+          "deviceScaleFactor": 3,
+          "isMobile": true,
+          "hasTouch": true,
+          "defaultBrowserType": "webkit"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "landscape-webkit"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "line"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run preview -- --base=/ --port 4173 --strictPort",
+      "url": "http://127.0.0.1:4173/",
+      "reuseExistingServer": false
+    }
+  },
+  "suites": [
+    {
+      "title": "dungeon-exploration.spec.ts",
+      "file": "dungeon-exploration.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "maximum-size saved floor renders and accepts a step after reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2010,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-03T23:37:22.009Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-24fc3ab559f953db600a",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 418,
+          "column": 1
+        },
+        {
+          "title": "maximum-size floor step responsiveness meets the established budget",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-webkit",
+              "projectName": "desktop-webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5439,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m33.4\u001b[39m\nReceived:    \u001b[31m43\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m33.4\u001b[39m\nReceived:    \u001b[31m43\u001b[39m\n    at /home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests/dungeon-exploration.spec.ts:447:83",
+                    "location": {
+                      "file": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests/dungeon-exploration.spec.ts",
+                      "column": 83,
+                      "line": 447
+                    },
+                    "snippet": "\u001b[0m \u001b[90m 445 |\u001b[39m  \u001b[36mconst\u001b[39m p95\u001b[33m=\u001b[39mpercentile(times\u001b[33m,\u001b[39m\u001b[35m.95\u001b[39m)\u001b[33m,\u001b[39mframeP95\u001b[33m=\u001b[39mpercentile(frames\u001b[33m,\u001b[39m\u001b[35m.95\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 446 |\u001b[39m  writeFileSync(test\u001b[33m.\u001b[39minfo()\u001b[33m.\u001b[39moutputPath(\u001b[32m'maximum-floor-step-performance.json'\u001b[39m)\u001b[33m,\u001b[39m\u001b[33mJSON\u001b[39m\u001b[33m.\u001b[39mstringify({times\u001b[33m,\u001b[39mp95\u001b[33m,\u001b[39mframes\u001b[33m,\u001b[39mframeP95\u001b[33m,\u001b[39mbudgetMs\u001b[33m:\u001b[39m\u001b[35m33.4\u001b[39m\u001b[33m,\u001b[39mdimension\u001b[33m:\u001b[39mmap\u001b[33m.\u001b[39mwidth}\u001b[33m,\u001b[39m\u001b[36mnull\u001b[39m\u001b[33m,\u001b[39m\u001b[35m2\u001b[39m))\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 447 |\u001b[39m  expect((\u001b[36mawait\u001b[39m dungeonSnapshot(page))\u001b[33m.\u001b[39mfloors[\u001b[35m4\u001b[39m]\u001b[33m.\u001b[39mposition)\u001b[33m.\u001b[39mtoBe(first)\u001b[33m;\u001b[39mexpect(p95)\u001b[33m.\u001b[39mtoBeLessThanOrEqual(\u001b[35m33.4\u001b[39m)\u001b[33m;\u001b[39mexpect(frameP95)\u001b[33m.\u001b[39mtoBeLessThanOrEqual(\u001b[35m33.4\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                                                   \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 448 |\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 449 |\u001b[39m\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests/dungeon-exploration.spec.ts",
+                        "column": 83,
+                        "line": 447
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m33.4\u001b[39m\nReceived:    \u001b[31m43\u001b[39m\n\n  445 |  const p95=percentile(times,.95),frameP95=percentile(frames,.95);\n  446 |  writeFileSync(test.info().outputPath('maximum-floor-step-performance.json'),JSON.stringify({times,p95,frames,frameP95,budgetMs:33.4,dimension:map.width},null,2));\n> 447 |  expect((await dungeonSnapshot(page)).floors[4].position).toBe(first);expect(p95).toBeLessThanOrEqual(33.4);expect(frameP95).toBeLessThanOrEqual(33.4);\n      |                                                                                   ^\n  448 | });\n  449 |\n    at /home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests/dungeon-exploration.spec.ts:447:83"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-03T23:37:24.140Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "startup-evidence",
+                      "contentType": "application/json",
+                      "body": "ewogICJldmVudHMiOiBbCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNDQ2MDcsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJkb2N1bWVudCIsCiAgICAgICJwYXRoIjogIltvdGhlcl0iCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDQ0NjEzLAogICAgICAia2luZCI6ICJuYXZpZ2F0aW9uIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA0NDYxNywKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvaW5kZXgtRDhsVUpHaWMuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDQ0NjE3LAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy90ZWxlbWV0cnktRFVzalNMbnQuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDQ0NjE3LAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9wcmVsb2FkLWhlbHBlci1CTGRIYmZkTi5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNDQ2MTgsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3ByZWZlcmVuY2VzLTZzWlRZYmcwLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA0NDYxOCwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvcm91dGVzLWllbzI1dnhWLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA0NDYxOSwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInN0eWxlc2hlZXQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3ByZWZlcmVuY2VzLUQxYlhTTFhVLmNzcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNDQ2MTksCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiW290aGVyXSIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNDQ2MjIsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy90ZWxlbWV0cnktRFVzalNMbnQuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDQ0NjIyLAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvaW5kZXgtRDhsVUpHaWMuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDQ0NjI0LAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvcm91dGVzLWllbzI1dnhWLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA0NDYyNCwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3ByZWxvYWQtaGVscGVyLUJMZEhiZmROLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA0NDYyNCwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3ByZWZlcmVuY2VzLTZzWlRZYmcwLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA0NDYyNSwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3ByZWZlcmVuY2VzLUQxYlhTTFhVLmNzcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNDQ2MzgsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3N0YXJ0RHVuZ2VvbkFwcC1CZktVZFppWi5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNDQ2MzksCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3N0YXJ0LUNKTm5fZUxsLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA0NDY0MCwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvYnJvd3Nlci1ESWdLR3hZbi5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNDQ2NDAsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2NvbWJhdENvbnRyb2xzLWwxNWJySmxyLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA0NDY0MCwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvcm5nLUJDY0pPcFJQLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA0NDY0MCwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvYmF0dGxlTGF5b3V0LUR2NGd3U2NHLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA0NDY0MSwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInN0eWxlc2hlZXQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2JhdHRsZUxheW91dC1EOUNieFZIai5jc3MiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDQ0NjQxLAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9iaW9tZXMtY2VXV3B0cEEuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDQ0NjQxLAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9kdW5nZW9uU3RvcmFnZS1DdVhCb3JWSy5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNDQ2NDEsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2l0ZW1zLUJ6aF9vbFd2LmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA0NDY0MSwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvYXJ0LTk0MWg2NHA3LmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA0NDY0MSwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInN0eWxlc2hlZXQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3N0YXJ0RHVuZ2VvbkFwcC1SSzM3NEdvNy5jc3MiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDQ0NjQ1LAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvYmF0dGxlTGF5b3V0LUR2NGd3U2NHLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA0NDY1MSwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2Jyb3dzZXItRElnS0d4WW4uanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDQ0NjUyLAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvcm5nLUJDY0pPcFJQLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA0NDY1MiwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3N0YXJ0RHVuZ2VvbkFwcC1CZktVZFppWi5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNDQ2NTIsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9jb21iYXRDb250cm9scy1sMTVickpsci5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNDQ2NTIsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9iYXR0bGVMYXlvdXQtRDlDYnhWSGouY3NzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA0NDY1MiwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2Jpb21lcy1jZVdXcHRwQS5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNDQ2NTMsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9kdW5nZW9uU3RvcmFnZS1DdVhCb3JWSy5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNDQ2NTMsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9pdGVtcy1Cemhfb2xXdi5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNDQ2NTQsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9hcnQtOTQxaDY0cDcuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDQ0NjU0LAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvc3RhcnREdW5nZW9uQXBwLVJLMzc0R283LmNzcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNDQ2NzYsCiAgICAgICJraW5kIjogInJlcXVlc3RmYWlsZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3N0YXJ0LUNKTm5fZUxsLmpzIiwKICAgICAgImVycm9yIjogIkxvYWQgcmVxdWVzdCBjYW5jZWxsZWQiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDQ0Njc2LAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAiZG9jdW1lbnQiLAogICAgICAicGF0aCI6ICJbb3RoZXJdIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA0NDY4OSwKICAgICAgImtpbmQiOiAibmF2aWdhdGlvbiIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNDQ2OTAsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2luZGV4LUQ4bFVKR2ljLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA0NDY5NCwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvdGVsZW1ldHJ5LURVc2pTTG50LmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA0NDY5NCwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3RlbGVtZXRyeS1EVXNqU0xudC5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNDQ2OTQsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3ByZWxvYWQtaGVscGVyLUJMZEhiZmROLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA0NDY5NSwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3ByZWxvYWQtaGVscGVyLUJMZEhiZmROLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA0NDY5NSwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvcHJlZmVyZW5jZXMtNnNaVFliZzAuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDQ0Njk1LAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvcHJlZmVyZW5jZXMtNnNaVFliZzAuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDQ0Njk1LAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9yb3V0ZXMtaWVvMjV2eFYuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDQ0Njk1LAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvcm91dGVzLWllbzI1dnhWLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA0NDY5NiwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInN0eWxlc2hlZXQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3ByZWZlcmVuY2VzLUQxYlhTTFhVLmNzcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNDQ2OTcsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiW290aGVyXSIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNDQ2OTcsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9pbmRleC1EOGxVSkdpYy5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNDQ2OTgsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9wcmVmZXJlbmNlcy1EMWJYU0xYVS5jc3MiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDQ0Njk5LAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9zdGFydER1bmdlb25BcHAtQmZLVWRaaVouanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDQ0NzAwLAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvc3RhcnREdW5nZW9uQXBwLUJmS1VkWmlaLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA0NDcwMCwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvc3RhcnQtQ0pObl9lTGwuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDQ0NzAwLAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9icm93c2VyLURJZ0tHeFluLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA0NDcwMCwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2Jyb3dzZXItRElnS0d4WW4uanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDQ0NzAxLAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9jb21iYXRDb250cm9scy1sMTVickpsci5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNDQ3MDEsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9jb21iYXRDb250cm9scy1sMTVickpsci5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNDQ3MDEsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3JuZy1CQ2NKT3BSUC5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNDQ3MDEsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9ybmctQkNjSk9wUlAuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDQ0NzAxLAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9iYXR0bGVMYXlvdXQtRHY0Z3dTY0cuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDQ0NzAyLAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvYmF0dGxlTGF5b3V0LUR2NGd3U2NHLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA0NDcwMiwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInN0eWxlc2hlZXQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2JhdHRsZUxheW91dC1EOUNieFZIai5jc3MiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDQ0NzAzLAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9iaW9tZXMtY2VXV3B0cEEuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDQ0NzAzLAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvYmlvbWVzLWNlV1dwdHBBLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA0NDcwMywKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvZHVuZ2VvblN0b3JhZ2UtQ3VYQm9yVksuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDQ0NzAzLAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvZHVuZ2VvblN0b3JhZ2UtQ3VYQm9yVksuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDQ0NzAzLAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9pdGVtcy1Cemhfb2xXdi5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNDQ3MDYsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9pdGVtcy1Cemhfb2xXdi5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNDQ3MDYsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2FydC05NDFoNjRwNy5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNDQ3MDYsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9hcnQtOTQxaDY0cDcuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDQ0NzA2LAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic3R5bGVzaGVldCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvc3RhcnREdW5nZW9uQXBwLVJLMzc0R283LmNzcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNDQ3MDcsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9iYXR0bGVMYXlvdXQtRDlDYnhWSGouY3NzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA0NDcwNywKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3N0YXJ0RHVuZ2VvbkFwcC1SSzM3NEdvNy5jc3MiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDQ0NzYyLAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvc3RhcnQtQ0pObl9lTGwuanMiCiAgICB9CiAgXSwKICAicGVuZGluZyI6IFtdLAogICJicm93c2VyIjogewogICAgInNhbXBsZXMiOiBbCiAgICAgIHsKICAgICAgICAiYXQiOiAxMywKICAgICAgICAicmVhZHkiOiAibG9hZGluZyIsCiAgICAgICAgInNjcmVlbiI6IGZhbHNlLAogICAgICAgICJib290IjogZmFsc2UsCiAgICAgICAgInN0YXR1cyI6ICJvdGhlciIKICAgICAgfSwKICAgICAgewogICAgICAgICJhdCI6IDIxLAogICAgICAgICJyZWFkeSI6ICJpbnRlcmFjdGl2ZSIsCiAgICAgICAgInNjcmVlbiI6IGZhbHNlLAogICAgICAgICJib290IjogZmFsc2UsCiAgICAgICAgInN0YXR1cyI6ICJsb2FkaW5nIgogICAgICB9LAogICAgICB7CiAgICAgICAgImF0IjogMzEsCiAgICAgICAgInJlYWR5IjogImNvbXBsZXRlIiwKICAgICAgICAic2NyZWVuIjogZmFsc2UsCiAgICAgICAgImJvb3QiOiBmYWxzZSwKICAgICAgICAic3RhdHVzIjogImxvYWRpbmciCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAiYXQiOiA0MzEsCiAgICAgICAgInJlYWR5IjogImNvbXBsZXRlIiwKICAgICAgICAic2NyZWVuIjogdHJ1ZSwKICAgICAgICAiYm9vdCI6IGZhbHNlLAogICAgICAgICJzdGF0dXMiOiAibG9hZGluZyIKICAgICAgfSwKICAgICAgewogICAgICAgICJhdCI6IDUxNywKICAgICAgICAicmVhZHkiOiAiY29tcGxldGUiLAogICAgICAgICJzY3JlZW4iOiB0cnVlLAogICAgICAgICJib290IjogdHJ1ZSwKICAgICAgICAic3RhdHVzIjogImxvYWRpbmciCiAgICAgIH0KICAgIF0sCiAgICAicmVhZHkiOiAiY29tcGxldGUiLAogICAgInZpc2liaWxpdHkiOiAidmlzaWJsZSIsCiAgICAic2NyaXB0cyI6IFsKICAgICAgIltvdGhlcl0iLAogICAgICAiL2Fzc2V0cy9pbmRleC1EOGxVSkdpYy5qcyIKICAgIF0sCiAgICAic3R5bGVzIjogWwogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL3ByZWZlcmVuY2VzLUQxYlhTTFhVLmNzcyIsCiAgICAgICAgInNoZWV0IjogdHJ1ZQogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL2JhdHRsZUxheW91dC1EOUNieFZIai5jc3MiLAogICAgICAgICJzaGVldCI6IHRydWUKICAgICAgfSwKICAgICAgewogICAgICAgICJ1cmwiOiAiL2Fzc2V0cy9zdGFydER1bmdlb25BcHAtUkszNzRHbzcuY3NzIiwKICAgICAgICAic2hlZXQiOiB0cnVlCiAgICAgIH0KICAgIF0sCiAgICAicmVzb3VyY2VzIjogWwogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL3RlbGVtZXRyeS1EVXNqU0xudC5qcyIsCiAgICAgICAgImR1cmF0aW9uIjogNAogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL2luZGV4LUQ4bFVKR2ljLmpzIiwKICAgICAgICAiZHVyYXRpb24iOiAxCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAidXJsIjogIi9hc3NldHMvcHJlbG9hZC1oZWxwZXItQkxkSGJmZE4uanMiLAogICAgICAgICJkdXJhdGlvbiI6IDEKICAgICAgfSwKICAgICAgewogICAgICAgICJ1cmwiOiAiL2Fzc2V0cy9wcmVmZXJlbmNlcy02c1pUWWJnMC5qcyIsCiAgICAgICAgImR1cmF0aW9uIjogMAogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL3JvdXRlcy1pZW8yNXZ4Vi5qcyIsCiAgICAgICAgImR1cmF0aW9uIjogMAogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL3ByZWZlcmVuY2VzLUQxYlhTTFhVLmNzcyIsCiAgICAgICAgImR1cmF0aW9uIjogMQogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL3N0YXJ0RHVuZ2VvbkFwcC1CZktVZFppWi5qcyIsCiAgICAgICAgImR1cmF0aW9uIjogMAogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL2Jyb3dzZXItRElnS0d4WW4uanMiLAogICAgICAgICJkdXJhdGlvbiI6IDEKICAgICAgfSwKICAgICAgewogICAgICAgICJ1cmwiOiAiL2Fzc2V0cy9zdGFydC1DSk5uX2VMbC5qcyIsCiAgICAgICAgImR1cmF0aW9uIjogNDcKICAgICAgfSwKICAgICAgewogICAgICAgICJ1cmwiOiAiL2Fzc2V0cy9jb21iYXRDb250cm9scy1sMTVickpsci5qcyIsCiAgICAgICAgImR1cmF0aW9uIjogMAogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL3JuZy1CQ2NKT3BSUC5qcyIsCiAgICAgICAgImR1cmF0aW9uIjogMAogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL2JhdHRsZUxheW91dC1EdjRnd1NjRy5qcyIsCiAgICAgICAgImR1cmF0aW9uIjogMQogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL2Jpb21lcy1jZVdXcHRwQS5qcyIsCiAgICAgICAgImR1cmF0aW9uIjogMAogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL2R1bmdlb25TdG9yYWdlLUN1WEJvclZLLmpzIiwKICAgICAgICAiZHVyYXRpb24iOiAxCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAidXJsIjogIi9hc3NldHMvYmF0dGxlTGF5b3V0LUQ5Q2J4VkhqLmNzcyIsCiAgICAgICAgImR1cmF0aW9uIjogMQogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL2l0ZW1zLUJ6aF9vbFd2LmpzIiwKICAgICAgICAiZHVyYXRpb24iOiAwCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAidXJsIjogIi9hc3NldHMvYXJ0LTk0MWg2NHA3LmpzIiwKICAgICAgICAiZHVyYXRpb24iOiAwCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAidXJsIjogIi9hc3NldHMvc3RhcnREdW5nZW9uQXBwLVJLMzc0R283LmNzcyIsCiAgICAgICAgImR1cmF0aW9uIjogMQogICAgICB9CiAgICBdCiAgfQp9"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/issue184/webkit-artifacts/dungeon-exploration-maximu-ae46a-eets-the-established-budget-desktop-webkit/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests/dungeon-exploration.spec.ts",
+                    "column": 83,
+                    "line": 447
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-5071a9e989a8a635ef0d",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 433,
+          "column": 1
+        },
+        {
+          "title": "maximum-size saved floor renders and accepts a step after reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1965,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-03T23:37:30.255Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-307425e768d3ad98fce0",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 418,
+          "column": 1
+        },
+        {
+          "title": "maximum-size floor step responsiveness meets the established budget",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "portrait-webkit",
+              "projectName": "portrait-webkit",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5802,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m33.4\u001b[39m\nReceived:    \u001b[31m40\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m33.4\u001b[39m\nReceived:    \u001b[31m40\u001b[39m\n    at /home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests/dungeon-exploration.spec.ts:447:83",
+                    "location": {
+                      "file": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests/dungeon-exploration.spec.ts",
+                      "column": 83,
+                      "line": 447
+                    },
+                    "snippet": "\u001b[0m \u001b[90m 445 |\u001b[39m  \u001b[36mconst\u001b[39m p95\u001b[33m=\u001b[39mpercentile(times\u001b[33m,\u001b[39m\u001b[35m.95\u001b[39m)\u001b[33m,\u001b[39mframeP95\u001b[33m=\u001b[39mpercentile(frames\u001b[33m,\u001b[39m\u001b[35m.95\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 446 |\u001b[39m  writeFileSync(test\u001b[33m.\u001b[39minfo()\u001b[33m.\u001b[39moutputPath(\u001b[32m'maximum-floor-step-performance.json'\u001b[39m)\u001b[33m,\u001b[39m\u001b[33mJSON\u001b[39m\u001b[33m.\u001b[39mstringify({times\u001b[33m,\u001b[39mp95\u001b[33m,\u001b[39mframes\u001b[33m,\u001b[39mframeP95\u001b[33m,\u001b[39mbudgetMs\u001b[33m:\u001b[39m\u001b[35m33.4\u001b[39m\u001b[33m,\u001b[39mdimension\u001b[33m:\u001b[39mmap\u001b[33m.\u001b[39mwidth}\u001b[33m,\u001b[39m\u001b[36mnull\u001b[39m\u001b[33m,\u001b[39m\u001b[35m2\u001b[39m))\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 447 |\u001b[39m  expect((\u001b[36mawait\u001b[39m dungeonSnapshot(page))\u001b[33m.\u001b[39mfloors[\u001b[35m4\u001b[39m]\u001b[33m.\u001b[39mposition)\u001b[33m.\u001b[39mtoBe(first)\u001b[33m;\u001b[39mexpect(p95)\u001b[33m.\u001b[39mtoBeLessThanOrEqual(\u001b[35m33.4\u001b[39m)\u001b[33m;\u001b[39mexpect(frameP95)\u001b[33m.\u001b[39mtoBeLessThanOrEqual(\u001b[35m33.4\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                                                   \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 448 |\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 449 |\u001b[39m\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests/dungeon-exploration.spec.ts",
+                        "column": 83,
+                        "line": 447
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m33.4\u001b[39m\nReceived:    \u001b[31m40\u001b[39m\n\n  445 |  const p95=percentile(times,.95),frameP95=percentile(frames,.95);\n  446 |  writeFileSync(test.info().outputPath('maximum-floor-step-performance.json'),JSON.stringify({times,p95,frames,frameP95,budgetMs:33.4,dimension:map.width},null,2));\n> 447 |  expect((await dungeonSnapshot(page)).floors[4].position).toBe(first);expect(p95).toBeLessThanOrEqual(33.4);expect(frameP95).toBeLessThanOrEqual(33.4);\n      |                                                                                   ^\n  448 | });\n  449 |\n    at /home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests/dungeon-exploration.spec.ts:447:83"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-03T23:37:32.339Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "startup-evidence",
+                      "contentType": "application/json",
+                      "body": "ewogICJldmVudHMiOiBbCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI3OTMsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJkb2N1bWVudCIsCiAgICAgICJwYXRoIjogIltvdGhlcl0iCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDUyODAwLAogICAgICAia2luZCI6ICJuYXZpZ2F0aW9uIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1MjgwMywKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvaW5kZXgtRDhsVUpHaWMuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDUyODAzLAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy90ZWxlbWV0cnktRFVzalNMbnQuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDUyODAzLAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9wcmVsb2FkLWhlbHBlci1CTGRIYmZkTi5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4MDMsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3ByZWZlcmVuY2VzLTZzWlRZYmcwLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1MjgwNCwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvcm91dGVzLWllbzI1dnhWLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1MjgwNCwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInN0eWxlc2hlZXQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3ByZWZlcmVuY2VzLUQxYlhTTFhVLmNzcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4MDQsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiW290aGVyXSIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4MDcsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy90ZWxlbWV0cnktRFVzalNMbnQuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDUyODA3LAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvaW5kZXgtRDhsVUpHaWMuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDUyODEwLAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvcm91dGVzLWllbzI1dnhWLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1MjgxMCwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3ByZWxvYWQtaGVscGVyLUJMZEhiZmROLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1MjgxMSwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3ByZWZlcmVuY2VzLUQxYlhTTFhVLmNzcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4MTEsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9wcmVmZXJlbmNlcy02c1pUWWJnMC5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4MjMsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3N0YXJ0RHVuZ2VvbkFwcC1CZktVZFppWi5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4MjMsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3N0YXJ0LUNKTm5fZUxsLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1MjgyMywKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvYnJvd3Nlci1ESWdLR3hZbi5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4MjMsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2NvbWJhdENvbnRyb2xzLWwxNWJySmxyLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1MjgyMywKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvcm5nLUJDY0pPcFJQLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1MjgyNSwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvYmF0dGxlTGF5b3V0LUR2NGd3U2NHLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1MjgyNSwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInN0eWxlc2hlZXQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2JhdHRsZUxheW91dC1EOUNieFZIai5jc3MiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDUyODI1LAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9iaW9tZXMtY2VXV3B0cEEuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDUyODI1LAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9kdW5nZW9uU3RvcmFnZS1DdVhCb3JWSy5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4MjUsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2l0ZW1zLUJ6aF9vbFd2LmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1MjgyNSwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvYXJ0LTk0MWg2NHA3LmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1MjgyNSwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInN0eWxlc2hlZXQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3N0YXJ0RHVuZ2VvbkFwcC1SSzM3NEdvNy5jc3MiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDUyODI3LAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvc3RhcnREdW5nZW9uQXBwLUJmS1VkWmlaLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1MjgyOSwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2JhdHRsZUxheW91dC1EdjRnd1NjRy5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4MjksCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9icm93c2VyLURJZ0tHeFluLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1MjgzMiwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3JuZy1CQ2NKT3BSUC5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4MzgsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9iYXR0bGVMYXlvdXQtRDlDYnhWSGouY3NzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1MjgzOCwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2Jpb21lcy1jZVdXcHRwQS5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4NDAsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9hcnQtOTQxaDY0cDcuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDUyODQwLAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvaXRlbXMtQnpoX29sV3YuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDUyODQwLAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvY29tYmF0Q29udHJvbHMtbDE1YnJKbHIuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDUyODQwLAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvc3RhcnREdW5nZW9uQXBwLVJLMzc0R283LmNzcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4NTEsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9kdW5nZW9uU3RvcmFnZS1DdVhCb3JWSy5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4NjAsCiAgICAgICJraW5kIjogInJlcXVlc3RmYWlsZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3N0YXJ0LUNKTm5fZUxsLmpzIiwKICAgICAgImVycm9yIjogIkxvYWQgcmVxdWVzdCBjYW5jZWxsZWQiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDUyODYwLAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAiZG9jdW1lbnQiLAogICAgICAicGF0aCI6ICJbb3RoZXJdIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1Mjg3MCwKICAgICAgImtpbmQiOiAibmF2aWdhdGlvbiIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4NzEsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2luZGV4LUQ4bFVKR2ljLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1Mjg3MiwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvdGVsZW1ldHJ5LURVc2pTTG50LmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1Mjg3MiwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3RlbGVtZXRyeS1EVXNqU0xudC5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4NzQsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3ByZWxvYWQtaGVscGVyLUJMZEhiZmROLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1Mjg3NSwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3ByZWxvYWQtaGVscGVyLUJMZEhiZmROLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1Mjg3NSwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvcHJlZmVyZW5jZXMtNnNaVFliZzAuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDUyODc1LAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvcHJlZmVyZW5jZXMtNnNaVFliZzAuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDUyODc1LAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9yb3V0ZXMtaWVvMjV2eFYuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDUyODc2LAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvcm91dGVzLWllbzI1dnhWLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1Mjg3NiwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInN0eWxlc2hlZXQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3ByZWZlcmVuY2VzLUQxYlhTTFhVLmNzcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4NzYsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiW290aGVyXSIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4NzYsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9pbmRleC1EOGxVSkdpYy5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4NzcsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3N0YXJ0RHVuZ2VvbkFwcC1CZktVZFppWi5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4NzcsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9zdGFydER1bmdlb25BcHAtQmZLVWRaaVouanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDUyODc3LAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9zdGFydC1DSk5uX2VMbC5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4NzcsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2Jyb3dzZXItRElnS0d4WW4uanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDUyODc5LAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvYnJvd3Nlci1ESWdLR3hZbi5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4NzksCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2NvbWJhdENvbnRyb2xzLWwxNWJySmxyLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1Mjg3OSwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2NvbWJhdENvbnRyb2xzLWwxNWJySmxyLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1Mjg3OSwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvcm5nLUJDY0pPcFJQLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1Mjg3OSwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3JuZy1CQ2NKT3BSUC5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4NzksCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2JhdHRsZUxheW91dC1EdjRnd1NjRy5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4NzksCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9iYXR0bGVMYXlvdXQtRHY0Z3dTY0cuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDUyODgwLAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic3R5bGVzaGVldCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvYmF0dGxlTGF5b3V0LUQ5Q2J4VkhqLmNzcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4ODAsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2Jpb21lcy1jZVdXcHRwQS5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4ODIsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9iaW9tZXMtY2VXV3B0cEEuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDUyODgyLAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9kdW5nZW9uU3RvcmFnZS1DdVhCb3JWSy5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4ODMsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9kdW5nZW9uU3RvcmFnZS1DdVhCb3JWSy5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4ODMsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2l0ZW1zLUJ6aF9vbFd2LmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1Mjg4NCwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2l0ZW1zLUJ6aF9vbFd2LmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1Mjg4NSwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvYXJ0LTk0MWg2NHA3LmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1Mjg4NSwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2FydC05NDFoNjRwNy5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4ODYsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzdHlsZXNoZWV0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9zdGFydER1bmdlb25BcHAtUkszNzRHbzcuY3NzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1Mjg4NywKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3ByZWZlcmVuY2VzLUQxYlhTTFhVLmNzcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNTI4OTEsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9iYXR0bGVMYXlvdXQtRDlDYnhWSGouY3NzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA1Mjg5MiwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3N0YXJ0RHVuZ2VvbkFwcC1SSzM3NEdvNy5jc3MiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDUyOTUyLAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvc3RhcnQtQ0pObl9lTGwuanMiCiAgICB9CiAgXSwKICAicGVuZGluZyI6IFtdLAogICJicm93c2VyIjogewogICAgInNhbXBsZXMiOiBbCiAgICAgIHsKICAgICAgICAiYXQiOiA5LAogICAgICAgICJyZWFkeSI6ICJsb2FkaW5nIiwKICAgICAgICAic2NyZWVuIjogZmFsc2UsCiAgICAgICAgImJvb3QiOiBmYWxzZSwKICAgICAgICAic3RhdHVzIjogIm90aGVyIgogICAgICB9LAogICAgICB7CiAgICAgICAgImF0IjogMTMsCiAgICAgICAgInJlYWR5IjogImludGVyYWN0aXZlIiwKICAgICAgICAic2NyZWVuIjogZmFsc2UsCiAgICAgICAgImJvb3QiOiBmYWxzZSwKICAgICAgICAic3RhdHVzIjogImxvYWRpbmciCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAiYXQiOiAyOSwKICAgICAgICAicmVhZHkiOiAiY29tcGxldGUiLAogICAgICAgICJzY3JlZW4iOiBmYWxzZSwKICAgICAgICAiYm9vdCI6IGZhbHNlLAogICAgICAgICJzdGF0dXMiOiAibG9hZGluZyIKICAgICAgfSwKICAgICAgewogICAgICAgICJhdCI6IDQyMywKICAgICAgICAicmVhZHkiOiAiY29tcGxldGUiLAogICAgICAgICJzY3JlZW4iOiB0cnVlLAogICAgICAgICJib290IjogZmFsc2UsCiAgICAgICAgInN0YXR1cyI6ICJsb2FkaW5nIgogICAgICB9LAogICAgICB7CiAgICAgICAgImF0IjogNDk1LAogICAgICAgICJyZWFkeSI6ICJjb21wbGV0ZSIsCiAgICAgICAgInNjcmVlbiI6IHRydWUsCiAgICAgICAgImJvb3QiOiB0cnVlLAogICAgICAgICJzdGF0dXMiOiAibG9hZGluZyIKICAgICAgfQogICAgXSwKICAgICJyZWFkeSI6ICJjb21wbGV0ZSIsCiAgICAidmlzaWJpbGl0eSI6ICJ2aXNpYmxlIiwKICAgICJzY3JpcHRzIjogWwogICAgICAiW290aGVyXSIsCiAgICAgICIvYXNzZXRzL2luZGV4LUQ4bFVKR2ljLmpzIgogICAgXSwKICAgICJzdHlsZXMiOiBbCiAgICAgIHsKICAgICAgICAidXJsIjogIi9hc3NldHMvcHJlZmVyZW5jZXMtRDFiWFNMWFUuY3NzIiwKICAgICAgICAic2hlZXQiOiB0cnVlCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAidXJsIjogIi9hc3NldHMvYmF0dGxlTGF5b3V0LUQ5Q2J4VkhqLmNzcyIsCiAgICAgICAgInNoZWV0IjogdHJ1ZQogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL3N0YXJ0RHVuZ2VvbkFwcC1SSzM3NEdvNy5jc3MiLAogICAgICAgICJzaGVldCI6IHRydWUKICAgICAgfQogICAgXSwKICAgICJyZXNvdXJjZXMiOiBbCiAgICAgIHsKICAgICAgICAidXJsIjogIi9hc3NldHMvdGVsZW1ldHJ5LURVc2pTTG50LmpzIiwKICAgICAgICAiZHVyYXRpb24iOiAxCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAidXJsIjogIi9hc3NldHMvcHJlbG9hZC1oZWxwZXItQkxkSGJmZE4uanMiLAogICAgICAgICJkdXJhdGlvbiI6IDEKICAgICAgfSwKICAgICAgewogICAgICAgICJ1cmwiOiAiL2Fzc2V0cy9pbmRleC1EOGxVSkdpYy5qcyIsCiAgICAgICAgImR1cmF0aW9uIjogMQogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL3ByZWZlcmVuY2VzLTZzWlRZYmcwLmpzIiwKICAgICAgICAiZHVyYXRpb24iOiAwCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAidXJsIjogIi9hc3NldHMvcm91dGVzLWllbzI1dnhWLmpzIiwKICAgICAgICAiZHVyYXRpb24iOiAwCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAidXJsIjogIi9hc3NldHMvcHJlZmVyZW5jZXMtRDFiWFNMWFUuY3NzIiwKICAgICAgICAiZHVyYXRpb24iOiAyCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAidXJsIjogIi9hc3NldHMvc3RhcnREdW5nZW9uQXBwLUJmS1VkWmlaLmpzIiwKICAgICAgICAiZHVyYXRpb24iOiAwCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAidXJsIjogIi9hc3NldHMvYnJvd3Nlci1ESWdLR3hZbi5qcyIsCiAgICAgICAgImR1cmF0aW9uIjogMQogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL3N0YXJ0LUNKTm5fZUxsLmpzIiwKICAgICAgICAiZHVyYXRpb24iOiA2MQogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL2NvbWJhdENvbnRyb2xzLWwxNWJySmxyLmpzIiwKICAgICAgICAiZHVyYXRpb24iOiAwCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAidXJsIjogIi9hc3NldHMvcm5nLUJDY0pPcFJQLmpzIiwKICAgICAgICAiZHVyYXRpb24iOiAxCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAidXJsIjogIi9hc3NldHMvYmF0dGxlTGF5b3V0LUR2NGd3U2NHLmpzIiwKICAgICAgICAiZHVyYXRpb24iOiAyCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAidXJsIjogIi9hc3NldHMvYmlvbWVzLWNlV1dwdHBBLmpzIiwKICAgICAgICAiZHVyYXRpb24iOiAzCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAidXJsIjogIi9hc3NldHMvYmF0dGxlTGF5b3V0LUQ5Q2J4VkhqLmNzcyIsCiAgICAgICAgImR1cmF0aW9uIjogMgogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL2R1bmdlb25TdG9yYWdlLUN1WEJvclZLLmpzIiwKICAgICAgICAiZHVyYXRpb24iOiAwCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAidXJsIjogIi9hc3NldHMvaXRlbXMtQnpoX29sV3YuanMiLAogICAgICAgICJkdXJhdGlvbiI6IDIKICAgICAgfSwKICAgICAgewogICAgICAgICJ1cmwiOiAiL2Fzc2V0cy9hcnQtOTQxaDY0cDcuanMiLAogICAgICAgICJkdXJhdGlvbiI6IDAKICAgICAgfSwKICAgICAgewogICAgICAgICJ1cmwiOiAiL2Fzc2V0cy9zdGFydER1bmdlb25BcHAtUkszNzRHbzcuY3NzIiwKICAgICAgICAiZHVyYXRpb24iOiAyCiAgICAgIH0KICAgIF0KICB9Cn0="
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/issue184/webkit-artifacts/dungeon-exploration-maximu-ae46a-eets-the-established-budget-portrait-webkit/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests/dungeon-exploration.spec.ts",
+                    "column": 83,
+                    "line": 447
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-4c4c83f7f990392e7207",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 433,
+          "column": 1
+        },
+        {
+          "title": "maximum-size saved floor renders and accepts a step after reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1976,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-03T23:37:38.800Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-70dffd0b049f831b5406",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 418,
+          "column": 1
+        },
+        {
+          "title": "maximum-size floor step responsiveness meets the established budget",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "landscape-webkit",
+              "projectName": "landscape-webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5181,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m33.4\u001b[39m\nReceived:    \u001b[31m42\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m33.4\u001b[39m\nReceived:    \u001b[31m42\u001b[39m\n    at /home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests/dungeon-exploration.spec.ts:447:83",
+                    "location": {
+                      "file": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests/dungeon-exploration.spec.ts",
+                      "column": 83,
+                      "line": 447
+                    },
+                    "snippet": "\u001b[0m \u001b[90m 445 |\u001b[39m  \u001b[36mconst\u001b[39m p95\u001b[33m=\u001b[39mpercentile(times\u001b[33m,\u001b[39m\u001b[35m.95\u001b[39m)\u001b[33m,\u001b[39mframeP95\u001b[33m=\u001b[39mpercentile(frames\u001b[33m,\u001b[39m\u001b[35m.95\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 446 |\u001b[39m  writeFileSync(test\u001b[33m.\u001b[39minfo()\u001b[33m.\u001b[39moutputPath(\u001b[32m'maximum-floor-step-performance.json'\u001b[39m)\u001b[33m,\u001b[39m\u001b[33mJSON\u001b[39m\u001b[33m.\u001b[39mstringify({times\u001b[33m,\u001b[39mp95\u001b[33m,\u001b[39mframes\u001b[33m,\u001b[39mframeP95\u001b[33m,\u001b[39mbudgetMs\u001b[33m:\u001b[39m\u001b[35m33.4\u001b[39m\u001b[33m,\u001b[39mdimension\u001b[33m:\u001b[39mmap\u001b[33m.\u001b[39mwidth}\u001b[33m,\u001b[39m\u001b[36mnull\u001b[39m\u001b[33m,\u001b[39m\u001b[35m2\u001b[39m))\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 447 |\u001b[39m  expect((\u001b[36mawait\u001b[39m dungeonSnapshot(page))\u001b[33m.\u001b[39mfloors[\u001b[35m4\u001b[39m]\u001b[33m.\u001b[39mposition)\u001b[33m.\u001b[39mtoBe(first)\u001b[33m;\u001b[39mexpect(p95)\u001b[33m.\u001b[39mtoBeLessThanOrEqual(\u001b[35m33.4\u001b[39m)\u001b[33m;\u001b[39mexpect(frameP95)\u001b[33m.\u001b[39mtoBeLessThanOrEqual(\u001b[35m33.4\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                                                   \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 448 |\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 449 |\u001b[39m\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests/dungeon-exploration.spec.ts",
+                        "column": 83,
+                        "line": 447
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m33.4\u001b[39m\nReceived:    \u001b[31m42\u001b[39m\n\n  445 |  const p95=percentile(times,.95),frameP95=percentile(frames,.95);\n  446 |  writeFileSync(test.info().outputPath('maximum-floor-step-performance.json'),JSON.stringify({times,p95,frames,frameP95,budgetMs:33.4,dimension:map.width},null,2));\n> 447 |  expect((await dungeonSnapshot(page)).floors[4].position).toBe(first);expect(p95).toBeLessThanOrEqual(33.4);expect(frameP95).toBeLessThanOrEqual(33.4);\n      |                                                                                   ^\n  448 | });\n  449 |\n    at /home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests/dungeon-exploration.spec.ts:447:83"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-03T23:37:40.900Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "startup-evidence",
+                      "contentType": "application/json",
+                      "body": "ewogICJldmVudHMiOiBbCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNjEzNjYsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJkb2N1bWVudCIsCiAgICAgICJwYXRoIjogIltvdGhlcl0iCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxMzcyLAogICAgICAia2luZCI6ICJuYXZpZ2F0aW9uIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA2MTM3NiwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvaW5kZXgtRDhsVUpHaWMuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxMzc2LAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy90ZWxlbWV0cnktRFVzalNMbnQuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxMzc2LAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9wcmVsb2FkLWhlbHBlci1CTGRIYmZkTi5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNjEzNzYsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3ByZWZlcmVuY2VzLTZzWlRZYmcwLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA2MTM3NywKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvcm91dGVzLWllbzI1dnhWLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA2MTM3NywKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInN0eWxlc2hlZXQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3ByZWZlcmVuY2VzLUQxYlhTTFhVLmNzcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNjEzNzcsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiW290aGVyXSIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNjEzODEsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy90ZWxlbWV0cnktRFVzalNMbnQuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxMzgxLAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvaW5kZXgtRDhsVUpHaWMuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxMzg0LAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvcm91dGVzLWllbzI1dnhWLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA2MTM4NCwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3ByZWxvYWQtaGVscGVyLUJMZEhiZmROLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA2MTM4NCwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3ByZWZlcmVuY2VzLUQxYlhTTFhVLmNzcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNjEzODQsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9wcmVmZXJlbmNlcy02c1pUWWJnMC5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNjEzOTYsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3N0YXJ0RHVuZ2VvbkFwcC1CZktVZFppWi5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNjEzOTcsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3N0YXJ0LUNKTm5fZUxsLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA2MTM5NywKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvYnJvd3Nlci1ESWdLR3hZbi5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNjEzOTcsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2NvbWJhdENvbnRyb2xzLWwxNWJySmxyLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA2MTM5OCwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvcm5nLUJDY0pPcFJQLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA2MTM5OCwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvYmF0dGxlTGF5b3V0LUR2NGd3U2NHLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA2MTM5OCwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInN0eWxlc2hlZXQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2JhdHRsZUxheW91dC1EOUNieFZIai5jc3MiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxMzk4LAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9iaW9tZXMtY2VXV3B0cEEuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxMzk4LAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9kdW5nZW9uU3RvcmFnZS1DdVhCb3JWSy5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNjEzOTgsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2l0ZW1zLUJ6aF9vbFd2LmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA2MTM5OCwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvYXJ0LTk0MWg2NHA3LmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA2MTM5OSwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInN0eWxlc2hlZXQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3N0YXJ0RHVuZ2VvbkFwcC1SSzM3NEdvNy5jc3MiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxNDA1LAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvYmF0dGxlTGF5b3V0LUR2NGd3U2NHLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA2MTQwNSwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2Jyb3dzZXItRElnS0d4WW4uanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxNDA1LAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvcm5nLUJDY0pPcFJQLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA2MTQwNSwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3N0YXJ0RHVuZ2VvbkFwcC1CZktVZFppWi5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNjE0MTIsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9iaW9tZXMtY2VXV3B0cEEuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxNDEyLAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvaXRlbXMtQnpoX29sV3YuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxNDE0LAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvYmF0dGxlTGF5b3V0LUQ5Q2J4VkhqLmNzcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNjE0MTQsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9kdW5nZW9uU3RvcmFnZS1DdVhCb3JWSy5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNjE0MTQsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9jb21iYXRDb250cm9scy1sMTVickpsci5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNjE0MTUsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9hcnQtOTQxaDY0cDcuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxNDE2LAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvc3RhcnREdW5nZW9uQXBwLVJLMzc0R283LmNzcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNjE0MzksCiAgICAgICJraW5kIjogInJlcXVlc3RmYWlsZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3N0YXJ0LUNKTm5fZUxsLmpzIiwKICAgICAgImVycm9yIjogIkxvYWQgcmVxdWVzdCBjYW5jZWxsZWQiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxNDM5LAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAiZG9jdW1lbnQiLAogICAgICAicGF0aCI6ICJbb3RoZXJdIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA2MTQ0NywKICAgICAgImtpbmQiOiAibmF2aWdhdGlvbiIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNjE0NTAsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2luZGV4LUQ4bFVKR2ljLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA2MTQ1MCwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvdGVsZW1ldHJ5LURVc2pTTG50LmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA2MTQ1MCwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3RlbGVtZXRyeS1EVXNqU0xudC5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNjE0NTAsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3ByZWxvYWQtaGVscGVyLUJMZEhiZmROLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA2MTQ1MSwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3ByZWxvYWQtaGVscGVyLUJMZEhiZmROLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA2MTQ1MiwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvcHJlZmVyZW5jZXMtNnNaVFliZzAuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxNDUyLAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvcHJlZmVyZW5jZXMtNnNaVFliZzAuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxNDUyLAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9yb3V0ZXMtaWVvMjV2eFYuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxNDUzLAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvcm91dGVzLWllbzI1dnhWLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA2MTQ1MywKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInN0eWxlc2hlZXQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3ByZWZlcmVuY2VzLUQxYlhTTFhVLmNzcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNjE0NTMsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiW290aGVyXSIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNjE0NTMsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9pbmRleC1EOGxVSkdpYy5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNjE0NTQsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9wcmVmZXJlbmNlcy1EMWJYU0xYVS5jc3MiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxNDU1LAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9zdGFydER1bmdlb25BcHAtQmZLVWRaaVouanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxNDU1LAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvc3RhcnREdW5nZW9uQXBwLUJmS1VkWmlaLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA2MTQ1NiwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvc3RhcnQtQ0pObl9lTGwuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxNDU2LAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9icm93c2VyLURJZ0tHeFluLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA2MTQ1NiwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2Jyb3dzZXItRElnS0d4WW4uanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxNDU2LAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9jb21iYXRDb250cm9scy1sMTVickpsci5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNjE0NTYsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9jb21iYXRDb250cm9scy1sMTVickpsci5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNjE0NTcsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3JuZy1CQ2NKT3BSUC5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNjE0NTcsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9ybmctQkNjSk9wUlAuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxNDU3LAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9iYXR0bGVMYXlvdXQtRHY0Z3dTY0cuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxNDU3LAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvYmF0dGxlTGF5b3V0LUR2NGd3U2NHLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA2MTQ1NywKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInN0eWxlc2hlZXQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2JhdHRsZUxheW91dC1EOUNieFZIai5jc3MiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxNDU5LAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9iaW9tZXMtY2VXV3B0cEEuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxNDYwLAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvYmlvbWVzLWNlV1dwdHBBLmpzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA2MTQ2MCwKICAgICAgImtpbmQiOiAicmVxdWVzdCIsCiAgICAgICJ0eXBlIjogInNjcmlwdCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvZHVuZ2VvblN0b3JhZ2UtQ3VYQm9yVksuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxNDYwLAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvZHVuZ2VvblN0b3JhZ2UtQ3VYQm9yVksuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxNDYzLAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic2NyaXB0IiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9pdGVtcy1Cemhfb2xXdi5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNjE0NjMsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9pdGVtcy1Cemhfb2xXdi5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNjE0NjMsCiAgICAgICJraW5kIjogInJlcXVlc3QiLAogICAgICAidHlwZSI6ICJzY3JpcHQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL2FydC05NDFoNjRwNy5qcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNjE0NjMsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9hcnQtOTQxaDY0cDcuanMiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxNDY1LAogICAgICAia2luZCI6ICJyZXF1ZXN0IiwKICAgICAgInR5cGUiOiAic3R5bGVzaGVldCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvc3RhcnREdW5nZW9uQXBwLVJLMzc0R283LmNzcyIKICAgIH0sCiAgICB7CiAgICAgICJhdCI6IDE3OTM3NDkwNjE0NjUsCiAgICAgICJraW5kIjogImZpbmlzaGVkIiwKICAgICAgInBhdGgiOiAiL2Fzc2V0cy9iYXR0bGVMYXlvdXQtRDlDYnhWSGouY3NzIgogICAgfSwKICAgIHsKICAgICAgImF0IjogMTc5Mzc0OTA2MTQ2OCwKICAgICAgImtpbmQiOiAiZmluaXNoZWQiLAogICAgICAicGF0aCI6ICIvYXNzZXRzL3N0YXJ0RHVuZ2VvbkFwcC1SSzM3NEdvNy5jc3MiCiAgICB9LAogICAgewogICAgICAiYXQiOiAxNzkzNzQ5MDYxNTI3LAogICAgICAia2luZCI6ICJmaW5pc2hlZCIsCiAgICAgICJwYXRoIjogIi9hc3NldHMvc3RhcnQtQ0pObl9lTGwuanMiCiAgICB9CiAgXSwKICAicGVuZGluZyI6IFtdLAogICJicm93c2VyIjogewogICAgInNhbXBsZXMiOiBbCiAgICAgIHsKICAgICAgICAiYXQiOiAxMSwKICAgICAgICAicmVhZHkiOiAibG9hZGluZyIsCiAgICAgICAgInNjcmVlbiI6IGZhbHNlLAogICAgICAgICJib290IjogZmFsc2UsCiAgICAgICAgInN0YXR1cyI6ICJvdGhlciIKICAgICAgfSwKICAgICAgewogICAgICAgICJhdCI6IDE2LAogICAgICAgICJyZWFkeSI6ICJpbnRlcmFjdGl2ZSIsCiAgICAgICAgInNjcmVlbiI6IGZhbHNlLAogICAgICAgICJib290IjogZmFsc2UsCiAgICAgICAgInN0YXR1cyI6ICJsb2FkaW5nIgogICAgICB9LAogICAgICB7CiAgICAgICAgImF0IjogMzEsCiAgICAgICAgInJlYWR5IjogImNvbXBsZXRlIiwKICAgICAgICAic2NyZWVuIjogZmFsc2UsCiAgICAgICAgImJvb3QiOiBmYWxzZSwKICAgICAgICAic3RhdHVzIjogImxvYWRpbmciCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAiYXQiOiA0MjksCiAgICAgICAgInJlYWR5IjogImNvbXBsZXRlIiwKICAgICAgICAic2NyZWVuIjogdHJ1ZSwKICAgICAgICAiYm9vdCI6IGZhbHNlLAogICAgICAgICJzdGF0dXMiOiAibG9hZGluZyIKICAgICAgfSwKICAgICAgewogICAgICAgICJhdCI6IDUwMSwKICAgICAgICAicmVhZHkiOiAiY29tcGxldGUiLAogICAgICAgICJzY3JlZW4iOiB0cnVlLAogICAgICAgICJib290IjogdHJ1ZSwKICAgICAgICAic3RhdHVzIjogImxvYWRpbmciCiAgICAgIH0KICAgIF0sCiAgICAicmVhZHkiOiAiY29tcGxldGUiLAogICAgInZpc2liaWxpdHkiOiAidmlzaWJsZSIsCiAgICAic2NyaXB0cyI6IFsKICAgICAgIltvdGhlcl0iLAogICAgICAiL2Fzc2V0cy9pbmRleC1EOGxVSkdpYy5qcyIKICAgIF0sCiAgICAic3R5bGVzIjogWwogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL3ByZWZlcmVuY2VzLUQxYlhTTFhVLmNzcyIsCiAgICAgICAgInNoZWV0IjogdHJ1ZQogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL2JhdHRsZUxheW91dC1EOUNieFZIai5jc3MiLAogICAgICAgICJzaGVldCI6IHRydWUKICAgICAgfSwKICAgICAgewogICAgICAgICJ1cmwiOiAiL2Fzc2V0cy9zdGFydER1bmdlb25BcHAtUkszNzRHbzcuY3NzIiwKICAgICAgICAic2hlZXQiOiB0cnVlCiAgICAgIH0KICAgIF0sCiAgICAicmVzb3VyY2VzIjogWwogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL3RlbGVtZXRyeS1EVXNqU0xudC5qcyIsCiAgICAgICAgImR1cmF0aW9uIjogMQogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL2luZGV4LUQ4bFVKR2ljLmpzIiwKICAgICAgICAiZHVyYXRpb24iOiAxCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAidXJsIjogIi9hc3NldHMvcHJlbG9hZC1oZWxwZXItQkxkSGJmZE4uanMiLAogICAgICAgICJkdXJhdGlvbiI6IDEKICAgICAgfSwKICAgICAgewogICAgICAgICJ1cmwiOiAiL2Fzc2V0cy9wcmVmZXJlbmNlcy02c1pUWWJnMC5qcyIsCiAgICAgICAgImR1cmF0aW9uIjogMQogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL3JvdXRlcy1pZW8yNXZ4Vi5qcyIsCiAgICAgICAgImR1cmF0aW9uIjogMAogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL3ByZWZlcmVuY2VzLUQxYlhTTFhVLmNzcyIsCiAgICAgICAgImR1cmF0aW9uIjogMQogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL3N0YXJ0RHVuZ2VvbkFwcC1CZktVZFppWi5qcyIsCiAgICAgICAgImR1cmF0aW9uIjogMAogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL2Jyb3dzZXItRElnS0d4WW4uanMiLAogICAgICAgICJkdXJhdGlvbiI6IDAKICAgICAgfSwKICAgICAgewogICAgICAgICJ1cmwiOiAiL2Fzc2V0cy9jb21iYXRDb250cm9scy1sMTVickpsci5qcyIsCiAgICAgICAgImR1cmF0aW9uIjogMQogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL3N0YXJ0LUNKTm5fZUxsLmpzIiwKICAgICAgICAiZHVyYXRpb24iOiA1NgogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL3JuZy1CQ2NKT3BSUC5qcyIsCiAgICAgICAgImR1cmF0aW9uIjogMAogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL2JhdHRsZUxheW91dC1EdjRnd1NjRy5qcyIsCiAgICAgICAgImR1cmF0aW9uIjogMQogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL2Jpb21lcy1jZVdXcHRwQS5qcyIsCiAgICAgICAgImR1cmF0aW9uIjogMQogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL2JhdHRsZUxheW91dC1EOUNieFZIai5jc3MiLAogICAgICAgICJkdXJhdGlvbiI6IDEKICAgICAgfSwKICAgICAgewogICAgICAgICJ1cmwiOiAiL2Fzc2V0cy9kdW5nZW9uU3RvcmFnZS1DdVhCb3JWSy5qcyIsCiAgICAgICAgImR1cmF0aW9uIjogMQogICAgICB9LAogICAgICB7CiAgICAgICAgInVybCI6ICIvYXNzZXRzL2l0ZW1zLUJ6aF9vbFd2LmpzIiwKICAgICAgICAiZHVyYXRpb24iOiAzCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAidXJsIjogIi9hc3NldHMvYXJ0LTk0MWg2NHA3LmpzIiwKICAgICAgICAiZHVyYXRpb24iOiAwCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAidXJsIjogIi9hc3NldHMvc3RhcnREdW5nZW9uQXBwLVJLMzc0R283LmNzcyIsCiAgICAgICAgImR1cmF0aW9uIjogMQogICAgICB9CiAgICBdCiAgfQp9"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/issue184/webkit-artifacts/dungeon-exploration-maximu-ae46a-eets-the-established-budget-landscape-webkit/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/tests/dungeon-exploration.spec.ts",
+                    "column": 83,
+                    "line": 447
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "c3b0f9df64366ba0ccb6-b3580cd889b76967df1e",
+          "file": "dungeon-exploration.spec.ts",
+          "line": 433,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-03T23:37:20.903Z",
+    "duration": 25346.981,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 3,
+    "flaky": 0
+  }
+}

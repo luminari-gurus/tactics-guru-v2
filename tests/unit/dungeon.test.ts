@@ -7,7 +7,7 @@ import { HERO_PROGRESSION } from '../../src/content/progression';
 import { assert, describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { dungeonCapacityFixture } from '../helpers/dungeonFixtures';
-import { clearedDungeonSlots, freshDungeon, newDungeonSeed, stepDungeon, dungeonBattle, dungeonOffer, floorDescriptor, FloorCache, dungeonSeed, readDungeon, travelDungeon, startDungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
+import { clearedDungeonSlots, freshDungeon, newDungeonSeed, stepDungeon, dungeonBattle, dungeonOffer, floorDescriptor, floorMap, FloorCache, dungeonSeed, readDungeon, travelDungeon, startDungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
 import { encodeDungeon, decodeDungeon, utf8Bytes } from '../../src/domain/dungeonSaveEnvelope';
 import { dungeonContent, dungeonIdentity, previousDungeonIdentity } from '../../src/content/dungeon';
 import { bothDungeonSlotsMissing, createDungeonStorage, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
@@ -131,7 +131,7 @@ describe('dungeon floors', () => {
   });
   it('continues at multi-digit depth with checked resource bounds and no fixed victory', () => {
     const base=fresh();
-    const floors=Array.from({length:10},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1);return {descriptor,position:descriptor.downstairs,exploration:freshExploration(descriptor.seed,descriptor.downstairs),completed:3};});
+    const floors=Array.from({length:10},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1);return {descriptor,position:descriptor.downstairs,exploration:freshExploration(descriptor.seed,descriptor.downstairs,floorMap(descriptor)),completed:3};});
     const s=good(readDungeon({...base,depth:10,floors,revision:100}));
     const next=good(travelDungeon(s,'descend',s.revision));expect(next.depth).toBe(11);expect(next.phase).toBe('ready');expect(next.floors).toHaveLength(11);
     expect(travelDungeon({...s,revision:Number.MAX_SAFE_INTEGER},'descend',Number.MAX_SAFE_INTEGER)).toEqual({ok:false,reason:'resourceLimit'});
@@ -148,7 +148,7 @@ describe('dungeon floors', () => {
     expect(decodeDungeon('bad').ok).toBe(false); expect(decodeDungeon('x'.repeat(1024*1024+1)).ok).toBe(false); expect(utf8Bytes('aé🧙')).toBe(7);
   });
   it('atomically refuses a full six-charm reward without losing the pending offer', () => {
-    const base=fresh(),floors=Array.from({length:4},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1);return {descriptor,position:descriptor.upstairs,exploration:freshExploration(descriptor.seed,descriptor.upstairs),completed:i===3?1:3};});
+    const base=fresh(),floors=Array.from({length:4},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1);return {descriptor,position:descriptor.upstairs,exploration:freshExploration(descriptor.seed,descriptor.upstairs,floorMap(descriptor)),completed:i===3?1:3};});
     const equipment=Array.from({length:6},(_,i)=>({instanceId:`${base.id}:floor:${Math.floor(i/2)+1}:reward:${i%2}:option:0`,itemId:'item:warding_charm' as const}));
     const candidate={...base,depth:4,floors,phase:'reward' as const,ownership:{consumables:[],equipment,assignments:[]}};
     const s=good(readDungeon({...atEncounter(candidate,0),offer:dungeonOffer(candidate)}));
@@ -226,6 +226,17 @@ describe('dungeon persistence',()=>{
     expect(store.remove('primary','old').ok).toBe(false);expect(store.remove('primary','corrupt').ok).toBe(true);expect(store.inspect().backup.status).toBe('valid');
     expect(m.getItem('tactics-guru:phaser:run:primary:v1')).toBe('old-run');
   });
+  it('does not share inspected state across cached reads and detects changed bytes',()=>{
+    const m=memory(),store=createDungeonStorage(()=>m),state=fresh();expect(store.save(state).ok).toBe(true);
+    const first=store.inspect().primary;if(first.status!=='valid')throw Error('Expected valid save');
+    (first.state.party[0] as {hp:number}).hp=0;
+    const again=store.inspect().primary;if(again.status!=='valid')throw Error('Expected valid save');
+    expect(again.state).toEqual(state);
+    m.setItem(DUNGEON_KEYS.primary,'corrupt');expect(store.inspect().primary.status).toBe('invalid');
+    const replacement=encodeDungeon(freshDungeon('replacement',20));if(!replacement.ok)throw Error(replacement.reason);
+    m.setItem(DUNGEON_KEYS.primary,replacement.text);const changed=store.inspect().primary;
+    expect(changed.status).toBe('valid');if(changed.status==='valid')expect(changed.state.id).toBe('replacement');
+  });
   it('does not publish travel on quota failure and can explicitly recover',()=>{
     const m=memory(),store=createDungeonStorage(()=>m),s=atStairApproach(clearFloor(fresh()));expect(store.save(s).ok).toBe(true);
     const session=new DungeonSession(s,store),before=session.snapshot;const write=m.setItem;
@@ -265,7 +276,7 @@ describe('dungeon recovery limits',()=>{
     expect(decodeDungeon(JSON.stringify({...value,digest:'sha256:'+'0'.repeat(64)}))).toEqual({ok:false,reason:'digest'});
   });
   it('preserves every visited floor until the byte budget explicitly refuses the candidate',()=>{
-    const base=fresh(),floors=Array.from({length:400},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1);return {descriptor,position:descriptor.downstairs,exploration:freshExploration(descriptor.seed,descriptor.downstairs),completed:3};});
+    const base=fresh(),floors=Array.from({length:400},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1);return {descriptor,position:descriptor.downstairs,exploration:freshExploration(descriptor.seed,descriptor.downstairs,floorMap(descriptor)),completed:3};});
     const s={...base,depth:400,floors,revision:4000};expect(readDungeon(s).ok).toBe(true);
     expect(encodeDungeon(s)).toEqual({ok:false,reason:'tooLarge'});expect(s.floors).toHaveLength(400);
     expect(s.phase).toBe('ready');expect(s.floors[0].descriptor).toEqual(base.floors[0].descriptor);
@@ -288,7 +299,7 @@ describe('durable encounter policies', () => {
   it('cold-decodes a bounded progression-format history by resolving only the current floor', async () => {
     const base=freshDungeon('cold-current',13),floors=Array.from({length:250},(_,i)=>{
       const descriptor=floorDescriptor(base.seed,i+1);
-      return {descriptor,completed:i===249?0:3,position:descriptor.upstairs,exploration:freshExploration(descriptor.seed,descriptor.upstairs)};
+      return {descriptor,completed:i===249?0:3,position:descriptor.upstairs,exploration:freshExploration(descriptor.seed,descriptor.upstairs,floorMap(descriptor))};
     });
     const state={...base,depth:250,floors},encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
     expect(utf8Bytes(encoded.text)).toBeLessThan(1024*1024);
@@ -304,7 +315,7 @@ describe('durable encounter policies', () => {
   },60000);
   it('rejects historical source mismatches immediately and geometry tampering before travel is published', () => {
     const base=freshDungeon('lazy-history',43),first=base.floors[0],descriptor=floorDescriptor(base.seed,2);
-    const state={...base,depth:2,floors:[{...first,completed:3},{descriptor,completed:0,position:descriptor.upstairs,exploration:freshExploration(descriptor.seed,descriptor.upstairs)}]};
+    const state={...base,depth:2,floors:[{...first,completed:3},{descriptor,completed:0,position:descriptor.upstairs,exploration:freshExploration(descriptor.seed,descriptor.upstairs,floorMap(descriptor))}]};
     for(const field of ['encounterId','mapId','layoutSeed']) {
       const bad=JSON.parse(JSON.stringify(state)),battlefield=bad.floors[0].descriptor.encounters[0].battlefield;
       expect(battlefield.kind).toBe('generated');
@@ -323,7 +334,7 @@ describe('durable encounter policies', () => {
   it('reuses admitted facts across a long retained floor history', () => {
     const base=fresh(),floors=Array.from({length:44},(_,i)=>{
       const descriptor=floorDescriptor(base.seed,i+1);
-      return {descriptor,completed:3,position:descriptor.downstairs,exploration:freshExploration(descriptor.seed,descriptor.downstairs)};
+      return {descriptor,completed:3,position:descriptor.downstairs,exploration:freshExploration(descriptor.seed,descriptor.downstairs,floorMap(descriptor))};
     });
     const state={...base,depth:44,floors};
     good(readDungeon(state));
@@ -454,7 +465,7 @@ describe('unordered encounters and moving dungeon enemies', () => {
       const adjacent=step(state,approach), floor=adjacent.floors[0];
       expect(adjacent.phase).toBe('ready');
       expect(poiCell(floor.exploration.pois[slot])).toBe(target);
-      expect(new Set(floor.exploration.pois.map(poiCell)).size).toBe(3);
+      expect(new Set(floor.exploration.pois.map(p => poiCell(p))).size).toBe(3);
       expect(floor.exploration.movement!.step).toBe(1);
       expect(adjacent.revision).toBe(state.revision+1);
       const encoded=encodeDungeon(adjacent);assert(encoded.ok);
@@ -477,21 +488,21 @@ describe('unordered encounters and moving dungeon enemies', () => {
   it('protects displayed upstairs from a passive enemy during a real player step', () => {
     let tested=false;
     for(let seed=0;seed<200&&!tested;seed++) {
-      const base=freshDungeon('protected-stair',seed), descriptor=floorDescriptor(seed,2), map=generateMap(descriptor.seed,'rooms');
-      const stair=descriptor.upstairs, adjacent=neighbors(stair).find(n=>map.cells[n]);if(adjacent===undefined)continue;
-      const initial=freshExploration(descriptor.seed,stair), exploration=movableExploration(initial,descriptor.seed,0,'ready');
-      const others=exploration.pois.slice(1);if(others.some(p=>poiCell(p)===adjacent))continue;
-      const pois=exploration.pois.map((p,i)=>i===0?{...p,x:adjacent%20,y:Math.floor(adjacent/20)}:p);
+      const base=freshDungeon('protected-stair',seed), descriptor=floorDescriptor(seed,2), map=floorMap(descriptor);
+      const stair=descriptor.upstairs, adjacent=neighbors(stair,map.width,map.height).find(n=>map.cells[n]);if(adjacent===undefined)continue;
+      const initial=freshExploration(descriptor.seed,stair,map), exploration=movableExploration(initial,descriptor.seed,0,'ready');
+      const others=exploration.pois.slice(1);if(others.some(p=>poiCell(p,map.width)===adjacent))continue;
+      const pois=exploration.pois.map((p,i)=>i===0?{...p,x:adjacent%map.width,y:Math.floor(adjacent/map.width)}:p);
       for(const from of map.cells.flatMap((c,i)=>c?[i]:[])) {
-        const dest=neighbors(from).find(n=>map.cells[n]&&n!==stair&&!pois.some(p=>poiCell(p)===n));
-        if(dest===undefined||pois.some(p=>poiCell(p)===from))continue;
-        const player={id:'player' as const,kind:'player' as const,x:dest%20,y:Math.floor(dest/20)};
+        const dest=neighbors(from,map.width,map.height).find(n=>map.cells[n]&&n!==stair&&!pois.some(p=>poiCell(p,map.width)===n));
+        if(dest===undefined||pois.some(p=>poiCell(p,map.width)===from))continue;
+        const player={id:'player' as const,kind:'player' as const,x:dest%map.width,y:Math.floor(dest/map.width)};
         const raw=stepMovement({world:{map:applyBiome(map),placementVersion:'markers-v1',markers:[player,...pois]},behaviors:DEFAULT_BEHAVIORS,rng:exploration.movement!.rng,step:0});
-        if(poiCell(raw.world.markers[1] as typeof pois[number])!==stair)continue;
+        if(poiCell(raw.world.markers[1] as typeof pois[number],map.width)!==stair)continue;
         const state=atCell({...base,depth:2,floors:[{...base.floors[0],completed:3},{descriptor,position:stair,completed:0,exploration:{...exploration,pois}}]},from);
         if(!readDungeon(state).ok)continue;
         const result=good(stepDungeon(state,{id:state.id,depth:2,revision:state.revision,destination:dest}));
-        expect(poiCell(result.floors[1].exploration.pois[0])).not.toBe(stair);
+        expect(poiCell(result.floors[1].exploration.pois[0],map.width)).not.toBe(stair);
         expect(result.floors[1].exploration.movement!.step).toBe(1);
         tested=true;break;
       }
@@ -639,5 +650,132 @@ describe('authoritative unsaved departure state',()=>{
     const session=new DungeonSession(fresh(),store);
     expect(session.continue(session.inspect())).toBe(true);
     expect(session.hasUnsavedProgress).toBe(false);
+  });
+});
+
+describe('versioned floor dimensions', () => {
+  it.each([2, 5])('holds and reserves an adjacent encounter on a depth-%i Arena floor across reload', depth => {
+    const base = freshDungeon(`wide-contact-${depth}`, 2);
+    const floors = Array.from({length:depth}, (_,i) => {
+      const descriptor = floorDescriptor(base.seed, i + 1), map = floorMap(descriptor);
+      return {descriptor, position:descriptor.upstairs, completed:i === depth - 1 ? 0 : 3,
+        exploration:freshExploration(descriptor.seed, descriptor.upstairs, map)};
+    });
+    const floor = floors[depth - 1], map = floorMap(floor.descriptor), width = map.width;
+    expect(map.type).toBe('arena');
+    expect(width).toBe(depth === 2 ? 24 : 36);
+    const from = 10 * width + 9, approach = from + 1, target = approach + 1;
+    const exploration = movableExploration(freshExploration(floor.descriptor.seed, from, map), floor.descriptor.seed, 0, 'ready');
+    // The blocker is directly behind the held wanderer, so its shortest approach
+    // would enter the reserved cell if held markers lost their occupancy.
+    const positions = [{x:11,y:10}, {x:3,y:3}, {x:12,y:10}];
+    floors[depth - 1] = {...floor, position:from, exploration:{...exploration,
+      pois:exploration.pois.map((poi,i) => ({...poi,...positions[i]}))}};
+    const state = good(readDungeon({...base,depth,floors}));
+    const adjacent = good(stepDungeon(state,{id:state.id,depth,revision:state.revision,destination:approach}));
+    const current = adjacent.floors[depth - 1];
+    expect(adjacent.phase).toBe('ready');
+    expect(poiCell(current.exploration.pois[0],width)).toBe(target);
+    expect(new Set(current.exploration.pois.map(poi => poiCell(poi,width))).size).toBe(3);
+    expect(poiCell(current.exploration.pois[2],width)).not.toBe(target);
+    expect(current.exploration.movement!.step).toBe(1);
+    const encoded = encodeDungeon(adjacent); assert(encoded.ok);
+    const restored = good(decodeDungeon(encoded.text));
+    const entered = good(stepDungeon(restored,{id:state.id,depth,revision:restored.revision,destination:target}));
+    expect(entered.phase).toBe('battle');
+    expect(entered.floors[depth - 1].exploration.active).toBe(0);
+    expect(entered.floors[depth - 1].exploration.movement!.step).toBe(1);
+    expect(entered.activeBattle!.seed).toBe(dungeonSeed(state.seed,depth,'battle',0));
+  });
+  it.each([9, 10])('retains a format-%i rooms-v1 history through movement and revisit, then grows only a new floor', format => {
+    const base = freshDungeon('legacy-room-history', 13);
+    const floors = Array.from({length:2}, (_,i) => {
+      const {size:_size,...selected} = floorDescriptor(base.seed, i + 1);
+      const map = generateMap(selected.seed,'rooms');
+      const descriptor = {...selected, generator:'rooms-v1' as const, mapHash:hashJson(map),
+        upstairs:map.cells.indexOf(1), downstairs:map.cells.lastIndexOf(1)};
+      return {descriptor, position:descriptor.upstairs, completed:3,
+        exploration:freshExploration(descriptor.seed,descriptor.upstairs,map)};
+    });
+    const original = {...base,depth:2,floors}, descriptors = floors.map(floor => floor.descriptor);
+    const body = {kind:'tactics-guru:dungeon',format,
+      identity:hashJson({dungeonIdentity:format === 9 ? previousDungeonIdentity : dungeonIdentity,progression:HERO_PROGRESSION}),payload:original};
+    const raw = canonical({...body,digest:hashJson(body)}), m = memory();
+    m.setItem(DUNGEON_KEYS.primary,raw);
+    const storage = createDungeonStorage(()=>m), inspected = storage.inspect().primary;
+    assert(inspected.status === 'valid');
+    expect(inspected.state).toEqual(original);
+    expect(inspected.text).toBe(raw);
+    const floor = inspected.state.floors[1], map = floorMap(floor.descriptor);
+    expect(map.width).toBe(20);
+    expect(floor.descriptor).not.toHaveProperty('size');
+    const destination = neighbors(floor.position,map.width,map.height).find(cell => map.cells[cell]);
+    assert(destination !== undefined);
+    const moved = good(stepDungeon(inspected.state,{id:base.id,depth:2,revision:base.revision,destination}));
+    expect(moved.floors[1].position).toBe(destination);
+    expect(storage.save(moved,raw)).toEqual({ok:true});
+    expect(storage.inspect().backup.text).toBe(raw);
+    const saved = storage.inspect().primary; assert(saved.status === 'valid');
+    expect(saved.state).toEqual(moved);
+    const ascended = good(stepDungeon(saved.state,{id:base.id,depth:2,revision:moved.revision,destination:floor.descriptor.upstairs}));
+    expect(ascended.depth).toBe(1);
+    const revisited = good(travelDungeon(atDownstairs(ascended),'descend',ascended.revision));
+    expect(revisited.floors[1]).toEqual(ascended.floors[1]);
+    const grown = good(travelDungeon(atDownstairs(revisited),'descend',revisited.revision));
+    expect(grown.depth).toBe(3);
+    expect(grown.floors.slice(0,2).map(floor => floor.descriptor)).toEqual(descriptors);
+    expect(grown.floors.slice(0,2).map(floor => floorMap(floor.descriptor).width)).toEqual([20,20]);
+    expect(grown.floors[2].descriptor).toEqual(floorDescriptor(base.seed,3));
+    expect(grown.floors[2].descriptor.size).toBe(28);
+    const encoded = encodeDungeon(grown); assert(encoded.ok);
+    expect(decodeDungeon(encoded.text)).toEqual({ok:true,state:grown});
+  });
+  it('keeps shared cached geometry immutable and keyed by generator and size', () => {
+    const a=floorDescriptor(19,2), first=floorMap(a);
+    expect(Object.isFrozen(first)).toBe(true);expect(Object.isFrozen(first.cells)).toBe(true);
+    expect(() => { (first.cells as number[])[0]=1; }).toThrow();
+    expect(floorMap(a)).toBe(first);
+    const other={...a,generator:a.generator === 'arena-v1' ? 'sector-graph-v1' as const : 'arena-v1' as const};
+    expect(floorMap(other).type).toBe(a.generator === 'arena-v1' ? 'sector-graph' : 'arena');expect(floorMap(other)).not.toBe(first);
+    expect(floorMap(a).cells[0]).toBe(0);
+  });
+  it('rejects changed saved geometry after immutable floor facts are warm', () => {
+    const base=freshDungeon('warm-floor-facts',19);
+    const floors=Array.from({length:5},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1),map=floorMap(descriptor);return {descriptor,position:descriptor.upstairs,completed:3,exploration:freshExploration(descriptor.seed,descriptor.upstairs,map)};});
+    const state=good(readDungeon({...base,depth:5,floors}));
+    const encoded=encodeDungeon(state);assert(encoded.ok);
+    for(const patch of [{mapHash:'sha256:'+'0'.repeat(64)},{upstairs:state.floors[4].descriptor.upstairs+1},{downstairs:state.floors[4].descriptor.downstairs-1}]){
+      const altered={...state,floors:state.floors.map((floor,i)=>i===4?{...floor,descriptor:{...floor.descriptor,...patch}}:floor)};
+      expect(readDungeon(altered).ok).toBe(false);
+    }
+    expect(encodeDungeon(state)).toEqual(encoded);
+    const cache=new FloorCache(1), original=floorDescriptor(19,5,cache);
+    const map=cache.resolve(original.seed,original.generator,original.size);
+    floorDescriptor(19,4,cache);
+    expect(floorDescriptor(19,5,cache)).toEqual(original);
+    expect(cache.resolve(original.seed,original.generator,original.size)).not.toBe(map);
+  });
+  it('grows new floors deterministically while preserving legacy floor geometry', () => {
+    for (const [depth,size] of [[1,20],[2,24],[3,28],[4,32],[5,36],[20,36]] as const) {
+      const descriptor = floorDescriptor(19,depth), map = floorMap(descriptor);
+      expect(map.width).toBe(size); expect(map.height).toBe(size);
+      expect(floorMap(descriptor)).toEqual(map);
+      expect(map.cells[descriptor.upstairs]).toBe(1); expect(map.cells[descriptor.downstairs]).toBe(1);
+      const exploration=freshExploration(descriptor.seed,descriptor.upstairs,map);
+      expect(new Set(exploration.pois.map(p=>poiCell(p,size))).size).toBe(3);
+      for (const poi of exploration.pois) expect(map.cells[poiCell(poi,size)]).toBe(1);
+    }
+  });
+  it('rejects altered dimensions and retains larger floors through storage and travel', () => {
+    const original=clearFloor(fresh()), next=good(travelDungeon(atDownstairs(original),'descend',original.revision));
+    const descriptor=next.floors[1].descriptor;
+    expect(descriptor.size).toBe(24);
+    const encoded=encodeDungeon(next); if(!encoded.ok)throw Error(encoded.reason);
+    expect(decodeDungeon(encoded.text)).toEqual({ok:true,state:next});
+    const bad=structuredClone(next); (bad.floors[1].descriptor as {size?:number}).size=36;
+    expect(readDungeon(bad).ok).toBe(false);
+    const back=good(travelDungeon(next,'ascend',next.revision));
+    const again=good(travelDungeon(back,'descend',back.revision));
+    expect(again.floors[1]).toEqual(next.floors[1]);
   });
 });

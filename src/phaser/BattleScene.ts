@@ -1,3 +1,4 @@
+import { testingProgress } from '../ui/testingProgress';
 import { enemyThreats, type Threat } from '../domain/threat';
 import { progressionLabel } from '../domain/progression';
 import { standaloneBattleCatalog } from '../content/standaloneCatalog';
@@ -70,7 +71,7 @@ export class BattleScene extends Phaser.Scene {
       });
       track('battle_started',{route:'battle',phase:session.phase});
       const tools=document.querySelector<HTMLElement>('#battle-persistence')!;
-      const notice=document.createElement('span');notice.textContent='Testing battle. Progress resets on reload.';
+      const notice=testingProgress('battle');
       const menu=menuReturnLink(()=>false,()=>{});tools.hidden=false;tools.replaceChildren(notice,menu);
       this.restartAction=()=>{
         if(dialogs.open)return;
@@ -124,7 +125,7 @@ export class BattleScene extends Phaser.Scene {
       }
       const danger=selection.showDanger && session.phase==='player'?session.state.units.filter(u=>threatIds.includes(u.id)).map(u=>u.cell):[];
       board.present(session.state,reach?.ok?reach.cells.map(c=>c.cell):[],selected,preview?.ok?preview.path:[],selection.overlays(),hover,danger);
-      hud.render(action,selected,message,selection.showDanger && session.phase==='player',threats,selection.planning && !radial.open);
+      hud.render(action,selected,message,selection.showDanger && session.phase==='player',threats,selection.planning && !radial.open,selection.planning?selection.planMove:null);
       const caption=document.querySelector('#battle-board-caption')!;
       // Picking changes independently of the cached controls. Compose a fresh
       // caption so hover cannot accumulate hints or retain a cleared hint.

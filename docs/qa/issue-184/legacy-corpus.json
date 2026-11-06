@@ -1,0 +1,62 @@
+{
+  "20": [
+    {
+      "count": 128,
+      "fallback": 0,
+      "max": 98,
+      "min": 60,
+      "style": "digger"
+    },
+    {
+      "count": 128,
+      "fallback": 0,
+      "max": 109,
+      "min": 60,
+      "style": "rogue"
+    },
+    {
+      "count": 128,
+      "fallback": 0,
+      "max": 139,
+      "min": 60,
+      "style": "rogue_v2"
+    },
+    {
+      "count": 128,
+      "fallback": 0,
+      "max": 324,
+      "min": 324,
+      "style": "arena"
+    }
+  ],
+  "36": [
+    {
+      "count": 128,
+      "fallback": 0,
+      "max": 141,
+      "min": 60,
+      "style": "digger"
+    },
+    {
+      "count": 128,
+      "fallback": 0,
+      "max": 185,
+      "min": 76,
+      "style": "rogue"
+    },
+    {
+      "count": 128,
+      "fallback": 0,
+      "max": 414,
+      "min": 129,
+      "style": "rogue_v2"
+    },
+    {
+      "count": 128,
+      "fallback": 0,
+      "max": 1156,
+      "min": 1156,
+      "style": "arena"
+    }
+  ]
+}

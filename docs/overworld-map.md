@@ -6,9 +6,9 @@ Open `/map` under the configured Vite base. The independent 20×20 inspection pr
 
 ## Layout and biome
 
-Defaults are Rooms, Grassland and Simple art. Layout IDs/versions are `rooms`/`rooms-v1`, `random-walker`/`random-walker-v1` and `cellular`/`cellular-v1`. Layout owns 400 row-major binary blocked/walkable cells, a blocked perimeter, 60–320 open cells, cardinal connectivity and bounded fallback status. Rooms output is preserved.
+Defaults are Rooms, Grassland and Simple art. Layout IDs/versions are `rooms`/`rooms-v1`, `random-walker`/`random-walker-v1` and `cellular`/`cellular-v1`, `sector-graph`/`sector-graph-v1` and `arena`/`arena-v1`. The inspection layouts have 400 row-major binary cells, a blocked perimeter, at least 60 open cells, cardinal connectivity and bounded fallback status. Arena deliberately opens all 324 interior cells; other inspection profiles retain the 320-cell maximum. Rooms output is preserved.
 
-Biome treatment follows layout generation and preserves every cell's walkability. All nine type/biome combinations are supported. There are no battle terrain rules, movement costs or generation constraints associated with a biome.
+Biome treatment follows layout generation and preserves every cell's walkability. All type/biome combinations are supported. There are no battle terrain rules, movement costs or generation constraints associated with a biome.
 
 | Biome ID / version | Open terrain / Simple color | Blocked terrain / Simple color | Treatment |
 | --- | --- | --- | --- |
