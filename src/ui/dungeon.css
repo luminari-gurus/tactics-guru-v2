@@ -60,3 +60,6 @@ body:has(#dungeon-screen:not([hidden])) #battle-heading { display: none; }
 #dungeon-screen .dungeon-compass-center { grid-area: 2 / 2; place-self: center; width: 10px; height: 10px; transform: rotate(45deg); border: 1px solid #a2a58a; border-radius: 2px; background: #b2a070; pointer-events: none; }
 
 #dungeon-screen section[aria-label="Floor exploration"] { overflow-x: auto; }
+
+/* Keep recovery status distinct from its action grid, including outside battle mode. */
+body:has(#dungeon-screen) #battle-dialog-message { margin-bottom:16px; white-space:pre-line; overflow-wrap:anywhere; }

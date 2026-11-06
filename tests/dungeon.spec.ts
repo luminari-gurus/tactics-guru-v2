@@ -386,3 +386,20 @@ test('hero progression commits once, heals at a threshold and survives inspectio
  const offer=saved.offer!;await page.getByRole('button',{name:`Claim ${dungeonContent.items[offer.options[0].itemId].label}`,exact:true}).click();await page.locator('#dungeon-item-confirm').click();
  expect((await snapshot(page)).party).toEqual(saved.party);
 });
+
+test('dungeon recovery separates status and preserves exploration scroll', async ({page}) => {
+ await page.goto('./?game=dungeon');
+ await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();
+ await page.locator('#dungeon-confirm-new').click();
+ await page.getByRole('button',{name:'Save recovery',exact:true}).focus();
+ const before=await page.locator('#dungeon-screen').evaluate(node=>node.scrollTop);
+ await page.keyboard.press('Enter');
+ await expect(page.getByRole('dialog')).toBeVisible();
+ const message=await page.locator('#battle-dialog-message').boundingBox();
+ const actions=await page.locator('#battle-dialog .fit-controls').boundingBox();
+ expect(actions!.y-message!.y-message!.height).toBeGreaterThanOrEqual(15);
+ expect(await page.locator('#dungeon-screen').evaluate(node=>node.scrollTop)).toBe(before);
+ await page.screenshot({path:test.info().outputPath('recovery-spacing.png')});
+ await page.locator('#dungeon-close-recovery').click();
+ await expect(page.locator('#dungeon-screen h1')).toBeFocused();
+});

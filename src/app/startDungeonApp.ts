@@ -77,6 +77,8 @@ function requestNew(){
  ]);
 }
 function recovery(){
+ // Opening recovery should not scroll the exploration page behind the modal.
+ const scrollTop=screen.scrollTop;
  if(!live||!storage)return;const review=session.inspect(),choices:DialogChoice[]=[];
  const close=()=>{if(!playing)render();screen.querySelector<HTMLElement>('h1')?.focus();};
  for(const [i,value] of session.exports(review).entries())choices.push({id:`dungeon-export-${i}`,label:`Export ${value.label}`,run:()=>{const url=URL.createObjectURL(new Blob([value.text],{type:'application/json'}));const a=el('a');a.href=url;a.download=`tactics-guru-dungeon-${i}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);close();}});
@@ -89,6 +91,7 @@ function recovery(){
  }
  choices.push({id:'dungeon-retry-save',label:'Retry saving current progress',run:()=>{if(startup){close();return;}session.retry(review);close();}}, {id:'dungeon-close-recovery',label:'Close',run:close});
  dialogs.showChoices('Dungeon save recovery',`primary: ${review.primary.status}. backup: ${review.backup.status}. ${session.status}`,choices,close);
+ screen.scrollTop=scrollTop;
 }
 function whenVisible(generation:number,run:()=>void){
  if(!live||generation!==loadGeneration)return;
