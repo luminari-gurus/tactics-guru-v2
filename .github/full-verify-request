@@ -1,9 +1,0 @@
-# Bump this file to start npm run verify:full on the pushed ref via
-# issue-200-baseline.yml. Humans with Actions write can instead dispatch
-# extra_job=full-verify. Do not treat a bump on main as release qualification
-# unless that was the intent.
-# Delete this file before merging; the push trigger ignores main, but the
-# token still should not land on main.
-requested: 2026-11-02T20:27:00Z
-head: cursor/deterministic-dungeon-seeds-308b
-reason: Follow-up to #272 — pin dungeon UI entropy, cover New Game/unsaved fresh layouts, sweep random seeds

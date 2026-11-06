@@ -1,0 +1,332 @@
+{
+  "scope": "Mage XP browser permutations only; not full regression or whole-build speedup",
+  "before": {
+    "source": {
+      "commit": "637ab9224e33952ff0552d5734f05cdc7d2ea8e3",
+      "node": "v24.22.2",
+      "runner": "unraid-tactics-02",
+      "lockSha256": "e4768389a179a65df5f04502dab87e8875b465b939e55493d5820a7dc99a74ed",
+      "conditions": "Persistent qualified runner; caches and unrelated background work not independently controlled"
+    },
+    "run": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42048414716",
+    "reports": [
+      {
+        "stats": {
+          "startTime": "2026-11-05T14:48:32.210Z",
+          "duration": 63837.304000000004,
+          "expected": 12,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "sha256": "ef59a30bf5143329210e32ecab2658623a97fceacd6ad3069d0c7735b9c93460",
+        "engine": "chromium",
+        "cases": [
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 0, caster level and exact active boundary",
+            "project": "desktop"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 60, caster level and exact active boundary",
+            "project": "desktop"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 180, caster level and exact active boundary",
+            "project": "desktop"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 600, caster level and exact active boundary",
+            "project": "desktop"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 0, caster level and exact active boundary",
+            "project": "mobile-portrait"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 60, caster level and exact active boundary",
+            "project": "mobile-portrait"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 180, caster level and exact active boundary",
+            "project": "mobile-portrait"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 600, caster level and exact active boundary",
+            "project": "mobile-portrait"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 0, caster level and exact active boundary",
+            "project": "mobile-landscape"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 60, caster level and exact active boundary",
+            "project": "mobile-landscape"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 180, caster level and exact active boundary",
+            "project": "mobile-landscape"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 600, caster level and exact active boundary",
+            "project": "mobile-landscape"
+          }
+        ]
+      },
+      {
+        "stats": {
+          "startTime": "2026-11-05T14:49:37.191Z",
+          "duration": 59057.115000000005,
+          "expected": 12,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "sha256": "35707e94d7e0e040c91ac9f55beb75b32f727fc9685421cb5afa5888d215a11a",
+        "engine": "webkit",
+        "cases": [
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 0, caster level and exact active boundary",
+            "project": "desktop-webkit"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 60, caster level and exact active boundary",
+            "project": "desktop-webkit"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 180, caster level and exact active boundary",
+            "project": "desktop-webkit"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 600, caster level and exact active boundary",
+            "project": "desktop-webkit"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 0, caster level and exact active boundary",
+            "project": "portrait-webkit"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 60, caster level and exact active boundary",
+            "project": "portrait-webkit"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 180, caster level and exact active boundary",
+            "project": "portrait-webkit"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 600, caster level and exact active boundary",
+            "project": "portrait-webkit"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 0, caster level and exact active boundary",
+            "project": "landscape-webkit"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 60, caster level and exact active boundary",
+            "project": "landscape-webkit"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 180, caster level and exact active boundary",
+            "project": "landscape-webkit"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 600, caster level and exact active boundary",
+            "project": "landscape-webkit"
+          }
+        ]
+      }
+    ],
+    "summedReportMs": 122894.41900000001,
+    "stepSeconds": 125.0,
+    "jobSeconds": 193.0,
+    "diagnosticsContractReports": [
+      {
+        "stats": {
+          "startTime": "2026-11-05T14:47:53.730Z",
+          "duration": 1531.044,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "sha256": "a9eafd814adea19c6cf5825a05e3a5905d1615ab4a2bf8bf7f3da47e8dbdfb9d",
+        "titles": [
+          "diagnostic contract"
+        ]
+      },
+      {
+        "stats": {
+          "startTime": "2026-11-05T14:47:51.089Z",
+          "duration": 1668.2450000000001,
+          "expected": 0,
+          "skipped": 0,
+          "unexpected": 1,
+          "flaky": 0
+        },
+        "sha256": "acb42ad056cc4b674f44cfafbe48bf18a0b12f5f15164d6bf2efabbf8774752e",
+        "titles": [
+          "diagnostic contract"
+        ]
+      }
+    ]
+  },
+  "after": {
+    "source": {
+      "commit": "96b14aab705d83c884e96d741be673a42ccb60c8",
+      "node": "v24.22.2",
+      "runner": "unraid-tactics-02",
+      "lockSha256": "e4768389a179a65df5f04502dab87e8875b465b939e55493d5820a7dc99a74ed",
+      "conditions": "Persistent qualified runner; caches and unrelated background work not independently controlled"
+    },
+    "run": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42048483145",
+    "reports": [
+      {
+        "stats": {
+          "startTime": "2026-11-05T14:51:39.783Z",
+          "duration": 30870.592,
+          "expected": 6,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "sha256": "4ff043e62fb84b238e51ab4afdf2cf44a9e350d796abaf9822211cc15ae9e0bd",
+        "engine": "chromium",
+        "cases": [
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 0, caster level and exact active boundary",
+            "project": "desktop"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 180, caster level and exact active boundary",
+            "project": "desktop"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 0, caster level and exact active boundary",
+            "project": "mobile-portrait"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 180, caster level and exact active boundary",
+            "project": "mobile-portrait"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 0, caster level and exact active boundary",
+            "project": "mobile-landscape"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 180, caster level and exact active boundary",
+            "project": "mobile-landscape"
+          }
+        ]
+      },
+      {
+        "stats": {
+          "startTime": "2026-11-05T14:52:11.552Z",
+          "duration": 32457.399999999998,
+          "expected": 6,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "sha256": "b8411e07e9417f33c3210c6fb2a153fad2c77c95cf4e3f078c5f6593dd8637c2",
+        "engine": "webkit",
+        "cases": [
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 0, caster level and exact active boundary",
+            "project": "desktop-webkit"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 180, caster level and exact active boundary",
+            "project": "desktop-webkit"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 0, caster level and exact active boundary",
+            "project": "portrait-webkit"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 180, caster level and exact active boundary",
+            "project": "portrait-webkit"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 0, caster level and exact active boundary",
+            "project": "landscape-webkit"
+          },
+          {
+            "file": "dungeon.spec.ts",
+            "title": "menu dungeon restores Mage XP 180, caster level and exact active boundary",
+            "project": "landscape-webkit"
+          }
+        ]
+      }
+    ],
+    "summedReportMs": 63327.992,
+    "stepSeconds": 66.0,
+    "jobSeconds": 124.0,
+    "diagnosticsContractReports": [
+      {
+        "stats": {
+          "startTime": "2026-11-05T14:51:10.866Z",
+          "duration": 1297.3180000000002,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "sha256": "c90fff9b4efee77828996d72f2ece1d6cdcfb0d842ec8f614cf37dde23c798fc",
+        "titles": [
+          "diagnostic contract"
+        ]
+      },
+      {
+        "stats": {
+          "startTime": "2026-11-05T14:51:08.596Z",
+          "duration": 1466.7069999999999,
+          "expected": 0,
+          "skipped": 0,
+          "unexpected": 1,
+          "flaky": 0
+        },
+        "sha256": "c220ff10c191a96d072f5e15d1087ffc2f669307f59c288c84c02bbce6fc5d93",
+        "titles": [
+          "diagnostic contract"
+        ]
+      }
+    ]
+  },
+  "observedReportReductionPercent": 48.469594864189894,
+  "diagnosticsNote": "The browser-diagnostics contract deliberately creates one failing fake-browser test followed by a successful ordinary cleanup run. Those control reports are retained separately; they are not application failures or XP measurements.",
+  "reuse": "Candidate XP measurement at 96b14aa is reused for 63607ef: later changes only replace the unrelated core PR proof-scene case with public New Game and update its contract/docs. Both measured configs, XP test body, helpers, runtime, assets and lockfile are unchanged."
+}

@@ -145,7 +145,10 @@ Follow-up validation: focused run/domain-boundary suite 70 passed; full unit sui
 
 ## Live integration (#80)
 
-`/run` is an additive entry linked from the single-battle panel. It starts with seed 13;
+Saved runs launch from the main menu at `/?game=run`, respecting the configured
+base prefix. Direct `/run` is a fresh testing entry with no save storage, hydration
+or recovery UI. Both use the same run/item/battle owner; testing accepted actions
+remain in memory, and reload discards them. The initial run starts with seed 13;
 Start new run increments the previous run seed modulo uint32 and supplies a fresh UUID.
 `createRunBattle` reconstructs initiative and local state from the projected catalog,
 then applies only the canonical living entry HP. `BattleSession.fromRun` records that

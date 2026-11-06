@@ -1,4 +1,6 @@
-import { test as base, expect } from '@playwright/test';
+import { test as base, expect } from './coreGraphics';
+import { installRailControls } from './forceRailControls';
+export type { Page } from '@playwright/test';
 import type { BrowserContext } from '@playwright/test';
 export { expect };
 
@@ -23,6 +25,14 @@ export const test = base.extend<{ pinDungeonSeed: boolean }>({
   pinDungeonSeed: [true, { option: true }],
   context: async ({ context, pinDungeonSeed }, use) => {
     await applyPinnedDungeonSeed(context, pinDungeonSeed);
+    await use(context);
+  },
+});
+
+/** Preserve the rail-control fixture for existing battle interaction specs. */
+export const railTest = test.extend({
+  context: async ({ context }, use) => {
+    await installRailControls(context);
     await use(context);
   },
 });

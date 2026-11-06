@@ -1,4 +1,5 @@
 import { consumeEntryIntent, routeHref } from './routes';
+import { appEntry } from './entry';
 import { menuReturnLink } from '../ui/menuReturn';
 import { mountTelemetryPreferences } from '../telemetry/preferences';
 import { reportFailure } from '../telemetry/telemetry';
@@ -12,11 +13,11 @@ import { mountRunItems } from '../ui/runItems';
 import { BattleScene, type RunBattleHost } from '../phaser/BattleScene';
 import { createGame } from '../phaser/start';
 import { diagnosticsSnapshot } from '../diagnostics/browser';
-import { createRunStorage, type RunLoadResult } from '../persistence/runStorage';
+import { createRunStorage, serializeBrowserRunWrite, type RunLoadResult } from '../persistence/runStorage';
 import { mountBattleLayout } from '../ui/battleLayout';
 
-const storage=createRunStorage(context),initial=storage.load();
-const controller = new RunItemSession(initial.ok && initial.selected ? initial.selected.state : freshRunSnapshot(crypto.randomUUID(), 13, context), context,storage);
+const storage=appEntry.persistent?createRunStorage(context):null,initial=storage?.load();
+const controller = new RunItemSession(initial?.ok && initial.selected ? initial.selected.state : freshRunSnapshot(crypto.randomUUID(), 13, context), context,storage,serializeBrowserRunWrite);
 const container = document.querySelector<HTMLElement>('#game')!;
 const panel = document.querySelector<HTMLElement>('#fit-panel')!;
 const status = document.querySelector<HTMLElement>('#fit-status')!;
@@ -62,7 +63,7 @@ function startBattle() {
  unmount();controller.onChange=()=>{evidence();const label=persistence.querySelector('span');if(label)label.textContent=controller.status;};screen.hidden=true;shell.hidden=false;panel.hidden=false;controls.hidden=false;container.style.visibility='visible';
  renderProgress();
  persistence.hidden=false;
- persistence.replaceChildren(button('Save recovery',()=>showRecovery()),document.createElement('span'));
+ persistence.replaceChildren(...(storage?[button('Save recovery',()=>showRecovery())]:[]),document.createElement('span'));
  persistence.querySelector('span')!.textContent=controller.status;
  host={catalog:session.catalog,session,dialogs,sound,modalTransition:()=>{},ended:endBattle,restart:requestNew};
  const scene=new BattleScene(setStatus,fail,host);
@@ -70,13 +71,24 @@ function startBattle() {
  engine.scene.remove('battle');engine.scene.add('battle',scene,true);
  evidence();
 }
+let replacementPending=false;
 function replace(review:RunLoadResult) {
- if(controller.replace(review,crypto.randomUUID(),(controller.snapshot.items.run.seed+1)>>>0)) {
-  startup=false;stopBattle();render();screen.querySelector<HTMLElement>('h1')?.focus();
- } else {if(!playing)render();showRecovery();}
+ if(replacementPending)return;
+ replacementPending=true;
+ controller.queueWrite(()=>{
+  replacementPending=false;
+  if(controller.replace(review,crypto.randomUUID(),(controller.snapshot.items.run.seed+1)>>>0)) {
+   startup=false;stopBattle();render();screen.querySelector<HTMLElement>('h1')?.focus();
+  } else {if(!playing)render();showRecovery();}
+ },()=>{replacementPending=false;});
 }
 function requestNew() {
- if(!live || dialogs.open)return;
+ if(!live || dialogs.open || replacementPending)return;
+ if(!storage){
+  if(startup)controller.startNew();
+  else controller.restart(crypto.randomUUID(),(controller.snapshot.items.run.seed+1)>>>0);
+  startup=false;stopBattle();render();screen.querySelector<HTMLElement>('h1')?.focus();return;
+ }
  const review=controller.inspect();
  const cancel=()=>{if(startup){render();screen.querySelector<HTMLElement>('#run-start')?.focus();}else restart.focus();};
  dialogs.showChoices('Start new run?', 'Replace this run with a full party, empty inventory and a fresh seed? Export saved data first if needed.',[
@@ -85,6 +97,7 @@ function requestNew() {
  ],cancel);
 }
 function showRecovery() {
+ if(!storage)return;
  const closeRecovery=()=>{
   if(!live || playing)return;
   render();
@@ -92,6 +105,13 @@ function showRecovery() {
   [...screen.querySelectorAll<HTMLButtonElement>('button')].find(button=>button.textContent==='Save recovery')?.focus();
  };
  const review=controller.inspect(),choices:DialogChoice[]=[];
+ if(!startup && controller.hasUnsavedProgress)choices.push({id:'run-export-current',label:'Export unsaved run',run:()=>{
+  const encoded=controller.exportCurrent();
+  if(!encoded.ok)return;
+  const url=URL.createObjectURL(new Blob([encoded.text],{type:'application/json'}));
+  const link=document.createElement('a');link.href=url;link.download='tactics-guru-run-unsaved.json';
+  link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);closeRecovery();
+ }});
  for(const [index,{slot,text}] of controller.recoveryTexts(review).entries()) {
   choices.push({id:`run-export-${slot}-${index}`,label:`Export ${slot} save`,run:()=>{
    const url=URL.createObjectURL(new Blob([JSON.stringify({slot,text})],{type:'application/json'}));
@@ -99,13 +119,13 @@ function showRecovery() {
   }});
   if(review.ok && 'text' in review.inspection[slot] && review.inspection[slot].text===text)choices.push({id:`run-remove-${slot}`,label:`Remove ${slot} save`,run:()=>{
    dialogs.showChoices('Remove reviewed save?',`Export first if needed. Remove the reviewed ${slot} bytes?`,[
-    {id:'run-confirm-remove',label:'Remove reviewed save',run:()=>{controller.remove(slot,review);showRecovery();}},
+    {id:'run-confirm-remove',label:'Remove reviewed save',run:()=>controller.queueWrite(()=>{controller.remove(slot,review);showRecovery();})},
     {id:'run-cancel-remove',label:'Cancel',run:()=>showRecovery()},
    ]);
   }});
  }
- if((startup || controller.isUnsavedOnly) && review.ok && review.selected)choices.push({id:'run-recover-continue',label:'Continue saved run',run:()=>continueRun(review)});
- choices.push({id:'run-retry-save',label:startup?'Retry storage':'Retry saving',run:()=>{if(!startup)controller.save();showRecovery();}},
+ if((startup || controller.isUnsavedOnly || controller.hasSaveConflict) && review.ok && review.selected)choices.push({id:'run-recover-continue',label:'Continue saved run',run:()=>continueRun(review)});
+ choices.push({id:'run-retry-save',label:startup?'Retry storage':'Retry saving',run:()=>{if(startup)showRecovery();else controller.requestSave(showRecovery);}},
   {id:'run-close-recovery',label:'Close',run:closeRecovery});
  const message=review.ok?`primary: ${review.inspection.primary.status}. backup: ${review.inspection.backup.status}. ${controller.status}`:`Storage ${review.kind}. Your run can continue unsaved.`;
  dialogs.showChoices('Run save recovery',message,choices,closeRecovery);
@@ -131,18 +151,20 @@ function render() {
  controller.onChange=()=>{itemRender();evidence();renderActions();};
  if(startup) {
   controller.onChange=null;
-  const review=controller.inspect();
   const title=items.querySelector('h1')!;title.textContent='Three-encounter run';
+  if(storage){
+  const review=controller.inspect();
   if(review.ok && review.selected)actions.append(button('Continue saved run',()=>continueRun(review),'run-continue'));
   actions.append(button('Start new run',()=>{
    const review=controller.inspect();
    if(review.ok && Object.values(review.inspection).every(s=>s.status==='missing')) {
-    if(initial.ok && initial.selected)replace(review);
+    if(initial?.ok && initial.selected)replace(review);
     else {startup=false;controller.startNew();render();}
    } else requestNew();
   },'run-start'));
   if(!review.ok || (!review.selected && Object.values(review.inspection).some(slot=>slot.status==='unavailable')))actions.append(button('Play unsaved run',()=>{startup=false;controller.playUnsaved();render();},'run-unsaved'));
   actions.append(button('Save recovery',showRecovery,'run-recovery'));
+  }else actions.append(button('Start new run',requestNew,'run-start'),document.createTextNode('Testing run. Progress resets on reload.'));
   // Startup is read-only: the seed placeholder is never saved or rendered as owned progress.
   items.replaceChildren(title);actions.append(nav.cloneNode(true), dungeonNav.cloneNode(true), menuReturnLink(() => !startup && controller.hasUnsavedProgress, showRecovery));mountTelemetryPreferences(actions);controller.onChange=()=>{evidence();};
  } else renderActions();
@@ -150,11 +172,14 @@ function render() {
 }
 function renderActions() {
  actions.replaceChildren();
+ if(!storage)actions.append(document.createTextNode('Testing run. Progress resets on reload.'));
  const snapshot=controller.snapshot,run=snapshot.items.run;
  if(run.phase==='battle' && !snapshot.activeBattle) actions.append(button('Start encounter',startBattle,'run-start-encounter'));
  else if(run.phase==='victory' || run.phase==='defeat') {
   items.querySelector('h1')!.textContent=run.phase==='victory'?'Run victory':'Run defeat';
-  actions.append(button('Start new run',()=>replace(controller.inspect()),'run-new'));
+  actions.append(button('Start new run',()=>{
+   if(!replacementPending){if(storage)replace(controller.inspect());else requestNew();}
+  },'run-new'));
  }
   actions.append(nav.cloneNode(true), dungeonNav.cloneNode(true), menuReturnLink(() => !startup && controller.hasUnsavedProgress, showRecovery));mountTelemetryPreferences(actions);
 }
@@ -170,7 +195,7 @@ render();
 // battle scene or save is created until the existing controls request it.
 const engine=createGame([],true);
 
-const entryIntent=consumeEntryIntent();
+const entryIntent=storage?consumeEntryIntent():null;
 if(entryIntent==='continue')continueRun(controller.inspect());
 else if(entryIntent==='recovery')showRecovery();
 else if(entryIntent==='new')requestNew();

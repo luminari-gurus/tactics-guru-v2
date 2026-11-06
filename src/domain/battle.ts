@@ -1,10 +1,11 @@
 import { CONTENT_BOUNDS, ENEMY_IDS, HERO_IDS } from '../content/constants';
 import type { ContentCatalog } from '../content/types';
-import { RNG_VERSION, RNG_WARMUP_DRAWS, RULES_VERSION, RULE_BOUNDS, STATE_FORMAT_VERSION, BASE_REPLAY_FORMAT_VERSION, REPLAY_FORMAT_VERSION, UINT32_RANGE } from './constants';
+import { RNG_VERSION, RNG_WARMUP_DRAWS, RULES_VERSION, RULE_BOUNDS, STATE_FORMAT_VERSION, BASE_REPLAY_FORMAT_VERSION, REPLAY_FORMAT_VERSION, DRAUGHT_REPLAY_FORMAT_VERSION, UINT32_RANGE } from './constants';
 import { isIntegerIn, isRngState } from './rng';
 import type { BattleState, Command, CommandPreview, Replay, UnitState, Versions } from './types';
 import { hashJson, rulesContent } from './contentIdentity';
 import { movementBlockSource, weakenedImmune, weakenedSource } from './effects';
+import { isDraughtLedger } from './draughts';
 
 import { hasShape as shape, isDenseArray } from './validation';
 function cell(v: unknown): v is { x: number; y: number } {
@@ -30,7 +31,9 @@ export type StateRead = { readonly ok: true; readonly state: BattleState } | { r
 /** Untrusted snapshot validation, using only runtime-relevant references in a trusted catalog. */
 export function readBattleState(input: unknown, catalog: ContentCatalog): StateRead {
   const bad = { ok: false, reason: 'invalidState' } as const;
-  if (!shape(input, ['format','versions','seed','rng','mapId','units','initiative','activeIndex','round','outcome','commandCount']) ||
+  const keys = ['format','versions','seed','rng','mapId','units','initiative','activeIndex','round','outcome','commandCount'];
+  if (input !== null && typeof input === 'object' && Object.hasOwn(input, 'draughts')) keys.push('draughts');
+  if (!shape(input, keys) ||
     input.format !== STATE_FORMAT_VERSION || !versions(input.versions, contentVersion(catalog)) ||
     !isIntegerIn(input.seed, RULE_BOUNDS.uint32) || !isRngState(input.rng) ||
     input.rng.words[3] !== (input.rng.cursor % UINT32_RANGE + RNG_WARMUP_DRAWS + 1) % UINT32_RANGE ||
@@ -104,10 +107,11 @@ export function readBattleState(input: unknown, catalog: ContentCatalog): StateR
   const livingEnemy = units.some(u => u.side === 'enemy' && u.hp > 0);
   const expectedOutcome = !livingPlayer ? 'playerLoss' : !livingEnemy ? 'playerWin' : 'ongoing';
   if (input.outcome !== expectedOutcome || (input.outcome === 'ongoing' && active.hp === 0)) return bad;
+  if (Object.hasOwn(input, 'draughts') && !isDraughtLedger(input.draughts, units, input.commandCount, input.round)) return bad;
   return { ok: true, state: clone(input) as unknown as BattleState };
 }
 function isCommand(input: unknown): input is Command {
-  if (shape(input, ['type','unitId'])) return input.type === 'endTurn' && unitId(input.unitId);
+  if (shape(input, ['type','unitId'])) return (input.type === 'endTurn' || input.type === 'drinkDraught') && unitId(input.unitId);
   if (shape(input, ['type','unitId','to'])) return input.type === 'move' && unitId(input.unitId) && cell(input.to);
   if (!shape(input, ['type','unitId','abilityId','target']) || input.type !== 'useAbility' || !unitId(input.unitId) || !prefixedId(input.abilityId, 'ability')) return false;
   return (shape(input.target, ['missileTargets']) && isDenseArray(input.target.missileTargets, 5) && input.target.missileTargets.length > 0 && input.target.missileTargets.every(unitId)) || (shape(input.target, ['unitId']) && unitId(input.target.unitId)) || (shape(input.target, ['cell']) && cell(input.target.cell));
@@ -130,11 +134,12 @@ export type ReplayRead = { readonly ok: true; readonly replay: Replay } | { read
 export function readReplay(input: unknown, catalog: ContentCatalog): ReplayRead {
   const bad = { ok: false, reason: 'invalidReplay' } as const;
   if (!shape(input, ['format','versions','initial','commands']) ||
-    (input.format !== BASE_REPLAY_FORMAT_VERSION && input.format !== REPLAY_FORMAT_VERSION) ||
+    (input.format !== BASE_REPLAY_FORMAT_VERSION && input.format !== REPLAY_FORMAT_VERSION && input.format !== DRAUGHT_REPLAY_FORMAT_VERSION) ||
     !isDenseArray(input.commands, RULE_BOUNDS.commandCount.max) ||
-    !input.commands.every(c => isCommand(c) || (input.format === REPLAY_FORMAT_VERSION &&
+    !input.commands.every(c => isCommand(c) ? c.type !== 'drinkDraught' || input.format === DRAUGHT_REPLAY_FORMAT_VERSION : (input.format !== BASE_REPLAY_FORMAT_VERSION &&
       shape(c, ['type','unitId']) && c.type === 'undoMove' && unitId(c.unitId)))) return bad;
   const checked = readBattleState(input.initial, catalog);
   if (!checked.ok || !versions(input.versions, checked.state.versions.content) || checked.state.commandCount !== 0 || checked.state.round !== RULE_BOUNDS.round.min) return bad;
+  if ((input.format === DRAUGHT_REPLAY_FORMAT_VERSION) !== Boolean(checked.state.draughts)) return bad;
   return { ok: true, replay: { format: input.format, versions: clone(input.versions), initial: checked.state, commands: clone(input.commands) as Replay['commands'] } };
 }

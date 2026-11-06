@@ -17,7 +17,7 @@ for (const mode of ['preview', 'dev']) {
     const receipt = resolve(root, 'verification-receipts/issue219', mode);
     mkdirSync(receipt, { recursive: true });
     try {
-      writeFileSync(join(dir, 'playwright.config.ts'), `import base from ${JSON.stringify(resolve(root, 'playwright.config.ts'))};
+      writeFileSync(join(dir, 'playwright.config.ts'), `import base from ${JSON.stringify(resolve(root, 'playwright.regression.config.ts'))};
 export default { ...base, testDir: ${JSON.stringify(dir)}, testMatch: 'contract.spec.cjs', testIgnore: [], retries: 0,
   projects: base.projects.filter(p => p.name === 'desktop'),
   webServer: { ...base.webServer, cwd: ${JSON.stringify(root)}, command: 'npm run ${mode} -- --port 4173 --strictPort', reuseExistingServer: false },

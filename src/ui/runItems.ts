@@ -2,7 +2,7 @@ import type { HeroId } from '../content/types';
 import type { ItemDef } from '../content/itemTypes';
 import type { ItemCommand } from '../domain/items';
 import { progressionLabel } from '../domain/progression';
-import { projectItemCatalog } from '../domain/items';
+import { preparationItemTarget, projectItemCatalog } from '../domain/items';
 import type { RunItemSession } from '../app/RunItemSession';
 import type { RunLoadResult } from '../persistence/runStorage';
 import { BattleDialogs, type DialogChoice } from './dialogs';
@@ -14,7 +14,8 @@ const element = <K extends keyof HTMLElementTagNameMap>(tag: K, text = '') => {
 const heroLabel = (id: HeroId) => id[0].toUpperCase() + id.slice(1);
 const encounterLabel = (id: string) => id.split(':').at(-1)!.split('_').map(word => word[0].toUpperCase() + word.slice(1)).join(' ');
 const effect = (def: ItemDef) => def.effect.kind === 'restoreHp' ? `Restore ${def.effect.amount} HP` :
-  `+${def.effect.amount} ${def.effect.stat === 'armorClass' ? 'armor class' : 'accuracy'}`;
+  def.effect.kind === 'revive' ? `Revive a fallen hero at ${def.effect.percent}% HP (rounded down, minimum 1)` :
+    `+${def.effect.amount} ${def.effect.stat === 'armorClass' ? 'armor class' : 'accuracy'}`;
 /** Mount once per flow, dispose before replacement. Caller owns the sole modal instance. */
 export function mountRunItems(root: HTMLElement, session: RunItemSession, dialogs: BattleDialogs,
   host?: { continueRun: (load: RunLoadResult) => void; recover: () => void }) {
@@ -56,14 +57,14 @@ export function mountRunItems(root: HTMLElement, session: RunItemSession, dialog
           } });
           choices.push({ id: `remove-${slot}`, label: `Remove ${slot} save`, run: () => {
             dialogs.showChoices('Remove saved data?', `Remove the reviewed ${slot} run save? Export it first if needed.`, [
-              { id: 'remove-confirm', label: 'Remove reviewed save', run: () => { session.remove(slot, load); focus(); } },
+              { id: 'remove-confirm', label: 'Remove reviewed save', run: () => session.queueWrite(() => { session.remove(slot, load); focus(); }) },
               { id: 'remove-cancel', label: 'Cancel', run: focus },
             ], focus);
           } });
         }
       }
     }
-    choices.push({ id: 'retry-save', label: 'Retry saving', run: () => { session.save(); focus(); } },
+    choices.push({ id: 'retry-save', label: 'Retry saving', run: () => session.requestSave(focus) },
       { id: 'recovery-cancel', label: 'Cancel', run: focus });
     const message = load.ok ? ['primary', 'backup'].map(slot => `${slot}: ${load.inspection[slot as 'primary' | 'backup'].status}`).join('. ')
       : `Storage ${load.kind}. Play can continue unsaved.`;
@@ -108,9 +109,8 @@ export function mountRunItems(root: HTMLElement, session: RunItemSession, dialog
     const targets = (def: ItemDef, id: string) => {
       const select = element('select'); select.id = id; select.setAttribute('aria-label', `${def.label} target`);
       for (const hero of run.party) {
-        const max = hero.maxHp;
-        const reason = hero.hp === 0 ? 'defeated' : !def.eligibleHeroes.includes(hero.heroId) ? 'ineligible' :
-          def.kind === 'consumable' && hero.hp === max ? 'full HP' : '';
+        const preview = preparationItemTarget(def, hero, run.party);
+        const reason = preview.ok ? '' : preview.reason;
         const option = element('option', `${heroLabel(hero.heroId)}${reason ? ` (${reason})` : ''}`);
         option.value = hero.heroId; option.disabled = !!reason; select.append(option);
       }
@@ -121,11 +121,17 @@ export function mountRunItems(root: HTMLElement, session: RunItemSession, dialog
     for (const stack of ownership.consumables) {
       const def = session.context.items[stack.itemId], row = element('div');
       const select = targets(def, `target-${def.id}`);
-      const use = button(`Use ${def.label}`, () => review(`Use ${def.label} on ${select.selectedOptions[0]?.text}?`,
-        { ...session.boundary(), type: 'useItem', itemId: def.id, heroId: select.value as HeroId }));
+      const use = button(`Use ${def.label}`, () => {
+        const hero = run.party.find(h => h.heroId === select.value);
+        if (!hero) return;
+        const preview = preparationItemTarget(def, hero, run.party), name = heroLabel(hero.heroId);
+        const result = preview.ok ? `${name} will have ${preview.hp}/${hero.maxHp} HP.` : `${name} cannot use this item (${preview.reason}).`;
+        review(`Use ${def.label} on ${name}? ${result}`,
+          { ...session.boundary(), type: 'useItem', itemId: def.id, heroId: hero.heroId });
+      });
       use.disabled = select.disabled;
       row.append(element('p', `${def.label} ×${stack.quantity} · ${effect(def)}`), select, use);
-      if (!select.value) row.append(element('p', 'No eligible living target with missing HP.'));
+      if (!select.value) row.append(element('p', def.effect.kind === 'revive' ? 'No eligible fallen hero.' : 'No eligible living target with missing HP.'));
       inventory.append(row);
     }
     for (const instance of ownership.equipment) {
@@ -141,6 +147,8 @@ export function mountRunItems(root: HTMLElement, session: RunItemSession, dialog
       if (!assignment) row.append(select);
       row.append(equip); inventory.append(row);
     }
+    root.replaceChildren(title, description, status, element('p', unavailable || 'Items may be used now, before the next battle starts.'), party, rewards, inventory);
+    if (session.storage) {
     const persistence = element('section'); persistence.setAttribute('aria-label', 'Run save');
     persistence.append(button('Continue saved run', () => {
       const load = session.inspect();
@@ -150,7 +158,8 @@ export function mountRunItems(root: HTMLElement, session: RunItemSession, dialog
         { id: 'continue-cancel', label: 'Cancel', run: focus },
       ], focus);
     }), button('Save recovery', () => recover()));
-    root.replaceChildren(title, description, status, element('p', unavailable || 'Items may be used now, before the next battle starts.'), party, rewards, inventory, persistence);
+    root.append(persistence);
+    }
   };
   session.onChange = render;
   render();

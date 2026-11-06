@@ -1,5 +1,5 @@
 import type { Command } from '../src/domain/types';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './helpers/forceRailControls';
 import { writeFileSync } from 'node:fs';
 import { BattleSession } from '../src/app/BattleSession';
 import { standaloneCatalog as catalog } from './helpers/playerPolicy';
@@ -73,8 +73,9 @@ async function boot(page:Page,fixture:Boundary) {
       sessionStorage.setItem('test:animation-seeded','yes');
     }
   },{keys,text:encoded.text});
-  await page.clock.install();await page.goto('./battle');await page.locator('#save-continue').click();await ready(page);
-  expect(new URL(page.url()).pathname).toBe(`${process.env.PLAYWRIGHT_BASE_PATH ?? '/'}battle`);
+  await page.clock.install();await page.goto('./?game=battle');await page.locator('#save-continue').click();await ready(page);
+  expect(new URL(page.url()).pathname).toBe(process.env.PLAYWRIGHT_BASE_PATH ?? '/');
+  expect(new URL(page.url()).searchParams.get('game')).toBe('battle');
   expect((await readSession(page)).state).toEqual(fixture.before);
 }
 async function press(page:Page,selector:string,keyboard=false) {

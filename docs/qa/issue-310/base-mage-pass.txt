@@ -1,0 +1,17 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> tactics-guru-v2@0.0.0 test:unit
+> vitest run tests/unit/dungeonBattle.test.ts -t finds a legal earned Mage Snare
+
+
+ RUN  v5.0.3 /workspace/scratch/71a48a2c2917/tactics-guru-v2
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 15 skipped (16)
+   Start at  17:06:09
+   Duration  9.67s (tests 69%, transform 29%, import 2%)
+
+  Transform  transforming modules took 2.70s · 29% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns

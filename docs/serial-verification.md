@@ -13,11 +13,28 @@ The manual `issue-200-baseline.yml` workflow now has three modes:
 Only trusted manual dispatch on `main` or `work/issue-208-serial-batches` can run
 the serial pipeline. No PR/fork trigger, privileged OS install, hosted fallback,
 release publication or deployment is introduced. The old qualification branch is
-also allowed for `qualify`. All jobs use `[self-hosted, tactics-browser]` and one
-workflow-wide `tactics-browser-exclusive` lock. `max-parallel: 1`, one Playwright
-worker and `fail-fast: false` keep browser jobs serial without starving later jobs
+also allowed for `qualify`. Select `runner` as `tactics-browser-01` or
+`tactics-browser-02` (default `tactics-browser-01`). Every job also requires
+`self-hosted` and `tactics-browser`. The selected unique label pins preparation,
+batches and aggregation to one VM; do not give both VMs the same unique label.
+The shared per-runner concurrency group reserves that VM across job boundaries,
+while an independent run selecting the other VM can execute concurrently.
+Push-triggered full verification has no dispatch inputs and selects VM 01.
+`max-parallel: 1`, one Playwright worker and `fail-fast: false` keep browser jobs
+serial without starving later jobs
 after an ordinary test failure. Manual runs are not automatically superseded;
-cancel an obsolete run explicitly. No automatic PR jobs need cancellation.
+cancel an obsolete run explicitly. Automatic PR verification shares the selected
+VM reservation. All four browser workflows use `queue: max` with
+`cancel-in-progress: false`: up to 100 waiting runs are preserved rather than a
+new arrival replacing the pending run. Beyond that documented queue bound, new
+runs are canceled. This preserves serialization, not a queue-time guarantee.
+
+Before using this workflow, an administrator must add `tactics-browser-01` only
+to VM 01 and `tactics-browser-02` only to VM 02, alongside the shared labels, and
+qualify each VM. These custom labels are not inferred from runner names. A missing
+label leaves jobs queued; do not add it to another VM to unblock an existing
+baseline. Keep one runner service per VM, with separate workspaces and browser/
+tool caches. Existing receipt checks still reject runner/runtime/browser drift.
 
 ## Coverage and build provenance
 
@@ -119,7 +136,7 @@ identity, load, commands and conditions. Browser preflight warms caches in every
 job. The aggregate includes job wall time, total attempt time and Actions API
 timestamps/compute, including earlier attempts. Creation-to-start includes
 scheduling/dependency delay; unavailable scheduler data is disclosed rather than
-invented. API totals exclude the still-running aggregate job. Cross-workflow
+invented. API totals exclude the still-running aggregate job. Per-runner cross-workflow
 locking does not establish that unrelated host workloads are idle; coordinate
 those separately and document them in `conditions`.
 
@@ -149,3 +166,4 @@ npm run verify:batches -- discover verification-receipts/serial/discovery
 For deliberate Actions execution, select the workflow's `pilot` or `capture` mode,
 record host conditions and inspect its aggregate. Start with the bounded pilot
 before launching expensive full coverage after changes to this tooling.
+

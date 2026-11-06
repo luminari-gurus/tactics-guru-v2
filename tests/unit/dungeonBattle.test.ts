@@ -13,10 +13,52 @@ import { playerDecision } from '../helpers/playerPolicy';
 import { encodeDungeon,decodeDungeon } from '../../src/domain/dungeonSaveEnvelope';
 import { dungeonContent } from '../../src/content/dungeon';
 import { resolveBattlefield } from '../../src/domain/battlefield';
-import { dispatch } from '../../src/domain/turns';
+import { dispatch, replayCommandSequence } from '../../src/domain/turns';
 import { LEGACY_ENCOUNTER_POLICY } from '../../src/domain/dungeonEncounters';
 import { priorDungeonEnvelope } from '../helpers/dungeonFixtures';
 import { freshExploration } from '../../src/domain/exploration';
+import { createDungeonStorage } from '../../src/persistence/dungeonStorage';
+
+it('saves a battle draught with its heal, replays it and settles stock on either outcome', () => {
+  const base = freshDungeon('draught-test', 13);
+  const ready = { ...base, party: base.party.map(hero => ({ ...hero, hp: 4 })),
+    ownership: { ...base.ownership, consumables: [{ itemId: 'item:healing_draught' as const, quantity: 2 }] } };
+  const started = startDungeonBattle(atEncounter(ready)); assert(started.ok && started.state.activeBattle);
+  const built = dungeonBattle(started.state)!;
+  const battle = new BattleSession(built.catalog, started.state.activeBattle, built.state.seed, undefined, true, built.battlefield);
+  while (battle.phase === 'enemy') { const step = battle.nextEnemy(); assert(step); battle.finishPresentation(step.token); }
+  const before = battle.state, actor = battle.active;
+  const use = { type: 'drinkDraught', unitId: actor.id } as const;
+  assert(battle.prepare(use).ok);
+  const step = battle.confirm(); assert(step);
+  expect(step.after.rng).toEqual(before.rng);
+  expect(dispatch(step.after, use, built.catalog)).toEqual({ ok: false, reason: 'alreadyActed' });
+  const updated = acceptDungeonBattle(started.state, step.after); assert(updated.ok);
+  const bytes = new Map<string,string>();
+  const storage = createDungeonStorage(()=>({getItem:key=>bytes.get(key)??null,setItem:(key,value)=>{bytes.set(key,value);},removeItem:key=>{bytes.delete(key);}}));
+  expect(storage.save(started.state).ok).toBe(true);
+  const checkpoint = storage.inspect().backup.text!;
+  expect(JSON.parse(checkpoint)).toMatchObject({format:10,payload:{phase:'ready',activeBattle:null}});
+  expect(storage.save(updated.state).ok).toBe(true);
+  expect(storage.inspect().backup.text).toBe(checkpoint);
+  expect(JSON.parse(storage.inspect().primary.text!).format).toBe(11);
+  expect(updated.state.ownership).toEqual(ready.ownership);
+  const wire = encodeDungeon(updated.state); assert(wire.ok);
+  const resumed = decodeDungeon(wire.text); assert(resumed.ok && resumed.state.activeBattle);
+  expect(resumed).toEqual(updated);
+  const replay = battle.replay!;
+  expect(replayCommandSequence(replay.initial, replay.commands, built.catalog)).toEqual({ ok: true, state: step.after, events: battle.events });
+  const hydrated = resumed.state.activeBattle;
+  expect(readDungeon({ ...resumed.state, activeBattle: { ...hydrated, draughts: { ...hydrated.draughts!, stock: 3 } } }).ok).toBe(false);
+  for (const outcome of ['playerWin', 'playerLoss'] as const) {
+    const state = { ...hydrated, outcome, units: hydrated.units.map(unit =>
+      unit.side === (outcome === 'playerWin' ? 'enemy' : 'player') ? { ...unit, hp: 0 } : unit) };
+    const finished = acceptDungeonBattle(resumed.state, state); assert(finished.ok);
+    expect(finished.state.ownership.consumables).toEqual([{ itemId: 'item:healing_draught', quantity: 1 }]);
+    expect(finished.state.activeBattle).toBeNull();
+    expect(acceptDungeonBattle(finished.state, state)).toEqual({ ok: false, reason: 'staleBoundary' });
+  }
+});
 
 it('completes production Shaman Hex and healing through the real session with exact command/event/RNG replay',()=>{
   const witness=shamanJourney(189),catalog=dungeonBattle(witness.entry)!.catalog;
@@ -38,7 +80,7 @@ it('completes production Shaman Hex and healing through the real session with ex
 });
 
 it('retains a legal six-battle Fighter level-three witness with healing, Taunt and exact terminal replay',()=>{
-  const witness=fighterJourney(28);
+  const witness=fighterJourney(50);
   expect({phase:witness.state.phase,healed:witness.healed,taunted:witness.taunted,depth:witness.depth,slot:witness.slot})
     .toEqual({phase:'defeat',healed:true,taunted:true,depth:2,slot:2});
   expect(witness.records).toHaveLength(6);
@@ -76,7 +118,7 @@ it('roundtrips live Weakened and Shaman ally healing without broadening party HP
 });
 
 it('finds a legal earned Mage Snare and multi-missile journey with exact replay and terminal cleanup',()=>{
-  const journey=mageJourney(46);
+  const journey=mageJourney(68);
   expect({used:journey.used,phase:journey.state.phase,party:journey.state.party}).toMatchObject({used:{snare:true,missiles:true},phase:'defeat'});
   expect(journey.state.party.find(h=>h.heroId==='mage')!.level).toBeGreaterThanOrEqual(3);
   expect(journey.records.some(r=>r.events.some(e=>e.type==='movementBlockExpired'&&e.abilityId==='ability:frost_snare'))).toBe(true);
@@ -240,7 +282,7 @@ it('uses the same scaled catalog for inspection, attack preview, AI, actual dama
 });
 
 it('plays a legal full-floor witness with existing rewards and carried party HP', () => {
-  const witness=dungeonJourney(43);expect(witness.won).toBe(true);
+  const witness=dungeonJourney(5);expect(witness.won).toBe(true);
   console.info(JSON.stringify({seed:witness.seed,battles:witness.battles.map(b=>({biome:b.selection.policy===LEGACY_ENCOUNTER_POLICY?'grassland':b.selection.biome,kind:b.selection.kind,commands:b.commands,party:b.party}))}));
   expect(witness.state.depth).toBe(1);expect(witness.state.floors.every(f=>f.completed===3)).toBe(true);
 },120000);

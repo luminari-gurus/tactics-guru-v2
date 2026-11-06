@@ -1,4 +1,4 @@
-import { expect, test } from './helpers/dungeonEntropy';
+import { expect, railTest as test } from './helpers/dungeonEntropy';
 import { battleCatalog } from '../src/content/catalog';
 import { standaloneCatalog } from './helpers/playerPolicy';
 import { BATTLE_CUES } from '../src/audio/battleCues';
@@ -9,7 +9,7 @@ import { walkDungeon } from './helpers/dungeonTraversal';
 import { navigateCapture, battleGesturePoint } from '../scripts/measure-fit-controls';
 import { captureTarget, parseMeasureArgs } from '../scripts/measure-fit-options';
 
-for (const route of ['', 'run']) test(`collector cold/warm ${route || 'battle'} uses real controls and isolates only v2 saves`, async ({page,baseURL}) => {
+for (const route of ['', 'run']) test(`collector cold/warm ${route || 'battle'} uses real controls and preserves saved games`, async ({page,baseURL}) => {
   const target=captureTarget(parseMeasureArgs(['--scene=battle','--url',new URL(route,baseURL!).href],{}));
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
   await navigateCapture(page,target,'cold');
@@ -24,18 +24,21 @@ for (const route of ['', 'run']) test(`collector cold/warm ${route || 'battle'} 
   await page.evaluate(()=>{
     localStorage.setItem('legacy-save','keep');
     localStorage.setItem('tactics-guru:phaser:unrelated','keep');
-    for(const kind of ['battle','run']) for(const slot of ['primary','backup']) localStorage.setItem(`tactics-guru:phaser:${kind}:${slot}:v1`,'invalid test save');
+    for(const kind of ['battle','run','dungeon']) for(const slot of ['primary','backup']) localStorage.setItem(`tactics-guru:phaser:${kind}:${slot}:v1`,'invalid test save');
   });
   await navigateCapture(page,target,'warm');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   await expect(page.getByRole('dialog')).not.toBeVisible();
   expect(await page.evaluate(()=>[localStorage.getItem('legacy-save'),localStorage.getItem('tactics-guru:phaser:unrelated')])).toEqual(['keep','keep']);
+  expect(await page.evaluate(()=>['battle','run','dungeon'].flatMap(kind=>['primary','backup'].map(slot=>localStorage.getItem(`tactics-guru:phaser:${kind}:${slot}:v1`))))).toEqual(Array(6).fill('invalid test save'));
   expect(errors).toEqual([]);
   await page.screenshot({path:test.info().outputPath(`collector-${route || 'battle'}-warm.png`)});
 });
 
 for (const scene of ['battle', 'proof', 'content-smoke'] as const) {
-  test(`${scene} direct entry and refresh resolve public assets`, async ({ page, baseURL }) => {
+  test(`${scene} direct entry and refresh resolve public assets`, {
+    ...(scene === 'battle' ? { tag: '@touch-audio' } : {}),
+  }, async ({ page, baseURL }) => {
     const paths = new Map<string, number>(), errors: string[] = [];
     page.on('request', request => {
       const path = new URL(request.url()).pathname.replace(/\/assets\/[a-f0-9]{16}(?=\/(?:battle|proof)\/)/, '');
@@ -57,7 +60,6 @@ for (const scene of ['battle', 'proof', 'content-smoke'] as const) {
       if (visit) {
         paths.clear();
         await page.reload();
-        if (scene === 'battle') await page.locator('#save-continue').click();
       }
       await expect(page.locator('#fit-status')).toHaveText(scene === 'proof' ? 'Ready' : scene === 'battle' ? 'Battle ready' : 'Content ready');
       await expect(page.locator('canvas')).toHaveCount(1);
@@ -78,7 +80,7 @@ for (const scene of ['battle', 'proof', 'content-smoke'] as const) {
           await page.locator('#audio-play').click();
           await expect(page.locator('#audio-status')).toHaveText('Played');
         } else {
-          // A base change must not alter the seeded state or save identity.
+          // A base change must not alter the fresh seeded testing state.
           await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
           const expectedSession = new BattleSession(standaloneCatalog, 'map:forest_ruins', 1);
           while (expectedSession.phase === 'enemy') {
@@ -100,7 +102,19 @@ for (const scene of ['battle', 'proof', 'content-smoke'] as const) {
   });
 }
 
-for (const route of ['battle', 'run', 'dungeon']) for (const backend of ['Web Audio', 'HTML5']) test(`${backend} ${route} audio loads at the base and plays a committed move`, async ({ page }) => {
+for (const route of ['battle', 'run', 'dungeon']) for (const backend of ['Web Audio', 'HTML5']) {
+  test(`${backend} ${route} audio loads at the base and plays a committed move`, {
+    ...(route === 'dungeon' ? { tag: '@touch-audio' } : {}),
+  }, async ({ page }) => {
+  // This workload qualifies audio/base delivery, not random-layout pursuit. Use
+  // the existing legal Fighter journey's initial floor for deterministic travel.
+  if(route==='dungeon')await page.addInitScript(()=>{
+    const draw=crypto.getRandomValues.bind(crypto);
+    crypto.getRandomValues=((array:ArrayBufferView<ArrayBuffer>)=>{
+      if(array instanceof Uint32Array&&array.length===1){array[0]=28;return array;}
+      return draw(array);
+    }) as typeof crypto.getRandomValues;
+  });
   if (backend === 'HTML5') await page.addInitScript(() => {
     Object.defineProperty(window, 'AudioContext', { value: undefined });
     Object.defineProperty(window, 'webkitAudioContext', { value: undefined });
@@ -109,7 +123,6 @@ for (const route of ['battle', 'run', 'dungeon']) for (const backend of ['Web Au
   if (route === 'run') { await page.locator('#run-start').click(); await page.locator('#run-start-encounter').click(); }
   if (route === 'dungeon') {
     await page.getByRole('button', { name: 'Start new dungeon', exact: true }).click();
-    await page.locator('#dungeon-confirm-new').click();
     await walkDungeon(page, undefined, test.info().project.use.hasTouch ? 'touch' : 'keyboard');
   }
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
@@ -122,6 +135,7 @@ for (const route of ['battle', 'run', 'dungeon']) for (const backend of ['Web Au
   await expect.poll(() => page.evaluate(() => window.fitDiagnostics().battleAudio!.completed)).toBeGreaterThan(0);
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
 });
+}
 
 test('content fixture uses the base and still validates input', async ({ page, baseURL }) => {
   const fixtureURL = new URL('battle/content-fixture.json', baseURL!).href;

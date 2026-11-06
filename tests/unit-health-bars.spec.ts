@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './helpers/forceRailControls';
 import { BattleSession } from '../src/app/BattleSession';
 import { standaloneCatalog as catalog } from './helpers/playerPolicy';
 import { encodeBattleSave } from '../src/domain/saveEnvelope';
@@ -52,7 +52,7 @@ async function bootBoundary(page:Page,state:BattleState) {
       localStorage.setItem(keys.primary,text);localStorage.setItem(keys.backup,text);sessionStorage.setItem('test:health-seeded','yes');
     }
   },{keys,text:encoded.text});
-  await page.clock.install();await page.goto('./battle');await page.locator('#save-continue').click();await ready(page);
+  await page.clock.install();await page.goto('./?game=battle');await page.locator('#save-continue').click();await ready(page);
 }
 async function confirmFrozen(page:Page) {
   await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
@@ -114,7 +114,7 @@ test('health bars are visible, attached and informational through mobile navigat
 });
 
 test('elevated movement keeps bars attached through refresh, rotation and restart',async({page},info)=>{
-  await page.clock.install();await page.goto('./battle');await ready(page);const initial=await settled(page),objects=initial.objectCount;
+  await page.clock.install();await page.goto('./?game=battle');await ready(page);const initial=await settled(page),objects=initial.objectCount;
   const to=initial.reachable.find((c:any)=>initial.tiles.find((t:any)=>t.x===c.x && t.y===c.y).elevation===1);expect(to).toBeDefined();
   await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption(`${to.x},${to.y}`);await confirmFrozen(page);
   await page.clock.runFor(48);const moving=await report(page);check(moving);

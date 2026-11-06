@@ -1,5 +1,5 @@
-import { test as base, type Request } from '@playwright/test';
-import { applyPinnedDungeonSeed } from './dungeonEntropy';
+import { type Request } from '@playwright/test';
+import { test as base } from './dungeonEntropy';
 export { expect } from '@playwright/test';
 
 /** Build-owned filenames only: discard origins, query/hash and arbitrary paths. */
@@ -13,12 +13,7 @@ function failure(raw: string): string {
 }
 
 /** Observe without routing requests, waiting, retrying, or reading browser storage. */
-export const test = base.extend<{ startupDiagnostics: void; pinDungeonSeed: boolean }>({
- pinDungeonSeed: [true, { option: true }],
- context: async ({ context, pinDungeonSeed }, use) => {
-  await applyPinnedDungeonSeed(context, pinDungeonSeed);
-  await use(context);
- },
+export const test = base.extend<{ startupDiagnostics: void }>({
  startupDiagnostics: [async ({page}, use, info) => {
   const origin=typeof info.project.use.baseURL==='string'?new URL(info.project.use.baseURL).origin:undefined;
   const assetPath=(raw:string)=>asset(raw,origin);

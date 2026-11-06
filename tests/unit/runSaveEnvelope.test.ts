@@ -2,6 +2,7 @@ import { combatStats } from '../../src/domain/effects';
 import { progressHero } from '../../src/domain/progression';
 import { createRunBattle, completeRunBattle, replayRunBattle } from '../../src/domain/runBattle';
 import { assert, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { activeSnapshot, preparedSnapshot, rewardSnapshot, runContext } from '../helpers/runItemFixtures';
 import { decodeRunSave, encodeRunSave, readRunSnapshot, runBattleCatalog, resolveRunBattlefield, RUN_SAVE_MAX_CODE_UNITS } from '../../src/domain/runSaveEnvelope';
 import { createBattle, dispatch } from '../../src/domain/turns';
@@ -10,6 +11,27 @@ import { contentVersion } from '../../src/domain/battle';
 import { createRun, deriveRunSeed, transitionRun, runBoundaryId } from '../../src/domain/run';
 import { emptyItemOwnership } from '../../src/domain/items';
 import { previewSupportAbility } from '../../src/domain/combat';
+import { DRAUGHT_REPLAY_FORMAT_VERSION } from '../../src/domain/constants';
+import { RunItemSession } from '../../src/app/RunItemSession';
+
+it.each(['active', 'reward'])('loads the exact pre-consumable run %s save and preserves its pending offer or battle', phase => {
+  const text = readFileSync(`tests/fixtures/saves/issue-172/run-${phase}.json`, 'utf8');
+  const previous = JSON.parse(text);
+  expect(previous.format).toBe(7);
+  const read = decodeRunSave(text, runContext); assert(read.ok);
+  expect(read.state).toEqual(previous.payload);
+  const current = encodeRunSave(read.state, runContext); assert(current.ok);
+  expect(JSON.parse(current.text).format).toBe(8);
+  expect(decodeRunSave(current.text, runContext)).toEqual(read);
+  if (phase === 'reward') {
+    const run = new RunItemSession(read.state, runContext, null);
+    const offer = run.snapshot.items.offer!; expect(offer.version).toBe(1);
+    const claimed = run.dispatch({ ...run.boundary(), type: 'claimReward', offerId: offer.id, itemId: offer.options[0].itemId });
+    assert(claimed.ok); expect(claimed.state.run.phase).toBe('battle');
+    expect(claimed.state.offer).toBeNull();
+  }
+  expect(decodeRunSave(JSON.stringify({ ...previous, digest: `sha256:${'0'.repeat(64)}` }), runContext)).toEqual({ ok: false, reason: 'corrupt' });
+});
 
 it('roundtrips enemy healing and active Weakened in a controlled run roster without relaxing hero-entry HP',()=>{
   const prepared=preparedSnapshot(),encounterId=prepared.items.run.encounters[prepared.items.run.encounterIndex];
@@ -83,12 +105,23 @@ it('admits only spent bounded Second Wind healing and carries it through run com
   const completed=completeRunBattle(snapshot,won,runContext);assert(completed.ok);
   expect(completed.state.items.run.party[0].hp).toBe(9);expect(completed.state.items.run.party[2].hp).toBe(0);
   expect(completed.state.items.run.party[0]).not.toHaveProperty('secondWindUsed');
+  let nextTurn=used.state;
+  do {
+    const advance=dispatch(nextTurn,{type:'endTurn',unitId:nextTurn.initiative[nextTurn.activeIndex]},created.catalog);
+    assert(advance.ok);nextTurn=advance.state;
+  } while(nextTurn.initiative[nextTurn.activeIndex]!==1);
+  const combined=dispatch(nextTurn,{type:'drinkDraught',unitId:1},created.catalog);assert(combined.ok);
+  const both={...snapshot,activeBattle:combined.state};
+  expect(readRunSnapshot(both,runContext).ok).toBe(true);
+  expect(combined.state.units[0]).toMatchObject({hp:15,secondWindUsed:true});
+  const {draughts:_,...withoutSpend}=combined.state;
+  expect(readRunSnapshot({...both,activeBattle:withoutSpend},runContext).ok).toBe(false);
   const old=JSON.stringify({...JSON.parse(encoded.text),format:3});expect(decodeRunSave(old,runContext)).toEqual({ok:false,reason:'incompatible'});
   // Canonical entry replay follows legal turn ends to the Fighter before healing.
   let live=created.state;const commands:import('../../src/domain/types').Command[]=[];const events:import('../../src/domain/types').BattleEvent[]=[];
   while(live.initiative[live.activeIndex]!==1){const c={type:'endTurn',unitId:live.initiative[live.activeIndex]} as const;const r=dispatch(live,c,created.catalog);assert(r.ok);commands.push(c);events.push(...r.events);live=r.state;}
   const r=dispatch(live,command,created.catalog);assert(r.ok);commands.push(command);events.push(...r.events);
-  const replay=replayRunBattle({format:live.format,versions:live.versions,initial:created.state,commands,battlefield:created.battlefield},items,runContext);assert(replay.ok);
+  const replay=replayRunBattle({format:DRAUGHT_REPLAY_FORMAT_VERSION,versions:live.versions,initial:created.state,commands,battlefield:created.battlefield},items,runContext);assert(replay.ok);
   expect(replay.state).toEqual(r.state);expect(replay.events).toEqual(events);
 });
 
