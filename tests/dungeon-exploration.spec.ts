@@ -17,6 +17,8 @@ import { atCell, atEncounter, atStairApproach, dungeonCapacityFixture, priorDung
 import { LEGACY_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
 import { freshExploration, movableExploration } from '../src/domain/exploration';
 import { encodeDungeon, utf8Bytes } from '../src/domain/dungeonSaveEnvelope';
+
+const fixedSeedTest = test.extend({ pinDungeonSeed: 28 });
 test.beforeEach(async ({ context }) => { await installRailControls(context); });
 test('map markers respect stair availability, discovery and saved floor state',async({page,isMobile})=>{
  const base=freshDungeon('marker-browser',1),floor=base.floors[0];
@@ -215,15 +217,9 @@ test('compass keeps keyboard focus when movement disables the activated directio
  }
 });
 
-test('real traversal, art independence, keyboard locks, active battle and exact reload',async({page,isMobile})=>{
+fixedSeedTest('real traversal, art independence, keyboard locks, active battle and exact reload',async({page,isMobile})=>{
  test.setTimeout(120000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  // Qualify input/art/reload on a traversable witness, independently of fresh entropy.
- await page.addInitScript(()=>{
-  const draw=crypto.getRandomValues.bind(crypto);
-  crypto.getRandomValues=((array:ArrayBufferView<ArrayBuffer>)=>{
-   if(array instanceof Uint32Array&&array.length===1){array[0]=28;return array;}return draw(array);
-  }) as typeof crypto.getRandomValues;
- });
  await page.goto('./?game=dungeon');await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();
  const initial=await dungeonSnapshot(page),f=initial.floors[0],map=generateMap(f.descriptor.seed,'rooms');
  await expect(page.locator('#dungeon-start-encounter')).toHaveCount(0);await expect(page.locator('[aria-label="Discovered places"]')).not.toContainText('Upstairs');

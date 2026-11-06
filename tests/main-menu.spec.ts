@@ -1,6 +1,7 @@
+import { generateMap } from '../src/map/generate';
 import { readFileSync } from 'node:fs';
 import { type Page } from '@playwright/test';
-import { test, expect } from './helpers/coreGraphics';
+import { test, expect } from './helpers/dungeonEntropy';
 import { preparedSnapshot, rewardSnapshot, runContext } from './helpers/runItemFixtures';
 import { encodeRunSave, type RunSnapshot } from '../src/domain/runSaveEnvelope';
 import { readFile } from 'node:fs/promises';
@@ -99,6 +100,17 @@ test('main menu: New Game starts immediately when no dungeon save exists',async(
  await expect.poll(()=>page.evaluate(key=>localStorage.getItem(key),keys.dungeon.primary)).not.toBeNull();
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.battle.primary)).toBe('battle sentinel');
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.run.primary)).toBe('run sentinel');
+});
+test('main menu: New Game starts a fresh dungeon layout',async({page})=>{
+ await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();
+ await expect(page.locator('#dungeon-screen')).toContainText('Floor 1');
+ const first=JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);
+ await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();
+ await page.getByRole('dialog').getByRole('button',{name:'Start new dungeon',exact:true}).click();
+ await expect(page.locator('#dungeon-screen')).toContainText('Floor 1');
+ const second=JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);
+ expect(second.seed).not.toBe(first.seed);
+ expect(generateMap(second.floors[0].descriptor.seed,'rooms').cells).not.toEqual(generateMap(first.floors[0].descriptor.seed,'rooms').cells);
 });
 test('main menu: a dungeon save appearing during navigation requires confirmation',async({page})=>{
  await page.addInitScript(key=>{if(new URLSearchParams(location.search).get('game')==='dungeon')localStorage.setItem(key,'newly arrived save');},keys.dungeon.primary);

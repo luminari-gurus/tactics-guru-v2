@@ -109,6 +109,11 @@ export function floorDescriptor(seed: number, depth: number, cache = new FloorCa
   });
   return { ...floorGeometry(seed, depth, legacy ? 'grassland-v1' : `${dungeonBiome(seed, depth)}-v1`, cache), encounters };
 }
+/** Injectable uint32 draw so app entropy and tests share the same previous-seed collision rule. */
+export function newDungeonSeed(draw: () => number, previous?: number): number {
+  const seed = draw() >>> 0;
+  return seed === previous ? (seed + 1) >>> 0 : seed;
+}
 export function freshDungeon(id: string, seed: number, encounterPolicy: DungeonEncounterPolicy = DUNGEON_ENCOUNTER_POLICY): DungeonState {
   if (!/^[A-Za-z0-9-]{1,64}$/.test(id) || !seedOk(seed)) throw new RangeError('Invalid dungeon identity');
   if (encounterPolicy !== DUNGEON_ENCOUNTER_POLICY && encounterPolicy !== LEGACY_ENCOUNTER_POLICY) throw new RangeError('Invalid encounter policy');

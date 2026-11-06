@@ -126,7 +126,13 @@ export class BattleScene extends Phaser.Scene {
       board.present(session.state,reach?.ok?reach.cells.map(c=>c.cell):[],selected,preview?.ok?preview.path:[],selection.overlays(),hover,danger);
       hud.render(action,selected,message,selection.showDanger && session.phase==='player',threats,selection.planning && !radial.open);
       const caption=document.querySelector('#battle-board-caption')!;
-      caption.textContent=board.pickingHint+caption.textContent;
+      // Picking changes independently of the cached controls. Compose a fresh
+      // caption so hover cannot accumulate hints or retain a cleared hint.
+      const captionText=board.pickingHint+(session.phase==='player' && action && action!=='move' && !session.active.hasActed
+        ? 'Gold: active · ✓ valid target · × unavailable · Double outline: selected'
+        : 'Gold: active · White: selected · Teal: reachable')+' · Purple dots: ability reach · Pink +: target in reach · Ring: preview origin'
+        +(selection.showDanger && session.phase==='player'?' · Orange triangle: hero potentially threatened':'');
+      if(caption.textContent!==captionText)caption.textContent=captionText;
       game.dataset.phase=session.phase;
       game.dataset.session=JSON.stringify({state:session.state,replay:session.replay,continuation:session.continuation,events:session.events,pending:session.pending,phase:session.phase});
       if(session.phase!=='player' || dialogs.open)radial.hide();
