@@ -87,6 +87,7 @@ export class BattleHud {
   readonly target: HTMLSelectElement;
   readonly ability: HTMLSelectElement;
   private abilityKey="";
+  private lastRender: readonly unknown[] = [];
   private skin: CombatSkin = 'rail';
   private readonly actorRoot=document.querySelector<HTMLElement>('#battle-actor')!;
   private readonly abort=new AbortController();
@@ -135,6 +136,7 @@ export class BattleHud {
     mountCombatControlsPreference(this.root.querySelector('#battle-overflow')!);
   }
   applySkin(skin: CombatSkin) {
+    this.lastRender = [];
     this.skin = skin;
     document.body.dataset.combatSkin = skin;
     document.body.classList.toggle('battle-skin-radial', skin === 'radial');
@@ -189,6 +191,12 @@ export class BattleHud {
     this.root.querySelector('#battle-sound-status')!.textContent=labels[snapshot.status]+(snapshot.error?`: ${snapshot.error}`:'');
   }
   render(action:Action|null, selected:CellPosition|null, message:string, danger=false, threats:readonly Threat[] | null=null, planWaiting=false) {
+    // Hover refreshes only change the board. Rebuilding the live controls during
+    // a pointer gesture can disturb native select interaction and scroll anchoring.
+    const inputs = [this.session.state, this.session.phase, this.session.pending, this.session.pendingPlan,
+      this.session.error, action, selected?.x, selected?.y, message, danger, threats, planWaiting, this.skin];
+    if (inputs.every((value, i) => Object.is(value, this.lastRender[i]))) return;
+    this.lastRender = inputs;
     const s=this.session, enabled=s.phase==='player', actor=s.active;
     const showPlanCancel=this.skin==='radial' && planWaiting && enabled;
     this.root.dataset.planWaiting=String(showPlanCancel);
@@ -254,13 +262,21 @@ export class BattleHud {
     this.root.querySelector('#battle-target-info')!.textContent=target?`Target: ${unitLabel(s,target)}`:'';
     const inspect=this.root.querySelector<HTMLButtonElement>('#battle-inspect-target')!;inspect.hidden=this.skin==='radial'||!target;inspect.dataset.unitId=target?String(target.id):'';
     this.root.querySelector('#battle-preview')!.textContent=s.error?`${s.phase==='error'?'Battle stopped':'Unavailable'}: ${s.error}`:message;
-    document.querySelector('#battle-board-caption')!.textContent = (enabled && action && action!=='move' && !actor.hasActed
-      ? 'Gold: active · ✓ valid target · × unavailable · Double outline: selected'
-      : 'Gold: active · White: selected · Teal: reachable') + ' · Purple dots: ability reach · Pink +: target in reach · Ring: preview origin' + (danger?' · Orange triangle: hero potentially threatened':'');
     const options: {cell:CellPosition;label:string}[]=[];
     if(enabled && action==='move') {if(movement?.ok) for(const c of movement.cells.filter(c=>c.cost>0)) options.push({cell:c.cell,label:`(${c.cell.x}, ${c.cell.y}) · cost ${c.cost}`});}
     else if(enabled && action) for(const u of actionTargets(s,action)) options.push({cell:u.cell,label:unitLabel(s,u)});
-    this.target.replaceChildren(new Option('Choose target',''),...options.map(o=>new Option(o.label,`${o.cell.x},${o.cell.y}`)));
+    const selectedValue=selected?`${selected.x},${selected.y}`:'';
+    const targetOptions=options.map(o=>new Option(o.label,`${o.cell.x},${o.cell.y}`));
+    // Board inspection may select an illegal destination. Keep it visible with
+    // its authoritative rejection instead of leaving the dropdown blank.
+    if(selected && !targetOptions.some(o=>o.value===selectedValue)) {
+      const command=action==='move'?{type:'move' as const,unitId:actor.id,to:selected}:null;
+      const preview=command?s.preview(command):null;
+      const reason=preview && !preview.ok?previewText(preview):'Unavailable target';
+      const option=new Option(`(${selected.x}, ${selected.y}) · ${reason}`,selectedValue);
+      option.disabled=true;targetOptions.push(option);
+    }
+    this.target.replaceChildren(new Option('Choose target',''),...targetOptions);
     this.target.value=selected?`${selected.x},${selected.y}`:'';this.target.disabled=!enabled || !action;
   }
   append(events:readonly BattleEvent[]) {

@@ -385,6 +385,8 @@ test('hero progression commits once, heals at a threshold and survives inspectio
  await expect(page.locator('section[aria-label="Party"]')).toContainText('Level 2');
  await expect(page.locator('section[aria-label="Party"]')).toContainText('XP');
  await expect(page.locator('.dungeon-status')).toContainText('reached level 2');
+ await expect(page.locator('.dungeon-status')).toContainText('learned Second Wind');
+ await expect(page.locator('.dungeon-status')).not.toContainText('ability:');
  await page.locator('section[aria-label="Party"]').scrollIntoViewIfNeeded();
  await expect(page.locator('section[aria-label="Party"]')).toBeVisible();
  expect(await page.locator('#dungeon-screen').evaluate(n=>n.scrollWidth<=n.clientWidth)).toBe(true);

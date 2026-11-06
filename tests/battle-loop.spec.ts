@@ -6,6 +6,80 @@ import { BattleSession } from '../src/app/BattleSession';
 import { previewTacticalPlan } from '../src/domain/tacticalPlan';
 import { enemyThreats } from '../src/domain/threat';
 import { displayName } from '../src/ui/hud';
+import { boardPoint } from './helpers/battlePolicy';
+
+test('QA: hover refresh preserves controls and first-click Confirm and Wait', async ({page,isMobile}) => {
+  await page.goto('./battle');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const before=await session(page), actor=before.state.units.find(u=>u.id===before.state.initiative[before.state.activeIndex])!;
+  const movement=previewMovement(before.state,actor.id,catalog);
+  if(!movement.ok)throw Error(movement.reason);
+  const destination=movement.cells.find(c=>c.cost>0)!.cell;
+  await page.locator('#battle-target').selectOption(`${destination.x},${destination.y}`);
+  await expect(page.locator('#battle-review')).toBeEnabled();
+  if(!isMobile) {
+    // An ordinary trip from the board to the controls must not rebuild a native
+    // select or rewrite text under the pointer while the player is clicking.
+    await page.evaluate(()=>{
+      (window as typeof window & {qaMutations:number}).qaMutations=0;
+      new MutationObserver(records=>{(window as typeof window & {qaMutations:number}).qaMutations+=records.length;})
+        .observe(document.querySelector('#battle-controls')!,{childList:true,subtree:true});
+    });
+    const point=await boardPoint(page,actor.cell);
+    await page.mouse.move(point.x,point.y);
+    await page.locator('#battle-review').hover();
+    expect(await page.evaluate(()=>(window as typeof window & {qaMutations:number}).qaMutations)).toBe(0);
+  }
+  const activate=async(selector:string)=>{if(isMobile)await page.locator(selector).tap();else await page.locator(selector).click();};
+  await activate('#battle-review');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const moved=await session(page);
+  expect(moved.state.commandCount).toBe(before.state.commandCount+1);
+  expect(moved.state.units.find(u=>u.id===actor.id)!.cell).toEqual(destination);
+  await activate('#battle-log-open');await activate('#log-close');
+  await expect(page.locator('#battle-dialog')).not.toBeVisible();
+  await activate('#battle-next');
+  await expect.poll(async()=> (await session(page)).state.commandCount).toBeGreaterThan(moved.state.commandCount);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const waited=await session(page);
+  expect(waited.replay.commands.slice(moved.replay.commands.length).filter(c=>c.type==='endTurn'&&c.unitId===actor.id)).toHaveLength(1);
+});
+
+test('QA: rejected board move stays named in the target picker and a legal selection recovers', async ({page}) => {
+  await page.goto('./battle');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const before=await session(page), actor=before.state.units.find(u=>u.id===before.state.initiative[before.state.activeIndex])!;
+  // The board cursor starts on the actor. Selecting it is an illegal zero-step
+  // move; it must remain inspectable without becoming a prepared command.
+  await page.locator('canvas').focus();await page.keyboard.press('Enter');
+  await expect(page.locator('#battle-target')).toHaveValue(`${actor.cell.x},${actor.cell.y}`);
+  await expect(page.locator('#battle-target option:checked')).toContainText('Unavailable: Same Cell');
+  await expect(page.locator('#battle-preview')).toContainText('Unavailable: Same Cell');
+  await expect(page.locator('#battle-review')).toBeDisabled();
+  expect((await session(page)).state).toEqual(before.state);
+  const far=catalog.maps[before.state.mapId].cells.find(cell=>{
+    const preview=previewMove(before.state,{type:'move',unitId:actor.id,to:{x:cell.x,y:cell.y}},catalog);
+    return !preview.ok && preview.reason==='unreachable';
+  });
+  expect(far).toBeDefined();
+  if(!far)throw Error('No unreachable destination in the battle fixture');
+  for(let x=actor.cell.x;x!==far.x;x+=Math.sign(far.x-x))await page.keyboard.press(far.x>x?'ArrowRight':'ArrowLeft');
+  for(let y=actor.cell.y;y!==far.y;y+=Math.sign(far.y-y))await page.keyboard.press(far.y>y?'ArrowDown':'ArrowUp');
+  await expect(page.locator('#battle-target')).toHaveValue(`${far.x},${far.y}`);
+  await expect(page.locator('#battle-target option:checked')).toContainText('Unavailable: Unreachable');
+  await expect(page.locator('#battle-preview')).toContainText('Unavailable: Unreachable');
+  await expect(page.locator('#battle-review')).toBeDisabled();
+  expect((await session(page)).state).toEqual(before.state);
+  const movement=previewMovement(before.state,actor.id,catalog);
+  if(!movement.ok)throw Error(movement.reason);
+  const destination=movement.cells.find(c=>c.cost>0)!.cell;
+  await page.locator('#battle-target').selectOption(`${destination.x},${destination.y}`);
+  await expect(page.locator('#battle-review')).toBeEnabled();
+  await expect(page.locator('#battle-target')).toHaveValue(`${destination.x},${destination.y}`);
+  await page.locator('#battle-cancel').click();
+  await expect(page.locator('#battle-review')).toBeDisabled();
+  expect((await session(page)).state).toEqual(before.state);
+});
 
 test('enemy danger inspection toggles without changing battle state or saves', async ({page}) => {
   await page.goto('./?game=battle');
