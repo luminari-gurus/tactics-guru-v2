@@ -115,12 +115,19 @@ passing current-head PR runs were #288 `42057412982`, #289 `42057452222`, and
 
 The [browser-to-unit inventory](browser-rule-coverage.md) maps combat, progression,
 dungeon/run, persistence, audio and device boundaries to their existing fast
-coverage and retained browser obligations. The next additive increment covers
-nine XP boundaries for the development ability-picker fixture, including its
+coverage and retained browser obligations. Merged PR #300 covers nine XP
+boundaries for the development ability-picker fixture, including its
 synthetic level-two action, exact HUD choice inputs, legal missile counts,
-cancellation/spent-action locks and fresh transient reconstruction. It changes
-no browser selection. Fixture-loop reduction needs its own retained UI witnesses,
-exact discovery comparison and matched browser timing before removal.
+cancellation/spent-action locks and fresh transient reconstruction. It changed
+no browser selection. PR #327 follows with the bounded XP 600 fixture reduction,
+preserving all three distinct picker states (XP 0/60/180) and their actual reload
+witnesses on each prior Chromium profile. Its
+[QA record](../qa/ability-fixture-reduction/README.md) owns exact discovery,
+removed assertion mappings and the qualified matched comparison: 12/12 original
+and 9/9 retained cases passed. Browser process wall decreased from 124.734s to
+93.500s (25.0% observed for this subset, with persistent caches and uncontrolled
+background workload). The same job passed 1,185 units, both type scopes, two
+build integrations and seven core journeys; ordinary verification took 192.734s.
 
 Cold dependency/browser setup measurement remains open; existing successful
 under-ten-minute observations use persistent caches. See the inventory for the
