@@ -13,6 +13,18 @@ export function dungeonEncounterLabel(s: DungeonState, slot: number): string {
   return kind === 'boss' ? 'Guardian · Goblins' : `${kind[0].toUpperCase()}${kind.slice(1)} encounter ${slot + 1}`;
 }
 
+/** Reward and battle phases belong to the active POI, not every revealed marker. */
+export function dungeonEncounterStatus(s: DungeonState, slot: number): string {
+  const f = currentFloor(s);
+  const activeSlot = f.exploration.version === 'exploration-v2' ? f.exploration.active
+    : s.phase === 'reward' ? f.completed - 1 : s.phase === 'battle' ? f.completed : null;
+  const active = activeSlot === slot;
+  if (active && s.phase === 'reward') return 'Reward pending';
+  if (clearedDungeonSlots(f).includes(slot)) return 'Cleared';
+  if (s.phase === 'defeat') return 'Unavailable after defeat';
+  return active && s.phase === 'battle' ? 'In battle' : 'Available';
+}
+
 /** View-local art state and bindings; no simulation timer or authoritative DOM state. */
 export class DungeonMap {
   readonly root = document.createElement('section');
@@ -78,7 +90,7 @@ export class DungeonMap {
     }
     const center=el('span');center.className='dungeon-compass-center';center.setAttribute('aria-hidden','true');directions.append(center);
     const list=el('ul');list.setAttribute('aria-label','Discovered places');
-    const entries=[...(showUpstairs?[{id:'stairs-up',cell:f.descriptor.upstairs,label:'Upstairs',status:'Available'}]:[]),...f.exploration.pois.map(p=>({id:p.id,cell:poiCell(p),label:`${dungeonEncounterLabel(s,p.encounterSlot)} · ${biome.label} · Floor ${s.depth}`,status:cleared.includes(p.encounterSlot)?'Cleared':s.phase==='ready'?'Available':s.phase==='reward'?'Reward pending':s.phase==='battle'?'In battle':'Unavailable after defeat'})),...(showDownstairs?[{id:'stairs-down',cell:f.descriptor.downstairs,label:'Downstairs',status:'Unlocked'}]:[])];
+    const entries=[...(showUpstairs?[{id:'stairs-up',cell:f.descriptor.upstairs,label:'Upstairs',status:'Available'}]:[]),...f.exploration.pois.map(p=>({id:p.id,cell:poiCell(p),label:`${dungeonEncounterLabel(s,p.encounterSlot)} · ${biome.label} · Floor ${s.depth}`,status:dungeonEncounterStatus(s,p.encounterSlot)})),...(showDownstairs?[{id:'stairs-down',cell:f.descriptor.downstairs,label:'Downstairs',status:'Unlocked'}]:[])];
     for(const p of entries)if(f.exploration.revealed.includes(p.cell)){const row=el('li',`${p.label} · row ${Math.floor(p.cell/20)+1}, column ${p.cell%20+1} · ${p.status}${f.exploration.visited.includes(p.cell)?' · Visited':''}`);row.dataset.poiId=p.id;list.append(row);}
     this.root.replaceChildren(heading,label,el('p','● Player · M encounter (including guardian) · ✓ cleared · ↑ upstairs (floor 2+) · ↓ downstairs (all encounters cleared). Enemies move when you move. Tap adjacent cells or use direction controls.'),grid,directions,feedback,list);
     this.paintArt();

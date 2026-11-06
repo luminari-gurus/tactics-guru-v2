@@ -1,3 +1,5 @@
+import { dungeonOffer } from '../src/domain/dungeon';
+import { atEncounter, checkedDungeon } from './helpers/dungeonFixtures';
 import { expect,test } from './helpers/startupDiagnostics';
 import { writeFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
@@ -451,4 +453,27 @@ test('closing on each wandering encounter holds contact and saves the matching b
   expect(await dungeonSnapshot(page)).toEqual(entered);
   await expect(page.locator('#battle-party')).toBeVisible();
  }
+});
+
+test('only the Guardian has reward pending after a Guardian-first victory and reload',async({page})=>{
+ // Structural reward boundary isolates marker rendering, not preceding combat.
+ const base=atEncounter(freshDungeon('guardian-first',1),2),floor=base.floors[0];
+ const staged:DungeonState={...base,phase:'reward',floors:[{...floor,completed:1,
+  exploration:{...movableExploration(floor.exploration,floor.descriptor.seed,0,'ready'),cleared:[2],active:2,revealed:Array.from({length:400},(_,i)=>i)}}]};
+ const reward=checkedDungeon(readDungeon({...staged,offer:dungeonOffer(staged)}));
+ const encoded=encodeDungeon(reward);if(!encoded.ok)throw Error(encoded.reason);
+ await page.goto('./?game=dungeon');
+ await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
+ const check=async()=>{
+  const places=page.getByRole('list',{name:'Discovered places',exact:true});
+  await expect(places.locator('[data-poi-id="enemy-3"]')).toContainText('Reward pending');
+  for(const id of ['enemy-1','enemy-2'])await expect(places.locator(`[data-poi-id="${id}"]`)).toContainText('Available');
+  await expect(places).not.toContainText('In battle');
+ };
+ await page.reload();await continueSavedDungeon(page);await check();
+ await page.reload();await continueSavedDungeon(page);await check();
+ await page.getByRole('button',{name:/^Claim /}).first().click();
+ await page.locator('#dungeon-item-confirm').click();
+ await expect(page.locator('[data-poi-id="enemy-3"]')).toContainText('Cleared');
+ await expect(page.getByRole('list',{name:'Discovered places',exact:true})).not.toContainText('Reward pending');
 });
