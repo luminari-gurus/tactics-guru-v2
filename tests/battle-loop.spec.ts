@@ -685,3 +685,18 @@ test('accepted rail and dock preserve drawable floors, readable controls and foc
   }
   writeFileSync(info.outputPath('responsive-measurements.json'),JSON.stringify(measurements,null,2));expect(errors).toEqual([]);
 });
+
+test('narrow landscape battle stacks controls below a usable board @fixed-viewport', async ({ page }) => {
+ for (const viewport of [{width:320,height:200},{width:400,height:300},{width:480,height:320}]) {
+  await page.setViewportSize(viewport);
+  await page.goto('./battle');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const board=await page.locator('#battle-board-region').boundingBox();
+  const panel=await page.locator('#fit-panel').boundingBox();
+  expect(board!.width).toBeGreaterThan(viewport.width*.85);
+  expect(board!.height).toBeGreaterThan(30);
+  expect(panel!.y).toBeGreaterThanOrEqual(board!.y+board!.height);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  await page.screenshot({path:test.info().outputPath(`narrow-${viewport.width}.png`)});
+ }
+});
