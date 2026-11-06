@@ -1,4 +1,5 @@
 import { expect,test } from './helpers/startupDiagnostics';
+import type { Page } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { dungeonSnapshot, walkDungeon, continueSavedDungeon } from './helpers/dungeonTraversal';
@@ -12,7 +13,7 @@ import { readSession,playCommand } from './helpers/battlePolicy';
 import { installRailControls } from './helpers/forceRailControls';
 import { playerDecision } from './helpers/playerPolicy';
 import { dungeonBattle } from '../src/domain/dungeon';
-import { atCell, atStairApproach, dungeonCapacityFixture, priorDungeonEnvelope, dungeonContactApproach } from './helpers/dungeonFixtures';
+import { atCell, atEncounter, atStairApproach, dungeonCapacityFixture, priorDungeonEnvelope, dungeonContactApproach } from './helpers/dungeonFixtures';
 import { LEGACY_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
 import { freshExploration, movableExploration } from '../src/domain/exploration';
 import { encodeDungeon, utf8Bytes } from '../src/domain/dungeonSaveEnvelope';
@@ -288,7 +289,7 @@ test('records route transfer and map responsiveness against established budgets'
  for(let i=0;i<20;i++)timings.push(await page.evaluate(destination=>{const begin=performance.now();const cell=document.querySelector<HTMLElement>(`#dungeon-map [data-cell="${destination}"]`)!;cell.click();return performance.now()-begin;},i%2===0?neighbor:f.position));
  const frames=await page.evaluate(async({a,b})=>{
    const idle:number[]=[],steps:number[]=[];
-   for(const [count,output] of [[30,idle],[40,steps]] as const){let previous=await new Promise<number>(r=>requestAnimationFrame(r));for(let i=0;i<count;i++){if(output===steps)document.querySelector<HTMLElement>(`#dungeon-map [data-cell="${i%2===0?b:a}"]`)!.click();const now=await new Promise<number>(r=>requestAnimationFrame(r));output.push(now-previous);previous=now;}}
+   for(const [count,output] of [[30,idle],[40,steps]] as const){let previous=await new Promise<number>(r=>requestAnimationFrame(r));for(let i=0;i<count;i++){if(output===steps)document.querySelector<HTMLElement>(`#dungeon-map [data-cell="${i%2===0?b:a}"]`)!.click();const now=await new Promise<number>(r=>requestAnimationFrame(r));output.push((Math.round(now*1000)-Math.round(previous*1000))/1000);previous=now;}}
    const p=(v:number[],q:number)=>[...v].sort((a,b)=>a-b)[Math.ceil(v.length*q)-1];return {idle,steps,idleP50:p(idle,.5),idleP95:p(idle,.95),stepP95:p(steps,.95)};
  },{a:f.position,b:neighbor});
  await page.locator('#dungeon-art').selectOption('legacy-8bit');if(f.descriptor.biome==='desert-v1')await expect(page.locator('#dungeon-map-feedback')).toContainText('fallback');else await expect(page.locator('#dungeon-map-feedback')).not.toContainText('fallback');
@@ -298,6 +299,13 @@ test('records route transfer and map responsiveness against established budgets'
  const diagnostics=await page.evaluate(()=>window.fitDiagnostics()),saveBytes=utf8Bytes((await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary))??'');
  const receipt={frames,frameBudgets:{idleP50:16.7,idleP95:20,stepP95:33.4},framePasses:{idleP50:frames.idleP50<=16.7,idleP95:frames.idleP95<=20,stepP95:frames.stepP95<=33.4},commit:diagnostics.build.commit,dirty:diagnostics.build.dirty,viewport:diagnostics.viewport,userAgent:diagnostics.userAgent,floorCreationMs,descriptorBytes:utf8Bytes(canonical(f.descriptor)),saveBytes,coldUsableMs,stepP95Ms:p95,codeGzipBytes:gzip,observedAssetBytes:assets,budgets:{coldUsableMs:2500,stepP95Ms:33.4,codeGzipBytes:400000,assetBytes:1500000},passes:{cold:coldUsableMs<=2500,step:p95<=33.4,code:gzip<=400000,assets:assets<=1500000},code,timings,resources};
  writeFileSync(test.info().outputPath('exploration-performance.json'),JSON.stringify(receipt,null,2));expect(timings).toHaveLength(20);expect((await dungeonSnapshot(page)).floors[0].position).toBe(f.position);
+ expect.soft(coldUsableMs,'Cold exploration readiness').toBeLessThanOrEqual(2500);
+ expect.soft(p95,'Synchronous exploration step P95').toBeLessThanOrEqual(33.4);
+ expect.soft(gzip,'Compressed exploration route code').toBeLessThanOrEqual(400000);
+ expect.soft(assets,'Observed exploration route assets').toBeLessThanOrEqual(1500000);
+ expect.soft(frames.idleP50,'Idle exploration frame P50').toBeLessThanOrEqual(16.7);
+ expect.soft(frames.idleP95,'Idle exploration frame P95').toBeLessThanOrEqual(20);
+ expect.soft(frames.stepP95,'Exploration movement-frame P95').toBeLessThanOrEqual(33.4);
 });
 
 for(const biome of ['forest','desert'] as const)test(`${biome} saved kinds, scaled inspection and reload use actual selected definitions`,async({page,isMobile})=>{
@@ -526,4 +534,157 @@ test('closing on each wandering encounter holds contact and saves the matching b
   await expect(page.locator('#battle-party')).toBeVisible();
  }
 
+});
+
+const dungeonEngineModule=/\/(?:start|BattleScene)-[^/]+\.js(?:\?.*)?$|\/src\/phaser\/(?:start|BattleScene)\.ts(?:\?.*)?$/;
+async function loadEncounterWithoutEngine(page:Page,id:string){
+ const initial=atEncounter(freshDungeon(id,1)),encoded=encodeDungeon(initial);
+ if(!encoded.ok)throw Error(encoded.reason);
+ await page.goto('./?game=dungeon');
+ await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
+ await page.reload();await continueSavedDungeon(page);
+ await expect(page.locator('#dungeon-map')).toBeVisible();
+ await expect(page.locator('canvas')).toHaveCount(0);
+ return initial;
+}
+const dungeonSlots=(page:Page)=>page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),DUNGEON_KEYS);
+
+async function finishRequestedDungeonModules(page:Page,requested:Set<string>){
+ // Vite requests the entry chunks and their shared chunks through modulepreload.
+ // Join only those observed requests; a prior navigation's networkidle flag is not proof of evaluation.
+ const hints=await page.locator('link[rel="modulepreload"]').evaluateAll(links=>links.map(link=>(link as HTMLLinkElement).href));
+ const urls=[...new Set([...requested,...hints.filter(url=>dungeonEngineModule.test(url))])];
+ expect(urls.length).toBeGreaterThan(0);
+ await expect.poll(()=>urls.every(url=>requested.has(url))).toBe(true);
+ await page.evaluate(async urls=>{
+  await Promise.all(urls.map(url=>import(url)));
+  await new Promise<void>(resolve=>queueMicrotask(resolve));
+ },urls);
+}
+
+test('unavailable battle modules preserve dungeon exploration, recovery and the saved encounter',async({page})=>{
+ const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+ let blocked=0;
+ await page.route(dungeonEngineModule,route=>{blocked++;return route.abort();});
+ const initial=await loadEncounterWithoutEngine(page,'lazy-engine-unavailable');
+ expect(blocked).toBe(0);
+ await page.getByRole('button',{name:'Enter encounter',exact:true}).click();
+ await expect(page.locator('#dungeon-load-error')).toContainText('Could not load the encounter');
+ expect(blocked).toBeGreaterThan(0);
+ const pending=await dungeonSnapshot(page),saved=await dungeonSlots(page);
+ expect(pending.id).toBe(initial.id);expect(pending.phase).toBe('battle');expect(pending.revision).toBe(initial.revision+1);
+ expect(JSON.parse(saved.primary!).payload).toEqual(pending);
+ await expect(page.getByRole('button',{name:'Save recovery',exact:true})).toBeEnabled();
+ await expect(page.getByRole('button',{name:'Start new dungeon',exact:true})).toBeEnabled();
+ await page.locator('#dungeon-map').focus();await page.keyboard.press('ArrowRight');
+ expect(await dungeonSnapshot(page)).toEqual(pending);expect(await dungeonSlots(page)).toEqual(saved);
+ await expect(page.locator('canvas')).toHaveCount(0);
+ await page.unroute(dungeonEngineModule);
+ await page.getByRole('button',{name:'Reload page',exact:true}).click();
+ await continueSavedDungeon(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ const resumed=await dungeonSnapshot(page);
+ expect(resumed.id).toBe(pending.id);expect(resumed.depth).toBe(pending.depth);
+ expect(resumed.activeBattle!.seed).toBe(pending.activeBattle!.seed);
+ expect(errors).toEqual([]);
+});
+
+test('delayed dungeon loading locks repeated entry and waits for recovery to close',async({page})=>{
+ const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+ let release!:()=>void;const requests=new Set<string>();
+ const gate=new Promise<void>(resolve=>{release=resolve;});
+ await page.route(dungeonEngineModule,async route=>{requests.add(route.request().url());await gate;await route.continue();});
+ try {
+  const initial=await loadEncounterWithoutEngine(page,'lazy-engine-recovery');
+  await page.getByRole('button',{name:'Enter encounter',exact:true}).evaluate(button=>{(button as HTMLButtonElement).click();(button as HTMLButtonElement).click();});
+  await expect.poll(()=>requests.size).toBeGreaterThan(0);
+  await expect(page.getByRole('heading',{name:'Loading encounter',exact:true})).toBeVisible();
+  await expect(page.locator('#game')).toHaveAttribute('data-ready','false');
+  await expect(page.locator('#game')).not.toHaveAttribute('data-phase','player');
+  const pending=await dungeonSnapshot(page),saved=await dungeonSlots(page);
+  expect(pending.revision).toBe(initial.revision+1);
+  await page.getByRole('button',{name:'Save recovery',exact:true}).click();
+  await expect(page.getByRole('dialog')).toContainText('Dungeon save recovery');
+  release();
+  // Drain the deferred module graph before asserting that no engine mounted behind the modal.
+  await finishRequestedDungeonModules(page,requests);
+  await expect(page.locator('canvas')).toHaveCount(0);
+  expect(await dungeonSnapshot(page)).toEqual(pending);expect(await dungeonSlots(page)).toEqual(saved);
+  await page.locator('#dungeon-close-recovery').click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  expect((await dungeonSnapshot(page)).id).toBe(pending.id);
+  await expect(page.locator('canvas')).toHaveCount(1);expect(errors).toEqual([]);
+ }finally {release();}
+});
+
+for(const interruption of ['restart','pagehide','visible'] as const)test(interruption==='visible'?'hidden dungeon engine resumes once when visible':`pending dungeon engine cannot mount after ${interruption}`,async({page})=>{
+ const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+ let release!:()=>void;const requests=new Set<string>();
+ const gate=new Promise<void>(resolve=>{release=resolve;});
+ await page.route(dungeonEngineModule,async route=>{requests.add(route.request().url());await gate;await route.continue();});
+ try {
+  const initial=await loadEncounterWithoutEngine(page,`lazy-engine-${interruption}`);
+  await page.getByRole('button',{name:'Enter encounter',exact:true}).click();
+  await expect.poll(()=>requests.size).toBeGreaterThan(0);
+  if(interruption==='restart'){
+   await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();
+   await page.locator('#dungeon-confirm-new').click();
+   await expect(page.locator('#dungeon-map')).toBeVisible();
+   const fresh=await dungeonSnapshot(page);expect(fresh.id).not.toBe(initial.id);expect(fresh.phase).toBe('ready');
+  }else {
+   await page.evaluate(()=>Object.defineProperty(document,'hidden',{configurable:true,value:true}));
+  }
+  const retained=await dungeonSnapshot(page),saved=await dungeonSlots(page);
+  release();await finishRequestedDungeonModules(page,requests);
+  await expect(page.locator('canvas')).toHaveCount(0);
+  if(interruption==='pagehide'){
+   // This exercises disposal callbacks and deferred visibility work, not an actual BFCache traversal.
+   await page.evaluate(()=>{
+    window.dispatchEvent(new Event('pagehide'));
+    Object.defineProperty(document,'hidden',{configurable:true,value:false});
+    document.dispatchEvent(new Event('visibilitychange'));
+   });
+  }
+  expect(await dungeonSnapshot(page)).toEqual(retained);expect(await dungeonSlots(page)).toEqual(saved);
+  if(interruption==='visible'){
+   await page.evaluate(()=>{
+    Object.defineProperty(document,'hidden',{configurable:true,value:false});
+    document.dispatchEvent(new Event('visibilitychange'));
+   });
+   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+   const resumed=await dungeonSnapshot(page);
+   expect(resumed.id).toBe(retained.id);expect(resumed.activeBattle!.seed).toBe(retained.activeBattle!.seed);
+   await expect(page.locator('canvas')).toHaveCount(1);
+  }else await expect(page.locator('canvas')).toHaveCount(0);
+  expect(errors).toEqual([]);
+ }finally {release();}
+});
+
+test('adopting a recovered dungeon invalidates the pending encounter load',async({page,isMobile})=>{
+ const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+ let release!:()=>void;const requests=new Set<string>();
+ const gate=new Promise<void>(resolve=>{release=resolve;});
+ await page.route(dungeonEngineModule,async route=>{requests.add(route.request().url());await gate;await route.continue();});
+ try {
+  const initial=await loadEncounterWithoutEngine(page,'lazy-engine-before-adoption');
+  await page.getByRole('button',{name:'Enter encounter',exact:true}).click();
+  await expect.poll(()=>requests.size).toBeGreaterThan(0);
+  const adopted=freshDungeon('lazy-engine-adopted',7),encoded=encodeDungeon(adopted);
+  if(!encoded.ok)throw Error(encoded.reason);
+  await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.backup,text:encoded.text});
+  await page.getByRole('button',{name:'Save recovery',exact:true}).click();
+  await page.locator('#dungeon-continue-backup').click();
+  const retained=await dungeonSnapshot(page),saved=await dungeonSlots(page);
+  expect(retained).toEqual(adopted);expect(retained.id).not.toBe(initial.id);
+  release();await finishRequestedDungeonModules(page,requests);
+  await expect(page.locator('#dungeon-map')).toBeVisible();await expect(page.locator('canvas')).toHaveCount(0);
+  expect(await dungeonSnapshot(page)).toEqual(retained);expect(await dungeonSlots(page)).toEqual(saved);
+  const floor=retained.floors[0],map=floorMap(floor.descriptor);
+  const next=neighbors(floor.position,map.width).find(cell=>map.cells[cell]&&cell!==floor.descriptor.downstairs&&!floor.exploration.pois.some(p=>poiCell(p,map.width)===cell));
+  if(next===undefined)throw Error('No safe recovered-floor step');
+  await walkDungeon(page,next,isMobile?'touch':'keyboard');
+  const stepped=await dungeonSnapshot(page);
+  expect(stepped.id).toBe(adopted.id);expect(stepped.phase).toBe('ready');expect(stepped.floors[0].position).toBe(next);
+  expect(JSON.parse((await dungeonSlots(page)).primary!).payload).toEqual(stepped);
+  await expect(page.locator('canvas')).toHaveCount(0);expect(errors).toEqual([]);
+ }finally {release();}
 });

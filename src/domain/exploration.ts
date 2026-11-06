@@ -64,8 +64,9 @@ export function readExploration(value: unknown, seed: number, position: number, 
       !reveal(position, map.width, map.height).every(i => (value.revealed as number[]).includes(i))) return null;
   if (!map.cells[position] || !value.visited.every(i => map.cells[i])) return null;
   if (!movable) {
-    if (canonical(value.pois) !== canonical(encounterPois(seed,map))) return null;
-    return { version: EXPLORATION_VERSION, pois: encounterPois(seed,map), revealed: [...value.revealed], visited: [...value.visited] };
+    const pois = encounterPois(seed,map);
+    if (canonical(value.pois) !== canonical(pois)) return null;
+    return { version: EXPLORATION_VERSION, pois, revealed: [...value.revealed], visited: [...value.visited] };
   }
   if (!isDenseArray(value.cleared,3) || !value.cleared.every((n,i)=>typeof n === 'number' && Number.isInteger(n) && n >= 0 && n < 3 && (i===0 || n > (value.cleared as number[])[i-1])) ||
       !(value.active === null || typeof value.active === 'number' && Number.isInteger(value.active) && value.active >= 0 && value.active < 3) ||

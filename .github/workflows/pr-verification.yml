@@ -68,48 +68,91 @@ jobs:
       - name: Record served build
         if: ${{ steps.build.outcome == 'success' }}
         run: find dist -type f -print0 | sort -z | xargs -0 sha256sum > verification-receipts/issue184/build.sha256
-      - name: Maximum-floor Chromium behavior, containment and timing
+      - name: Chromium initial and maximum floor budgets
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         env:
           PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/maximum-chromium.json
-        run: npx --no-install playwright test -c playwright.regression.config.ts tests/dungeon-exploration.spec.ts -g 'maximum-size' --workers=1 --retries=0 --reporter=line,json --trace=retain-on-failure --output=verification-receipts/issue184/maximum-chromium-artifacts
-      - name: Maximum-floor WebKit behavior, containment and timing
+        run: npx --no-install playwright test -c playwright.regression.config.ts tests/dungeon-exploration.spec.ts -g 'maximum-size|records route transfer|cold progression-format' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/maximum-chromium-artifacts
+      - name: WebKit initial and maximum floor budgets
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         env:
           PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/maximum-webkit.json
-        run: npx --no-install playwright test -c playwright.exploration.config.ts -g 'maximum-size' --workers=1 --retries=0 --reporter=line,json --trace=retain-on-failure --output=verification-receipts/issue184/maximum-webkit-artifacts
-      - name: Dungeon and map Chromium consumers
+        run: npx --no-install playwright test -c playwright.exploration.config.ts -g 'maximum-size|records route transfer|cold progression-format' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/maximum-webkit-artifacts
+      - name: Upload initial performance receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue184-performance-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/issue184/
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Dungeon Chromium consumers
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         env:
           PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/chromium-consumers.json
-        run: npx --no-install playwright test -c playwright.regression.config.ts tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts tests/dungeon-lifecycle.spec.ts tests/overworld-map.spec.ts --grep-invert 'maximum-size' --workers=1 --retries=0 --reporter=line,json --trace=retain-on-failure --output=verification-receipts/issue184/chromium-consumer-artifacts
+        run: npx --no-install playwright test -c playwright.regression.config.ts tests/dungeon-exploration.spec.ts tests/dungeon-lifecycle.spec.ts --grep-invert 'maximum-size|records route transfer|cold progression-format' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/chromium-consumer-artifacts
+      - name: Complete Chromium dungeon battle and travel witnesses
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/chromium-journeys.json
+        run: npx --no-install playwright test -c playwright.regression.config.ts tests/dungeon.spec.ts -g 'Shaman production journey|read-only entry, keyboard new dungeon|legal reward and guardian boundaries' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/chromium-journey-artifacts
       - name: Saved-dungeon menu consumers
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         env:
           PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/menu.json
-        run: npx --no-install playwright test -c playwright.regression.config.ts tests/main-menu.spec.ts --workers=1 --retries=0 --reporter=line,json --trace=retain-on-failure --output=verification-receipts/issue184/menu-artifacts
+        run: npx --no-install playwright test -c playwright.regression.config.ts tests/main-menu.spec.ts -g 'dungeon|New Game|new-game|stale Continue|unavailable storage and failed artwork' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/menu-artifacts
       - name: Shared dungeon guard and direct-route isolation consumers
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         env:
           PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/shared-chromium.json
         run: >-
-          npx --no-install playwright test -c playwright.regression.config.ts tests/guarded-effects.spec.ts tests/battle-persistence.spec.ts -g 'shared Guarded lifecycle and saved feedback: dungeon|testing routes:' --workers=1 --retries=0 --reporter=line,json --trace=retain-on-failure --output=verification-receipts/issue184/shared-chromium-artifacts
+          npx --no-install playwright test -c playwright.regression.config.ts tests/guarded-effects.spec.ts tests/battle-persistence.spec.ts -g 'shared Guarded lifecycle and saved feedback: dungeon|testing routes:' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/shared-chromium-artifacts
       - name: WebKit direct-route save isolation
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         env:
           PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/shared-webkit.json
-        run: npx --no-install playwright test -c playwright.device-acceptance.config.ts tests/battle-persistence.spec.ts -g 'testing routes:' --workers=1 --retries=0 --reporter=line,json --trace=retain-on-failure --output=verification-receipts/issue184/shared-webkit-artifacts
+        run: npx --no-install playwright test -c playwright.device-acceptance.config.ts tests/battle-persistence.spec.ts -g 'testing routes:' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/shared-webkit-artifacts
       - name: WebKit exploration consumers
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         env:
           PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/webkit-consumers.json
-        run: npx --no-install playwright test -c playwright.exploration.config.ts --grep-invert 'maximum-size' --workers=1 --retries=0 --reporter=line,json --trace=retain-on-failure --output=verification-receipts/issue184/webkit-consumer-artifacts
-      - name: Development map placement and disposal
+        run: npx --no-install playwright test -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts tests/dungeon-lifecycle.spec.ts --grep-invert 'maximum-size|records route transfer|cold progression-format' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/webkit-consumer-artifacts
+      - name: Complete WebKit dungeon battle and travel witnesses
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/webkit-journeys.json
+        run: npx --no-install playwright test -c playwright.exploration.config.ts tests/dungeon.spec.ts -g 'Shaman production journey|read-only entry, keyboard new dungeon|legal reward and guardian boundaries' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/webkit-journey-artifacts
+      - name: Dungeon audio and public assets at root preview
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/audio-root-preview.json
+        run: npx --no-install playwright test -c playwright.regression.config.ts tests/public-asset-base.spec.ts -g 'dungeon audio' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/audio-root-preview-artifacts
+      - name: Dungeon audio and public assets at root dev
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         env:
           PLAYWRIGHT_SERVER_MODE: dev
-          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/map-dev.json
-        run: npx --no-install playwright test -c playwright.regression.config.ts tests/overworld-map.spec.ts -g 'controlled placement failure|direct map disposer' --workers=1 --retries=0 --reporter=line,json --trace=retain-on-failure --output=verification-receipts/issue184/map-dev-artifacts
+          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/audio-root-dev.json
+        run: npx --no-install playwright test -c playwright.regression.config.ts tests/public-asset-base.spec.ts -g 'dungeon audio' --project=desktop --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/audio-root-dev-artifacts
+      - name: Build prefix bundle for deferred engine delivery
+        id: prefix
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run build:bundle -- --base=/prototype/
+      - name: Record served prefix bundle
+        if: ${{ !cancelled() && steps.prefix.outcome == 'success' }}
+        run: find dist -type f -print0 | sort -z | xargs -0 sha256sum > verification-receipts/issue184/prefix-build.sha256
+      - name: Dungeon audio and public assets at prefix preview
+        if: ${{ !cancelled() && steps.prefix.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_BASE_PATH: /prototype/
+          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/audio-prefix-preview.json
+        run: npx --no-install playwright test -c playwright.prefix-assets.config.ts -g 'dungeon audio' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/audio-prefix-preview-artifacts
+      - name: Dungeon audio and public assets at prefix dev
+        if: ${{ !cancelled() && steps.prefix.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_BASE_PATH: /prototype/
+          PLAYWRIGHT_SERVER_MODE: dev
+          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/audio-prefix-dev.json
+        run: npx --no-install playwright test -c playwright.prefix-assets.config.ts -g 'dungeon audio' --workers=1 --retries=0 --reporter=line,json --trace=off --output=verification-receipts/issue184/audio-prefix-dev-artifacts
       - uses: actions/upload-artifact@v4
         if: always()
         with:

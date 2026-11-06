@@ -4,7 +4,7 @@ import { generateMap } from '../../src/map/generate';
 import { neighbors, poiCell } from '../../src/domain/exploration';
 import { clearedDungeonSlots, floorMap } from '../../src/domain/dungeon';
 export async function dungeonSnapshot(page: Page): Promise<DungeonState> { return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!); }
-/** Wait for Phaser READY (`#dungeon-screen[data-boot=ready]`), then heading and an enabled Continue. */
+/** Wait for the dungeon DOM entry (`#dungeon-screen[data-boot=ready]`), then heading and an enabled Continue. */
 export async function continueSavedDungeon(page: Page) {
   const boot = { timeout: 60_000 };
   await expect(page.locator('#dungeon-screen')).toHaveAttribute('data-boot', 'ready', boot);
