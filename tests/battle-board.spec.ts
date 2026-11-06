@@ -79,6 +79,30 @@ test('occluded archer exposed art selects the same legal target as the dropdown'
   expect(errors).toEqual([]);
 });
 
+test('overlap caption stays singular during hover and clears when picking resets',async({page},info)=>{
+  await occlusionBoundary(page,9);
+  await page.locator('#battle-target').selectOption('3,5');
+  await boardClick(page,{x:-77,y:160},!!info.project.use.hasTouch);
+  const caption=page.locator('#battle-board-caption');
+  await expect(caption).toContainText('Overlap 1/2');
+  const r=await settledReport(page), x=r.transform.x-77*r.transform.scale, y=r.transform.y+160*r.transform.scale;
+  const before=await page.locator('#game').getAttribute('data-session');
+  for(const dx of [20,40,60,80,100]) {
+    await page.mouse.move(x+dx,y);
+    expect((await caption.textContent())!.match(/Overlap /g)?.length??0).toBeLessThanOrEqual(1);
+  }
+  expect(await page.locator('#game').getAttribute('data-session')).toBe(before);
+  await page.locator('#battle-target').selectOption('3,5');
+  await expect(caption).not.toContainText('Overlap');
+  await expect(caption).toContainText('Teal: reachable');
+  await page.locator('[data-action=basic]').click();
+  await expect(caption).toContainText('✓ valid target');
+  await page.locator('#battle-danger').click();
+  await expect(caption).toContainText('Orange triangle: hero potentially threatened');
+  await page.locator('#battle-danger').click();
+  await expect(caption).not.toContainText('Orange triangle');
+});
+
 test('repeated map selection reaches a legal ground destination behind the same platform',async({page,browserName},info)=>{
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
   page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});

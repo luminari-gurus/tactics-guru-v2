@@ -1,5 +1,9 @@
 # Nov 5 QA controls and level-up acceptance
 
+This records the original implementation at `125c239`. The subsequent caption
+review correction and its current-source acceptance are recorded in
+[caption-fix/README.md](caption-fix/README.md).
+
 Fixes #326, #325 and #319. Runtime and test inputs are identified in
 [receipt.json](receipt.json); compressed logs retain the results below.
 
