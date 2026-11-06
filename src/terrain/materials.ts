@@ -1,6 +1,6 @@
 // Square top-down sources; Phaser supplies projection and elevation geometry.
 export const TERRAIN_IDS = ["grass","grass_path","stone","forest","tree_single","tree_cluster","tree_dense","water","cliff","mud","sand","ash","lava","brush"] as const;
-export type TerrainId = typeof TERRAIN_IDS[number] | 'rock';
+export type TerrainId = typeof TERRAIN_IDS[number] | 'rock' | 'void';
 // Trees are separate props; their tile surfaces use the forest floor material.
 export const MATERIAL_IDS = TERRAIN_IDS.filter(id =>
   id !== 'tree_single' && id !== 'tree_cluster' && id !== 'tree_dense' && id !== 'brush',

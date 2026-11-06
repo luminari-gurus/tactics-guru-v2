@@ -16,11 +16,21 @@ const SELECTED_COLOR = 0xffffff;
 const BOB_HEIGHT = 2;
 const BOB_CYCLE_MS = 1200;
 const cellKey = (cell: CellPosition): string => `${cell.x},${cell.y}`;
+const DEFAULT_COLUMN_COLORS = { left: 0x354538, right: 0x4c6050, top: 0x5b7157 } as const;
+
+/** Optional presentation-only board look; battle rules never read it. */
+export interface BoardStyle {
+  readonly id: string;
+  readonly columnColors?: { readonly left: number; readonly right: number; readonly top: number };
+  readonly surfaceTint?: number;
+}
 
 /** Draws snapshots and sends selection intent; combat state belongs to BattleScene. */
 export class BoardRenderer {
   private readonly root: Phaser.GameObjects.Container;
   private readonly board;
+  /** Drawn, pickable tiles: `void` cells exist for the rules but are open air. */
+  private readonly solidTiles;
   private readonly byCell;
   private readonly bounds: Bounds;
   private readonly highlights = new Map<string, Phaser.GameObjects.Image>();
@@ -118,18 +128,29 @@ export class BoardRenderer {
   }
 
   constructor(private readonly scene: Phaser.Scene, private readonly catalog: ContentCatalog, private readonly mapId: MapId,
-    private readonly onSelect: (cell: CellPosition | null) => void) {
+    private readonly onSelect: (cell: CellPosition | null) => void, style?: BoardStyle) {
     this.board = buildBoardPresentation(catalog, mapId);
+    this.solidTiles = this.board.tiles.filter(tile => tile.terrain !== 'void');
     this.byCell = new Map(this.board.tiles.map(tile => [cellKey(tile), tile]));
     this.root = scene.add.container();
+    const colors = style?.columnColors ?? DEFAULT_COLUMN_COLORS;
+    const columnPrefix = style?.columnColors ? `column-${style.id}` : 'column';
     for (const tile of orderTiles(this.board.tiles)) {
       const point = projectTile(tile);
+      if (tile.terrain === 'void') {
+        // Keep a highlight so cursor/overlay bookkeeping stays total over the map.
+        const highlight = scene.add.image(point.x - 44, point.y - 24, this.highlightTexture(0))
+          .setOrigin(0).setDisplaySize(88,48).setDepth(tile.depth + 2).setVisible(false);
+        this.highlights.set(cellKey(tile), highlight);
+        this.root.add(highlight);
+        continue;
+      }
       // Repeated immutable column shapes share a texture; depth and placement stay per tile.
       const columnBounds = {left:-TILE_WIDTH/2, top:-TILE_HEIGHT/2, right:TILE_WIDTH/2, bottom:TILE_HEIGHT/2 + BASE_THICKNESS + tile.elevation * ELEVATION_STEP};
-      const columnKey = this.shapeTexture(`column-${tile.elevation}`, columnBounds, graphics => {
+      const columnKey = this.shapeTexture(`${columnPrefix}-${tile.elevation}`, columnBounds, graphics => {
         const local = tileFaces({x:0,y:0,elevation:tile.elevation});
         graphics.translateCanvas(0, tile.elevation * ELEVATION_STEP);
-        for (const [points,color] of [[local.left,0x354538],[local.right,0x4c6050],[local.top,0x5b7157]] as const)
+        for (const [points,color] of [[local.left,colors.left],[local.right,colors.right],[local.top,colors.top]] as const)
           graphics.fillStyle(color).fillPoints(points.map(p=>new Phaser.Math.Vector2(p.x,p.y)),true);
       });
       const column = scene.add.image(point.x + columnBounds.left, point.y + columnBounds.top, columnKey)
@@ -137,6 +158,7 @@ export class BoardRenderer {
       const surface = scene.add.container(point.x, point.y).setScale(1, TILE_HEIGHT / TILE_WIDTH).setDepth(tile.depth + 1);
       const image = scene.add.image(0, 0, tile.surfaceAssetId).setOrigin(0.5)
         .setDisplaySize(TILE_WIDTH / Math.SQRT2, TILE_WIDTH / Math.SQRT2).setRotation(Math.PI / 4);
+      if (style?.surfaceTint !== undefined) image.setTint(style.surfaceTint);
       surface.add(image);
       this.surfaces.push({ tile, image });
       const highlight = scene.add.image(point.x - 44, point.y - 24, this.highlightTexture(0))
@@ -175,11 +197,11 @@ export class BoardRenderer {
     }
     // Reserve sprite space on every cell so moving never escapes the fitted bounds.
     // Reserve the maximum bounded bar extent on every cell (also during movement).
-    const rectangles = [boardBounds(this.board.tiles), ...this.board.tiles.map(tile => {
+    const rectangles = [boardBounds(this.solidTiles), ...this.solidTiles.map(tile => {
       const p = projectTile(tile);
       return {left:p.x-48, right:p.x+24, top:p.y-46, bottom:p.y+19};
     }), ...this.canopies.map(({ tile }) => canopyBounds(tile)),
-      ...this.board.tiles.flatMap(tile => this.board.occupants.map(occupant => {
+      ...this.solidTiles.flatMap(tile => this.board.occupants.map(occupant => {
         const asset = catalog.assets[occupant.assetId];
         return unitBounds(tile, { x: occupant.anchor.x / asset.runtimeWidth, y: occupant.anchor.y / asset.runtimeHeight });
       }))];
@@ -620,7 +642,7 @@ export class BoardRenderer {
 
   private pickCandidates(point: Point): Tile[] {
     const local=screenToBoard(point,this.view);
-    const candidates=pickTileCandidates(this.board.tiles,local);
+    const candidates=pickTileCandidates(this.solidTiles,local);
     const front=candidates[0];
     // Only visible opaque living art can precede the solid terrain hit. Use the
     // authoritative cell/anchor, independent of transient presentation offsets.

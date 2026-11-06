@@ -12,8 +12,9 @@ const opacitySlider = document.querySelector<HTMLInputElement>('#tree-opacity')!
 const audioButton = document.querySelector<HTMLButtonElement>('#audio-play')!;
 const report = document.querySelector<HTMLElement>('#fit-report')!;
 let restart: (() => void) | undefined;
-const contentSmoke = new URLSearchParams(location.search).get('scene') === 'content-smoke';
-const battle = !contentSmoke && new URLSearchParams(location.search).get('scene') !== 'proof';
+const qbert = appEntry.route === 'qbert';
+const contentSmoke = !qbert && new URLSearchParams(location.search).get('scene') === 'content-smoke';
+const battle = qbert || (!contentSmoke && new URLSearchParams(location.search).get('scene') !== 'proof');
 if (battle) {
   const runLink=document.createElement('a');runLink.href=`${import.meta.env.BASE_URL}run`;runLink.textContent='Play three-encounter run';runLink.className='run-entry-link';
   document.querySelector('#fit-panel')!.append(runLink);
@@ -22,6 +23,7 @@ if (battle) {
   document.querySelector<HTMLElement>('#fit-panel')!.setAttribute('aria-label', 'Battle controls');
   document.querySelector<HTMLElement>('#board-caption')!.textContent = 'Gold: active · White: selected · Teal: reachable · Tap to select · Drag to pan · Wheel/pinch to zoom · Keyboard: arrows, Enter selects, Escape cancels';
   restartButton.textContent = 'Restart battle';
+  if (qbert) document.querySelector<HTMLElement>('#battle-heading h1')!.textContent = 'Q*bert Pyramid';
   mountBattleLayout();
 }
 if (contentSmoke) {
@@ -63,7 +65,8 @@ window.addEventListener('unhandledrejection', () => showError('The scene encount
 
 try {
   const { startProof } = await import('../phaser/start');
-  restart = startProof(setStatus, showError, appEntry.persistent);
+  const variant = qbert ? await import('../content/qbertPyramid').then(m => ({ catalog: m.qbertCatalog, mapId: m.QBERT_MAP_ID, style: m.QBERT_BOARD_STYLE })) : undefined;
+  restart = startProof(setStatus, showError, appEntry.persistent, variant);
 } catch {
   showError('Could not load or start Phaser');
 }

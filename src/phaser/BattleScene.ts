@@ -3,7 +3,7 @@ import { progressionLabel } from '../domain/progression';
 import { standaloneBattleCatalog } from '../content/standaloneCatalog';
 import Phaser from 'phaser';
 import { battleCatalog } from '../content/catalog';
-import type { AbilityId, CellPosition, ContentCatalog } from '../content/types';
+import type { AbilityId, CellPosition, ContentCatalog, MapId } from '../content/types';
 import { BattleSession, type Presentation } from '../app/BattleSession';
 import { BattlePersistence } from '../app/BattlePersistence';
 import { previewMove, previewMovement } from '../domain/grid';
@@ -20,7 +20,7 @@ import { BattleSelection } from '../ui/battleSelection';
 import { BattleRadial, clientPointFromCanvas } from '../ui/battleRadial';
 import { resolveCombatControlsSkin, watchCombatControls, type CombatSkin } from '../ui/combatControls';
 import { lightHaptic, type RadialSliceId } from '../ui/radialGesture';
-import { BoardRenderer } from './BoardRenderer';
+import { BoardRenderer, type BoardStyle } from './BoardRenderer';
 import { bindBoardInput } from './BoardInput';
 import { contentLoadPlan, loadContentAssets } from './contentLoading';
 import { BattleAudio } from './BattleAudio';
@@ -31,18 +31,25 @@ export interface RunBattleHost {
   ended: () => void; restart: () => void;
 }
 export const FIRST_BATTLE_MAP_ID = 'map:forest_ruins';
+/** Alternate standalone (non-persistent) testing battle on another map, e.g. /qbert. */
+export interface BattleVariant {
+  readonly catalog: unknown;
+  readonly mapId: MapId;
+  readonly style?: BoardStyle & { readonly background?: string };
+}
 export class BattleScene extends Phaser.Scene {
   private persistence: BattlePersistence | null = null;
   private restartAction: (()=>void) | null = null;
   private soundEnabled = false;
   private testingSeed = 1;
-  constructor(private readonly status: (state: 'loading'|'ready'|'error') => void, private readonly error: (message:string)=>void, private readonly host?: RunBattleHost, private readonly persistent = false) {super('battle'); this.soundEnabled=host?.sound.enabled??false;}
+  constructor(private readonly status: (state: 'loading'|'ready'|'error') => void, private readonly error: (message:string)=>void, private readonly host?: RunBattleHost, private readonly persistent = false, private readonly variant?: BattleVariant) {super('battle'); this.soundEnabled=host?.sound.enabled??false;}
   requestRestart(){this.restartAction?.();}
   create():void {
     this.status('loading');measurements.begin(performance.now());
     let catalog:ContentCatalog;
     // Hosts supply trusted progression/equipment projections of validated raw content.
-    try{catalog=this.host?.catalog??contentLoadPlan(battleCatalog);}catch(e){this.error(e instanceof Error?e.message:'Invalid battle content');return;}
+    if(this.variant?.style?.background)this.cameras.main.setBackgroundColor(this.variant.style.background);
+    try{catalog=this.host?.catalog??contentLoadPlan(this.variant?.catalog??battleCatalog);}catch(e){this.error(e instanceof Error?e.message:'Invalid battle content');return;}
     if(!this.host)catalog=standaloneBattleCatalog(catalog);
     loadContentAssets(this,catalog,()=>{try{this.prepareBattle(catalog);}catch(e){this.error(e instanceof Error?e.message:'Could not render battle');}},this.error);
   }
@@ -54,11 +61,11 @@ export class BattleScene extends Phaser.Scene {
       this.begin(catalog,host.session,host.dialogs,fn=>{host.modalTransition=fn;});
       return;
     }
-    if (!this.persistent) {
+    if (!this.persistent || this.variant) {
       let modalTransition=()=>{};
       const dialogs=new BattleDialogs(()=>modalTransition(),()=>this.requestRestart());
       const outcomeKey=crypto.randomUUID();
-      const session=new BattleSession(catalog,FIRST_BATTLE_MAP_ID,this.testingSeed,()=>{
+      const session=new BattleSession(catalog,this.variant?.mapId??FIRST_BATTLE_MAP_ID,this.testingSeed,()=>{
         if(session.state.outcome!=='ongoing')track('battle_outcome',{route:'battle',phase:'ended',outcome:session.state.outcome==='playerWin'?'victory':'defeat'},outcomeKey);
       });
       track('battle_started',{route:'battle',phase:session.phase});
@@ -166,7 +173,7 @@ export class BattleScene extends Phaser.Scene {
       refresh();
       if(changed)measurements.interaction('selection',inputMs);
     };
-    const board=new BoardRenderer(this,catalog,session.state.mapId,select);
+    const board=new BoardRenderer(this,catalog,session.state.mapId,select,this.host?undefined:this.variant?.style);
     const radial=new BattleRadial(selection,{
       commit:(cell,slice,abilityId)=>commitSlice(cell,slice,abilityId),
       inspect:()=>{

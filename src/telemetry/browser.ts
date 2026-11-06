@@ -37,7 +37,7 @@ export function startTelemetry() {
     if (!collectionAllowed(env, { automated: navigator.webdriver, local: ['localhost','127.0.0.1','[::1]'].includes(location.hostname), dnt: navigator.doNotTrack === '1' || (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl === true,
       optedOut: localStorage.getItem(OPT_OUT) === 'true' })) return;
     const route = classifyRoute(location.pathname, location.search, env.BASE_URL);
-    if(route==='menu'||route==='dungeon')return;
+    if(route==='menu'||route==='dungeon'||route==='qbert')return;
     accepting = true;
     const context: Context = { route, phase: 'entry' };
     setTelemetryContext({ ...context, visibility: document.hidden ? 'hidden' : 'visible' });
