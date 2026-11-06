@@ -1,3 +1,4 @@
+import { testingProgress } from '../ui/testingProgress';
 import { consumeEntryIntent, routeHref } from './routes';
 import { appEntry } from './entry';
 import { menuReturnLink } from '../ui/menuReturn';
@@ -164,7 +165,7 @@ function render() {
   },'run-start'));
   if(!review.ok || (!review.selected && Object.values(review.inspection).some(slot=>slot.status==='unavailable')))actions.append(button('Play unsaved run',()=>{startup=false;controller.playUnsaved();render();},'run-unsaved'));
   actions.append(button('Save recovery',showRecovery,'run-recovery'));
-  }else actions.append(button('Start new run',requestNew,'run-start'),document.createTextNode('Testing run. Progress resets on reload.'));
+  }else actions.append(button('Start new run',requestNew,'run-start'),testingProgress('run'));
   // Startup is read-only: the seed placeholder is never saved or rendered as owned progress.
   items.replaceChildren(title);actions.append(nav.cloneNode(true), dungeonNav.cloneNode(true), menuReturnLink(() => !startup && controller.hasUnsavedProgress, showRecovery));mountTelemetryPreferences(actions);controller.onChange=()=>{evidence();};
  } else renderActions();
@@ -172,7 +173,7 @@ function render() {
 }
 function renderActions() {
  actions.replaceChildren();
- if(!storage)actions.append(document.createTextNode('Testing run. Progress resets on reload.'));
+ if(!storage)actions.append(testingProgress('run'));
  const snapshot=controller.snapshot,run=snapshot.items.run;
  if(run.phase==='battle' && !snapshot.activeBattle) actions.append(button('Start encounter',startBattle,'run-start-encounter'));
  else if(run.phase==='victory' || run.phase==='defeat') {
