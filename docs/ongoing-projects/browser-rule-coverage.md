@@ -9,7 +9,7 @@ permutation is covered or authorize removing the remaining browser cases.
 | --- | --- | --- |
 | Commands, turn/RNG and replay | `combat`, `turns`, `battleSession`, `saveEnvelope`, `battlefieldContinuation` unit suites | Complete legal battle, command controls, reload and replay in the core journey |
 | Progression and learned actions | `progression` and `dungeonProgressionBoundary` | Dungeon XP 0/180 picker and party inspection across the retained Chromium/WebKit profiles; earned progression in explicit extended journeys |
-| Authored ability-picker XP fixture | New `abilityFixtureProgression` plus `battleActions` | All four existing XP fixture cases still run on three Chromium fixture profiles; DOM health/choices/inspection, actual reload and pointer/touch are unchanged |
+| Authored ability-picker XP fixture | `abilityFixtureProgression` plus `battleActions` | XP 0/60/180 retain the three distinct picker states on all three Chromium fixture profiles; DOM health/choices/inspection, actual reload and separate pointer/touch cases remain |
 | Dungeon floor, traversal, encounter and reward rules | `dungeon`, `exploration`, `dungeonBattle`, `dungeonEncounters`, `rewards` | Dungeon creation, real action and exact active resume on Chromium/WebKit; stair and complete progression journeys remain explicit |
 | Run items, rewards and terminal transitions | `run`, `runBattle`, `items`, `itemCommands`, `RunItemSession` | Core undo/reload/terminal journey plus explicit authored item/encounter fixtures |
 | Persistence and recovery failures | `saveEnvelope`, `runSaveEnvelope`, `battleStorage`, `runStorage`, dungeon storage/session tests in `dungeon`, and `menuSaves` | Real reload, recovery dialogs/focus, native download and browser lifecycle/BFCache witnesses |
@@ -21,7 +21,7 @@ Suite names above refer to `tests/unit/<name>.test.ts`. They identify relevant
 owners; a change still needs transitive-consumer selection under
 [`verification-policy.md`](../verification-policy.md).
 
-## Current increment: XP fixture rule coverage
+## Merged rule coverage: PR #300
 
 The development ability fixture uses `abilityCatalog(2)`, rather than the
 production catalog. Its synthetic `ability:zz_mage` unlocks at level two. The
@@ -44,19 +44,23 @@ local draft accidentally used the positioned helper directly (a resumed session)
 and failed nine replay assertions. Correcting the test composition fixed those
 failures; no product or fixture behavior was changed.
 
-## Next removal requires browser evidence
+## Bounded fixture reduction
 
-`tests/ability-picker.spec.ts` still runs XP 0/60/180/600. Removing its XP 60 or
-600 cases is a separate increment. Retain real DOM health, choice, inspection,
-action and actual fixture-reload witnesses; preserve level-one, level-two and
-level-three UI transitions where each is distinct. The synthetic level-two gate
-means the earlier dungeon XP 0/180 mapping cannot simply be copied here.
+PR #327 removes only XP 600 from `tests/ability-picker.spec.ts`, retaining XP
+0/60/180 on the same three profiles. The synthetic level-two gate is distinct,
+so XP 60 remains a real UI witness. The removed level-five HP and three-missile
+permutation is covered by the nine boundary units; XP 180 keeps the same
+three-choice picker, full-health DOM, inspection, accepted cast and actual reload.
+Separate native picker/touch, cancellation and narrow-layout cases remain.
 
-Before editing that loop, capture exact fixture discovery, identify each removed
-assertion's retained unit/UI witness, then execute the affected Chromium fixture
-profiles on a qualified self-hosted runner with matching baseline/candidate
-inputs. Retain failures and compare timings. Keep core discovery at seven and
-do not claim an E2E reduction or speedup from this additive unit increment.
+The [QA record](../qa/ability-fixture-reduction/README.md) tracks exact discovery,
+removed-to-retained mappings and qualified matched execution. Fixture discovery
+changes from 93 to 90; the standalone ability alias changes from 60 to 57.
+These are two entry points for the same three removals, not six different cases.
+Core discovery remains seven. Qualified same-host execution passed all 12
+original and nine retained cases, with no failures/skips/flakes; the measured
+browser process wall decreased from 124.734s to 93.500s (25.0% for this subset).
+The QA record retains exact inputs, report hashes and measurement limits.
 
 ## Remaining measurement work
 

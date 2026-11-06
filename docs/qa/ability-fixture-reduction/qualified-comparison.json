@@ -1,0 +1,281 @@
+{
+  "base": "19529c5a47f48489e2c9e169af774ac9d37759a5",
+  "source": "7b6ec831c4029efbfee9bd32d8650eeac47c3969",
+  "tree": "de185385db297462782363bbb741e33e7e114f21",
+  "runner": "unraid-tactics-01",
+  "node": "v24.22.1",
+  "lockSha256": "e4768389a179a65df5f04502dab87e8875b465b939e55493d5820a7dc99a74ed",
+  "conditions": "Sequential same-process baseline then candidate on qualified VM01; persistent caches; host workloads not independently controlled. Baseline replaces only the spec with exact base bytes; all other inputs remain the candidate tree.",
+  "results": [
+    {
+      "id": "baseline",
+      "specSha256": "501ba6f7f86a9d99abb0d595793860da3e1fadd0353e2f56c8211dc492c910c7",
+      "args": [
+        "node_modules/playwright/cli.js",
+        "test",
+        "-c",
+        "playwright.fixtures.config.ts",
+        "tests/ability-picker.spec.ts",
+        "-g",
+        "progression XP ",
+        "--reporter=line,json",
+        "--trace=retain-on-failure",
+        "--retries=0",
+        "--output=/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/ability-fixture-migration/baseline-artifacts"
+      ],
+      "wallMs": 124733.90645299999,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "interrupted": false,
+      "error": null,
+      "cleanup": {
+        "mode": "linux-proc-ancestry",
+        "sampleIntervalMs": 100,
+        "escalated": [],
+        "survivors": [],
+        "errors": [],
+        "complete": true
+      },
+      "stats": {
+        "startTime": "2026-11-06T01:19:53.308Z",
+        "duration": 124161.257,
+        "expected": 12,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "reportSha256": "03fe384ae84c2b2120ffe8d5e954da281962d937ad808b4479b202cf3f9e4b69",
+      "passed": true,
+      "selectionSha256": "c8782227b3cc5c9e38bbfe8d4bd248c0625ed350493651d4e80f6c60f7c380f3"
+    },
+    {
+      "id": "candidate",
+      "specSha256": "ce88a767d5612a4aed49fb56a2d84f4c3b953502e84a89fe91b20088d6481923",
+      "args": [
+        "node_modules/playwright/cli.js",
+        "test",
+        "-c",
+        "playwright.fixtures.config.ts",
+        "tests/ability-picker.spec.ts",
+        "-g",
+        "progression XP ",
+        "--reporter=line,json",
+        "--trace=retain-on-failure",
+        "--retries=0",
+        "--output=/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/ability-fixture-migration/candidate-artifacts"
+      ],
+      "wallMs": 93499.74762099999,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "interrupted": false,
+      "error": null,
+      "cleanup": {
+        "mode": "linux-proc-ancestry",
+        "sampleIntervalMs": 100,
+        "escalated": [],
+        "survivors": [],
+        "errors": [],
+        "complete": true
+      },
+      "stats": {
+        "startTime": "2026-11-06T01:21:59.643Z",
+        "duration": 92925.42,
+        "expected": 9,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "reportSha256": "260d3d034a955d4b9ef56ff5508bad56e09bb6e6b1e6084b15fdb7b09e2ec437",
+      "passed": true,
+      "selectionSha256": "f736792a7de05f0e42f7929778cea66be88183dae2dbd9b68f6eec18a53d1f69"
+    }
+  ],
+  "restoredSpecSha256": "ce88a767d5612a4aed49fb56a2d84f4c3b953502e84a89fe91b20088d6481923",
+  "passed": true,
+  "sourceReceiptSha256": "05bfbec47223e8fefd9b21e681bb535d1355cd73508df48c8ab2c0d954d049cd",
+  "workflow": {
+    "runId": 42142702532,
+    "head": "53fc67bc2a71aed58e3416a78d4b08305ec60c54",
+    "url": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42142702532",
+    "runner": "unraid-tactics-01",
+    "startedAt": "2026-11-06T01:16:24Z",
+    "completedAt": "2026-11-06T01:23:39Z",
+    "activeJobSeconds": 435,
+    "queuedSeconds": 2,
+    "artifactId": 13468627761,
+    "artifactDigest": "sha256:fc57487cfdb2c45cba293eb0191348f9e23b6923f20a1aca0e2cb2205ba41412",
+    "expiresAt": "2026-11-20T01:23:32Z",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T01:16:25Z",
+        "completedAt": "2026-11-06T01:16:26Z"
+      },
+      {
+        "name": "Check host disposition",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T01:16:27Z",
+        "completedAt": "2026-11-06T01:16:27Z"
+      },
+      {
+        "name": "Run actions/checkout@v4",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T01:16:27Z",
+        "completedAt": "2026-11-06T01:16:31Z"
+      },
+      {
+        "name": "Run actions/setup-node@v4",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T01:16:31Z",
+        "completedAt": "2026-11-06T01:16:31Z"
+      },
+      {
+        "name": "Run npm ci",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T01:16:31Z",
+        "completedAt": "2026-11-06T01:16:37Z"
+      },
+      {
+        "name": "Run npm run setup:browsers",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T01:16:37Z",
+        "completedAt": "2026-11-06T01:16:38Z"
+      },
+      {
+        "name": "Run npm run verify:pr",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T01:16:38Z",
+        "completedAt": "2026-11-06T01:19:51Z"
+      },
+      {
+        "name": "Bounded ability-fixture baseline and candidate comparison",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T01:19:51Z",
+        "completedAt": "2026-11-06T01:23:32Z"
+      },
+      {
+        "name": "Run actions/upload-artifact@v4",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T01:23:32Z",
+        "completedAt": "2026-11-06T01:23:34Z"
+      },
+      {
+        "name": "Post Run actions/setup-node@v4",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T01:23:34Z",
+        "completedAt": "2026-11-06T01:23:37Z"
+      },
+      {
+        "name": "Post Run actions/checkout@v4",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T01:23:37Z",
+        "completedAt": "2026-11-06T01:23:37Z"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success",
+        "startedAt": "2026-11-06T01:23:37Z",
+        "completedAt": "2026-11-06T01:23:37Z"
+      }
+    ]
+  },
+  "observedSubsetReductionPercent": 25.040632270880657,
+  "ordinaryVerification": {
+    "source": "7b6ec831c4029efbfee9bd32d8650eeac47c3969",
+    "dirty": "",
+    "node": "v24.22.1",
+    "startedAt": "2026-11-06T01:16:38.278Z",
+    "budgetMs": 480000,
+    "durationMs": 192734,
+    "stages": [
+      {
+        "id": "tooling",
+        "durationMs": 6119.700223,
+        "status": "passed",
+        "exitCode": 0,
+        "timedOut": false,
+        "interrupted": false,
+        "error": null
+      },
+      {
+        "id": "units",
+        "durationMs": 53614.156779000004,
+        "status": "passed",
+        "exitCode": 0,
+        "timedOut": false,
+        "interrupted": false,
+        "error": null
+      },
+      {
+        "id": "typecheck",
+        "durationMs": 1286.172123999997,
+        "status": "passed",
+        "exitCode": 0,
+        "timedOut": false,
+        "interrupted": false,
+        "error": null
+      },
+      {
+        "id": "build-integration",
+        "durationMs": 7363.879418999997,
+        "status": "passed",
+        "exitCode": 0,
+        "timedOut": false,
+        "interrupted": false,
+        "error": null
+      },
+      {
+        "id": "bundle",
+        "durationMs": 974.093652999989,
+        "status": "passed",
+        "exitCode": 0,
+        "timedOut": false,
+        "interrupted": false,
+        "error": null
+      },
+      {
+        "id": "journeys",
+        "durationMs": 123364.17964500001,
+        "status": "passed",
+        "exitCode": 0,
+        "timedOut": false,
+        "interrupted": false,
+        "error": null
+      }
+    ],
+    "reports": {
+      "summary.json": {
+        "sha256": "846d9d2fba271f5a198d6c7331e22f97ab5da5932b86ed4f1635ce7a5ee5f1cd"
+      },
+      "units.json": {
+        "sha256": "4be73227827666f1da87e8cc31f5e9a4a33c6ccfbbabbd687e920062d69b5f48"
+      },
+      "build-integration.json": {
+        "sha256": "006f70a76ee28eb83179f7acbb0c897e0e09f54534d5e5ae7eb82cb329848bd8"
+      },
+      "journeys.json": {
+        "sha256": "6e82f39bc6e4fcefbc3757276637e6381e393d5019fbfb9671c46147d39b3b4c"
+      }
+    },
+    "counts": {
+      "units": 1185,
+      "buildIntegrations": 2,
+      "journeys": {
+        "startTime": "2026-11-06T01:17:48.299Z",
+        "duration": 122667.214,
+        "expected": 7,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    }
+  },
+  "limitations": [
+    "One fixed-order same-host comparison, persistent caches, background workloads not independently controlled; not a full-regression speedup or cold-setup result.",
+    "The 435-second job includes both extra comparison phases; ordinary verification itself took 192.734 seconds. Final ordinary-only job is separately qualified.",
+    "Temporary harness and workflow changes are removed after these receipts; final application, fixture, dependency and selection inputs stay unchanged."
+  ]
+}
