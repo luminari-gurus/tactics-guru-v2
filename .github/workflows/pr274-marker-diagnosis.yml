@@ -1,0 +1,62 @@
+name: PR 274 marker timeout diagnosis
+on:
+  push:
+    branches: [cursor/deterministic-dungeon-seeds-308b]
+    paths: [.github/workflows/pr274-marker-diagnosis.yml]
+permissions:
+  contents: read
+concurrency:
+  group: tactics-browser-tactics-browser-01
+  queue: max
+  cancel-in-progress: false
+jobs:
+  diagnose:
+    runs-on: [self-hosted, tactics-browser, tactics-browser-01]
+    timeout-minutes: 20
+    steps:
+      - name: Check host disposition
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run setup:browsers
+      - name: Compare unchanged head and exact base with original and diagnostic budgets
+        shell: bash
+        run: |
+          set -u
+          out="$RUNNER_TEMP/pr274-marker-${GITHUB_RUN_ID}"
+          mkdir -p "$out"
+          node --version > "$out/runtime.txt"
+          for ref in 625d8b7f4525d6c836360476cccf12d06b11c82a 8fd168616113c0c44e4255c69edb9c2e62cb57a9; do
+            git checkout --detach "$ref"
+            mkdir -p "$out/$ref"
+            git rev-parse HEAD > "$out/$ref/source.txt"
+            npm run build > "$out/$ref/build.log" 2>&1 || exit 1
+            for engine in chromium webkit; do
+              config=playwright.regression.config.ts
+              project=desktop
+              if [ "$engine" = webkit ]; then config=playwright.exploration.config.ts; project=desktop-webkit; fi
+              for budget in 30000 120000; do
+                dest="$out/$ref/$engine-$budget"
+                mkdir -p "$dest"
+                set +e
+                PLAYWRIGHT_JSON_OUTPUT_FILE="$dest/results.json" npx --no-install playwright test -c "$config" tests/dungeon-exploration.spec.ts -g 'map markers respect' --project="$project" --timeout="$budget" --reporter=line,json --output="$dest/artifacts" > "$dest/run.log" 2>&1
+                result=$?
+                set -e
+                echo "$result" > "$dest/exit-code.txt"
+                echo "$ref $engine $budget exit=$result" | tee -a "$out/summary.txt" "$GITHUB_STEP_SUMMARY"
+              done
+            done
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pr274-marker-diagnosis-${{ github.run_id }}
+          path: ${{ runner.temp }}/pr274-marker-${{ github.run_id }}/
+          retention-days: 14
