@@ -206,8 +206,7 @@ jobs:
           if-no-files-found: warn
 
   full-verify:
-    # Removing the temporary request before review must not launch another full run.
-    if: github.repository == 'luminari-gurus/tactics-guru-v2' && ((github.event_name == 'push' && !contains(github.event.head_commit.removed, '.github/full-verify-request')) || inputs.extra_job == 'full-verify')
+    if: github.repository == 'luminari-gurus/tactics-guru-v2' && (github.event_name == 'push' || inputs.extra_job == 'full-verify')
     runs-on: [self-hosted, tactics-browser, "${{ inputs.runner || 'tactics-browser-01' }}"]
     timeout-minutes: 420
     # Push and extra_job=full-verify do not set inputs.mode=capture; discover requires it.
