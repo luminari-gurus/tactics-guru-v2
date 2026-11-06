@@ -233,7 +233,10 @@ test('legal reward and guardian boundaries, travel reload, backtracking and isol
   if(slot<2){
    await expect(page.locator('#dungeon-descend')).toHaveCount(0);await expect(page.getByRole('heading',{name:'Choose one reward'})).toBeVisible();
    await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(s);
-   await page.getByRole('button',{name:/^Claim /}).first().click();await page.locator('#dungeon-item-cancel').click();expect(await snapshot(page)).toEqual(s);
+   const claim=page.getByRole('button',{name:/^Claim /}).first();
+   const item=(await claim.textContent())!.replace(/^Claim /,'');
+   await claim.click();await expect(page.locator('#battle-dialog-message')).toHaveText(`Claim ${item} and prepare the next encounter?`);
+   await page.locator('#dungeon-item-cancel').click();expect(await snapshot(page)).toEqual(s);
    await page.getByRole('button',{name:/^Claim /}).first().click();await page.locator('#dungeon-item-confirm').click();expect((await snapshot(page)).phase).toBe('ready');
   }else{
    await page.evaluate(()=>localStorage.setItem('tactics-guru:phaser:run:primary:v1','preserved-short-run'));
