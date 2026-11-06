@@ -137,7 +137,9 @@ test('undo and compound plan use the live HUD without bypassing review',async({p
   expect(plan).not.toBeNull();if(!plan)return;
   const before=await session(page),target=before.state.units.find(u=>u.id===plan!.target)!;
   await activate('#battle-plan');await page.locator('#battle-target').selectOption(`${plan.move.to.x},${plan.move.to.y}`);
-  await activate('[data-action=basic]');await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
+  await activate('[data-action=basic]');
+  await expect(page.locator(`#battle-target option[value="${target.cell.x},${target.cell.y}"]`)).not.toContainText('Unavailable');
+  await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
   await expect(page.locator('#battle-preview')).toContainText(`Move to (${plan.move.to.x}, ${plan.move.to.y}) + ability`);
   const report=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
   expect(report.path.at(-1)).toEqual(plan.move.to);
