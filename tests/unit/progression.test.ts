@@ -12,10 +12,24 @@ import { describe, expect, it } from 'vitest';
 import { battleCatalog as catalog } from '../../src/content/catalog';
 import { HERO_IDS } from '../../src/content/constants';
 import { HERO_PROGRESSION as rules } from '../../src/content/progression';
-import { awardHero, progressHero, projectProgression, readProgressHero } from '../../src/domain/progression';
+import { awardHero, progressHero, projectProgression, readProgressHero, levelUpFeedback } from '../../src/domain/progression';
 import { validateContent } from '../../src/content/validate';
 import { projectOwnedCatalog, emptyItemOwnership } from '../../src/domain/items';
 import { itemCatalog } from '../../src/content/items';
+
+it('names newly learned abilities in level-up feedback without changing progression', () => {
+  const before=HERO_IDS.map(id=>progressHero(id,0,1,runContext.catalog));
+  const after=before.map(hero=>awardHero(hero,180,runContext.catalog));
+  const snapshot=structuredClone({before,after});
+  const feedback=levelUpFeedback(before,after);
+  expect(feedback).toContain('learned Second Wind');
+  expect(feedback).toContain('learned Mark Target');
+  expect(feedback).toContain('learned Frost Snare');
+  expect(feedback).not.toContain('ability:');
+  expect(feedback).not.toContain('learned Basic Attack');
+  expect(levelUpFeedback(after,after)).toBe('');
+  expect({before,after}).toEqual(snapshot);
+});
 import { createRun, transitionRun, runBoundaryId } from '../../src/domain/run';
 import { authoredRun, runCatalog } from '../../src/content/encounters';
 

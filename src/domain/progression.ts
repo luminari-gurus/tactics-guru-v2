@@ -43,5 +43,5 @@ export function progressionLabel(hero: ProgressHero): string {
   return `Level ${hero.level} · ${hero.level === 5 ? 'MAX' : `XP ${hero.xp}/${rules.thresholds[hero.level]}`} · Learned: ${hero.learned.map(id => id.replace('ability:','').replaceAll('_',' ')).join(', ')}`;
 }
 export function levelUpFeedback(before: readonly ProgressHero[], after: readonly ProgressHero[]): string {
-  return after.filter((h,i) => h.level > before[i].level).map(h => `${h.heroId} reached level ${h.level}: healed to ${h.maxHp} HP${h.learned.filter(id => !before.find(b => b.heroId === h.heroId)!.learned.includes(id)).map(id => `; learned ${id}`).join('')}`).join('. ');
+  return after.filter((h,i) => h.level > before[i].level).map(h => `${h.heroId} reached level ${h.level}: healed to ${h.maxHp} HP${h.learned.filter(id => !before.find(b => b.heroId === h.heroId)!.learned.includes(id)).map(id => `; learned ${id.replace(/^ability:/, '').replaceAll('_', ' ').replace(/\b\w/g, c => c.toUpperCase())}`).join('')}`).join('. ');
 }
