@@ -1,3 +1,4 @@
+import { testingProgress } from '../ui/testingProgress';
 import { consumeEntryIntent } from './routes';
 import { appEntry } from './entry';
 import { menuReturnLink } from '../ui/menuReturn';
@@ -40,10 +41,10 @@ function render(){
   screen.append(resume,button('Start new dungeon',requestNew),button('Save recovery',recovery));
   const unsaved=button('Play unsaved dungeon',()=>{startup=false;session.playUnsaved();render();});
   screen.append(el('p','Unsaved play permits battles; floor travel is blocked until progress can be saved.'),unsaved);
-  }else screen.append(el('p','Testing dungeon. Progress resets on reload.'),button('Start new dungeon',requestNew));
+  }else screen.append(testingProgress('dungeon'),button('Start new dungeon',requestNew));
   const link=el('a','Three-battle scenario');link.href=`${import.meta.env.BASE_URL}run`;screen.append(link);
  }else renderDungeon(screen,session,dialogs,{start,recover:storage?recovery:undefined,restart:requestNew},cache,mapView);
- if(!storage&&!startup)screen.append(el('p','Testing dungeon. Progress resets on reload.'));
+ if(!storage&&!startup)screen.append(testingProgress('dungeon'));
  screen.append(menuReturnLink(() => !startup && session.hasUnsavedProgress, recovery));
  mountTelemetryPreferences(screen);
 }
