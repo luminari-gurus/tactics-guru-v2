@@ -92,7 +92,8 @@ jobs:
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         env:
           PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/issue184/shared-chromium.json
-        run: npx --no-install playwright test -c playwright.regression.config.ts tests/guarded-effects.spec.ts tests/battle-persistence.spec.ts -g 'shared Guarded lifecycle and saved feedback: dungeon|testing routes:' --workers=1 --retries=0 --reporter=line,json --trace=retain-on-failure --output=verification-receipts/issue184/shared-chromium-artifacts
+        run: >-
+          npx --no-install playwright test -c playwright.regression.config.ts tests/guarded-effects.spec.ts tests/battle-persistence.spec.ts -g 'shared Guarded lifecycle and saved feedback: dungeon|testing routes:' --workers=1 --retries=0 --reporter=line,json --trace=retain-on-failure --output=verification-receipts/issue184/shared-chromium-artifacts
       - name: WebKit direct-route save isolation
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         env:
