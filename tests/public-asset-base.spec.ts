@@ -9,6 +9,8 @@ import { walkDungeon } from './helpers/dungeonTraversal';
 import { navigateCapture, battleGesturePoint } from '../scripts/measure-fit-controls';
 import { captureTarget, parseMeasureArgs } from '../scripts/measure-fit-options';
 
+const fixedSeedTest = test.extend({ pinDungeonSeed: 28 });
+
 for (const route of ['', 'run']) test(`collector cold/warm ${route || 'battle'} uses real controls and preserves saved games`, async ({page,baseURL}) => {
   const target=captureTarget(parseMeasureArgs(['--scene=battle','--url',new URL(route,baseURL!).href],{}));
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
@@ -103,18 +105,12 @@ for (const scene of ['battle', 'proof', 'content-smoke'] as const) {
 }
 
 for (const route of ['battle', 'run', 'dungeon']) for (const backend of ['Web Audio', 'HTML5']) {
-  test(`${backend} ${route} audio loads at the base and plays a committed move`, {
+  const audioTest = route === 'dungeon' ? fixedSeedTest : test;
+  audioTest(`${backend} ${route} audio loads at the base and plays a committed move`, {
     ...(route === 'dungeon' ? { tag: '@touch-audio' } : {}),
   }, async ({ page }) => {
   // This workload qualifies audio/base delivery, not random-layout pursuit. Use
   // the existing legal Fighter journey's initial floor for deterministic travel.
-  if(route==='dungeon')await page.addInitScript(()=>{
-    const draw=crypto.getRandomValues.bind(crypto);
-    crypto.getRandomValues=((array:ArrayBufferView<ArrayBuffer>)=>{
-      if(array instanceof Uint32Array&&array.length===1){array[0]=28;return array;}
-      return draw(array);
-    }) as typeof crypto.getRandomValues;
-  });
   if (backend === 'HTML5') await page.addInitScript(() => {
     Object.defineProperty(window, 'AudioContext', { value: undefined });
     Object.defineProperty(window, 'webkitAudioContext', { value: undefined });

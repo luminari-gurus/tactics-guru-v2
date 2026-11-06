@@ -1,0 +1,41 @@
+name: PR 274 seed fixture validation
+on:
+  push:
+    branches: [cursor/deterministic-dungeon-seeds-308b]
+    paths: [.github/workflows/pr274-seed-fix.yml]
+permissions:
+  contents: read
+concurrency:
+  group: tactics-browser-tactics-browser-01
+  queue: max
+  cancel-in-progress: false
+jobs:
+  seed-fixture:
+    runs-on: [self-hosted, tactics-browser, tactics-browser-01]
+    timeout-minutes: 30
+    steps:
+      - run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run setup:browsers
+      - run: npm run build
+      - name: Fixed-seed Chromium consumers
+        run: npx playwright test -c playwright.regression.config.ts tests/dungeon.spec.ts tests/dungeon-exploration.spec.ts tests/public-asset-base.spec.ts -g 'testing dungeon legally|dungeon battle undo survives|read-only entry, keyboard|real traversal, art independence|dungeon audio loads' --reporter=line,json --output=verification-receipts/pr274-fix/chromium
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/pr274-fix/chromium.json
+      - name: Fixed-seed WebKit consumers
+        run: npx playwright test -c playwright.exploration.config.ts -g 'testing dungeon legally|dungeon battle undo survives|read-only entry, keyboard|real traversal, art independence' --reporter=line,json --output=verification-receipts/pr274-fix/webkit
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: verification-receipts/pr274-fix/webkit.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pr274-seed-fix-${{ github.run_id }}
+          path: verification-receipts/pr274-fix/
+          retention-days: 14
