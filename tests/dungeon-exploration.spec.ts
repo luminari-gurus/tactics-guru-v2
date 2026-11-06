@@ -742,3 +742,82 @@ test('a second dungeon encounter reuses the engine after a legal victory without
  expect(await canvas.evaluate(node=>node.isConnected&&node===document.querySelector('#game canvas'))).toBe(true);
  expect(errors).toEqual([]);
 });
+
+test('warm maximum-size floor step responsiveness meets the established budget after a legal victory',async({page,isMobile})=>{
+ const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+ // Legal domain play reaches the ongoing boundary; the real HUD enacts its winning command.
+ const witness=dungeonVictoryBoundary(1,0);if(!witness)throw Error('Missing legal victory boundary');
+ const battleSave=encodeDungeon(witness.snapshot);if(!battleSave.ok)throw Error(battleSave.reason);
+ await page.goto('./?game=dungeon');
+ await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:battleSave.text});
+ await page.reload();await continueSavedDungeon(page);
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ expect((await readSession(page)).state).toEqual(witness.snapshot.activeBattle);
+ await expect(page.locator('canvas')).toHaveCount(1);
+ const canvas=await page.locator('#game canvas').elementHandle();if(!canvas)throw Error('Missing battle canvas');
+ const canvasIdentity=()=>canvas.evaluate(node=>({connected:node.isConnected,sameCanvas:node===document.querySelector('#game canvas'),count:document.querySelectorAll('canvas').length,timeOrigin:performance.timeOrigin}));
+ const originalCanvas=await canvasIdentity();
+ await playCommand(page,witness.command);
+ await expect(page.getByRole('heading',{name:'Choose one reward',exact:true})).toBeVisible();
+ const won=await dungeonSnapshot(page);
+ expect(won.phase).toBe('reward');expect(won.floors[0].completed).toBe(1);expect(won.activeBattle).toBeNull();
+ const decline=page.getByRole('button',{name:'Decline reward',exact:true});
+ if(isMobile)await decline.tap();else await decline.click();
+ await page.locator('#dungeon-item-confirm').click();
+ const ready=await dungeonSnapshot(page);expect(ready.phase).toBe('ready');expect(ready.offer).toBeNull();
+
+ // This history is structural, not earned floor-five progression. Real recovery adopts it
+ // without navigation, retaining the engine created by the legally completed battle above.
+ const base=freshDungeon('warm-large-floor-performance',19);
+ const floors=Array.from({length:5},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1),map=floorMap(descriptor);return {descriptor,position:descriptor.upstairs,completed:3,exploration:freshExploration(descriptor.seed,descriptor.upstairs,map)};});
+ const floor=floors[4],map=floorMap(floor.descriptor),stairs=[floor.descriptor.upstairs,floor.descriptor.downstairs];
+ const first=map.cells.findIndex((v,i)=>v===1&&!stairs.includes(i)&&neighbors(i,map.width).some(n=>map.cells[n]&&!stairs.includes(n)));
+ const second=neighbors(first,map.width).find(n=>map.cells[n]&&!stairs.includes(n));if(first<0||second===undefined)throw Error('No safe timing pair');
+ const state=atCell({...base,depth:5,floors},first),encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
+ await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
+ const recover=page.getByRole('button',{name:'Save recovery',exact:true});
+ if(isMobile)await recover.tap();else await recover.click();
+ await page.locator('#dungeon-continue-primary').click();
+ const adopted=await dungeonSnapshot(page);expect(adopted).toEqual(JSON.parse(encoded.text).payload);
+ await expect(page.locator('#dungeon-map [data-cell]')).toHaveCount(36*36);
+ await page.keyboard.press('Tab');
+ await page.locator(`#dungeon-map [data-cell="${first}"]`).evaluate(cell=>cell.scrollIntoView({block:'center',inline:'center',behavior:'instant'}));
+ await page.locator('#dungeon-map').evaluate(grid=>(grid as HTMLElement).focus({preventScroll:true}));
+ const visibleGrid=()=>page.locator('#dungeon-map').evaluate((grid,{first,second})=>{
+  const rect=(element:Element)=>{const b=element.getBoundingClientRect();return {left:b.left,top:b.top,right:b.right,bottom:b.bottom,width:b.width,height:b.height};};
+  const region=grid.parentElement!,screen=document.querySelector<HTMLElement>('#dungeon-screen')!;
+  const regionBounds=rect(region),screenBounds=rect(screen);
+  const clip={left:Math.max(0,screenBounds.left,regionBounds.left+region.clientLeft),top:Math.max(0,screenBounds.top,regionBounds.top+region.clientTop),right:Math.min(innerWidth,screenBounds.right,regionBounds.left+region.clientLeft+region.clientWidth),bottom:Math.min(innerHeight,screenBounds.bottom,regionBounds.top+region.clientTop+region.clientHeight)};
+  const intersection=(bounds:ReturnType<typeof rect>)=>({width:Math.max(0,Math.min(bounds.right,clip.right)-Math.max(bounds.left,clip.left)),height:Math.max(0,Math.min(bounds.bottom,clip.bottom)-Math.max(bounds.top,clip.top))});
+  const bounds=rect(grid);
+  return {visibility:document.visibilityState,focused:document.activeElement===grid,focusVisible:grid.matches(':focus-visible'),viewport:{width:innerWidth,height:innerHeight},bounds,intersection:intersection(bounds),clip,regionScroll:{left:region.scrollLeft,top:region.scrollTop},screenScroll:screen.scrollTop,cells:[first,second].map(index=>{
+   const cell=grid.querySelector<HTMLElement>(`[data-cell="${index}"]`)!,bounds=rect(cell),visible=intersection(bounds);
+   const hit=visible.width>0&&visible.height>0?document.elementFromPoint((Math.max(bounds.left,clip.left)+Math.min(bounds.right,clip.right))/2,(Math.max(bounds.top,clip.top)+Math.min(bounds.bottom,clip.bottom))/2):null;
+   return {index,bounds,intersection:visible,player:cell.hasAttribute('data-player'),unoccluded:hit===cell||!!hit&&cell.contains(hit)};
+  })};
+ },{first,second});
+ const before={canvas:await canvasIdentity(),grid:await visibleGrid()};
+ await page.screenshot({path:test.info().outputPath('warm-maximum-floor-visible.png'),fullPage:false});
+ expect(before.canvas).toEqual(originalCanvas);
+ expect(before.grid.visibility).toBe('visible');expect(before.grid.focused).toBe(true);expect(before.grid.focusVisible).toBe(true);
+ for(const cell of before.grid.cells){expect(cell.intersection.width).toBeGreaterThanOrEqual(cell.bounds.width-.1);expect(cell.intersection.height).toBeGreaterThanOrEqual(cell.bounds.height-.1);expect(cell.unoccluded).toBe(true);}
+ expect(before.grid.cells.find(cell=>cell.player)?.index).toBe(first);
+
+ // Preserve the cold case's 40 idle intervals, 20 synchronous clicks and 40 moving frames.
+ const idleFrames=await page.evaluate(async()=>{const samples:number[]=[];let previous=await new Promise<number>(resolve=>requestAnimationFrame(resolve));for(let i=0;i<40;i++){const now=await new Promise<number>(resolve=>requestAnimationFrame(resolve));samples.push((Math.round(now*1000)-Math.round(previous*1000))/1000);previous=now;}return samples;});
+ const times:number[]=[];
+ for(let i=0;i<20;i++)times.push(await page.evaluate(destination=>{const start=performance.now();document.querySelector<HTMLElement>(`#dungeon-map [data-cell="${destination}"]`)!.click();return performance.now()-start;},i%2===0?second:first));
+ const frames=await page.evaluate(async({a,b})=>{const samples:number[]=[];let previous=await new Promise<number>(resolve=>requestAnimationFrame(resolve));for(let i=0;i<40;i++){document.querySelector<HTMLElement>(`#dungeon-map [data-cell="${i%2===0?b:a}"]`)!.click();const now=await new Promise<number>(resolve=>requestAnimationFrame(resolve));samples.push((Math.round(now*1000)-Math.round(previous*1000))/1000);previous=now;}return samples;},{a:first,b:second});
+ const percentile=(values:number[],q:number)=>[...values].sort((a,b)=>a-b)[Math.ceil(values.length*q)-1];
+ const p95=percentile(times,.95),frameP95=percentile(frames,.95),stepped=await dungeonSnapshot(page);
+ const after={canvas:await canvasIdentity(),grid:await visibleGrid()};
+ writeFileSync(test.info().outputPath('warm-maximum-floor-step-performance.json'),JSON.stringify({fixture:'structural five-floor history adopted through recovery; not earned floor-five progression',warmup:{seed:witness.snapshot.seed,depth:witness.snapshot.depth,command:witness.command,completed:won.floors[0].completed},dimension:map.width,first,second,before,after,idleFrames,times,p95,frames,frameP95,budgetMs:33.4,revision:{before:adopted.revision,after:stepped.revision}},null,2));
+ expect(after.canvas).toEqual(originalCanvas);
+ expect(after.grid.visibility).toBe('visible');expect(after.grid.focused).toBe(true);expect(after.grid.focusVisible).toBe(true);
+ for(const cell of after.grid.cells){expect(cell.intersection.width).toBeGreaterThanOrEqual(cell.bounds.width-.1);expect(cell.intersection.height).toBeGreaterThanOrEqual(cell.bounds.height-.1);expect(cell.unoccluded).toBe(true);}
+ expect(after.grid.cells.find(cell=>cell.player)?.index).toBe(first);
+ expect(stepped.id).toBe(adopted.id);expect(stepped.depth).toBe(5);expect(stepped.phase).toBe('ready');
+ expect(stepped.floors[4].position).toBe(first);expect(stepped.revision).toBe(adopted.revision+60);
+ expect(JSON.parse((await dungeonSlots(page)).primary!).payload).toEqual(stepped);expect(errors).toEqual([]);
+ expect(p95).toBeLessThanOrEqual(33.4);expect(frameP95).toBeLessThanOrEqual(33.4);
+});
