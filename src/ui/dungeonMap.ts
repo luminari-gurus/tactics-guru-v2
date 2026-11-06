@@ -13,6 +13,18 @@ export function dungeonEncounterLabel(s: DungeonState, slot: number): string {
   return kind === 'boss' ? 'Guardian · Goblins' : `${kind[0].toUpperCase()}${kind.slice(1)} encounter ${slot + 1}`;
 }
 
+/** Reward and battle phases belong to the active POI, not every revealed marker. */
+export function dungeonEncounterStatus(s: DungeonState, slot: number): string {
+  const f = currentFloor(s);
+  const activeSlot = f.exploration.version === 'exploration-v2' ? f.exploration.active
+    : s.phase === 'reward' ? f.completed - 1 : s.phase === 'battle' ? f.completed : null;
+  const active = activeSlot === slot;
+  if (active && s.phase === 'reward') return 'Reward pending';
+  if (clearedDungeonSlots(f).includes(slot)) return 'Cleared';
+  if (s.phase === 'defeat') return 'Unavailable after defeat';
+  return active && s.phase === 'battle' ? 'In battle' : 'Available';
+}
+
 /** View-local art state and bindings; no simulation timer or authoritative DOM state. */
 export class DungeonMap {
   readonly root = document.createElement('section');
@@ -142,7 +154,7 @@ export class DungeonMap {
       const disabled=s.phase!=='ready'||!adjacent.includes(destination)||!map.cells[destination];
       if(button.disabled!==disabled)button.disabled=disabled;
     }
-    const entries=[...(showUpstairs?[{id:'stairs-up',cell:f.descriptor.upstairs,label:'Upstairs',status:'Available'}]:[]),...f.exploration.pois.map(p=>({id:p.id,cell:poiCell(p,map.width),label:`${dungeonEncounterLabel(s,p.encounterSlot)} · ${biome.label} · Floor ${s.depth}`,status:cleared.includes(p.encounterSlot)?'Cleared':s.phase==='ready'?'Available':s.phase==='reward'?'Reward pending':s.phase==='battle'?'In battle':'Unavailable after defeat'})),...(showDownstairs?[{id:'stairs-down',cell:f.descriptor.downstairs,label:'Downstairs',status:'Unlocked'}]:[])];
+    const entries=[...(showUpstairs?[{id:'stairs-up',cell:f.descriptor.upstairs,label:'Upstairs',status:'Available'}]:[]),...f.exploration.pois.map(p=>({id:p.id,cell:poiCell(p,map.width),label:`${dungeonEncounterLabel(s,p.encounterSlot)} · ${biome.label} · Floor ${s.depth}`,status:dungeonEncounterStatus(s,p.encounterSlot)})),...(showDownstairs?[{id:'stairs-down',cell:f.descriptor.downstairs,label:'Downstairs',status:'Unlocked'}]:[])];
     const visiblePlaces=new Set<string>();let cursor=this.places.firstElementChild;
     for(const p of entries)if(revealed.has(p.cell)){
       let row=this.placeRows.get(p.id);

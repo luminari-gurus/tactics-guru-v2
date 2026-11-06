@@ -1,3 +1,5 @@
+import { dungeonOffer } from '../src/domain/dungeon';
+import { checkedDungeon } from './helpers/dungeonFixtures';
 import { expect,test } from './helpers/startupDiagnostics';
 import type { Page } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
@@ -816,4 +818,37 @@ test('warm maximum-size floor step responsiveness meets the established budget a
  expect(stepped.floors[4].position).toBe(first);expect(stepped.revision).toBe(adopted.revision+60);
  expect(JSON.parse((await dungeonSlots(page)).primary!).payload).toEqual(stepped);expect(errors).toEqual([]);
  expect(p95).toBeLessThanOrEqual(33.4);expect(frameP95).toBeLessThanOrEqual(33.4);
+});
+
+for(const depth of [1,5])test(`only the Guardian has reward pending after a Guardian-first victory and reload at depth ${depth}`,async({page})=>{
+ // Structural reward boundary isolates marker rendering, not preceding combat.
+ const fresh=freshDungeon('guardian-first',1);
+ const floors=Array.from({length:depth},(_,i)=>{
+  const descriptor=floorDescriptor(fresh.seed,i+1),map=floorMap(descriptor);
+  return {descriptor,position:descriptor.upstairs,completed:i===depth-1?0:3,
+   exploration:freshExploration(descriptor.seed,descriptor.upstairs,map)};
+ });
+ const base=atEncounter({...fresh,depth,floors},2),floor=base.floors[depth-1],map=floorMap(floor.descriptor);
+ const staged:DungeonState={...base,phase:'reward',floors:base.floors.map((f,i)=>i!==depth-1?f:{...floor,completed:1,
+  exploration:{...movableExploration(floor.exploration,floor.descriptor.seed,0,'ready'),cleared:[2],active:2,revealed:Array.from({length:map.cells.length},(_,i)=>i)}})};
+ const reward=checkedDungeon(readDungeon({...staged,offer:dungeonOffer(staged)}));
+ const encoded=encodeDungeon(reward);if(!encoded.ok)throw Error(encoded.reason);
+ await page.goto('./?game=dungeon');
+ await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
+ const check=async()=>{
+  const places=page.getByRole('list',{name:'Discovered places',exact:true});
+  await expect(places.locator('[data-poi-id="enemy-3"]')).toContainText('Reward pending');
+  for(const id of ['enemy-1','enemy-2'])await expect(places.locator(`[data-poi-id="${id}"]`)).toContainText('Available');
+  await expect(places).not.toContainText('In battle');
+ };
+ await page.reload();await continueSavedDungeon(page);await check();
+ await page.reload();await continueSavedDungeon(page);await check();
+ await expect(page.locator('#dungeon-map [data-cell]')).toHaveCount(map.cells.length);
+ const rows=page.getByRole('list',{name:'Discovered places',exact:true});
+ await rows.evaluate(list=>{for(const row of list.children)row.setAttribute('data-retained','true');});
+ await page.getByRole('button',{name:/^Claim /}).first().click();
+ await page.locator('#dungeon-item-confirm').click();
+ await expect(page.locator('[data-poi-id="enemy-3"]')).toContainText('Cleared');
+ await expect(rows.locator('[data-retained="true"]')).toHaveCount(3+(depth>1?1:0));
+ await expect(page.getByRole('list',{name:'Discovered places',exact:true})).not.toContainText('Reward pending');
 });
