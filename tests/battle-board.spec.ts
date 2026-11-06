@@ -687,3 +687,25 @@ test('drawable boundaries and layout changes discard captured gestures without b
   after=await settledReport(page);expect(after.transform).toEqual(resized.transform);expect(after.selectionEvents).toBe(initial.selectionEvents);
   expect(after.commandCount).toBe(initial.commandCount);await expect(page.locator('canvas')).toHaveCount(1);await cdp.detach();
 });
+
+test('temporary HUD expansion does not leave the battle camera zoomed', async ({page}) => {
+ await page.setViewportSize({width:390,height:1000});
+ await page.goto('./battle');
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ const region=page.locator('#battle-board-region');
+ const resize=async (height:number)=>{
+  await region.evaluate((node,height)=>{node.style.flex=`0 0 ${height}px`;node.style.minHeight=`${height}px`;},height);
+  return settledReport(page);
+ };
+ await resize(80);
+ const box=(await region.boundingBox())!;
+ await page.mouse.move(box.x+box.width/2,box.y+box.height/2);await page.mouse.wheel(0,10000);
+ const before=await settledReport(page);
+ for(let i=0;i<3;i++){
+  await resize(240);const after=await resize(80);
+  expect(after.transform.scale).toBeCloseTo(before.transform.scale,5);
+  expect(after.transform.x).toBeCloseTo(before.transform.x,5);
+  expect(after.transform.y).toBeCloseTo(before.transform.y,5);
+  expect(after.commandCount).toBe(before.commandCount);
+ }
+});
