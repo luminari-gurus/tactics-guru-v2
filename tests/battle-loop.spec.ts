@@ -880,3 +880,15 @@ test('narrow landscape battle stacks controls below a usable board', async ({ pa
   await page.screenshot({path:test.info().outputPath(`narrow-${viewport.width}-safe-area.png`)});
  }
 });
+
+test('battle log starts with the initial actor before opening enemy actions', async ({ page }) => {
+  await page.goto('./battle');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  const current = await session(page), initial = current.replay.initial;
+  const actor = initial.units.find(unit => unit.id === initial.initiative[initial.activeIndex])!;
+  await page.locator('#battle-log-open').click();
+  const lines = await page.locator('#battle-log li').allTextContents();
+  expect(lines[0]).toBe(`Round ${initial.round}: ${displayName(actor.defId)} #${actor.id}'s turn`);
+  expect(lines.some(line => /moves to|waits|uses/.test(line))).toBe(true);
+  await page.locator('#log-close').click();
+});
