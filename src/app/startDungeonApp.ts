@@ -24,6 +24,7 @@ let engine: ReturnType<typeof import('../phaser/start').createGame> | null = nul
 let deferredStart: (()=>void) | null = null;
 const sound={enabled:false};
 const dialogs=new BattleDialogs(()=>{host?.modalTransition();queueMicrotask(()=>deferredStart?.());},()=>requestNew(),()=>screen.querySelector<HTMLElement>('h1')?.focus());
+panel.setAttribute('aria-label','Dungeon battle controls');
 mountBattleLayout();window.fitDiagnostics=diagnosticsSnapshot;
 const mapView=new DungeonMap(destination=>{if(!live||playing||loading||loadError||dialogs.open)return;if(session.step({...session.spatialBoundary,destination})&&session.phase==='battle')start();},()=>!live||playing||loading||loadError||dialogs.open);
 function button(label:string,run:()=>void){const n=el('button',label);n.type='button';n.onclick=run;return n;}
@@ -125,7 +126,6 @@ async function start(){
     document.querySelector<HTMLElement>('#battle-heading h1')!.textContent=title;
     document.querySelector<HTMLElement>('#board-caption')!.textContent='Tap to select · Drag to pan · Wheel/pinch to zoom · Arrows and Enter to select';
     restart.textContent='Start new dungeon';persistence.hidden=false;persistence.replaceChildren(...(storage?[button('Save recovery',recovery)]:[]),el('span',session.status), menuReturnLink(() => session.hasUnsavedProgress, recovery));
-    document.querySelectorAll<HTMLElement>('#fit-panel > details').forEach(n=>n.hidden=true);
     host={catalog:battle.catalog,session:battle,dialogs,sound,modalTransition:()=>{},ended:()=>{if(!live||!playing||generation!==loadGeneration)return;stop();render();screen.querySelector<HTMLElement>('h1')?.focus();},restart:requestNew};
     currentEngine.scene.remove('battle');currentEngine.scene.add('battle',new BattleScene(value=>{
      if(!live||generation!==loadGeneration)return;

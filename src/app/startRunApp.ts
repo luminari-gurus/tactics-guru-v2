@@ -32,7 +32,6 @@ const nav = document.createElement('a');nav.href=routeHref('battle',import.meta.
 const progress=document.createElement('p');progress.id='run-progress';panel.prepend(progress);
 const dungeonNav = document.createElement('a'); dungeonNav.href=`${import.meta.env.BASE_URL}dungeon`; dungeonNav.textContent='Dungeon floors'; dungeonNav.className='run-entry-link';
 panel.append(nav, dungeonNav, menuReturnLink(() => !startup && controller.hasUnsavedProgress, showRecovery));
-document.querySelectorAll<HTMLElement>('#fit-panel > details').forEach(e=>e.hidden=true);
 document.querySelector<HTMLElement>('#board-caption')!.textContent='Tap to select · Drag to pan · Wheel/pinch to zoom · Keyboard: arrows, Enter selects, Escape cancels';
 panel.setAttribute('aria-label','Run battle controls');restart.textContent='Start new run';
 mountBattleLayout();

@@ -2,7 +2,7 @@
 
 Planning date: 2026-11-07 (Asia/Jerusalem). [Issue #297](https://github.com/luminari-gurus/tactics-guru-v2/issues/297), assigned to `@moshehbenavraham`. Base: `origin/main` at `4148eb1043163587de30eb1243d4eee717b248bf`. Work branch: `branch/issue-297-hide-gameplay-diagnostics`.
 
-Status: planning only; application code and tests have not been changed. This request ends with the committed, published plan. Implementation requires the caller's subsequent instruction. Preserve the previous completed #172 plan in [issue-172-combat-consumables-revival-plan.md](issue-172-combat-consumables-revival-plan.md).
+Status: implementation authorized by the caller's continuation on 2026-11-07, including autonomous fixes, commits, pushes and a focused labeled PR. Track implementation in [OpenSpec issue-297-hide-gameplay-diagnostics](../../openspec/changes/issue-297-hide-gameplay-diagnostics/tasks.md). The previous completed #172 plan is preserved in [issue-172-combat-consumables-revival-plan.md](issue-172-combat-consumables-revival-plan.md).
 
 ## Selection and readiness
 
@@ -44,7 +44,7 @@ No combat, balance, seed, RNG, movement, save-format, telemetry-schema or routin
 
 ## Files and implementation
 
-Use one focused implementation PR. The behavior is a localized visibility/markup repair with established route and scene contracts; a second OpenSpec proposal/spec/design/task set would duplicate this concrete plan without resolving an open design question.
+Use one focused implementation PR. Per the caller's explicit continuation request, use the repository's OpenSpec workflow with a compact proposal, startup spec, design and tracked tasks. The original implementation scope stays unchanged.
 
 1. **Default HTML to the player-facing state.** In `index.html`, retain a visible generic live loading/error status and stable shared gameplay nodes. Mark proof-only sections hidden in the markup, including before JavaScript or styles arrive, and use neutral initial landmark/restart wording. Keep visibility rules effective after layout reparenting. Do not hide the only error announcement or depend solely on post-load CSS.
 2. **Reveal diagnostics deliberately.** In `src/app/startBattleApp.ts`, reveal the existing proof controls and diagnostic wording only for the explicit proof scene; preserve content-smoke's restricted status output. Keep normal standalone and Q*bert gameplay controls correctly named and available. Reuse the existing scene decision and element IDs.
@@ -91,8 +91,16 @@ Browser/device emulation is sufficient under [AGENTS.md](../../AGENTS.md). Local
 
 Local Markdown link/path validation passed for both plan files, and the archived #172 plan matches the previous committed content after line-ending normalization. `git diff --check` passed. Playwright discovery succeeded: the five named Chromium regression files select 215 cases, WebKit acceptance selects 204, and WebKit exploration selects 168. These are discovery counts, not executed browser results or a recommendation to run every selected case for this fix. The work branch was created from the recorded base and linked natively to #297 using GitHub's `createLinkedBranch` mutation.
 
+## Implementation progress — 2026-11-07
+
+- The caller explicitly authorized implementation and requested OpenSpec. Change `issue-297-hide-gameplay-diagnostics` is valid under strict validation; its three tasks cover startup, repeated dungeon gameplay and integrated delivery.
+- Implemented native hidden defaults, neutral initial wording, explicit proof reveal, shared gameplay restart/caption reveal and dungeon panel naming. Removed the three obsolete direct-child diagnostic-hiding loops. No rules, saves, scene selection or dependencies changed.
+- New desktop regressions failed on the unchanged application: visible proof restart before modules and missing dungeon panel naming (`tmp/issue297-red.log`). The first fixed-build run retained two test-setup failures: the saved New Game seed was 29 instead of the unsaved witness's 28, and held stylesheets blocked the screenshot. The saved test now draws 27 to obtain playable seed 28 through the existing collision rule; styles are aborted while scripts are held. Neither repair changes gameplay or timeouts.
+- Root build passed both TypeScript scopes and 226 content checks. `tmp/issue297-focused-desktop.json` records **3/3 passes**, one worker, zero retries: delayed startup across nine routes, route-import recovery for all three game modes, and the saved legal three-battle/floor-travel journey. Battle screenshot visually reviewed: no proof tools overlap the playfield. Cross-device, explicit-proof and core qualification remain pending.
+- Local commands need the existing npm wrapper at `C:/Users/apexw/.codex/tmp/issue163-tools` on PATH. OpenSpec 1.14.1 is cached at `C:/Users/apexw/AppData/Local/npm-cache/_npx/c37562604d2d088d/node_modules/@fission-ai/openspec/bin/openspec.js`. Baseline content checks rewrote snapshot line endings; only those generated normalization changes were restored after confirming identical normalized content. Restore them again after later units if needed; never commit them.
+
 ## Estimate and delivery
 
 Estimated time for **me**: **2–3 hours** to implement the visibility/naming repair and focused regressions, plus **1–2 hours** for affected browser/build qualification, review and PR preparation: **3–5 hours total**, excluding runner queue/unavailability and unrelated pre-existing failures. This is an estimate, not execution evidence.
 
-For this planning task: preserve the old plan, publish this file on the dedicated branch, attach the branch natively to #297 and post its links to the issue. Commit only those planning files. No application implementation, implementation PR, merge or deployment is part of the current request.
+The original planning delivery is complete at `be97c75`. Continue implementation on the same branch, keep this document and OpenSpec tasks current, commit and push coherent work, and open a focused labeled PR. Do not create a release tag or deploy for this UI repair.

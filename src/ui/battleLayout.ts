@@ -2,6 +2,8 @@
 export function mountBattleLayout(): void {
   document.body.classList.add('battle-mode');
   document.querySelector<HTMLElement>('#battlefield')!.hidden = false;
+  document.querySelector<HTMLElement>('#fit-restart')!.hidden = false;
+  document.querySelector<HTMLElement>('#board-caption')!.hidden = false;
   const panel = document.querySelector<HTMLElement>('#fit-panel')!;
   const scroll = document.createElement('div');
   scroll.id = 'battle-scroll'; scroll.tabIndex = 0;
