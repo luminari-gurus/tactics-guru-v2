@@ -249,6 +249,31 @@ test('radial multiple specials remain reachable on a narrow viewport', async ({p
   await expect.poll(async()=> (await readSession(page)).state.commandCount).toBe(before.state.commandCount+1);
 });
 
+test('radial Frost Snare label fits at a readable font size', async ({page}) => {
+  await page.setViewportSize({width:1200,height:900});
+  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await page.evaluate(() => {
+    (globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';
+    globalThis.dispatchEvent(new Event('combat-controls-change'));
+  });
+  await tapBoard(page,{x:2,y:0});
+  const special=page.locator('#battle-radial-special');
+  await expect(special).toBeEnabled();
+  const title=special.locator('strong');
+  await expect(title).toBeVisible();
+  await expect(title).toHaveText('Frost Snare');
+  expect(await title.evaluate(node => {
+    const bounds=node.getBoundingClientRect();
+    const text=document.createRange();
+    text.selectNodeContents(node);
+    return parseFloat(getComputedStyle(node).fontSize)>=10 &&
+      [...text.getClientRects()].every(rect =>
+        rect.left>=bounds.left && rect.right<=bounds.right &&
+        rect.top>=bounds.top && rect.bottom<=bounds.bottom);
+  })).toBe(true);
+});
+
 test('radial hold keeps edge actions visible and cancels at the original press', async ({page}) => {
   await page.setViewportSize({width:320,height:568});
   await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');

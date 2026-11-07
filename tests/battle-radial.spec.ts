@@ -56,9 +56,10 @@ async function radialLabelProblems(page: Page) {
       const nowrap = style.whiteSpace.includes('nowrap');
       const lines = el.getClientRects().length;
       if (!nowrap || lines > 1) issues.push(`wrap (${lines}): ${el.textContent}`);
-      const overflow = el.scrollWidth > el.clientWidth + 1;
-      const abbreviated = style.textOverflow === 'ellipsis' && parseFloat(style.fontSize) <= 10.5;
-      if (overflow && !abbreviated) issues.push(`overflow ${el.scrollWidth}>${el.clientWidth} @${style.fontSize}: ${el.textContent}`);
+      const text = document.createRange();
+      text.selectNodeContents(el);
+      const overflow = text.getBoundingClientRect().width > el.clientWidth;
+      if (overflow) issues.push(`overflow ${el.scrollWidth}>${el.clientWidth} @${style.fontSize}: ${el.textContent}`);
     }
     const plan = root.querySelector('#battle-radial-plan')?.getBoundingClientRect();
     const inspect = root.querySelector('#battle-radial-inspect')?.getBoundingClientRect();
@@ -341,6 +342,16 @@ test('radial labels stay on one line without overflowing', async ({ page }) => {
   await tapBoard(page, cell);
   await expect(page.locator('#battle-radial')).toBeVisible();
   expect(await radialLabelProblems(page)).toEqual([]);
+  const bounds = await page.locator('#battle-board-region').boundingBox();
+  const radial = (await page.locator('#battle-radial').boundingBox())!;
+  if (bounds && bounds.width >= radial.width + 4 && bounds.height >= radial.height + 100) {
+    expect(radial.x).toBeGreaterThanOrEqual(bounds.x);
+    expect(radial.x + radial.width).toBeLessThanOrEqual(bounds.x + bounds.width);
+    expect(radial.y).toBeGreaterThanOrEqual(bounds.y);
+    const plan = (await page.locator('#battle-radial-plan').boundingBox())!;
+    expect(plan.y + plan.height).toBeLessThanOrEqual(bounds.y + bounds.height);
+  }
+  await page.screenshot({ path: test.info().outputPath('radial-labels.png') });
   await page.locator('#battle-radial-move').click();
   await expect(page.locator('#battle-undo')).toBeEnabled();
   const { enemy } = await livingEnemy(page);
@@ -394,7 +405,7 @@ test('radial plan specials can be chosen after a destination', async ({ page }) 
   await expect.poll(async () => (await session(page)).state.commandCount).toBeGreaterThan(current.state.commandCount);
 });
 
-test('radial special tap waits for a sub-ring choice after pointerenter', async ({ page }) => {
+test('radial special tap waits for a sub-ring choice after hovering', async ({ page }) => {
   await ready(page);
   const { enemy, current } = await livingEnemy(page);
   await tapBoard(page, enemy.cell);
@@ -404,7 +415,8 @@ test('radial special tap waits for a sub-ring choice after pointerenter', async 
     await page.locator('#battle-radial-hub').click();
     return;
   }
-  await special.dispatchEvent('pointerenter');
+  await special.hover();
+  await expect(special).toHaveAttribute('aria-pressed', 'true');
   await special.click();
   const sub = page.locator('#battle-radial-sub');
   if (await sub.isVisible()) {
@@ -643,8 +655,8 @@ test('radial plan cancellation stays available while choosing a destination or t
   }
 });
 
-test('radial compact landscape fits controls and keeps tap and hold usable', async ({page}) => {
-  await page.setViewportSize({width:568,height:300});
+for (const height of [300, 234]) test(`radial compact landscape fits controls and keeps tap and hold usable at ${height}px`, async ({page}) => {
+  await page.setViewportSize({width:568,height});
   await ready(page);
   const {cell,current}=await reachableEmpty(page);
   await tapBoard(page,cell);
@@ -654,7 +666,7 @@ test('radial compact landscape fits controls and keeps tap and hold usable', asy
     expect(box.x).toBeGreaterThanOrEqual(0);
     expect(box.y).toBeGreaterThanOrEqual(0);
     expect(box.x+box.width).toBeLessThanOrEqual(568);
-    expect(box.y+box.height).toBeLessThanOrEqual(300);
+    expect(box.y+box.height).toBeLessThanOrEqual(height);
     expect(box.width).toBeGreaterThanOrEqual(44);
     expect(box.height).toBeGreaterThanOrEqual(44);
   }
@@ -671,6 +683,23 @@ test('radial compact landscape fits controls and keeps tap and hold usable', asy
   await expect.poll(async()=> (await session(page)).state.commandCount).toBeGreaterThan(current.state.commandCount);
 });
 
+
+test('radial compact hold can inspect at the inner edge of the slice', async ({page}) => {
+  await page.setViewportSize({width:568,height:234});
+  await ready(page);
+  const {cell,current}=await reachableEmpty(page);
+  await holdAt(page,await boardPoint(page,cell));
+  await expect(page.locator('#battle-radial')).toBeVisible();
+  const move=(await page.locator('#battle-radial-move').boundingBox())!;
+  await page.mouse.move(move.x+move.width/2,move.y+move.height/2);
+  const inspect=page.locator('#battle-radial-inspect');
+  const box=(await inspect.boundingBox())!;
+  await page.mouse.move(box.x+box.width/2,box.y+1);
+  await expect(inspect).toHaveAttribute('aria-pressed','true');
+  await page.mouse.up();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  expect((await session(page)).state.commandCount).toBe(current.state.commandCount);
+});
 
 test('radial resize dismisses an open tap menu without committing or stranding it', async ({page}) => {
   await page.setViewportSize({width:915,height:412});
@@ -726,6 +755,7 @@ test('radial resize cancels a held gesture and ignores the trailing release', as
 });
 
 test('radial stays open on a layout reflow without a viewport resize', async ({page}) => {
+  await page.setViewportSize({width:1000,height:800});
   await ready(page);
   const {cell}=await reachableEmpty(page);
   await tapBoard(page,cell);
@@ -733,9 +763,20 @@ test('radial stays open on a layout reflow without a viewport resize', async ({p
   const pending=(await session(page)).pending;
   expect(pending).toMatchObject({type:'move',to:cell});
   const caption=page.locator('#battle-board-caption');
-  const before=(await caption.boundingBox())!.height;
-  await caption.evaluate(node=>{(node as HTMLElement).style.paddingTop='32px';});
-  await expect.poll(async()=> (await caption.boundingBox())!.height).toBeGreaterThan(before);
+  const board=page.locator('#battle-board-region');
+  const plan=page.locator('#battle-radial-plan');
+  const originalPlan=(await plan.boundingBox())!;
+  await caption.evaluate(node=>{node.style.paddingTop='60px';});
+  await expect.poll(async()=> {
+    const bounds=(await board.boundingBox())!;
+    return bounds.y+bounds.height;
+  }).toBeLessThan(originalPlan.y+originalPlan.height);
+  const bounds=(await board.boundingBox())!;
+  expect(bounds.height).toBeGreaterThan(320);
+  await expect.poll(async()=> {
+    const box=(await plan.boundingBox())!;
+    return box.y+box.height;
+  }).toBeLessThanOrEqual(bounds.y+bounds.height);
   await expect(page.locator('#battle-radial')).toBeVisible();
   expect((await session(page)).pending).toEqual(pending);
 });
