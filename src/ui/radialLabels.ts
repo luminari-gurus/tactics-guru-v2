@@ -45,7 +45,11 @@ export function fitRadialLabels(root: HTMLElement): void {
     if (node.closest('[hidden]') || !node.textContent?.trim()) continue;
     const maxPx = node.tagName === 'STRONG' ? RADIAL_LABEL_MAX_PX : 12;
     fitSingleLine(node, RADIAL_LABEL_MIN_PX, maxPx);
-    if (node.tagName === 'SPAN' && node.scrollWidth > node.clientWidth + 0.5) node.textContent = '';
+    if (node.tagName === 'SPAN') {
+      const text = document.createRange();
+      text.selectNodeContents(node);
+      if (text.getBoundingClientRect().width > node.clientWidth) node.textContent = '';
+    }
   }
   const hub = root.querySelector<HTMLElement>('#battle-radial-hub');
   const hubSpan = hub?.querySelector('span');
