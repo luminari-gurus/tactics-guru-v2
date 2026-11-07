@@ -2,6 +2,11 @@ name: PR verification
 on:
   pull_request:
   workflow_dispatch:
+    inputs:
+      cold_setup:
+        description: Use empty job-local npm and Playwright caches
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -20,10 +25,18 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+      - name: Isolate cold dependency and browser setup
+        if: github.event_name == 'workflow_dispatch' && inputs.cold_setup
+        run: |
+          test -z "${PLAYWRIGHT_CHROMIUM_EXECUTABLE:-}"
+          cache_root="$(mktemp -d "${RUNNER_TEMP}/pr-cold-setup.XXXXXX")"
+          mkdir "$cache_root/npm" "$cache_root/browsers"
+          printf 'npm_config_cache=%s/npm\nPLAYWRIGHT_BROWSERS_PATH=%s/browsers\n' \
+            "$cache_root" "$cache_root" >> "$GITHUB_ENV"
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-          cache: npm
+          cache: ${{ inputs.cold_setup != true && 'npm' || '' }}
       - run: node --test tests/tooling/risk-gate.test.mjs
       - run: npm ci
       - run: npm run setup:browsers
