@@ -7,13 +7,13 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: tactics-browser-tactics-browser-01
+  group: tactics-browser-tactics-browser-02
   queue: max
   cancel-in-progress: false
 jobs:
   recovery:
     if: github.repository == 'luminari-gurus/tactics-guru-v2' && github.ref == 'refs/heads/work/issue-258-module-load-recovery'
-    runs-on: [self-hosted, tactics-browser, tactics-browser-01]
+    runs-on: [self-hosted, tactics-browser, tactics-browser-02]
     timeout-minutes: 20
     steps:
       - name: Check host disposition

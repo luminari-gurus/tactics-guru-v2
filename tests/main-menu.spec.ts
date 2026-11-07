@@ -96,33 +96,44 @@ test('main menu: application import failure preserves battle saves and reload re
   }
  },{slots:keys.battle,bytes});
  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
- await page.clock.install();await page.goto('./?game=battle');await page.locator('#save-continue').click();
- await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- expect((await readSession(page)).state).toEqual(saved.state);expect(await stored()).toEqual(bytes);
- await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
+ await page.clock.install();
  const entry=/\/startBattleApp(?:-[^/]+\.js|\.ts)(?:\?|$)/;
- let blocked=0;
- const failImport=async(route:Route)=>{blocked++;await route.abort();};
- await page.route(entry,failImport);
+ let rejectImport=false,blocked=0,allowed=0;
+ // Keep routing active from the first navigation through recovery. Installing
+ // it only after a warm import lets WebKit satisfy the reload without interception.
+ const routeImport=async(route:Route)=>{
+  if(rejectImport){blocked++;await route.abort();}
+  else {allowed++;await route.continue();}
+ };
+ await page.route(entry,routeImport);
  try {
+  await page.goto('./?game=battle');await page.locator('#save-continue').click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  expect(allowed).toBeGreaterThan(0);
+  expect((await readSession(page)).state).toEqual(saved.state);expect(await stored()).toEqual(bytes);
+  await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
+  rejectImport=true;
   await page.reload();
+  await expect.poll(()=>blocked).toBeGreaterThan(0);
   await expect(page.getByRole('alert')).toHaveText('Error: Could not load the application. Reload the page to retry.');
   await expect(page.getByRole('alert')).toBeVisible();await expect(page.locator('#save-continue')).toHaveCount(0);
-  expect(blocked).toBeGreaterThan(0);expect(await stored()).toEqual(bytes);
+  expect(await stored()).toEqual(bytes);
   await expect.poll(()=>applicationLoadDiagnostics.failures().length).toBe(1);
   expect(applicationLoadDiagnostics.failures()[0]).toMatchObject({route:'battle',name:'TypeError',category:'module-fetch'});
- } finally { await page.unroute(entry,failImport); }
- // The error path stays inert. Recovery remains the user's explicit reload and
- // Continue, with the paused-clock interaction from the original failing test.
- await page.reload();await page.clock.resume();await expect(page.locator('#save-continue')).toBeVisible();
- expect(await stored()).toEqual(bytes);await page.locator('#save-continue').click();
- await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- const resumed=await readSession(page);
- expect(resumed.state).toEqual(saved.state);expect(resumed.events).toEqual([]);
- expect(resumed.continuation).toEqual({snapshot:saved.state,commands:[],events:[]});expect(resumed.pending).toBeNull();
- expect(JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).effect).toBeNull();
- expect(await stored()).toEqual(bytes);expect(errors).toEqual([]);
- await info.attach('application-load-recovery',{body:JSON.stringify({blocked,failures:applicationLoadDiagnostics.failures()},null,2),contentType:'application/json'});
+  // The error path stays inert. Recovery remains the user's explicit reload and
+  // Continue, with the paused-clock interaction from the original failing test.
+  const allowedBeforeRecovery=allowed;rejectImport=false;
+  await page.reload();await page.clock.resume();await expect(page.locator('#save-continue')).toBeVisible();
+  expect(allowed).toBeGreaterThan(allowedBeforeRecovery);
+  expect(await stored()).toEqual(bytes);await page.locator('#save-continue').click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const resumed=await readSession(page);
+  expect(resumed.state).toEqual(saved.state);expect(resumed.events).toEqual([]);
+  expect(resumed.continuation).toEqual({snapshot:saved.state,commands:[],events:[]});expect(resumed.pending).toBeNull();
+  expect(JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).effect).toBeNull();
+  expect(await stored()).toEqual(bytes);expect(errors).toEqual([]);
+  await info.attach('application-load-recovery',{body:JSON.stringify({blocked,allowed,failures:applicationLoadDiagnostics.failures()},null,2),contentType:'application/json'});
+ } finally { await page.unroute(entry,routeImport); }
 });
 
 for(const mode of ['run','dungeon'] as const)test(`main menu: post-mount ${mode} failure remains visible and preserves saves`,async({page},info)=>{
