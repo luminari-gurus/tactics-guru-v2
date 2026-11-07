@@ -14,6 +14,6 @@
 ## 3. Caller-authorized adversarial review and merge
 
 - [x] 3.1 Repair the confirmed invisible post-mount/preparation error finding with shared presentation and regression coverage; verify visible alerts, deduplication and unchanged saves across affected browser profiles.
-- [ ] 3.2 Address the PR discussion, verify the final combined source locally and record source-bound evidence and merge readiness.
+- [x] 3.2 Address the PR discussion, verify the final combined source locally and record source-bound evidence and merge readiness.
 
 - After qualification, execute the caller-authorized merge, close completed work and clean up only proven-safe refs/worktrees. Record the published outcome on the PR and issue.

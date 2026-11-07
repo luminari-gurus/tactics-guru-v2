@@ -30,5 +30,93 @@
   "workflow-crlf.log.gz": {
     "source": "tmp/issue297-review/workflow-crlf.log",
     "sha256": "c8f66b82a7688b85817d7195df10c6d13b036b5f5ef55a86fc83829a12dcab2a"
+  },
+  "combined-pr-summary.json.gz": {
+    "source": "verification-receipts/pr/1794015041048-27536/summary.json",
+    "sha256": "2e4e00322d5e620cdf07f43f7a82978352fcc506f17f30f04b4ac014676a66cc"
+  },
+  "combined-pr-units.json.gz": {
+    "source": "verification-receipts/pr/1794015041048-27536/units.json",
+    "sha256": "397e202eb0bd261ede20025bb3c0e4174341c5edacdb99b63b04eb441006642e"
+  },
+  "combined-pr-journeys.json.gz": {
+    "source": "verification-receipts/pr/1794015041048-27536/journeys.json",
+    "sha256": "86667db90c0083fe1fc172de7458a51e1ed973703668639fe2fbfe75461e1922"
+  },
+  "final-chromium.json.gz": {
+    "source": "tmp/issue297-review/final-chromium.json",
+    "sha256": "b9c3162525dca91fda82d96f38d50b3d0abe7c607dd04c4b82ab577634df8b31"
+  },
+  "final-webkit.json.gz": {
+    "source": "tmp/issue297-review/final-webkit.json",
+    "sha256": "15d9ff2fc9121bbcf345a67fe9c93bf5da7995d7cbeacb6e016fc085b0362419"
+  },
+  "final-dev.json.gz": {
+    "source": "tmp/issue297-review/final-dev.json",
+    "sha256": "b91778b9de05490ed85aaff4af03ac089590eabc309420829c83462d3d705a5f"
+  },
+  "prefix-errors.json.gz": {
+    "source": "tmp/issue297-review/final-prefix-errors.json",
+    "sha256": "e9c243e9c6d8b75bac017846162c1ebaacb93bc4462b92ed2defe69070949408"
+  },
+  "prefix-assets.json.gz": {
+    "source": "tmp/issue297-review/final-prefix-assets.json",
+    "sha256": "59cde0b02152e637c56742b220d91319076faeb485e41ffb946ffacb27f71310"
+  },
+  "combined-smoke.json.gz": {
+    "source": "tmp/issue297-review/combined-smoke.json",
+    "sha256": "c6fe0e2a6b31136849200845b20cea0a4d69bf1cf920ba587ade430c44a022f4"
+  },
+  "workflow-fixed.log.gz": {
+    "source": "tmp/issue297-review/workflow-fixed-tooling.log",
+    "sha256": "64b5552bb6260e00d70bb732ddd932f6556fd6a5c6c239e7f8abc275e8ba3823"
+  },
+  "workflow-crlf-fixed.log.gz": {
+    "source": "tmp/issue297-review/workflow-crlf-fixed.log",
+    "sha256": "ea58e6ebd0cacbb00cfcdf5d63f58d478af1b98f54e8df552c6d47ccbe94fa70"
+  },
+  "risk-gate-before.log.gz": {
+    "source": "tmp/issue297-review/risk-gate-local.log",
+    "sha256": "bdf23737d91b1841cc1ba99969a725f3da858625b18d0b087e5ac7e9494a5eed"
+  },
+  "batches-crlf-before.log.gz": {
+    "source": "tmp/issue297-review/batches-crlf-failure.log",
+    "sha256": "2e0c11638ee03f55651f96b4f1b11f8ffc4b523b2893bf4a6db3b2fe71fc3099"
+  },
+  "crlf-before-batch-repair.log.gz": {
+    "source": "tmp/issue297-review/all-crlf-tooling-fixed.log",
+    "sha256": "af98a08b8247d70b89dd4dd1e6f74aa67afb781741f44cfa3ddffc27595a044d"
+  },
+  "selection-before.log.gz": {
+    "source": "tmp/issue297-review/selection-isolated.log",
+    "sha256": "6371b351504a909d57a2f803eb07f783470656da64e2f34c25facb2c449bf775"
+  },
+  "missing-batch-cases.json.gz": {
+    "source": "tmp/issue297-review/missing-batch-cases.json",
+    "sha256": "a30d7fe9f6ab7bfaa2f1a4f620529029f5239c07d2a889631d6177e052fefe2d"
+  },
+  "crlf-final.log.gz": {
+    "source": "tmp/issue297-review/all-crlf-tooling-final.log",
+    "sha256": "115803f8ed1590b3494e1df8741117661406efa1d0640bd166d304303571966f"
+  },
+  "combined-final-tooling.log.gz": {
+    "source": "tmp/issue297-review/combined-final-tooling.log",
+    "sha256": "919318a2876798aaba001f7f67bc8fbb4afc05bff7bc46df476138fda894c881"
+  },
+  "qbert.json.gz": {
+    "source": "tmp/issue297-review/batch-qbert.json",
+    "sha256": "5bd10cdcb90cb1a9362c57d6b743697453c57a3a2d3ab897c26058178349550e"
+  },
+  "probe-source.ts.gz": {
+    "source": "tmp/issue297-review/review.spec.ts",
+    "sha256": "e4b84ccd86a37ce549cf69e50dcee059babb591b6b058b8530dc6e04c8431068"
+  },
+  "probe-config.ts.gz": {
+    "source": "tmp/issue297-review/playwright.config.ts",
+    "sha256": "99f145cae4c810785e0676f9d07ddccd53f1234de644464e6ddd735686ffe229"
+  },
+  "qualified-source.json.gz": {
+    "source": "sourceIdentity at final local qualification",
+    "sha256": "1a4f81d8662da68cfc474fbf78079ad9c470613e06a596dee9782809d1d675a3"
   }
 }
