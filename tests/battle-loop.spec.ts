@@ -688,3 +688,20 @@ test('accepted rail and dock preserve drawable floors, readable controls and foc
   }
   writeFileSync(info.outputPath('responsive-measurements.json'),JSON.stringify(measurements,null,2));expect(errors).toEqual([]);
 });
+
+test('opening enemy initiative is explicit before the first playable hero turn', async ({ page }) => {
+  await page.addInitScript(() => {
+    const labels: string[] = [];
+    (window as unknown as { turnLabels: string[] }).turnLabels = labels;
+    new MutationObserver(() => {
+      const text = document.querySelector('#battle-active')?.textContent;
+      if (text && labels.at(-1) !== text && labels.length < 100) labels.push(text);
+    }).observe(document, { subtree: true, childList: true, characterData: true });
+  });
+  await page.goto('./battle');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  const labels = await page.evaluate(() => (window as unknown as { turnLabels: string[] }).turnLabels);
+  expect(labels.some(text => text.includes('Enemy opening turn (initiative)'))).toBe(true);
+  await expect(page.locator('#battle-active')).toContainText('Your turn');
+  expect((await session(page)).replay.initial.initiative).toEqual(new BattleSession(catalog, 'map:forest_ruins', 1).state.initiative);
+});
