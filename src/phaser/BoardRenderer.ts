@@ -479,7 +479,8 @@ export class BoardRenderer {
     const layout = fitBoard(this.bounds, region);
     const viewportChanged = width !== this.viewport.width || height !== this.viewport.height;
     if(viewportChanged)this.resetPicking();
-    const zoom = Math.max(1, this.navigationView.scale / this.fitScale);
+    // Saved intent can exceed a temporary layout's cap; center using the bounded zoom.
+    const zoom = Math.max(1, Math.min(MAX_ZOOM, this.navigationView.scale / this.fitScale));
     this.viewport = { width, height };
     this.region = region;
     this.fitScale = layout.scale;

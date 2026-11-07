@@ -709,3 +709,44 @@ test('temporary HUD expansion does not leave the battle camera zoomed', async ({
   expect(after.commandCount).toBe(before.commandCount);
  }
 });
+
+test('viewport resize recenters a camera capped by temporary HUD reflow', async ({page}) => {
+  await page.setViewportSize({width:390,height:1000});
+  await page.goto('./battle');
+  await expect(page.getByRole('status')).toHaveText('Battle ready');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const region=page.locator('#battle-board-region');
+  const resizeRegion=async (height:number)=>{
+    await region.evaluate((node,height)=>{node.style.flex=`0 0 ${height}px`;node.style.minHeight=`${height}px`;},height);
+    await expect.poll(async()=>(await report(page)).region.height).toBeCloseTo(height,5);
+    return settledReport(page);
+  };
+  const initial=await resizeRegion(240);
+  const localBounds={
+    left:(initial.bounds.left-initial.transform.x)/initial.transform.scale,
+    right:(initial.bounds.right-initial.transform.x)/initial.transform.scale,
+    top:(initial.bounds.top-initial.transform.y)/initial.transform.scale,
+    bottom:(initial.bounds.bottom-initial.transform.y)/initial.transform.scale,
+  };
+  await page.mouse.move(initial.region.x+5,initial.region.y+initial.region.height-5);
+  for(let wheel=0;wheel<8;wheel++){
+    await page.mouse.wheel(0,-10000);
+    await settledReport(page);
+  }
+  const zoomed=await settledReport(page);
+  expect(zoomed.transform.scale).toBeCloseTo(fitBoard(localBounds,zoomed.region).scale*MAX_ZOOM,5);
+  await page.mouse.move(0,0);
+  const capped=await resizeRegion(80);
+  expect(capped.transform.scale).toBeCloseTo(fitBoard(localBounds,capped.region).scale*MAX_ZOOM,5);
+  expect(capped.transform.scale).toBeLessThan(zoomed.transform.scale);
+  expect(capped.viewport).toEqual(initial.viewport);
+  // No further navigation: preserve the saved scale above this layout's zoom cap.
+  await page.setViewportSize({width:391,height:1000});
+  await expect.poll(async()=>(await report(page)).viewport).toEqual({width:391,height:1000});
+  const resized=await settledReport(page);
+  expect(resized.transform.scale).toBeCloseTo(fitBoard(localBounds,resized.region).scale*MAX_ZOOM,5);
+  expect((resized.bounds.left+resized.bounds.right)/2).toBeCloseTo(resized.region.x+resized.region.width/2,5);
+  expect((resized.bounds.top+resized.bounds.bottom)/2).toBeCloseTo(resized.region.y+resized.region.height/2,5);
+  expect(resized.commandCount).toBe(initial.commandCount);
+  expect(resized.selectionEvents).toBe(initial.selectionEvents);
+});
