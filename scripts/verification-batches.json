@@ -1,0 +1,146 @@
+[
+  {
+    "id": "desktop-1",
+    "project": "desktop",
+    "files": [
+      "tests/battle-board.spec.ts",
+      "tests/battle-persistence.spec.ts",
+      "tests/dungeon-exploration.spec.ts",
+      "tests/dungeon-lifecycle.spec.ts",
+      "tests/dungeon.spec.ts",
+      "tests/grass-surface.spec.ts",
+      "tests/input.spec.ts",
+      "tests/opacity.spec.ts",
+      "tests/overworld-map.spec.ts",
+      "tests/main-menu.spec.ts"
+    ]
+  },
+  {
+    "id": "desktop-2",
+    "project": "desktop",
+    "files": [
+      "tests/battle-animations.spec.ts",
+      "tests/battle-audio.spec.ts",
+      "tests/battle-radial.spec.ts",
+      "tests/engine-fit.spec.ts",
+      "tests/guarded-effects.spec.ts",
+      "tests/layout.spec.ts",
+      "tests/move.spec.ts",
+      "tests/procedural-grids.spec.ts",
+      "tests/terrain-materials.spec.ts",
+      "tests/unit-health-bars.spec.ts"
+    ]
+  },
+  {
+    "id": "desktop-3",
+    "project": "desktop",
+    "files": [
+      "tests/assets.spec.ts",
+      "tests/audio.spec.ts",
+      "tests/battle-loop.spec.ts",
+      "tests/board.spec.ts",
+      "tests/boot.spec.ts",
+      "tests/content-loading.spec.ts",
+      "tests/lifecycle.spec.ts",
+      "tests/public-asset-base.spec.ts",
+      "tests/run-progression.spec.ts",
+      "tests/qbert.spec.ts"
+    ]
+  },
+  {
+    "id": "mobile-portrait-1",
+    "project": "mobile-portrait",
+    "files": [
+      "tests/battle-persistence.spec.ts",
+      "tests/board.spec.ts",
+      "tests/content-loading.spec.ts",
+      "tests/dungeon-exploration.spec.ts",
+      "tests/dungeon.spec.ts",
+      "tests/input.spec.ts",
+      "tests/layout.spec.ts",
+      "tests/move.spec.ts",
+      "tests/opacity.spec.ts",
+      "tests/public-asset-base.spec.ts",
+      "tests/main-menu.spec.ts"
+    ]
+  },
+  {
+    "id": "mobile-portrait-2",
+    "project": "mobile-portrait",
+    "files": [
+      "tests/assets.spec.ts",
+      "tests/audio.spec.ts",
+      "tests/battle-animations.spec.ts",
+      "tests/battle-audio.spec.ts",
+      "tests/battle-board.spec.ts",
+      "tests/engine-fit.spec.ts",
+      "tests/grass-surface.spec.ts",
+      "tests/lifecycle.spec.ts",
+      "tests/overworld-map.spec.ts"
+    ]
+  },
+  {
+    "id": "mobile-portrait-3",
+    "project": "mobile-portrait",
+    "files": [
+      "tests/battle-loop.spec.ts",
+      "tests/battle-radial.spec.ts",
+      "tests/boot.spec.ts",
+      "tests/dungeon-lifecycle.spec.ts",
+      "tests/guarded-effects.spec.ts",
+      "tests/procedural-grids.spec.ts",
+      "tests/run-progression.spec.ts",
+      "tests/terrain-materials.spec.ts",
+      "tests/unit-health-bars.spec.ts",
+      "tests/qbert.spec.ts"
+    ]
+  },
+  {
+    "id": "mobile-landscape-1",
+    "project": "mobile-landscape",
+    "files": [
+      "tests/battle-persistence.spec.ts",
+      "tests/board.spec.ts",
+      "tests/content-loading.spec.ts",
+      "tests/dungeon-exploration.spec.ts",
+      "tests/dungeon.spec.ts",
+      "tests/grass-surface.spec.ts",
+      "tests/input.spec.ts",
+      "tests/layout.spec.ts",
+      "tests/move.spec.ts",
+      "tests/opacity.spec.ts",
+      "tests/public-asset-base.spec.ts",
+      "tests/main-menu.spec.ts"
+    ]
+  },
+  {
+    "id": "mobile-landscape-2",
+    "project": "mobile-landscape",
+    "files": [
+      "tests/assets.spec.ts",
+      "tests/battle-animations.spec.ts",
+      "tests/battle-audio.spec.ts",
+      "tests/battle-board.spec.ts",
+      "tests/engine-fit.spec.ts",
+      "tests/guarded-effects.spec.ts",
+      "tests/lifecycle.spec.ts",
+      "tests/overworld-map.spec.ts"
+    ]
+  },
+  {
+    "id": "mobile-landscape-3",
+    "project": "mobile-landscape",
+    "files": [
+      "tests/audio.spec.ts",
+      "tests/battle-loop.spec.ts",
+      "tests/battle-radial.spec.ts",
+      "tests/boot.spec.ts",
+      "tests/dungeon-lifecycle.spec.ts",
+      "tests/procedural-grids.spec.ts",
+      "tests/run-progression.spec.ts",
+      "tests/terrain-materials.spec.ts",
+      "tests/unit-health-bars.spec.ts",
+      "tests/qbert.spec.ts"
+    ]
+  }
+]

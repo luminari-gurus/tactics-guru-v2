@@ -8,7 +8,7 @@ import { definitions, createPlan, discover, exactCoverage, inventory, verifyBuil
 import { digest, compareReports } from '../../scripts/verification-report.mjs';
 import { stages } from '../../scripts/verification-timings.mjs';
 
-const batches = JSON.parse(readFileSync(new URL('../../docs/qa/issue-200/chromium-timeout-investigation.json', import.meta.url))).batchPlan.batches;
+const batches = JSON.parse(readFileSync(new URL('../../scripts/verification-batches.json', import.meta.url)));
 const testcase = (id, project = 'desktop') => ({ id, project });
 function discovery(stage) {
   if (stage.sourceStage !== 'chromium') return [testcase(stage.sourceStage)];
