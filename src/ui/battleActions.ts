@@ -1,8 +1,13 @@
 import type { AbilityId, CellPosition } from '../content/types';
-import type { BattleSession } from '../app/BattleSession';
+import type { BattleSession, Presentation } from '../app/BattleSession';
 import type { Command, UnitState } from '../domain/types';
 
 export type Action = 'move' | 'basic' | AbilityId;
+/** The accepted state may already point at the next turn while the prior actor animates. */
+export function presentationActor(session: BattleSession, presentation: Presentation | null = null): UnitState {
+  const actorId=presentation?.before.initiative[presentation.before.activeIndex];
+  return presentation?.after.units.find(unit=>unit.id===actorId) ?? session.active;
+}
 export function ownedAbilities(session: BattleSession, actorDefId: UnitState['defId'] = session.active.defId) {
   return Object.values(session.catalog.abilities).filter(a=>a.id!=='ability:basic_attack' && a.owners.includes(actorDefId))
     .sort((a,b)=>a.id<b.id?-1:a.id>b.id?1:0);

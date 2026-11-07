@@ -11,7 +11,7 @@ import type { BattleAudioSnapshot } from '../phaser/BattleAudio';
 import { publicAssetUrl } from './publicAssetUrl';
 import { GUARDED_STRIKE_TRADEOFF } from '../content/constants';
 
-import { ownedAbilities, actionCommand, actionTargets, type Action } from './battleActions';
+import { ownedAbilities, actionCommand, actionTargets, presentationActor, type Action } from './battleActions';
 import { mountCombatControlsPreference, type CombatSkin } from './combatControls';
 import { draughtsSpent } from '../domain/draughts';
 export const displayName = (id: string) => id.replace(/^ability:/,'').replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase());
@@ -206,7 +206,7 @@ export class BattleHud {
     const s=this.session, enabled=s.phase==='player';
     // Resolution already advanced initiative, but the board is still animating
     // the command's actor. Keep the entire card on that actor until completion.
-    const actor=presentation?.after.units.find(unit=>unit.id===presentation.before.initiative[presentation.before.activeIndex]) ?? s.active;
+    const actor=presentationActor(s,presentation);
     const round=presentation?.before.round ?? s.state.round;
     const showPlanCancel=this.skin==='radial' && planWaiting && enabled;
     this.root.dataset.planWaiting=String(showPlanCancel);

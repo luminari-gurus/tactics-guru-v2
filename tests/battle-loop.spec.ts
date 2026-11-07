@@ -742,3 +742,49 @@ test('animation keeps turn header and actor card together with locked budgets', 
   await expect(page.locator('#battle-actor-name')).toHaveText(displayName(next.defId));
   await expect(page.locator('#battle-budgets')).not.toContainText('Controls locked');
 });
+
+test('presentation inspection defaults to the displayed actor and remains read-only through the turn handoff', async ({ page }) => {
+  await page.clock.install();
+  await page.goto('./battle');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  const before = await session(page);
+  const actor = before.state.units.find(unit => unit.id === before.state.initiative[before.state.activeIndex])!;
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
+  await page.locator('#battle-next').click({ force: true });
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'presenting');
+  const accepted = await session(page);
+  const next = accepted.state.units.find(unit => unit.id === accepted.state.initiative[accepted.state.activeIndex])!;
+  expect(next.id).not.toBe(actor.id);
+  expect(accepted.state.commandCount).toBe(before.state.commandCount + 1);
+  expect(accepted.replay.commands).toEqual([...before.replay.commands, { type: 'endTurn', unitId: actor.id }]);
+  const expectReadOnly = async () => {
+    const current = await session(page);
+    expect(current.state).toEqual(accepted.state);
+    expect(current.replay).toEqual(accepted.replay);
+  };
+  const title = page.locator('#battle-dialog-title'), message = page.locator('#battle-dialog-message');
+  await page.locator('#battle-party').click({ force: true });
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'presenting');
+  await expect(title).toHaveText(`Inspection only — ${displayName(actor.defId)} #${actor.id}`);
+  await expect(page.locator('#battle-actor-name')).toHaveText(displayName(actor.defId));
+  await expect(message).toContainText('Inspection never changes the turn.');
+  await expect(message).not.toContainText('Acting unit remains');
+  await expectReadOnly();
+
+  const inspected = accepted.state.units.find(unit => unit.id !== actor.id && unit.id !== next.id)!;
+  const inspectedTitle = `Inspection only — ${displayName(inspected.defId)} #${inspected.id}`;
+  await page.locator(`#inspect-unit-${inspected.id}`).click({ force: true });
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'presenting');
+  await expect(title).toHaveText(inspectedTitle);
+  await expectReadOnly();
+  await page.clock.resume();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', next.side === 'player' ? 'player' : 'enemy');
+  await expect(page.locator('#battle-dialog')).toBeVisible();
+  await expect(page.locator('#battle-actor-name')).toHaveText(displayName(next.defId));
+  await expect(title).toHaveText(inspectedTitle);
+  await expect(message).toContainText('Inspection never changes the turn.');
+  await expect(message).not.toContainText('Acting unit remains');
+  await expectReadOnly();
+  await page.locator('#inspection-close').click();
+  await expect(page.locator('#battle-dialog')).not.toBeVisible();
+});
