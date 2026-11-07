@@ -336,10 +336,12 @@ export class BattleScene extends Phaser.Scene {
         width:r.width*this.scale.width/c.width,height:r.height*this.scale.height/c.height};
       // A caption/layout reflow cancels held gestures, but may keep the same
       // camera and hit candidates. Do not let our overlap hint reset itself.
-      if(next.x!==region.x||next.y!==region.y||next.width!==region.width||next.height!==region.height)removeInput.reset(true);
+      const regionChanged=next.x!==region.x||next.y!==region.y||next.width!==region.width||next.height!==region.height;
+      if(regionChanged)removeInput.reset(true);
       region=next;
       canvas.style.clipPath=`inset(${r.top-c.top}px ${c.right-r.right}px ${c.bottom-r.bottom}px ${r.left-c.left}px)`;
       board.fit(this.scale.width,this.scale.height,region);
+      if(regionChanged && radial.mode==='tap')radial.reposition();
     };
     const observer=new ResizeObserver(fit);observer.observe(drawable);observer.observe(document.querySelector('#battle-shell')!);this.scale.on(Phaser.Scale.Events.RESIZE,fit);
     refresh();fit();
