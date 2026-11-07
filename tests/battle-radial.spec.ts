@@ -654,8 +654,8 @@ test('radial plan cancellation stays available while choosing a destination or t
   }
 });
 
-test('radial compact landscape fits controls and keeps tap and hold usable', async ({page}) => {
-  await page.setViewportSize({width:568,height:300});
+for (const height of [300, 234]) test(`radial compact landscape fits controls and keeps tap and hold usable at ${height}px`, async ({page}) => {
+  await page.setViewportSize({width:568,height});
   await ready(page);
   const {cell,current}=await reachableEmpty(page);
   await tapBoard(page,cell);
@@ -665,7 +665,7 @@ test('radial compact landscape fits controls and keeps tap and hold usable', asy
     expect(box.x).toBeGreaterThanOrEqual(0);
     expect(box.y).toBeGreaterThanOrEqual(0);
     expect(box.x+box.width).toBeLessThanOrEqual(568);
-    expect(box.y+box.height).toBeLessThanOrEqual(300);
+    expect(box.y+box.height).toBeLessThanOrEqual(height);
     expect(box.width).toBeGreaterThanOrEqual(44);
     expect(box.height).toBeGreaterThanOrEqual(44);
   }
@@ -737,6 +737,7 @@ test('radial resize cancels a held gesture and ignores the trailing release', as
 });
 
 test('radial stays open on a layout reflow without a viewport resize', async ({page}) => {
+  await page.setViewportSize({width:1000,height:800});
   await ready(page);
   const {cell}=await reachableEmpty(page);
   await tapBoard(page,cell);
@@ -744,9 +745,20 @@ test('radial stays open on a layout reflow without a viewport resize', async ({p
   const pending=(await session(page)).pending;
   expect(pending).toMatchObject({type:'move',to:cell});
   const caption=page.locator('#battle-board-caption');
-  const before=(await caption.boundingBox())!.height;
-  await caption.evaluate(node=>{(node as HTMLElement).style.paddingTop='32px';});
-  await expect.poll(async()=> (await caption.boundingBox())!.height).toBeGreaterThan(before);
+  const board=page.locator('#battle-board-region');
+  const plan=page.locator('#battle-radial-plan');
+  const originalPlan=(await plan.boundingBox())!;
+  await caption.evaluate(node=>{node.style.paddingTop='60px';});
+  await expect.poll(async()=> {
+    const bounds=(await board.boundingBox())!;
+    return bounds.y+bounds.height;
+  }).toBeLessThan(originalPlan.y+originalPlan.height);
+  const bounds=(await board.boundingBox())!;
+  expect(bounds.height).toBeGreaterThan(320);
+  await expect.poll(async()=> {
+    const box=(await plan.boundingBox())!;
+    return box.y+box.height;
+  }).toBeLessThanOrEqual(bounds.y+bounds.height);
   await expect(page.locator('#battle-radial')).toBeVisible();
   expect((await session(page)).pending).toEqual(pending);
 });
