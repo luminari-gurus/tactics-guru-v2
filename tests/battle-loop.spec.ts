@@ -698,5 +698,20 @@ test('narrow landscape battle stacks controls below a usable board @fixed-viewpo
   expect(panel!.y).toBeGreaterThanOrEqual(board!.y+board!.height);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.screenshot({path:test.info().outputPath(`narrow-${viewport.width}.png`)});
+  // Use the same inset hooks as the portrait/rail stress case above.
+  await page.evaluate(()=>{
+   for(const [side,size] of Object.entries({top:24,right:24,bottom:34,left:24}))document.body.style.setProperty('--safe-'+side,size+'px');
+  });
+  await expect.poll(async()=> (await page.locator('#battlefield').boundingBox())!.y).toBeGreaterThanOrEqual(24);
+  const insetBoard=await page.locator('#battle-board-region').boundingBox();
+  const insetPanel=await page.locator('#fit-panel').boundingBox();
+  expect(insetBoard!.height).toBeGreaterThan(30);
+  expect(insetBoard!.x).toBeGreaterThanOrEqual(24);
+  expect(insetBoard!.x+insetBoard!.width).toBeLessThanOrEqual(viewport.width-24);
+  expect(insetPanel!.y).toBeGreaterThanOrEqual(insetBoard!.y+insetBoard!.height);
+  expect(insetPanel!.x).toBeGreaterThanOrEqual(24);
+  expect(insetPanel!.x+insetPanel!.width).toBeLessThanOrEqual(viewport.width-24);
+  expect(insetPanel!.y+insetPanel!.height).toBeLessThanOrEqual(viewport.height-34);
+  await page.screenshot({path:test.info().outputPath(`narrow-${viewport.width}-safe-area.png`)});
  }
 });
