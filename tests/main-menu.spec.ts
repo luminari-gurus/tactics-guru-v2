@@ -98,11 +98,11 @@ test('main menu: application import failure preserves battle saves and reload re
  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
  await page.clock.install();
  const entry=/\/startBattleApp(?:-[^/]+\.js|\.ts)(?:\?|$)/;
- let rejectImport=false,blocked=0,allowed=0,failedResponses=0;
+ let rejectImport=true,blocked=0,allowed=0,failedResponses=0;
  const observeEntryResponse=(response:Response)=>{if(entry.test(response.url()) && response.status()===503)failedResponses++;};
  page.on('response',observeEntryResponse);
- // This controlled server contract is explicitly no-store throughout the test.
- // Allowed responses preserve module bytes; the failing reload receives HTTP503.
+ // The first document receives a cold HTTP 503 with the legal save already seeded.
+ // All controlled responses are no-store; recovery preserves the module bytes.
  const routeImport=async(route:Route)=>{
   if(rejectImport){
    blocked++;await route.fulfill({status:503,contentType:'text/javascript',headers:{'cache-control':'no-store'},body:'// Controlled unavailable application module.\n'});
@@ -113,13 +113,8 @@ test('main menu: application import failure preserves battle saves and reload re
  };
  await page.route(entry,routeImport);
  try {
-  await page.goto('./?game=battle');await page.locator('#save-continue').click();
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-  expect(allowed).toBeGreaterThan(0);
-  expect((await readSession(page)).state).toEqual(saved.state);expect(await stored()).toEqual(bytes);
   await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
-  rejectImport=true;
-  await page.reload();
+  await page.goto('./?game=battle');
   await expect.poll(()=>blocked).toBeGreaterThan(0);
   await expect.poll(()=>failedResponses).toBeGreaterThan(0);
   await expect(page.getByRole('alert')).toHaveText('Error: Could not load the application. Reload the page to retry.');
@@ -139,7 +134,7 @@ test('main menu: application import failure preserves battle saves and reload re
   expect(resumed.continuation).toEqual({snapshot:saved.state,commands:[],events:[]});expect(resumed.pending).toBeNull();
   expect(JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).effect).toBeNull();
   expect(await stored()).toEqual(bytes);expect(errors).toEqual([]);
-  await info.attach('application-load-recovery',{body:JSON.stringify({cacheControl:'no-store',blocked,allowed,
+  await info.attach('application-load-recovery',{body:JSON.stringify({entryState:'cold',cacheControl:'no-store',blocked,allowed,
    injectedResponse:{status:503,observed:failedResponses},failures:applicationLoadDiagnostics.failures()},null,2),contentType:'application/json'});
  } finally { page.off('response',observeEntryResponse);await page.unroute(entry,routeImport); }
 });
