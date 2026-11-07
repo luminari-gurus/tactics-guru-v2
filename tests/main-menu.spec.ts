@@ -57,7 +57,8 @@ test('main menu: failed gameplay imports retain visible recovery without proof t
 
 for(const mode of ['run','dungeon'] as const)test(`main menu: post-mount ${mode} failure remains visible and preserves saves`,async({page},info)=>{
  const saved=menuFixture(mode);
- await page.addInitScript(({key,saved})=>localStorage.setItem(key,saved),{key:keys[mode].primary,saved});
+ const backup='preserved recovery bytes';
+ await page.addInitScript(({slots,saved,backup})=>{localStorage.setItem(slots.primary,saved);localStorage.setItem(slots.backup,backup);},{slots:keys[mode],saved,backup});
  await page.route(/\/start(?:Run|Dungeon)App(?:-[^/]+\.js|\.ts)(?:\?|$)/,async route=>{
   const response=await route.fetch();
   await route.fulfill({response,body:(await response.text())+'\nthrow new Error("review: post-mount initialization failed");\n'});
@@ -67,13 +68,14 @@ for(const mode of ['run','dungeon'] as const)test(`main menu: post-mount ${mode}
  await expect(page.getByRole('alert')).toBeInViewport();
  await expect(page.locator('#fit-board-controls')).not.toBeVisible();
  await expect(page.locator('#fit-measurements')).not.toBeVisible();
- expect(await page.evaluate(key=>localStorage.getItem(key),keys[mode].primary)).toBe(saved);
+ expect(await page.evaluate(slots=>({primary:localStorage.getItem(slots.primary),backup:localStorage.getItem(slots.backup)}),keys[mode])).toEqual({primary:saved,backup});
  await page.screenshot({path:info.outputPath(`${mode}-post-mount-error.png`)});
 });
 
 test('main menu: run preparation runtime errors use one visible alert and preserve saves',async({page},info)=>{
  const saved=menuFixture('run');
- await page.addInitScript(({key,saved})=>localStorage.setItem(key,saved),{key:keys.run.primary,saved});
+ const backup='preserved recovery bytes';
+ await page.addInitScript(({slots,saved,backup})=>{localStorage.setItem(slots.primary,saved);localStorage.setItem(slots.backup,backup);},{slots:keys.run,saved,backup});
  await page.goto('./?game=run');await expect(page.locator('#run-start')).toBeVisible();
  for(let i=0;i<2;i++){
   await page.evaluate(()=>window.dispatchEvent(new ErrorEvent('error',{message:'review: renderer initialization failed'})));
@@ -83,7 +85,7 @@ test('main menu: run preparation runtime errors use one visible alert and preser
  }
  await expect(page.locator('#fit-board-controls')).not.toBeVisible();
  await expect(page.locator('#fit-measurements')).not.toBeVisible();
- expect(await page.evaluate(key=>localStorage.getItem(key),keys.run.primary)).toBe(saved);
+ expect(await page.evaluate(slots=>({primary:localStorage.getItem(slots.primary),backup:localStorage.getItem(slots.backup)}),keys.run)).toEqual({primary:saved,backup});
  await page.screenshot({path:info.outputPath('run-preparation-error.png')});
 });
 
