@@ -2,12 +2,19 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 
-const yaml = readFileSync(new URL('../../.github/workflows/auto-merge-low-risk.yml', import.meta.url), 'utf8');
-const script = yaml.split('          script: |\n')[1].split('\n').map(l => l.slice(12)).join('\n');
+function workflowFixture(text) {
+  const yaml = text.replaceAll('\r\n', '\n');
+  const script = yaml.split('          script: |\n')[1].split('\n').map(l => l.slice(12)).join('\n');
+  return {yaml, script};
+}
+const {yaml, script} = workflowFixture(readFileSync(new URL('../../.github/workflows/auto-merge-low-risk.yml', import.meta.url), 'utf8'));
 const execute = new (Object.getPrototypeOf(async function () {}).constructor)('github', 'context', 'core', script);
 const A = 'a'.repeat(40), B = 'b'.repeat(40), C = 'c'.repeat(40);
 const repository = 'luminari-gurus/tactics-guru-v2';
 const body = (sha = A, level = 'low') => `<!-- tactics-guru-pr-risk -->\n<!-- tactics-guru-pr-risk:v1 head=${sha} level=${level} -->\nRisk: ${level}\nEvidence: tests passed.\n`;
+test('workflow fixture extracts identical gate code from LF and CRLF', () => {
+  assert.deepEqual(workflowFixture(yaml), workflowFixture(yaml.replaceAll('\n', '\r\n')));
+});
 function fixture() {
   const s = {
     pr: {number: 7, base: {ref: 'main'}, state: 'open', merged: false, draft: false, head: {sha: A, repo: {full_name: repository}}, user: {login: 'author'}, labels: [{name: 'risk:low'}, {name: 'bug'}]},

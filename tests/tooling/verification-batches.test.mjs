@@ -8,7 +8,7 @@ import { definitions, createPlan, discover, exactCoverage, inventory, verifyBuil
 import { digest, compareReports } from '../../scripts/verification-report.mjs';
 import { stages } from '../../scripts/verification-timings.mjs';
 
-const batches = JSON.parse(readFileSync(new URL('../../docs/qa/issue-200/chromium-timeout-investigation.json', import.meta.url))).batchPlan.batches;
+const batches = JSON.parse(readFileSync(new URL('../../scripts/verification-batches.json', import.meta.url)));
 const testcase = (id, project = 'desktop') => ({ id, project });
 function discovery(stage) {
   if (stage.sourceStage !== 'chromium') return [testcase(stage.sourceStage)];
@@ -298,10 +298,13 @@ test('browser workflows share a non-cancelling lock for the selected VM', () => 
 
 
 test('automatic PR checks retain the shared VM reservation and durable pending queue', () => {
-  const workflow = readFileSync(new URL('../../.github/workflows/pr-verification.yml', import.meta.url), 'utf8');
-  const concurrency = workflow.split('\nconcurrency:\n')[1]?.split(/\n\S/)[0];
-  assert.match(concurrency, /group: tactics-browser-tactics-browser-01/);
-  assert.match(concurrency, /queue: max/);
-  assert.match(concurrency, /cancel-in-progress: false/);
-  assert.match(workflow, /runs-on: \[self-hosted, tactics-browser, tactics-browser-01\]/);
+  const source = readFileSync(new URL('../../.github/workflows/pr-verification.yml', import.meta.url), 'utf8').replaceAll('\r\n', '\n');
+  for (const input of [source, source.replaceAll('\n', '\r\n')]) {
+    const workflow = input.replaceAll('\r\n', '\n');
+    const concurrency = workflow.split('\nconcurrency:\n')[1]?.split(/\n\S/)[0];
+    assert.match(concurrency, /group: tactics-browser-tactics-browser-01/);
+    assert.match(concurrency, /queue: max/);
+    assert.match(concurrency, /cancel-in-progress: false/);
+    assert.match(workflow, /runs-on: \[self-hosted, tactics-browser, tactics-browser-01\]/);
+  }
 });
