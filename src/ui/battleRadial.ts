@@ -59,12 +59,14 @@ export class BattleRadial {
     const signal = this.abort.signal;
     this.root.addEventListener('pointerdown', event => event.stopPropagation(), { signal });
     this.root.querySelectorAll<HTMLButtonElement>('[data-slice]').forEach(button => {
+      const slice = button.dataset.slice as RadialSliceId;
       button.addEventListener('click', () => {
         if (this.mode !== 'tap' || button.disabled) return;
-        this.activate(button.dataset.slice as RadialSliceId);
+        this.activate(slice);
       }, { signal });
-      button.addEventListener('pointerenter', () => {
-        if (this.open && !button.disabled) this.aim(button.dataset.slice as RadialSliceId);
+      // Opening or repositioning the menu can put a slice under a stationary pointer.
+      button.addEventListener('pointermove', () => {
+        if (this.mode === 'tap' && !button.disabled && this.aimed !== slice) this.aim(slice);
       }, { signal });
     });
     this.root.querySelector('#battle-radial-hub')!.addEventListener('click', () => {
@@ -123,8 +125,8 @@ export class BattleRadial {
     const dx = point.x - this.origin.x, dy = point.y - this.origin.y;
     const slice = this.sliceAt(point);
     const cardinal = cardinalFromVector(dx, dy);
-    const inPressHub = this.inPressHub(point);
-    if (inPressHub || (cardinal === 'hub' && slice !== 'plan')) {
+    const aim = slice ?? (cardinal === 'hub' ? 'hub' : CARDINAL_SLICE[cardinal]);
+    if (this.inPressHub(point) || aim === 'hub') {
       this.aim('hub');
       return;
     }
@@ -133,15 +135,14 @@ export class BattleRadial {
       const chip = this.chipAt(point);
       if (chip) { this.highlightChip(chip); return; }
     }
-    this.aim(slice ?? CARDINAL_SLICE[cardinal === 'hub' ? 's' : cardinal]);
+    this.aim(aim);
   }
 
   releaseAt(point: Point): 'commit' | 'cancel' | 'open-sub' | 'inspect' | 'plan' | 'none' {
     if (!this.open || !this.cell) return 'none';
     const dx = point.x - this.origin.x, dy = point.y - this.origin.y;
     const slice = this.sliceAt(point);
-    const inHub = this.inPressHub(point)
-      || (hubContains(dx, dy) && slice !== 'plan');
+    const inHub = this.inPressHub(point) || (!slice && hubContains(dx, dy));
     if (inHub) {
       if (this.leftHub || this.mode === 'tap') { this.cancel(); return 'cancel'; }
       return this.activate(this.defaultId());

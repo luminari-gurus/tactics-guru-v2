@@ -405,7 +405,7 @@ test('radial plan specials can be chosen after a destination', async ({ page }) 
   await expect.poll(async () => (await session(page)).state.commandCount).toBeGreaterThan(current.state.commandCount);
 });
 
-test('radial special tap waits for a sub-ring choice after pointerenter', async ({ page }) => {
+test('radial special tap waits for a sub-ring choice after hovering', async ({ page }) => {
   await ready(page);
   const { enemy, current } = await livingEnemy(page);
   await tapBoard(page, enemy.cell);
@@ -415,7 +415,8 @@ test('radial special tap waits for a sub-ring choice after pointerenter', async 
     await page.locator('#battle-radial-hub').click();
     return;
   }
-  await special.dispatchEvent('pointerenter');
+  await special.hover();
+  await expect(special).toHaveAttribute('aria-pressed', 'true');
   await special.click();
   const sub = page.locator('#battle-radial-sub');
   if (await sub.isVisible()) {
@@ -682,6 +683,23 @@ for (const height of [300, 234]) test(`radial compact landscape fits controls an
   await expect.poll(async()=> (await session(page)).state.commandCount).toBeGreaterThan(current.state.commandCount);
 });
 
+
+test('radial compact hold can inspect at the inner edge of the slice', async ({page}) => {
+  await page.setViewportSize({width:568,height:234});
+  await ready(page);
+  const {cell,current}=await reachableEmpty(page);
+  await holdAt(page,await boardPoint(page,cell));
+  await expect(page.locator('#battle-radial')).toBeVisible();
+  const move=(await page.locator('#battle-radial-move').boundingBox())!;
+  await page.mouse.move(move.x+move.width/2,move.y+move.height/2);
+  const inspect=page.locator('#battle-radial-inspect');
+  const box=(await inspect.boundingBox())!;
+  await page.mouse.move(box.x+box.width/2,box.y+1);
+  await expect(inspect).toHaveAttribute('aria-pressed','true');
+  await page.mouse.up();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  expect((await session(page)).state.commandCount).toBe(current.state.commandCount);
+});
 
 test('radial resize dismisses an open tap menu without committing or stranding it', async ({page}) => {
   await page.setViewportSize({width:915,height:412});
