@@ -29,7 +29,7 @@ feedback; explicit setup/regression configs still own the diagnostic check. An e
 discovery contract prevents accidental expansion or loss of the seven selections.
 Before this migration, the broad default selected 1,036 cases (353 desktop, 344
 portrait, 339 landscape). Ordinary E2E now selects seven; the explicit broad
-regression matrix selects 1,075 cases (366 desktop, 357 portrait and 352 landscape),
+regression matrix selects 1,117 cases (380 desktop, 371 portrait and 366 landscape),
 including the growing-floor and deferred-loading regressions. Redundant XP 60/600
 permutations remain removed. This is a selection count,
 not a measured runtime speedup or equivalent full-regression coverage.
@@ -150,6 +150,13 @@ Capture before changing selection. The compare command rejects unmapped omission
 extra/duplicate IDs, changed retained metadata and unexpected effective device
 settings. Historical captures are immutable; deliberate later selection changes
 need their own source-bound comparison and updated contract, not rewritten history.
+
+Current whole-file serial assignments live in `scripts/verification-batches.json`.
+Keep each new browser test file in one batch for every applicable profile; the
+real discovery contract rejects omissions and duplicates. Historical timing reports
+remain immutable evidence and are not the runner's current configuration. The
+Q*bert suite is assigned to each profile's third batch without changing job IDs,
+workers, retries or budgets; this is coverage repair, not a new timing baseline.
 
 ### Small dependency patches
 

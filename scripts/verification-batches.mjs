@@ -30,7 +30,7 @@ export function definitions(mode = 'capture') {
     { id: 'pilot-webkit', stages: [{ ...chromium, id: 'pilot-webkit', args: [...chromium.args,
       '-c', 'playwright.setup-smoke.config.ts', '--project=setup-webkit'] }] },
   ];
-  const batches = read(join(root, 'docs/qa/issue-200/chromium-timeout-investigation.json')).batchPlan.batches;
+  const batches = read(join(root, 'scripts/verification-batches.json'));
   const chromiumJobs = batches.map(batch => ({ id: 'chromium-' + batch.id,
     stages: [{ ...chromium, id: 'chromium-' + batch.id,
       args: [...chromium.args, '--project=' + batch.project, ...batch.files.map(file => file.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$')] }] }));
