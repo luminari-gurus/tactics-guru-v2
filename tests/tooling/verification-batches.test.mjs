@@ -298,10 +298,13 @@ test('browser workflows share a non-cancelling lock for the selected VM', () => 
 
 
 test('automatic PR checks retain the shared VM reservation and durable pending queue', () => {
-  const workflow = readFileSync(new URL('../../.github/workflows/pr-verification.yml', import.meta.url), 'utf8');
-  const concurrency = workflow.split('\nconcurrency:\n')[1]?.split(/\n\S/)[0];
-  assert.match(concurrency, /group: tactics-browser-tactics-browser-01/);
-  assert.match(concurrency, /queue: max/);
-  assert.match(concurrency, /cancel-in-progress: false/);
-  assert.match(workflow, /runs-on: \[self-hosted, tactics-browser, tactics-browser-01\]/);
+  const source = readFileSync(new URL('../../.github/workflows/pr-verification.yml', import.meta.url), 'utf8').replaceAll('\r\n', '\n');
+  for (const input of [source, source.replaceAll('\n', '\r\n')]) {
+    const workflow = input.replaceAll('\r\n', '\n');
+    const concurrency = workflow.split('\nconcurrency:\n')[1]?.split(/\n\S/)[0];
+    assert.match(concurrency, /group: tactics-browser-tactics-browser-01/);
+    assert.match(concurrency, /queue: max/);
+    assert.match(concurrency, /cancel-in-progress: false/);
+    assert.match(workflow, /runs-on: \[self-hosted, tactics-browser, tactics-browser-01\]/);
+  }
 });
