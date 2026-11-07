@@ -451,6 +451,9 @@ test('keyboard selection, confirmation lock, touch and restart discard old gestu
 
 test('battle HUD targets fit portrait and short landscape with a bounded readable log',async({page})=>{
   await page.goto('./battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await expect(page.locator('#fit-board-controls')).not.toBeVisible();
+  await expect(page.locator('#fit-measurements')).not.toBeVisible();
+  await expect(page.getByRole('button',{name:'Restart battle',exact:true})).toBeEnabled();
   for(const viewport of [{width:390,height:844},{width:844,height:390},{width:360,height:640}]){
     await page.setViewportSize(viewport);
     const boxes=await page.evaluate(()=>{

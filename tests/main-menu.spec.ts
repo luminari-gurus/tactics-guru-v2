@@ -12,6 +12,83 @@ import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { readSession, reviewDraught } from './helpers/battlePolicy';
 const keys={battle:BATTLE_STORAGE_KEYS,run:RUN_STORAGE_KEYS,dungeon:DUNGEON_KEYS};
 
+test('main menu: startup hides proof tools before application modules run',async({page})=>{
+ let release!:()=>void;
+ let held:Promise<void>;
+ await page.route('**/*',async route=>{
+  if(route.request().resourceType()==='script'){await held;await route.abort();}
+  else if(route.request().resourceType()==='stylesheet')await route.abort();
+  else await route.continue();
+ });
+ try{
+  for(const route of ['', '?game=battle', '?game=run', '?game=dungeon', 'battle', 'run', 'dungeon', 'map', 'qbert']){
+   held=new Promise<void>(resolve=>{release=resolve;});
+   await page.goto('./'+route,{waitUntil:'commit'});
+   await expect(page.locator('#fit-status')).toBeVisible();
+   await expect(page.locator('#fit-status')).toHaveText('Loading');
+   await expect(page.getByRole('button',{name:'Restart proof scene',exact:true})).not.toBeVisible();
+   await expect(page.getByText('Board controls',{exact:true})).not.toBeVisible();
+   await expect(page.getByText('Measurements',{exact:true})).not.toBeVisible();
+   await expect(page.getByRole('complementary',{name:'Proof scene diagnostics'})).toHaveCount(0);
+   await expect(page.getByRole('complementary',{name:'Game status',exact:true})).toBeVisible();
+   await expect(page.locator('#fit-restart')).not.toBeVisible();
+   await expect(page.locator('#board-caption')).not.toBeVisible();
+   // WebKit waits for navigation to settle before capturing a screenshot.
+   // Reject the held modules after asserting the shell; no app code can run.
+   release();await page.waitForLoadState('load');
+   if(!route)await page.screenshot({path:test.info().outputPath('neutral-startup.png')});
+  }
+ }finally{release();await page.unrouteAll({behavior:'wait'});}
+});
+
+test('main menu: failed gameplay imports retain visible recovery without proof tools',async({page})=>{
+ const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+ await page.route(/\/start(?:Battle|Run|Dungeon)App(?:-[^/]+\.js|\.ts)(?:\?|$)/,route=>route.abort());
+ for(const mode of ['battle','run','dungeon']){
+  await page.goto('./?game='+mode);
+  await expect(page.getByRole('alert')).toHaveText('Error: Could not load the application. Reload the page to retry.');
+  await expect(page.getByRole('alert')).toBeVisible();
+  await expect(page.getByText('Board controls',{exact:true})).not.toBeVisible();
+  await expect(page.getByText('Measurements',{exact:true})).not.toBeVisible();
+  await expect(page.getByRole('complementary',{name:'Proof scene diagnostics'})).toHaveCount(0);
+ }
+ expect(errors).toEqual([]);
+});
+
+for(const mode of ['run','dungeon'] as const)test(`main menu: post-mount ${mode} failure remains visible and preserves saves`,async({page},info)=>{
+ const saved=menuFixture(mode);
+ const backup='preserved recovery bytes';
+ await page.addInitScript(({slots,saved,backup})=>{localStorage.setItem(slots.primary,saved);localStorage.setItem(slots.backup,backup);},{slots:keys[mode],saved,backup});
+ await page.route(/\/start(?:Run|Dungeon)App(?:-[^/]+\.js|\.ts)(?:\?|$)/,async route=>{
+  const response=await route.fetch();
+  await route.fulfill({response,body:(await response.text())+'\nthrow new Error("review: post-mount initialization failed");\n'});
+ });
+ await page.goto('./?game='+mode);
+ await expect(page.getByRole('alert')).toHaveText('Error: Could not load the application. Reload the page to retry.');
+ await expect(page.getByRole('alert')).toBeInViewport();
+ await expect(page.locator('#fit-board-controls')).not.toBeVisible();
+ await expect(page.locator('#fit-measurements')).not.toBeVisible();
+ expect(await page.evaluate(slots=>({primary:localStorage.getItem(slots.primary),backup:localStorage.getItem(slots.backup)}),keys[mode])).toEqual({primary:saved,backup});
+ await page.screenshot({path:info.outputPath(`${mode}-post-mount-error.png`)});
+});
+
+test('main menu: run preparation runtime errors use one visible alert and preserve saves',async({page},info)=>{
+ const saved=menuFixture('run');
+ const backup='preserved recovery bytes';
+ await page.addInitScript(({slots,saved,backup})=>{localStorage.setItem(slots.primary,saved);localStorage.setItem(slots.backup,backup);},{slots:keys.run,saved,backup});
+ await page.goto('./?game=run');await expect(page.locator('#run-start')).toBeVisible();
+ for(let i=0;i<2;i++){
+  await page.evaluate(()=>window.dispatchEvent(new ErrorEvent('error',{message:'review: renderer initialization failed'})));
+  await expect(page.getByRole('alert')).toHaveCount(1);
+  await expect(page.getByRole('alert')).toHaveText('Error: The run encountered a runtime error. Reload to retry.');
+  await expect(page.getByRole('alert')).toBeInViewport();
+ }
+ await expect(page.locator('#fit-board-controls')).not.toBeVisible();
+ await expect(page.locator('#fit-measurements')).not.toBeVisible();
+ expect(await page.evaluate(slots=>({primary:localStorage.getItem(slots.primary),backup:localStorage.getItem(slots.backup)}),keys.run)).toEqual({primary:saved,backup});
+ await page.screenshot({path:info.outputPath('run-preparation-error.png')});
+});
+
 test('main menu: repeated scene selectors use the first value throughout startup',async({page})=>{
  await page.goto('./?scene=unknown&scene=proof');
  await expect(page.locator('[data-menu-action]')).toHaveCount(4);

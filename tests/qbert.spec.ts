@@ -15,6 +15,9 @@ for (const search of ['', '?scene=proof', '?scene=content-smoke']) {
     await expect(page.locator('#game')).toHaveAttribute('data-ready', 'true');
     await expect(page.locator('#battle-heading h1')).toHaveText('Q*bert Pyramid');
     await expect(page.locator('#fit-status')).toHaveText('Battle ready');
+    await expect(page.locator('#fit-board-controls')).not.toBeVisible();
+    await expect(page.locator('#fit-measurements')).not.toBeVisible();
+    await expect(page.getByRole('button', { name: 'Restart battle', exact: true })).toBeEnabled();
     const r = await report(page);
     const tiles: Cell[] = r.tiles;
     expect(tiles).toHaveLength(49);

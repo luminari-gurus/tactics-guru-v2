@@ -18,13 +18,18 @@ const battle = qbert || (!contentSmoke && new URLSearchParams(location.search).g
 if (battle) {
   const runLink=document.createElement('a');runLink.href=`${import.meta.env.BASE_URL}run`;runLink.textContent='Play three-encounter run';runLink.className='run-entry-link';
   document.querySelector('#fit-panel')!.append(runLink);
-  document.querySelectorAll<HTMLElement>('#fit-panel > details').forEach(element => { element.hidden = true; });
   document.querySelector<HTMLElement>('#battle-controls')!.hidden = false;
   document.querySelector<HTMLElement>('#fit-panel')!.setAttribute('aria-label', 'Battle controls');
   document.querySelector<HTMLElement>('#board-caption')!.textContent = 'Gold: active · White: selected · Teal: reachable · Tap to select · Drag to pan · Wheel/pinch to zoom · Keyboard: arrows, Enter selects, Escape cancels';
   restartButton.textContent = 'Restart battle';
   if (qbert) document.querySelector<HTMLElement>('#battle-heading h1')!.textContent = 'Q*bert Pyramid';
   mountBattleLayout();
+}
+if (!battle && !contentSmoke) {
+  document.querySelector<HTMLElement>('#fit-panel')!.setAttribute('aria-label', 'Proof scene diagnostics');
+  restartButton.textContent = 'Restart proof scene';
+  restartButton.hidden = false;
+  document.querySelectorAll<HTMLElement>('#fit-board-controls, #fit-measurements, #board-caption').forEach(element => { element.hidden = false; });
 }
 if (contentSmoke) {
   document.querySelectorAll('#fit-panel > :not(.fit-controls), .fit-controls > :not(#fit-status)').forEach(element => { (element as HTMLElement).hidden = true; });

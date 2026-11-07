@@ -2,6 +2,7 @@ import { mountTelemetryPreferences } from './telemetry/preferences';
 import { startTelemetry } from './telemetry/browser';
 import { reportFailure } from './telemetry/telemetry';
 import { appEntry } from './app/entry';
+import { showGameError } from './ui/gameError';
 const { route } = appEntry;
 // Menu, dungeon and the /qbert prototype have no approved collection taxonomy.
 if (route !== 'menu' && route !== 'dungeon' && route !== 'qbert') startTelemetry();
@@ -22,11 +23,7 @@ try {
   }
 } catch (error) {
   reportFailure('application_load', { phase: 'entry' }, error);
-  const status = document.querySelector<HTMLElement>('#fit-status');
-  if (status) {
-    status.textContent = 'Error: Could not load the application. Reload the page to retry.';
-    status.setAttribute('role', 'alert');
-  }
+  showGameError('Error: Could not load the application. Reload the page to retry.');
 }
 
 const privacyTools = document.querySelector<HTMLElement>('#battle-scroll') ?? document.querySelector<HTMLElement>('#fit-panel, #map-page');

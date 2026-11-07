@@ -38,20 +38,38 @@ for(const [xp,level,maxHp]of [[0,1,11],[180,3,19]])test(`menu dungeon restores M
  if(missile.kind==='magicMissile')expect(missile.casterLevel).toBe(level);
 });
 
-fixedSeedTest('testing dungeon legally clears a floor, descends and backtracks without accessing saves',async({page,isMobile})=>{
+// Saved New Game avoids its initial dormant seed; draw 27 so the playable seed
+// is 28, matching the existing complete legal first-floor witness.
+for(const saved of [false,true])(saved?test.extend({pinDungeonSeed:27}):fixedSeedTest)(saved?'saved menu dungeon keeps proof tools hidden across legal encounters':'testing dungeon legally clears a floor, descends and backtracks without accessing saves',async({page,isMobile})=>{
  test.setTimeout(300000); // Three complete battles plus normal exploration and stair input.
  // Reuse the complete first floor of the existing legal Fighter journey.
  const errors:string[]=[];let taunted=false;page.on('pageerror',error=>errors.push(error.message));
- await page.addInitScript(()=>{
+ if(!saved)await page.addInitScript(()=>{
   const get=Storage.prototype.getItem,set=Storage.prototype.setItem,remove=Storage.prototype.removeItem;
   const gameKey=(key:string)=>key.startsWith('tactics-guru:phaser:')||key==='tactics-guru:menu-new-dungeon-review';
   Storage.prototype.getItem=function(key){if(gameKey(key))throw Error('Testing saved-game read');return get.call(this,key);};
   Storage.prototype.setItem=function(key,value){if(gameKey(key))throw Error('Testing saved-game write');set.call(this,key,value);};
   Storage.prototype.removeItem=function(key){if(gameKey(key))throw Error('Testing saved-game removal');remove.call(this,key);};
  });
- await page.goto('./dungeon');await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();
+ if(saved){await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();}
+ else{await page.goto('./dungeon');await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();}
+ await expect(page.locator('#dungeon-map')).toBeVisible();
+ expect((await snapshot(page)).seed).toBe(28);
  for(let slot=0;slot<3;slot++){
   await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await expect(page.getByRole('complementary',{name:'Dungeon battle controls',exact:true})).toBeVisible();
+  await expect(page.getByText('Board controls',{exact:true})).not.toBeVisible();
+  await expect(page.getByText('Measurements',{exact:true})).not.toBeVisible();
+  await expect(page.getByRole('button',{name:'Play test sound',exact:true})).not.toBeVisible();
+  await expect(page.locator('#fit-restart')).toBeEnabled();
+  await expect(page.locator('#battle-sound')).toBeVisible();
+  if(saved&&slot===0){
+   await page.getByRole('button',{name:'Save recovery',exact:true}).click();await page.locator('#dungeon-close-recovery').click();
+   await page.locator('#fit-restart').click();await page.locator('#dungeon-cancel-new').click();
+   await expect(page.locator('#fit-restart')).toBeFocused();
+  }
+  if(saved)await page.screenshot({path:test.info().outputPath(`gameplay-battle-${slot}.png`)});
   for(let step=0;step<500;step++){
    await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||(await readSession(page))?.phase==='player';}).toBe(true);
    const s=await snapshot(page);if(s.phase!=='battle')break;
@@ -72,7 +90,7 @@ fixedSeedTest('testing dungeon legally clears a floor, descends and backtracks w
  const second=await snapshot(page);expect(second.depth).toBe(2);expect(second.party).toEqual(cleared.party);expect(second.ownership).toEqual(cleared.ownership);
  await reenterDungeonStair(page,'ascend',isMobile?'touch':'keyboard');
  const returned=await snapshot(page);expect(returned.depth).toBe(1);expect(returned.floors[0].completed).toBe(3);expect(returned.party).toEqual(cleared.party);expect(returned.ownership).toEqual(cleared.ownership);
- await expect(page.getByRole('button',{name:'Save recovery',exact:true})).toHaveCount(0);expect(errors).toEqual([]);
+ await expect(page.getByRole('button',{name:'Save recovery',exact:true})).toHaveCount(saved?1:0);expect(errors).toEqual([]);
 });
 
 test('new dungeons use fresh layouts across reloads and saved dungeons retain theirs',async({page})=>{

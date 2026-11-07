@@ -1,0 +1,207 @@
+{
+  "runtimeCommit": "ea70451a3b13c495c6874a93ec62a42c14d64a85",
+  "core": {
+    "source": "verification-receipts/pr/1794012062004-16564/summary.json",
+    "units": 1233,
+    "coreJourneys": 7,
+    "buildIntegrations": 2,
+    "types": 2,
+    "seconds": 106.9
+  },
+  "reports": {
+    "focused-desktop": {
+      "startTime": "2026-11-07T00:37:01.402Z",
+      "duration": 73715.007,
+      "expected": 3,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "ui-chromium": {
+      "startTime": "2026-11-07T00:43:41.052Z",
+      "duration": 125175.557,
+      "expected": 59,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "dungeon-touch": {
+      "startTime": "2026-11-07T00:46:20.128Z",
+      "duration": 74233.133,
+      "expected": 1,
+      "skipped": 0,
+      "unexpected": 1,
+      "flaky": 0
+    },
+    "dungeon-landscape-recovery": {
+      "startTime": "2026-11-07T00:48:09.247Z",
+      "duration": 73041.909,
+      "expected": 1,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "ui-webkit": {
+      "startTime": "2026-11-07T00:49:22.711Z",
+      "duration": 112204.771,
+      "expected": 6,
+      "skipped": 0,
+      "unexpected": 2,
+      "flaky": 0
+    },
+    "startup-webkit-recovery": {
+      "startTime": "2026-11-07T00:51:56.357Z",
+      "duration": 3943.052,
+      "expected": 2,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "startup-chromium-final": {
+      "startTime": "2026-11-07T00:52:00.703Z",
+      "duration": 5759.643,
+      "expected": 3,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "dungeon-webkit": {
+      "startTime": "2026-11-07T00:52:06.845Z",
+      "duration": 359932.326,
+      "expected": 6,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "proof-webkit": {
+      "startTime": "2026-11-07T00:59:38.486Z",
+      "duration": 2377.014,
+      "expected": 1,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "dev": {
+      "startTime": "2026-11-07T00:59:41.256Z",
+      "duration": 38695.122,
+      "expected": 8,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "prefix": {
+      "startTime": "2026-11-07T01:00:21.588Z",
+      "duration": 8182.7699999999995,
+      "expected": 4,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  },
+  "builds": {
+    "qualifiedRootIndexSha256": "67cf434b62dfac1a75130936ebc065d079d468f7598f884555fd1a79c0309c6c",
+    "prefixIndexSha256": "76e010aab47040314f1df2a180d47d7d79acb9fdc7ad78c5e4105952399afdc4",
+    "restoredRootIndexSha256": "67cf434b62dfac1a75130936ebc065d079d468f7598f884555fd1a79c0309c6c"
+  },
+  "scope": "PR readiness plus affected consumers; no full regression or physical-device claim",
+  "retention": "Original failures retained; targeted recovery does not relabel the failed capture.",
+  "commands": {
+    "core": "npm run verify:pr",
+    "chromium": {
+      "config": "playwright.regression.config.ts",
+      "files": [
+        "tests/main-menu.spec.ts",
+        "tests/boot.spec.ts",
+        "tests/layout.spec.ts",
+        "tests/opacity.spec.ts",
+        "tests/move.spec.ts",
+        "tests/audio.spec.ts",
+        "tests/content-loading.spec.ts",
+        "tests/public-asset-base.spec.ts",
+        "tests/run-progression.spec.ts",
+        "tests/battle-loop.spec.ts",
+        "tests/qbert.spec.ts"
+      ],
+      "grep": "startup hides proof|failed gameplay imports|repeated scene selectors|missing engine chunk|boots a Phaser scene|controls stay at least 44 px and reachable at (390x844|844x390)|opacity slider previews|actual move controls reject|the test tone plays only|content smoke: (success|missing)$|direct entry and refresh resolve public assets|legal defeat reload, native keyboard restart|battle HUD targets fit|/qbert.*renders"
+    },
+    "touch": {
+      "config": "playwright.regression.config.ts",
+      "files": [
+        "tests/dungeon.spec.ts"
+      ],
+      "grep": "saved menu dungeon keeps",
+      "projects": [
+        "mobile-portrait",
+        "mobile-landscape"
+      ],
+      "recoveryProject": "mobile-landscape"
+    },
+    "webkitUI": {
+      "config": "playwright.device-acceptance.config.ts",
+      "files": [
+        "tests/main-menu.spec.ts",
+        "tests/run-progression.spec.ts"
+      ],
+      "grep": "startup hides proof|failed gameplay imports|repeated scene selectors|legal defeat reload, native keyboard restart",
+      "recoveryGrep": "startup hides proof"
+    },
+    "finalStartupChromium": {
+      "config": "playwright.regression.config.ts",
+      "files": [
+        "tests/main-menu.spec.ts"
+      ],
+      "grep": "startup hides proof"
+    },
+    "webkitDungeon": {
+      "config": "playwright.exploration.config.ts",
+      "files": [
+        "tests/dungeon.spec.ts"
+      ],
+      "grep": "saved menu dungeon keeps|read-only entry, keyboard"
+    },
+    "webkitProof": {
+      "config": "playwright.setup-smoke.config.ts",
+      "projects": [
+        "setup-webkit"
+      ]
+    },
+    "development": {
+      "config": "playwright.regression.config.ts",
+      "env": {
+        "PLAYWRIGHT_SERVER_MODE": "dev"
+      },
+      "files": [
+        "tests/main-menu.spec.ts",
+        "tests/opacity.spec.ts",
+        "tests/move.spec.ts",
+        "tests/public-asset-base.spec.ts"
+      ],
+      "grep": "startup hides proof|failed gameplay imports|repeated scene selectors|opacity slider previews|actual move controls reject|direct entry and refresh resolve public assets",
+      "projects": [
+        "desktop"
+      ]
+    },
+    "prefix": {
+      "build": "npm run build:bundle -- --base=/prototype/",
+      "config": "playwright.prefix-assets.config.ts",
+      "env": {
+        "PLAYWRIGHT_BASE_PATH": "/prototype/",
+        "PLAYWRIGHT_SERVER_MODE": "preview"
+      },
+      "files": [
+        "tests/public-asset-base.spec.ts"
+      ],
+      "grep": "direct entry and refresh resolve public assets"
+    },
+    "finalTypes": "npm run typecheck",
+    "restoredRoot": "npm run build:bundle -- --base=/",
+    "browserEnvironment": "node scripts/browser-check.mjs"
+  },
+  "reuse": {
+    "application": "All production/content/build/dependency/config inputs match ea70451; later edits are documentation, evidence and bounded tests.",
+    "core": "The seven core case bodies and their helpers remain unchanged; final TypeScript scopes reran after test edits.",
+    "chromium": "The 59-case capture remains valid for unchanged cases; its cold-start harness was subsequently corrected and all three exact profile cases reverified.",
+    "touch": "The earlier portrait pass already crossed the ready-map boundary; its accepted commands/assertions are unchanged. Landscape was recovered after adding the explicit map-ready wait.",
+    "failures": "Both original partially failed captures remain failed. Recovery reports cover their exact failed project/title identities; no full clean matrix is claimed."
+  }
+}

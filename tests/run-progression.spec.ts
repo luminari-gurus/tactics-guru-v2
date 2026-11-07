@@ -144,7 +144,11 @@ test('testing routes: an earned combat draught stays in the transient authored r
  expect(errors).toEqual([]);
 });
 test('legal defeat reload, native keyboard restart and isolated single-battle save',async({page})=>{
- test.setTimeout(180000);await start(page);await fight(page,true);await expect(page.getByRole('heading',{name:'Run defeat',exact:true})).toBeVisible();
+ test.setTimeout(180000);await start(page);
+ await expect(page.locator('#fit-board-controls')).not.toBeVisible();
+ await expect(page.locator('#fit-measurements')).not.toBeVisible();
+ await expect(page.getByRole('button',{name:'Start new run',exact:true})).toBeEnabled();
+ await fight(page,true);await expect(page.getByRole('heading',{name:'Run defeat',exact:true})).toBeVisible();
  const ended=await snapshot(page);await page.reload();await page.locator('#run-continue').click();expect(await snapshot(page)).toEqual(ended);
  await page.locator('#run-new').focus();await page.keyboard.press('Enter');await expect(page.locator('#run-start-encounter')).toBeVisible();
  const saved=await snapshot(page),slots=await page.evaluate(keys=>[localStorage.getItem(keys.primary),localStorage.getItem(keys.backup)],RUN_STORAGE_KEYS);

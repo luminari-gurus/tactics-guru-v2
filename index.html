@@ -15,10 +15,10 @@
       <div id="battle-board-region"></div>
       <p id="battle-board-caption">Gold: active · White: selected · Teal: reachable</p>
     </section>
-    <aside id="fit-panel" aria-label="Proof scene diagnostics">
+    <aside id="fit-panel" aria-label="Game status">
       <div class="fit-controls">
         <span id="fit-status" role="status" aria-live="polite">Loading</span>
-        <button id="fit-restart" type="button" disabled>Restart proof scene</button>
+        <button id="fit-restart" type="button" disabled hidden>Restart</button>
         <img id="proof-portrait" alt="Fighter portrait" width="48" height="48" hidden />
       </div>
       <div id="battle-persistence" class="fit-controls" hidden></div>
@@ -30,7 +30,7 @@
           <span id="battle-selection" aria-live="polite">Select a tile</span>
         </div>
       </div>
-      <details id="fit-board-controls" open>
+      <details id="fit-board-controls" open hidden>
         <summary>Board controls</summary>
         <div class="fit-controls" aria-label="Occlusion fixtures">
           <button data-fixture="ground-behind" disabled>Ground: Behind</button>
@@ -54,8 +54,8 @@
           <span id="audio-status" aria-live="polite">Loading</span>
         </div>
       </details>
-      <p id="board-caption">Elevated board · Tap to select · Drag to pan · Wheel/pinch to zoom</p>
-      <details>
+      <p id="board-caption" hidden>Elevated board · Tap to select · Drag to pan · Wheel/pinch to zoom</p>
+      <details id="fit-measurements" hidden>
         <summary>Measurements</summary>
         <button id="fit-snapshot" type="button">Refresh measurements</button>
         <pre id="fit-report">Refresh to capture current measurements.</pre>

@@ -16,6 +16,7 @@ import { createGame } from '../phaser/start';
 import { diagnosticsSnapshot } from '../diagnostics/browser';
 import { createRunStorage, serializeBrowserRunWrite, type RunLoadResult } from '../persistence/runStorage';
 import { mountBattleLayout } from '../ui/battleLayout';
+import { showGameError } from '../ui/gameError';
 
 const storage=appEntry.persistent?createRunStorage(context):null,initial=storage?.load();
 const controller = new RunItemSession(initial?.ok && initial.selected ? initial.selected.state : freshRunSnapshot(crypto.randomUUID(), 13, context), context,storage,serializeBrowserRunWrite);
@@ -32,7 +33,6 @@ const nav = document.createElement('a');nav.href=routeHref('battle',import.meta.
 const progress=document.createElement('p');progress.id='run-progress';panel.prepend(progress);
 const dungeonNav = document.createElement('a'); dungeonNav.href=`${import.meta.env.BASE_URL}dungeon`; dungeonNav.textContent='Dungeon floors'; dungeonNav.className='run-entry-link';
 panel.append(nav, dungeonNav, menuReturnLink(() => !startup && controller.hasUnsavedProgress, showRecovery));
-document.querySelectorAll<HTMLElement>('#fit-panel > details').forEach(e=>e.hidden=true);
 document.querySelector<HTMLElement>('#board-caption')!.textContent='Tap to select · Drag to pan · Wheel/pinch to zoom · Keyboard: arrows, Enter selects, Escape cancels';
 panel.setAttribute('aria-label','Run battle controls');restart.textContent='Start new run';
 mountBattleLayout();
@@ -46,7 +46,7 @@ function button(label:string,run:()=>void,id?:string) {
  const node=document.createElement('button');node.type='button';node.textContent=label;if(id)node.id=id;node.addEventListener('click',run);return node;
 }
 function evidence() { container.dataset.runSnapshot=JSON.stringify(controller.snapshot); container.dataset.runBattleRecord=JSON.stringify(controller.completedBattle); }
-function fail(message:string,handled=true) {if(handled)reportFailure('scene_load', { route: 'run' });status.textContent=`Error: ${message}. Reload to retry.`;status.setAttribute('role','alert');restart.disabled=false;}
+function fail(message:string,handled=true) {if(handled)reportFailure('scene_load', { route: 'run' });showGameError(`Error: ${message}. Reload to retry.`);restart.disabled=false;}
 function setStatus(value:'loading'|'ready'|'error') {
  status.textContent=value==='ready'?'Battle ready':value==='loading'?'Loading':'Error';
  container.dataset.ready=String(value==='ready');restart.disabled=value!=='ready';

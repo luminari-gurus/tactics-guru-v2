@@ -1,0 +1,92 @@
+{
+  "reviewedOriginalHead": "5e27e8a15faf33d8ff652cb70879ff00aef09f01",
+  "qualifiedCommit": "32ec1865d9c08c5289445ceba6af6fa632f3fe8b",
+  "applicationImplementation": "e0506a1306dd7403b6c3bca574d48a83139dfb4a",
+  "companions": [
+    {
+      "pr": 339,
+      "merge": "b286b3203f45774c84bdf02bb7eebd7e9f814a18"
+    },
+    {
+      "pr": 340,
+      "merge": "735df4ec0174d1cd958ac80851e5fc0a85df4a69"
+    },
+    {
+      "pr": 341,
+      "merge": "8f84bd19ad5dd4cdc90600ac2c3db48146f65f1f"
+    }
+  ],
+  "browser": {
+    "final-chromium": {
+      "startTime": "2026-11-07T01:38:25.397Z",
+      "duration": 24917.596,
+      "expected": 31,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "final-webkit": {
+      "startTime": "2026-11-07T01:38:50.745Z",
+      "duration": 6283.485,
+      "expected": 8,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "final-dev": {
+      "startTime": "2026-11-07T01:40:37.768Z",
+      "duration": 20301.217,
+      "expected": 4,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "final-prefix-errors": {
+      "startTime": "2026-11-07T01:40:59.671Z",
+      "duration": 3603.897,
+      "expected": 4,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "final-prefix-assets": {
+      "startTime": "2026-11-07T01:41:03.659Z",
+      "duration": 8631.426000000001,
+      "expected": 4,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "combined-smoke": {
+      "startTime": "2026-11-07T02:01:06.862Z",
+      "duration": 4201.385,
+      "expected": 5,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "batch-qbert": {
+      "startTime": "2026-11-07T01:54:21.413Z",
+      "duration": 9026.026,
+      "expected": 9,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  },
+  "tooling": {
+    "combined": 141,
+    "allPassed": true,
+    "physicalCRLFPassed": 141
+  },
+  "core": {
+    "commit": "c96345c4c6377d8e1ab7822d3eb992d8de953650",
+    "units": 1233,
+    "journeys": 7,
+    "types": 2,
+    "buildIntegrations": 2,
+    "seconds": 108.5
+  },
+  "reuse": "No production/content/dependency/browser-config changes after e0506a1. Later changes are storage assertions, fixture portability, current batch configuration and evidence. Fresh 141-test combined tooling validates the changed configuration and canonical partition; current fault/smoke tests validate the application. Failed captures remain failed; no full-regression or new performance-baseline claim.",
+  "remoteCI": "Not used as a waiting gate per explicit caller instruction."
+}
