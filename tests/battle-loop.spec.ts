@@ -719,17 +719,20 @@ test('battle log starts with the initial actor before opening enemy actions', as
 });
 
 test('animation keeps turn header and actor card together with locked budgets', async ({ page }) => {
+  await page.clock.install();
   await page.goto('./battle');
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   const before = await session(page);
   const actor = before.state.units.find(unit => unit.id === before.state.initiative[before.state.activeIndex])!;
-  await page.clock.install();
+  const signature = page.locator('[data-action="signature"] strong');
+  await expect(signature).toHaveText('Magic Missile');
   await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
   await page.locator('#battle-next').click({ force: true });
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'presenting');
   await expect(page.locator('#battle-actor-name')).toHaveText(displayName(actor.defId));
   await expect(page.locator('#battle-active')).toContainText('Your turn');
   await expect(page.locator('#battle-active')).toContainText('Resolving action');
+  await expect(signature).toHaveText('Magic Missile');
   await expect(page.locator('#battle-budgets')).toHaveText('Resolving action · Controls locked');
   await expect(page.locator('#battle-next')).toBeDisabled();
   await page.clock.resume();

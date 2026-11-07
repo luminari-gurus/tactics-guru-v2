@@ -242,7 +242,7 @@ export class BattleHud {
     this.actorRoot.querySelector('#battle-status')!.textContent=info.status;
     this.actorRoot.querySelector('#battle-budgets')!.textContent=s.phase==='presenting'?'Resolving action · Controls locked':`Move ${actor.hasMoved?'spent':'ready'} / Action ${actor.hasActed?'spent':'ready'}`;
     const locked=s.phase==='presenting'?'Resolving action. Gameplay is locked until presentation finishes.':s.phase==='enemy'?'Enemy turn. Hero actions are unavailable.':s.phase==='ended'?'Battle complete. Gameplay is unavailable.':s.phase==='error'?'Battle stopped. Use recovery or restart.':'';
-    const abilities=ownedAbilities(s),key=abilities.map(a=>a.id).join('|');
+    const abilities=ownedAbilities(s,actor.defId),key=abilities.map(a=>a.id).join('|');
     if(key!==this.abilityKey){this.abilityKey=key;this.ability.replaceChildren(...abilities.map(a=>new Option(displayName(a.id),a.id)));}
     if(action?.startsWith('ability:'))this.ability.value=action;
     this.ability.disabled=!enabled || actor.hasActed || !abilities.length;
