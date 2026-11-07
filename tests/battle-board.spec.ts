@@ -688,18 +688,55 @@ test('drawable boundaries and layout changes discard captured gestures without b
   expect(after.commandCount).toBe(initial.commandCount);await expect(page.locator('canvas')).toHaveCount(1);await cdp.detach();
 });
 
-test('temporary HUD expansion does not leave the battle camera zoomed', async ({page}) => {
- await page.setViewportSize({width:390,height:1000});
+/** Mobile WebKit has no Playwright wheel/pinch API. Synthetic wheel is zoom
+ * fixture setup only; reflow/resize assertions still exercise the real renderer.
+ * Native touchscreen taps below independently check post-reflow picking. */
+async function cameraZoomSetup(page: Page, deltaY: number, anchor: Point, mobileWebKit: boolean) {
+  if (mobileWebKit) {
+    await page.locator('canvas').evaluate((canvas, { deltaY, anchor }) => {
+      canvas.dispatchEvent(new WheelEvent('wheel', {
+        bubbles: true, cancelable: true, deltaY, clientX: anchor.x, clientY: anchor.y,
+      }));
+    }, { deltaY, anchor });
+  } else {
+    await page.mouse.move(anchor.x, anchor.y);
+    await page.mouse.wheel(0, deltaY);
+  }
+}
+
+async function cameraPickingAfterReflow(page: Page, touch: boolean) {
+  const before = await settledReport(page);
+  const point = before.tiles.map((tile: {x:number;y:number;elevation:number}) => {
+    const local = projectTile(tile);
+    return { x: before.transform.x + local.x * before.transform.scale, y: before.transform.y + local.y * before.transform.scale };
+  }).find((point: Point) => point.x > Math.max(0, before.region.x) + 3
+    && point.x < Math.min(before.viewport.width, before.region.x + before.region.width) - 3
+    && point.y > Math.max(0, before.region.y) + 3
+    && point.y < Math.min(before.viewport.height, before.region.y + before.region.height) - 3);
+  if (!point) throw Error('Camera reflow left no visible tile for picking');
+  if (touch) await page.touchscreen.tap(point.x, point.y);
+  else await page.mouse.click(point.x, point.y);
+  const after = await settledReport(page);
+  expect(after.selectionEvents).toBe(before.selectionEvents + 1);
+  expect(after.selected).not.toBeNull();
+  expect(after.commandCount).toBe(before.commandCount);
+  expect(after.transform).toEqual(before.transform);
+}
+
+test('temporary HUD expansion does not leave the battle camera zoomed', async ({page,browserName,isMobile,hasTouch}) => {
+ if (!isMobile) await page.setViewportSize({width:390,height:1000});
  await page.goto('./battle');
+ await expect(page.getByRole('status')).toHaveText('Battle ready');
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const region=page.locator('#battle-board-region');
  const resize=async (height:number)=>{
   await region.evaluate((node,height)=>{node.style.flex=`0 0 ${height}px`;node.style.minHeight=`${height}px`;},height);
+  await expect.poll(async()=>(await report(page)).region.height).toBeCloseTo(height,5);
   return settledReport(page);
  };
  await resize(80);
  const box=(await region.boundingBox())!;
- await page.mouse.move(box.x+box.width/2,box.y+box.height/2);await page.mouse.wheel(0,10000);
+ await cameraZoomSetup(page,10000,{x:box.x+box.width/2,y:box.y+box.height/2},browserName==='webkit' && isMobile);
  const before=await settledReport(page);
  for(let i=0;i<3;i++){
   await resize(240);const after=await resize(80);
@@ -707,11 +744,13 @@ test('temporary HUD expansion does not leave the battle camera zoomed', async ({
   expect(after.transform.x).toBeCloseTo(before.transform.x,5);
   expect(after.transform.y).toBeCloseTo(before.transform.y,5);
   expect(after.commandCount).toBe(before.commandCount);
+  expect(after.selectionEvents).toBe(before.selectionEvents);
  }
+ await cameraPickingAfterReflow(page,hasTouch);
 });
 
-test('viewport resize recenters a camera capped by temporary HUD reflow', async ({page}) => {
-  await page.setViewportSize({width:390,height:1000});
+test('viewport resize recenters a camera capped by temporary HUD reflow', async ({page,browserName,isMobile,hasTouch}) => {
+  if (!isMobile) await page.setViewportSize({width:390,height:1000});
   await page.goto('./battle');
   await expect(page.getByRole('status')).toHaveText('Battle ready');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
@@ -728,9 +767,9 @@ test('viewport resize recenters a camera capped by temporary HUD reflow', async 
     top:(initial.bounds.top-initial.transform.y)/initial.transform.scale,
     bottom:(initial.bounds.bottom-initial.transform.y)/initial.transform.scale,
   };
-  await page.mouse.move(initial.region.x+5,initial.region.y+initial.region.height-5);
+  const anchor={x:initial.region.x+5,y:initial.region.y+initial.region.height-5};
   for(let wheel=0;wheel<8;wheel++){
-    await page.mouse.wheel(0,-10000);
+    await cameraZoomSetup(page,-10000,anchor,browserName==='webkit' && isMobile);
     await settledReport(page);
   }
   const zoomed=await settledReport(page);
@@ -741,12 +780,14 @@ test('viewport resize recenters a camera capped by temporary HUD reflow', async 
   expect(capped.transform.scale).toBeLessThan(zoomed.transform.scale);
   expect(capped.viewport).toEqual(initial.viewport);
   // No further navigation: preserve the saved scale above this layout's zoom cap.
-  await page.setViewportSize({width:391,height:1000});
-  await expect.poll(async()=>(await report(page)).viewport).toEqual({width:391,height:1000});
+  const nextViewport={width:initial.viewport.width+1,height:initial.viewport.height};
+  await page.setViewportSize(nextViewport);
+  await expect.poll(async()=>(await report(page)).viewport).toEqual(nextViewport);
   const resized=await settledReport(page);
   expect(resized.transform.scale).toBeCloseTo(fitBoard(localBounds,resized.region).scale*MAX_ZOOM,5);
   expect((resized.bounds.left+resized.bounds.right)/2).toBeCloseTo(resized.region.x+resized.region.width/2,5);
   expect((resized.bounds.top+resized.bounds.bottom)/2).toBeCloseTo(resized.region.y+resized.region.height/2,5);
   expect(resized.commandCount).toBe(initial.commandCount);
   expect(resized.selectionEvents).toBe(initial.selectionEvents);
+  await cameraPickingAfterReflow(page,hasTouch);
 });
