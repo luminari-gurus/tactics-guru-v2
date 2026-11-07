@@ -89,9 +89,16 @@ export class BattleRadial {
     const bottomMargin = this.root.offsetHeight / 2 + 14 + Math.ceil(plan.getBoundingClientRect().height);
     // Keep the initial press as the hold cancel point even when the visible disk is clamped.
     this.holdOrigin = options.origin;
+    const board = document.querySelector('#battle-board-region')?.getBoundingClientRect();
+    // Prefer the drawable board. On a board smaller than the menu, retain
+    // viewport bounds so every control remains reachable.
+    const left = board && board.width >= marginX * 2 ? board.left : 0;
+    const right = board && board.width >= marginX * 2 ? board.right : innerWidth;
+    const top = board && board.height >= marginY + bottomMargin ? board.top : 0;
+    const bottom = board && board.height >= marginY + bottomMargin ? board.bottom : innerHeight;
     const origin = {
-      x: Math.min(innerWidth - marginX, Math.max(marginX, options.origin.x)),
-      y: Math.min(innerHeight - bottomMargin, Math.max(marginY, options.origin.y)),
+      x: Math.max(left + marginX, Math.min(right - marginX, options.origin.x)),
+      y: Math.max(top + marginY, Math.min(bottom - bottomMargin, options.origin.y)),
     };
     this.origin = origin;
     this.root.style.left = `${origin.x}px`;

@@ -57,8 +57,7 @@ async function radialLabelProblems(page: Page) {
       const lines = el.getClientRects().length;
       if (!nowrap || lines > 1) issues.push(`wrap (${lines}): ${el.textContent}`);
       const overflow = el.scrollWidth > el.clientWidth + 1;
-      const abbreviated = style.textOverflow === 'ellipsis' && parseFloat(style.fontSize) <= 10.5;
-      if (overflow && !abbreviated) issues.push(`overflow ${el.scrollWidth}>${el.clientWidth} @${style.fontSize}: ${el.textContent}`);
+      if (overflow) issues.push(`overflow ${el.scrollWidth}>${el.clientWidth} @${style.fontSize}: ${el.textContent}`);
     }
     const plan = root.querySelector('#battle-radial-plan')?.getBoundingClientRect();
     const inspect = root.querySelector('#battle-radial-inspect')?.getBoundingClientRect();
@@ -341,6 +340,16 @@ test('radial labels stay on one line without overflowing', async ({ page }) => {
   await tapBoard(page, cell);
   await expect(page.locator('#battle-radial')).toBeVisible();
   expect(await radialLabelProblems(page)).toEqual([]);
+  const bounds = await page.locator('#battle-board-region').boundingBox();
+  const radial = (await page.locator('#battle-radial').boundingBox())!;
+  if (bounds && bounds.width >= radial.width + 4 && bounds.height >= radial.height + 100) {
+    expect(radial.x).toBeGreaterThanOrEqual(bounds.x);
+    expect(radial.x + radial.width).toBeLessThanOrEqual(bounds.x + bounds.width);
+    expect(radial.y).toBeGreaterThanOrEqual(bounds.y);
+    const plan = (await page.locator('#battle-radial-plan').boundingBox())!;
+    expect(plan.y + plan.height).toBeLessThanOrEqual(bounds.y + bounds.height);
+  }
+  await page.screenshot({ path: test.info().outputPath('radial-labels.png') });
   await page.locator('#battle-radial-move').click();
   await expect(page.locator('#battle-undo')).toBeEnabled();
   const { enemy } = await livingEnemy(page);
