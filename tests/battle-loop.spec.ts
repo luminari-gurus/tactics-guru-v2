@@ -689,6 +689,29 @@ test('accepted rail and dock preserve drawable floors, readable controls and foc
   writeFileSync(info.outputPath('responsive-measurements.json'),JSON.stringify(measurements,null,2));expect(errors).toEqual([]);
 });
 
+test('opening handoff keeps ability and party inspection on the animating actor', async ({ page }) => {
+  await page.addInitScript(() => {
+    const observer = new MutationObserver(() => {
+      const game = document.querySelector<HTMLElement>('#game');
+      if (game?.dataset.phase !== 'presenting' || !game.dataset.session) return;
+      const { state }: { state: BattleSession['state'] } = JSON.parse(game.dataset.session);
+      if (!state.units.some(unit => unit.id === state.initiative[state.activeIndex] && unit.side === 'player')) return;
+      const picker = document.querySelector<HTMLSelectElement>('#battle-ability')!;
+      Object.assign(window, { openingPicker: { options: picker.length, disabled: picker.disabled } });
+      observer.disconnect();
+      document.querySelector<HTMLButtonElement>('#battle-party')!.click();
+    });
+    observer.observe(document, { subtree: true, attributes: true, attributeFilter: ['data-phase'] });
+  });
+  await page.goto('./battle');
+  await expect(page.locator('#battle-dialog-title')).toHaveText(/^Inspection only — Goblin Grunt #/);
+  expect(await page.evaluate(() => (window as unknown as { openingPicker: unknown }).openingPicker))
+    .toEqual({ options: 0, disabled: true });
+  await page.locator('#inspection-close').click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  await expect(page.locator('#battle-ability')).toHaveValue('ability:magic_missile');
+});
+
 test('opening enemy initiative is explicit before the first playable hero turn', async ({ page }) => {
   await page.addInitScript(() => {
     const turns: { phase: string; label: string }[] = [];

@@ -3,8 +3,8 @@ import type { BattleSession } from '../app/BattleSession';
 import type { Command } from '../domain/types';
 
 export type Action = 'move' | 'basic' | AbilityId;
-export function ownedAbilities(session: BattleSession) {
-  return Object.values(session.catalog.abilities).filter(a=>a.id!=='ability:basic_attack' && a.owners.includes(session.active.defId))
+export function ownedAbilities(session: BattleSession, owner = session.active.defId) {
+  return Object.values(session.catalog.abilities).filter(a=>a.id!=='ability:basic_attack' && a.owners.includes(owner))
     .sort((a,b)=>a.id<b.id?-1:a.id>b.id?1:0);
 }
 export function actionCommand(session: BattleSession, action: Action, cell: CellPosition): Command | null {
