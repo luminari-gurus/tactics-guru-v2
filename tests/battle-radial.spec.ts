@@ -787,3 +787,20 @@ test('radial resize cancels a native touch hold without accepting a command', as
     expect(after.pending).toBeNull();
   } finally { await cdp.detach(); }
 });
+
+
+test('desktop radial preference replaces the side rail with a bottom dock @canonical', async ({ page }) => {
+  await ready(page);
+  const board = (await page.locator('#battlefield').boundingBox())!;
+  const dock = (await page.locator('#fit-panel').boundingBox())!;
+  expect(dock.y).toBeGreaterThanOrEqual(board.y + board.height);
+  expect(Math.abs(dock.x - board.x)).toBeLessThan(2);
+  expect(Math.abs(dock.width - board.width)).toBeLessThan(2);
+  await expect(page.locator('[data-action="move"]')).toBeHidden();
+  await expect(page.locator('#battle-target')).toBeHidden();
+  await expect(page.locator('#battle-next')).toBeVisible();
+  const { cell } = await reachableEmpty(page);
+  await tapBoard(page, cell);
+  await expect(page.locator('#battle-radial-move')).toBeVisible();
+  await page.screenshot({ path: test.info().outputPath('radial-dock.png') });
+});
