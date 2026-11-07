@@ -1,6 +1,6 @@
 import { generateMap } from '../src/map/generate';
 import { readFileSync } from 'node:fs';
-import { type Page, type Route, type Response } from '@playwright/test';
+import { type Page, type Response } from '@playwright/test';
 import { test as base, expect } from './helpers/dungeonEntropy';
 import { preparedSnapshot, rewardSnapshot, runContext } from './helpers/runItemFixtures';
 import { encodeRunSave, type RunSnapshot } from '../src/domain/runSaveEnvelope';
@@ -14,6 +14,7 @@ import { BattleSession } from '../src/app/BattleSession';
 import { encodeBattleSave } from '../src/domain/saveEnvelope';
 import { standaloneCatalog as battleCatalog } from './helpers/playerPolicy';
 import { startApplicationLoadDiagnostics, type ApplicationLoadDiagnostics } from './helpers/applicationLoadDiagnostics';
+import { startBattleModuleFaultServer } from './helpers/battleModuleFaultServer';
 
 const test = base.extend<{ applicationLoadDiagnostics: ApplicationLoadDiagnostics }>({
  applicationLoadDiagnostics: [async ({page},use,info) => {
@@ -97,25 +98,16 @@ test('main menu: application import failure preserves battle saves and reload re
  },{slots:keys.battle,bytes});
  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
  await page.clock.install();
- const entry=/\/startBattleApp(?:-[^/]+\.js|\.ts)(?:\?|$)/;
- let rejectImport=true,blocked=0,allowed=0,failedResponses=0;
- const observeEntryResponse=(response:Response)=>{if(entry.test(response.url()) && response.status()===503)failedResponses++;};
+ const faultServer=await startBattleModuleFaultServer();
+ let failedResponses=0,recoveryVerified=false;
+ const observeEntryResponse=(response:Response)=>{if(faultServer.isModuleURL(response.url()) && response.status()===503)failedResponses++;};
  page.on('response',observeEntryResponse);
- // The first document receives a cold HTTP 503 with the legal save already seeded.
- // All controlled responses are no-store; recovery preserves the module bytes.
- const routeImport=async(route:Route)=>{
-  if(rejectImport){
-   blocked++;await route.fulfill({status:503,contentType:'text/javascript',headers:{'cache-control':'no-store'},body:'// Controlled unavailable application module.\n'});
-  }else {
-   const response=await route.fetch();allowed++;
-   await route.fulfill({response,headers:{...response.headers(),'cache-control':'no-store'}});
-  }
- };
- await page.route(entry,routeImport);
+ // The first document receives a real server HTTP 503 with the legal save seeded.
+ // The origin stays fixed; recovery serves the unchanged build through Vite.
  try {
   await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
-  await page.goto('./?game=battle');
-  await expect.poll(()=>blocked).toBeGreaterThan(0);
+  await page.goto(faultServer.battleURL);
+  await expect.poll(()=>faultServer.receipt().blocked).toBeGreaterThan(0);
   await expect.poll(()=>failedResponses).toBeGreaterThan(0);
   await expect(page.getByRole('alert')).toHaveText('Error: Could not load the application. Reload the page to retry.');
   await expect(page.getByRole('alert')).toBeVisible();await expect(page.locator('#save-continue')).toHaveCount(0);
@@ -124,9 +116,10 @@ test('main menu: application import failure preserves battle saves and reload re
   expect(applicationLoadDiagnostics.failures()[0]).toMatchObject({route:'battle',name:'TypeError',category:'module-fetch'});
   // The error path stays inert. Recovery remains the user's explicit reload and
   // Continue, with the paused-clock interaction from the original failing test.
-  const allowedBeforeRecovery=allowed;rejectImport=false;
+  const allowedBeforeRecovery=faultServer.receipt().allowed;faultServer.allowImport();
   await page.reload();await page.clock.resume();await expect(page.locator('#save-continue')).toBeVisible();
-  expect(allowed).toBeGreaterThan(allowedBeforeRecovery);
+  expect(faultServer.receipt().allowed).toBeGreaterThan(allowedBeforeRecovery);
+  await expect.poll(()=>faultServer.receipt().assets.reduce((sum,asset)=>sum+asset.responses['200']+asset.responses['304'],0)).toBeGreaterThan(0);
   expect(await stored()).toEqual(bytes);await page.locator('#save-continue').click();
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const resumed=await readSession(page);
@@ -134,9 +127,14 @@ test('main menu: application import failure preserves battle saves and reload re
   expect(resumed.continuation).toEqual({snapshot:saved.state,commands:[],events:[]});expect(resumed.pending).toBeNull();
   expect(JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).effect).toBeNull();
   expect(await stored()).toEqual(bytes);expect(errors).toEqual([]);
-  await info.attach('application-load-recovery',{body:JSON.stringify({entryState:'cold',cacheControl:'no-store',blocked,allowed,
-   injectedResponse:{status:503,observed:failedResponses},failures:applicationLoadDiagnostics.failures()},null,2),contentType:'application/json'});
- } finally { page.off('response',observeEntryResponse);await page.unroute(entry,routeImport); }
+  recoveryVerified=true;
+ } finally {
+  page.off('response',observeEntryResponse);
+  try {
+   await info.attach('application-load-recovery',{body:JSON.stringify({...faultServer.receipt(),recoveryVerified,
+    injectedResponse:{status:503,cacheControl:'no-store',observed:failedResponses},failures:applicationLoadDiagnostics.failures()},null,2),contentType:'application/json'});
+  } finally { await faultServer.close(); }
+ }
 });
 
 for(const mode of ['run','dungeon'] as const)test(`main menu: post-mount ${mode} failure remains visible and preserves saves`,async({page},info)=>{
