@@ -18,7 +18,7 @@ export class BattleRadial {
   readonly root: HTMLElement;
   private readonly abort = new AbortController();
   private origin: Point = { x: 0, y: 0 };
-  private holdOrigin: Point = { x: 0, y: 0 };
+  private anchor: Point = { x: 0, y: 0 };
   private cell: CellPosition | null = null;
   mode: 'hold' | 'tap' | null = null;
   private aimed: RadialSliceId | 'hub' = 'hub';
@@ -59,12 +59,14 @@ export class BattleRadial {
     const signal = this.abort.signal;
     this.root.addEventListener('pointerdown', event => event.stopPropagation(), { signal });
     this.root.querySelectorAll<HTMLButtonElement>('[data-slice]').forEach(button => {
+      const slice = button.dataset.slice as RadialSliceId;
       button.addEventListener('click', () => {
         if (this.mode !== 'tap' || button.disabled) return;
-        this.activate(button.dataset.slice as RadialSliceId);
+        this.activate(slice);
       }, { signal });
-      button.addEventListener('pointerenter', () => {
-        if (this.open && !button.disabled) this.aim(button.dataset.slice as RadialSliceId);
+      // Opening or repositioning the menu can put a slice under a stationary pointer.
+      button.addEventListener('pointermove', () => {
+        if (this.mode === 'tap' && !button.disabled && this.aimed !== slice) this.aim(slice);
       }, { signal });
     });
     this.root.querySelector('#battle-radial-hub')!.addEventListener('click', () => {
@@ -81,21 +83,11 @@ export class BattleRadial {
     this.leftHub = false;
     this.root.hidden = false;
     const def = this.selection.planning && this.selection.planMove ? 'attack' : this.selection.defaultSlice(cell);
+    // The press remains the hold cancel point even when the menu moves.
+    this.anchor = options.origin;
     // Render first: fitted labels can change the Plan control's height.
     this.aim(def);
-    const marginX = this.root.offsetWidth / 2 + 2;
-    const marginY = this.root.offsetHeight / 2 + 2;
-    const plan = this.root.querySelector<HTMLElement>('#battle-radial-plan')!;
-    const bottomMargin = this.root.offsetHeight / 2 + 14 + Math.ceil(plan.getBoundingClientRect().height);
-    // Keep the initial press as the hold cancel point even when the visible disk is clamped.
-    this.holdOrigin = options.origin;
-    const origin = {
-      x: Math.min(innerWidth - marginX, Math.max(marginX, options.origin.x)),
-      y: Math.min(innerHeight - bottomMargin, Math.max(marginY, options.origin.y)),
-    };
-    this.origin = origin;
-    this.root.style.left = `${origin.x}px`;
-    this.root.style.top = `${origin.y}px`;
+    this.reposition();
     const live = document.querySelector('#battle-preview');
     if (live) live.textContent = this.announce();
     if (options.mode === 'tap') {
@@ -104,13 +96,37 @@ export class BattleRadial {
     }
   }
 
+  reposition(): void {
+    if (!this.open) return;
+    const marginX = this.root.offsetWidth / 2 + 2;
+    const marginY = this.root.offsetHeight / 2 + 2;
+    const plan = this.root.querySelector<HTMLElement>('#battle-radial-plan')!;
+    const bottomMargin = this.root.offsetHeight / 2 + 14 + Math.ceil(plan.getBoundingClientRect().height);
+    const board = document.querySelector('#battle-board-region')?.getBoundingClientRect();
+    // Prefer the drawable board. On a board smaller than the menu, retain
+    // viewport bounds so every control remains reachable.
+    const left = board && board.width >= marginX * 2 ? board.left : 0;
+    const right = board && board.width >= marginX * 2 ? board.right : innerWidth;
+    const top = board && board.height >= marginY + bottomMargin ? board.top : 0;
+    const bottom = board && board.height >= marginY + bottomMargin ? board.bottom : innerHeight;
+    const origin = {
+      x: Math.max(left + marginX, Math.min(right - marginX, this.anchor.x)),
+      y: Math.min(bottom - bottomMargin, Math.max(top + marginY, this.anchor.y)),
+    };
+    this.origin = origin;
+    this.root.style.left = `${origin.x}px`;
+    this.root.style.top = `${origin.y}px`;
+    const sub = this.root.querySelector<HTMLElement>('#battle-radial-sub')!;
+    if (!sub.hidden) this.positionSubmenu(sub);
+  }
+
   aimAt(point: Point): void {
     if (!this.open || !this.cell) return;
     const dx = point.x - this.origin.x, dy = point.y - this.origin.y;
     const slice = this.sliceAt(point);
     const cardinal = cardinalFromVector(dx, dy);
-    const inPressHub = this.inPressHub(point);
-    if (inPressHub || (cardinal === 'hub' && slice !== 'plan')) {
+    const aim = slice ?? (cardinal === 'hub' ? 'hub' : CARDINAL_SLICE[cardinal]);
+    if (this.inPressHub(point) || aim === 'hub') {
       this.aim('hub');
       return;
     }
@@ -119,15 +135,14 @@ export class BattleRadial {
       const chip = this.chipAt(point);
       if (chip) { this.highlightChip(chip); return; }
     }
-    this.aim(slice ?? CARDINAL_SLICE[cardinal === 'hub' ? 's' : cardinal]);
+    this.aim(aim);
   }
 
   releaseAt(point: Point): 'commit' | 'cancel' | 'open-sub' | 'inspect' | 'plan' | 'none' {
     if (!this.open || !this.cell) return 'none';
     const dx = point.x - this.origin.x, dy = point.y - this.origin.y;
     const slice = this.sliceAt(point);
-    const inHub = this.inPressHub(point)
-      || (hubContains(dx, dy) && slice !== 'plan');
+    const inHub = this.inPressHub(point) || (!slice && hubContains(dx, dy));
     if (inHub) {
       if (this.leftHub || this.mode === 'tap') { this.cancel(); return 'cancel'; }
       return this.activate(this.defaultId());
@@ -168,8 +183,8 @@ export class BattleRadial {
   private inPressHub(point: Point): boolean {
     if (this.mode !== 'hold') return false;
     // When the disk shifts, a full-size cancel area can cover an entire slice.
-    const shifted = this.origin.x !== this.holdOrigin.x || this.origin.y !== this.holdOrigin.y;
-    return hubContains(point.x - this.holdOrigin.x, point.y - this.holdOrigin.y, shifted ? 12 : 44);
+    const shifted = this.origin.x !== this.anchor.x || this.origin.y !== this.anchor.y;
+    return hubContains(point.x - this.anchor.x, point.y - this.anchor.y, shifted ? 12 : 44);
   }
 
   private defaultId(): RadialSliceId {
@@ -298,14 +313,18 @@ export class BattleRadial {
         button.addEventListener('click', () => { if (this.mode === 'tap') this.pickSpecial(ability.id); });
         return button;
       }));
-      // Keep choices clear of Special: a hold release there must not select a chip.
-      const root = this.root.getBoundingClientRect();
-      const width = sub.offsetWidth, height = sub.offsetHeight;
-      const left = root.right + 6 + width <= innerWidth ? root.right + 6 : Math.max(0, root.left - width - 6);
-      sub.style.left = `${left - root.left}px`;
-      sub.style.top = `${Math.max(0, Math.min(innerHeight - height, root.top + 8)) - root.top}px`;
+      this.positionSubmenu(sub);
     }
     this.writeHub(this.aimed);
+  }
+
+  private positionSubmenu(sub: HTMLElement): void {
+    // Keep choices clear of Special: a hold release there must not select a chip.
+    const root = this.root.getBoundingClientRect();
+    const width = sub.offsetWidth, height = sub.offsetHeight;
+    const left = root.right + 6 + width <= innerWidth ? root.right + 6 : Math.max(0, root.left - width - 6);
+    sub.style.left = `${left - root.left}px`;
+    sub.style.top = `${Math.max(0, Math.min(innerHeight - height, root.top + 8)) - root.top}px`;
   }
 
   private writeHub(slice: RadialSliceId | 'hub'): void {

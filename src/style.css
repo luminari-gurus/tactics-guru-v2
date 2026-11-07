@@ -164,7 +164,15 @@ dialog button { touch-action: manipulation; }
   .battle-radial-plan { height:44px; }
   .battle-radial-plan span { display:none; }
 }
-.battle-mode #battle-radial button { overflow-wrap:normal; word-break:normal; }
+@media (max-height:279px) {
+  /* Reserve space below the disk for the 44px Plan button and its gap. */
+  #battle-radial { height:max(160px, calc(100dvh - 60px)); }
+  .battle-radial-slice { height:44px; }
+  #battle-radial-hub { height:64px; }
+}
+.battle-mode #battle-radial button { overflow-wrap:normal; word-break:normal; padding:3px 2px; }
+.battle-mode #battle-radial-sub button { padding:6px 8px; }
+.battle-mode #battle-radial-plan { min-width:120px; }
 .battle-skin-radial #battle-board-caption { overflow-wrap:break-word; word-break:normal; hyphens:none; }
 
 
