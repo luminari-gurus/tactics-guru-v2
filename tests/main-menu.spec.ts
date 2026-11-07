@@ -1,6 +1,6 @@
 import { generateMap } from '../src/map/generate';
 import { readFileSync } from 'node:fs';
-import { type Page, type Route } from '@playwright/test';
+import { type Page, type Route, type Response } from '@playwright/test';
 import { test as base, expect } from './helpers/dungeonEntropy';
 import { preparedSnapshot, rewardSnapshot, runContext } from './helpers/runItemFixtures';
 import { encodeRunSave, type RunSnapshot } from '../src/domain/runSaveEnvelope';
@@ -98,12 +98,18 @@ test('main menu: application import failure preserves battle saves and reload re
  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
  await page.clock.install();
  const entry=/\/startBattleApp(?:-[^/]+\.js|\.ts)(?:\?|$)/;
- let rejectImport=false,blocked=0,allowed=0;
- // Keep routing active from the first navigation through recovery. Installing
- // it only after a warm import lets WebKit satisfy the reload without interception.
+ let rejectImport=false,blocked=0,allowed=0,failedResponses=0;
+ const observeEntryResponse=(response:Response)=>{if(entry.test(response.url()) && response.status()===503)failedResponses++;};
+ page.on('response',observeEntryResponse);
+ // This controlled server contract is explicitly no-store throughout the test.
+ // Allowed responses preserve module bytes; the failing reload receives HTTP503.
  const routeImport=async(route:Route)=>{
-  if(rejectImport){blocked++;await route.abort();}
-  else {allowed++;await route.continue();}
+  if(rejectImport){
+   blocked++;await route.fulfill({status:503,contentType:'text/javascript',headers:{'cache-control':'no-store'},body:'// Controlled unavailable application module.\n'});
+  }else {
+   const response=await route.fetch();allowed++;
+   await route.fulfill({response,headers:{...response.headers(),'cache-control':'no-store'}});
+  }
  };
  await page.route(entry,routeImport);
  try {
@@ -115,6 +121,7 @@ test('main menu: application import failure preserves battle saves and reload re
   rejectImport=true;
   await page.reload();
   await expect.poll(()=>blocked).toBeGreaterThan(0);
+  await expect.poll(()=>failedResponses).toBeGreaterThan(0);
   await expect(page.getByRole('alert')).toHaveText('Error: Could not load the application. Reload the page to retry.');
   await expect(page.getByRole('alert')).toBeVisible();await expect(page.locator('#save-continue')).toHaveCount(0);
   expect(await stored()).toEqual(bytes);
@@ -132,8 +139,9 @@ test('main menu: application import failure preserves battle saves and reload re
   expect(resumed.continuation).toEqual({snapshot:saved.state,commands:[],events:[]});expect(resumed.pending).toBeNull();
   expect(JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).effect).toBeNull();
   expect(await stored()).toEqual(bytes);expect(errors).toEqual([]);
-  await info.attach('application-load-recovery',{body:JSON.stringify({blocked,allowed,failures:applicationLoadDiagnostics.failures()},null,2),contentType:'application/json'});
- } finally { await page.unroute(entry,routeImport); }
+  await info.attach('application-load-recovery',{body:JSON.stringify({cacheControl:'no-store',blocked,allowed,
+   injectedResponse:{status:503,observed:failedResponses},failures:applicationLoadDiagnostics.failures()},null,2),contentType:'application/json'});
+ } finally { page.off('response',observeEntryResponse);await page.unroute(entry,routeImport); }
 });
 
 for(const mode of ['run','dungeon'] as const)test(`main menu: post-mount ${mode} failure remains visible and preserves saves`,async({page},info)=>{
