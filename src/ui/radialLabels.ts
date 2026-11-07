@@ -25,30 +25,31 @@ export function fontSizeToFit(overflows: (px: number) => boolean, minPx = RADIAL
   return best;
 }
 
-export function fitSingleLine(node: HTMLElement, minPx = RADIAL_LABEL_MIN_PX, maxPx = RADIAL_LABEL_MAX_PX): number {
+function singleLineOverflows(node: HTMLElement, maxPx: number): boolean {
   node.style.whiteSpace = 'nowrap';
-  if (!node.clientWidth || !node.textContent?.trim()) return maxPx;
+  if (!node.clientWidth) return false;
   const text = document.createRange();
   text.selectNodeContents(node);
   const size = fontSizeToFit(px => {
     node.style.fontSize = `${px}px`;
     // scrollWidth is integer-rounded and can miss subpixel clipping/ellipsis.
     return text.getBoundingClientRect().width > node.clientWidth - 1;
-  }, minPx, maxPx);
+  }, RADIAL_LABEL_MIN_PX, maxPx);
   node.style.fontSize = `${size}px`;
-  return size;
+  return text.getBoundingClientRect().width > node.getBoundingClientRect().width;
 }
 
-/** Scale visible radial copy onto one line. Drop a secondary line that still overflows at the minimum. */
+/** Fit one line where possible. Wrap long titles and drop overflowing secondary copy. */
 export function fitRadialLabels(root: HTMLElement): void {
   for (const node of root.querySelectorAll<HTMLElement>('strong, span')) {
     if (node.closest('[hidden]') || !node.textContent?.trim()) continue;
-    const maxPx = node.tagName === 'STRONG' ? RADIAL_LABEL_MAX_PX : 12;
-    fitSingleLine(node, RADIAL_LABEL_MIN_PX, maxPx);
-    if (node.tagName === 'SPAN') {
-      const text = document.createRange();
-      text.selectNodeContents(node);
-      if (text.getBoundingClientRect().width > node.clientWidth) node.textContent = '';
+    const title = node.tagName === 'STRONG';
+    if (!singleLineOverflows(node, title ? RADIAL_LABEL_MAX_PX : 12)) continue;
+    if (title) {
+      node.style.whiteSpace = 'normal';
+      node.style.overflowWrap = 'anywhere';
+    } else {
+      node.textContent = '';
     }
   }
   const hub = root.querySelector<HTMLElement>('#battle-radial-hub');
