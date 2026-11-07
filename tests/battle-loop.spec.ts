@@ -688,3 +688,49 @@ test('accepted rail and dock preserve drawable floors, readable controls and foc
   }
   writeFileSync(info.outputPath('responsive-measurements.json'),JSON.stringify(measurements,null,2));expect(errors).toEqual([]);
 });
+
+test('opening handoff keeps ability and party inspection on the animating actor', async ({ page }) => {
+  await page.addInitScript(() => {
+    const observer = new MutationObserver(() => {
+      const game = document.querySelector<HTMLElement>('#game');
+      if (game?.dataset.phase !== 'presenting' || !game.dataset.session) return;
+      const { state }: { state: BattleSession['state'] } = JSON.parse(game.dataset.session);
+      if (!state.units.some(unit => unit.id === state.initiative[state.activeIndex] && unit.side === 'player')) return;
+      const picker = document.querySelector<HTMLSelectElement>('#battle-ability')!;
+      Object.assign(window, { openingPicker: { options: picker.length, disabled: picker.disabled } });
+      observer.disconnect();
+      document.querySelector<HTMLButtonElement>('#battle-party')!.click();
+    });
+    observer.observe(document, { subtree: true, attributes: true, attributeFilter: ['data-phase'] });
+  });
+  await page.goto('./battle');
+  await expect(page.locator('#battle-dialog-title')).toHaveText(/^Inspection only — Goblin Grunt #/);
+  expect(await page.evaluate(() => (window as unknown as { openingPicker: unknown }).openingPicker))
+    .toEqual({ options: 0, disabled: true });
+  await page.locator('#inspection-close').click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  await expect(page.locator('#battle-ability')).toHaveValue('ability:magic_missile');
+});
+
+test('opening enemy initiative is explicit before the first playable hero turn', async ({ page }) => {
+  await page.addInitScript(() => {
+    const turns: { phase: string; label: string }[] = [];
+    (window as unknown as { openingTurns: typeof turns }).openingTurns = turns;
+    new MutationObserver(() => {
+      const phase = document.querySelector('#game')?.getAttribute('data-phase');
+      const label = document.querySelector('#battle-active')?.textContent;
+      const previous = turns.at(-1);
+      if (phase && label && (previous?.phase !== phase || previous.label !== label)) turns.push({ phase, label });
+    }).observe(document, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['data-phase'] });
+  });
+  await page.goto('./battle');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  const turns = await page.evaluate(() => (window as unknown as { openingTurns: { phase: string; label: string }[] }).openingTurns);
+  const firstPlayer = turns.findIndex(turn => turn.phase === 'player');
+  expect(firstPlayer).toBeGreaterThan(0);
+  const opening = turns.slice(0, firstPlayer);
+  expect(opening.some(turn => turn.phase === 'presenting')).toBe(true);
+  expect(opening.filter(turn => !turn.label.includes('Enemy opening turn (initiative)'))).toEqual([]);
+  await expect(page.locator('#battle-active')).toContainText('Your turn');
+  expect((await session(page)).replay.initial.initiative).toEqual(new BattleSession(catalog, 'map:forest_ruins', 1).state.initiative);
+});

@@ -6,7 +6,7 @@ import type { BattleEvent, UnitState, Command } from '../domain/types';
 import { previewTacticalPlan } from '../domain/tacticalPlan';
 import { previewMovement } from '../domain/grid';
 import { D20_SIDES, NATURAL_AUTO_MISS, NATURAL_CRITICAL } from '../domain/constants';
-import type { BattleSession, ActionPreview } from '../app/BattleSession';
+import type { BattleSession, ActionPreview, Presentation } from '../app/BattleSession';
 import type { BattleAudioSnapshot } from '../phaser/BattleAudio';
 import { publicAssetUrl } from './publicAssetUrl';
 import { GUARDED_STRIKE_TRADEOFF } from '../content/constants';
@@ -90,10 +90,12 @@ export class BattleHud {
   private abilityKey="";
   private lastRender: readonly unknown[] = [];
   private skin: CombatSkin = 'rail';
+  private openingEnemyTurn: boolean;
   private readonly actorRoot=document.querySelector<HTMLElement>('#battle-actor')!;
   private readonly abort=new AbortController();
   private readonly log:string[]=[];
   constructor(private readonly session:BattleSession, callbacks:{action:(a:Action)=>void;target:(c:CellPosition|null)=>void;confirm:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void;inspect:()=>void;inspectTarget:(id:number)=>void;danger:()=>void;plan:()=>void;undo:()=>void;draught:()=>void;log:(lines:readonly string[])=>void}) {
+    this.openingEnemyTurn = !session.resumed && session.phase === 'enemy';
     this.actorRoot.hidden=false;
     this.actorRoot.innerHTML=`<p id="battle-active" aria-live="polite"></p><div class="battle-identity"><div id="battle-portraits"></div><div><h2 id="battle-actor-name" aria-live="polite"></h2><p id="battle-hp"></p><div class="battle-health" aria-hidden="true"><span></span></div><p id="battle-stats"></p><p id="battle-status"></p></div></div><p id="battle-budgets"></p>`;
     for(const unit of session.state.units.filter((u,i,all)=>all.findIndex(v=>v.defId===u.defId)===i)) {
@@ -191,14 +193,18 @@ export class BattleHud {
     const labels={muted:'Sound off',loading:'Loading sound',unavailable:'Sound unavailable',hidden:'Sound paused while hidden',unlocking:'Unlocking sound',blocked:'Sound blocked',ready:'Sound on'};
     this.root.querySelector('#battle-sound-status')!.textContent=labels[snapshot.status]+(snapshot.error?`: ${snapshot.error}`:'');
   }
-  render(action:Action|null, selected:CellPosition|null, message:string, danger=false, threats:readonly Threat[] | null=null, planWaiting=false, planMove:Extract<Command,{type:'move'}>|null=null) {
+  render(action:Action|null, selected:CellPosition|null, message:string, danger=false, threats:readonly Threat[] | null=null, planWaiting=false, planMove:Extract<Command,{type:'move'}>|null=null, presentation:Presentation|null=null) {
     // Hover refreshes only change the board. Rebuilding the live controls during
     // a pointer gesture can disturb native select interaction and scroll anchoring.
     const inputs = [this.session.state, this.session.phase, this.session.pending, this.session.pendingPlan,
-      this.session.error, action, selected?.x, selected?.y, message, danger, threats, planWaiting, planMove?.to.x, planMove?.to.y, this.skin];
+      this.session.error, action, selected?.x, selected?.y, message, danger, threats, planWaiting, planMove?.to.x, planMove?.to.y, this.skin, presentation];
     if (inputs.every((value, i) => Object.is(value, this.lastRender[i]))) return;
     this.lastRender = inputs;
-    const s=this.session, enabled=s.phase==='player', actor=s.active;
+    const s=this.session, enabled=s.phase==='player';
+    // Resolution already advanced initiative, but the board is still animating
+    // the command's actor. Keep the entire card on that actor until completion.
+    const actor=presentation?.after.units.find(unit=>unit.id===presentation.before.initiative[presentation.before.activeIndex]) ?? s.active;
+    const round=presentation?.before.round ?? s.state.round;
     const showPlanCancel=this.skin==='radial' && planWaiting && enabled;
     this.root.dataset.planWaiting=String(showPlanCancel);
     this.root.querySelector<HTMLButtonElement>('#battle-plan-cancel')!.hidden=!showPlanCancel;
@@ -223,16 +229,17 @@ export class BattleHud {
       draught.disabled = !!reason;
       draught.textContent = `Healing Draught ×${remaining}${reason ? ` · ${reason}` : ''}`;
     }
-    this.actorRoot.querySelector('#battle-active')!.textContent=`${s.state.outcome==='ongoing'?'':s.state.outcome==='playerWin'?'Victory · ':'Defeat · '}Round ${s.state.round} · ${actor.side==='player'?'Your turn':'Enemy turn'}${s.phase==='presenting'?' · Resolving action (Animating)':s.phase==='error'?' · Battle stopped':''}`;
+    if (s.phase === 'player' || s.state.outcome !== 'ongoing') this.openingEnemyTurn = false;
+    this.actorRoot.querySelector('#battle-active')!.textContent=`${s.state.outcome==='ongoing'?'':s.state.outcome==='playerWin'?'Victory · ':'Defeat · '}Round ${round} · ${actor.side==='player'?'Your turn':this.openingEnemyTurn?'Enemy opening turn (initiative)':'Enemy turn'}${s.phase==='presenting'?' · Resolving action (Animating)':s.phase==='error'?' · Battle stopped':''}`;
     this.actorRoot.querySelector('#battle-actor-name')!.textContent=info.name;
     this.actorRoot.querySelector('#battle-hp')!.textContent=`HP ${actor.hp}/${info.def.stats.maxHp}`;
     this.actorRoot.querySelectorAll<HTMLImageElement>('.battle-portrait').forEach(img=>{img.hidden=img.dataset.unitType!==actor.defId;});
     (this.actorRoot.querySelector('.battle-health span') as HTMLElement).style.width=`${100*actor.hp/info.def.stats.maxHp}%`;
     this.actorRoot.querySelector('#battle-stats')!.textContent=`AC ${info.armorClass} · Accuracy ${info.accuracy>=0?'+':''}${info.accuracy}`;
     this.actorRoot.querySelector('#battle-status')!.textContent=info.status;
-    this.actorRoot.querySelector('#battle-budgets')!.textContent=`Move ${actor.hasMoved?'spent':'ready'} / Action ${actor.hasActed?'spent':'ready'}`;
+    this.actorRoot.querySelector('#battle-budgets')!.textContent=s.phase==='presenting'?'Resolving action · Controls locked':`Move ${actor.hasMoved?'spent':'ready'} / Action ${actor.hasActed?'spent':'ready'}`;
     const locked=s.phase==='presenting'?'Resolving action. Gameplay is locked until presentation finishes.':s.phase==='enemy'?'Enemy turn. Hero actions are unavailable.':s.phase==='ended'?'Battle complete. Gameplay is unavailable.':s.phase==='error'?'Battle stopped. Use recovery or restart.':'';
-    const abilities=ownedAbilities(s),key=abilities.map(a=>a.id).join('|');
+    const abilities=ownedAbilities(s,actor.defId),key=abilities.map(a=>a.id).join('|');
     if(key!==this.abilityKey){this.abilityKey=key;this.ability.replaceChildren(...abilities.map(a=>new Option(displayName(a.id),a.id)));}
     if(action?.startsWith('ability:'))this.ability.value=action;
     this.ability.disabled=!enabled || actor.hasActed || !abilities.length;

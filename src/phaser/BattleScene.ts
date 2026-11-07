@@ -100,6 +100,7 @@ export class BattleScene extends Phaser.Scene {
     let hovered:CellPosition|null=null;
     let region:BoardRegion={x:0,y:0,width:0,height:0};
     let animation:{done:Promise<void>;cancel:()=>void}|null=null;
+    let hudPresentation:Presentation|null=null;
     const game=document.querySelector<HTMLElement>('#game')!;
     const canvas=this.game.canvas;canvas.tabIndex=0;canvas.setAttribute('aria-label','Battle board. Arrow keys navigate, Enter selects, Escape cancels.');
     let cursor:CellPosition=session.active.cell;
@@ -125,7 +126,7 @@ export class BattleScene extends Phaser.Scene {
       }
       const danger=selection.showDanger && session.phase==='player'?session.state.units.filter(u=>threatIds.includes(u.id)).map(u=>u.cell):[];
       board.present(session.state,reach?.ok?reach.cells.map(c=>c.cell):[],selected,preview?.ok?preview.path:[],selection.overlays(),hover,danger);
-      hud.render(action,selected,message,selection.showDanger && session.phase==='player',threats,selection.planning && !radial.open,selection.planning?selection.planMove:null);
+      hud.render(action,selected,message,selection.showDanger && session.phase==='player',threats,selection.planning && !radial.open,selection.planning?selection.planMove:null,hudPresentation);
       const caption=document.querySelector('#battle-board-caption')!;
       // Picking changes independently of the cached controls. Compose a fresh
       // caption so hover cannot accumulate hints or retain a cleared hint.
@@ -231,6 +232,7 @@ export class BattleScene extends Phaser.Scene {
     {reducedMotion:()=>matchMedia('(prefers-reduced-motion: reduce)').matches});
     const present=async(step:Presentation|null,followPlan=false)=>{
       if(!step){refresh();return;}
+      hudPresentation=step;
       if(followPlan){planInFlight=true;planInterrupted=false;}
       clear(followPlan);selection.selectedCell=null;removeInput.reset();hud.append(step.events);audio.present(step.token,step.events);
       refresh();animation=board.animate(step.before,step.after,step.events);
@@ -240,6 +242,7 @@ export class BattleScene extends Phaser.Scene {
       await animation.done;if(!live)return;animation=null;
       if(moving)measurements.workload('move',performance.now(),0);movingPresentation=false;
       session.finishPresentation(step.token);cursor=session.active.cell;
+      hudPresentation=null;
       if(followPlan){
         planInFlight=false;
         if(planInterrupted || document.hidden || dialogs.open){session.cancel();selection.message='Planned ability cancelled after interruption';}
@@ -260,11 +263,13 @@ export class BattleScene extends Phaser.Scene {
     };
     const cancel=()=>{if(dialogs.open || session.phase!=='player')return;clear();refresh();hud.focusAction();};
     const applySkin=()=>{skin=resolveCombatControlsSkin();hud.applySkin(skin);if(skin!=='radial')radial.hide();refresh();};
-    const inspect=(id:number=session.active.id)=>{
-      const unit=session.state.units.find(u=>u.id===id);if(!unit)return;
+    const inspect=(id?:number)=>{
+      const before=hudPresentation?.before;
+      const inspectedId=id ?? (before ? before.initiative[before.activeIndex] : session.active.id);
+      const unit=session.state.units.find(u=>u.id===inspectedId);if(!unit)return;
       const {def,name,armorClass,accuracy,status,support}=unitFeedback(session,unit);
       dialogs.showChoices(`Inspection only — ${name} #${unit.id}`,
-        `HP ${unit.hp}/${def.stats.maxHp} · ${status}${session.progression.find(h => h.heroId === unit.defId) ? ` · ${progressionLabel(session.progression.find(h => h.heroId === unit.defId)!)}` : ''}\nAC ${armorClass} · Accuracy ${accuracy>=0?'+':''}${accuracy} · Power ${def.stats.power}\nMovement allowance ${def.stats.move} · Jump ${def.stats.jump} · Dexterity ${def.stats.dexterity} · Will ${def.stats.will}${support?`\n${support}`:''}\nActing unit remains ${unitFeedback(session,session.active).name}. Inspection never changes the turn.`,[
+        `HP ${unit.hp}/${def.stats.maxHp} · ${status}${session.progression.find(h => h.heroId === unit.defId) ? ` · ${progressionLabel(session.progression.find(h => h.heroId === unit.defId)!)}` : ''}\nAC ${armorClass} · Accuracy ${accuracy>=0?'+':''}${accuracy} · Power ${def.stats.power}\nMovement allowance ${def.stats.move} · Jump ${def.stats.jump} · Dexterity ${def.stats.dexterity} · Will ${def.stats.will}${support?`\n${support}`:''}\nInspection never changes the turn.`,[
           ...session.state.units.map(u=>({id:`inspect-unit-${u.id}`,label:`Inspect ${unitFeedback(session,u).name} #${u.id}`,run:()=>inspect(u.id),keepOpen:true})),
           {id:'inspection-close',label:'Close inspection',run:()=>{}},
         ],()=>{});
