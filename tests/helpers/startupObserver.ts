@@ -164,21 +164,34 @@ export async function startStartupDiagnostics(page: Page, info: TestInfo): Promi
     sampleRunner();
     stop();
     if (info.status === info.expectedStatus) return;
-    const capture = page.evaluate(markNames => ({
-      samples: (window as unknown as { __tacticsStartupProbe: unknown }).__tacticsStartupProbe,
-      ready: document.readyState, visibility: document.visibilityState,
-      marks: markNames.flatMap(name => performance.getEntriesByName(name, 'mark').slice(-8).map(entry => ({ name, at: entry.startTime }))),
-      scripts: Array.from(document.scripts).slice(0, 32).map(script => script.src),
-      styles: Array.from(document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')).slice(0, 32).map(link => ({ url: link.href, sheet: !!link.sheet })),
-      resources: performance.getEntriesByType('resource').filter(entry => ['script', 'link', 'img', 'css', 'fetch', 'xmlhttprequest', 'video', 'audio'].includes((entry as PerformanceResourceTiming).initiatorType))
-        .slice(-64).map(entry => ({ url: entry.name, at: entry.startTime, duration: entry.duration })),
-    }), marks).catch(() => null);
+    const capture = page.evaluate(markNames => {
+      let measurements: { run: number | null; sceneStartedMs: number | null; sceneReadyMs: number | null; controlsUsableMs: number | null } | null = null;
+      try {
+        // BattleScene updates this interface, while proof scenes also emit marks.
+        // Select four numeric fields inside the page; never serialize its payload.
+        if (typeof window.fitDiagnostics === 'function') {
+          const { run, sceneStartedMs, sceneReadyMs, controlsUsableMs } = window.fitDiagnostics();
+          const numeric = (value: unknown) => typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value : null;
+          measurements = { run: Number.isSafeInteger(run) && run >= 0 ? run : null,
+            sceneStartedMs: numeric(sceneStartedMs), sceneReadyMs: numeric(sceneReadyMs), controlsUsableMs: numeric(controlsUsableMs) };
+        }
+      } catch { /* An unavailable diagnostic provider must not hide other evidence. */ }
+      return {
+        samples: (window as unknown as { __tacticsStartupProbe: unknown }).__tacticsStartupProbe,
+        ready: document.readyState, visibility: document.visibilityState, measurements,
+        marks: markNames.flatMap(name => performance.getEntriesByName(name, 'mark').slice(-8).map(entry => ({ name, at: entry.startTime }))),
+        scripts: Array.from(document.scripts).slice(0, 32).map(script => script.src),
+        styles: Array.from(document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')).slice(0, 32).map(link => ({ url: link.href, sheet: !!link.sheet })),
+        resources: performance.getEntriesByType('resource').filter(entry => ['script', 'link', 'img', 'css', 'fetch', 'xmlhttprequest', 'video', 'audio'].includes((entry as PerformanceResourceTiming).initiatorType))
+          .slice(-64).map(entry => ({ url: entry.name, at: entry.startTime, duration: entry.duration })),
+      };
+    }, marks).catch(() => null);
     let timer: ReturnType<typeof setTimeout> | undefined;
     const snapshot = await Promise.race([capture, new Promise<null>(resolve => { timer = setTimeout(() => resolve(null), 1500); })]);
     clearTimeout(timer);
     const browser = snapshot ? { samples: samples(snapshot.samples),
       ready: choice(snapshot.ready, ['loading', 'interactive', 'complete']), visibility: choice(snapshot.visibility, ['visible', 'hidden']),
-      marks: snapshot.marks.map(mark => ({ name: choice(mark.name, marks), at: number(mark.at) })),
+      marks: snapshot.marks.map(mark => ({ name: choice(mark.name, marks), at: number(mark.at) })), measurements: snapshot.measurements,
       scripts: snapshot.scripts.map(assetPath), styles: snapshot.styles.map(style => ({ url: assetPath(style.url), sheet: style.sheet })),
       resources: snapshot.resources.map(resource => ({ url: assetPath(resource.url), at: number(resource.at), duration: number(resource.duration) })),
     } : null;

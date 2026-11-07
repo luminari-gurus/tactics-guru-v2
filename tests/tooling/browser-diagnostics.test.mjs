@@ -105,15 +105,19 @@ test('startup evidence covers proof battle and development boundaries while pres
         }
         await shell(page,mode);
         await page.evaluate(mode=>{
-          performance.mark('fit:scene-start');
+          if(mode==='proof')performance.mark('fit:scene-start');
           performance.mark('private-mark-sentinel');
           localStorage.setItem('private-save','private-save-sentinel');
           const game=document.querySelector('#game');
           if(mode==='battle'){
-            performance.mark('fit:scene-ready');performance.mark('fit:controls-usable');
+            window.fitDiagnostics=()=>({run:2,sceneStartedMs:10,sceneReadyMs:20,controlsUsableMs:30,
+              private:'private-diagnostics-sentinel',get resources(){throw Error('private-diagnostics-sentinel');}});
             game.setAttribute('data-ready','true');game.setAttribute('data-phase','player');
             document.querySelector('#fit-status').textContent='Battle ready';
-          }else if(mode==='dev')game.setAttribute('data-phase','private-phase-sentinel');
+          }else if(mode==='dev'){
+            window.fitDiagnostics=()=>({run:-1,sceneStartedMs:Infinity,sceneReadyMs:NaN,controlsUsableMs:'private-diagnostics-sentinel'});
+            game.setAttribute('data-phase','private-phase-sentinel');
+          }
         },mode);
         if(mode==='proof')await expect(page.locator('#fit-status')).toHaveText('Ready',{timeout:1100});
         else await expect(page.locator('#game')).toHaveAttribute('data-phase','ended',{timeout:100});
@@ -156,7 +160,7 @@ test('startup evidence covers proof battle and development boundaries while pres
       assert.match(result.errors[0].message, /toHaveText|toHaveAttribute/);
       const raw = attachment.body ? Buffer.from(attachment.body, 'base64').toString() : readFileSync(attachment.path, 'utf8');
       for (const secret of ['query-sentinel', 'private-status-sentinel', 'private-phase-sentinel', 'private-mark-sentinel',
-        'private-save-sentinel', 'private-file-sentinel', 'diagnostics.invalid', 'foreign.invalid', '/outside/']) {
+        'private-save-sentinel', 'private-file-sentinel', 'private-diagnostics-sentinel', 'diagnostics.invalid', 'foreign.invalid', '/outside/']) {
         assert.ok(!raw.includes(secret), secret);
       }
       const evidence = JSON.parse(raw);
@@ -175,8 +179,9 @@ test('startup evidence covers proof battle and development boundaries while pres
       }
       const state = evidence.browser.samples.at(-1);
       assert.equal(state.game, true);
-      assert.ok(evidence.browser.marks.some(mark => mark.name === 'fit:scene-start' && mark.at >= 0));
       if (entry.title.includes('proof')) {
+        assert.ok(evidence.browser.marks.some(mark => mark.name === 'fit:scene-start' && mark.at >= 0));
+        assert.equal(evidence.browser.measurements, null);
         assert.equal(state.status, 'loading');
         assert.equal(state.gameReady, false);
         assert.ok(evidence.runner.samples.length >= 3, 'Node sampling must continue while page.clock is paused');
@@ -185,8 +190,10 @@ test('startup evidence covers proof battle and development boundaries while pres
         assert.equal(state.status, 'ready');
         assert.equal(state.gameReady, true);
         assert.equal(state.phase, 'player');
-        assert.deepEqual(evidence.browser.marks.map(mark => mark.name), ['fit:scene-start', 'fit:scene-ready', 'fit:controls-usable']);
+        assert.deepEqual(evidence.browser.marks, []);
+        assert.deepEqual(evidence.browser.measurements, { run: 2, sceneStartedMs: 10, sceneReadyMs: 20, controlsUsableMs: 30 });
       } else {
+        assert.deepEqual(evidence.browser.measurements, { run: null, sceneStartedMs: null, sceneReadyMs: null, controlsUsableMs: null });
         assert.equal(state.phase, 'other');
         assert.ok(evidence.browser.scripts.includes('/src/main.ts'));
         assert.ok(evidence.browser.styles.some(style => style.url === '/src/style.css'));
