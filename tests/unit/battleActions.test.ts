@@ -1,9 +1,22 @@
 import { expect,it } from 'vitest';
 import { abilityCatalog,abilitySession } from '../helpers/abilityCatalog';
-import { actionCommand,ownedAbilities,actionTargets,friendlyFire } from '../../src/ui/battleActions';
+import { actionCommand,ownedAbilities,actionTargets,friendlyFire,presentationActor } from '../../src/ui/battleActions';
 import { BattleSession } from '../../src/app/BattleSession';
 import { previewText } from '../../src/ui/hud';
 import { targetOverlays } from '../../src/ui/targetPreview';
+
+it('keeps the resolving actor and its abilities until the accepted turn handoff is presented',()=>{
+  const s=abilitySession('mage'),actor=s.active,abilities=ownedAbilities(s);
+  expect(s.prepare({type:'endTurn',unitId:actor.id}).ok).toBe(true);
+  const step=s.confirm()!;
+  expect(s.phase).toBe('presenting');
+  expect(s.active.id).not.toBe(actor.id);
+  expect(presentationActor(s,step).id).toBe(actor.id);
+  expect(ownedAbilities(s,presentationActor(s,step).defId)).toEqual(abilities);
+  s.finishPresentation(step.token);
+  expect(presentationActor(s)).toBe(s.active);
+  expect(s.state).toBe(step.after);
+});
 
 it('self healing uses the shared preview and self target without friendly-fire or attack copy',()=>{
   const base=abilitySession('fighter'),state={...base.state,units:base.state.units.map(u=>u.id===base.active.id?{...u,hp:2}:u)};
