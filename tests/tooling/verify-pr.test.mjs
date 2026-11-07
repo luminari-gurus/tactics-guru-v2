@@ -41,17 +41,19 @@ test('ordinary Playwright discovery and the PR alias have identical bounded sele
 
 test('every shared browser workflow preserves pending checks without concurrent execution', () => {
   const validate = workflow => {
-    const concurrency = workflow.split('\nconcurrency:\n')[1]?.split(/\n\S/)[0];
+    const concurrency = workflow.replaceAll('\r\n', '\n').split('\nconcurrency:\n')[1]?.split(/\n\S/)[0];
     assert.match(concurrency, /^  group: tactics-browser-/m);
     assert.match(concurrency, /^  queue: max$/m);
     assert.match(concurrency, /^  cancel-in-progress: false$/m);
   };
   for (const file of ['pr-verification.yml', 'browser-setup.yml', 'issue-200-baseline.yml', 'issue-219-process-cleanup.yml']) {
-    const workflow = readFileSync(new URL('../../.github/workflows/' + file, import.meta.url), 'utf8');
-    validate(workflow);
-    assert.throws(() => validate(workflow.replace('queue: max', 'queue: single')));
-    assert.throws(() => validate(workflow.replace('  queue: max\n', '')));
-    assert.throws(() => validate(workflow.replace('cancel-in-progress: false', 'cancel-in-progress: true')));
+    const source = readFileSync(new URL('../../.github/workflows/' + file, import.meta.url), 'utf8').replaceAll('\r\n', '\n');
+    for (const workflow of [source, source.replaceAll('\n', '\r\n')]) {
+      validate(workflow);
+      assert.throws(() => validate(workflow.replace('queue: max', 'queue: single')));
+      assert.throws(() => validate(workflow.replace(/  queue: max\r?\n/, '')));
+      assert.throws(() => validate(workflow.replace('cancel-in-progress: false', 'cancel-in-progress: true')));
+    }
   }
 });
 
