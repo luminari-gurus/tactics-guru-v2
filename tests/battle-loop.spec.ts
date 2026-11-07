@@ -734,3 +734,15 @@ test('opening enemy initiative is explicit before the first playable hero turn',
   await expect(page.locator('#battle-active')).toContainText('Your turn');
   expect((await session(page)).replay.initial.initiative).toEqual(new BattleSession(catalog, 'map:forest_ruins', 1).state.initiative);
 });
+
+test('battle log starts with the initial actor before opening enemy actions', async ({ page }) => {
+  await page.goto('./battle');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  const current = await session(page), initial = current.replay.initial;
+  const actor = initial.units.find(unit => unit.id === initial.initiative[initial.activeIndex])!;
+  await page.locator('#battle-log-open').click();
+  const lines = await page.locator('#battle-log li').allTextContents();
+  expect(lines[0]).toBe(`Round ${initial.round}: ${displayName(actor.defId)} #${actor.id}'s turn`);
+  expect(lines.some(line => /moves to|waits|uses/.test(line))).toBe(true);
+  await page.locator('#log-close').click();
+});
