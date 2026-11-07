@@ -23,7 +23,7 @@ Ordinary battle, run, dungeon and Q*bert screens SHALL keep proof tools hidden t
 - **THEN** its ordinary controls remain usable and proof controls remain hidden on desktop and touch layouts
 
 ### Requirement: Explicit diagnostics and recoverable failures remain reachable
-Explicit proof/content-smoke scenes SHALL retain their established tools and status behavior. Application and engine import failures SHALL show visible recovery guidance. Existing scene precedence and Q*bert route semantics SHALL be preserved.
+Explicit proof/content-smoke scenes SHALL retain their established tools and status behavior. Application initialization/runtime and engine import failures SHALL show visible recovery guidance. Existing scene precedence and Q*bert route semantics SHALL be preserved.
 
 #### Scenario: Deliberate proof scene
 - **WHEN** the first scene selector requests proof
@@ -32,3 +32,7 @@ Explicit proof/content-smoke scenes SHALL retain their established tools and sta
 #### Scenario: Content smoke and failure
 - **WHEN** content smoke runs or a route/engine import fails
 - **THEN** the relevant visible status reports readiness or recoverable failure without leaking proof controls into ordinary gameplay
+
+#### Scenario: Failure after a preparation screen mounts
+- **WHEN** run/dungeon initialization throws after mounting its screen, or the run's runtime error handler fires during preparation
+- **THEN** one alert is visible in the owning screen, repeated errors do not duplicate it, diagnostic tools stay hidden, and saved bytes remain unchanged

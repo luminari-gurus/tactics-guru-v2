@@ -55,6 +55,38 @@ test('main menu: failed gameplay imports retain visible recovery without proof t
  expect(errors).toEqual([]);
 });
 
+for(const mode of ['run','dungeon'] as const)test(`main menu: post-mount ${mode} failure remains visible and preserves saves`,async({page},info)=>{
+ const saved=menuFixture(mode);
+ await page.addInitScript(({key,saved})=>localStorage.setItem(key,saved),{key:keys[mode].primary,saved});
+ await page.route(/\/start(?:Run|Dungeon)App(?:-[^/]+\.js|\.ts)(?:\?|$)/,async route=>{
+  const response=await route.fetch();
+  await route.fulfill({response,body:(await response.text())+'\nthrow new Error("review: post-mount initialization failed");\n'});
+ });
+ await page.goto('./?game='+mode);
+ await expect(page.getByRole('alert')).toHaveText('Error: Could not load the application. Reload the page to retry.');
+ await expect(page.getByRole('alert')).toBeInViewport();
+ await expect(page.locator('#fit-board-controls')).not.toBeVisible();
+ await expect(page.locator('#fit-measurements')).not.toBeVisible();
+ expect(await page.evaluate(key=>localStorage.getItem(key),keys[mode].primary)).toBe(saved);
+ await page.screenshot({path:info.outputPath(`${mode}-post-mount-error.png`)});
+});
+
+test('main menu: run preparation runtime errors use one visible alert and preserve saves',async({page},info)=>{
+ const saved=menuFixture('run');
+ await page.addInitScript(({key,saved})=>localStorage.setItem(key,saved),{key:keys.run.primary,saved});
+ await page.goto('./?game=run');await expect(page.locator('#run-start')).toBeVisible();
+ for(let i=0;i<2;i++){
+  await page.evaluate(()=>window.dispatchEvent(new ErrorEvent('error',{message:'review: renderer initialization failed'})));
+  await expect(page.getByRole('alert')).toHaveCount(1);
+  await expect(page.getByRole('alert')).toHaveText('Error: The run encountered a runtime error. Reload to retry.');
+  await expect(page.getByRole('alert')).toBeInViewport();
+ }
+ await expect(page.locator('#fit-board-controls')).not.toBeVisible();
+ await expect(page.locator('#fit-measurements')).not.toBeVisible();
+ expect(await page.evaluate(key=>localStorage.getItem(key),keys.run.primary)).toBe(saved);
+ await page.screenshot({path:info.outputPath('run-preparation-error.png')});
+});
+
 test('main menu: repeated scene selectors use the first value throughout startup',async({page})=>{
  await page.goto('./?scene=unknown&scene=proof');
  await expect(page.locator('[data-menu-action]')).toHaveCount(4);

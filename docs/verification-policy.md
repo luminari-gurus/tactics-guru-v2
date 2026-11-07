@@ -29,7 +29,7 @@ feedback; explicit setup/regression configs still own the diagnostic check. An e
 discovery contract prevents accidental expansion or loss of the seven selections.
 Before this migration, the broad default selected 1,036 cases (353 desktop, 344
 portrait, 339 landscape). Ordinary E2E now selects seven; the explicit broad
-regression matrix selects 1,126 cases (383 desktop, 374 portrait and 369 landscape),
+regression matrix selects 1,135 cases (386 desktop, 377 portrait and 372 landscape),
 including the growing-floor, deferred-loading and diagnostic-visibility regressions. Redundant XP 60/600
 permutations remain removed. This is a selection count,
 not a measured runtime speedup or equivalent full-regression coverage.

@@ -21,3 +21,7 @@ Use native hidden markup plus existing scene owners. Retain visible loading/erro
 ## Migration Plan
 
 No persisted data changes. Deliver one focused PR on the issue branch; ordinary rollback restores the previous markup/bootstrap. Keep OpenSpec artifacts unarchived for review.
+
+## Adversarial follow-up
+
+The entry catch and run error handler can update the battle status after the owner has hidden that panel. A small shared presentation helper also places one alert into an existing visible run/dungeon screen. It leaves normal battle/pre-mount status behavior intact, scrolls failure feedback into view, and does not alter controller or save state. Post-mount fault injection and repeated runtime-error browser cases prove the boundary that pre-evaluation request aborts could not cover.
