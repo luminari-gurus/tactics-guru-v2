@@ -1,0 +1,192 @@
+{
+  "red.log.gz": {
+    "source": "tmp/issue297-red.log",
+    "sha256": "89a52534e6db5b063b46965730af66817b11f436de197477d71e89a35cda6442",
+    "bytes": 4916
+  },
+  "first-fixed-desktop.log.gz": {
+    "source": "tmp/issue297-green-desktop.log",
+    "sha256": "5c1cbec42ca9db08d73db929fd50a1cb7bd001c04f4de71160ff0bc7a8ab104d",
+    "bytes": 18533
+  },
+  "focused-desktop.json.gz": {
+    "source": "tmp/issue297-focused-desktop.json",
+    "sha256": "26df6e308f11cdab5128ab61a5e9ab55f3654876b948c1615c05d258efe3806f",
+    "bytes": 8840
+  },
+  "ui-chromium.json.gz": {
+    "source": "tmp/issue297-ui-chromium.json",
+    "sha256": "23c252ebfde5edd2012cff52a5c7d7fc3c1e51bdb09d5486b31bd72297dc5e28",
+    "bytes": 74132
+  },
+  "dungeon-touch-failed.json.gz": {
+    "source": "tmp/issue297-dungeon-touch.json",
+    "sha256": "acbba4847e7957ed59d093aaf024a0eb69d2aa257d3d9526ba2917520a6ab425",
+    "bytes": 11844
+  },
+  "dungeon-landscape-recovery.json.gz": {
+    "source": "tmp/issue297-dungeon-landscape-recovery.json",
+    "sha256": "b3795d8f9d26e2d8cbfd18807cb842aca6dcf56da2de31434688ddf933179289",
+    "bytes": 6581
+  },
+  "ui-webkit-failed.json.gz": {
+    "source": "tmp/issue297-ui-webkit.json",
+    "sha256": "fd3e15b8eeb67d25929b3a30d94072311c643482595d4d1ca4b31b6c684ac544",
+    "bytes": 19456
+  },
+  "startup-webkit-recovery.json.gz": {
+    "source": "tmp/issue297-startup-webkit-recovery.json",
+    "sha256": "5b91bd518daef9b1fa5e8b5cc656234af604fe71f1bc25c07a22276ba175836a",
+    "bytes": 9286
+  },
+  "startup-chromium-final.json.gz": {
+    "source": "tmp/issue297-startup-chromium-final.json",
+    "sha256": "562cca1e08bcbf83c3253d6e666df52cab8f7cb2d1cd1804ffafa86b80aed295",
+    "bytes": 11471
+  },
+  "pr-summary.json.gz": {
+    "source": "verification-receipts/pr/1794012062004-16564/summary.json",
+    "sha256": "9ae635c8bfd29f225e86f468ece73814f34a0771da4425aa84c541f7857776c2",
+    "bytes": 5727
+  },
+  "pr-units.json.gz": {
+    "source": "verification-receipts/pr/1794012062004-16564/units.json",
+    "sha256": "4d9beaf067d08dd32964aefbdf15f01d3d62db694569204c17a53ded84a437f1",
+    "bytes": 406900
+  },
+  "pr-journeys.json.gz": {
+    "source": "verification-receipts/pr/1794012062004-16564/journeys.json",
+    "sha256": "d2b640d05fee8ad9f043e5f7fc1f26b46a6dba54538cb09a4f6cc08e13345438",
+    "bytes": 16710
+  },
+  "pr-tooling-environment-failure.json.gz": {
+    "source": "verification-receipts/pr/1794011943712-28420/summary.json",
+    "sha256": "a06675994b4765013340b8bea35949b6feb5c2edcf739857c3a11260fe6a3f7c",
+    "bytes": 1098
+  },
+  "pr-line-endings-failure.json.gz": {
+    "source": "verification-receipts/pr/1794012013583-33036/summary.json",
+    "sha256": "9e794d029a1a32dc6ee712202c4b793f7bc3c060814b9cf74910c2b802b8c0ed",
+    "bytes": 1098
+  },
+  "selection-inventory.json.gz": {
+    "source": "tmp/issue297-selection-inventory.json",
+    "sha256": "e5aaf505a3df76e76477880a9d62fe5d43c0a20d410c0afed861120ce59b2388",
+    "bytes": 513
+  },
+  "inputs-before-ready-wait.json.gz": {
+    "source": "tmp/issue297-inputs.json",
+    "sha256": "6e229b529a618677aaf9b35efeabcbfd2730de40aa3bf1902476fdcdddab6838",
+    "bytes": 42263
+  },
+  "regression-discovery.json.gz": {
+    "source": "tmp/issue297-playwright.regression.config.ts.json",
+    "sha256": "1f1b1a3ea3219829302f76b1baf746a6722a59e2d72534b6d9435b3da23d0551",
+    "bytes": 724028
+  },
+  "acceptance-discovery.json.gz": {
+    "source": "tmp/issue297-playwright.device-acceptance.config.ts.json",
+    "sha256": "bc9ab242d0024e56f8c78c3d790d627fbe14a0d77aee5f37a020bc7bd778bbb3",
+    "bytes": 144462
+  },
+  "exploration-discovery.json.gz": {
+    "source": "tmp/issue297-playwright.exploration.config.ts.json",
+    "sha256": "db413c98b1d9513a5e5fdf05836d78e05234bf15a98930425d2986dda53fe354",
+    "bytes": 118349
+  },
+  "pr-build-integration.json.gz": {
+    "source": "verification-receipts/pr/1794012062004-16564/build-integration.json",
+    "sha256": "d58ede1bb8b9c07be9678dad43ba5906c20b65b8e49d1bf9f2b8703719b4c442",
+    "bytes": 1316
+  },
+  "pr-typecheck.log.gz": {
+    "source": "verification-receipts/pr/1794012062004-16564/typecheck.log",
+    "sha256": "e169155b776999d5c89afe5b42cff7d0f4c2b0791b10dcb5a6dd6b9c63204e11",
+    "bytes": 115
+  },
+  "pr-bundle.log.gz": {
+    "source": "verification-receipts/pr/1794012062004-16564/bundle.log",
+    "sha256": "fe5412865a12ed64fc9c83022ce48f647cff29219454f3e455095cb4230eca6f",
+    "bytes": 6497
+  },
+  "dungeon-webkit.json.gz": {
+    "source": "tmp/issue297-dungeon-webkit.json",
+    "sha256": "a1ebe25a0104c07a0af56f7a55d7e8cc5a7e19c46b35273bd96bca18a6b28e94",
+    "bytes": 15286
+  },
+  "proof-webkit.json.gz": {
+    "source": "tmp/issue297-proof-webkit.json",
+    "sha256": "0d67742f5bcf0a51ad35c7f6edebdb47772b7635953fe196fa7c7d782249cf4c",
+    "bytes": 5089
+  },
+  "development.json.gz": {
+    "source": "tmp/issue297-dev.json",
+    "sha256": "5a07996ea159e79d8239e56bf99f81472b64c85810e6c1611e5328482f7edd58",
+    "bytes": 14630
+  },
+  "prefix-preview.json.gz": {
+    "source": "tmp/issue297-prefix.json",
+    "sha256": "bfb29c676998af188cff03d251def5e41934189b4437cc24b715b0b9bcabf1d4",
+    "bytes": 10550
+  },
+  "final-typecheck.log.gz": {
+    "source": "tmp/issue297-final-typecheck.log",
+    "sha256": "71682df857aca07688d276bd068ffa17a01f5634c099fe6548e792e175e1d44a",
+    "bytes": 117
+  },
+  "prefix-build.log.gz": {
+    "source": "tmp/issue297-prefix-build.log",
+    "sha256": "7daedac5308c929ca27934ff8a75eb5df3037ad063d1232bff0b8a13ed33e8ea",
+    "bytes": 6592
+  },
+  "restored-root-build.log.gz": {
+    "source": "tmp/issue297-restored-root-build.log",
+    "sha256": "622c22e54196e4fa1d187071b71d23c2d4f7b6acb598726fed3c2abe69401db6",
+    "bytes": 6582
+  },
+  "browser-environment.json.gz": {
+    "source": "verification-receipts/browser-environment/run-fNgA0y/environment.json",
+    "sha256": "fa75f6bef772e58851c923e5eef896e3a4155633541a46fa41e5cdee088f64d6",
+    "bytes": 717
+  },
+  "final-inputs.json.gz": {
+    "source": "tmp/issue297-final-inputs.json",
+    "sha256": "3374c3fa42e04b832840f625f0c994008f4b17b006cf134a3ca7c1831581e10c",
+    "bytes": 42119
+  },
+  "desktop.png": {
+    "source": "tmp/issue297-focused-desktop/dungeon-saved-menu-dungeon-6ad43-den-across-legal-encounters-desktop/gameplay-battle-0.png",
+    "sha256": "fb8a987e82645526c1ad706e62be1e9381f9cd35d3f3704de9bf133781ac1646",
+    "bytes": 479310
+  },
+  "touch-portrait.png": {
+    "source": "tmp/issue297-dungeon-touch/dungeon-saved-menu-dungeon-6ad43-den-across-legal-encounters-mobile-portrait/gameplay-battle-0.png",
+    "sha256": "ac6e4759ab33420750620db0687e0f491bfc0c7d21c63216ff879d49bff5ac01",
+    "bytes": 700923
+  },
+  "webkit-landscape.png": {
+    "source": "tmp/issue297-dungeon-webkit/dungeon-saved-menu-dungeon-6ad43-den-across-legal-encounters-landscape-webkit/gameplay-battle-0.png",
+    "sha256": "66a7a9777824ac04dfd1433c2ba0cf20b3c78c70a260e9ad1c1deb7f652a1080",
+    "bytes": 921791
+  },
+  "proof.png": {
+    "source": "tmp/issue297-ui-chromium/layout-controls-stay-at-least-44-px-and-reachable-at-390x844-mobile-portrait/layout-390x844.png",
+    "sha256": "5e04d8c6b38718f836174c462ab9e4b42ece6fa95c91174a6f10983bebcecca8",
+    "bytes": 468870
+  },
+  "cold-start.png": {
+    "source": "tmp/issue297-startup-webkit-recovery/main-menu-main-menu-startu-37067-ore-application-modules-run-acceptance-webkit-portrait/neutral-startup.png",
+    "sha256": "f28a8d2f41a26c0c9cca38b513d86d5048297ffc0fd9d785f7442d977c41af29",
+    "bytes": 15926
+  },
+  "development.log.gz": {
+    "source": "tmp/issue297-dev.log",
+    "sha256": "d9fb4fef06fd84aa441c5be75a40c27c85455a0c32154bf5b511692066639962",
+    "bytes": 26548
+  },
+  "prefix-preview.log.gz": {
+    "source": "tmp/issue297-prefix.log",
+    "sha256": "086ca9cebd524019f68154e8cc7c130e3d9937c691db5d4e150b7553c44ab291",
+    "bytes": 1859
+  }
+}

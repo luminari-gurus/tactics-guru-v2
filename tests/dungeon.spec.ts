@@ -53,6 +53,7 @@ for(const saved of [false,true])(saved?test.extend({pinDungeonSeed:27}):fixedSee
  });
  if(saved){await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();}
  else{await page.goto('./dungeon');await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();}
+ await expect(page.locator('#dungeon-map')).toBeVisible();
  expect((await snapshot(page)).seed).toBe(28);
  for(let slot=0;slot<3;slot++){
   await walkDungeon(page,undefined,isMobile?'touch':'keyboard');

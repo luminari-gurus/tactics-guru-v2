@@ -14,7 +14,7 @@ const keys={battle:BATTLE_STORAGE_KEYS,run:RUN_STORAGE_KEYS,dungeon:DUNGEON_KEYS
 
 test('main menu: startup hides proof tools before application modules run',async({page})=>{
  let release!:()=>void;
- const held=new Promise<void>(resolve=>{release=resolve;});
+ let held:Promise<void>;
  await page.route('**/*',async route=>{
   if(route.request().resourceType()==='script'){await held;await route.abort();}
   else if(route.request().resourceType()==='stylesheet')await route.abort();
@@ -22,6 +22,7 @@ test('main menu: startup hides proof tools before application modules run',async
  });
  try{
   for(const route of ['', '?game=battle', '?game=run', '?game=dungeon', 'battle', 'run', 'dungeon', 'map', 'qbert']){
+   held=new Promise<void>(resolve=>{release=resolve;});
    await page.goto('./'+route,{waitUntil:'commit'});
    await expect(page.locator('#fit-status')).toBeVisible();
    await expect(page.locator('#fit-status')).toHaveText('Loading');
@@ -32,6 +33,9 @@ test('main menu: startup hides proof tools before application modules run',async
    await expect(page.getByRole('complementary',{name:'Game status',exact:true})).toBeVisible();
    await expect(page.locator('#fit-restart')).not.toBeVisible();
    await expect(page.locator('#board-caption')).not.toBeVisible();
+   // WebKit waits for navigation to settle before capturing a screenshot.
+   // Reject the held modules after asserting the shell; no app code can run.
+   release();await page.waitForLoadState('load');
    if(!route)await page.screenshot({path:test.info().outputPath('neutral-startup.png')});
   }
  }finally{release();await page.unrouteAll({behavior:'wait'});}
