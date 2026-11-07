@@ -691,17 +691,23 @@ test('accepted rail and dock preserve drawable floors, readable controls and foc
 
 test('opening enemy initiative is explicit before the first playable hero turn', async ({ page }) => {
   await page.addInitScript(() => {
-    const labels: string[] = [];
-    (window as unknown as { turnLabels: string[] }).turnLabels = labels;
+    const turns: { phase: string; label: string }[] = [];
+    (window as unknown as { openingTurns: typeof turns }).openingTurns = turns;
     new MutationObserver(() => {
-      const text = document.querySelector('#battle-active')?.textContent;
-      if (text && labels.at(-1) !== text && labels.length < 100) labels.push(text);
-    }).observe(document, { subtree: true, childList: true, characterData: true });
+      const phase = document.querySelector('#game')?.getAttribute('data-phase');
+      const label = document.querySelector('#battle-active')?.textContent;
+      const previous = turns.at(-1);
+      if (phase && label && (previous?.phase !== phase || previous.label !== label)) turns.push({ phase, label });
+    }).observe(document, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['data-phase'] });
   });
   await page.goto('./battle');
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
-  const labels = await page.evaluate(() => (window as unknown as { turnLabels: string[] }).turnLabels);
-  expect(labels.some(text => text.includes('Enemy opening turn (initiative)'))).toBe(true);
+  const turns = await page.evaluate(() => (window as unknown as { openingTurns: { phase: string; label: string }[] }).openingTurns);
+  const firstPlayer = turns.findIndex(turn => turn.phase === 'player');
+  expect(firstPlayer).toBeGreaterThan(0);
+  const opening = turns.slice(0, firstPlayer);
+  expect(opening.some(turn => turn.phase === 'presenting')).toBe(true);
+  expect(opening.filter(turn => !turn.label.includes('Enemy opening turn (initiative)'))).toEqual([]);
   await expect(page.locator('#battle-active')).toContainText('Your turn');
   expect((await session(page)).replay.initial.initiative).toEqual(new BattleSession(catalog, 'map:forest_ruins', 1).state.initiative);
 });
