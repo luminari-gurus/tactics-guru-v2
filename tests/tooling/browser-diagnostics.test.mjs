@@ -33,6 +33,7 @@ test('dungeon startup evidence retains failed boundaries with bounded private da
         });
         const error=page.waitForEvent('pageerror');
         await page.goto('https://diagnostics.invalid/dungeon?private=query-sentinel');await error;
+        expect(await page.evaluate(()=>crypto.getRandomValues(new Uint32Array(1))[0])).toBe(100);
         await page.evaluate(noisy=>{localStorage.setItem('private-save','private-save-sentinel');if(noisy)for(let i=0;i<300;i++)console.error('private-console-sentinel');},noisy);
         await expect(page.locator('#dungeon-screen')).toBeVisible({timeout:100});
       });
@@ -63,6 +64,137 @@ test('dungeon startup evidence retains failed boundaries with bounded private da
       } else assert.equal(evidence.events.length,128,'noisy errors must remain bounded');
     }
   } finally { rmSync(fixture,{recursive:true,force:true}); }
+});
+
+test('startup evidence covers proof battle and development boundaries while preserving fixtures', () => {
+  mkdirSync('tmp', { recursive: true });
+  const fixture = mkdtempSync('tmp/startup-boundaries-');
+  try {
+    const helper = resolve('tests/helpers/startupDiagnostics.ts').replaceAll('\\', '/');
+    writeFileSync(join(fixture, 'contract.config.ts'), `
+      import {defineConfig} from '@playwright/test';
+      export default defineConfig({testDir:'.',testMatch:'contract.spec.ts',workers:1,retries:0,
+        use:{baseURL:'https://diagnostics.invalid/tactics/'},
+        projects:[{name:'chromium',use:{browserName:'chromium',channel:'chromium',launchOptions:{
+          executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE}}},
+          {name:'webkit',use:{browserName:'webkit'}}]});
+    `);
+    writeFileSync(join(fixture, 'contract.spec.ts'), `
+      import {plainTest as test,railTest,expect} from '${helper}';
+      async function shell(page,mode) {
+        await page.route('**/*',route=>{
+          const url=new URL(route.request().url()),path=url.pathname;
+          if(path.endsWith('/startBattleApp.ts'))return route.abort('failed');
+          if(path.endsWith('.css'))return route.fulfill({contentType:'text/css',body:'body { color: black; }'});
+          if(path.endsWith('.js')||path.endsWith('.ts'))return route.fulfill({contentType:'text/javascript',body:''});
+          return route.fulfill({contentType:'text/html',body:
+            '<p id="fit-status">Loading private-status-sentinel</p><div id="game" data-ready="false"></div>'
+            +'<link rel="stylesheet" href="/tactics/src/style.css?private=query-sentinel">'
+            +(mode==='dev'
+              ?'<script src="/tactics/src/main.ts?private=query-sentinel"></script><script src="/tactics/src/app/startBattleApp.ts?private=query-sentinel"></script>'
+                +'<script src="/tactics/src/private-file-sentinel.ts"></script><script src="https://foreign.invalid/tactics/src/main.ts"></script>'
+                +'<script src="/outside/src/main.ts"></script>'
+              :'<script src="/tactics/assets/probe-12345678.js?private=query-sentinel"></script>')});
+        });
+        await page.goto('./battle?private=query-sentinel');
+      }
+      for(const mode of ['proof','battle','dev'])test('failed '+mode+' startup boundary',async({page})=>{
+        if(mode==='proof'){
+          await page.clock.install({time:new Date('2026-10-25T12:00:00Z')});
+          await page.clock.pauseAt(new Date('2026-10-25T12:00:01Z'));
+        }
+        await shell(page,mode);
+        await page.evaluate(mode=>{
+          performance.mark('fit:scene-start');
+          performance.mark('private-mark-sentinel');
+          localStorage.setItem('private-save','private-save-sentinel');
+          const game=document.querySelector('#game');
+          if(mode==='battle'){
+            performance.mark('fit:scene-ready');performance.mark('fit:controls-usable');
+            game.setAttribute('data-ready','true');game.setAttribute('data-phase','player');
+            document.querySelector('#fit-status').textContent='Battle ready';
+          }else if(mode==='dev')game.setAttribute('data-phase','private-phase-sentinel');
+        },mode);
+        if(mode==='proof')await expect(page.locator('#fit-status')).toHaveText('Ready',{timeout:1100});
+        else await expect(page.locator('#game')).toHaveAttribute('data-phase','ended',{timeout:100});
+      });
+      test('successful startup keeps neutral fixtures',async({page})=>{
+        await shell(page,'plain');
+        const storage=await page.evaluate(()=>{
+          crypto.getRandomValues(new Uint32Array(1));
+          return {entropy:sessionStorage.getItem('test-dungeon-entropy'),rail:localStorage.getItem('tactics-guru:combat-controls')};
+        });
+        expect(storage).toEqual({entropy:null,rail:null});
+      });
+      railTest('successful startup keeps seeded rail fixtures',async({page})=>{
+        await shell(page,'rail');
+        const storage=await page.evaluate(()=>({draw:crypto.getRandomValues(new Uint32Array(1))[0],
+          rail:localStorage.getItem('tactics-guru:combat-controls')}));
+        expect(storage).toEqual({draw:100,rail:'rail'});
+      });
+    `);
+    const output = resolve(fixture, 'results.json');
+    const run = spawnSync(process.execPath, [require.resolve('@playwright/test/cli'), 'test', '-c',
+      resolve(fixture, 'contract.config.ts'), '--reporter=json', '--output', resolve(fixture, 'artifacts')], {
+      encoding: 'utf8', timeout: 60000, env: { ...process.env, PLAYWRIGHT_JSON_OUTPUT_FILE: output },
+    });
+    assert.equal(run.status, 1, run.stdout + run.stderr);
+    const report = JSON.parse(readFileSync(output, 'utf8'));
+    assert.equal(report.stats.unexpected, 6); // Three deliberate failed waits in each engine.
+    assert.equal(report.stats.expected, 4); // Fixture behavior remains unchanged.
+    const tests = report.suites.flatMap(suite => suite.specs.flatMap(spec => spec.tests.map(entry => ({ ...entry, title: spec.title }))));
+    for (const entry of tests) {
+      assert.equal(entry.results.length, 1);
+      const result = entry.results[0];
+      const attachment = result.attachments.find(item => item.name === 'startup-evidence');
+      if (entry.title.startsWith('successful')) {
+        assert.equal(result.status, 'passed');
+        assert.equal(attachment, undefined, 'successful cases must not emit failure evidence');
+        continue;
+      }
+      assert.ok(attachment, entry.title);
+      assert.match(result.errors[0].message, /toHaveText|toHaveAttribute/);
+      const raw = attachment.body ? Buffer.from(attachment.body, 'base64').toString() : readFileSync(attachment.path, 'utf8');
+      for (const secret of ['query-sentinel', 'private-status-sentinel', 'private-phase-sentinel', 'private-mark-sentinel',
+        'private-save-sentinel', 'private-file-sentinel', 'diagnostics.invalid', 'foreign.invalid', '/outside/']) {
+        assert.ok(!raw.includes(secret), secret);
+      }
+      const evidence = JSON.parse(raw);
+      assert.ok(evidence.events.length <= 128);
+      assert.ok(evidence.pending.length <= 64);
+      assert.ok(evidence.browser.samples.length <= 32);
+      assert.ok(evidence.browser.marks.length <= 24);
+      assert.ok(evidence.browser.resources.length <= 64);
+      assert.ok(evidence.runner.samples.length >= 2 && evidence.runner.samples.length <= 32);
+      assert.ok(evidence.runner.cpus > 0 && evidence.runner.totalMemoryBytes > 0);
+      for (const sample of evidence.runner.samples) {
+        assert.ok(Number.isFinite(sample.at) && Number.isFinite(sample.elapsedMs));
+        assert.equal(sample.load.length, 3);
+        assert.ok(sample.load.every(value => Number.isFinite(value) && value >= 0));
+        assert.ok(sample.freeMemoryBytes >= 0);
+      }
+      const state = evidence.browser.samples.at(-1);
+      assert.equal(state.game, true);
+      assert.ok(evidence.browser.marks.some(mark => mark.name === 'fit:scene-start' && mark.at >= 0));
+      if (entry.title.includes('proof')) {
+        assert.equal(state.status, 'loading');
+        assert.equal(state.gameReady, false);
+        assert.ok(evidence.runner.samples.length >= 3, 'Node sampling must continue while page.clock is paused');
+        assert.ok(evidence.runner.samples.at(-1).elapsedMs - evidence.runner.samples[0].elapsedMs >= 1000);
+      } else if (entry.title.includes('battle')) {
+        assert.equal(state.status, 'ready');
+        assert.equal(state.gameReady, true);
+        assert.equal(state.phase, 'player');
+        assert.deepEqual(evidence.browser.marks.map(mark => mark.name), ['fit:scene-start', 'fit:scene-ready', 'fit:controls-usable']);
+      } else {
+        assert.equal(state.phase, 'other');
+        assert.ok(evidence.browser.scripts.includes('/src/main.ts'));
+        assert.ok(evidence.browser.styles.some(style => style.url === '/src/style.css'));
+        assert.ok(evidence.events.some(event => event.kind === 'requestfailed' && event.path === '/src/app/startBattleApp.ts'));
+        assert.ok(evidence.browser.scripts.includes('[other]'));
+      }
+    }
+  } finally { rmSync(fixture, { recursive: true, force: true }); }
 });
 
 // Integration check: requires installed full Chromium and WebKit, no application server.

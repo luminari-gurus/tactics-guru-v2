@@ -1,0 +1,78 @@
+name: Issue 257 focused startup capture
+on:
+  push:
+    branches: [work/issue-257-startup-readiness]
+    paths: ['src/**', 'tests/**', 'scripts/**', '*config*', 'package*.json', '.github/workflows/issue-257-startup-readiness.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: tactics-browser-tactics-browser-01
+  queue: max
+  cancel-in-progress: false
+jobs:
+  capture:
+    if: github.repository == 'luminari-gurus/tactics-guru-v2' && github.ref == 'refs/heads/work/issue-257-startup-readiness'
+    runs-on: [self-hosted, tactics-browser, tactics-browser-01]
+    timeout-minutes: 20
+    steps:
+      - name: Check host disposition
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run setup:browsers && npm run check:browsers
+      - name: Record source and runner conditions
+        run: |
+          mkdir -p verification-receipts/issue-257
+          node --input-type=module <<'JS'
+          import { writeFileSync } from 'node:fs';
+          import os from 'node:os';
+          import { sourceIdentity } from './scripts/verification-report.mjs';
+          writeFileSync('verification-receipts/issue-257/source.json', JSON.stringify({
+            source: sourceIdentity(process.cwd()), node: process.version,
+            runner: process.env.RUNNER_NAME, platform: process.platform, arch: process.arch,
+            cpuCount: os.cpus().length, loadAverage: os.loadavg(), freeMemoryBytes: os.freemem(),
+            conditions: 'Qualified persistent runner; shared host load and caches not independently controlled'
+          }, null, 2));
+          JS
+      - name: Build the root application
+        id: build
+        run: npm run build
+      - name: Verify bounded startup evidence in Chromium and WebKit
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: node --test --test-name-pattern='startup' tests/tooling/browser-diagnostics.test.mjs
+      - name: Capture original landscape proof and route-recovery witnesses
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.regression.config.ts tests/opacity.spec.ts tests/overworld-map.spec.ts --project=mobile-landscape -g 'opacity slider previews|failed route import at / shows a reload instruction' --diagnostics
+      - name: Capture cold battle in root preview
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.regression.config.ts tests/public-asset-base.spec.ts --project=desktop -g 'collector cold/warm battle uses real controls and preserves saved games' --diagnostics
+      - name: Capture original cold battle in root development
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_SERVER_MODE: dev
+        run: npm run test:browser -- -c playwright.regression.config.ts tests/public-asset-base.spec.ts --project=desktop -g 'collector cold/warm battle uses real controls and preserves saved games' --diagnostics
+      - name: Check development modules under the configured prefix
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_SERVER_MODE: dev
+          PLAYWRIGHT_BASE_PATH: /prototype/
+        run: npm run test:browser -- -c playwright.prefix-assets.config.ts --project=desktop -g 'collector cold/warm battle uses real controls and preserves saved games' --diagnostics
+      - name: Check the existing dungeon diagnostic adapter
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts --project=landscape-webkit -g 'unavailable battle modules preserve dungeon exploration, recovery and the saved encounter' --diagnostics
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-257-startup-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/
+          retention-days: 14
+          if-no-files-found: warn

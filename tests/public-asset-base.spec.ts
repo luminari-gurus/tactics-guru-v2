@@ -1,4 +1,4 @@
-import { expect, railTest as test } from './helpers/dungeonEntropy';
+import { expect, railTest as test } from './helpers/startupDiagnostics';
 import { battleCatalog } from '../src/content/catalog';
 import { standaloneCatalog } from './helpers/playerPolicy';
 import { BATTLE_CUES } from '../src/audio/battleCues';
