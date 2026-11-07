@@ -127,6 +127,13 @@ dialog button { touch-action: manipulation; }
 .battle-skin-radial #battle-next { min-height:48px; width:100%; font-size:1rem; }
 .battle-skin-radial #battle-overflow summary { min-height:44px; }
 .battle-skin-radial #battle-overflow[open] { display:block; }
+/* A mouse user can explicitly choose radial controls too. Keep supporting
+   information in a bottom dock rather than retaining the desktop action rail. */
+@media (min-width:760px) and (min-height:501px) {
+  .battle-mode.battle-skin-radial #battle-shell { grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(0,1fr) min(34%,280px); }
+  .battle-mode.battle-skin-radial #fit-panel { display:grid; grid-template-columns:minmax(220px,1fr) minmax(0,2fr); }
+  .battle-mode.battle-skin-radial #battle-actor { max-height:none; border-bottom:0; border-right:1px solid var(--edge); }
+}
 .battle-mode [data-combat-controls] { border:1px solid var(--edge); border-radius:6px; padding:8px; margin:8px 0; }
 .battle-mode [data-combat-controls] legend, .menu-dialog [data-combat-controls] legend { font-weight:650; }
 .battle-mode [data-combat-controls] label, .menu-dialog [data-combat-controls] label { display:flex; align-items:center; gap:8px; min-height:44px; }
