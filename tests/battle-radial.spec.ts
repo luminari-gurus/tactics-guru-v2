@@ -56,7 +56,9 @@ async function radialLabelProblems(page: Page) {
       const nowrap = style.whiteSpace.includes('nowrap');
       const lines = el.getClientRects().length;
       if (!nowrap || lines > 1) issues.push(`wrap (${lines}): ${el.textContent}`);
-      const overflow = el.scrollWidth > el.clientWidth + 1;
+      const text = document.createRange();
+      text.selectNodeContents(el);
+      const overflow = text.getBoundingClientRect().width > el.clientWidth;
       if (overflow) issues.push(`overflow ${el.scrollWidth}>${el.clientWidth} @${style.fontSize}: ${el.textContent}`);
     }
     const plan = root.querySelector('#battle-radial-plan')?.getBoundingClientRect();

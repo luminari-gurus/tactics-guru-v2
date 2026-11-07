@@ -28,9 +28,12 @@ export function fontSizeToFit(overflows: (px: number) => boolean, minPx = RADIAL
 export function fitSingleLine(node: HTMLElement, minPx = RADIAL_LABEL_MIN_PX, maxPx = RADIAL_LABEL_MAX_PX): number {
   node.style.whiteSpace = 'nowrap';
   if (!node.clientWidth || !node.textContent?.trim()) return maxPx;
+  const text = document.createRange();
+  text.selectNodeContents(node);
   const size = fontSizeToFit(px => {
     node.style.fontSize = `${px}px`;
-    return node.scrollWidth > node.clientWidth + 0.5;
+    // scrollWidth is integer-rounded and can miss subpixel clipping/ellipsis.
+    return text.getBoundingClientRect().width > node.clientWidth - 1;
   }, minPx, maxPx);
   node.style.fontSize = `${size}px`;
   return size;
