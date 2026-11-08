@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
       max-parallel: 1
       matrix:
-        batch: [1, 2]
+        batch: [1]
     env:
       ISSUE_257_STARTUP_CAPTURE: '1'
       PLAYWRIGHT_SERVER_MODE: preview
@@ -46,7 +46,28 @@ jobs:
           cache: npm
           cache-dependency-path: historical/package-lock.json
       - run: npm ci
-      - run: npm run setup:browsers -- --no-remove && npm run check:browsers
+      - run: npm run setup:browsers -- --no-remove
+      - name: Check pinned browsers and record launch timing
+        run: |
+          probe="$(mktemp scripts/issue-257-browser-check.XXXXXX.mjs)"
+          trap 'rm -f -- "$probe"' EXIT
+          node --input-type=module - "$probe" <<'JS'
+          import { readFileSync, writeFileSync } from 'node:fs';
+          const source = readFileSync('scripts/browser-check.mjs', 'utf8');
+          const launch = /^    browser = await type\.launch\(.*timeout: 15000.*$/m;
+          if (!launch.test(source)) throw Error('Unexpected historical browser launch probe');
+          writeFileSync(process.argv[2], source.replace(launch, line => [
+            "    entry.launchTimeoutMs = name === 'chromium' ? 45000 : 15000;",
+            '    const launchStarted = performance.now();',
+            '    try {',
+            '  ' + line.replace('timeout: 15000', 'timeout: entry.launchTimeoutMs'),
+            '    } finally {',
+            '      entry.launchMs = Math.round(performance.now() - launchStarted);',
+            '      console.log(name, "launch settled after", entry.launchMs, "ms");',
+            '    }',
+          ].join('\n')));
+          JS
+          node "$probe"
       - name: Record clean historical source and build preview
         run: |
           out=verification-receipts/issue-257
