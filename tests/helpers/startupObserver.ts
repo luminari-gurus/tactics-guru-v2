@@ -1,6 +1,7 @@
 import { type ConsoleMessage, type Frame, type Page, type Request, type Response, type TestInfo } from '@playwright/test';
 import { availableParallelism, freemem, loadavg, totalmem } from 'node:os';
 import { performance as hostClock } from 'node:perf_hooks';
+import { readFileSync } from 'node:fs';
 
 const marks = ['fit:scene-start', 'fit:scene-ready', 'fit:controls-usable'];
 const phases = ['player', 'enemy', 'presenting', 'ended', 'error', 'disposed'];
@@ -43,6 +44,16 @@ function choice(value: unknown, allowed: string[]): string {
   return typeof value === 'string' && allowed.includes(value) ? value : 'other';
 }
 
+function pressureTotal(resource: 'cpu' | 'io'): number | null {
+  try {
+    const pressure = readFileSync(`/proc/pressure/${resource}`, 'utf8');
+    const total = /^some [^\n]*\btotal=(\d+)$/m.exec(pressure)?.[1];
+    return total === undefined ? null : number(Number(total));
+  } catch {
+    return null;
+  }
+}
+
 /** Preserve only our fixed state fields even if page code replaces the probe. */
 function samples(value: unknown): Record<string, unknown>[] {
   if (!Array.isArray(value)) return [];
@@ -73,12 +84,21 @@ export async function startStartupDiagnostics(page: Page, info: TestInfo, buildF
     events.push({ at: Date.now(), elapsedMs: elapsed(), ...value });
   };
   const runner = { cpus: availableParallelism(), totalMemoryBytes: totalmem(), samples: [] as Record<string, unknown>[] };
-  const sampleRunner = () => {
+  const capturePressure = process.env.ISSUE_257_STARTUP_CAPTURE === '1';
+  const intervalMs = 1000;
+  let previousHeartbeat = elapsed();
+  const sampleRunner = (heartbeatDelayMs: number | null = null) => {
     if (runner.samples.length === 32) { runner.samples.shift(); dropped.runner++; }
-    runner.samples.push({ at: Date.now(), elapsedMs: elapsed(), load: loadavg(), freeMemoryBytes: freemem() });
+    runner.samples.push({ at: Date.now(), elapsedMs: elapsed(), load: loadavg(), freeMemoryBytes: freemem(),
+      ...(capturePressure ? { heartbeatDelayMs, cpuPressureUs: pressureTotal('cpu'), ioPressureUs: pressureTotal('io') } : {}),
+    });
   };
   sampleRunner();
-  const interval = setInterval(sampleRunner, 1000);
+  const interval = setInterval(() => {
+    const now = elapsed();
+    sampleRunner(Math.max(0, now - previousHeartbeat - intervalMs));
+    previousHeartbeat = now;
+  }, intervalMs);
   interval.unref();
 
   const onRequest = (request: Request) => {

@@ -1,0 +1,80 @@
+name: Issue 257 Chromium startup attribution
+on:
+  push:
+    branches: [work/issue-257-startup-attribution]
+    paths: ['.github/workflows/issue-257-startup-attribution.yml']
+permissions:
+  contents: read
+concurrency:
+  group: tactics-browser-tactics-browser-01
+  queue: max
+  cancel-in-progress: false
+jobs:
+  capture:
+    if: github.repository == 'luminari-gurus/tactics-guru-v2' && github.ref == 'refs/heads/work/issue-257-startup-attribution'
+    runs-on: [self-hosted, tactics-browser, tactics-browser-01]
+    timeout-minutes: 20
+    env:
+      ISSUE_257_STARTUP_CAPTURE: '1'
+    steps:
+      - name: Check host disposition
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run setup:browsers && npm run check:browsers
+      - name: Record source and runner conditions
+        run: |
+          mkdir -p verification-receipts/issue-257
+          node --input-type=module <<'JS'
+          import { writeFileSync } from 'node:fs';
+          import os from 'node:os';
+          import { sourceIdentity } from './scripts/verification-report.mjs';
+          writeFileSync('verification-receipts/issue-257/source.json', JSON.stringify({
+            source: sourceIdentity(process.cwd()), node: process.version,
+            runner: process.env.RUNNER_NAME, platform: process.platform, arch: process.arch,
+            cpuCount: os.availableParallelism(), loadAverage: os.loadavg(), freeMemoryBytes: os.freemem(),
+          }, null, 2));
+          JS
+      - name: Build and hash the root preview
+        id: build
+        run: |
+          npm run build
+          find dist -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum | sha256sum > verification-receipts/issue-257/dist.sha256
+      - name: Repeat the two original landscape preview witnesses
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: >-
+          npm run test:browser -- -c playwright.regression.config.ts tests/opacity.spec.ts tests/overworld-map.spec.ts
+          --project=mobile-landscape --workers=1 --repeat-each=5
+          -g 'opacity slider previews|failed route import at / shows a reload instruction' --diagnostics
+      - name: Repeat the original desktop cold battle witness in root development
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_SERVER_MODE: dev
+        run: >-
+          npm run test:browser -- -c playwright.regression.config.ts tests/public-asset-base.spec.ts
+          --project=desktop --workers=1 --repeat-each=5
+          -g 'collector cold/warm battle uses real controls and preserves saved games' --diagnostics
+      - name: Repeat the desktop cold battle control in root preview
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_SERVER_MODE: preview
+        run: >-
+          npm run test:browser -- -c playwright.regression.config.ts tests/public-asset-base.spec.ts
+          --project=desktop --workers=1 --repeat-each=5
+          -g 'collector cold/warm battle uses real controls and preserves saved games' --diagnostics
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-257-attribution-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            verification-receipts/issue-257/
+            verification-receipts/browser-environment/
+            verification-receipts/browser-runs/
+          retention-days: 14

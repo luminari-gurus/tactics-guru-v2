@@ -1,4 +1,4 @@
-import { expect, plainTest as test, type Page } from './helpers/startupDiagnostics';
+import { expect, observeStartupAssertion, plainTest as test, type Page } from './helpers/startupDiagnostics';
 import { createOverworld } from '../src/map/state';
 import { generateMap, type MapType } from '../src/map/generate';
 import { applyBiome, type Biome } from '../src/map/biomes';
@@ -71,7 +71,7 @@ for (const { path, chunk, otherChunk } of [
     await page.unrouteAll();
     await page.reload();
     if (path === '/map') await expect(page.locator('#map-grid span')).toHaveCount(400);
-    else await expect(page.locator('#fit-status')).toHaveText('Battle ready');
+    else await observeStartupAssertion(page, 'Battle ready', () => expect(page.locator('#fit-status')).toHaveText('Battle ready'));
     expect(errors).toEqual([]);
   });
 }

@@ -1,8 +1,8 @@
-import { expect, plainTest as test } from './helpers/startupDiagnostics';
+import { expect, observeStartupAssertion, plainTest as test } from './helpers/startupDiagnostics';
 
 test('opacity slider previews 0–100, preserves its choice across fixtures and restart', async ({ page }) => {
   await page.goto('/?scene=proof');
-  await expect(page.getByRole('status')).toHaveText('Ready');
+  await observeStartupAssertion(page, 'Ready', () => expect(page.getByRole('status')).toHaveText('Ready'));
   const slider = page.getByRole('slider', { name: 'Tree opacity (unit behind)' });
   await expect(slider).toHaveAttribute('min', '0');
   await expect(slider).toHaveAttribute('max', '100');

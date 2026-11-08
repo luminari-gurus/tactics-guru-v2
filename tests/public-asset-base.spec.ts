@@ -1,4 +1,4 @@
-import { expect, railTest as test } from './helpers/startupDiagnostics';
+import { expect, observeStartupAssertion, railTest as test } from './helpers/startupDiagnostics';
 import { battleCatalog } from '../src/content/catalog';
 import { standaloneCatalog } from './helpers/playerPolicy';
 import { BATTLE_CUES } from '../src/audio/battleCues';
@@ -15,7 +15,7 @@ for (const route of ['', 'run']) test(`collector cold/warm ${route || 'battle'} 
   const target=captureTarget(parseMeasureArgs(['--scene=battle','--url',new URL(route,baseURL!).href],{}));
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
   await navigateCapture(page,target,'cold');
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await observeStartupAssertion(page, 'player', () => expect(page.locator('#game')).toHaveAttribute('data-phase','player'));
   const cold=await page.evaluate(()=>window.fitDiagnostics());
   expect(cold.controlsUsableMs).not.toBeNull();
   const point=await battleGesturePoint(page);
