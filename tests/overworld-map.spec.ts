@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, plainTest as test, type Page } from './helpers/startupDiagnostics';
 import { createOverworld } from '../src/map/state';
 import { generateMap, type MapType } from '../src/map/generate';
 import { applyBiome, type Biome } from '../src/map/biomes';
