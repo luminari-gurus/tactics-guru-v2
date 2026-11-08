@@ -68,6 +68,7 @@ test('main menu: failed gameplay imports retain visible recovery without proof t
 });
 
 test('main menu: application import failure preserves battle saves and reload resumes without historical effects',async({page,browserName,applicationLoadDiagnostics},info)=>{
+ test.skip(process.env.PLAYWRIGHT_SERVER_MODE==='dev','Requires emitted production chunks and the build manifest.');
  // Reach a real accepted High Shot boundary, retaining different valid primary
  // and backup bytes so a reload cannot silently replace either saved slot.
  const session=new BattleSession(battleCatalog,'map:forest_ruins',2);
