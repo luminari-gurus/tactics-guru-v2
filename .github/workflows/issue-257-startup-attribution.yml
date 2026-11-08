@@ -42,33 +42,31 @@ jobs:
             cpuCount: os.availableParallelism(), loadAverage: os.loadavg(), freeMemoryBytes: os.freemem(),
           }, null, 2));
           JS
-      - name: Build and hash the root preview
-        id: build
-        run: |
-          npm run build
-          find dist -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum | sha256sum > verification-receipts/issue-257/dist.sha256
-      - name: Repeat the two original landscape preview witnesses
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: >-
-          npm run test:browser -- -c playwright.regression.config.ts tests/opacity.spec.ts tests/overworld-map.spec.ts
-          --project=mobile-landscape --workers=1 --repeat-each=5
-          -g 'opacity slider previews|failed route import at / shows a reload instruction' --diagnostics
-      - name: Repeat the original desktop cold battle witness in root development
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+      - name: Capture five desktop battles from fresh Vite servers and optimizer caches
         env:
           PLAYWRIGHT_SERVER_MODE: dev
-        run: >-
-          npm run test:browser -- -c playwright.regression.config.ts tests/public-asset-base.spec.ts
-          --project=desktop --workers=1 --repeat-each=5
-          -g 'collector cold/warm battle uses real controls and preserves saved games' --diagnostics
-      - name: Repeat the desktop cold battle control in root preview
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        env:
-          PLAYWRIGHT_SERVER_MODE: preview
-        run: >-
-          npm run test:browser -- -c playwright.regression.config.ts tests/public-asset-base.spec.ts
-          --project=desktop --workers=1 --repeat-each=5
-          -g 'collector cold/warm battle uses real controls and preserves saved games' --diagnostics
+        run: |
+          cache_dir="$PWD/node_modules/.vite"
+          trials=verification-receipts/issue-257/trials.tsv
+          printf 'trial\tstarted_at\texit_code\toptimizer_metadata_created\n' > "$trials"
+          failed=0
+          for trial in 1 2 3 4 5; do
+            echo "::group::Cold Vite trial $trial"
+            # Playwright starts and stops its own server for each invocation.
+            rm -rf -- "$cache_dir"
+            test ! -e "$cache_dir" && test ! -L "$cache_dir" || exit 1
+            started_at="$(date -u +%FT%TZ)"
+            status=0
+            npm run test:browser -- -c playwright.regression.config.ts tests/public-asset-base.spec.ts \
+              --project=desktop --workers=1 \
+              -g 'collector cold/warm battle uses real controls and preserves saved games' --diagnostics || status=$?
+            optimized=no
+            if test -f "$cache_dir/deps/_metadata.json"; then optimized=yes; fi
+            printf '%s\t%s\t%s\t%s\n' "$trial" "$started_at" "$status" "$optimized" >> "$trials"
+            echo "::endgroup::"
+            if test "$status" -ne 0; then failed=1; fi
+          done
+          exit "$failed"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
