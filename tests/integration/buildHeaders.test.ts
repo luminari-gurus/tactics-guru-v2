@@ -57,6 +57,12 @@ for (const base of ['/', '/tactics/']) {
       expect(preloads(base, `?game=${mode}&scene=unknown&scene=proof`)).toEqual(direct);
       expect(preloads(base.replace(/\/$/, ''), `?game=${mode}`)).toEqual(direct);
     }
+    const battleEntry = code.find(file => file.type === 'chunk' &&
+      file.facadeModuleId?.replaceAll('\\', '/').endsWith('/src/app/startBattleApp.ts'));
+    if (!battleEntry) throw new Error('Missing built battle entry');
+    const battleHints = preloads(`${base}battle`);
+    expect(battleHints.some(link => link.href === base + battleEntry.fileName)).toBe(false);
+    expect(battleHints.some(link => link.rel === 'modulepreload' && link.href.includes('/assets/start-'))).toBe(true);
     for (const scene of ['battle', 'proof', 'content-smoke']) {
       const diagnostic = preloads(base, `?scene=${scene}`);
       expect(diagnostic.length).toBeGreaterThan(0);

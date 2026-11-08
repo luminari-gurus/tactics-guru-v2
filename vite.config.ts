@@ -24,6 +24,10 @@ const phaserDefines = {
   global: 'globalThis',
 };
 
+// WebKit can retain a failed modulepreload across reloads (bug 270357).
+// Let the battle entry's import own its request while keeping dependency hints.
+const battleEntryChunk = /^assets\/startBattleApp-[\w-]{8}\.js$/;
+
 /** Start only the selected game route's required requests while its entry script loads. */
 function gamePreloads(): Plugin {
   let base = '/', nonce: string | undefined;
@@ -73,9 +77,11 @@ function gamePreloads(): Plugin {
         entries.forEach(visit);
         return {js: [...js], css: [...css]};
       };
+      const battleEntry = entry('src/app/startBattleApp.ts');
+      const battle = dependencies([battleEntry, entry('src/phaser/start.ts')]);
       const plan = {
         base,
-        battle: dependencies([entry('src/app/startBattleApp.ts'), entry('src/phaser/start.ts')]),
+        battle: { ...battle, js: battle.js.filter(file => file !== battleEntry) },
         run: dependencies([entry('src/app/startRunApp.ts')]),
         images: Object.values(battleAssets).map(asset => imageUrls[asset.runtimePath].slice(1)),
         runImages: Object.values(imageUrls).map(path => path.slice(1)),
@@ -90,7 +96,12 @@ function gamePreloads(): Plugin {
 
 export default defineConfig({
   plugins: [gamePreloads()],
-  build: { sourcemap: process.env.POSTHOG_SOURCEMAPS === 'true' ? 'hidden' : false },
+  build: {
+    sourcemap: process.env.POSTHOG_SOURCEMAPS === 'true' ? 'hidden' : false,
+    modulePreload: {
+      resolveDependencies: (_filename, dependencies) => dependencies.filter(file => !battleEntryChunk.test(file)),
+    },
+  },
   resolve: { alias: [{ find: /^phaser$/, replacement: phaserArcade }] },
   // Vite's dev dependency optimizer does not inherit the top-level define map.
   optimizeDeps: { rolldownOptions: { transform: { define: phaserDefines } } },

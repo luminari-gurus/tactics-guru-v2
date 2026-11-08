@@ -55,6 +55,12 @@ jobs:
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: |
           npm run test:browser -- -c playwright.device-acceptance.config.ts tests/main-menu.spec.ts -g 'main menu: application import failure preserves battle saves and reload resumes without historical effects' --diagnostics
+      - name: Verify retained battle startup hints at root and prefix
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          npm run test:browser -- -c playwright.regression.config.ts tests/public-asset-base.spec.ts -g 'built startup hints preserve a supplied script nonce' --diagnostics
+          npm run build:bundle -- --base=/tactics/
+          PLAYWRIGHT_BASE_PATH=/tactics/ npm run test:browser -- -c playwright.prefix-assets.config.ts tests/public-asset-base.spec.ts -g 'built startup hints preserve a supplied script nonce' --diagnostics
       - uses: actions/upload-artifact@v4
         if: always()
         with:

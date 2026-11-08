@@ -127,6 +127,7 @@ test('main menu: application import failure preserves battle saves and reload re
   expect(resumed.continuation).toEqual({snapshot:saved.state,commands:[],events:[]});expect(resumed.pending).toBeNull();
   expect(JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).effect).toBeNull();
   expect(await stored()).toEqual(bytes);expect(errors).toEqual([]);
+  await expect(page.locator('link[rel="modulepreload"][href*="/assets/startBattleApp-"]')).toHaveCount(0);
   recoveryVerified=true;
  } finally {
   page.off('response',observeEntryResponse);
