@@ -2,7 +2,8 @@ import { dungeonContent } from '../src/content/dungeon';
 import { walkDungeon, reenterDungeonStair, continueSavedDungeon } from './helpers/dungeonTraversal';
 import { atEncounter, atStairApproach } from './helpers/dungeonFixtures';
 import { expect,railTest as test,type Page } from './helpers/dungeonEntropy';
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
+import type { Locator } from '@playwright/test';
 import { dungeonCapacityFixture, dungeonVictoryBoundary } from './helpers/dungeonFixtures';
 import { dungeonBattle, startDungeonBattle, acceptDungeonBattle, freshDungeon, type DungeonState } from '../src/domain/dungeon';
 import { progressHero } from '../src/domain/progression';
@@ -13,6 +14,7 @@ import { readSession,playCommand,playUndo } from './helpers/battlePolicy';
 import { playerDecision, fighterDecision } from './helpers/playerPolicy';
 import { journeyPreparation, healedFighterBoundary, shamanJourney } from './helpers/dungeonFixtures';
 import { dispatch } from '../src/domain/turns';
+import { previewMovement } from '../src/domain/grid';
 import { generateMap } from '../src/map/generate';
 import type { Command, BattleEvent } from '../src/domain/types';
 
@@ -91,6 +93,108 @@ for(const saved of [false,true])(saved?test.extend({pinDungeonSeed:27}):fixedSee
  await reenterDungeonStair(page,'ascend',isMobile?'touch':'keyboard');
  const returned=await snapshot(page);expect(returned.depth).toBe(1);expect(returned.floors[0].completed).toBe(3);expect(returned.party).toEqual(cleared.party);expect(returned.ownership).toEqual(cleared.ownership);
  await expect(page.getByRole('button',{name:'Save recovery',exact:true})).toHaveCount(saved?1:0);expect(errors).toEqual([]);
+});
+
+// Use the same legal New Game seed as the complete saved first-floor journey above.
+test.extend({pinDungeonSeed:27})('saved dungeon downloads only after explicit recovery export',async({page,isMobile})=>{
+ test.setTimeout(120000);
+ const downloads:string[]=[];
+ page.on('download',download=>downloads.push(download.suggestedFilename()));
+ const activate=async(control:Locator)=>{if(isMobile)await control.tap();else await control.click();};
+ const stored=()=>page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),DUNGEON_KEYS);
+ const dialog=page.getByRole('dialog'),recovery=page.getByRole('button',{name:'Save recovery',exact:true});
+
+ await test.step('ordinary exploration, accepted movement and an enemy turn never download',async()=>{
+  await page.goto('./');await activate(page.getByRole('button',{name:'New Game',exact:true}));
+  await expect(page.locator('#dungeon-map')).toBeVisible();
+  expect((await snapshot(page)).seed).toBe(28);
+  await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const before=await readSession(page),actor=before.state.initiative[before.state.activeIndex];
+  const reach=previewMovement(before.state,actor,dungeonBattle(await snapshot(page))!.catalog);
+  if(!reach.ok)throw Error(reach.reason);
+  const destination=reach.cells.find(cell=>cell.cost>0);
+  if(!destination)throw Error('Legal opening battle has no movement destination');
+  await activate(page.locator('#battle-move'));
+  await page.locator('#battle-target').selectOption(`${destination.cell.x},${destination.cell.y}`);
+  await activate(page.locator('#battle-review'));
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const moved=await readSession(page);
+  expect(moved.state.commandCount).toBe(before.state.commandCount+1);
+  expect(moved.state.units.find(unit=>unit.id===actor)?.cell).toEqual(destination.cell);
+  expect(downloads).toEqual([]);
+
+  const enemies=new Set(before.state.units.filter(unit=>unit.side==='enemy').map(unit=>unit.id));
+  let enemyTurn=false;
+  for(let turn=0;turn<before.state.initiative.length&&!enemyTurn;turn++){
+   const previous=await readSession(page);
+   await activate(page.getByRole('button',{name:'Wait / End turn',exact:true}));
+   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+   const current=await readSession(page);
+   expect(current.state.commandCount).toBeGreaterThan(previous.state.commandCount);
+   enemyTurn=current.events.slice(previous.events.length).some(event=>event.type==='turnStarted'&&enemies.has(event.unitId));
+   expect(downloads).toEqual([]);
+  }
+  expect(enemyTurn,'the legal witness must cross an enemy turn and return to player control').toBe(true);
+ });
+
+ const saved=await stored(),boundary=await snapshot(page),battle=(await readSession(page)).state;
+ expect(saved.primary).not.toBeNull();expect(saved.backup).not.toBeNull();
+ const unchanged=async()=>{
+  expect(await stored()).toEqual(saved);
+  expect(await snapshot(page)).toEqual(boundary);
+  expect((await readSession(page)).state).toEqual(battle);
+ };
+ await test.step('reload and Continue preserve the accepted boundary without downloading',async()=>{
+  await page.reload();await continueSavedDungeon(page);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await unchanged();expect(downloads).toEqual([]);
+ });
+
+ await test.step('native pointer or touch recovery open, close and removal cancel never download',async()=>{
+  await activate(recovery);await expect(dialog).toHaveAccessibleName('Dungeon save recovery');
+  await activate(page.locator('#dungeon-close-recovery'));await expect(dialog).not.toBeVisible();
+  await activate(recovery);await activate(page.locator('#dungeon-remove-primary'));
+  await expect(dialog).toHaveAccessibleName('Remove reviewed save?');
+  await activate(page.locator('#dungeon-remove-cancel'));await expect(dialog).toHaveAccessibleName('Dungeon save recovery');
+  await activate(page.locator('#dungeon-close-recovery'));await expect(dialog).not.toBeVisible();
+  await unchanged();expect(downloads).toEqual([]);
+ });
+
+ for(const key of ['Enter','Space'])await test.step(`held ${key} cannot activate export across recovery or dialog replacement`,async()=>{
+  await recovery.focus();await page.keyboard.down(key);
+  if(key==='Enter')await expect(dialog).toHaveAccessibleName('Dungeon save recovery');
+  else await expect(dialog).not.toBeVisible(); // Native Space activates on release.
+  await page.keyboard.down(key);await page.keyboard.down(key);await page.keyboard.up(key);
+  await expect(dialog).toHaveAccessibleName('Dungeon save recovery');
+  await expect(dialog.locator('button').first()).toBeFocused();
+  await unchanged();expect(downloads).toEqual([]);
+
+  await activate(page.locator('#dungeon-remove-primary'));
+  await expect(dialog).toHaveAccessibleName('Remove reviewed save?');
+  await page.locator('#dungeon-remove-cancel').focus();await page.keyboard.down(key);
+  await expect(dialog).toHaveAccessibleName(key==='Enter'?'Dungeon save recovery':'Remove reviewed save?');
+  await page.keyboard.down(key);await page.keyboard.down(key);await page.keyboard.up(key);
+  await expect(dialog).toHaveAccessibleName('Dungeon save recovery');
+  await expect(dialog.locator('button').first()).toBeFocused();
+  await page.keyboard.press('Escape');await expect(dialog).not.toBeVisible();
+  await unchanged();expect(downloads).toEqual([]);
+ });
+
+ await test.step('one explicit export downloads the exact reviewed bytes without changing saves or state',async()=>{
+  await activate(recovery);await expect(dialog).toHaveAccessibleName('Dungeon save recovery');
+  const exportPrimary=page.getByRole('button',{name:'Export primary save',exact:true});
+  const exportId=await exportPrimary.getAttribute('id');expect(exportId).toMatch(/^dungeon-export-\d+$/);
+  const expectedName=`tactics-guru-dungeon-${exportId!.replace('dungeon-export-','')}.json`;
+  expect(downloads).toEqual([]);
+  const pending=page.waitForEvent('download');await activate(exportPrimary);
+  const download=await pending,file=await download.path();
+  expect(file).not.toBeNull();expect(await download.failure()).toBeNull();
+  expect(download.suggestedFilename()).toBe(expectedName);
+  expect(readFileSync(file!,'utf8')).toBe(saved.primary);
+  await expect(dialog).not.toBeVisible();await unchanged();
+  expect(downloads).toEqual([expectedName]);
+ });
 });
 
 test('new dungeons use fresh layouts across reloads and saved dungeons retain theirs',async({page})=>{
