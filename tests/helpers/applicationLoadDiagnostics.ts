@@ -1,6 +1,7 @@
 import type { Page, TestInfo } from '@playwright/test';
+import { readFile } from 'node:fs/promises';
 import { performance } from 'node:perf_hooks';
-import { APPLICATION_LOAD_FAILURE_EVENT, readApplicationLoadFailure, type ApplicationLoadFailure } from '../../src/diagnostics/applicationLoadFailure';
+import { APPLICATION_LOAD_FAILURE_EVENT, APPLICATION_LOAD_FILES_MANIFEST, readApplicationLoadFailure, type ApplicationLoadFailure } from '../../src/diagnostics/applicationLoadFailure';
 import { startStartupDiagnostics } from './startupObserver';
 
 export interface CapturedApplicationLoadFailure extends ApplicationLoadFailure { elapsedMs: number }
@@ -9,15 +10,27 @@ export interface ApplicationLoadDiagnostics {
   finalize(): Promise<void>;
 }
 
+async function readBuildFiles(): Promise<ReadonlySet<string>> {
+  if (process.env.PLAYWRIGHT_SERVER_MODE === 'dev') return new Set();
+  try {
+    const manifest = await readFile(new URL(`../../dist/${APPLICATION_LOAD_FILES_MANIFEST}`, import.meta.url), 'utf8');
+    return new Set<string>(JSON.parse(manifest));
+  } catch {
+    // Dev runs and missing build metadata still retain the fixed source labels.
+    return new Set();
+  }
+}
+
 /** Keep caught import failures across reloads, including when the page clock is paused. */
 export async function startApplicationLoadDiagnostics(page: Page, info: TestInfo): Promise<ApplicationLoadDiagnostics> {
-  const finishStartup = await startStartupDiagnostics(page, info), started = performance.now();
+  const buildFiles = await readBuildFiles();
+  const finishStartup = await startStartupDiagnostics(page, info, buildFiles), started = performance.now();
   const failures: CapturedApplicationLoadFailure[] = [];
   let finalized = false;
   const binding = '__tacticsCaptureApplicationLoadFailure';
   try {
     await page.exposeBinding(binding, (_source, value: unknown) => {
-      const detail = readApplicationLoadFailure(value);
+      const detail = readApplicationLoadFailure(value, buildFiles);
       if (finalized || !detail) return;
       if (failures.length === 16) failures.shift();
       failures.push({ elapsedMs: performance.now() - started, ...detail });

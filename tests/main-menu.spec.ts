@@ -67,7 +67,7 @@ test('main menu: failed gameplay imports retain visible recovery without proof t
  expect(errors).toEqual([]);
 });
 
-test('main menu: application import failure preserves battle saves and reload resumes without historical effects',async({page,applicationLoadDiagnostics},info)=>{
+test('main menu: application import failure preserves battle saves and reload resumes without historical effects',async({page,browserName,applicationLoadDiagnostics},info)=>{
  // Reach a real accepted High Shot boundary, retaining different valid primary
  // and backup bytes so a reload cannot silently replace either saved slot.
  const session=new BattleSession(battleCatalog,'map:forest_ruins',2);
@@ -113,7 +113,13 @@ test('main menu: application import failure preserves battle saves and reload re
   await expect(page.getByRole('alert')).toBeVisible();await expect(page.locator('#save-continue')).toHaveCount(0);
   expect(await stored()).toEqual(bytes);
   await expect.poll(()=>applicationLoadDiagnostics.failures().length).toBe(1);
-  expect(applicationLoadDiagnostics.failures()[0]).toMatchObject({route:'battle',name:'TypeError',category:'module-fetch'});
+  const [failure]=applicationLoadDiagnostics.failures();
+  expect(failure).toMatchObject({route:'battle',name:'TypeError',category:'module-fetch'});
+  // Chromium includes the failed module URL in the caught error. Check that
+  // both the browser and host allowlists retain the real emitted filename.
+  if(browserName==='chromium'){
+   expect(failure.frames).toEqual(expect.arrayContaining([{file:faultServer.receipt().assets[0].file}]));
+  }
   // The error path stays inert. Recovery remains the user's explicit reload and
   // Continue, with the paused-clock interaction from the original failing test.
   const allowedBeforeRecovery=faultServer.receipt().allowed;faultServer.allowImport();

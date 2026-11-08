@@ -17,7 +17,7 @@ const failureTokens = ['ERR_ABORTED', 'ERR_FAILED', 'ERR_INTERNET_DISCONNECTED',
   'Failed to fetch dynamically imported module', 'Unable to preload CSS', 'Load failed'];
 
 /** Retain only build-owned filenames or exact dev entries inside the configured base. */
-function asset(raw: string, base: URL | undefined): string {
+function asset(raw: string, base: URL | undefined, buildFiles?: ReadonlySet<string>): string {
   try {
     const url = new URL(raw);
     if (!base || url.origin !== base.origin || url.pathname.length > 256) return '[other]';
@@ -25,8 +25,9 @@ function asset(raw: string, base: URL | undefined): string {
     const prefix = base.pathname.endsWith('/') ? base.pathname : `${base.pathname}/`;
     if (!path.startsWith(prefix)) return '[other]';
     const relative = `/${path.slice(prefix.length)}`;
-    return /^\/assets\/[A-Za-z0-9_-]+-[A-Za-z0-9_-]{8}\.(?:js|css)$/.test(relative)
-      || developmentPaths.has(relative) ? relative : '[other]';
+    const built = buildFiles ? buildFiles.has(relative.slice(1))
+      : /^\/assets\/[A-Za-z0-9_-]+-[A-Za-z0-9_-]{8}\.(?:js|css)$/.test(relative);
+    return built || developmentPaths.has(relative) ? relative : '[other]';
   } catch { return '[other]'; }
 }
 
@@ -59,9 +60,9 @@ function samples(value: unknown): Record<string, unknown>[] {
  * The caller owns its fixtures; finalize in finally after use(). Only unexpected
  * failures receive an attachment. Host sampling uses Node time, never page.clock.
  */
-export async function startStartupDiagnostics(page: Page, info: TestInfo): Promise<() => Promise<void>> {
+export async function startStartupDiagnostics(page: Page, info: TestInfo, buildFiles?: ReadonlySet<string>): Promise<() => Promise<void>> {
   const base = typeof info.project.use.baseURL === 'string' ? new URL(info.project.use.baseURL) : undefined;
-  const assetPath = (raw: string) => asset(raw, base);
+  const assetPath = (raw: string) => asset(raw, base, buildFiles);
   const started = hostClock.now();
   const elapsed = () => hostClock.now() - started;
   const events: Record<string, unknown>[] = [];

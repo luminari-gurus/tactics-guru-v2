@@ -5,6 +5,7 @@ import { createHash } from 'node:crypto';
 import { battleAssets } from '../../src/content/assets';
 import { desertAssets } from '../../src/content/desertAssets';
 import { runInNewContext } from 'node:vm';
+import { APPLICATION_LOAD_FILES_MANIFEST, APPLICATION_LOAD_FILES_META } from '../../src/diagnostics/applicationLoadFailure';
 
 for (const base of ['/', '/tactics/']) {
   test(`built cache rules cover only versioned code and unchanged battle images at ${base}`, async () => {
@@ -39,6 +40,11 @@ for (const base of ['/', '/tactics/']) {
     expect(result.output.some(file => file.fileName === 'index.html')).toBe(true);
     const html = result.output.find(file => file.fileName === 'index.html');
     if (html?.type !== 'asset') throw new Error('Missing HTML');
+    const manifest = result.output.find(file => file.fileName === APPLICATION_LOAD_FILES_MANIFEST);
+    if (manifest?.type !== 'asset') throw new Error('Missing application load file manifest');
+    expect(JSON.parse(String(manifest.source))).toEqual(code.map(file => file.fileName).sort());
+    const metaFiles = String(html.source).match(new RegExp(`<meta name="${APPLICATION_LOAD_FILES_META}" content="([^"]+)"`))?.[1];
+    expect(metaFiles?.split(' ')).toEqual(code.filter(file => file.type === 'chunk').map(file => file.fileName).sort());
     const script = String(html.source).match(/<script[^>]*data-game-preloads[^>]*>([\s\S]*?)<\/script>/)?.[1];
     if (!script) throw new Error('Missing route preloader');
     const preloads = (pathname: string, search = '') => {

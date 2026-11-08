@@ -1,8 +1,9 @@
 import { afterEach, expect, it, vi } from 'vitest';
-import { APPLICATION_LOAD_FAILURE_EVENT, describeApplicationLoadFailure, readApplicationLoadFailure, reportApplicationLoadFailure } from '../../src/diagnostics/applicationLoadFailure';
+import { APPLICATION_LOAD_FAILURE_EVENT, APPLICATION_LOAD_FILES_META, describeApplicationLoadFailure, readApplicationLoadFailure, reportApplicationLoadFailure } from '../../src/diagnostics/applicationLoadFailure';
 import { bindTelemetry } from '../../src/telemetry/telemetry';
 
 afterEach(() => { bindTelemetry(); vi.unstubAllGlobals(); });
+const buildFiles = new Set(['assets/startBattleApp-12345678.js', 'assets/main-abcdefgh.js', 'assets/main-12345678.js']);
 
 it('retains the import category and build-owned frame locations without raw error or URL data', () => {
   const error = {
@@ -14,12 +15,22 @@ it('retains the import category and build-owned frame locations without raw erro
       + 'at https://game.invalid/prototype/private/PRIVATE.js:1:2',
     cause: { save: 'PRIVATE' }, save: 'PRIVATE',
   };
-  const result = describeApplicationLoadFailure(error, 'battle', 'https://game.invalid', '/prototype/');
+  const result = describeApplicationLoadFailure(error, 'battle', 'https://game.invalid', '/prototype/', buildFiles);
   expect(result).toEqual({ route: 'battle', name: 'TypeError', category: 'module-fetch', frames: [
     { file: 'assets/startBattleApp-12345678.js' }, { file: 'assets/main-abcdefgh.js', line: 41, column: 9 },
     { file: 'assets/main-abcdefgh.js' },
   ] });
   expect(JSON.stringify(result)).not.toMatch(/PRIVATE|https?:|secretFunction|cause|save/);
+});
+
+it('rejects same-origin chunk lookalikes in both error text and event frames', () => {
+  const file = 'assets/PRIVATE_SAVE_TOKEN-Abc12345.js';
+  const url = `https://game.invalid/${file}`;
+  const detail = { route: 'battle', name: 'Error', category: 'other', frames: [] };
+  expect(describeApplicationLoadFailure({ message: url, stack: `at ${url}:4:2` },
+    'battle', 'https://game.invalid', '/', buildFiles)).toEqual(detail);
+  expect(readApplicationLoadFailure({ ...detail, frames: [{ file }] }, buildFiles)).toEqual(detail);
+  expect(readApplicationLoadFailure({ ...detail, frames: [{ file: 'assets/main-12345678.js' }] })).toEqual(detail);
 });
 
 it('classifies browser module failures and CSS preload failures without depending on Vite production events', () => {
@@ -43,14 +54,15 @@ it('uses only fixed development entry labels and drops arbitrary source paths an
 
 it('bounds and deduplicates frames, tolerates hostile getters and never reads causes or arbitrary fields', () => {
   const stack = Array.from({ length: 30 }, (_, i) => `https://game.invalid/assets/chunk${i}-12345678.js:1:2`).join('\n');
+  const emitted = new Set(Array.from({ length: 30 }, (_, i) => `assets/chunk${i}-12345678.js`));
   const error = { name: 'PRIVATE', message: 'PRIVATE', stack: stack.split('\n')[0] + '\n' + stack };
   Object.defineProperty(error, 'cause', { get() { throw Error('must not inspect causes'); } });
-  const result = describeApplicationLoadFailure(error, 'battle', 'https://game.invalid');
+  const result = describeApplicationLoadFailure(error, 'battle', 'https://game.invalid', '/', emitted);
   expect(result.frames).toHaveLength(8); expect(new Set(result.frames.map(f => f.file)).size).toBe(8);
   expect(result.name).toBe('Error'); expect(result.category).toBe('other');
   const hostile = new Proxy({}, { get() { throw Error('PRIVATE'); } });
   expect(describeApplicationLoadFailure(hostile, 'battle', 'https://game.invalid')).toEqual({ route: 'battle', name: 'Error', category: 'other', frames: [] });
-  expect(describeApplicationLoadFailure({ stack: 'x'.repeat(6000) + stack }, 'battle', 'https://game.invalid').frames).toEqual([]);
+  expect(describeApplicationLoadFailure({ stack: 'x'.repeat(6000) + stack }, 'battle', 'https://game.invalid', '/', emitted).frames).toEqual([]);
 });
 
 it('rebuilds local event data from a closed bounded schema before retaining it', () => {
@@ -60,13 +72,13 @@ it('rebuilds local event data from a closed bounded schema before retaining it',
     { file: 'https://game.invalid/assets/main-12345678.js?PRIVATE' },
     { file: 'dev:PRIVATE' },
   ] };
-  expect(readApplicationLoadFailure(input)).toEqual({ route: 'battle', name: 'TypeError', category: 'module-fetch', frames: [
+  expect(readApplicationLoadFailure(input, buildFiles)).toEqual({ route: 'battle', name: 'TypeError', category: 'module-fetch', frames: [
     { file: 'assets/main-12345678.js', line: 4, column: 8 }, { file: 'dev:main' },
   ] });
   expect(readApplicationLoadFailure({ ...input, route: 'PRIVATE' })).toBeNull();
   expect(readApplicationLoadFailure({ ...input, name: 'PRIVATE' })).toBeNull();
   expect(readApplicationLoadFailure({ ...input, category: 'PRIVATE' })).toBeNull();
-  expect(readApplicationLoadFailure({ ...input, frames: Array(100).fill(input.frames[0]) })?.frames).toHaveLength(8);
+  expect(readApplicationLoadFailure({ ...input, frames: Array(100).fill(input.frames[0]) }, buildFiles)?.frames).toHaveLength(8);
   expect(readApplicationLoadFailure(new Proxy({}, { get() { throw Error('PRIVATE'); } }))).toBeNull();
 });
 
@@ -81,7 +93,7 @@ it('validates and retains the same primitive snapshot when event getters change 
   ));
   const entry = changing('frame', { file: 'assets/main-12345678.js', line: 4, column: 8 });
   const input = changing('event', { route: 'battle', name: 'TypeError', category: 'module-fetch', frames: [entry] });
-  const result = readApplicationLoadFailure(input);
+  const result = readApplicationLoadFailure(input, buildFiles);
   expect(result).toEqual({ route: 'battle', name: 'TypeError', category: 'module-fetch', frames: [
     { file: 'assets/main-12345678.js', line: 4, column: 8 },
   ] });
@@ -94,10 +106,13 @@ it('emits one local notification independently of telemetry, storage and network
   const target = new EventTarget(), received: unknown[] = [], network = vi.fn(), telemetry = vi.fn(), storage = vi.fn();
   target.addEventListener(APPLICATION_LOAD_FAILURE_EVENT, event => received.push((event as CustomEvent).detail));
   vi.stubGlobal('window', target); vi.stubGlobal('location', { origin: 'https://game.invalid' });
+  const querySelector = vi.fn(() => ({ content: [...buildFiles].join(' ') }));
+  vi.stubGlobal('document', { querySelector });
   vi.stubGlobal('fetch', network); vi.stubGlobal('localStorage', { getItem: storage, setItem: storage });
   bindTelemetry({ event: telemetry, error: telemetry });
-  reportApplicationLoadFailure(new TypeError('Importing a module script failed.'), 'battle');
-  expect(received).toEqual([{ route: 'battle', name: 'TypeError', category: 'module-fetch', frames: [] }]);
+  reportApplicationLoadFailure(new TypeError('Failed to fetch dynamically imported module: https://game.invalid/assets/startBattleApp-12345678.js'), 'battle');
+  expect(querySelector).toHaveBeenCalledWith(`meta[name="${APPLICATION_LOAD_FILES_META}"]`);
+  expect(received).toEqual([{ route: 'battle', name: 'TypeError', category: 'module-fetch', frames: [{ file: 'assets/startBattleApp-12345678.js' }] }]);
   expect(network).not.toHaveBeenCalled(); expect(telemetry).not.toHaveBeenCalled(); expect(storage).not.toHaveBeenCalled();
   vi.stubGlobal('window', { dispatchEvent() { throw Error('diagnostic receiver failed'); } });
   expect(() => reportApplicationLoadFailure(new Error('PRIVATE'), 'battle')).not.toThrow();
