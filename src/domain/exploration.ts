@@ -31,11 +31,11 @@ const union = (a: readonly number[], b: readonly number[]) => [...new Set([...a,
 export function visit(exploration: Exploration, position: number, width = 20, height = width): Exploration {
   return { ...exploration, revealed: union(exploration.revealed, reveal(position, width, height)), visited: union(exploration.visited, [position]) };
 }
-export function encounterPois(seed: number, map: GeneratedMap = generateMap(seed, 'rooms')): EncounterPoi[] {
+export function encounterPois(seed: number, map: GeneratedMap = generateMap(seed, 'rooms'), reserved: readonly number[] = []): EncounterPoi[] {
   if (!validMapCells(map.cells, map.width, map.height, map.type === 'arena')) throw Error('Invalid exploration geometry');
   const first = map.cells.indexOf(1), last = map.cells.lastIndexOf(1);
   const candidates: number[] = [];
-  map.cells.forEach((cell,i) => { if (cell && i !== first && i !== last) candidates.push(i); });
+  map.cells.forEach((cell,i) => { if (cell && i !== first && i !== last && !reserved.includes(i)) candidates.push(i); });
   if (candidates.length < 3) throw Error('Insufficient encounter cells');
   let rng = seedRng(Number.parseInt(hashJson({ seed, policy: EXPLORATION_VERSION }).slice(-8),16));
   return [0,1,2].map(encounterSlot => {
@@ -49,6 +49,14 @@ export function encounterPois(seed: number, map: GeneratedMap = generateMap(seed
 export const poiCell = (poi: EncounterPoi, width = 20) => poi.y * width + poi.x;
 export function freshExploration(seed: number, position: number, map = generateMap(seed)): Exploration {
   return visit({ version: EXPLORATION_VERSION, pois: encounterPois(seed, map), revealed: [], visited: [] }, position, map.width, map.height);
+}
+export function freshArrivalExploration(seed: number, upstairs: number, map: GeneratedMap): Exploration {
+  const initial = freshExploration(seed, upstairs, map);
+  const landing = neighbors(upstairs, map.width, map.height);
+  if (!initial.pois.some(poi => landing.includes(poiCell(poi, map.width)))) return initial;
+  // Exploration v1 saves require the original seeded positions. Store adjusted
+  // positions in the existing movable format, without changing either save reader.
+  return movableExploration({ ...initial, pois: encounterPois(seed, map, landing) }, seed, 0, 'ready');
 }
 /** Upgrade only validated legacy floors; their original ordering is their cleared set. */
 export function movableExploration(exploration: Exploration, seed: number, completed: number, phase: string): Exploration {

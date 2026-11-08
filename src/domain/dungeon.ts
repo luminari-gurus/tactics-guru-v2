@@ -1,6 +1,6 @@
 import { awardHero, progressHero, readProgressHero } from './progression';
 import { HERO_PROGRESSION } from '../content/progression';
-import { freshExploration, readExploration, movableExploration, visit, poiCell, neighbors, type Exploration } from './exploration';
+import { freshArrivalExploration, freshExploration, readExploration, movableExploration, visit, poiCell, neighbors, type Exploration } from './exploration';
 import { HERO_IDS } from '../content/constants';
 import { dungeonContent, DUNGEON_TEMPLATE } from '../content/dungeon';
 import type { ItemCatalog, ItemOwnership } from '../content/itemTypes';
@@ -267,7 +267,7 @@ export function travelDungeon(s: DungeonState, direction: 'ascend' | 'descend', 
   floors[s.depth - 1] = { ...current, position: direction === 'descend' ? current.descriptor.downstairs : current.descriptor.upstairs };
   if (depth > floors.length) {
     const descriptor = floorDescriptor(s.seed, depth, undefined, s.encounterPolicy);
-    floors = [...floors, { descriptor, position: descriptor.upstairs, completed: 0, exploration: freshExploration(descriptor.seed, descriptor.upstairs, floorMap(descriptor)) }];
+    floors = [...floors, { descriptor, position: descriptor.upstairs, completed: 0, exploration: freshArrivalExploration(descriptor.seed, descriptor.upstairs, floorMap(descriptor)) }];
   }
   return advance(s, { depth, floors });
 }
