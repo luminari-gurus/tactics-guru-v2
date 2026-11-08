@@ -161,13 +161,33 @@ test.extend({pinDungeonSeed:27})('saved dungeon downloads only after explicit re
   await unchanged();expect(downloads).toEqual([]);
  });
 
+ await test.step('a fresh Enter after opening recovery or cancelling removal cannot export',async()=>{
+  const heading=dialog.getByRole('heading',{name:'Dungeon save recovery'});
+  await recovery.focus();await page.keyboard.press('Enter');
+  await expect(dialog).toHaveAccessibleName('Dungeon save recovery');
+  await expect(heading).toBeFocused();
+  await page.keyboard.press('Enter');await expect(dialog).toHaveAccessibleName('Dungeon save recovery');
+  await page.keyboard.press('Tab');await expect(dialog.getByRole('button').first()).toBeFocused();
+  await page.keyboard.press('Escape');await expect(dialog).not.toBeVisible();
+  await unchanged();expect(downloads).toEqual([]);
+
+  await activate(recovery);await activate(page.locator('#dungeon-remove-primary'));
+  await expect(dialog).toHaveAccessibleName('Remove reviewed save?');
+  await page.locator('#dungeon-remove-cancel').focus();await page.keyboard.press('Enter');
+  await expect(dialog).toHaveAccessibleName('Dungeon save recovery');
+  await expect(heading).toBeFocused();
+  await page.keyboard.press('Enter');await expect(dialog).toHaveAccessibleName('Dungeon save recovery');
+  await page.keyboard.press('Escape');await expect(dialog).not.toBeVisible();
+  await unchanged();expect(downloads).toEqual([]);
+ });
+
  for(const key of ['Enter','Space'])await test.step(`held ${key} cannot activate export across recovery or dialog replacement`,async()=>{
   await recovery.focus();await page.keyboard.down(key);
   if(key==='Enter')await expect(dialog).toHaveAccessibleName('Dungeon save recovery');
   else await expect(dialog).not.toBeVisible(); // Native Space activates on release.
   await page.keyboard.down(key);await page.keyboard.down(key);await page.keyboard.up(key);
   await expect(dialog).toHaveAccessibleName('Dungeon save recovery');
-  await expect(dialog.locator('button').first()).toBeFocused();
+  await expect(dialog.getByRole('heading',{name:'Dungeon save recovery'})).toBeFocused();
   await unchanged();expect(downloads).toEqual([]);
 
   await activate(page.locator('#dungeon-remove-primary'));
@@ -176,7 +196,7 @@ test.extend({pinDungeonSeed:27})('saved dungeon downloads only after explicit re
   await expect(dialog).toHaveAccessibleName(key==='Enter'?'Dungeon save recovery':'Remove reviewed save?');
   await page.keyboard.down(key);await page.keyboard.down(key);await page.keyboard.up(key);
   await expect(dialog).toHaveAccessibleName('Dungeon save recovery');
-  await expect(dialog.locator('button').first()).toBeFocused();
+  await expect(dialog.getByRole('heading',{name:'Dungeon save recovery'})).toBeFocused();
   await page.keyboard.press('Escape');await expect(dialog).not.toBeVisible();
   await unchanged();expect(downloads).toEqual([]);
  });

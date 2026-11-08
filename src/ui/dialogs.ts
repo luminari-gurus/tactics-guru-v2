@@ -41,15 +41,22 @@ export class BattleDialogs {
     choices.push({id:'dialog-restart',label:'Restart battle',run:this.restart});
     this.showChoices(title,message,choices,cancel??(()=>{}));
   }
-  showChoices(title:string,message:string,choices:readonly DialogChoice[],cancel:(()=>void)|null=null) {
+  showChoices(title:string,message:string,choices:readonly DialogChoice[],cancel:(()=>void)|null=null,options:{focusTitle?:boolean}={}) {
     if(!this.open)this.prior=document.activeElement as HTMLElement;
     this.choices=choices;this.cancel=cancel;
-    this.element.querySelector('#battle-dialog-title')!.textContent=title;
+    const heading=this.element.querySelector<HTMLHeadingElement>('#battle-dialog-title')!;
+    heading.textContent=title;
+    heading.toggleAttribute('autofocus', options.focusTitle === true);
+    if(options.focusTitle)heading.tabIndex=-1;
+    else heading.removeAttribute('tabindex');
     this.element.querySelector('#battle-dialog-message')!.textContent=message;
     this.element.querySelector('.fit-controls')!.replaceChildren(...choices.map(choice=>{
       const button=document.createElement('button');button.type='button';button.id=choice.id;button.textContent=choice.label;return button;
     }));
-    this.transition();if(!this.open)this.element.showModal();else this.element.querySelector('button')?.focus();
+    this.transition();
+    if(!this.open)this.element.showModal();
+    else if(options.focusTitle)heading.focus();
+    else this.element.querySelector('button')?.focus();
   }
   dismiss(){if(this.cancel)this.close(this.cancel);}
   close(callback:(()=>void)|null=null){
