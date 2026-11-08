@@ -1,0 +1,70 @@
+name: Issue 258 focused module-load recovery
+on:
+  push:
+    branches: [work/issue-258-module-load-recovery]
+    paths: ['src/**', 'tests/**', 'scripts/**', '*config*', 'package*.json', '.github/workflows/issue-258-module-load-recovery.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: tactics-browser-tactics-browser-02
+  queue: max
+  cancel-in-progress: false
+jobs:
+  recovery:
+    if: github.repository == 'luminari-gurus/tactics-guru-v2' && github.ref == 'refs/heads/work/issue-258-module-load-recovery'
+    runs-on: [self-hosted, tactics-browser, tactics-browser-02]
+    timeout-minutes: 20
+    steps:
+      - name: Check host disposition
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run setup:browsers && npm run check:browsers
+      - name: Record source identity
+        run: |
+          mkdir -p verification-receipts/issue-258
+          node --input-type=module <<'JS'
+          import { writeFileSync } from 'node:fs';
+          import { sourceIdentity } from './scripts/verification-report.mjs';
+          writeFileSync('verification-receipts/issue-258/source.json', JSON.stringify({
+            source: sourceIdentity(process.cwd()), node: process.version, runner: process.env.RUNNER_NAME,
+            conditions: 'Qualified persistent runner; shared host load and caches not independently controlled'
+          }, null, 2));
+          JS
+      - name: Build the application
+        id: build
+        run: npm run build
+      - name: Verify saved-battle failure and recovery on Chromium
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          npm run test:browser -- -c playwright.regression.config.ts tests/main-menu.spec.ts -g 'main menu: application import failure preserves battle saves and reload resumes without historical effects' --diagnostics
+      - name: Capture the original High Shot reload and cancellation witnesses
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          npm run test:browser -- -c playwright.regression.config.ts tests/battle-animations.spec.ts --project=mobile-landscape -g 'high_shot: repeated cancellation, modal refresh, resize and restart during travel and impact|high_shot: reload resumes accepted save without historical effects' --diagnostics
+      - name: Verify saved-battle recovery on WebKit touch profiles
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          npm run test:browser -- -c playwright.device-acceptance.config.ts tests/main-menu.spec.ts -g 'main menu: application import failure preserves battle saves and reload resumes without historical effects' --diagnostics
+      - name: Verify retained battle startup hints at root and prefix
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          npm run test:browser -- -c playwright.regression.config.ts tests/public-asset-base.spec.ts -g 'built startup hints preserve a supplied script nonce' --diagnostics
+          npm run build:bundle -- --base=/tactics/
+          PLAYWRIGHT_BASE_PATH=/tactics/ npm run test:browser -- -c playwright.prefix-assets.config.ts tests/public-asset-base.spec.ts -g 'built startup hints preserve a supplied script nonce' --diagnostics
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-258-recovery-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/
+          retention-days: 14
+          if-no-files-found: warn

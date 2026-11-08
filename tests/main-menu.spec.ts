@@ -1,7 +1,7 @@
 import { generateMap } from '../src/map/generate';
 import { readFileSync } from 'node:fs';
-import { type Page } from '@playwright/test';
-import { test, expect } from './helpers/dungeonEntropy';
+import { type Page, type Response } from '@playwright/test';
+import { test as base, expect } from './helpers/dungeonEntropy';
 import { preparedSnapshot, rewardSnapshot, runContext } from './helpers/runItemFixtures';
 import { encodeRunSave, type RunSnapshot } from '../src/domain/runSaveEnvelope';
 import { readFile } from 'node:fs/promises';
@@ -9,7 +9,19 @@ import { menuFixture, terminalMenuBattle, rewardRunFixture } from './helpers/men
 import { BATTLE_STORAGE_KEYS } from '../src/persistence/battleStorage';
 import { RUN_STORAGE_KEYS } from '../src/persistence/runStorage';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
-import { readSession, reviewDraught } from './helpers/battlePolicy';
+import { readSession, reviewDraught, playerDecision } from './helpers/battlePolicy';
+import { BattleSession } from '../src/app/BattleSession';
+import { encodeBattleSave } from '../src/domain/saveEnvelope';
+import { standaloneCatalog as battleCatalog } from './helpers/playerPolicy';
+import { startApplicationLoadDiagnostics, type ApplicationLoadDiagnostics } from './helpers/applicationLoadDiagnostics';
+import { startBattleModuleFaultServer } from './helpers/battleModuleFaultServer';
+
+const test = base.extend<{ applicationLoadDiagnostics: ApplicationLoadDiagnostics }>({
+ applicationLoadDiagnostics: [async ({page},use,info) => {
+  const diagnostics = await startApplicationLoadDiagnostics(page,info);
+  try { await use(diagnostics); } finally { await diagnostics.finalize(); }
+ }, {auto:true}],
+});
 const keys={battle:BATTLE_STORAGE_KEYS,run:RUN_STORAGE_KEYS,dungeon:DUNGEON_KEYS};
 
 test('main menu: startup hides proof tools before application modules run',async({page})=>{
@@ -53,6 +65,84 @@ test('main menu: failed gameplay imports retain visible recovery without proof t
   await expect(page.getByRole('complementary',{name:'Proof scene diagnostics'})).toHaveCount(0);
  }
  expect(errors).toEqual([]);
+});
+
+test('main menu: application import failure preserves battle saves and reload resumes without historical effects',async({page,browserName,applicationLoadDiagnostics},info)=>{
+ test.skip(process.env.PLAYWRIGHT_SERVER_MODE==='dev','Requires emitted production chunks and the build manifest.');
+ // Reach a real accepted High Shot boundary, retaining different valid primary
+ // and backup bytes so a reload cannot silently replace either saved slot.
+ const session=new BattleSession(battleCatalog,'map:forest_ruins',2);
+ let saved:{primary:string;backup:string;state:typeof session.state}|undefined;
+ try {
+  for(let i=0;i<200 && session.state.outcome==='ongoing';i++){
+   const command=session.phase==='player'?playerDecision(session.state):null;
+   if(command && !session.prepare(command).ok)throw Error('Recovery fixture policy rejected');
+   const step=command?session.confirm():session.nextEnemy();
+   if(!step)throw Error('Recovery fixture did not advance');
+   session.finishPresentation(step.token);
+   if(command?.type==='useAbility' && command.abilityId==='ability:high_shot'){
+    const primary=encodeBattleSave(step.after,battleCatalog),backup=encodeBattleSave(step.before,battleCatalog);
+    if(!primary.ok || !backup.ok)throw Error('Recovery fixture could not be encoded');
+    saved={primary:primary.text,backup:backup.text,state:step.after};break;
+   }
+  }
+ } finally { session.dispose(); }
+ if(!saved)throw Error('No legal saved High Shot boundary');
+ expect(saved.primary).not.toBe(saved.backup);
+ const bytes={primary:saved.primary,backup:saved.backup};
+ const stored=()=>page.evaluate(slots=>({primary:localStorage.getItem(slots.primary),backup:localStorage.getItem(slots.backup)}),keys.battle);
+ await page.addInitScript(({slots,bytes})=>{
+  if(!sessionStorage.getItem('test:application-load-seeded')){
+   localStorage.setItem(slots.primary,bytes.primary);localStorage.setItem(slots.backup,bytes.backup);
+   sessionStorage.setItem('test:application-load-seeded','yes');
+  }
+ },{slots:keys.battle,bytes});
+ const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+ await page.clock.install();
+ const faultServer=await startBattleModuleFaultServer();
+ let failedResponses=0,recoveryVerified=false;
+ const observeEntryResponse=(response:Response)=>{if(faultServer.isModuleURL(response.url()) && response.status()===503)failedResponses++;};
+ page.on('response',observeEntryResponse);
+ // The first document receives a real server HTTP 503 with the legal save seeded.
+ // The origin stays fixed; recovery serves the unchanged build through Vite.
+ try {
+  await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
+  await page.goto(faultServer.battleURL);
+  await expect.poll(()=>faultServer.receipt().blocked).toBeGreaterThan(0);
+  await expect.poll(()=>failedResponses).toBeGreaterThan(0);
+  await expect(page.getByRole('alert')).toHaveText('Error: Could not load the application. Reload the page to retry.');
+  await expect(page.getByRole('alert')).toBeVisible();await expect(page.locator('#save-continue')).toHaveCount(0);
+  expect(await stored()).toEqual(bytes);
+  await expect.poll(()=>applicationLoadDiagnostics.failures().length).toBe(1);
+  const [failure]=applicationLoadDiagnostics.failures();
+  expect(failure).toMatchObject({route:'battle',name:'TypeError',category:'module-fetch'});
+  // Chromium includes the failed module URL in the caught error. Check that
+  // both the browser and host allowlists retain the real emitted filename.
+  if(browserName==='chromium'){
+   expect(failure.frames).toEqual(expect.arrayContaining([{file:faultServer.receipt().assets[0].file}]));
+  }
+  // The error path stays inert. Recovery remains the user's explicit reload and
+  // Continue, with the paused-clock interaction from the original failing test.
+  const allowedBeforeRecovery=faultServer.receipt().allowed;faultServer.allowImport();
+  await page.reload();await page.clock.resume();await expect(page.locator('#save-continue')).toBeVisible();
+  expect(faultServer.receipt().allowed).toBeGreaterThan(allowedBeforeRecovery);
+  await expect.poll(()=>faultServer.receipt().assets.reduce((sum,asset)=>sum+asset.responses['200']+asset.responses['304'],0)).toBeGreaterThan(0);
+  expect(await stored()).toEqual(bytes);await page.locator('#save-continue').click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const resumed=await readSession(page);
+  expect(resumed.state).toEqual(saved.state);expect(resumed.events).toEqual([]);
+  expect(resumed.continuation).toEqual({snapshot:saved.state,commands:[],events:[]});expect(resumed.pending).toBeNull();
+  expect(JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).effect).toBeNull();
+  expect(await stored()).toEqual(bytes);expect(errors).toEqual([]);
+  await expect(page.locator('link[rel="modulepreload"][href*="/assets/startBattleApp-"]')).toHaveCount(0);
+  recoveryVerified=true;
+ } finally {
+  page.off('response',observeEntryResponse);
+  try {
+   await info.attach('application-load-recovery',{body:JSON.stringify({...faultServer.receipt(),recoveryVerified,
+    injectedResponse:{status:503,cacheControl:'no-store',observed:failedResponses},failures:applicationLoadDiagnostics.failures()},null,2),contentType:'application/json'});
+  } finally { await faultServer.close(); }
+ }
 });
 
 for(const mode of ['run','dungeon'] as const)test(`main menu: post-mount ${mode} failure remains visible and preserves saves`,async({page},info)=>{

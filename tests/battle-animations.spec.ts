@@ -1,5 +1,5 @@
 import type { Command } from '../src/domain/types';
-import { expect, test, type Page } from './helpers/forceRailControls';
+import { expect, test as base, type Page } from './helpers/forceRailControls';
 import { writeFileSync } from 'node:fs';
 import { BattleSession } from '../src/app/BattleSession';
 import { standaloneCatalog as catalog } from './helpers/playerPolicy';
@@ -10,6 +10,15 @@ import { projectTile } from '../src/geometry/iso';
 import { HEALTH_BAR } from '../src/phaser/healthBar';
 import { abilityPresentation, type SignatureKind } from '../src/phaser/abilityPresentation';
 import { playerDecision, readSession, confirmRestart } from './helpers/battlePolicy';
+import { startApplicationLoadDiagnostics, type ApplicationLoadDiagnostics } from './helpers/applicationLoadDiagnostics';
+
+// Add failure evidence without replacing the rail controls or graphics fixtures.
+const test = base.extend<{ applicationLoadDiagnostics: ApplicationLoadDiagnostics }>({
+  applicationLoadDiagnostics: [async ({page},use,info) => {
+    const diagnostics = await startApplicationLoadDiagnostics(page,info);
+    try { await use(diagnostics); } finally { await diagnostics.finalize(); }
+  }, {auto:true}],
+});
 
 // Include real cached-document return, matching the persistence regression suite.
 test.use({launchOptions:async({browserName},use)=>{
