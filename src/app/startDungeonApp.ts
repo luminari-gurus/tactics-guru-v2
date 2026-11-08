@@ -91,7 +91,7 @@ function recovery(){
   ])});
  }
  choices.push({id:'dungeon-retry-save',label:'Retry saving current progress',run:()=>{if(startup){close();return;}session.retry(review);close();}}, {id:'dungeon-close-recovery',label:'Close',run:close});
- dialogs.showChoices('Dungeon save recovery',`primary: ${review.primary.status}. backup: ${review.backup.status}. ${session.status}`,choices,close);
+ dialogs.showChoices('Dungeon save recovery',`primary: ${review.primary.status}. backup: ${review.backup.status}. ${session.status}`,choices,close,{focusTitle:true});
  screen.scrollTop=scrollTop;
 }
 function whenVisible(generation:number,run:()=>void){
