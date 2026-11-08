@@ -1,0 +1,81 @@
+assets.spec.ts › canonical assets, near/far fixtures and restart remain stable
+battle-audio.spec.ts › sound control uses real gestures, preserves previews, modal focus and restart preference
+battle-audio.spec.ts › mute, hidden and context interruptions discard active feedback while commands finish
+battle-audio.spec.ts › gesture unlock reject remains bounded and retryable
+battle-audio.spec.ts › gesture unlock pending remains bounded and retryable
+battle-audio.spec.ts › automatic recovery reject after successful unlock stays nonfatal and bounded
+battle-audio.spec.ts › automatic recovery pending after successful unlock stays nonfatal and bounded
+battle-audio.spec.ts › HTML5 per-element permission survives early enable
+battle-audio.spec.ts › HTML5 per-element permission survives enabled restart
+battle-audio.spec.ts › HTML5 completion survives delayed animation frames after enabled restart
+battle-audio.spec.ts › unrelated asynchronous failures still reach the fatal application handler
+battle-audio.spec.ts › missing optional media leaves legal controls usable
+battle-audio.spec.ts › corrupt optional media leaves legal controls usable
+battle-audio.spec.ts › stalled optional media leaves legal controls usable
+battle-audio.spec.ts › decode-stalled optional media leaves legal controls usable
+battle-audio.spec.ts › HTML5 fallback loads and plays future cues after a gesture
+battle-audio.spec.ts › unsupported audio has a useful nonfatal status
+battle-audio.spec.ts › late decode from a destroyed scene cannot alter replacement controls or playback
+battle-audio.spec.ts › seed 1: short sound on/off legal checkpoints preserve session and saved bytes
+battle-audio.spec.ts › seed 2: short sound on/off legal checkpoints preserve session and saved bytes
+battle-audio.spec.ts › seed 1: complete audible legal battle delivers committed cues and playerLoss
+battle-audio.spec.ts › seed 2: complete audible legal battle delivers committed cues and playerWin
+battle-board.spec.ts › occluded archer exposed art selects the same legal target as the dropdown
+battle-board.spec.ts › repeated map selection reaches a legal ground destination behind the same platform
+battle-board.spec.ts › completed pen taps keep overlap cycling after leaving hover range
+battle-board.spec.ts › right-click cancels a prepared move through the existing action path and respects modal locks
+battle-board.spec.ts › layout clamping resets overlap history when the actual camera changes
+battle-board.spec.ts › hovered origins show only ability reach without changing selection, pending commands or saves
+battle-board.spec.ts › selection labels retain the zoomed and panned camera without gameplay commands
+battle-board.spec.ts › authored camera keeps zoom bounds and refits on real orientation changes
+battle-board.spec.ts › default authored board renders canonical units, highlights and stable restarts
+battle-board.spec.ts › default battle reports a controlled missing canonical sprite error
+battle-board.spec.ts › default battle reports a controlled corrupt canonical sprite error
+battle-board.spec.ts › picks authored elevated tops and visible side faces outside living unit art
+battle-board.spec.ts › authored visible picking survives resize, pan, zoom, DPR and drag completion
+battle-board.spec.ts › legal player movement updates elevation, reachability and canopy occlusion
+battle-board.spec.ts › touch pinch and cancelled pointer cannot select or move a unit
+battle-board.spec.ts › drawable boundaries and layout changes discard captured gestures without board pass-through
+engine-fit.spec.ts › proof controls survive repeated restart and expose distinct ready markers
+guarded-effects.spec.ts › shared Guarded lifecycle and saved feedback: standalone hit
+guarded-effects.spec.ts › shared Guarded lifecycle and saved feedback: standalone miss
+guarded-effects.spec.ts › shared Guarded lifecycle and saved feedback: run hit
+guarded-effects.spec.ts › shared Guarded lifecycle and saved feedback: run miss
+guarded-effects.spec.ts › shared Guarded lifecycle and saved feedback: dungeon hit
+guarded-effects.spec.ts › shared Guarded lifecycle and saved feedback: dungeon miss
+guarded-effects.spec.ts › Guarded badge follows legal move presentation
+guarded-effects.spec.ts › Guarded badge follows legal defeat presentation
+guarded-effects.spec.ts › Guarded badge stays attached when panning the Fighter offscreen and back
+lifecycle.spec.ts › hidden and visible while idle count once each, keep rendering and never start audio
+lifecycle.spec.ts › a move in flight freezes while hidden and completes exactly once after resume, also after restart
+lifecycle.spec.ts › a pointer held down across hide and show cannot pan or select on resume
+lifecycle.spec.ts › window blur and focus are counted and never start or repeat audio
+battle-animations.spec.ts › target overlays follow invalid selection, action changes, keyboard, cancellation and board taps without resolving commands
+battle-animations.spec.ts › shared corpse cell keeps living target identity through inspection, confirmation and execution
+battle-animations.spec.ts › guarded strike miss: panned-edge actor and target feedback never overlap
+battle-animations.spec.ts › guarded strike defeat: panned-edge actor and target feedback never overlap
+battle-animations.spec.ts › guarded_strike: real controls, travel/impact, transformed anchors and exactly one accepted result
+battle-animations.spec.ts › high_shot: real controls, travel/impact, transformed anchors and exactly one accepted result
+battle-animations.spec.ts › magic_missile: real controls, travel/impact, transformed anchors and exactly one accepted result
+battle-animations.spec.ts › guarded_strike: miss feedback matches resolved events
+battle-animations.spec.ts › high_shot: miss feedback matches resolved events
+battle-animations.spec.ts › high_shot: critical feedback matches resolved events
+battle-animations.spec.ts › magic_missile: defeat feedback matches resolved events
+battle-animations.spec.ts › guarded_strike: repeated cancellation, modal refresh, resize and restart during travel and impact
+battle-animations.spec.ts › high_shot: repeated cancellation, modal refresh, resize and restart during travel and impact
+battle-animations.spec.ts › magic_missile: repeated cancellation, modal refresh, resize and restart during travel and impact
+battle-animations.spec.ts › guarded_strike: reload resumes accepted save without historical effects
+battle-animations.spec.ts › high_shot: reload resumes accepted save without historical effects
+battle-animations.spec.ts › magic_missile: reload resumes accepted save without historical effects
+battle-animations.spec.ts › elevated target remains anchored through rotation during impact
+battle-animations.spec.ts › ability departure through real browser history › guarded_strike: cached return preserves exact accepted slots until Continue
+battle-animations.spec.ts › ability departure through real browser history › high_shot: cached return preserves exact accepted slots until Continue
+battle-animations.spec.ts › ability departure through real browser history › magic_missile: cached return preserves exact accepted slots until Continue
+battle-animations.spec.ts › ability:basic_attack: spent action and effective Guarded feedback agree in actor and inspection
+battle-animations.spec.ts › ability:guarded_strike: spent action and effective Guarded feedback agree in actor and inspection
+battle-animations.spec.ts › visible action feedback stays inside the drawable board at small sizes and zoomed edges
+battle-animations.spec.ts › active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state
+battle-animations.spec.ts › active bob: presentation, actor change, hidden page and restart restore anchors without duplicate loops
+battle-animations.spec.ts › active bob: initial reduced motion keeps sprite and static actor marker anchored
+overworld-map.spec.ts › failed route import at /map shows a reload instruction
+overworld-map.spec.ts › failed route import at / shows a reload instruction

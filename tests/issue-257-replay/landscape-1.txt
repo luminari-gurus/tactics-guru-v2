@@ -1,0 +1,63 @@
+battle-persistence.spec.ts › undo stays unavailable after a move exhausts the command limit
+battle-persistence.spec.ts › default Move Continue is read-only and confirmed movement keeps the remaining-action flow
+battle-persistence.spec.ts › default Move does not return after a legally reached attack before movement
+battle-persistence.spec.ts › default Move respects command limit without an intent or save mutation
+battle-persistence.spec.ts › default Move respects origin only without an intent or save mutation
+battle-persistence.spec.ts › startup is read-only, keyboard Continue rebuilds no historical presentation, and recovery captures touch/focus
+battle-persistence.spec.ts › held confirmation Enter cannot flow through Restart and replace either saved slot
+battle-persistence.spec.ts › reload during legal player presentation matches an uninterrupted browser
+battle-persistence.spec.ts › reload during legal enemy presentation matches an uninterrupted browser
+battle-persistence.spec.ts › backup recovery retains damaged primary, exports exact text, removes only after confirmation and resumes saving
+battle-persistence.spec.ts › unknown storage blocks startup until retry; writes remain nonfatal during play
+battle-persistence.spec.ts › failed partial reset retains battle, seed, recovery copies and usable controls; a retry succeeds once
+battle-persistence.spec.ts › changed saved data refuses an old confirmation and requires fresh review
+battle-persistence.spec.ts › successful reset with failed fresh save cannot recover an old battle on reload
+battle-persistence.spec.ts › invalid startup requires explicit reset: {broken
+battle-persistence.spec.ts › invalid startup requires explicit reset: {"kind":"tac
+battle-persistence.spec.ts › browser history with BFCache enabled › cached battle cannot overwrite either slot of its replacement
+battle-persistence.spec.ts › browser history with BFCache enabled › cached recovery dialog cannot overwrite either slot of its replacement
+battle-persistence.spec.ts › browser history with BFCache enabled › cached return after restart at player preserves the accepted boundary
+battle-persistence.spec.ts › browser history with BFCache enabled › cached return after restart at presentation preserves the accepted boundary
+board.spec.ts › shows the complete elevated board in both orientations and after restart
+content-loading.spec.ts › content smoke: success
+content-loading.spec.ts › content smoke: malformed
+content-loading.spec.ts › content smoke: unknown
+content-loading.spec.ts › content smoke: missing
+content-loading.spec.ts › content smoke: corrupt
+content-loading.spec.ts › content smoke: stalled
+dungeon-exploration.spec.ts › map markers respect stair availability, discovery and saved floor state
+dungeon-exploration.spec.ts › stairs remain visible under cleared saved markers and live markers stay visible
+dungeon-exploration.spec.ts › stairs travel once per entry with arrows, stay on arrival and restore, and respect locks
+dungeon-exploration.spec.ts › stairs travel once per entry with wasd, stay on arrival and restore, and respect locks
+dungeon-exploration.spec.ts › stairs travel once per entry with compass, stay on arrival and restore, and respect locks
+dungeon-exploration.spec.ts › stairs travel once per entry with cell, stay on arrival and restore, and respect locks
+dungeon-exploration.spec.ts › diamond compass directions, focus, touch targets and unavailable states
+dungeon-exploration.spec.ts › compass keeps keyboard focus when movement disables the activated direction
+dungeon-exploration.spec.ts › real traversal, art independence, keyboard locks, active battle and exact reload
+dungeon-exploration.spec.ts › pre-progression dungeon remains incompatible and exportable
+dungeon-exploration.spec.ts › cold progression-format Continue retains a long saved history within the startup budget
+dungeon-exploration.spec.ts › map input stays inert while hidden and retains discovery through resize and failed art
+dungeon-exploration.spec.ts › records route transfer and map responsiveness against established budgets
+dungeon-exploration.spec.ts › forest saved kinds, scaled inspection and reload use actual selected definitions
+dungeon-exploration.spec.ts › desert saved kinds, scaled inspection and reload use actual selected definitions
+dungeon-exploration.spec.ts › exploration cells stay square across viewport sizes and art styles
+dungeon-exploration.spec.ts › dungeon enemies move only after a player step and persist across reload
+dungeon-exploration.spec.ts › walking onto a guardian before other enemies starts and resumes its own encounter
+dungeon.spec.ts › Shaman production journey uses Hex and ally healing, reloads Weakened and replays a complete legal battle
+dungeon.spec.ts › Mage legal progression journey earns level three uses Frost Snare and multiple missiles and resumes
+dungeon.spec.ts › Ranger legal progression journey earns level three uses Mark and Pin and resumes
+dungeon.spec.ts › Fighter legal progression journey earns level three uses both abilities and resumes
+dungeon.spec.ts › automatic stairs preserve healed Fighter carry and fresh battle resources
+dungeon.spec.ts › dungeon battle undo survives reload and a legal defeat journey
+dungeon.spec.ts › read-only entry, keyboard new dungeon, real action and active resume
+dungeon.spec.ts › legal reward and guardian boundaries, travel reload, backtracking and isolated saves
+dungeon.spec.ts › corrupt bytes stay exportable and uncertain travel requires explicit recovery
+dungeon.spec.ts › confirmed charm discard frees full capacity without cancelling or duplicating the pending reward
+dungeon.spec.ts › hero progression commits once, heals at a threshold and survives inspection and reload
+grass-surface.spec.ts › square grass material projects all corners exactly onto the shared tile geometry
+input.spec.ts › picks visible cells through art after transforms, resize and restart
+input.spec.ts › touch tap selects, pinch and its trailing pointer do not
+input.spec.ts › selection survives a live device pixel ratio change
+layout.spec.ts › page gestures are suppressed in CSS and the canvas has no context menu
+move.spec.ts › actual move controls reject repeated input, complete, and cancel on repeated restart
+opacity.spec.ts › opacity slider previews 0–100, preserves its choice across fixtures and restart
