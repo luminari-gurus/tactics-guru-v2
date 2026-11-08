@@ -69,6 +69,22 @@ jobs:
       - name: Check the existing dungeon diagnostic adapter
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts --project=landscape-webkit -g 'unavailable battle modules preserve dungeon exploration, recovery and the saved encounter' --diagnostics
+      - name: Compare the dungeon recovery boundary at the literal base
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          set -euo pipefail
+          trap 'git checkout --detach "$GITHUB_SHA"' EXIT
+          git checkout --detach 28016bb452ee4926e5c3a5c20940b91d96cea0d8
+          node --input-type=module <<'JS'
+          import { writeFileSync } from 'node:fs';
+          import { sourceIdentity } from './scripts/verification-report.mjs';
+          writeFileSync('verification-receipts/issue-257/baseline-source.json', JSON.stringify({
+            source: sourceIdentity(process.cwd()), node: process.version, runner: process.env.RUNNER_NAME,
+            conditions: 'Same job, browser environment and command as the affected revision; shared host load and caches not independently controlled'
+          }, null, 2));
+          JS
+          npm run build
+          npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts --project=landscape-webkit -g 'unavailable battle modules preserve dungeon exploration, recovery and the saved encounter' --diagnostics
       - uses: actions/upload-artifact@v4
         if: always()
         with:

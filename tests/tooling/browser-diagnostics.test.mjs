@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, rmSync, existsSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, rmSync, existsSync, renameSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -9,9 +9,20 @@ import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const hash = path => createHash('sha256').update(readFileSync(path)).digest('hex');
 
+function finishStartupFixture(fixture, verified) {
+  if (verified) { rmSync(fixture, { recursive: true, force: true }); return; }
+  // Deliberate browser failures are successful contract inputs. Retain their
+  // reports only when the outer harness fails to verify the diagnostic contract.
+  mkdirSync('verification-receipts/startup-contracts', { recursive: true });
+  const receipt = mkdtempSync('verification-receipts/startup-contracts/run-');
+  renameSync(fixture, join(receipt, 'fixture'));
+  console.error('Startup contract failure receipts: ' + resolve(receipt));
+}
+
 test('dungeon startup evidence retains failed boundaries with bounded private data', () => {
   mkdirSync('tmp', {recursive:true});
   const fixture=mkdtempSync('tmp/startup-diagnostics-');
+  let verified = false;
   try {
     const helper=resolve('tests/helpers/startupDiagnostics.ts').replaceAll('\\','/');
     writeFileSync(join(fixture,'contract.config.ts'),`
@@ -63,12 +74,14 @@ test('dungeon startup evidence retains failed boundaries with bounded private da
         assert.ok(evidence.events.some(e=>e.kind==='pageerror'&&e.name==='TypeError'&&e.error==='[redacted]'));
       } else assert.equal(evidence.events.length,128,'noisy errors must remain bounded');
     }
-  } finally { rmSync(fixture,{recursive:true,force:true}); }
+    verified = true;
+  } finally { finishStartupFixture(fixture, verified); }
 });
 
 test('startup evidence covers proof battle and development boundaries while preserving fixtures', () => {
   mkdirSync('tmp', { recursive: true });
   const fixture = mkdtempSync('tmp/startup-boundaries-');
+  let verified = false;
   try {
     const helper = resolve('tests/helpers/startupDiagnostics.ts').replaceAll('\\', '/');
     writeFileSync(join(fixture, 'contract.config.ts'), `
@@ -98,18 +111,21 @@ test('startup evidence covers proof battle and development boundaries while pres
         });
         await page.goto('./battle?private=query-sentinel');
       }
-      for(const mode of ['proof','battle','dev'])test('failed '+mode+' startup boundary',async({page})=>{
+      for(const mode of ['proof','proof-native','battle','dev'])test('failed '+mode+' startup boundary',async({page})=>{
         if(mode==='proof'){
           await page.clock.install({time:new Date('2026-10-25T12:00:00Z')});
           await page.clock.pauseAt(new Date('2026-10-25T12:00:01Z'));
         }
         await shell(page,mode);
         await page.evaluate(mode=>{
-          if(mode==='proof')performance.mark('fit:scene-start');
+          if(mode.startsWith('proof'))performance.mark('fit:scene-start');
           performance.mark('private-mark-sentinel');
           localStorage.setItem('private-save','private-save-sentinel');
           const game=document.querySelector('#game');
-          if(mode==='battle'){
+          if(mode==='proof-native'){
+            performance.mark('fit:scene-ready');performance.mark('fit:controls-usable');
+            game.setAttribute('data-ready','true');document.querySelector('#fit-status').textContent='Ready';
+          }else if(mode==='battle'){
             window.fitDiagnostics=()=>({run:2,sceneStartedMs:10,sceneReadyMs:20,controlsUsableMs:30,
               private:'private-diagnostics-sentinel',get resources(){throw Error('private-diagnostics-sentinel');}});
             game.setAttribute('data-ready','true');game.setAttribute('data-phase','player');
@@ -144,7 +160,7 @@ test('startup evidence covers proof battle and development boundaries while pres
     });
     assert.equal(run.status, 1, run.stdout + run.stderr);
     const report = JSON.parse(readFileSync(output, 'utf8'));
-    assert.equal(report.stats.unexpected, 6); // Three deliberate failed waits in each engine.
+    assert.equal(report.stats.unexpected, 8); // Four deliberate failed waits in each engine.
     assert.equal(report.stats.expected, 4); // Fixture behavior remains unchanged.
     const tests = report.suites.flatMap(suite => suite.specs.flatMap(spec => spec.tests.map(entry => ({ ...entry, title: spec.title }))));
     for (const entry of tests) {
@@ -179,8 +195,16 @@ test('startup evidence covers proof battle and development boundaries while pres
       }
       const state = evidence.browser.samples.at(-1);
       assert.equal(state.game, true);
-      if (entry.title.includes('proof')) {
-        assert.ok(evidence.browser.marks.some(mark => mark.name === 'fit:scene-start' && mark.at >= 0));
+      if (entry.title.includes('proof-native')) {
+        assert.equal(state.status, 'ready');
+        assert.equal(state.gameReady, true);
+        assert.equal(evidence.browser.measurements, null);
+        assert.deepEqual(evidence.browser.marks.map(mark => mark.name), ['fit:scene-start', 'fit:scene-ready', 'fit:controls-usable']);
+        assert.ok(evidence.browser.marks.every(mark => Number.isFinite(mark.at) && mark.at >= 0));
+      } else if (entry.title.includes('proof')) {
+        // Playwright's installed clock stubs Performance entries. Keep this case
+        // for Node-clock independence; the native-clock case owns real marks.
+        assert.deepEqual(evidence.browser.marks, []);
         assert.equal(evidence.browser.measurements, null);
         assert.equal(state.status, 'loading');
         assert.equal(state.gameReady, false);
@@ -201,7 +225,8 @@ test('startup evidence covers proof battle and development boundaries while pres
         assert.ok(evidence.browser.scripts.includes('[other]'));
       }
     }
-  } finally { rmSync(fixture, { recursive: true, force: true }); }
+    verified = true;
+  } finally { finishStartupFixture(fixture, verified); }
 });
 
 // Integration check: requires installed full Chromium and WebKit, no application server.
