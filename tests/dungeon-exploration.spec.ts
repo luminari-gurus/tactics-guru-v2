@@ -31,12 +31,10 @@ test('map markers respect stair availability, discovery and saved floor state',a
  };
  const reload=async()=>{await page.reload();await continueSavedDungeon(page);};
  const cell=(index:number)=>page.locator(`#dungeon-map [data-cell="${index}"]`);
- const places=page.getByRole('list',{name:'Discovered places',exact:true});
  // Structural saved-state fixtures isolate rendering; they do not prove preceding battle completion.
  const revealed={...floor,exploration:{...floor.exploration,revealed:Array.from({length:400},(_,i)=>i)}};
  await load({...base,floors:[{...revealed,position:floor.position}]});
- await expect(places.locator('[data-poi-id="stairs-up"]')).toHaveCount(0);
- await expect(places.locator('[data-poi-id="stairs-down"]')).toHaveCount(0);
+ await expect(page.locator('[aria-label="Discovered places"]')).toHaveCount(0);
  await expect(cell(floor.descriptor.downstairs)).toHaveText('');
  for(const poi of floor.exploration.pois)await expect(cell(poiCell(poi))).toHaveText('M');
  await expect(page.locator('#dungeon-map')).not.toContainText(/[123]/);
@@ -47,14 +45,12 @@ test('map markers respect stair availability, discovery and saved floor state',a
  const firstStep=neighbors(floor.position).find(n=>firstMap.cells[n]&&!floor.exploration.pois.some(p=>poiCell(p,firstMap.width)===n))!;
  await walkDungeon(page,firstStep,isMobile?'touch':'keyboard');
  await expect(cell(floor.descriptor.upstairs)).toHaveText('');
- await reload();await expect(cell(floor.descriptor.upstairs)).toHaveText('');await expect(places.locator('[data-poi-id="stairs-up"]')).toHaveCount(0);
+ await reload();await expect(cell(floor.descriptor.upstairs)).toHaveText('');
  // Completion alone cannot reveal an undiscovered staircase.
  await load({...base,floors:[{...floor,completed:3}]});
  await expect(cell(floor.descriptor.downstairs)).toHaveClass('explore-hidden');
- await expect(places.locator('[data-poi-id="stairs-down"]')).toHaveCount(0);
  await load({...base,floors:[{...revealed,position:floor.position,completed:3}]});
  await expect(cell(floor.descriptor.downstairs)).toHaveText('↓');
- await expect(places.locator('[data-poi-id="stairs-down"]')).toContainText('Unlocked');
  for(const poi of floor.exploration.pois)await expect(cell(poiCell(poi))).toHaveText('✓');
  await reload();await expect(cell(floor.descriptor.downstairs)).toHaveText('↓');
  await page.locator('#dungeon-map').scrollIntoViewIfNeeded();
@@ -62,8 +58,6 @@ test('map markers respect stair availability, discovery and saved floor state',a
  const descriptor=floorDescriptor(base.seed,2),exploration=freshExploration(descriptor.seed,descriptor.upstairs,floorMap(descriptor));
  const second={descriptor,completed:0,position:descriptor.upstairs,exploration};
  await load({...base,depth:2,floors:[{...floor,completed:3},second]});
- await expect(places.locator('[data-poi-id="stairs-up"]')).toContainText('Upstairs');
- await expect(places.locator('[data-poi-id="stairs-down"]')).toHaveCount(0);
  const map=floorMap(descriptor),adjacent=neighbors(descriptor.upstairs,map.width,map.height).find(n=>map.cells[n]&&!exploration.pois.some(p=>poiCell(p,map.width)===n))!;
  await walkDungeon(page,adjacent,isMobile?'touch':'keyboard');await expect(cell(descriptor.upstairs)).toHaveText('↑');
  await reload();await expect(cell(descriptor.upstairs)).toHaveText('↑');
@@ -224,7 +218,7 @@ fixedSeedTest('real traversal, art independence, keyboard locks, active battle a
  // Qualify input/art/reload on a traversable witness, independently of fresh entropy.
  await page.goto('./?game=dungeon');await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();
  const initial=await dungeonSnapshot(page),f=initial.floors[0],map=generateMap(f.descriptor.seed,'rooms');
- await expect(page.locator('#dungeon-start-encounter')).toHaveCount(0);await expect(page.locator('[aria-label="Discovered places"]')).not.toContainText('Upstairs');
+ await expect(page.locator('#dungeon-start-encounter')).toHaveCount(0);await expect(page.locator('#dungeon-map')).not.toContainText('↑');
  const adjacent=neighbors(f.position).find(n=>map.cells[n])!;
  await walkDungeon(page,adjacent,isMobile?'touch':'pointer');const stepped=await dungeonSnapshot(page);expect(stepped.revision).toBe(initial.revision+1);
  await page.locator('#dungeon-map').focus();await page.keyboard.down('ArrowUp');await page.keyboard.up('ArrowUp');const after=await dungeonSnapshot(page);
@@ -329,7 +323,7 @@ for(const biome of ['forest','desert'] as const)test(`${biome} saved kinds, scal
   expect(await page.locator('#dungeon-screen').evaluate(n=>n.scrollWidth<=n.clientWidth)).toBe(true);
   await expect(page.locator('#dungeon-screen h1')).toHaveText(`Dungeon · Floor 2 · ${biome==='forest'?'Forest':'Desert'}`);
   const undiscovered=state.floors[1].exploration.pois.filter(p=>!state!.floors[1].exploration.revealed.includes(poiCell(p,map.width)));
-  for(const p of undiscovered)await expect(page.locator(`[data-poi-id="${p.id}"]`)).toHaveCount(0);
+  for(const p of undiscovered)await expect(page.locator(`#dungeon-map [data-poi="${p.id}"]`)).toHaveCount(0);
   await walkDungeon(page,target,isMobile?'touch':'keyboard');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const label=kind==='boss'?'Guardian · Goblins':`${kind[0].toUpperCase()}${kind.slice(1)} encounter ${slot+1}`;
   await expect(page.locator('#battle-heading h1')).toHaveText(`Dungeon · Floor 2 · ${biome==='forest'?'Forest':'Desert'} · ${label}`);
@@ -820,7 +814,7 @@ test('warm maximum-size floor step responsiveness meets the established budget a
  expect(p95).toBeLessThanOrEqual(33.4);expect(frameP95).toBeLessThanOrEqual(33.4);
 });
 
-for(const depth of [1,5])test(`only the Guardian has reward pending after a Guardian-first victory and reload at depth ${depth}`,async({page})=>{
+for(const depth of [1,5])test(`Guardian-first reward, map and encounter state survive claim and reload at depth ${depth}`,async({page})=>{
  // Structural reward boundary isolates marker rendering, not preceding combat.
  const fresh=freshDungeon('guardian-first',1);
  const floors=Array.from({length:depth},(_,i)=>{
@@ -835,20 +829,26 @@ for(const depth of [1,5])test(`only the Guardian has reward pending after a Guar
  const encoded=encodeDungeon(reward);if(!encoded.ok)throw Error(encoded.reason);
  await page.goto('./?game=dungeon');
  await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
- const check=async()=>{
-  const places=page.getByRole('list',{name:'Discovered places',exact:true});
-  await expect(places.locator('[data-poi-id="enemy-3"]')).toContainText('Reward pending');
-  for(const id of ['enemy-1','enemy-2'])await expect(places.locator(`[data-poi-id="${id}"]`)).toContainText('Available');
-  await expect(places).not.toContainText('In battle');
+ const rewardPanel=page.getByRole('region',{name:'Rewards',exact:true});
+ const checkMap=async()=>{
+  await expect(page.locator('#dungeon-map [data-cell]')).toHaveCount(map.cells.length);
+  await expect(page.locator('[aria-label="Discovered places"]')).toHaveCount(0);
+  for(const id of ['enemy-1','enemy-2'])await expect(page.locator(`#dungeon-map [data-poi="${id}"]`)).toHaveText('M');
  };
- await page.reload();await continueSavedDungeon(page);await check();
- await page.reload();await continueSavedDungeon(page);await check();
- await expect(page.locator('#dungeon-map [data-cell]')).toHaveCount(map.cells.length);
- const rows=page.getByRole('list',{name:'Discovered places',exact:true});
- await rows.evaluate(list=>{for(const row of list.children)row.setAttribute('data-retained','true');});
- await page.getByRole('button',{name:/^Claim /}).first().click();
+ await page.reload();await continueSavedDungeon(page);await checkMap();
+ await expect(rewardPanel).toBeVisible();
+ const pending=await dungeonSnapshot(page);
+ expect(pending).toEqual(reward);
+ await rewardPanel.getByRole('button',{name:/^Claim /}).first().click();
  await page.locator('#dungeon-item-confirm').click();
- await expect(page.locator('[data-poi-id="enemy-3"]')).toContainText('Cleared');
- await expect(rows.locator('[data-retained="true"]')).toHaveCount(3+(depth>1?1:0));
- await expect(page.getByRole('list',{name:'Discovered places',exact:true})).not.toContainText('Reward pending');
+ await expect(rewardPanel).toHaveCount(0);
+ await checkMap();
+ const claimed=await dungeonSnapshot(page);
+ expect(claimed.phase).toBe('ready');
+ expect(claimed.revision).toBe(pending.revision+1);
+ expect(claimed.ownership).not.toEqual(pending.ownership);
+ expect(claimed.floors[depth-1].exploration.cleared).toEqual([2]);
+ await page.reload();await continueSavedDungeon(page);await checkMap();
+ await expect(rewardPanel).toHaveCount(0);
+ expect(await dungeonSnapshot(page)).toEqual(claimed);
 });

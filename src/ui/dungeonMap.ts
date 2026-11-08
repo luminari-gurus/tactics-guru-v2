@@ -13,18 +13,6 @@ export function dungeonEncounterLabel(s: DungeonState, slot: number): string {
   return kind === 'boss' ? 'Guardian · Goblins' : `${kind[0].toUpperCase()}${kind.slice(1)} encounter ${slot + 1}`;
 }
 
-/** Reward and battle phases belong to the active POI, not every revealed marker. */
-export function dungeonEncounterStatus(s: DungeonState, slot: number): string {
-  const f = currentFloor(s);
-  const activeSlot = f.exploration.version === 'exploration-v2' ? f.exploration.active
-    : s.phase === 'reward' ? f.completed - 1 : s.phase === 'battle' ? f.completed : null;
-  const active = activeSlot === slot;
-  if (active && s.phase === 'reward') return 'Reward pending';
-  if (clearedDungeonSlots(f).includes(slot)) return 'Cleared';
-  if (s.phase === 'defeat') return 'Unavailable after defeat';
-  return active && s.phase === 'battle' ? 'In battle' : 'Available';
-}
-
 /** View-local art state and bindings; no simulation timer or authoritative DOM state. */
 export class DungeonMap {
   readonly root = document.createElement('section');
@@ -36,12 +24,10 @@ export class DungeonMap {
   private readonly select = document.createElement('select');
   private readonly grid = document.createElement('div');
   private readonly feedback = document.createElement('p');
-  private readonly places = document.createElement('ul');
   private readonly controls: { button: HTMLButtonElement; dx: number; dy: number }[] = [];
   private readonly cells: HTMLSpanElement[] = [];
   private readonly terrainCells = new Set<HTMLElement>();
   private readonly fallbackCells = new Set<HTMLElement>();
-  private readonly placeRows = new Map<string, HTMLLIElement>();
   private visual: { map: GeneratedMap; biome: string; revealed: Set<number>; markers: number[] } | null = null;
   private readonly abort = new AbortController();
   private readonly treatment = createMapArt(() => { if (this.live) this.paintArt(); });
@@ -72,9 +58,8 @@ export class DungeonMap {
       this.controls.push({button,dx,dy});directions.append(button);
     }
     const center=el('span');center.className='dungeon-compass-center';center.setAttribute('aria-hidden','true');directions.append(center);
-    this.places.setAttribute('aria-label','Discovered places');
     const legend=el('p','● Player · M encounter (including guardian) · ✓ cleared · ↑ upstairs (floor 2+) · ↓ downstairs (all encounters cleared). Enemies move when you move. Tap adjacent cells or use direction controls.');
-    this.root.append(this.heading,label,legend,this.grid,directions,this.feedback,this.places);
+    this.root.append(this.heading,label,legend,this.grid,directions,this.feedback);
     this.root.addEventListener('keydown',e => {
       if (!(e.target instanceof HTMLElement) || e.target.id !== 'dungeon-map') return;
       const width = this.map?.width ?? 20;
@@ -154,17 +139,6 @@ export class DungeonMap {
       const disabled=s.phase!=='ready'||!adjacent.includes(destination)||!map.cells[destination];
       if(button.disabled!==disabled)button.disabled=disabled;
     }
-    const entries=[...(showUpstairs?[{id:'stairs-up',cell:f.descriptor.upstairs,label:'Upstairs',status:'Available'}]:[]),...f.exploration.pois.map(p=>({id:p.id,cell:poiCell(p,map.width),label:`${dungeonEncounterLabel(s,p.encounterSlot)} · ${biome.label} · Floor ${s.depth}`,status:dungeonEncounterStatus(s,p.encounterSlot)})),...(showDownstairs?[{id:'stairs-down',cell:f.descriptor.downstairs,label:'Downstairs',status:'Unlocked'}]:[])];
-    const visiblePlaces=new Set<string>();let cursor=this.places.firstElementChild;
-    for(const p of entries)if(revealed.has(p.cell)){
-      let row=this.placeRows.get(p.id);
-      if(!row){row=document.createElement('li');row.dataset.poiId=p.id;this.placeRows.set(p.id,row);}
-      const text=`${p.label} · row ${Math.floor(p.cell/map.width)+1}, column ${p.cell%map.width+1} · ${p.status}${f.exploration.visited.includes(p.cell)?' · Visited':''}`;
-      if(row.textContent!==text)row.textContent=text;
-      if(row!==cursor)this.places.insertBefore(row,cursor);
-      cursor=row.nextElementSibling;visiblePlaces.add(p.id);
-    }
-    for(const [id,row] of this.placeRows)if(!visiblePlaces.has(id)){row.remove();this.placeRows.delete(id);}
     // Movement only treats newly changed terrain. Style changes and image completion repaint the visible set.
     this.paintArt(artDirty);
     if(focused&&document.activeElement!==focused&&focused.isConnected)focused.focus({preventScroll:true});
