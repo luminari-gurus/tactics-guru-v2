@@ -23,6 +23,7 @@ export class DungeonMap {
   private readonly heading = document.createElement('h2');
   private readonly select = document.createElement('select');
   private readonly grid = document.createElement('div');
+  private readonly markerDescription = document.createElement('p');
   private readonly feedback = document.createElement('p');
   private readonly controls: { button: HTMLButtonElement; dx: number; dy: number }[] = [];
   private readonly cells: HTMLSpanElement[] = [];
@@ -42,6 +43,9 @@ export class DungeonMap {
     this.select.addEventListener('change',()=>{this.art=this.select.value as ArtStyle;this.paintArt();},{signal});
     label.append(this.select);
     this.grid.id='dungeon-map';this.grid.tabIndex=0;this.grid.setAttribute('role','application');
+    this.markerDescription.id = 'dungeon-map-markers';
+    this.markerDescription.hidden = true;
+    this.grid.setAttribute('aria-describedby', this.markerDescription.id);
     this.grid.addEventListener('click',e=>{
       if(!this.live||!this.state||!this.map||this.locked()||document.hidden||!(e.target instanceof Element))return;
       const cell=e.target.closest<HTMLElement>('[data-cell]');if(!cell)return;
@@ -59,7 +63,7 @@ export class DungeonMap {
     }
     const center=el('span');center.className='dungeon-compass-center';center.setAttribute('aria-hidden','true');directions.append(center);
     const legend=el('p','● Player · M encounter (including guardian) · ✓ cleared · ↑ upstairs (floor 2+) · ↓ downstairs (all encounters cleared). Enemies move when you move. Tap adjacent cells or use direction controls.');
-    this.root.append(this.heading,label,legend,this.grid,directions,this.feedback);
+    this.root.append(this.heading,label,legend,this.grid,this.markerDescription,directions,this.feedback);
     this.root.addEventListener('keydown',e => {
       if (!(e.target instanceof HTMLElement) || e.target.id !== 'dungeon-map') return;
       const width = this.map?.width ?? 20;
@@ -90,8 +94,28 @@ export class DungeonMap {
     }
     if(grid.dataset.position!==String(f.position))grid.dataset.position=String(f.position);
     if(grid.dataset.biome!==biome.id)grid.dataset.biome=biome.id;
-    const showUpstairs=s.depth>1, showDownstairs=f.completed===3;
+    const revealed = new Set(f.exploration.revealed);
+    const showUpstairs = s.depth > 1 && revealed.has(f.descriptor.upstairs);
+    const showDownstairs = f.completed === 3 && revealed.has(f.descriptor.downstairs);
     const cleared=clearedDungeonSlots(f);
+    const activeSlot = f.exploration.version === 'exploration-v2' ? f.exploration.active
+      : s.phase === 'reward' ? f.completed - 1 : s.phase === 'battle' ? f.completed : null;
+    const markerDescriptions: string[] = [];
+    const location = (cell: number) => `row ${Math.floor(cell / map.width) + 1}, column ${cell % map.width + 1}`;
+    if (showUpstairs) markerDescriptions.push(`Upstairs at ${location(f.descriptor.upstairs)}.`);
+    for (const poi of f.exploration.pois) {
+      const cell = poiCell(poi, map.width);
+      if (!revealed.has(cell)) continue;
+      const slot = poi.encounterSlot;
+      const status = slot === activeSlot && s.phase === 'reward' ? 'Reward pending'
+        : cleared.includes(slot) ? 'Cleared'
+        : s.phase === 'defeat' ? 'Unavailable after defeat'
+        : slot === activeSlot && s.phase === 'battle' ? 'In battle' : 'Available';
+      markerDescriptions.push(`${dungeonEncounterLabel(s, slot)} at ${location(cell)}. ${status}.`);
+    }
+    if (showDownstairs) markerDescriptions.push(`Downstairs at ${location(f.descriptor.downstairs)}.`);
+    const description = markerDescriptions.join(' ') || 'No encounters or stairs discovered.';
+    if (this.markerDescription.textContent !== description) this.markerDescription.textContent = description;
     const pois=new Map([...f.exploration.pois].sort((a,b)=>Number(cleared.includes(b.encounterSlot))-Number(cleared.includes(a.encounterSlot))).map(p=>[poiCell(p,map.width),p]));
     const total=map.width*map.height;
     let rebuild=this.cells.length!==total||grid.children.length!==total;
@@ -100,7 +124,7 @@ export class DungeonMap {
       for(let i=0;i<total;i++) {const cell=document.createElement('span');cell.dataset.cell=String(i);cell.setAttribute('aria-hidden','true');this.cells.push(cell);fragment.append(cell);}
       grid.replaceChildren(fragment);
     }
-    const revealed=new Set(f.exploration.revealed), prior=this.visual;
+    const prior=this.visual;
     rebuild ||= !prior || prior.map!==map || prior.biome!==biome.id;
     const markers=[f.position,f.descriptor.upstairs,f.descriptor.downstairs,...f.exploration.pois.map(p=>poiCell(p,map.width))];
     const dirty=new Set<number>(),artDirty=new Set<HTMLElement>();
