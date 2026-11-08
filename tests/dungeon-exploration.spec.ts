@@ -95,6 +95,35 @@ test('stairs remain visible under cleared saved markers and live markers stay vi
  await load({...state,floors:[state.floors[0],all]});await expect(page.locator(`#dungeon-map [data-cell="${down}"]`)).toHaveText('↓');
 });
 
+test('fresh descent leaves room to move off the arrival stairs before battle', async ({page,isMobile})=>{
+ // Seed 6074 previously placed the Desert Guardian immediately east of the landing.
+ const base=freshDungeon('safe-arrival',6074);
+ const approach=atStairApproach({...base,floors:[{...base.floors[0],completed:3}]});
+ const encoded=encodeDungeon(approach);
+ if(!encoded.ok)throw Error(encoded.reason);
+ await page.goto('./?game=dungeon');
+ await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
+ await page.reload();await continueSavedDungeon(page);
+
+ const mode=isMobile?'touch':'keyboard';
+ await walkDungeon(page,approach.floors[0].descriptor.downstairs,mode);
+ const arrived=await dungeonSnapshot(page), floor=arrived.floors[1], map=floorMap(floor.descriptor);
+ expect(arrived).toMatchObject({depth:2,phase:'ready',activeBattle:null,party:approach.party});
+ expect(floor.position).toBe(floor.descriptor.upstairs);
+ const east=floor.position+1;
+ expect(map.cells[east]).toBe(1);
+ await expect(page.getByRole('heading',{name:'Explore Desert · Floor 2'})).toBeVisible();
+ await page.reload();await continueSavedDungeon(page);
+ expect(await dungeonSnapshot(page)).toEqual(arrived);
+
+ await walkDungeon(page,east,mode);
+ const moved=await dungeonSnapshot(page);
+ expect(moved).toMatchObject({depth:2,phase:'ready',activeBattle:null});
+ expect(moved.floors[1].position).toBe(east);
+ const landing=[floor.position,...neighbors(floor.position,map.width,map.height)];
+ expect(floor.exploration.pois.every(p=>!landing.includes(poiCell(p,map.width)))).toBe(true);
+});
+
 for(const control of ['arrows','wasd','compass','cell'] as const)test(`stairs travel once per entry with ${control}, stay on arrival and restore, and respect locks`,async({page,isMobile})=>{
  test.setTimeout(240000);
  const base=freshDungeon('stairs-browser',1),cleared={...base,floors:[{...base.floors[0],completed:3}]};
