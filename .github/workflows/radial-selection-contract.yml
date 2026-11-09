@@ -28,7 +28,15 @@ jobs:
       - run: npm run setup:browsers
       - run: npm run test:verification-batches
       - run: npm run build
-      - run: npm run test:browser -- -c playwright.regression.config.ts tests/battle-radial.spec.ts tests/battle-loop.spec.ts -g 'radial preference replaces the side rail|narrow landscape battle stacks controls' --diagnostics
+      - name: Exercise the retained and equivalent omitted profiles
+        run: |
+          mkdir -p tmp
+          cat > tmp/radial-all-profiles.config.ts <<'TS'
+          import base from '../playwright.regression.config';
+          export default {...base,testDir:'../tests',webServer:{...base.webServer,cwd:process.cwd()},
+            projects:base.projects.map(({grepInvert,...project})=>project)};
+          TS
+          npm run test:browser -- -c tmp/radial-all-profiles.config.ts tests/battle-radial.spec.ts tests/battle-loop.spec.ts -g 'radial preference replaces the side rail|narrow landscape battle stacks controls' --diagnostics
       - uses: actions/upload-artifact@v4
         if: always()
         with:
