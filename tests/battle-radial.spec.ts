@@ -98,6 +98,46 @@ test('radial tap fallback opens the same radial without requiring a hold', async
   expect((await session(page)).pending).toBeNull();
 });
 
+test('keyboard-only shortcuts aim radial movement before one explicit confirmation',async({page})=>{
+  await ready(page);
+  const {actor,cell,current}=await reachableEmpty(page);
+  await page.locator('canvas').focus();
+  for(let x=actor.cell.x;x!==cell.x;x+=Math.sign(cell.x-x))await page.keyboard.press(cell.x>x?'ArrowRight':'ArrowLeft');
+  for(let y=actor.cell.y;y!==cell.y;y+=Math.sign(cell.y-y))await page.keyboard.press(cell.y>y?'ArrowDown':'ArrowUp');
+  await page.keyboard.press('m');
+  await expect(page.locator('#battle-radial-move')).toBeFocused();
+  await expect(page.locator('#battle-radial-hub')).toContainText('Move');
+  expect((await session(page)).state).toEqual(current.state);
+  await page.screenshot({path:test.info().outputPath('keyboard-radial-move.png')});
+  await page.keyboard.press('c');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const moved=await session(page);
+  expect(moved.state.commandCount).toBe(current.state.commandCount+1);
+  expect(moved.state.units.find(u=>u.id===actor.id)!.cell).toEqual(cell);
+  await page.keyboard.press('m');await page.keyboard.press('c');
+  expect((await session(page)).state).toEqual(moved.state);
+});
+
+test('keyboard-only shortcuts leave held radial gestures and skin changes under existing control',async({page})=>{
+  await ready(page);
+  const {cell,current}=await reachableEmpty(page);
+  await holdAt(page,await boardPoint(page,cell));
+  await expect(page.locator('#battle-radial')).toBeVisible();
+  await page.keyboard.press('m');await page.keyboard.press('c');
+  expect((await session(page)).state).toEqual(current.state);
+  await page.keyboard.press('Escape');await page.mouse.up();
+  expect((await session(page)).state).toEqual(current.state);
+  await tapBoard(page,cell);await page.keyboard.press('m');
+  await expect(page.locator('#battle-radial-move')).toBeFocused();
+  await page.evaluate(()=>{
+    (globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='rail';
+    globalThis.dispatchEvent(new Event('combat-controls-change'));
+  });
+  await expect(page.locator('#battle-radial')).toBeHidden();
+  await expect(page.locator('#battle-review')).toBeDisabled();
+  await page.locator('canvas').focus();await page.keyboard.press('c');
+  expect((await session(page)).state).toEqual(current.state);
+});
+
 test('radial tap fallback is dismissed without a command when the page is hidden', async ({ page }) => {
   await ready(page);
   const { cell, current } = await reachableEmpty(page);
@@ -364,7 +404,7 @@ test('radial labels stay on one line without overflowing', async ({ page }) => {
   await page.locator('#battle-radial-hub').click({ position: { x: 44, y: 44 } });
 });
 
-test('radial plan specials can be chosen after a destination', async ({ page }) => {
+for(const keyboard of [false,true])test(keyboard?'keyboard-only shortcuts retain radial plan specials and follow-up confirmation':'radial plan specials can be chosen after a destination', async ({ page }) => {
   await ready(page);
   const current = await session(page);
   const actor = current.state.units.find(unit => unit.id === current.state.initiative[current.state.activeIndex])!;
@@ -372,7 +412,7 @@ test('radial plan specials can be chosen after a destination', async ({ page }) 
   if (!reach.ok) throw Error(reach.reason);
   const enemies = current.state.units.filter(unit => unit.side === 'enemy' && unit.hp > 0);
   const abilities = Object.values(catalog.abilities).filter(ability => ability.id !== 'ability:basic_attack' && ability.owners.includes(actor.defId));
-  let setup: { dest: { x: number; y: number }; enemy: typeof enemies[number] } | null = null;
+  let setup: { dest: { x: number; y: number }; enemy: typeof enemies[number]; abilityId: string } | null = null;
   for (const destination of reach.cells.filter(entry => entry.cost > 0)) {
     const occupied = current.state.units.some(unit => unit.hp > 0 && unit.cell.x === destination.cell.x && unit.cell.y === destination.cell.y);
     if (occupied) continue;
@@ -382,7 +422,7 @@ test('radial plan specials can be chosen after a destination', async ({ page }) 
       for (const enemy of enemies) {
         const command = { type: 'useAbility' as const, unitId: actor.id, abilityId: ability.id, target: { unitId: enemy.id } };
         if (previewTacticalPlan(current.state, move, command, catalog).ok) {
-          setup = { dest: destination.cell, enemy };
+          setup = { dest: destination.cell, enemy, abilityId: ability.id };
           break;
         }
       }
@@ -397,12 +437,24 @@ test('radial plan specials can be chosen after a destination', async ({ page }) 
   await tapBoard(page, setup.dest);
   await expect(page.locator('#battle-radial')).toBeVisible();
   await expect(page.locator('#battle-radial-special')).toBeEnabled();
-  await page.locator('#battle-radial-special').click();
-  const sub = page.locator('#battle-radial-sub');
-  if (await sub.isVisible()) await sub.locator('button').first().click();
+  if(keyboard){
+    const ids=await page.locator('#battle-ability option').evaluateAll(options=>options.map(option=>(option as HTMLOptionElement).value));
+    await page.keyboard.press(String(ids.indexOf(setup.abilityId)+1));
+    expect((await session(page)).state).toEqual(current.state);
+    await page.keyboard.press('c');
+    expect((await session(page)).state).toEqual(current.state);
+  }else{
+    await page.locator('#battle-radial-special').click();
+    const sub = page.locator('#battle-radial-sub');
+    if (await sub.isVisible()) await sub.locator('button').first().click();
+  }
   await expect(page.locator('#battle-radial')).toBeHidden();
   await tapBoard(page, setup.enemy.cell);
   await expect.poll(async () => (await session(page)).state.commandCount).toBeGreaterThan(current.state.commandCount);
+  if(keyboard){
+    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    expect((await session(page)).state.commandCount).toBe(current.state.commandCount+2);
+  }
 });
 
 test('radial special tap waits for a sub-ring choice after hovering', async ({ page }) => {

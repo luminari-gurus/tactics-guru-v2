@@ -11,10 +11,15 @@ import type { BattleAudioSnapshot } from '../phaser/BattleAudio';
 import { publicAssetUrl } from './publicAssetUrl';
 import { GUARDED_STRIKE_TRADEOFF } from '../content/constants';
 
-import { ownedAbilities, actionCommand, actionTargets, type Action } from './battleActions';
+import { BATTLE_KEYS, ownedAbilities, actionCommand, actionTargets, type Action } from './battleActions';
 import { mountCombatControlsPreference, type CombatSkin } from './combatControls';
 import { draughtsSpent } from '../domain/draughts';
 export const displayName = (id: string) => id.replace(/^ability:/,'').replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase());
+export function shortcutHint(control: HTMLElement, key: string, label: string) {
+  const hint=key==='Escape'?key:key.toUpperCase();
+  control.setAttribute('aria-keyshortcuts',hint);
+  control.title=`${label} (${hint})`;
+}
 export function previewText(preview: ActionPreview): string {
   if (!preview.ok) return `Unavailable: ${displayName(preview.reason.replace(/([A-Z])/g,' $1'))}`;
   if ('path' in preview) return `Move ${preview.path.length-1} steps · cost ${preview.cost} · uses movement`;
@@ -93,7 +98,7 @@ export class BattleHud {
   private readonly actorRoot=document.querySelector<HTMLElement>('#battle-actor')!;
   private readonly abort=new AbortController();
   private readonly log:string[]=[];
-  constructor(private readonly session:BattleSession, callbacks:{action:(a:Action)=>void;target:(c:CellPosition|null)=>void;confirm:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void;inspect:()=>void;inspectTarget:(id:number)=>void;danger:()=>void;plan:()=>void;undo:()=>void;draught:()=>void;log:(lines:readonly string[])=>void}) {
+  constructor(private readonly session:BattleSession, private readonly callbacks:{action:(a:Action)=>void;target:(c:CellPosition|null)=>void;confirm:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void;inspect:()=>void;inspectTarget:(id:number)=>void;danger:()=>void;plan:()=>void;undo:()=>void;draught:()=>void;log:(lines:readonly string[])=>void}) {
     this.actorRoot.hidden=false;
     this.actorRoot.innerHTML=`<p id="battle-active" aria-live="polite"></p><div class="battle-identity"><div id="battle-portraits"></div><div><h2 id="battle-actor-name" aria-live="polite"></h2><p id="battle-hp"></p><div class="battle-health" aria-hidden="true"><span></span></div><p id="battle-stats"></p><p id="battle-status"></p></div></div><p id="battle-budgets"></p>`;
     for(const unit of session.state.units.filter((u,i,all)=>all.findIndex(v=>v.defId===u.defId)===i)) {
@@ -110,6 +115,14 @@ export class BattleHud {
       <label for="battle-ability">Ability</label><select id="battle-ability" aria-describedby="battle-ability-info battle-availability"></select><p id="battle-ability-info"></p><p id="battle-availability"></p><section class="battle-decision" aria-label="Target and action preview"><label for="battle-target">Target / destination</label><select id="battle-target"><option value="">Choose target</option></select><p id="battle-selection">Select a tile</p><p id="battle-target-info"></p><button id="battle-inspect-target" hidden>Inspect target</button><p id="battle-preview" aria-live="polite">Choose an action and target</p><div class="battle-commit"><button id="battle-review" disabled>Confirm action</button><button id="battle-cancel" disabled>Cancel action</button></div></section>
       <nav class="battle-tools" aria-label="Secondary battle tools"><button id="battle-plan">Plan move + ability</button><button id="battle-undo">Undo move</button><button id="battle-party">Inspect party</button><button id="battle-danger" aria-pressed="false" aria-describedby="battle-danger-info">Show enemy danger</button><button id="battle-log-open">Battle log</button><button id="battle-sound" aria-pressed="false" aria-describedby="battle-sound-status">Enable sound</button><button id="battle-sound-retry" hidden>Retry sound</button><details id="battle-overflow"><summary>More</summary></details></nav><p id="battle-danger-info">Danger shows living heroes reachable by an enemy attack or Weakening Hex on its next turn, assuming current positions and statuses; it does not predict enemy choice.</p><p id="battle-danger-results" aria-live="polite" aria-atomic="true"></p><p id="battle-sound-status" aria-live="polite">Sound off</p>`;
     const signal=this.abort.signal;
+    const help=document.createElement('details');help.id='battle-shortcuts';
+    help.innerHTML=`<summary>Keyboard shortcuts</summary><p>${BATTLE_KEYS.move.toUpperCase()}: Move · ${BATTLE_KEYS.basic.toUpperCase()}: Basic attack · ${BATTLE_KEYS.ability.toUpperCase()}: selected ability · 1–9: learned abilities · ${BATTLE_KEYS.wait.toUpperCase()}: Wait / End turn immediately · ${BATTLE_KEYS.confirm.toUpperCase()}: confirm · ${BATTLE_KEYS.cancel}: cancel.</p><p>Rail: choose an action, then a target. Radial: choose a target with the board cursor first, then aim an action; confirm with C or activate its focused button. Arrow keys navigate the board; Enter/Space select a cell or activate a focused control. Tab moves focus. Shortcuts pause while editing, in dialogs, or while holding modifiers. Held keys never repeat actions.</p><ol aria-label="Learned ability shortcuts"></ol>`;
+    this.root.querySelector('.battle-tools')!.append(help);
+    for(const [selector,key,label] of [
+      ['#battle-move',BATTLE_KEYS.move,'Move'],['[data-action="basic"]',BATTLE_KEYS.basic,'Basic attack'],
+      ['#battle-next',BATTLE_KEYS.wait,'End turn immediately'],['#battle-review',BATTLE_KEYS.confirm,'Confirm action'],
+      ['#battle-cancel',BATTLE_KEYS.cancel,'Cancel action'],
+    ])shortcutHint(this.root.querySelector<HTMLElement>(selector)!,key,label);
     const draught = document.createElement('button');
     draught.id = 'battle-draught'; draught.type = 'button'; draught.hidden = true;
     draught.addEventListener('click', callbacks.draught, { signal });
@@ -135,6 +148,23 @@ export class BattleHud {
     this.root.querySelector('#battle-plan-cancel')!.addEventListener('click',callbacks.cancel,{signal});
     this.root.querySelector('#battle-next')!.addEventListener('click',callbacks.wait,{signal});
     mountCombatControlsPreference(this.root.querySelector('#battle-overflow')!);
+  }
+  shortcut(key:string):boolean {
+    if(/^[1-9]$/.test(key)) {
+      const option=this.ability.options[Number(key)-1];
+      if(this.ability.disabled || !option || option.disabled)return false;
+      this.ability.value=option.value;
+      this.callbacks.action(option.value as Action);
+      return true;
+    }
+    const selector:Record<string,string>={
+      [BATTLE_KEYS.move]:'#battle-move',[BATTLE_KEYS.basic]:'[data-action="basic"]',
+      [BATTLE_KEYS.ability]:'[data-action="signature"]',[BATTLE_KEYS.wait]:'#battle-next',
+      [BATTLE_KEYS.confirm]:'#battle-review',
+    };
+    const button=selector[key]?this.root.querySelector<HTMLButtonElement>(selector[key]):null;
+    if(!button || button.disabled || button.closest('[hidden]'))return false;
+    button.click();return true;
   }
   applySkin(skin: CombatSkin) {
     this.lastRender = [];
@@ -233,10 +263,18 @@ export class BattleHud {
     this.actorRoot.querySelector('#battle-budgets')!.textContent=`Move ${actor.hasMoved?'spent':'ready'} / Action ${actor.hasActed?'spent':'ready'}`;
     const locked=s.phase==='presenting'?'Resolving action. Gameplay is locked until presentation finishes.':s.phase==='enemy'?'Enemy turn. Hero actions are unavailable.':s.phase==='ended'?'Battle complete. Gameplay is unavailable.':s.phase==='error'?'Battle stopped. Use recovery or restart.':'';
     const abilities=ownedAbilities(s),key=abilities.map(a=>a.id).join('|');
-    if(key!==this.abilityKey){this.abilityKey=key;this.ability.replaceChildren(...abilities.map(a=>new Option(displayName(a.id),a.id)));}
+    if(key!==this.abilityKey){
+      this.abilityKey=key;this.ability.replaceChildren(...abilities.map(a=>new Option(displayName(a.id),a.id)));
+      this.root.querySelector('#battle-shortcuts ol')!.replaceChildren(...abilities.map((a,index)=>{
+        const item=document.createElement('li');item.textContent=`${index<9?index+1:'Picker'}: ${displayName(a.id)}`;return item;
+      }));
+      this.ability.setAttribute('aria-keyshortcuts',abilities.slice(0,9).map((_,index)=>index+1).join(' '));
+      this.ability.title='1–9: select a learned ability (outside editable controls)';
+    }
     if(action?.startsWith('ability:'))this.ability.value=action;
     this.ability.disabled=!enabled || actor.hasActed || !abilities.length;
     const chosen=s.catalog.abilities[this.ability.value as import('../content/types').AbilityId];
+    shortcutHint(this.root.querySelector<HTMLElement>('[data-action="signature"]')!,BATTLE_KEYS.ability,chosen?displayName(chosen.id):'Selected ability');
     this.root.querySelector('#battle-ability-info')!.textContent=chosen
       ? `${!enabled?locked+' ':actor.hasActed?'Action spent. ':''}Range ${chosen.rangeMin}–${chosen.rangeMax} · ${chosen.kind==='weakeningHex'?`Hostile target · Will save vs DC ${10+info.def.stats.power} · −2 accuracy on failure until target turn end or source/target defeat`:chosen.kind==='healGoblin'?'Living injured goblin ally · heal up to 4 HP · no self heal or revival · no roll':chosen.kind==='secondWind'?`Self only · heal up to ${chosen.healBase+info.def.stats.power} HP · ${actor.secondWindUsed?'0':'1'}/1 use this battle · no roll`:chosen.kind==='taunt'?'Hostile target · forced target until its next turn ends · no roll':chosen.kind==='markTarget'?'Hostile target · +2 on next player attack roll, consumed even on miss · no damage or roll':chosen.kind==='pinningShot'||chosen.kind==='frostSnare'?'Hostile target · blocks movement until its next turn ends or source/target defeat · no damage or roll':chosen.kind==='magicMissile'?'Living target, including allies · automatic force damage':chosen.kind==='guardedAttack'?'Hostile target · −2 attack / +2 AC until next turn':'Hostile target · attack roll'}${chosen.requiredLevel?` · unlock level ${chosen.requiredLevel}`:''} · uses action`
       : 'No owned abilities';

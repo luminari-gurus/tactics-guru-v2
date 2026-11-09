@@ -18,6 +18,7 @@ import { track } from '../telemetry/telemetry';
 import { hoverPreview } from '../ui/targetPreview';
 import { previewDraught } from '../domain/turns';
 import { BattleSelection } from '../ui/battleSelection';
+import { BATTLE_KEYS } from '../ui/battleActions';
 import { BattleRadial, clientPointFromCanvas } from '../ui/battleRadial';
 import { resolveCombatControlsSkin, watchCombatControls, type CombatSkin } from '../ui/combatControls';
 import { lightHaptic, type RadialSliceId } from '../ui/radialGesture';
@@ -316,8 +317,24 @@ export class BattleScene extends Phaser.Scene {
       select(cursor);
     };
     canvas.addEventListener('keydown',key);
-    const escape=(event:KeyboardEvent)=>{if(event.key==='Escape' && !event.defaultPrevented && !dialogs.open && ready && session.phase==='player'){cancel();event.preventDefault();}};
-    document.addEventListener('keydown',escape);
+    const shortcut=(event:KeyboardEvent)=>{
+      if(!live || !ready || document.hidden || dialogs.open || document.querySelector('dialog[open]') || session.phase!=='player' || event.defaultPrevented)return;
+      if(event.key==='Escape'){cancel();event.preventDefault();return;}
+      if(event.repeat || event.isComposing || event.ctrlKey || event.altKey || event.metaKey || event.shiftKey)return;
+      if(event.composedPath().some(target=>target instanceof HTMLElement &&
+        (target.isContentEditable || target.matches('input, textarea, select, [role="textbox"]'))))return;
+      const key=event.key.toLowerCase();
+      if(skin==='rail' || key===BATTLE_KEYS.wait){if(hud.shortcut(key))event.preventDefault();return;}
+      if(key===BATTLE_KEYS.confirm){if(radial.confirmShortcut())event.preventDefault();return;}
+      const ability=key===BATTLE_KEYS.ability?hud.ability.value:/^[1-9]$/.test(key)?hud.ability.options[Number(key)-1]?.value:undefined;
+      const slice=key===BATTLE_KEYS.move?'move':key===BATTLE_KEYS.basic?'attack':ability?'special':null;
+      const cell=selection.selectedCell??cursor;
+      if(slice && radial.focusShortcut(cell,slice,cellOrigin(cell),ability as AbilityId|undefined)){
+        if(ability)hud.ability.value=ability;
+        board.resetPicking();hovered=null;refresh();event.preventDefault();
+      }
+    };
+    document.addEventListener('keydown',shortcut);
     const visibility=()=>{if(document.hidden){if(movingPresentation){if(planInFlight)planInterrupted=true;session.cancel();}measurements.frame(performance.now(),false);animation?.cancel();removeInput.reset();if(radial.open){clearRadial();radial.hide();}refresh();}else {refresh();pump();}};
     document.addEventListener('visibilitychange',visibility);
     const drawable=document.querySelector<HTMLElement>('#battle-board-region')!;
@@ -358,7 +375,7 @@ export class BattleScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{
       live=false;ready=false;this.game.events.off(Phaser.Core.Events.POST_RENDER,onRender);audio.destroy();setBattleAudioDiagnostics(null);session.dispose();animation?.cancel();radial.dispose();hud.dispose();removeInput();stopSkinWatch();observer.disconnect();
       canvas.removeEventListener('keydown',key);canvas.removeAttribute('tabindex');canvas.removeAttribute('aria-label');
-      document.removeEventListener('keydown',escape);canvas.style.clipPath='';
+      document.removeEventListener('keydown',shortcut);canvas.style.clipPath='';
       document.removeEventListener('visibilitychange',visibility);this.scale.off(Phaser.Scale.Events.RESIZE,fit);this.game.events.off(Phaser.Core.Events.POST_RENDER,onReady);
       delete game.dataset.battleReport;delete game.dataset.session;delete game.dataset.phase;
       delete document.body.dataset.combatSkin;document.body.classList.remove('battle-skin-radial','battle-skin-rail');

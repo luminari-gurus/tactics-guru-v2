@@ -6,6 +6,74 @@ import { HERO_IDS } from '../src/content/constants';
 import { previewMovement } from '../src/domain/grid';
 import { COMBAT_CONTROLS_KEY } from '../src/ui/combatControls';
 
+for(const hero of ['fighter','ranger','mage'] as const)test(`keyboard-only shortcuts select ${hero} learned abilities and preserve resource locks`,async({page})=>{
+  const expected={fighter:['guarded_strike','second_wind','taunt'],ranger:['high_shot','mark_target','pinning_shot'],mage:['frost_snare','magic_missile']}[hero].map(id=>`ability:${id}`);
+  await page.goto(`/tests/fixtures/abilities/index.html?hero=${hero}&xp=180&real&injured`);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const before=await readSession(page),picker=page.locator('#battle-ability'),canvas=page.locator('canvas');
+  expect(await picker.locator('option').evaluateAll(options=>options.map(option=>(option as HTMLOptionElement).value))).toEqual(expected);
+  const saves=await page.evaluate(()=>JSON.stringify(localStorage));
+  for(const [index,ability] of expected.entries()){
+    await canvas.focus();await page.keyboard.press(String(index+1));
+    await expect(picker).toHaveValue(ability);
+    await expect(page.locator('[data-action=signature]')).toHaveAttribute('aria-pressed','true');
+    await expect(page.locator('#battle-shortcuts ol')).toContainText(`${index+1}:`);
+    expect((await readSession(page)).state).toEqual(before.state);
+  }
+  await page.keyboard.press('9');await expect(picker).toHaveValue(expected.at(-1)!);
+  await page.keyboard.press('Escape');await page.keyboard.press('s');
+  await expect(page.locator('[data-action=signature]')).toHaveAttribute('aria-pressed','true');
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saves);
+  const ability=hero==='fighter'?'ability:second_wind':hero==='ranger'?'ability:mark_target':'ability:frost_snare';
+  const index=expected.indexOf(ability);
+  await canvas.focus();await page.keyboard.press(String(index+1));
+  await page.locator('#battle-target').selectOption(hero==='fighter'?'0,0':'2,0');
+  expect((await readSession(page)).state).toEqual(before.state);
+  await canvas.focus();await page.keyboard.press('c');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const accepted=await readSession(page);
+  expect(accepted.state.commandCount).toBe(before.state.commandCount+1);
+  expect(accepted.events.some(event=>event.type==='abilityUsed'&&event.abilityId===ability)).toBe(true);
+  await page.keyboard.press(String(index+1));await page.keyboard.press('s');await page.keyboard.press('c');
+  expect((await readSession(page)).state).toEqual(accepted.state);
+  await page.goto(`/tests/fixtures/abilities/index.html?hero=${hero}&xp=0&real`);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await expect(picker.locator('option')).toHaveCount(1);
+  const locked=await readSession(page);
+  await canvas.focus();await page.keyboard.press('2');await page.keyboard.press('c');
+  expect((await readSession(page)).state).toEqual(locked.state);
+});
+
+test('keyboard-only shortcuts use canonical radial ability numbers without casting unavailable alternatives',async({page})=>{
+  await page.addInitScript(()=>{(globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';});
+  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const before=await readSession(page),canvas=page.locator('canvas');
+  await canvas.focus();await page.keyboard.press('ArrowRight');await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('1');
+  const snare=page.locator('[data-radial-ability="ability:frost_snare"]');
+  await expect(snare).toBeFocused();await expect(snare).toHaveAttribute('aria-keyshortcuts','1');
+  await expect(page.locator('#battle-radial-hub')).toContainText('Frost Snare');
+  await expect(page.locator('#battle-preview')).toContainText('Snared');
+  await expect(page.locator('#battle-preview')).toContainText('no damage or roll');
+  expect((await readSession(page)).state).toEqual(before.state);
+  await page.keyboard.press('2');
+  await expect(page.locator('[data-radial-ability="ability:magic_missile"]')).toBeFocused();
+  expect((await readSession(page)).state).toEqual(before.state);
+  await page.keyboard.press('1');await page.keyboard.press('c');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const accepted=await readSession(page);expect(accepted.state.commandCount).toBe(before.state.commandCount+1);
+  expect(accepted.events.some(event=>event.type==='abilityUsed'&&event.abilityId==='ability:frost_snare')).toBe(true);
+  await page.keyboard.press('1');await page.keyboard.press('2');await page.keyboard.press('c');
+  expect((await readSession(page)).state).toEqual(accepted.state);
+  // At range one Frost Snare is unavailable, but Magic Missile keeps key 2.
+  await page.reload();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const fresh=await readSession(page);await canvas.focus();await page.keyboard.press('ArrowRight');await page.keyboard.press('1');
+  await expect(page.locator('#battle-radial')).toBeHidden();expect((await readSession(page)).state).toEqual(fresh.state);
+  await page.keyboard.press('2');await expect(page.locator('[data-radial-ability="ability:magic_missile"]')).toBeFocused();
+  await page.keyboard.press('Escape');expect((await readSession(page)).state).toEqual(fresh.state);
+});
+
 test('Mage real learned picker consolidates Arc Bolt and gates Frost Snare at level three',async({page})=>{
   for(const [xp,count] of [[0,0],[60,0],[180,1]]) {
     await page.goto(`/tests/fixtures/abilities/index.html?hero=mage&xp=${xp}&real`);

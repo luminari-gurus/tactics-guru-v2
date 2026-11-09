@@ -60,10 +60,16 @@ async function prepare(page:Page){
 }
 test('run battle undo survives reload and a legal terminal journey',async({page,isMobile})=>{
  test.setTimeout(300000);await start(page);const entry=await snapshot(page);
+ await page.locator('canvas').focus();await page.keyboard.press('a');
+ await expect(page.locator('[data-action=basic]')).toHaveAttribute('aria-pressed','true');
+ await page.keyboard.press('m');await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');
+ expect(await snapshot(page)).toEqual(entry);
  const catalog=runBattleCatalog(entry.items,runContext)!;const restored=await playUndo(page,catalog,isMobile);
  await page.reload();await page.locator('#run-continue').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  expect((await readSession(page)).state).toEqual(restored);await expect(page.locator('#battle-undo')).toBeDisabled();
  await fight(page,true);await expect(page.getByRole('heading',{name:'Run defeat',exact:true})).toBeVisible();
+ const ended=await snapshot(page);await page.keyboard.press('c');await page.keyboard.press('w');
+ expect(await snapshot(page)).toEqual(ended);
  await page.reload();await page.locator('#run-continue').click();await expect(page.getByRole('heading',{name:'Run defeat',exact:true})).toBeVisible();
  await page.locator('#run-new').click();await expect(page.locator('#run-start-encounter')).toBeVisible();
 });

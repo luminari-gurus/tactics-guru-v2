@@ -5,7 +5,9 @@ Issue: [#284](https://github.com/luminari-gurus/tactics-guru-v2/issues/284).
 Owner: @moshehbenavraham, verified from the authenticated GitHub identity and assigned on the issue.
 Base: `origin/main` at `130c5ccffc491f893da8e598b8c008898fa92138`.
 Branch: [`branch/issue-284-desktop-shortcuts`](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-284-desktop-shortcuts).
-Status: planning handoff only; application code and tests have not been implemented.
+Status: implementation authorized by the caller on 2026-11-09. OpenSpec change
+[`issue-284-desktop-shortcuts`](../../openspec/changes/issue-284-desktop-shortcuts/proposal.md)
+tracks this approved plan. Application implementation and qualification are in progress.
 The previous plan is preserved unchanged in [the #297 plan](issue-297-hide-gameplay-diagnostics-plan.md).
 
 ## Why this item
@@ -255,3 +257,16 @@ application/browser execution belongs to implementation. The branch was created
 with GitHub's native linked-branch mutation, attaching it to #284 in Development.
 No production state was changed and no application verification is claimed by
 this planning commit.
+
+## Implementation progress — 2026-11-09
+
+- Caller explicitly authorized implementation, autonomous issue resolution, commits/pushes and a labeled review PR, and requested OpenSpec. This approval applies to the concrete plan above.
+- Confirmed clean branch at `b7dad6a`, unchanged `origin/main` at `130c5cc`, issue assignment and open PR #355. No runtime evidence is reused as proof of the new feature.
+- Created the OpenSpec change using the existing project root and spec-driven schema. Reusing the existing `battle-controls` capability; no new framework, preferences or dependencies are needed.
+- Implemented one scene-owned guarded dispatch path, fixed key descriptions, accessible hints/disclosure, ordered learned ability selection and radial aim/focus before explicit confirmation. Reused existing callbacks, previews and disabled controls; no new dependencies, preferences, rules or save fields.
+- The compact radial label fitter can omit long hub text. New keyboard aiming now retains the complete existing preview in the HUD; the focused Snare case proves the no-damage/no-roll details remain visible before casting. This repair is required by the planned preview contract.
+- Added focused regressions to the existing battle-loop, ability-picker and radial suites; preserved the old radial plan test and added its keyboard variant. Existing run/dungeon core journeys now assert shortcut selection leaves their authoritative snapshots unchanged.
+- Desktop iteration: `tmp/issue284-desktop-final.log` records **6/6 production shortcut passes**, including guarded selection, held keys, modal/editable contexts, presentation/visibility, restart/reload, radial movement, held pointer/skin change and plan follow-up. `tmp/issue284-abilities-desktop.log` retains three passing real hero ability cases plus the radial preview failure; `tmp/issue284-radial-abilities-fixed.log` records the repaired radial case passing. Both TypeScript scopes passed. These are focused iteration results; full affected qualification remains in progress.
+- Retained failures: initial dev navigation timed out at startup before any feature assertion (`tmp/issue284-red`); the built-preview pre-change witness correctly failed because A did not select Basic attack (`tmp/issue284-red-preview.log`). A newly written reload test initially used the fresh-replay-only helper on a resumed battle; switching it to the existing `readSession` helper repaired the witness without changing product behavior (`tmp/issue284-rail-guards.log`). The radial HUD detail failure above was repaired in production code, not hidden by weakening its detail assertion.
+- Verification source inputs are recorded in `tmp/issue284-verification-inputs.json`: original tested HEAD `b7dad6a` plus dirty paths and 333 relevant source/test/tooling SHA-256 values, Node 24.22.1, Windows x64, Playwright 1.64.1, one worker, zero retries. Standard `verify:pr` is running with receipts at `verification-receipts/pr/1794232084939-8808/`; no passing result is assumed yet. Source/build identity and final relevant-input parity will be checked before review handoff.
+- OpenSpec implementation tasks 1.1/2.1 are complete; integrated device/browser qualification and the final review handoff remain. Next: finish standard verification, run the affected Chromium/fixture/WebKit filters, review screenshots, retain results, and publish/update the focused review PR.

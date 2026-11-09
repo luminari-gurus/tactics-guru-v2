@@ -355,6 +355,11 @@ fixedSeedTest('read-only entry, keyboard new dungeon, real action and active res
  expect(await page.locator('#dungeon-screen').evaluate(n=>n.scrollWidth<=n.clientWidth)).toBe(true);
  await page.screenshot({path:test.info().outputPath('floor-entry.png'),fullPage:true});
  await walkDungeon(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ const shortcutEntry=await snapshot(page);
+ await page.locator('canvas').focus();await page.keyboard.press('a');
+ await expect(page.locator('[data-action=basic]')).toHaveAttribute('aria-pressed','true');
+ await page.keyboard.press('m');await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');
+ expect(await snapshot(page)).toEqual(shortcutEntry);
  await page.locator('#battle-party').focus();
  if(isMobile)await page.locator('#fit-restart').tap();else await page.locator('#fit-restart').click();
  await page.locator('#dungeon-cancel-new').click();await expect(page.locator('#fit-restart')).toBeFocused();

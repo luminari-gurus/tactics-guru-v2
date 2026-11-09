@@ -84,6 +84,10 @@ dialog button { touch-action: manipulation; }
 .battle-mode #battle-review:not(:disabled) { color:var(--panel); background:var(--gold); border-color:var(--gold); font-weight:650; }
 .battle-mode .battle-tools { display:flex; gap:6px; flex-wrap:wrap; border-top:1px solid #66768d; padding-top:12px; margin-top:16px; }
 .battle-mode .battle-tools button, .battle-mode #battle-persistence, .battle-mode #battle-scroll > .fit-controls { font-size:.8rem; }
+.battle-mode #battle-shortcuts { flex-basis:100%; min-width:0; font-size:.8rem; }
+.battle-mode #battle-shortcuts summary { min-height:44px; padding:10px 0; box-sizing:border-box; cursor:pointer; }
+.battle-mode #battle-shortcuts p { overflow-wrap:anywhere; }
+.battle-mode #battle-shortcuts ol { padding-left:24px; }
 .battle-mode #battle-sound-status, .battle-mode #fit-status, .battle-mode #board-caption { font-size:.75rem; color:var(--muted); }
 .battle-mode #battle-persistence { display:flex; flex-direction:column; align-items:stretch; }
 .battle-mode #battle-save-status { min-width:0; overflow-wrap:anywhere; }
