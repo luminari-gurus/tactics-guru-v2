@@ -12,8 +12,9 @@ source-bound union of **36 affected browser cases**. All six freshly requalified
 progression profiles finish below 600 seconds, with no skipped/flaky/retried
 cases. [Final proof](qualification-42687875604/summary.json),
 [reuse validation](evidence-reuse.json) and [requirement audit](acceptance-audit.json)
-are authoritative. Historical failed attempts below remain failed. Final Git/PR
-publication is being completed; no application matrix needs repeating for prose.
+are authoritative. Historical failed attempts below remain failed. Both PRs are
+ready for review and all six OpenSpec tasks are complete. The final handoff
+updates documentation only; no application matrix is repeated for prose.
 
 ## Scope and preserved assertions
 

@@ -52,5 +52,22 @@
     "actualSource": "b17443a1096c70ee8b54a95196a30e017bfae453",
     "equalImplementationTree": "4a3dfda631c1db37530fc35e2300e4227fb769d7"
   },
-  "limitations": "Affected-scope acceptance, not an executed full regression or physical-device claim. The original failed matrix is retained and is not described as a clean run. PR publication/readiness and final OpenSpec handoff still need completion."
+  "limitations": "Affected-scope acceptance, not an executed full regression or physical-device claim. Original failed matrices remain preserved. Final tracking/evidence commits change documentation only, preserving qualified inputs.",
+  "reviewHandoff": {
+    "evidenceCommit": "8d6487ffd2e80b0a634769f78b2ebf88b8eba1a1",
+    "pr357": {
+      "state": "open",
+      "draft": false,
+      "base": "branch/fix-radial-selection-contract",
+      "issueReference": "Closes #316"
+    },
+    "pr358": {
+      "state": "open",
+      "draft": false,
+      "base": "main"
+    },
+    "openspecTasks": "6/6 complete; strict validation passes",
+    "remainingImplementation": 0,
+    "workflowFollowup": "Review #358 before #357; keep issue open until merge; archive after merge, not during this task."
+  }
 }

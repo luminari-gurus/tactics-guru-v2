@@ -5,9 +5,9 @@ Issue: [#316](https://github.com/luminari-gurus/tactics-guru-v2/issues/316).
 Branch: [`branch/issue-316-mage-acceptance-fixtures`](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-316-mage-acceptance-fixtures).
 Original main base: `6aad368761e6684d88d9b3eb5b3cacc53a615c90`.
 
-**Status:** all implementation and functional acceptance gates pass. The complete
-source-bound audit is retained; final evidence publication and PR-ready handoff
-are being completed. The first matrix's desktop timeout remains preserved.
+**Status:** implementation, verification and review handoff are complete. Both
+PRs are ready for review and all six OpenSpec tasks are complete. The full
+source-bound audit and the first matrix's desktop timeout remain preserved.
 The caller explicitly
 authorized implementation, autonomous repairs, commits/pushes, incremental PRs
 and OpenSpec on November 9. No additional implementation approval is needed.
@@ -17,7 +17,7 @@ Review stack:
 - [PR #358](https://github.com/luminari-gurus/tactics-guru-v2/pull/358),
   `branch/fix-radial-selection-contract` → main, is **ready for review**.
 - [PR #357](https://github.com/luminari-gurus/tactics-guru-v2/pull/357), the issue
-  branch → #358's branch, contains the Mage implementation and remains draft.
+  branch → #358's branch, contains the Mage implementation and is **ready for review**.
 - Both have appropriate feature/risk labels. Keep #316 open until the complete
   reviewed implementation merges. No merge, release tag or production operation
   is part of this handoff.
@@ -190,11 +190,13 @@ restart target jobs. Automatic documentation-head PR checks may still run.
 Required failure evidence is retained; only owned scratch configs/probes are
 eligible for cleanup.
 
-Remaining publication steps: push the final evidence, use `Closes #316` on the
-fully qualified #357, mark it ready, record the final OpenSpec handoff, and verify
-remote parity/clean owned worktree/PR states. Keep #316 open until merge and do
-not merge or archive the OpenSpec change as part of this task. After these steps,
-no implementation work remains; the review order is #358 then #357.
+Evidence was published in `8d6487f`, #357 now uses `Closes #316` and is ready for
+review, and all six OpenSpec tasks are complete. This final tracking update is
+documentation only. Six owned temporary probe/config/helper scripts were removed;
+unrelated worktrees and required raw failure evidence were preserved. Final
+head/parity is reported through Git/PR metadata rather than a self-referential
+commit hash here. No implementation work remains. Keep #316 open until merge;
+the review order is #358 then #357. Merge and OpenSpec archive are later workflow.
 ## Commands and execution policy
 
 Apply [verification-policy.md](../verification-policy.md) to the affected test
@@ -235,5 +237,5 @@ retains the full inventory and rationale. PR #314's merged contact fix is an
 ancestor of the base; it is not reopened by this work.
 
 Initial implementation/verification estimate was **2–3 hours**, excluding runner
-queue time. Code and verification are complete; only the final review handoff is
-being published. The selected seed is fixture evidence, not a gameplay fix.
+queue time. Implementation and the review handoff are complete. The selected seed
+is fixture evidence, not a gameplay fix.
