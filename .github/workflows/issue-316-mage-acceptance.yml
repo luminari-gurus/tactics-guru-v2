@@ -43,6 +43,9 @@ jobs:
           }, null, 2));
           JS
           npm run build
+      - name: Verify selection contracts
+        if: ${{ !cancelled() && !contains(github.event.head_commit.message, '[mage baseline]') && steps.build.outcome == 'success' }}
+        run: npm run test:verification-batches
       - name: Capture original seed-68 Chromium baseline
         if: contains(github.event.head_commit.message, '[mage baseline]') && steps.build.outcome == 'success'
         run: npm run test:browser -- -c playwright.extended.config.ts -g 'Mage legal progression' --project desktop --diagnostics

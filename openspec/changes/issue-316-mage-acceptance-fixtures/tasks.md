@@ -5,7 +5,7 @@ plan's complete acceptance remains required; no product spec changes apply.
 
 ## 1. Baseline and preserved coverage
 
-- [ ] 1.1 Record the unchanged source/test selections and original seed-68 unit/browser results on the qualified runner; preserve failures, per-case timings and the complete original assertion map in the issue QA record.
+- [x] 1.1 Record the unchanged source/test selections and original seed-68 unit/browser results on the qualified runner; preserve failures, per-case timings and the complete original assertion map in the issue QA record.
 
 ## 2. Resilient focused verification
 
@@ -15,7 +15,8 @@ plan's complete acceptance remains required; no product spec changes apply.
 
 ## 3. Integration and review handoff
 
-- [ ] 3.1 Pass affected units, both type scopes/build integrations, core PR journeys and exact selection contracts; audit all issue/plan gates against current-source evidence, update the plan/QA record, push and open a correctly labeled focused PR ready for review.
+- [ ] 3.1 Qualify the separate prerequisite PR #358 restoring mobile executions excluded by unregistered layout tags; verify the exact-main reproduction, selection contracts and all six affected browser cases without changing assertions or classification policy.
+- [ ] 3.2 Pass affected units, both type scopes/build integrations, core PR journeys and exact selection contracts; audit all issue/plan gates against current-source evidence, update the plan/QA record, push and open a correctly labeled focused PR ready for review.
 
 ## Workflow follow-up
 

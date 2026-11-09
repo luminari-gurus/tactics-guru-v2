@@ -1,0 +1,1427 @@
+{
+  "source": "cb5927663f66ec5dd1f70aca9edfd3dec5e32c09",
+  "dirty": "",
+  "node": "v24.22.1",
+  "startedAt": "2026-11-09T18:14:18.951Z",
+  "budgetMs": 480000,
+  "results": [
+    {
+      "id": "tooling",
+      "command": [
+        "npm",
+        "exec",
+        "--no",
+        "--",
+        "node",
+        "--test",
+        "tests/tooling/verify-pr.test.mjs",
+        "tests/tooling/verify-full.test.mjs"
+      ],
+      "log": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/pr/1794248058921-1188165/tooling.log",
+      "durationMs": 8658.900077,
+      "status": "passed",
+      "wallMs": 8658.900077,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "interrupted": false,
+      "error": null,
+      "cleanup": {
+        "mode": "linux-proc-ancestry",
+        "sampleIntervalMs": 100,
+        "observed": [
+          {
+            "pid": 1188182,
+            "parent": 1188165,
+            "start": "27767387",
+            "signalPid": 1188182
+          },
+          {
+            "pid": 1188198,
+            "parent": 1188182,
+            "start": "27767415",
+            "signalPid": 1188198
+          },
+          {
+            "pid": 1188199,
+            "parent": 1188198,
+            "start": "27767416",
+            "signalPid": 1188199
+          },
+          {
+            "pid": 1188205,
+            "parent": 1188199,
+            "start": "27767420",
+            "signalPid": 1188205
+          },
+          {
+            "pid": 1188206,
+            "parent": 1188199,
+            "start": "27767420",
+            "signalPid": 1188206
+          },
+          {
+            "pid": 1188219,
+            "parent": 1188205,
+            "start": "27767425",
+            "signalPid": 1188219
+          },
+          {
+            "pid": 1188220,
+            "parent": 1188206,
+            "start": "27767425",
+            "signalPid": 1188220
+          },
+          {
+            "pid": 1188240,
+            "parent": 1188205,
+            "start": "27767438",
+            "signalPid": 1188240
+          },
+          {
+            "pid": 1188252,
+            "parent": 1188206,
+            "start": "27767797",
+            "signalPid": 1188252
+          },
+          {
+            "pid": 1188264,
+            "parent": 1188206,
+            "start": "27767880",
+            "signalPid": 1188264
+          },
+          {
+            "pid": 1188276,
+            "parent": 1188206,
+            "start": "27767963",
+            "signalPid": 1188276
+          },
+          {
+            "pid": 1188288,
+            "parent": 1188206,
+            "start": "27768038",
+            "signalPid": 1188288
+          },
+          {
+            "pid": 1188300,
+            "parent": 1188206,
+            "start": "27768112",
+            "signalPid": 1188300
+          },
+          {
+            "pid": 1188312,
+            "parent": 1188206,
+            "start": "27768180",
+            "signalPid": 1188312
+          }
+        ],
+        "escalated": [],
+        "survivors": [],
+        "errors": [],
+        "complete": true
+      }
+    },
+    {
+      "id": "units",
+      "command": [
+        "npm",
+        "run",
+        "test:unit",
+        "--",
+        "--reporter=json",
+        "--outputFile=/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/pr/1794248058921-1188165/units.json"
+      ],
+      "log": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/pr/1794248058921-1188165/units.log",
+      "durationMs": 59784.094961999996,
+      "status": "passed",
+      "wallMs": 59784.094961999996,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "interrupted": false,
+      "error": null,
+      "cleanup": {
+        "mode": "linux-proc-ancestry",
+        "sampleIntervalMs": 100,
+        "observed": [
+          {
+            "pid": 1188324,
+            "parent": 1188165,
+            "start": "27768253",
+            "signalPid": 1188324
+          },
+          {
+            "pid": 1188335,
+            "parent": 1188324,
+            "start": "27768263",
+            "signalPid": 1188335
+          },
+          {
+            "pid": 1188336,
+            "parent": 1188335,
+            "start": "27768263",
+            "signalPid": 1188336
+          },
+          {
+            "pid": 1188359,
+            "parent": 1188336,
+            "start": "27768295",
+            "signalPid": 1188359
+          },
+          {
+            "pid": 1188360,
+            "parent": 1188336,
+            "start": "27768296",
+            "signalPid": 1188360
+          },
+          {
+            "pid": 1188366,
+            "parent": 1188336,
+            "start": "27768296",
+            "signalPid": 1188366
+          },
+          {
+            "pid": 1188372,
+            "parent": 1188336,
+            "start": "27768297",
+            "signalPid": 1188372
+          },
+          {
+            "pid": 1188378,
+            "parent": 1188336,
+            "start": "27768297",
+            "signalPid": 1188378
+          },
+          {
+            "pid": 1188394,
+            "parent": 1188336,
+            "start": "27768471",
+            "signalPid": 1188394
+          },
+          {
+            "pid": 1188401,
+            "parent": 1188336,
+            "start": "27768516",
+            "signalPid": 1188401
+          },
+          {
+            "pid": 1188408,
+            "parent": 1188336,
+            "start": "27768591",
+            "signalPid": 1188408
+          },
+          {
+            "pid": 1188415,
+            "parent": 1188336,
+            "start": "27768877",
+            "signalPid": 1188415
+          },
+          {
+            "pid": 1188422,
+            "parent": 1188336,
+            "start": "27768913",
+            "signalPid": 1188422
+          },
+          {
+            "pid": 1188429,
+            "parent": 1188336,
+            "start": "27769127",
+            "signalPid": 1188429
+          },
+          {
+            "pid": 1188436,
+            "parent": 1188336,
+            "start": "27769149",
+            "signalPid": 1188436
+          },
+          {
+            "pid": 1188444,
+            "parent": 1188336,
+            "start": "27769967",
+            "signalPid": 1188444
+          },
+          {
+            "pid": 1188451,
+            "parent": 1188336,
+            "start": "27769974",
+            "signalPid": 1188451
+          },
+          {
+            "pid": 1188458,
+            "parent": 1188336,
+            "start": "27770002",
+            "signalPid": 1188458
+          },
+          {
+            "pid": 1188466,
+            "parent": 1188336,
+            "start": "27770232",
+            "signalPid": 1188466
+          },
+          {
+            "pid": 1188474,
+            "parent": 1188336,
+            "start": "27770425",
+            "signalPid": 1188474
+          },
+          {
+            "pid": 1188481,
+            "parent": 1188474,
+            "start": "27770462",
+            "signalPid": 1188481
+          },
+          {
+            "pid": 1188488,
+            "parent": 1188474,
+            "start": "27770474",
+            "signalPid": 1188488
+          },
+          {
+            "pid": 1188499,
+            "parent": 1188474,
+            "start": "27770486",
+            "signalPid": 1188499
+          },
+          {
+            "pid": 1188510,
+            "parent": 1188474,
+            "start": "27770499",
+            "signalPid": 1188510
+          },
+          {
+            "pid": 1188521,
+            "parent": 1188474,
+            "start": "27770512",
+            "signalPid": 1188521
+          },
+          {
+            "pid": 1188532,
+            "parent": 1188336,
+            "start": "27770526",
+            "signalPid": 1188532
+          },
+          {
+            "pid": 1188539,
+            "parent": 1188336,
+            "start": "27770551",
+            "signalPid": 1188539
+          },
+          {
+            "pid": 1188546,
+            "parent": 1188336,
+            "start": "27770638",
+            "signalPid": 1188546
+          },
+          {
+            "pid": 1188558,
+            "parent": 1188546,
+            "start": "27770657",
+            "signalPid": 1188558
+          },
+          {
+            "pid": 1188566,
+            "parent": 1188546,
+            "start": "27770673",
+            "signalPid": 1188566
+          },
+          {
+            "pid": 1188574,
+            "parent": 1188546,
+            "start": "27770686",
+            "signalPid": 1188574
+          },
+          {
+            "pid": 1188582,
+            "parent": 1188546,
+            "start": "27770699",
+            "signalPid": 1188582
+          },
+          {
+            "pid": 1188590,
+            "parent": 1188546,
+            "start": "27770711",
+            "signalPid": 1188590
+          },
+          {
+            "pid": 1188598,
+            "parent": 1188546,
+            "start": "27770725",
+            "signalPid": 1188598
+          },
+          {
+            "pid": 1188606,
+            "parent": 1188546,
+            "start": "27770738",
+            "signalPid": 1188606
+          },
+          {
+            "pid": 1188614,
+            "parent": 1188546,
+            "start": "27770776",
+            "signalPid": 1188614
+          },
+          {
+            "pid": 1188622,
+            "parent": 1188336,
+            "start": "27770786",
+            "signalPid": 1188622
+          },
+          {
+            "pid": 1188629,
+            "parent": 1188546,
+            "start": "27770789",
+            "signalPid": 1188629
+          },
+          {
+            "pid": 1188638,
+            "parent": 1188546,
+            "start": "27770836",
+            "signalPid": 1188638
+          },
+          {
+            "pid": 1188646,
+            "parent": 1188546,
+            "start": "27770884",
+            "signalPid": 1188646
+          },
+          {
+            "pid": 1188654,
+            "parent": 1188546,
+            "start": "27770940",
+            "signalPid": 1188654
+          },
+          {
+            "pid": 1188662,
+            "parent": 1188546,
+            "start": "27770951",
+            "signalPid": 1188662
+          },
+          {
+            "pid": 1188671,
+            "parent": 1188546,
+            "start": "27770974",
+            "signalPid": 1188671
+          },
+          {
+            "pid": 1188679,
+            "parent": 1188546,
+            "start": "27770986",
+            "signalPid": 1188679
+          },
+          {
+            "pid": 1188680,
+            "parent": 1188546,
+            "start": "27770986",
+            "signalPid": 1188680
+          },
+          {
+            "pid": 1188694,
+            "parent": 1188546,
+            "start": "27771059",
+            "signalPid": 1188694
+          },
+          {
+            "pid": 1188703,
+            "parent": 1188546,
+            "start": "27771072",
+            "signalPid": 1188703
+          },
+          {
+            "pid": 1188726,
+            "parent": 1188546,
+            "start": "27771107",
+            "signalPid": 1188726
+          },
+          {
+            "pid": 1188749,
+            "parent": 1188546,
+            "start": "27771139",
+            "signalPid": 1188749
+          },
+          {
+            "pid": 1188765,
+            "parent": 1188546,
+            "start": "27771170",
+            "signalPid": 1188765
+          },
+          {
+            "pid": 1188773,
+            "parent": 1188546,
+            "start": "27771184",
+            "signalPid": 1188773
+          },
+          {
+            "pid": 1188781,
+            "parent": 1188546,
+            "start": "27771196",
+            "signalPid": 1188781
+          },
+          {
+            "pid": 1188789,
+            "parent": 1188546,
+            "start": "27771209",
+            "signalPid": 1188789
+          },
+          {
+            "pid": 1188797,
+            "parent": 1188546,
+            "start": "27771222",
+            "signalPid": 1188797
+          },
+          {
+            "pid": 1188805,
+            "parent": 1188546,
+            "start": "27771255",
+            "signalPid": 1188805
+          },
+          {
+            "pid": 1188813,
+            "parent": 1188546,
+            "start": "27771268",
+            "signalPid": 1188813
+          },
+          {
+            "pid": 1188821,
+            "parent": 1188546,
+            "start": "27771281",
+            "signalPid": 1188821
+          },
+          {
+            "pid": 1188829,
+            "parent": 1188546,
+            "start": "27771295",
+            "signalPid": 1188829
+          },
+          {
+            "pid": 1188837,
+            "parent": 1188546,
+            "start": "27771308",
+            "signalPid": 1188837
+          },
+          {
+            "pid": 1188845,
+            "parent": 1188546,
+            "start": "27771320",
+            "signalPid": 1188845
+          },
+          {
+            "pid": 1188854,
+            "parent": 1188546,
+            "start": "27771488",
+            "signalPid": 1188854
+          },
+          {
+            "pid": 1188866,
+            "parent": 1188336,
+            "start": "27771649",
+            "signalPid": 1188866
+          },
+          {
+            "pid": 1188873,
+            "parent": 1188336,
+            "start": "27771655",
+            "signalPid": 1188873
+          },
+          {
+            "pid": 1188880,
+            "parent": 1188336,
+            "start": "27771682",
+            "signalPid": 1188880
+          },
+          {
+            "pid": 1188891,
+            "parent": 1188336,
+            "start": "27771720",
+            "signalPid": 1188891
+          },
+          {
+            "pid": 1188898,
+            "parent": 1188336,
+            "start": "27771771",
+            "signalPid": 1188898
+          },
+          {
+            "pid": 1188905,
+            "parent": 1188336,
+            "start": "27771815",
+            "signalPid": 1188905
+          },
+          {
+            "pid": 1188912,
+            "parent": 1188336,
+            "start": "27771846",
+            "signalPid": 1188912
+          },
+          {
+            "pid": 1188919,
+            "parent": 1188336,
+            "start": "27771865",
+            "signalPid": 1188919
+          },
+          {
+            "pid": 1188926,
+            "parent": 1188336,
+            "start": "27771895",
+            "signalPid": 1188926
+          },
+          {
+            "pid": 1188933,
+            "parent": 1188336,
+            "start": "27771928",
+            "signalPid": 1188933
+          },
+          {
+            "pid": 1188940,
+            "parent": 1188336,
+            "start": "27771938",
+            "signalPid": 1188940
+          },
+          {
+            "pid": 1188951,
+            "parent": 1188336,
+            "start": "27771954",
+            "signalPid": 1188951
+          },
+          {
+            "pid": 1188958,
+            "parent": 1188336,
+            "start": "27771976",
+            "signalPid": 1188958
+          },
+          {
+            "pid": 1188966,
+            "parent": 1188336,
+            "start": "27772029",
+            "signalPid": 1188966
+          },
+          {
+            "pid": 1188967,
+            "parent": 1188336,
+            "start": "27772030",
+            "signalPid": 1188967
+          },
+          {
+            "pid": 1188980,
+            "parent": 1188336,
+            "start": "27772062",
+            "signalPid": 1188980
+          },
+          {
+            "pid": 1188988,
+            "parent": 1188336,
+            "start": "27772080",
+            "signalPid": 1188988
+          },
+          {
+            "pid": 1188995,
+            "parent": 1188336,
+            "start": "27772084",
+            "signalPid": 1188995
+          },
+          {
+            "pid": 1189002,
+            "parent": 1188336,
+            "start": "27772099",
+            "signalPid": 1189002
+          },
+          {
+            "pid": 1189009,
+            "parent": 1188336,
+            "start": "27772126",
+            "signalPid": 1189009
+          },
+          {
+            "pid": 1189016,
+            "parent": 1188336,
+            "start": "27772145",
+            "signalPid": 1189016
+          },
+          {
+            "pid": 1189023,
+            "parent": 1188336,
+            "start": "27772162",
+            "signalPid": 1189023
+          },
+          {
+            "pid": 1189030,
+            "parent": 1188336,
+            "start": "27772200",
+            "signalPid": 1189030
+          },
+          {
+            "pid": 1189036,
+            "parent": 1188336,
+            "start": "27772203",
+            "signalPid": 1189036
+          },
+          {
+            "pid": 1189044,
+            "parent": 1188336,
+            "start": "27772219",
+            "signalPid": 1189044
+          },
+          {
+            "pid": 1189055,
+            "parent": 1188336,
+            "start": "27772251",
+            "signalPid": 1189055
+          },
+          {
+            "pid": 1189066,
+            "parent": 1188336,
+            "start": "27772272",
+            "signalPid": 1189066
+          },
+          {
+            "pid": 1189073,
+            "parent": 1188336,
+            "start": "27772279",
+            "signalPid": 1189073
+          },
+          {
+            "pid": 1189080,
+            "parent": 1188336,
+            "start": "27772288",
+            "signalPid": 1189080
+          },
+          {
+            "pid": 1189087,
+            "parent": 1188336,
+            "start": "27772307",
+            "signalPid": 1189087
+          },
+          {
+            "pid": 1189095,
+            "parent": 1188336,
+            "start": "27772333",
+            "signalPid": 1189095
+          },
+          {
+            "pid": 1189102,
+            "parent": 1188336,
+            "start": "27772458",
+            "signalPid": 1189102
+          },
+          {
+            "pid": 1189109,
+            "parent": 1188336,
+            "start": "27772485",
+            "signalPid": 1189109
+          },
+          {
+            "pid": 1189118,
+            "parent": 1188336,
+            "start": "27772813",
+            "signalPid": 1189118
+          },
+          {
+            "pid": 1189125,
+            "parent": 1188336,
+            "start": "27772830",
+            "signalPid": 1189125
+          },
+          {
+            "pid": 1189132,
+            "parent": 1188336,
+            "start": "27772850",
+            "signalPid": 1189132
+          },
+          {
+            "pid": 1189139,
+            "parent": 1188336,
+            "start": "27772865",
+            "signalPid": 1189139
+          },
+          {
+            "pid": 1189146,
+            "parent": 1188336,
+            "start": "27772894",
+            "signalPid": 1189146
+          },
+          {
+            "pid": 1189153,
+            "parent": 1188336,
+            "start": "27772910",
+            "signalPid": 1189153
+          },
+          {
+            "pid": 1189160,
+            "parent": 1188336,
+            "start": "27772926",
+            "signalPid": 1189160
+          },
+          {
+            "pid": 1189167,
+            "parent": 1188336,
+            "start": "27772942",
+            "signalPid": 1189167
+          },
+          {
+            "pid": 1189174,
+            "parent": 1188336,
+            "start": "27772964",
+            "signalPid": 1189174
+          },
+          {
+            "pid": 1189181,
+            "parent": 1188336,
+            "start": "27772985",
+            "signalPid": 1189181
+          },
+          {
+            "pid": 1189188,
+            "parent": 1188336,
+            "start": "27773000",
+            "signalPid": 1189188
+          },
+          {
+            "pid": 1189195,
+            "parent": 1188336,
+            "start": "27773066",
+            "signalPid": 1189195
+          },
+          {
+            "pid": 1189202,
+            "parent": 1188336,
+            "start": "27773083",
+            "signalPid": 1189202
+          },
+          {
+            "pid": 1189209,
+            "parent": 1188336,
+            "start": "27773102",
+            "signalPid": 1189209
+          },
+          {
+            "pid": 1189216,
+            "parent": 1188336,
+            "start": "27773119",
+            "signalPid": 1189216
+          },
+          {
+            "pid": 1189223,
+            "parent": 1188336,
+            "start": "27773134",
+            "signalPid": 1189223
+          },
+          {
+            "pid": 1189234,
+            "parent": 1188336,
+            "start": "27773282",
+            "signalPid": 1189234
+          }
+        ],
+        "escalated": [],
+        "survivors": [],
+        "errors": [],
+        "complete": true
+      }
+    },
+    {
+      "id": "typecheck",
+      "command": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "log": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/pr/1794248058921-1188165/typecheck.log",
+      "durationMs": 1347.076270000005,
+      "status": "passed",
+      "wallMs": 1347.076270000005,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "interrupted": false,
+      "error": null,
+      "cleanup": {
+        "mode": "linux-proc-ancestry",
+        "sampleIntervalMs": 100,
+        "observed": [
+          {
+            "pid": 1189244,
+            "parent": 1188165,
+            "start": "27774232",
+            "signalPid": 1189244
+          },
+          {
+            "pid": 1189255,
+            "parent": 1189244,
+            "start": "27774242",
+            "signalPid": 1189255
+          },
+          {
+            "pid": 1189256,
+            "parent": 1189255,
+            "start": "27774242",
+            "signalPid": 1189256
+          },
+          {
+            "pid": 1189275,
+            "parent": 1189255,
+            "start": "27774349",
+            "signalPid": 1189275
+          }
+        ],
+        "escalated": [],
+        "survivors": [],
+        "errors": [],
+        "complete": true
+      }
+    },
+    {
+      "id": "build-integration",
+      "command": [
+        "npm",
+        "run",
+        "test:build",
+        "--",
+        "--reporter=json",
+        "--outputFile=/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/pr/1794248058921-1188165/build-integration.json"
+      ],
+      "log": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/pr/1794248058921-1188165/build-integration.log",
+      "durationMs": 7194.076983999999,
+      "status": "passed",
+      "wallMs": 7194.076983999999,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "interrupted": false,
+      "error": null,
+      "cleanup": {
+        "mode": "linux-proc-ancestry",
+        "sampleIntervalMs": 100,
+        "observed": [
+          {
+            "pid": 1189291,
+            "parent": 1188165,
+            "start": "27774367",
+            "signalPid": 1189291
+          },
+          {
+            "pid": 1189302,
+            "parent": 1189291,
+            "start": "27774377",
+            "signalPid": 1189302
+          },
+          {
+            "pid": 1189303,
+            "parent": 1189302,
+            "start": "27774377",
+            "signalPid": 1189303
+          },
+          {
+            "pid": 1189326,
+            "parent": 1189303,
+            "start": "27774408",
+            "signalPid": 1189326
+          },
+          {
+            "pid": 1189363,
+            "parent": 1189326,
+            "start": "27774766",
+            "signalPid": 1189363
+          }
+        ],
+        "escalated": [],
+        "survivors": [],
+        "errors": [],
+        "complete": true
+      }
+    },
+    {
+      "id": "bundle",
+      "command": [
+        "npm",
+        "run",
+        "build:bundle"
+      ],
+      "log": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/pr/1794248058921-1188165/bundle.log",
+      "durationMs": 942.7083129999955,
+      "status": "passed",
+      "wallMs": 942.7083129999955,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "interrupted": false,
+      "error": null,
+      "cleanup": {
+        "mode": "linux-proc-ancestry",
+        "sampleIntervalMs": 100,
+        "observed": [
+          {
+            "pid": 1189372,
+            "parent": 1188165,
+            "start": "27775086",
+            "signalPid": 1189372
+          },
+          {
+            "pid": 1189384,
+            "parent": 1189372,
+            "start": "27775096",
+            "signalPid": 1189384
+          },
+          {
+            "pid": 1189385,
+            "parent": 1189384,
+            "start": "27775097",
+            "signalPid": 1189385
+          },
+          {
+            "pid": 1189412,
+            "parent": 1189385,
+            "start": "27775116",
+            "signalPid": 1189412
+          }
+        ],
+        "escalated": [],
+        "survivors": [],
+        "errors": [],
+        "complete": true
+      }
+    },
+    {
+      "id": "journeys",
+      "command": [
+        "npm",
+        "test",
+        "--",
+        "--reporter=line,json",
+        "--output=/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/pr/1794248058921-1188165/artifacts"
+      ],
+      "log": "/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/pr/1794248058921-1188165/journeys.log",
+      "durationMs": 126985.308079,
+      "status": "passed",
+      "wallMs": 126985.308079,
+      "exitCode": 0,
+      "signal": null,
+      "timedOut": false,
+      "interrupted": false,
+      "error": null,
+      "cleanup": {
+        "mode": "linux-proc-ancestry",
+        "sampleIntervalMs": 100,
+        "observed": [
+          {
+            "pid": 1189421,
+            "parent": 1188165,
+            "start": "27775180",
+            "signalPid": 1189421
+          },
+          {
+            "pid": 1189432,
+            "parent": 1189421,
+            "start": "27775191",
+            "signalPid": 1189432
+          },
+          {
+            "pid": 1189433,
+            "parent": 1189432,
+            "start": "27775191",
+            "signalPid": 1189433
+          },
+          {
+            "pid": 1189449,
+            "parent": 1189433,
+            "start": "27775249",
+            "signalPid": 1189449
+          },
+          {
+            "pid": 1189450,
+            "parent": 1189449,
+            "start": "27775250",
+            "signalPid": 1189450
+          },
+          {
+            "pid": 1189451,
+            "parent": 1189450,
+            "start": "27775250",
+            "signalPid": 1189451
+          },
+          {
+            "pid": 1189456,
+            "parent": 1189433,
+            "start": "27775278",
+            "signalPid": 1189456
+          },
+          {
+            "pid": 1189457,
+            "parent": 1189433,
+            "start": "27775402",
+            "signalPid": 1189457
+          },
+          {
+            "pid": 1189458,
+            "parent": 1189457,
+            "start": "27775402",
+            "signalPid": 1189458
+          },
+          {
+            "pid": 1189469,
+            "parent": 1189458,
+            "start": "27775412",
+            "signalPid": 1189469
+          },
+          {
+            "pid": 1189470,
+            "parent": 1189469,
+            "start": "27775412",
+            "signalPid": 1189470
+          },
+          {
+            "pid": 1189506,
+            "parent": 1189433,
+            "start": "27775463",
+            "signalPid": 1189506
+          },
+          {
+            "pid": 1189518,
+            "parent": 1189506,
+            "start": "27775515",
+            "signalPid": 1189518
+          },
+          {
+            "pid": 1189525,
+            "parent": 1189518,
+            "start": "27775551",
+            "signalPid": 1189525
+          },
+          {
+            "pid": 1189526,
+            "parent": 1189518,
+            "start": "27775551",
+            "signalPid": 1189526
+          },
+          {
+            "pid": 1189560,
+            "parent": 1189525,
+            "start": "27775556",
+            "signalPid": 1189560
+          },
+          {
+            "pid": 1189563,
+            "parent": 1189518,
+            "start": "27775556",
+            "signalPid": 1189563
+          },
+          {
+            "pid": 1189564,
+            "parent": 1189526,
+            "start": "27775557",
+            "signalPid": 1189564
+          },
+          {
+            "pid": 1189589,
+            "parent": 1189526,
+            "start": "27775562",
+            "signalPid": 1189589
+          },
+          {
+            "pid": 1189598,
+            "parent": 1189526,
+            "start": "27775564",
+            "signalPid": 1189598
+          },
+          {
+            "pid": 1189602,
+            "parent": 1189526,
+            "start": "27775564",
+            "signalPid": 1189602
+          },
+          {
+            "pid": 1189642,
+            "parent": 1189526,
+            "start": "27775621",
+            "signalPid": 1189642
+          },
+          {
+            "pid": 1189651,
+            "parent": 1189526,
+            "start": "27775622",
+            "signalPid": 1189651
+          },
+          {
+            "pid": 1189653,
+            "parent": 1189526,
+            "start": "27775622",
+            "signalPid": 1189653
+          },
+          {
+            "pid": 1189684,
+            "parent": 1189518,
+            "start": "27775646",
+            "signalPid": 1189684
+          },
+          {
+            "pid": 1189707,
+            "parent": 1189526,
+            "start": "27782212",
+            "signalPid": 1189707
+          },
+          {
+            "pid": 1189716,
+            "parent": 1189526,
+            "start": "27782214",
+            "signalPid": 1189716
+          },
+          {
+            "pid": 1189717,
+            "parent": 1189526,
+            "start": "27782214",
+            "signalPid": 1189717
+          },
+          {
+            "pid": 1189747,
+            "parent": 1189526,
+            "start": "27782255",
+            "signalPid": 1189747
+          },
+          {
+            "pid": 1189758,
+            "parent": 1189526,
+            "start": "27782256",
+            "signalPid": 1189758
+          },
+          {
+            "pid": 1189759,
+            "parent": 1189526,
+            "start": "27782256",
+            "signalPid": 1189759
+          },
+          {
+            "pid": 1189794,
+            "parent": 1189526,
+            "start": "27783156",
+            "signalPid": 1189794
+          },
+          {
+            "pid": 1189803,
+            "parent": 1189526,
+            "start": "27783157",
+            "signalPid": 1189803
+          },
+          {
+            "pid": 1189805,
+            "parent": 1189526,
+            "start": "27783158",
+            "signalPid": 1189805
+          },
+          {
+            "pid": 1189837,
+            "parent": 1189433,
+            "start": "27783276",
+            "signalPid": 1189837
+          },
+          {
+            "pid": 1189849,
+            "parent": 1189837,
+            "start": "27783328",
+            "signalPid": 1189849
+          },
+          {
+            "pid": 1189856,
+            "parent": 1189849,
+            "start": "27783332",
+            "signalPid": 1189856
+          },
+          {
+            "pid": 1189857,
+            "parent": 1189849,
+            "start": "27783332",
+            "signalPid": 1189857
+          },
+          {
+            "pid": 1189879,
+            "parent": 1189856,
+            "start": "27783335",
+            "signalPid": 1189879
+          },
+          {
+            "pid": 1189881,
+            "parent": 1189849,
+            "start": "27783336",
+            "signalPid": 1189881
+          },
+          {
+            "pid": 1189897,
+            "parent": 1189857,
+            "start": "27783337",
+            "signalPid": 1189897
+          },
+          {
+            "pid": 1189935,
+            "parent": 1189857,
+            "start": "27783344",
+            "signalPid": 1189935
+          },
+          {
+            "pid": 1189946,
+            "parent": 1189857,
+            "start": "27783346",
+            "signalPid": 1189946
+          },
+          {
+            "pid": 1189948,
+            "parent": 1189857,
+            "start": "27783347",
+            "signalPid": 1189948
+          },
+          {
+            "pid": 1189972,
+            "parent": 1189857,
+            "start": "27783399",
+            "signalPid": 1189972
+          },
+          {
+            "pid": 1189981,
+            "parent": 1189857,
+            "start": "27783401",
+            "signalPid": 1189981
+          },
+          {
+            "pid": 1189983,
+            "parent": 1189857,
+            "start": "27783401",
+            "signalPid": 1189983
+          },
+          {
+            "pid": 1190015,
+            "parent": 1189849,
+            "start": "27783428",
+            "signalPid": 1190015
+          },
+          {
+            "pid": 1190041,
+            "parent": 1189433,
+            "start": "27786624",
+            "signalPid": 1190041
+          },
+          {
+            "pid": 1190053,
+            "parent": 1190041,
+            "start": "27786676",
+            "signalPid": 1190053
+          },
+          {
+            "pid": 1190060,
+            "parent": 1190053,
+            "start": "27786680",
+            "signalPid": 1190060
+          },
+          {
+            "pid": 1190061,
+            "parent": 1190053,
+            "start": "27786680",
+            "signalPid": 1190061
+          },
+          {
+            "pid": 1190081,
+            "parent": 1190060,
+            "start": "27786683",
+            "signalPid": 1190081
+          },
+          {
+            "pid": 1190083,
+            "parent": 1190053,
+            "start": "27786683",
+            "signalPid": 1190083
+          },
+          {
+            "pid": 1190102,
+            "parent": 1190061,
+            "start": "27786684",
+            "signalPid": 1190102
+          },
+          {
+            "pid": 1190139,
+            "parent": 1190061,
+            "start": "27786692",
+            "signalPid": 1190139
+          },
+          {
+            "pid": 1190150,
+            "parent": 1190061,
+            "start": "27786694",
+            "signalPid": 1190150
+          },
+          {
+            "pid": 1190151,
+            "parent": 1190061,
+            "start": "27786694",
+            "signalPid": 1190151
+          },
+          {
+            "pid": 1190177,
+            "parent": 1190061,
+            "start": "27786744",
+            "signalPid": 1190177
+          },
+          {
+            "pid": 1190186,
+            "parent": 1190061,
+            "start": "27786746",
+            "signalPid": 1190186
+          },
+          {
+            "pid": 1190190,
+            "parent": 1190061,
+            "start": "27786746",
+            "signalPid": 1190190
+          },
+          {
+            "pid": 1190218,
+            "parent": 1190053,
+            "start": "27786771",
+            "signalPid": 1190218
+          },
+          {
+            "pid": 1190237,
+            "parent": 1189433,
+            "start": "27787195",
+            "signalPid": 1190237
+          },
+          {
+            "pid": 1190249,
+            "parent": 1190237,
+            "start": "27787251",
+            "signalPid": 1190249
+          },
+          {
+            "pid": 1190255,
+            "parent": 1190249,
+            "start": "27787252",
+            "signalPid": 1190255
+          },
+          {
+            "pid": 1190266,
+            "parent": 1190255,
+            "start": "27787339",
+            "signalPid": 1190266
+          },
+          {
+            "pid": 1190271,
+            "parent": 1190255,
+            "start": "27787341",
+            "signalPid": 1190271
+          },
+          {
+            "pid": 1190273,
+            "parent": 1190255,
+            "start": "27787341",
+            "signalPid": 1190273
+          },
+          {
+            "pid": 1190325,
+            "parent": 1190255,
+            "start": "27787382",
+            "signalPid": 1190325
+          }
+        ],
+        "escalated": [],
+        "survivors": [],
+        "errors": [],
+        "complete": true
+      }
+    }
+  ],
+  "durationMs": 204929
+}

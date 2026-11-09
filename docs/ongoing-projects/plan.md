@@ -275,10 +275,28 @@ emulation accurately and retain any real platform failure.
   both type scopes and direct local bundle pass after fixing a staging-helper
   type inference error. Final current-source standard/browser checks are still
   required. See [QA record](../qa/issue-316/README.md) for identities and limits.
-- Next: publish the implementation and reviewable PR, run the self-hosted
-  focused/full Mage and standard PR gates, preserve artifacts/failures, and mark
-  the PR ready only after every issue acceptance gate is verified. No merge,
-  release tag or deployment is part of this work.
+- Published implementation `5e3df8b` as draft PR
+  [#357](https://github.com/luminari-gurus/tactics-guru-v2/pull/357), labeled
+  enhancement/risk:medium. Its ordinary PR verification passed 1,245 units, two
+  build integrations, both types, bundle and seven core journeys in 204.9 s.
+  Actual synthetic merge tree was verified equal to the published source tree.
+- Baseline run 42670137498 is complete: both exact-base desktop cases passed,
+  Chromium 438.973 s and WebKit 211.504 s on VM-02, with zero retries/skips.
+  Portable source/full result receipts are in `docs/qa/issue-316/baseline/`.
+- Broader selection contracts exposed two pre-existing unregistered reduction
+  tags on literal main. A separate repair PR
+  [#358](https://github.com/luminari-gurus/tactics-guru-v2/pull/358) restores three
+  mobile executions without changing assertions/filters/deadlines. It has
+  bug/risk:medium labels and all six local selection contracts pass. The Mage
+  branch incorporates the repair and #357 stacks above #358; qualified layout
+  and Linux shell-contract execution remains pending.
+- GitHub rejected several qualification/PR attempts with an Internal server
+  error before creating any job. Preserve those zero-test attempts; one ordinary
+  PR retry succeeded. Mage dedicated browser qualification has not yet run.
+- Next: qualify the separate selection repair and the complete current-source
+  focused/extended Mage matrix on the qualified runner; retain all failures and
+  source identities, update OpenSpec/evidence and mark both PRs ready only after
+  their gates pass. No merge, release tag or deployment is part of this work.
 
 Estimated time **for me: 2–3 hours** of elapsed implementation and affected
 verification after work begins, excluding self-hosted runner queue time:

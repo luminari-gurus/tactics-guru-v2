@@ -47,8 +47,9 @@ the complete legal journey still owns that proof.
 
 [discovery.json](discovery.json) and compressed
 [before](selection-before.json.gz)/[after](selection-after.json.gz) inventories
-retain exact Windows discovery IDs and expected statuses. No existing case is
-removed or changed. The only additions are the two staged Mage cases per
+retain exact Windows discovery IDs and expected statuses for the initial Mage
+increment. No existing case is removed or changed in that increment. Its only
+additions are the two staged Mage cases per
 production profile: Chromium 1,177 → 1,183; WebKit exploration 177 → 183.
 Fixtures remain 141; each extended engine retains all nine Mage/Ranger/Fighter
 cases; ordinary PR selection remains seven. These are discovery counts, not
@@ -89,8 +90,12 @@ qualified Linux self-hosted VM, not a substituted local engine.
 [Baseline run 42670137498](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42670137498)
 checks out exact `1a02557`, records source hashes/runner conditions, builds and
 executes the original desktop Chromium and desktop WebKit Mage journey, with
-workers 1/retries 0. It remains live while implementation proceeds; final results
-and any failures will be retained here.
+workers 1/retries 0. It passed both cases: desktop Chromium **438,973 ms** and
+desktop WebKit **211,504 ms**, with no skips/flakes/errors. The source receipt
+confirms clean exact `1a02557` on `unraid-tactics-02`.
+[Source/results summary](baseline/summary.json) and compressed full reports in
+`baseline/` preserve the measurements. Both are below the unchanged 600,000 ms
+deadline; no before/after speedup is claimed.
 
 The task-scoped `Issue 316 Mage acceptance` workflow reserves
 `tactics-browser-tactics-browser-02`, following the existing qualified runner
@@ -100,7 +105,34 @@ serially. PR verification independently reserves VM-01 for the standard gate.
 Per-case ten-minute budgets remain unchanged; the 80-minute enclosing job budget
 accounts for the serial union and setup, not a longer test deadline.
 
-Current-source browser execution, complete standard PR verification and final
-acceptance are pending. A green discovery or unit result is not substituted for
-those gates. Physical hardware was not requested; describe device emulation
-accurately and retain engine/platform failures.
+### Published implementation and prerequisite
+
+PR [#357](https://github.com/luminari-gurus/tactics-guru-v2/pull/357), initial
+implementation `5e3df8b`, is labeled enhancement/risk:medium. Standard
+[PR verification 42671827774, attempt 2](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42671827774/attempts/2)
+passed in **204,929 ms**: 1,245 units, both types, two build integrations, bundle
+and all seven core journeys (zero skipped/flaky/failed).
+[Full stage receipt](pr-5e3df8b-summary.json) records actual synthetic merge
+`cb5927663f66ec5dd1f70aca9edfd3dec5e32c09`; GitHub's Git objects confirm its tree
+`928405d9b164b2659d2548fb5a6cbd88136e5077` equals the published implementation tree.
+
+Broader selection contracts exposed two pre-existing unregistered reduction
+tags on literal main `6aad368`. The exact base reproduces the radial omission;
+after that first tag repair, the second narrow-landscape omission becomes
+visible. Compressed original/base/intermediate/green logs are retained here.
+PR [#358](https://github.com/luminari-gurus/tactics-guru-v2/pull/358) removes both
+tags without changing assertions or approved classification policy. All six
+local selection contracts pass; qualified Linux batch contracts and all six
+affected browser executions remain pending. The Mage branch incorporates that
+separate prerequisite and stacks #357 above it. Its three restored mobile
+executions and two title renames are distinct from the Mage discovery additions.
+
+GitHub service failures are preserved separately: #357 standard run attempt 1,
+Mage qualification 42671820980 (attempts 1 and 2), and manual run 42672732211
+failed with **Internal server error** annotations before any job/test existed.
+The standard retry succeeded. These attempts are not application failures or
+passing test evidence; subsequent qualification must still run every gate.
+
+Complete focused/extended browser execution and final acceptance remain pending.
+Physical hardware was not requested; describe device emulation accurately and
+retain engine/platform failures.
