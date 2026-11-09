@@ -1,6 +1,6 @@
 import { dungeonContent } from '../src/content/dungeon';
 import { walkDungeon, reenterDungeonStair, continueSavedDungeon } from './helpers/dungeonTraversal';
-import { atEncounter, atStairApproach } from './helpers/dungeonFixtures';
+import { atEncounter, atStairApproach, stagedMageAbility } from './helpers/dungeonFixtures';
 import { expect,railTest as test,type Page } from './helpers/dungeonEntropy';
 import { readFileSync, writeFileSync } from 'node:fs';
 import type { Locator } from '@playwright/test';
@@ -13,7 +13,7 @@ import { COMBAT_CONTROLS_KEY } from '../src/ui/combatControls';
 import { readSession,playCommand,playUndo } from './helpers/battlePolicy';
 import { playerDecision, fighterDecision } from './helpers/playerPolicy';
 import { journeyPreparation, healedFighterBoundary, shamanJourney } from './helpers/dungeonFixtures';
-import { dispatch } from '../src/domain/turns';
+import { dispatch, replayCommandSequence } from '../src/domain/turns';
 import { previewMovement } from '../src/domain/grid';
 import { generateMap } from '../src/map/generate';
 import type { Command, BattleEvent } from '../src/domain/types';
@@ -38,6 +38,30 @@ for(const [xp,level,maxHp]of [[0,1,11],[180,3,19]])test(`menu dungeon restores M
  await expect(page.locator('#battle-ability option[value="ability:frost_snare"]')).toHaveCount(level>=3?1:0);
  const catalog=dungeonBattle(await snapshot(page))!.catalog,missile=catalog.abilities['ability:magic_missile'];expect(missile.kind).toBe('magicMissile');
  if(missile.kind==='magicMissile')expect(missile.casterLevel).toBe(level);
+});
+
+for(const abilityId of ['ability:frost_snare','ability:magic_missile'] as const)test(`staged Mage ${abilityId} accepts exact effects replay and saved active reload`,async({page})=>{
+ // The level/position boundary is deliberately staged. The extended journey alone proves earned XP.
+ const fixture=stagedMageAbility(abilityId),catalog=dungeonBattle(fixture.state)!.catalog;
+ const expected=dispatch(fixture.state.activeBattle!,fixture.command,catalog);expect(expected.ok).toBe(true);if(!expected.ok)throw Error(expected.reason);
+ await seed(page,fixture.state);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ const before=await readSession(page);expect(before.state).toEqual(fixture.state.activeBattle);expect(before.events).toEqual([]);
+ await playCommand(page,fixture.command);
+ await expect.poll(async()=>(await readSession(page)).state.commandCount).toBe(before.state.commandCount+1);
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ const accepted=await readSession(page);expect(accepted.state).toEqual(expected.state);expect(accepted.events).toEqual(expected.events);
+ const history=accepted.replay??accepted.continuation!;
+ expect(replayCommandSequence('initial' in history?history.initial:history.snapshot,history.commands,catalog))
+   .toEqual({ok:true,state:accepted.state,events:accepted.events});
+ if(abilityId==='ability:frost_snare') {
+   expect(accepted.state.rng).toEqual(before.state.rng);expect(accepted.state.units.map(u=>u.hp)).toEqual(before.state.units.map(u=>u.hp));
+   expect(accepted.events).toContainEqual({type:'movementBlocked',unitId:'unitId' in fixture.command.target?fixture.command.target.unitId:0,sourceId:fixture.command.unitId,abilityId});
+ } else expect(accepted.events.filter(e=>e.type==='missileRolled')).toHaveLength(2);
+ const saved=await snapshot(page),slots=await page.evaluate(keys=>keys.map(key=>localStorage.getItem(key)),[DUNGEON_KEYS.primary,DUNGEON_KEYS.backup]);
+ await page.reload();await continueSavedDungeon(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ const resumed=await readSession(page);expect(await snapshot(page)).toEqual(saved);expect(resumed.state).toEqual(accepted.state);expect(resumed.events).toEqual([]);
+ expect(await page.evaluate(keys=>keys.map(key=>localStorage.getItem(key)),[DUNGEON_KEYS.primary,DUNGEON_KEYS.backup])).toEqual(slots);
+ await test.info().attach('staged-mage-boundary',{body:JSON.stringify({fixture:'staged level/position; not earned progression',command:fixture.command,before:before.state,after:accepted.state,events:accepted.events}),contentType:'application/json'});
 });
 
 // Saved New Game avoids its initial dormant seed; draw 27 so the playable seed

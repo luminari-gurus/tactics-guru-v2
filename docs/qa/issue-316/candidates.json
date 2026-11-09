@@ -1,0 +1,217 @@
+{
+  "source": "d687e6d4eafdde774436decf87175e81789410f2",
+  "node": "v24.22.1",
+  "platform": "win32",
+  "method": "One pure mageJourney(seed) simulation per integer 64 through 79; no browser or replay qualification overhead included",
+  "totalMs": 13732.921100000001,
+  "candidates": [
+    {
+      "seed": 64,
+      "durationMs": 890.0271,
+      "used": {
+        "snare": false,
+        "missiles": false
+      },
+      "level": 2,
+      "phase": "defeat",
+      "battles": 3,
+      "commands": 209,
+      "expiry": false
+    },
+    {
+      "seed": 65,
+      "durationMs": 755.9030000000002,
+      "used": {
+        "snare": false,
+        "missiles": false
+      },
+      "level": 1,
+      "phase": "defeat",
+      "battles": 3,
+      "commands": 217,
+      "expiry": false
+    },
+    {
+      "seed": 66,
+      "durationMs": 520.3378000000002,
+      "used": {
+        "snare": false,
+        "missiles": false
+      },
+      "level": 1,
+      "phase": "defeat",
+      "battles": 3,
+      "commands": 132,
+      "expiry": false
+    },
+    {
+      "seed": 67,
+      "durationMs": 566.8522000000003,
+      "used": {
+        "snare": false,
+        "missiles": false
+      },
+      "level": 1,
+      "phase": "defeat",
+      "battles": 2,
+      "commands": 141,
+      "expiry": false
+    },
+    {
+      "seed": 68,
+      "durationMs": 1387.9352000000003,
+      "used": {
+        "snare": true,
+        "missiles": true
+      },
+      "level": 3,
+      "phase": "defeat",
+      "battles": 5,
+      "commands": 274,
+      "expiry": true
+    },
+    {
+      "seed": 69,
+      "durationMs": 1459.9852999999994,
+      "used": {
+        "snare": false,
+        "missiles": false
+      },
+      "level": 1,
+      "phase": "defeat",
+      "battles": 5,
+      "commands": 279,
+      "expiry": false
+    },
+    {
+      "seed": 70,
+      "durationMs": 1636.4424,
+      "used": {
+        "snare": false,
+        "missiles": false
+      },
+      "level": 1,
+      "phase": "defeat",
+      "battles": 6,
+      "commands": 310,
+      "expiry": false
+    },
+    {
+      "seed": 71,
+      "durationMs": 583.3022000000001,
+      "used": {
+        "snare": false,
+        "missiles": false
+      },
+      "level": 1,
+      "phase": "defeat",
+      "battles": 2,
+      "commands": 136,
+      "expiry": false
+    },
+    {
+      "seed": 72,
+      "durationMs": 823.1530000000002,
+      "used": {
+        "snare": false,
+        "missiles": false
+      },
+      "level": 1,
+      "phase": "defeat",
+      "battles": 3,
+      "commands": 167,
+      "expiry": false
+    },
+    {
+      "seed": 73,
+      "durationMs": 811.5468000000001,
+      "used": {
+        "snare": false,
+        "missiles": false
+      },
+      "level": 1,
+      "phase": "defeat",
+      "battles": 3,
+      "commands": 141,
+      "expiry": false
+    },
+    {
+      "seed": 74,
+      "durationMs": 771.0401999999995,
+      "used": {
+        "snare": false,
+        "missiles": false
+      },
+      "level": 2,
+      "phase": "defeat",
+      "battles": 3,
+      "commands": 165,
+      "expiry": false
+    },
+    {
+      "seed": 75,
+      "durationMs": 588.6976999999988,
+      "used": {
+        "snare": false,
+        "missiles": false
+      },
+      "level": 1,
+      "phase": "defeat",
+      "battles": 2,
+      "commands": 142,
+      "expiry": false
+    },
+    {
+      "seed": 76,
+      "durationMs": 332.78330000000096,
+      "used": {
+        "snare": false,
+        "missiles": false
+      },
+      "level": 1,
+      "phase": "defeat",
+      "battles": 2,
+      "commands": 67,
+      "expiry": false
+    },
+    {
+      "seed": 77,
+      "durationMs": 765.4673000000003,
+      "used": {
+        "snare": false,
+        "missiles": false
+      },
+      "level": 1,
+      "phase": "defeat",
+      "battles": 3,
+      "commands": 176,
+      "expiry": false
+    },
+    {
+      "seed": 78,
+      "durationMs": 1108.4975000000013,
+      "used": {
+        "snare": true,
+        "missiles": true
+      },
+      "level": 3,
+      "phase": "defeat",
+      "battles": 4,
+      "commands": 229,
+      "expiry": true
+    },
+    {
+      "seed": 79,
+      "durationMs": 730.9501,
+      "used": {
+        "snare": false,
+        "missiles": false
+      },
+      "level": 1,
+      "phase": "defeat",
+      "battles": 3,
+      "commands": 176,
+      "expiry": false
+    }
+  ]
+}

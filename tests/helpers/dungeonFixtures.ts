@@ -4,6 +4,10 @@ import { generateMap } from '../../src/map/generate';
 import { BattleSession } from '../../src/app/BattleSession';
 import { playerDecision, fighterDecision, rangerDecision, mageDecision } from './playerPolicy';
 import type { Command, ReplayCommand } from '../../src/domain/types';
+import { dispatch } from '../../src/domain/turns';
+import { previewAbility } from '../../src/domain/combat';
+import { progressHero } from '../../src/domain/progression';
+import type { ContentCatalog } from '../../src/content/types';
 function witnessCommands(commands:readonly ReplayCommand[]):readonly Command[] {
   if(commands.some(command=>command.type==='undoMove')) throw Error('Unexpected undo in witness history');
   return commands.filter((command):command is Command=>command.type!=='undoMove');
@@ -247,6 +251,63 @@ export function mageJourney(seed:number) {
     if(depth<3)state=checkedDungeon(travelDungeon(atDownstairs(state),'descend',state.revision));
   }
   return {seed,records,state,used};
+}
+
+export const MAGE_JOURNEY_SEEDS = [64,79] as const;
+/** Node-side search only. The optional simulator keeps negative tests independent of lucky real seeds. */
+export function selectMageJourney(range:readonly [number,number]=MAGE_JOURNEY_SEEDS,simulate= mageJourney) {
+  const [first,last]=range;
+  if(!Number.isInteger(first)||!Number.isInteger(last)||first<0||last>0xffffffff||first>last||last-first>=16)
+    throw Error('Mage seed range must contain 1–16 ascending uint32 candidates');
+  const attempts:{seed:number;missing:string[]}[]=[];
+  for(let seed=first;seed<=last;seed++) {
+    const witness=simulate(seed),missing:string[]=[];
+    if(witness.seed!==seed)throw Error(`Mage witness seed mismatch: requested ${seed}, received ${witness.seed}`);
+    if(witness.state.party.find(h=>h.heroId==='mage')!.level<3)missing.push('earned level three');
+    if(!witness.used.snare)missing.push('Frost Snare');
+    if(!witness.used.missiles)missing.push('multiple missiles');
+    if(witness.state.phase!=='defeat'||witness.state.activeBattle!==null)missing.push('terminal cleanup');
+    if(missing.length){attempts.push({seed,missing});continue;}
+    let blocked=false,expiredAtTurnEnd=false;
+    for(const record of witness.records) {
+      const catalog=dungeonBattle(record.entry)!.catalog;
+      let state=record.entry.activeBattle!;
+      const events:import('../../src/domain/types').BattleEvent[]=[];
+      for(const command of record.commands) {
+        if(state.units.find(u=>u.id===command.unitId)?.movementBlock?.abilityId==='ability:frost_snare'){
+          blocked=true;if(command.type==='move')throw Error(`Mage seed ${seed} moved a Snared unit`);
+        }
+        const result=dispatch(state,command,catalog);
+        if(!result.ok)throw Error(`Mage seed ${seed} replay rejected: ${result.reason}`);
+        expiredAtTurnEnd ||= command.type==='endTurn'&&result.events.some(e=>e.type==='movementBlockExpired'&&e.unitId===command.unitId&&e.abilityId==='ability:frost_snare');
+        state=result.state;events.push(...result.events);
+      }
+      if(canonical({state,events})!==canonical({state:record.state,events:record.events}))throw Error(`Mage seed ${seed} replay diverged`);
+      if(state.units.some(u=>u.movementBlock!==undefined))missing.push('terminal status cleanup');
+    }
+    if(!blocked||!expiredAtTurnEnd)missing.push('Snared target turn and expiry');
+    attempts.push({seed,missing});
+    if(!missing.length)return {range:[first,last] as const,attempts,witness};
+  }
+  throw Error(`No qualifying Mage journey in ${first}–${last}: ${attempts.map(a=>`${a.seed}: ${a.missing.join(', ')}`).join('; ')}`);
+}
+
+/** Explicit level-three/position staging; this is not evidence of earned progression or exploration. */
+export function stagedMageAbility(abilityId:'ability:frost_snare'|'ability:magic_missile') {
+  const fresh=freshDungeon('mage-focused-ability',190),party=fresh.party.map(h=>{
+    const hero=progressHero(h.heroId,180,h.hp,dungeonContent.catalog);return {...hero,hp:hero.maxHp};
+  });
+  const entry=checkedDungeon(startDungeonBattle(atEncounter({...fresh,party}))),built=dungeonBattle(entry)!;
+  const catalog:ContentCatalog=built.catalog;
+  const initial=entry.activeBattle!,mage=initial.units.find(u=>u.defId==='mage')!,map=catalog.maps[initial.mapId];
+  for(const target of initial.units.filter(u=>u.side==='enemy'))for(const cell of map.cells) {
+    if(!built.catalog.terrains[cell.terrainId].walkable||initial.units.some(u=>u.id!==mage.id&&u.cell.x===cell.x&&u.cell.y===cell.y))continue;
+    const battle={...initial,activeIndex:initial.initiative.indexOf(mage.id),units:initial.units.map(u=>u.id===mage.id?{...u,cell:{x:cell.x,y:cell.y}}:u)};
+    const command={type:'useAbility' as const,unitId:mage.id,abilityId,target:abilityId==='ability:magic_missile'?{missileTargets:[target.id,target.id]}:{unitId:target.id}};
+    if(!previewAbility(battle,command,built.catalog).ok)continue;
+    return {state:checkedDungeon(readDungeon({...entry,activeBattle:battle})),command};
+  }
+  throw Error(`No legal staged Mage target for ${abilityId}`);
 }
 
 /** Legal first-floor Fighter witness supplies the healed carry fixture in the current wire format. */

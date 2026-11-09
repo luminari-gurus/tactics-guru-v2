@@ -119,7 +119,10 @@ No merge, deployment or PR creation is part of this planning handoff.
 
 Planning publication touches this file, the unchanged previous-plan archive and
 the two #284 OpenSpec pointer corrections. Implementation should touch only the
-test/helper/evidence files above. Existing configurations should suffice.
+test/helper/evidence files above, the requested OpenSpec artifacts and one
+task-scoped self-hosted qualification workflow. Existing browser configurations
+remain unchanged. The workflow is necessary to select these extended cases on
+the qualified runner; existing manual jobs do not expose this selection.
 
 ## Ablation decisions
 
@@ -243,6 +246,39 @@ Chromium/WebKit emulation satisfy device acceptance under AGENTS.md. Describe
 emulation accurately and retain any real platform failure.
 
 ## Estimate and handoff
+
+### Implementation progress — 2026-11-09
+
+- The caller explicitly authorized implementation, autonomous fixes, commits,
+  pushes, incremental PRs and OpenSpec. The OpenSpec change is valid with
+  `skip_specs: true` (test refactor; no product requirements changed).
+- Baseline workflow source `d687e6d` is published. Live run
+  [42670137498](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42670137498)
+  checks out exact `1a02557` on VM-02 and measures the original seed-68 desktop
+  Chromium/WebKit journey. Preserve its actual result; no broad capture was
+  started and no app/test timeout was increased.
+- `selectMageJourney` searches at most 16 candidates, records exclusions and
+  checks the actual earned/replayed terminal witness. Default first qualifying
+  seed remains 68; 78 is a second qualifying candidate in the measured interval.
+  One-time simulation of all 16 candidates took ~13.7 seconds locally; default
+  selection plus retained unit replay took ~4.3 seconds. No browser speedup is
+  claimed. Failure-path tests inject synthetic results only at this helper's
+  small test seam; production/browser selection uses actual simulation.
+- Two focused production cases now stage validated level/position boundaries
+  and enact Snare/multiple missiles through the real HUD, checking exact
+  effects/replay and active reload with unchanged save bytes. Their browser
+  qualification is pending. All old extended assertions and the original
+  low-HP continuation fixture remain intact.
+- Exact discovery comparison adds six staged cases to each engine's production
+  matrix and removes/changes none. Each extended configuration remains nine;
+  ordinary PR selection remains seven. Affected iteration units passed 72/72;
+  both type scopes and direct local bundle pass after fixing a staging-helper
+  type inference error. Final current-source standard/browser checks are still
+  required. See [QA record](../qa/issue-316/README.md) for identities and limits.
+- Next: publish the implementation and reviewable PR, run the self-hosted
+  focused/full Mage and standard PR gates, preserve artifacts/failures, and mark
+  the PR ready only after every issue acceptance gate is verified. No merge,
+  release tag or deployment is part of this work.
 
 Estimated time **for me: 2–3 hours** of elapsed implementation and affected
 verification after work begins, excluding self-hosted runner queue time:

@@ -6,7 +6,7 @@ import { guardedBoundary } from '../helpers/guardedBoundary';
 import { combatStats } from '../../src/domain/effects';
 import { assert,expect,it } from 'vitest';
 import { previewSupportAbility } from '../../src/domain/combat';
-import { dungeonJourney, dungeonVictoryBoundary, rangerJourney, mageJourney, healedFighterBoundary, shamanJourney, fighterJourney } from '../helpers/dungeonFixtures';
+import { dungeonJourney, dungeonVictoryBoundary, rangerJourney, selectMageJourney, MAGE_JOURNEY_SEEDS, healedFighterBoundary, shamanJourney, fighterJourney } from '../helpers/dungeonFixtures';
 import { dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState } from '../../src/domain/dungeon';
 import { BattleSession } from '../../src/app/BattleSession';
 import { playerDecision } from '../helpers/playerPolicy';
@@ -118,7 +118,10 @@ it('roundtrips live Weakened and Shaman ally healing without broadening party HP
 });
 
 it('finds a legal earned Mage Snare and multi-missile journey with exact replay and terminal cleanup',()=>{
-  const journey=mageJourney(68);
+  const selected=selectMageJourney(),journey=selected.witness;
+  expect(selected.range).toEqual(MAGE_JOURNEY_SEEDS);
+  expect(selected.attempts.at(-1)).toEqual({seed:journey.seed,missing:[]});
+  expect(selected.attempts.slice(0,-1).every(a=>a.missing.length>0)).toBe(true);
   expect({used:journey.used,phase:journey.state.phase,party:journey.state.party}).toMatchObject({used:{snare:true,missiles:true},phase:'defeat'});
   expect(journey.state.party.find(h=>h.heroId==='mage')!.level).toBeGreaterThanOrEqual(3);
   expect(journey.records.some(r=>r.events.some(e=>e.type==='movementBlockExpired'&&e.abilityId==='ability:frost_snare'))).toBe(true);
@@ -133,6 +136,27 @@ it('finds a legal earned Mage Snare and multi-missile journey with exact replay 
     expect(state).toEqual(record.state);expect(events).toEqual(record.events);expect(state.units.every(u=>u.movementBlock===undefined)).toBe(true);
   }
   expect(blocked&&expiredAtTurnEnd).toBe(true);
+},120000);
+
+it('bounds Mage selection, records nonqualifying outcomes and never hides unexpected witness errors',()=>{
+  const {witness}=selectMageJourney(),range=[witness.seed-1,witness.seed] as const,visited:number[]=[];
+  const simulate=(seed:number)=>{visited.push(seed);return seed===witness.seed?witness:{...witness,seed,used:{snare:false,missiles:false}};};
+  const selected=selectMageJourney(range,simulate);
+  expect(visited).toEqual([...range]);
+  expect(selected.attempts).toEqual([{seed:range[0],missing:['Frost Snare','multiple missiles']},{seed:range[1],missing:[]}]);
+  expect(selected.witness).toEqual(witness);
+  expect(selectMageJourney([witness.seed,witness.seed]).witness).toEqual(witness);
+  const rejected:number[]=[];
+  expect(()=>selectMageJourney(range,seed=>{rejected.push(seed);return {...witness,seed,used:{snare:false,missiles:false}};}))
+    .toThrow(`No qualifying Mage journey in ${range[0]}–${range[1]}`);
+  expect(rejected).toEqual([...range]);
+  const broken=new Error('unexpected simulation failure'),failures:number[]=[];
+  expect(()=>selectMageJourney(range,seed=>{failures.push(seed);throw broken;})).toThrow(broken);
+  expect(failures).toEqual([range[0]]);
+  expect(()=>selectMageJourney([witness.seed,witness.seed],()=>({...witness,records:witness.records.map((r,i)=>i===0?{...r,events:[]}:r)})))
+    .toThrow('replay diverged');
+  for(const invalid of [[1,0],[-1,1],[64,80],[1,Infinity],[0,0x100000000],[1.5,2]] as const)
+    expect(()=>selectMageJourney(invalid)).toThrow('1–16 ascending uint32');
 },120000);
 
 it('roundtrips active Mage Snare in dungeon continuation and clears it before the next encounter',()=>{

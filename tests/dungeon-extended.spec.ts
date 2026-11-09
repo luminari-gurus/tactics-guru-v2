@@ -8,15 +8,16 @@ import { dispatch } from '../src/domain/turns';
 import { walkDungeon, continueSavedDungeon } from './helpers/dungeonTraversal';
 import { readSession, playCommand } from './helpers/battlePolicy';
 import { fighterDecision, rangerDecision, mageDecision } from './helpers/playerPolicy';
-import { journeyPreparation, rangerJourney, mageJourney, fighterJourney } from './helpers/dungeonFixtures';
+import { journeyPreparation, rangerJourney, selectMageJourney, fighterJourney } from './helpers/dungeonFixtures';
 
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
 async function seed(page:Page,s:DungeonState){const encoded=encodeDungeon(s);if(!encoded.ok)throw Error(encoded.reason);await page.goto('./?game=dungeon');await page.evaluate(({key,text})=>{localStorage.setItem(key,text);}, {key:DUNGEON_KEYS.primary,text:encoded.text});await page.reload();await continueSavedDungeon(page);}
 
 test('Mage legal progression journey earns level three uses Frost Snare and multiple missiles and resumes',async({page,isMobile})=>{
  test.setTimeout(600000);page.setDefaultTimeout(10000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
- const witness=mageJourney(68),used={snare:false,missiles:false};expect(witness.used).toEqual({snare:true,missiles:true});expect(witness.state.phase).toBe('defeat');
- await seed(page,freshDungeon('mage-production-journey',68));
+ const selectionStart=performance.now(),selection=selectMageJourney(),selectionMs=performance.now()-selectionStart,witness=selection.witness,used={snare:false,missiles:false};expect(witness.used).toEqual({snare:true,missiles:true});expect(witness.state.phase).toBe('defeat');
+ await test.info().attach('mage-seed-selection',{body:JSON.stringify({range:selection.range,attempts:selection.attempts,seed:witness.seed,selectionMs}),contentType:'application/json'});
+ await seed(page,freshDungeon('mage-production-journey',witness.seed));
  const records:unknown[]=[];let expired=false,blocked=false;
  for(const expected of witness.records) {
   const position=await snapshot(page);
@@ -62,7 +63,7 @@ test('Mage legal progression journey earns level three uses Frost Snare and mult
    else throw Error('Unexpected preparation command');await page.locator('#dungeon-item-confirm').click();
   }
  }
- const final=await snapshot(page);writeFileSync(test.info().outputPath('mage-production-journey.json'),JSON.stringify({seed:68,records,final,used,blocked,expired}));
+ const final=await snapshot(page);writeFileSync(test.info().outputPath('mage-production-journey.json'),JSON.stringify({seed:witness.seed,range:selection.range,attempts:selection.attempts,selectionMs,records,final,used,blocked,expired}));
  expect(final.phase).toBe('defeat');expect(final.party).toEqual(witness.state.party);expect(used).toEqual({snare:true,missiles:true});expect(blocked&&expired).toBe(true);expect(errors).toEqual([]);
  await page.screenshot({path:test.info().outputPath('mage-terminal-journey.png'),fullPage:true});
 });
