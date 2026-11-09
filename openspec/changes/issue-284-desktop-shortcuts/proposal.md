@@ -23,4 +23,4 @@ None.
 
 ## Impact
 
-Scene keyboard ownership, HUD hints/ability selection, radial aim/focus, minimal CSS and player instructions; existing browser regressions and OpenSpec tracking. No dependencies, configurable input framework, gameplay, saves, RNG or telemetry changes. Follow the approved `docs/ongoing-projects/plan.md` on `branch/issue-284-desktop-shortcuts`.
+Scene keyboard ownership, HUD hints/ability selection, radial aim/focus, minimal CSS and player instructions; existing browser regressions and OpenSpec tracking. No dependencies, configurable input framework, gameplay, saves, RNG or telemetry changes. Follow the approved `docs/ongoing-projects/issue-284-desktop-shortcuts-plan.md` on `branch/issue-284-desktop-shortcuts`.

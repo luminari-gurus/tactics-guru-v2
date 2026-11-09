@@ -2,7 +2,7 @@
 
 ## Context
 
-The approved plan is `docs/ongoing-projects/plan.md`; see proposal.md for motivation. BattleScene owns ready/player/modal/visibility state and lifecycle. BattleHud owns native controls and their disabled state; BattleSelection owns previews/plans. BattleRadial already has disabled buttons, a legal-special submenu and preview hub. All three battle hosts reuse this scene. PR #355's turn-status changes are integrated from main at `a6e9a2f`.
+The approved plan is `docs/ongoing-projects/issue-284-desktop-shortcuts-plan.md`; see proposal.md for motivation. BattleScene owns ready/player/modal/visibility state and lifecycle. BattleHud owns native controls and their disabled state; BattleSelection owns previews/plans. BattleRadial already has disabled buttons, a legal-special submenu and preview hub. All three battle hosts reuse this scene. PR #355's turn-status changes are integrated from main at `a6e9a2f`.
 
 ## Goals / Non-Goals
 
