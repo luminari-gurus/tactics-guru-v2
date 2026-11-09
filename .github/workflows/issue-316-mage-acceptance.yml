@@ -1,0 +1,73 @@
+name: Issue 316 Mage acceptance
+on:
+  push:
+    branches: [branch/issue-316-mage-acceptance-fixtures]
+    paths: ['tests/**', 'scripts/**', '*config*', 'package*.json', '.github/workflows/issue-316-mage-acceptance.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: tactics-browser-tactics-browser-02
+  queue: max
+  cancel-in-progress: false
+jobs:
+  mage:
+    if: github.repository == 'luminari-gurus/tactics-guru-v2' && github.ref == 'refs/heads/branch/issue-316-mage-acceptance-fixtures'
+    runs-on: [self-hosted, tactics-browser, tactics-browser-02]
+    timeout-minutes: 80
+    steps:
+      - name: Check host disposition
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ contains(github.event.head_commit.message, '[mage baseline]') && '1a02557e76041e307ddf172d39ddc3e477ac967d' || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run setup:browsers && npm run check:browsers
+      - name: Record source and build
+        id: build
+        run: |
+          mkdir -p verification-receipts/issue-316
+          node --input-type=module <<'JS'
+          import { writeFileSync } from 'node:fs';
+          import { sourceIdentity } from './scripts/verification-report.mjs';
+          writeFileSync('verification-receipts/issue-316/source.json', JSON.stringify({
+            source: sourceIdentity(process.cwd()), node: process.version,
+            runner: process.env.RUNNER_NAME,
+            conditions: 'Persistent qualified runner; shared storage/network load and caches not independently controlled'
+          }, null, 2));
+          JS
+          npm run build
+      - name: Capture original seed-68 Chromium baseline
+        if: contains(github.event.head_commit.message, '[mage baseline]') && steps.build.outcome == 'success'
+        run: npm run test:browser -- -c playwright.extended.config.ts -g 'Mage legal progression' --project desktop --diagnostics
+      - name: Capture original seed-68 WebKit baseline
+        if: ${{ !cancelled() && contains(github.event.head_commit.message, '[mage baseline]') && steps.build.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.extended-webkit.config.ts -g 'Mage legal progression' --project desktop-webkit --diagnostics
+      - name: Focused production Chromium
+        if: ${{ !cancelled() && !contains(github.event.head_commit.message, '[mage baseline]') && steps.build.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.regression.config.ts tests/dungeon.spec.ts -g 'Mage' --diagnostics
+      - name: Focused production WebKit
+        if: ${{ !cancelled() && !contains(github.event.head_commit.message, '[mage baseline]') && steps.build.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon.spec.ts -g 'Mage' --diagnostics
+      - name: Retained Mage picker
+        if: ${{ !cancelled() && !contains(github.event.head_commit.message, '[mage baseline]') && steps.build.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.fixtures.config.ts tests/ability-picker.spec.ts -g 'Mage real' --diagnostics
+      - name: Complete earned Mage progression Chromium
+        if: ${{ !cancelled() && !contains(github.event.head_commit.message, '[mage baseline]') && steps.build.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.extended.config.ts -g 'Mage legal progression' --diagnostics
+      - name: Complete earned Mage progression WebKit
+        if: ${{ !cancelled() && !contains(github.event.head_commit.message, '[mage baseline]') && steps.build.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.extended-webkit.config.ts -g 'Mage legal progression' --diagnostics
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-316-mage-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/
+          retention-days: 14
+          if-no-files-found: warn

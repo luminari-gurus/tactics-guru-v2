@@ -10,7 +10,9 @@ Base: `origin/main` at `6aad368761e6684d88d9b3eb5b3cacc53a615c90`.
 
 Branch: [`branch/issue-316-mage-acceptance-fixtures`](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-316-mage-acceptance-fixtures).
 
-Status: planning handoff only; implementation and test changes have not started.
+Status: implementation authorized by the caller on 2026-11-09. OpenSpec change
+[`issue-316-mage-acceptance-fixtures`](../../openspec/changes/issue-316-mage-acceptance-fixtures/proposal.md)
+tracks implementation. No runtime changes are planned.
 
 The previous plan is preserved byte-for-byte in
 [issue-284-desktop-shortcuts-plan.md](issue-284-desktop-shortcuts-plan.md).
@@ -128,9 +130,9 @@ expiry and terminal cleanup gates.
 
 **Simplify** seed handling into one Mage-specific pure helper shared by unit and
 browser consumers, using current session/content rules. Reuse existing staged
-production-save and picker fixtures for focused checks. A dedicated OpenSpec
-change adds no design clarity to this test-only refactor; this requested plan is
-the single implementation handoff.
+production-save and picker fixtures for focused checks. The caller subsequently
+requested OpenSpec: use its proposal/design/tasks with `skip_specs: true` because
+product requirements do not change. This plan remains the session handoff.
 
 **Drop** generalized journey search, new configuration/dependencies, new fixture
 routes, persistent/generated seed caches, CI sharding and balance adjustments.
@@ -174,8 +176,8 @@ fallback to seed 68 or a caught unexpected helper exception would hide failure.
    through real inputs. Keep exact replay, active reload and legal terminal
    assertions. Record per-profile duration and pure selection overhead against
    the existing ten-minute per-case budget, including setup/search cost.
-5. **Publish one focused implementation PR after a subsequent implementation
-   request.** Run the checks below, audit every issue bullet and the final diff,
+5. **Publish one focused implementation PR under the caller's 2026-11-09
+   implementation authorization.** Run the checks below, audit every issue bullet and the final diff,
    attach the source-bound evidence, and use `Closes #316` only when all gates
    pass. If delivery needs an incomplete increment, use `Refs #316`, state what
    remains and keep the issue open. Do not close it with this planning commit.
