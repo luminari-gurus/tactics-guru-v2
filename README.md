@@ -100,6 +100,7 @@ an action/ability shortcut to aim its enabled control and read the preview. **C*
 or native activation confirms it; selecting a numbered ability never casts it.
 In the radial skin, **S** aims the legal ability currently offered by **Special**;
 number keys retain their displayed learned-ability order even at an illegal target.
+Radial actions that damage an ally show a friendly-fire dialog before committing.
 Sound starts off; **Enable sound** turns on battle cues.
 
 ### Pick up where you left off

@@ -21,5 +21,5 @@
 
 - [x] 4.1 Synchronize the full radial review with native focus, tap and held aiming; verify Tab/C, mixed pointer/native activation and the three direct radial harness consumers.
 - [x] 4.2 Preserve the planned-destination prerequisite and latest cursor targeting; prove both reproduced regressions and retained compound-plan behavior through real controls.
-- [x] 4.3 Reuse shared command review semantics for friendly fire and self-targeted compound plans; prove the complete warning/effects and move/heal review before accepted commands.
-- [ ] 4.4 Run affected local browser/host and PR verification, address all PR threads, update source-bound evidence and verify the exact head is ready for the authorized merge.
+- [x] 4.3 Reuse shared command review semantics for friendly fire and self-targeted compound plans; prove complete chip/HUD warnings and move/heal review, explicit radial friendly confirmation and stale-intent rejection before accepted commands.
+- [x] 4.4 Run affected local browser/host and PR verification, address all PR threads, update source-bound evidence and verify the exact head is ready for the authorized merge.

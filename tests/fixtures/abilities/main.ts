@@ -27,5 +27,7 @@ document.querySelector<HTMLElement>('#battle-controls')!.hidden=false;
 document.querySelectorAll<HTMLElement>('#fit-panel > details').forEach(e=>e.hidden=true);
 mountBattleLayout();
 window.fitDiagnostics=diagnosticsSnapshot;
-const scene=new BattleScene(()=>{},message=>{throw Error(message);},host);
+const scene=new BattleScene(state=>{
+  document.querySelector<HTMLElement>('#game')!.dataset.ready=String(state==='ready');
+},message=>{throw Error(message);},host);
 new Phaser.Game({type:Phaser.AUTO,parent:'game',backgroundColor:'#172033',scale:{mode:Phaser.Scale.RESIZE,width:innerWidth,height:innerHeight},scene});

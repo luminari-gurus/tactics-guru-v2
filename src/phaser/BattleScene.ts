@@ -18,7 +18,7 @@ import { track } from '../telemetry/telemetry';
 import { hoverPreview } from '../ui/targetPreview';
 import { previewDraught } from '../domain/turns';
 import { BattleSelection, selectableSpecials } from '../ui/battleSelection';
-import { BATTLE_KEYS } from '../ui/battleActions';
+import { BATTLE_KEYS, friendlyFire } from '../ui/battleActions';
 import { BattleRadial, clientPointFromCanvas } from '../ui/battleRadial';
 import { resolveCombatControlsSkin, watchCombatControls, type CombatSkin } from '../ui/combatControls';
 import { lightHaptic, type RadialSliceId } from '../ui/radialGesture';
@@ -257,9 +257,20 @@ export class BattleScene extends Phaser.Scene {
     const confirm=()=>{
       if(session.phase!=='player' || (!session.pending && !session.pendingPlan) || dialogs.open)return;
       const focused=document.activeElement===hud.root.querySelector('#battle-review');
-      const compound=Boolean(session.pendingPlan);
-      void present(compound?session.confirmPlan():session.confirm(),compound);
-      if(focused)document.querySelector<HTMLElement>('#fit-restart')?.focus();
+      const reviewed=session.state,intent=session.pending,plan=session.pendingPlan;
+      const accept=()=>{
+        if(!live || document.hidden || dialogs.open || session.phase!=='player' || session.state!==reviewed || session.pending!==intent || session.pendingPlan!==plan)return;
+        const compound=Boolean(plan);
+        void present(compound?session.confirmPlan():session.confirm(),compound);
+        if(focused)document.querySelector<HTMLElement>('#fit-restart')?.focus();
+      };
+      const command=plan?.ability??intent;
+      if(skin==='radial' && command && friendlyFire(session,command)){
+        dialogs.showChoices('Friendly fire?',selection.message,[
+          {id:'battle-friendly-cancel',label:'Cancel',run:()=>cancel()},
+          {id:'battle-friendly-confirm',label:'Confirm friendly action',run:accept},
+        ],()=>cancel());
+      }else accept();
     };
     const cancel=()=>{if(dialogs.open || session.phase!=='player')return;clear();refresh();hud.focusAction();};
     const applySkin=()=>{skin=resolveCombatControlsSkin();hud.applySkin(skin);if(skin!=='radial')radial.hide();refresh();};

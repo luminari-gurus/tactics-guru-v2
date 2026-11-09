@@ -306,26 +306,28 @@ export class BattleRadial {
     return button?.dataset.radialAbility as AbilityId | undefined ?? null;
   }
 
+  private specialReview(abilityId: AbilityId) {
+    const self = this.selection.session.catalog.abilities[abilityId]?.kind === 'secondWind';
+    const needsTarget = Boolean(this.selection.planning && this.selection.planMove && !self);
+    const {command, preview} = needsTarget ? {command:null,preview:null} : previewAction(this.selection.session, abilityId,
+      self ? this.selection.session.active.cell : this.cell!, this.selection.planMove);
+    const detail = needsTarget ? 'Choose a target' : preview ? previewText(preview) : 'Unavailable target';
+    const prefix = !needsTarget && this.selection.planning && this.selection.planMove
+      ? `Move to (${this.selection.planMove.to.x}, ${this.selection.planMove.to.y}) + ability`
+      : displayName(abilityId);
+    const text = `${prefix} · ${detail}`;
+    return {preview,detail,message:command ? this.selection.reviewText(command,text) : text};
+  }
+
   private highlightChip(abilityId: AbilityId): void {
     this.root.querySelectorAll<HTMLButtonElement>('[data-radial-ability]').forEach(button => {
       button.setAttribute('aria-pressed', String(button.dataset.radialAbility === abilityId));
     });
     if (!this.cell) return;
-    const self = this.selection.session.catalog.abilities[abilityId]?.kind === 'secondWind';
-    if (this.selection.planning && this.selection.planMove && !self) {
-      this.paintHub(displayName(abilityId), 'Choose a target');
-      this.review(abilityId, `${displayName(abilityId)} · Choose a target`);
-      return;
-    }
-    const {command, preview} = previewAction(this.selection.session, abilityId,
-      self ? this.selection.session.active.cell : this.cell, this.selection.planMove);
-    const lines = uniqueHubLines(displayName(abilityId), preview ? previewText(preview) : '', preview && !preview.ok ? previewText(preview) : null, Boolean(preview && !preview.ok));
-    this.paintHub(lines.title, lines.subtitle);
-    const prefix = this.selection.planning && this.selection.planMove
-      ? `Move to (${this.selection.planMove.to.x}, ${this.selection.planMove.to.y}) + ability`
-      : displayName(abilityId);
-    const text = `${prefix} · ${preview ? previewText(preview) : 'Unavailable target'}`;
-    this.review(abilityId, command ? this.selection.reviewText(command, text) : text);
+    const {preview,detail,message} = this.specialReview(abilityId);
+    const lines = uniqueHubLines(displayName(abilityId),detail,preview && !preview.ok ? detail : null,Boolean(preview && !preview.ok));
+    this.paintHub(lines.title,lines.subtitle);
+    this.review(abilityId,message);
   }
 
   /** The fitted hub and full HUD follow the same aim/focus in both gesture modes. */
@@ -355,21 +357,20 @@ export class BattleRadial {
     }
     const sub = this.root.querySelector<HTMLElement>('#battle-radial-sub')!;
     const specials = selectableSpecials(this.selection.session, this.cell, this.selection.planMove);
-    const followUp = Boolean(this.selection.planning && this.selection.planMove);
     sub.hidden = !this.subOpen || specials.length === 0;
     this.root.dataset.subOpen = String(!sub.hidden);
     if (!sub.hidden) {
       const last = this.selection.lastUsedSpecial();
       sub.replaceChildren(...specials.map((ability, index) => {
-        const preview = followUp ? null : previewAction(this.selection.session, ability.id, this.cell!, this.selection.planMove).preview;
+        const review = this.specialReview(ability.id);
         const button = document.createElement('button');
         button.type = 'button';
         button.dataset.radialAbility = ability.id;
         button.className = `battle-radial-sub n${index + 1}`;
         button.setAttribute('aria-pressed', String(ability.id === last || (!last && index === 0)));
-        const detail = followUp ? 'Choose a target' : (preview ? previewText(preview) : '');
+        const detail = review.detail;
         button.innerHTML = `<strong>${displayName(ability.id)}</strong><span>${ability.id === last ? 'Last used' : stripUnavailablePrefix(detail)}</span>`;
-        button.setAttribute('aria-label', `${displayName(ability.id)}, ${detail}`);
+        button.setAttribute('aria-label', `${displayName(ability.id)}, ${review.message}`);
         const shortcutIndex = ownedAbilities(this.selection.session).findIndex(owned => owned.id === ability.id);
         if (shortcutIndex >= 0 && shortcutIndex < 9) shortcutHint(button, String(shortcutIndex + 1), displayName(ability.id));
         button.addEventListener('focus', () => this.highlightChip(ability.id));

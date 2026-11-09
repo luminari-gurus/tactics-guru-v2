@@ -7,11 +7,11 @@ Base: `origin/main` at `130c5ccffc491f893da8e598b8c008898fa92138`.
 Branch: [`branch/issue-284-desktop-shortcuts`](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-284-desktop-shortcuts).
 Status: implementation authorized by the caller on 2026-11-09. OpenSpec change
 [`issue-284-desktop-shortcuts`](../../openspec/changes/issue-284-desktop-shortcuts/proposal.md)
-tracks this approved plan. **Adversarial review corrections are in progress.**
-[PR #356](https://github.com/luminari-gurus/tactics-guru-v2/pull/356) is undergoing
-the caller-authorized independent review/fix/merge workflow. The original four
-implementation tasks are complete; the review correction tasks below track the
-current work. Earlier implementation/qualification evidence remains historical.
+tracks this approved plan. **Adversarial review corrections are locally qualified and addressed.**
+[PR #356](https://github.com/luminari-gurus/tactics-guru-v2/pull/356) is ready for
+the caller-authorized merge after independent review, fixes and local qualification. The original four
+implementation tasks are complete; the review correction tasks below record the
+completed pre-merge work. Earlier implementation/qualification evidence remains historical.
 
 ## PR #356 adversarial review — 2026-11-09
 
@@ -382,3 +382,64 @@ this planning commit.
 - Marked PR #356 ready for review and updated its description with `Closes #284` only after these gates passed. The issue remains open until merge. Appropriate feature/risk labels are present; normal repository risk assessment and human review remain review work, not an implementation exception or a request to merge.
 - OpenSpec reports **4/4 tasks complete** and strict validation passes. The branch has the approved plan, implementation, regressions and portable QA evidence. No dependency, preference, domain rule, save format, CI workflow or shipped Playwright configuration was added.
 - This final checklist/receipt update changes documentation only. Its source/test/tooling hashes are identical to `9329ff0`; the final PR's Checks tab supplies any automatically triggered documentation-commit CI result. Do not rerun application tests merely to rewrite this prose. Preserve the earlier failed/incomplete attempts with their actual source identities.
+
+Review follow-through: WebKit production passed 70 cases with six documented
+CDP/native-touch skips. The broader dev run passed 36 and failed two label cases
+before their font assertions. Literal main a6e9a2f, original head afab96c and fix
+3477878 each passed the isolated case. A same-turn layout probe showed the
+published region still 810×756.09 after the DOM became 1174×464.09. This sixth
+finding (verification harness race) is posted on PR #356. The existing three-frame
+settledReport checkpoint is now shared with battle-board.spec.ts and used before
+the post-skin-switch font tap. Font size/bounds assertions remain unchanged.
+
+Additional input-style checks extended the friendly-fire finding: first touch
+activation and planned follow-up accepted allied damage without a guaranteed
+review barrier. Radial friendly damage now uses the existing native dialog owner,
+with Cancel first and acceptance bound to the exact state and pending intent/plan.
+Ordinary enemy actions and healing retain their flow. The shared special-review
+description also fixes the self-heal chip's false Choose a target instruction and
+its accessible label. The late-native-change witness proves a replacement valid
+prepared command cannot be accepted through the old dialog.
+
+Raw results are retained in tmp/pr356-webkit-fixtures.*,
+tmp/pr356-friendly-layout-red.*, and tmp/pr356-last-boundaries.*. The two probe
+executions were diagnostic observations, not feature acceptance. The eight final
+WebKit boundary witnesses passed; their repaired startup/skin-transition drivers
+use the shared rendering checkpoint rather than treating domain phase as UI
+readiness. Final qualification is rerun below after these changes.
+
+## Review correction qualification
+
+All six findings (five product defects plus one verification-harness race) are
+implemented. The final runtime uses one preview owner and the existing selection,
+tactical preview and native-dialog paths; no new rules, dependencies or save format.
+The final fixture repair connects the previously ignored scene callback to the
+existing data-ready attribute. Every ability navigation waits for actual readiness;
+all four skin switches settle rendering before projecting input. The intermediate
+43/46 WebKit attempt and invalid status-label wait are retained in
+[review-356.json](../qa/issue-284/review-356.json), alongside the original red repros.
+The invalid label wait was stopped, not counted as a completed run.
+
+Final results:
+
+- development fixture, playwright.fixtures.config.ts: **108 passed, 0 expected skips**, zero failures/flaky cases; exact commands, profiles and cases in the receipt.
+- development fixture, tmp/issue284-abilities-webkit.config.ts: **46 passed, 0 expected skips**, zero failures/flaky cases; exact commands, profiles and cases in the receipt.
+- ordinary production preview, playwright.regression.config.ts: **151 passed, 3 expected skips**, zero failures/flaky cases; exact commands, profiles and cases in the receipt.
+- ordinary production preview, playwright.device-acceptance.config.ts: **74 passed, 6 expected skips**, zero failures/flaky cases; exact commands, profiles and cases in the receipt.
+
+Local verify:pr passed in **105.9 seconds**: 1,244 units, both types/build
+integrations, bundle and seven complete core journeys. Only the two ability
+fixture/driver files changed afterward; their complete affected development
+modes and both type scopes were rerun. The shipped runtime, core journeys,
+unit/tooling and production-build inputs are unchanged. Production checks above
+also freshly cover the shared scene and camera-harness consumers. All 333
+relevant input hashes match the final snapshot. Earlier passes retain their own
+identities; the earlier failed broader attempts are not called clean full runs.
+
+Final screenshots show desktop move/heal consequences, portrait friendly-fire
+warning and landscape native-focus review. Font minimum, complete text bounds,
+state/RNG equality, timeouts and zero-retry policy were preserved. Desktop and
+mobile Chromium/WebKit emulation satisfy the standing device instruction; no
+physical hardware testing is claimed. Strict OpenSpec, review replies/resolution,
+publication and exact-tree readback complete the pre-merge checkpoint; actual
+merge, issue closure and safe cleanup are recorded on PR #356 after execution.

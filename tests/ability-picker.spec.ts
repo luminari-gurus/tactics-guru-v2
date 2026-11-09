@@ -1,15 +1,21 @@
-import {expect,test} from './helpers/forceRailControls';
-import { readSession, playCommand, tapBoard, boardPoint } from './helpers/battlePolicy';
+import {expect,test,type Page} from './helpers/forceRailControls';
+import { readSession, playCommand, tapBoard, boardPoint, settledReport } from './helpers/battlePolicy';
 import { abilityCatalog } from './helpers/abilityCatalog';
 import { progressHero, projectProgression } from '../src/domain/progression';
 import { HERO_IDS } from '../src/content/constants';
 import { previewMovement } from '../src/domain/grid';
 import { COMBAT_CONTROLS_KEY } from '../src/ui/combatControls';
 
+async function abilityReady(page:Page,url:string) {
+  await page.goto(url);
+  await expect(page.locator('#game')).toHaveAttribute('data-ready','true');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await settledReport(page);
+}
+
 test('review356 radial Tab review matches the ability actually confirmed',async({page})=>{
   await page.addInitScript(()=>{(globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';});
-  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
   await page.locator('canvas').focus();await page.keyboard.press('ArrowRight');await page.keyboard.press('ArrowRight');await page.keyboard.press('1');
   await expect(page.locator('[data-radial-ability="ability:frost_snare"]')).toBeFocused();
   await page.keyboard.press('Tab');
@@ -26,8 +32,7 @@ test('review356 radial Tab review matches the ability actually confirmed',async(
 
 test('review356 radial ability shortcuts cannot cast before choosing a planned destination',async({page})=>{
   await page.addInitScript(()=>{(globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';});
-  await page.goto('/tests/fixtures/abilities/index.html?hero=fighter&xp=180&real&injured');
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=fighter&xp=180&real&injured');
   const before=await readSession(page);
   await tapBoard(page,{x:0,y:0});await page.locator('#battle-radial-plan').click();
   await page.locator('canvas').focus();await page.keyboard.press('2');await page.keyboard.press('c');
@@ -39,8 +44,7 @@ test('review356 radial ability shortcuts cannot cast before choosing a planned d
 
 test('review356 radial pointer aiming and native Enter share the full review',async({page})=>{
   await page.addInitScript(()=>{(globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';});
-  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
   await tapBoard(page,{x:1,y:0});
   await page.locator('#battle-radial-special').hover();
   const shown=await page.locator('#battle-preview').innerText();
@@ -53,8 +57,7 @@ test('review356 radial pointer aiming and native Enter share the full review',as
 
 test('review356 held radial aim keeps the full review aligned with release',async({page})=>{
   await page.addInitScript(()=>{(globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';});
-  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
   const point=await boardPoint(page,{x:1,y:0});await page.mouse.move(point.x,point.y);await page.mouse.down();
   await expect(page.locator('#battle-radial')).toBeVisible();
   const box=(await page.locator('#battle-radial-special').boundingBox())!;
@@ -68,8 +71,7 @@ test('review356 held radial aim keeps the full review aligned with release',asyn
 });
 
 test('review356 radial shortcuts use the moved cursor after switching from rail',async({page})=>{
-  await page.goto('/tests/fixtures/abilities/index.html?hero=mage');
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=mage');
   const before=await readSession(page),actor=before.state.units.find(u=>u.id===before.state.initiative[before.state.activeIndex])!;
   const cells=await page.locator('#battle-target option').evaluateAll(options=>options
     .filter(option=>!(option as HTMLOptionElement).disabled&&(option as HTMLOptionElement).value)
@@ -91,40 +93,91 @@ test('review356 radial shortcuts use the moved cursor after switching from rail'
 
 test('review356 self-heal plan has a complete review before confirmation',async({page})=>{
   await page.addInitScript(()=>{(globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';});
-  await page.goto('/tests/fixtures/abilities/index.html?hero=fighter&xp=180&real&injured');
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=fighter&xp=180&real&injured');
   const before=await readSession(page);
   await tapBoard(page,{x:0,y:0});await page.locator('#battle-radial-plan').click();
   const value=await page.locator('#battle-target option').nth(1).getAttribute('value');
   const [x,y]=value!.split(',').map(Number);await tapBoard(page,{x,y});
   await page.keyboard.press('2');const shown=await page.locator('#battle-preview').innerText();
+  const chipLabel=await page.locator('[data-radial-ability="ability:second_wind"]').getAttribute('aria-label');
   await page.screenshot({path:test.info().outputPath('self-plan-before-confirm.png')});
   await page.keyboard.press('c');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const after=await readSession(page);expect(after.state.commandCount).toBe(before.state.commandCount+2);
   expect(after.events.some(event=>event.type==='healed')).toBe(true);
   await test.info().attach('self-plan-review',{body:JSON.stringify({shown,events:after.events}),contentType:'application/json'});
   expect(shown).toContain(`Move to (${x}, ${y})`);expect(shown).toContain('Heal');
+  expect(chipLabel).not.toContain('Choose a target');expect(chipLabel).toContain('Heal');
+});
+
+for(const mode of ['tap','plan','hold'] as const)test(`review356 friendly radial ${mode} requires review before damage`,async({page,isMobile})=>{
+  await page.addInitScript(()=>{(globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';});
+  await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
+  const before=await readSession(page),fighter=before.state.units.find(u=>u.defId==='fighter')!;
+  const activate=async(selector:string)=>isMobile?page.locator(selector).tap():page.locator(selector).click();
+  for(const accept of [false,true]){
+    await settledReport(page);
+    if(mode==='plan'){
+      await tapBoard(page,{x:0,y:0});await activate('#battle-radial-plan');
+      await page.locator('canvas').focus();await page.keyboard.press('ArrowRight');await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter');
+      await page.keyboard.press('2');await page.keyboard.press('c');
+      await page.keyboard.press('ArrowRight');await page.keyboard.press('ArrowRight');await page.keyboard.press('ArrowRight');await page.keyboard.press('ArrowUp');
+      await page.keyboard.press('Enter');
+    }else if(mode==='hold'){
+      const point=await boardPoint(page,fighter.cell);await page.mouse.move(point.x,point.y);await page.mouse.down();
+      await expect(page.locator('#battle-radial')).toBeVisible();const box=(await page.locator('#battle-radial-special').boundingBox())!;
+      await page.mouse.move(box.x+box.width/2,box.y+box.height/2);await page.mouse.up();
+    }else{
+      await tapBoard(page,fighter.cell);await activate('#battle-radial-special');
+    }
+    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    const requested=await readSession(page);
+    await test.info().attach('friendly-activation',{body:JSON.stringify({mode,requested:requested.state,before:before.state}),contentType:'application/json'});
+    expect(requested.state).toEqual(before.state);
+    await expect(page.getByRole('dialog')).toHaveAccessibleName('Friendly fire?');
+    await expect(page.locator('#battle-dialog-message')).toContainText('Friendly fire');
+    if(accept){
+      await activate('#battle-friendly-confirm');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+      const after=await readSession(page);expect(after.state.commandCount).toBe(before.state.commandCount+(mode==='plan'?2:1));
+      expect(after.state.units.find(u=>u.id===fighter.id)!.hp).toBeLessThan(fighter.hp);
+    }else{
+      await page.keyboard.press('Escape');expect((await readSession(page)).state).toEqual(before.state);
+    }
+  }
 });
 
 test('review356 radial review preserves the shared friendly-fire warning',async({page})=>{
   await page.addInitScript(()=>{(globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';});
-  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
   const before=await readSession(page),fighter=before.state.units.find(u=>u.defId==='fighter')!;
   await page.locator('canvas').focus();for(let i=0;i<4;i++)await page.keyboard.press('ArrowRight');
   await page.keyboard.press('2');await expect(page.locator('[data-radial-ability="ability:magic_missile"]')).toBeFocused();
   const shown=await page.locator('#battle-preview').innerText();
   await page.screenshot({path:test.info().outputPath('friendly-review-before-confirm.png')});
-  await page.keyboard.press('c');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await page.keyboard.press('c');await expect(page.getByRole('dialog')).toHaveAccessibleName('Friendly fire?');
+  expect((await readSession(page)).state).toEqual(before.state);
+  await page.locator('#battle-friendly-confirm').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const after=await readSession(page);expect(after.state.units.find(u=>u.id===fighter.id)!.hp).toBeLessThan(fighter.hp);
   await test.info().attach('friendly-review',{body:JSON.stringify({shown,events:after.events}),contentType:'application/json'});
   expect(shown).toContain('Friendly fire');expect(shown).toContain('fighter');
 });
 
+test('review356 friendly confirmation rejects a replacement prepared command',async({page})=>{
+  await page.addInitScript(()=>{(globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';});
+  await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=mage');
+  const before=await readSession(page);
+  await page.locator('canvas').focus();for(let i=0;i<4;i++)await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('2');await page.keyboard.press('c');
+  await expect(page.getByRole('dialog')).toHaveAccessibleName('Friendly fire?');
+  // Model a late native control change after the modal captured its reviewed intent.
+  await page.locator('#battle-ability').evaluate(select=>{(select as HTMLSelectElement).value='ability:magic_missile';select.dispatchEvent(new Event('change',{bubbles:true}));});
+  expect((await readSession(page)).pending).toMatchObject({abilityId:'ability:magic_missile'});
+  await page.locator('#battle-friendly-confirm').click();
+  expect((await readSession(page)).state).toEqual(before.state);
+});
+
 for(const hero of ['fighter','ranger','mage'] as const)test(`keyboard-only shortcuts select ${hero} learned abilities and preserve resource locks`,async({page})=>{
   const expected={fighter:['guarded_strike','second_wind','taunt'],ranger:['high_shot','mark_target','pinning_shot'],mage:['frost_snare','magic_missile']}[hero].map(id=>`ability:${id}`);
-  await page.goto(`/tests/fixtures/abilities/index.html?hero=${hero}&xp=180&real&injured`);
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await abilityReady(page,`/tests/fixtures/abilities/index.html?hero=${hero}&xp=180&real&injured`);
   const before=await readSession(page),picker=page.locator('#battle-ability'),canvas=page.locator('canvas');
   expect(await picker.locator('option').evaluateAll(options=>options.map(option=>(option as HTMLOptionElement).value))).toEqual(expected);
   const saves=await page.evaluate(()=>JSON.stringify(localStorage));
@@ -151,8 +204,7 @@ for(const hero of ['fighter','ranger','mage'] as const)test(`keyboard-only short
   expect(accepted.events.some(event=>event.type==='abilityUsed'&&event.abilityId===ability)).toBe(true);
   await page.keyboard.press(String(index+1));await page.keyboard.press('s');await page.keyboard.press('c');
   expect((await readSession(page)).state).toEqual(accepted.state);
-  await page.goto(`/tests/fixtures/abilities/index.html?hero=${hero}&xp=0&real`);
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await abilityReady(page,`/tests/fixtures/abilities/index.html?hero=${hero}&xp=0&real`);
   await expect(picker.locator('option')).toHaveCount(1);
   const locked=await readSession(page);
   await canvas.focus();await page.keyboard.press('2');await page.keyboard.press('c');
@@ -161,8 +213,7 @@ for(const hero of ['fighter','ranger','mage'] as const)test(`keyboard-only short
 
 test('keyboard-only shortcuts use canonical radial ability numbers without casting unavailable alternatives',async({page})=>{
   await page.addInitScript(()=>{(globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';});
-  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
   const before=await readSession(page),canvas=page.locator('canvas');
   await canvas.focus();await page.keyboard.press('ArrowRight');await page.keyboard.press('ArrowRight');
   await page.keyboard.press('1');
@@ -185,8 +236,7 @@ test('keyboard-only shortcuts use canonical radial ability numbers without casti
 
 test('keyboard-only shortcuts keep radial S aligned with the offered Special and A with Basic attack',async({page})=>{
   await page.addInitScript(()=>{(globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';});
-  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
   const canvas=page.locator('canvas');
   // At range one Frost Snare is unavailable, but Magic Missile keeps key 2.
   const fresh=await readSession(page);await canvas.focus();await page.keyboard.press('ArrowRight');await page.keyboard.press('1');
@@ -206,8 +256,7 @@ test('keyboard-only shortcuts keep radial S aligned with the offered Special and
 
 test('Mage real learned picker consolidates Arc Bolt and gates Frost Snare at level three',async({page})=>{
   for(const [xp,count] of [[0,0],[60,0],[180,1]]) {
-    await page.goto(`/tests/fixtures/abilities/index.html?hero=mage&xp=${xp}&real`);
-    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    await abilityReady(page,`/tests/fixtures/abilities/index.html?hero=mage&xp=${xp}&real`);
     await expect(page.locator('#battle-ability option[value="ability:magic_missile"]')).toHaveCount(1);
     await expect(page.locator('#battle-ability option[value="ability:frost_snare"]')).toHaveCount(count);
     await expect(page.locator('#battle-ability option')).toHaveCount(count+1);
@@ -217,7 +266,7 @@ test('Mage real learned picker consolidates Arc Bolt and gates Frost Snare at le
 
 test('Mage real Frost Snare preserves keyboard touch previews cancellation inspection and fresh reload without attack audio',async({page,isMobile})=>{
   test.setTimeout(90000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
-  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
   const picker=page.locator('#battle-ability'),button=page.locator('[data-action=signature]'),before=await readSession(page);
   if(isMobile)await page.locator('#battle-sound').tap();else{await page.locator('#battle-sound').focus();await page.keyboard.press('Enter');}
   await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().battleAudio)).toMatchObject({enabled:true,status:'ready',started:0});
@@ -243,8 +292,7 @@ test('Mage real Frost Snare preserves keyboard touch previews cancellation inspe
 
 test('Ranger learned actions follow level one, two and three through the real picker',async({page})=>{
   for(const [xp,mark,pin] of [[0,0,0],[60,1,0],[180,1,1]]) {
-    await page.goto(`/tests/fixtures/abilities/index.html?hero=ranger&xp=${xp}`);
-    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    await abilityReady(page,`/tests/fixtures/abilities/index.html?hero=ranger&xp=${xp}`);
     await expect(page.locator('#battle-ability option[value="ability:high_shot"]')).toHaveCount(1);
     await expect(page.locator('#battle-ability option[value="ability:mark_target"]')).toHaveCount(mark);
     await expect(page.locator('#battle-ability option[value="ability:pinning_shot"]')).toHaveCount(pin);
@@ -254,8 +302,7 @@ test('Ranger learned actions follow level one, two and three through the real pi
 
 for(const ability of ['mark_target','pinning_shot'] as const)test(`Ranger ${ability} preserves keyboard touch preview cancellation inspection and fresh reload`,async({page,isMobile})=>{
   test.setTimeout(90000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
-  await page.goto('/tests/fixtures/abilities/index.html?hero=ranger&xp=180');
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=ranger&xp=180');
   const picker=page.locator('#battle-ability'),button=page.locator('[data-action=signature]'),abilityId=`ability:${ability}`;
   const before=await readSession(page),storage=await page.evaluate(()=>JSON.stringify(localStorage));
   // Exercise no-roll controls with a real unlocked backend, so muted audio cannot
@@ -296,8 +343,7 @@ for(const ability of ['mark_target','pinning_shot'] as const)test(`Ranger ${abil
 
 test('Fighter healing and Taunt preserve keyboard touch cancellation inspection and fresh reload',async({page,isMobile})=>{
   test.setTimeout(90000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
-  await page.goto('/tests/fixtures/abilities/index.html?hero=fighter&xp=180&injured');
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=fighter&xp=180&injured');
   const picker=page.locator('#battle-ability'),signature=page.locator('[data-action=signature]');
   await expect(picker.locator('option[value="ability:second_wind"]')).toHaveCount(1);await expect(picker.locator('option[value="ability:taunt"]')).toHaveCount(1);
   const initial=await readSession(page);
@@ -338,8 +384,7 @@ test('Fighter healing and Taunt preserve keyboard touch cancellation inspection 
   expect(errors).toEqual([]);
 });
 for(const hero of ['fighter','ranger','mage'])test(`${hero} explicit later ability survives inspection/layout and cancels without mutation`,async({page,isMobile})=>{
-  await page.goto(`/tests/fixtures/abilities/index.html?hero=${hero}`);
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await abilityReady(page,`/tests/fixtures/abilities/index.html?hero=${hero}`);
   const picker=page.locator('#battle-ability'),button=page.locator('[data-action=signature]');
   await expect(picker.locator('option')).toHaveCount(2);
   const before=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
@@ -381,8 +426,7 @@ for(const hero of ['fighter','ranger','mage'])test(`${hero} explicit later abili
 });
 
 test('friendly missile confirmation supports Cancel and Escape then one deliberate damage action',async({page})=>{
-  await page.goto('/tests/fixtures/abilities/index.html?hero=mage');
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=mage');
   const before=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
   for(const dismissal of ['cancel','escape']){
     await page.locator('#battle-ability').selectOption('ability:zz_mage');await page.locator('[data-action=signature]').click();
@@ -406,7 +450,7 @@ test('friendly missile confirmation supports Cancel and Escape then one delibera
 // Keep all three distinct picker states; abilityFixtureProgression covers the
 // numeric XP/HP/missile permutations, including level five's third missile.
 for(const [xp,level,missiles,maxHp] of [[0,1,1,11],[60,2,1,15],[180,3,2,19]])test(`progression XP ${xp} gates learned fixture actions and resets on reload`,async({page})=>{
- await page.goto(`/tests/fixtures/abilities/index.html?hero=mage&xp=${xp}`);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ await abilityReady(page,`/tests/fixtures/abilities/index.html?hero=mage&xp=${xp}`);
  const initial=await readSession(page);
  await expect.poll(async()=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))??'null')?.units.find((u:{unitId:string})=>u.unitId==='mage')?.health.maxHp).toBe(maxHp);
  const health=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).units.find((u:{unitId:string})=>u.unitId==='mage').health;expect(health.hp).toBe(maxHp);expect(health.ratio).toBe(1);
@@ -424,12 +468,12 @@ for(const [xp,level,missiles,maxHp] of [[0,1,1,11],[60,2,1,15],[180,3,2,19]])tes
 
 test('radial multiple specials remain reachable on a narrow viewport', async ({page,isMobile}) => {
   await page.setViewportSize({width:320,height:568});
-  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
   await page.evaluate(() => {
     (globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls = 'radial';
     globalThis.dispatchEvent(new Event('combat-controls-change'));
   });
+  await settledReport(page);
   await tapBoard(page,{x:2,y:0});
   await expect(page.locator('#battle-radial')).toBeVisible();
   await page.locator('#battle-radial-special').click();
@@ -449,12 +493,12 @@ test('radial multiple specials remain reachable on a narrow viewport', async ({p
 
 test('radial Frost Snare label fits at a readable font size', async ({page}) => {
   await page.setViewportSize({width:1200,height:900});
-  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
   await page.evaluate(() => {
     (globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';
     globalThis.dispatchEvent(new Event('combat-controls-change'));
   });
+  await settledReport(page);
   await tapBoard(page,{x:2,y:0});
   const special=page.locator('#battle-radial-special');
   await expect(special).toBeEnabled();
@@ -474,8 +518,7 @@ test('radial Frost Snare label fits at a readable font size', async ({page}) => 
 
 test('radial hold keeps edge actions visible and cancels at the original press', async ({page}) => {
   await page.setViewportSize({width:320,height:568});
-  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
   const results = await page.evaluate(async () => {
     const radialPath='/src/ui/battleRadial.ts', selectionPath='/src/ui/battleSelection.ts', fixturePath='/tests/helpers/abilityCatalog.ts';
     const {BattleRadial}=await import(/* @vite-ignore */ radialPath);
@@ -522,12 +565,12 @@ test('radial hold keeps edge actions visible and cancels at the original press',
 
 test('radial Special does not commit when choices appear on a narrow screen', async ({page,isMobile}) => {
   await page.setViewportSize({width:320,height:568});
-  await page.goto('/tests/fixtures/abilities/index.html?hero=ranger&xp=180&real');
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=ranger&xp=180&real');
   await page.evaluate(() => {
     (globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';
     globalThis.dispatchEvent(new Event('combat-controls-change'));
   });
+  await settledReport(page);
   await tapBoard(page,{x:2,y:0});
   const special=page.locator('#battle-radial-special');
   await expect(special).toBeEnabled();
@@ -554,8 +597,7 @@ test('radial Special does not commit when choices appear on a narrow screen', as
 
 test('radial shifted hold can aim Special and still cancel at the press', async ({page}) => {
   await page.setViewportSize({width:320,height:568});
-  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
   const result=await page.evaluate(async()=>{
     const radialPath='/src/ui/battleRadial.ts', selectionPath='/src/ui/battleSelection.ts', fixturePath='/tests/helpers/abilityCatalog.ts';
     const {BattleRadial}=await import(/* @vite-ignore */ radialPath);
@@ -605,8 +647,7 @@ test('radial shifted hold can aim Special and still cancel at the press', async 
 
 test('radial compact landscape keeps every slice reachable on tap and hold', async ({page}) => {
   await page.setViewportSize({width:568,height:300});
-  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
   const results=await page.evaluate(async()=>{
     const radialPath='/src/ui/battleRadial.ts', selectionPath='/src/ui/battleSelection.ts', fixturePath='/tests/helpers/abilityCatalog.ts';
     const {BattleRadial}=await import(/* @vite-ignore */ radialPath);
@@ -649,12 +690,12 @@ test('radial compact landscape keeps every slice reachable on tap and hold', asy
 
 test('radial compact landscape keeps Special choices reachable', async ({page,isMobile}) => {
   await page.setViewportSize({width:568,height:300});
-  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
   await page.evaluate(()=>{
     (globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';
     globalThis.dispatchEvent(new Event('combat-controls-change'));
   });
+  await settledReport(page);
   await tapBoard(page,{x:2,y:0});
   const special=page.locator('#battle-radial-special');
   await expect(special).toBeEnabled();

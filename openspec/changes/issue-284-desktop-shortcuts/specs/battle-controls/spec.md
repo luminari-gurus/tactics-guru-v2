@@ -27,6 +27,7 @@ An active battle SHALL support M for Move, A for Basic attack, S for the selecte
 #### Scenario: Complete plan and friendly-target review
 - **WHEN** a self-heal plan or friendly-target ability is reviewed
 - **THEN** the full review includes the move/heal consequences or shared friendly-fire warning before confirmation, while offensive plans retain their target-choice step
+- **AND** radial friendly damage requires an explicit dialog confirmation bound to the displayed state and pending command or plan; cancellation and stale confirmation accept no command
 
 #### Scenario: Plan ordering and current cursor
 - **WHEN** a player is still choosing a planned destination or moves the board cursor after changing control skins
