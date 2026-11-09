@@ -1,0 +1,8 @@
+{
+  "run": 42675462523,
+  "source": "bcc523cc2dc0d9f1e8660be880ac156964ddd90e",
+  "path": "tmp/issue316-qualified-bcc523c/browser-runs/run-WhkeVE/artifacts/dungeon-extended-Mage-lega-2ad0f-ltiple-missiles-and-resumes-desktop/trace.zip",
+  "bytes": 351375129,
+  "sha256": "f92aa0896cf4471592c39a97589c9e25304a8218803c2b32d30c08bfdb11aa4b",
+  "condition": "Original diagnostic ZIP is truncated: central-directory record missing. Original retained unchanged; recovery uses a separate copy."
+}

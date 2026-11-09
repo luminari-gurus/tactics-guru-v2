@@ -1,0 +1,8 @@
+{
+  "seed": 68,
+  "calls": 145,
+  "rebuildMs": 1763.718499999999,
+  "uncachedDecisionMs": 724.5483000000022,
+  "cachedDecisionMs": 702.5742999999993,
+  "scope": "Pure Node component measurement; every uncached/cached decision and terminal state matches the same legal witness. Not a browser failure attribution."
+}

@@ -3,8 +3,8 @@
 ## Context
 
 See proposal.md for motivation and the approved plan for the acceptance map.
-`mageJourney` already bounds real dungeon stepping and session commands. Both
-its unit consumer and extended browser consumer hard-code seed 68. Existing
+`mageJourney` already bounds real dungeon stepping and session commands. At the
+planning base its unit/browser consumers hard-coded seed 68. Existing
 production `dungeon.spec.ts` cases can resume explicitly staged valid saves;
 the real picker and pure ability tests already own detailed Snare rules.
 
@@ -35,6 +35,14 @@ evidence, not simulation, projection, content, saves or browser budgets.
   lock for an exact-base desktop baseline and final serial six-profile proof.
   A new qualification entry is necessary because existing manual workflows do
   not select these extended Mage cases. It does not change general CI policy.
+- The first traced desktop run spent ~276 seconds across 1,530 full snapshot/
+  session attribute reads. Poll only fresh phase/count values from those same
+  DOM records in one browser evaluation; retain full state for decisions and
+  assertions, both original readiness conditions, tracing and deadlines. Do not
+  cache mutable state or bypass real inputs. Requalify all six changed progression
+  profiles. The manual workflow's `progression` scope avoids repeating the 30
+  unchanged focused/picker cases; `all` retains complete initial qualification.
+  The completed baseline remains in its exact historical workflow/source.
 - Use OpenSpec with `skip_specs: true`: existing product requirements are
   unchanged. Maintain this change's tasks and the requested plan as work proceeds.
 

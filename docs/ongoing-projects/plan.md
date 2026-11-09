@@ -6,8 +6,8 @@ Branch: [`branch/issue-316-mage-acceptance-fixtures`](https://github.com/luminar
 Original main base: `6aad368761e6684d88d9b3eb5b3cacc53a615c90`.
 
 **Status:** code is implemented and published. Standard verification passes.
-The qualified six-profile Mage progression matrix is still running; #357 stays
-draft until its complete result accounting is verified. The caller explicitly
+The first qualified matrix has 35 passes and one desktop Chromium deadline
+failure under investigation; #357 remains draft. The caller explicitly
 authorized implementation, autonomous repairs, commits/pushes, incremental PRs
 and OpenSpec on November 9. No additional implementation approval is needed.
 
@@ -61,7 +61,7 @@ existing validated save/HUD and picker fixtures for focused checks. No persisten
 seed cache, generic search framework, extra fixture route or new dependency.
 
 **Drop:** balance changes, content changes, production UI/save/RNG changes,
-configuration surfaces, sharding, broad timing captures and unrelated cleanup.
+product/developer configuration surfaces, sharding, broad timing captures and unrelated cleanup.
 The seven-case ordinary PR selection stays unchanged. Existing browser configs,
 workers 1 and retries 0 remain. The task-scoped self-hosted workflow supplies the
 needed extended selection without changing general CI policy.
@@ -141,29 +141,42 @@ assertions/deadlines remain, and all six explicit browser controls were executed
   attempts remain incomplete. Their records are not application failures or
   passing acceptance. Current qualified execution is authoritative.
 
-## Live verification and continuation
+## Current failure and continuation
 
-The remaining matrix is **[run 42675462523](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42675462523)**
-at clean implementation `bcc523c`, on qualified VM-02. Selection contracts,
-focused production Chromium/WebKit and retained picker steps succeeded. Full
-Chromium earned progression started at 18:41:54 UTC; WebKit follows serially.
-The final JSON results/counts must be inspected before completing the tasks.
+**[Run 42675462523](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42675462523)**
+at clean `bcc523c` on VM-02 is terminal: **35 passed, 1 failed**, no skips, flakes
+or test retries. All 24 focused production and six picker cases pass. Both mobile
+Chromium and all three WebKit complete journeys pass. Desktop Chromium hit the
+600,000 ms deadline and then a 30,000 ms teardown deadline (639,262 ms total).
 
-The existing local watcher is exec session **40420** and writes
-`tmp/issue316-mage-watch.log`. Re-poll that handle or the same GitHub run. An
-observation timeout is not a stopped run; never restart because observation
-expired. Later local/published changes are documentation/receipts only and do
-not invalidate the tested runtime/test inputs.
+The failed case wrote its complete five-battle terminal receipt and screenshot.
+Its selection took 9.808 s. Its 351 MB trace is truncated; keep the original.
+The intact event stream has been extracted: 1,530 full snapshot/session reads
+consumed ~276 s. The observer now returns fresh phase/count fields from the same
+DOM records in one call per status poll, retaining full decision/assertion state,
+both original poll conditions, tracing and deadlines. Strict types and unchanged
+exact discovery pass; all six progression profiles require requalification.
+Full accounting, source, all raw reports and journey receipts are retained in
+`docs/qa/issue-316/qualification-42675462523/`. The full download completed under
+`tmp/issue316-qualified-bcc523c/`. Watch session 40420 and recovery session 61118
+have ended. The unmodified raw trace is identified by SHA-256 in the QA record.
+Do not claim that the original 35/36 run is green after a later repair.
 
 Next actions:
 
-1. Wait for this existing run's authoritative terminal state. Preserve any
-   failure and repair its cause without retries, looser deadlines or lost gates.
-2. Download its `issue-316-mage-42675462523-1` artifact. Inspect all final reports:
-   expected union **36 browser cases** = 12 focused production Chromium + 12
-   focused WebKit + 6 retained picker + 3 full Chromium + 3 full WebKit.
-   Require zero unexpected/skipped/flaky/retried cases. Validate selected seed,
-   range, rejected candidates and exact journey receipts for every full profile.
+1. Publish the compact-observer repair and let ordinary PR verification finish.
+   Then dispatch the scoped manual workflow on the issue branch with
+   `scope=progression`, avoiding overlap with our own VM-01 verification work.
+   The old baseline remains preserved in its exact historical workflow/source.
+2. Requalify all six invalidated progression cases on the qualified runner.
+   Preserve the
+   complete acceptance union: **36 browser cases** = 12 focused production
+   Chromium + 12 focused WebKit + 6 picker + 3 full Chromium + 3 full WebKit.
+   Require zero unexpected/skipped/flaky/retried cases in final affected proof;
+   reuse only unchanged relevant inputs and clearly identify each source/run.
+   The 30 focused/picker tests and their dependencies are unchanged and retain
+   their original passing evidence. Use the existing manual workflow command:
+   `gh workflow run issue-316-mage-acceptance.yml --ref branch/issue-316-mage-acceptance-fixtures -f scope=progression`.
 3. Compare each full case's complete duration, including selection/setup, to
    600,000 ms. Record actual measured overhead and retained runner/cache limits.
 4. Retain portable raw/derived receipts, source/build identity and a final audit

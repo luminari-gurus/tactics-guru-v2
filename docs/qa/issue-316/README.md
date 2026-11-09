@@ -171,3 +171,60 @@ WebKit (4/4, zero retries/skips). Portable red and green reports are in
 `iteration/`. These are local iteration results, not the required qualified
 Linux six-profile matrix. Old-head CI attempts are superseded by this concrete
 fixture change; cancellation preserves them as incomplete, never passing proof.
+
+## First complete qualified matrix — one deadline failure
+
+[Run 42675462523](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42675462523)
+is now terminal: **35 passed, 1 failed**, zero skipped/flaky/retried cases.
+[Complete accounting](qualification-42675462523/summary.json), all five raw JSON
+reports, source hashes, journey receipts and logs are retained in that directory.
+All 24 focused production cases and six picker cases pass. Both mobile Chromium
+and all three WebKit full progression cases pass; these prove their complete
+retained earned journeys under the unchanged deadlines.
+
+Desktop Chromium exceeded 600,000 ms, then a 30,000 ms teardown deadline; its
+reported total is **639,262 ms**. The same case wrote a five-battle terminal
+receipt with seed 68, both ability flags and blocked/expired flags, and a final
+screenshot. That does not make its deadline failure pass. Its selection took
+9,808 ms, so the bounded selector alone does not account for the excess time.
+
+The 351 MB diagnostic trace lacks its ZIP central directory, consistent with
+interrupted finalization. [Original trace identity](qualification-42675462523/desktop-trace.json)
+records its hash and retained local path; a separate copy is being recovered.
+The raw original is not modified or committed as a huge Git blob. It is also in
+the run's 14-day artifact. Trace timing must establish whether execution or final
+capture/teardown consumed the deadline before choosing a repair.
+
+A pure component measurement confirmed per-command catalog reconstruction costs
+~1.76 s locally across 145 player commands, and cached/uncached choices produce
+the same commands and terminal states. This is not a browser attribution; no
+cache or gameplay change was added in response to that small component cost.
+
+OpenSpec focused task 2.2 is complete. Full six-profile/budget task 2.3 and final
+handoff remain open; PR #357 stays draft. Reuse only results whose relevant
+inputs remain unchanged after the targeted repair, and retain this original
+failed run rather than describing a later rerun as a clean original matrix.
+
+### Trace-guided observation repair
+
+The intact `test.trace` event stream was extracted from the original truncated
+archive with the existing streaming archive reader. It contains 6,304 events
+and 3,151 calls. [API cost accounting](qualification-42675462523/trace-api-cost.json)
+shows **864 full dungeon-snapshot reads (146.7 s)** and **666 full session reads
+(129.7 s)**. The final screenshot completed near the main deadline; the separate
+context teardown then took 38.6 s. This is slow observation throughout the
+journey, not evidence that reaching terminal state satisfies its deadline.
+
+The Mage loop now obtains fresh phase/count values from the same public DOM
+attributes in one page evaluation per status poll. Full snapshots/sessions are
+still read for command decisions, HP/RNG/inspection checks, reload and exact
+replay assertions. The two original readiness polls remain separate with the
+same predicates and timeouts; no state is cached or advanced by observation.
+All original commands, assertions, six profiles, trace mode and deadlines remain.
+
+Both TypeScript scopes and exact extended/core discovery pass locally. All six
+progression profiles must be requalified because their observer changed. The
+30 focused/picker cases remain reusable at their original source: their tests,
+helpers, runtime, configuration and arguments are unchanged. The scoped manual
+workflow supports `all` or `progression` for this concrete recovery; the latter
+executes both complete three-profile engines, with diagnostics retained.

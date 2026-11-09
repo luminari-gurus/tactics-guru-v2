@@ -1,9 +1,12 @@
 name: Issue 316 Mage acceptance
 on:
-  push:
-    branches: [branch/issue-316-mage-acceptance-fixtures]
-    paths: ['tests/**', 'scripts/**', '*config*', 'package*.json', '.github/workflows/issue-316-mage-acceptance.yml']
   workflow_dispatch:
+    inputs:
+      scope:
+        description: Complete acceptance or only invalidated progression journeys
+        type: choice
+        options: [all, progression]
+        default: all
 permissions:
   contents: read
 concurrency:
@@ -15,12 +18,14 @@ jobs:
     if: github.repository == 'luminari-gurus/tactics-guru-v2' && github.ref == 'refs/heads/branch/issue-316-mage-acceptance-fixtures'
     runs-on: [self-hosted, tactics-browser, tactics-browser-02]
     timeout-minutes: 80
+    env:
+      MAGE_SCOPE: ${{ inputs.scope || 'all' }}
     steps:
       - name: Check host disposition
         run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
       - uses: actions/checkout@v4
         with:
-          ref: ${{ contains(github.event.head_commit.message, '[mage baseline]') && '1a02557e76041e307ddf172d39ddc3e477ac967d' || github.sha }}
+          ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@v4
@@ -38,34 +43,28 @@ jobs:
           import { sourceIdentity } from './scripts/verification-report.mjs';
           writeFileSync('verification-receipts/issue-316/source.json', JSON.stringify({
             source: sourceIdentity(process.cwd()), node: process.version,
-            runner: process.env.RUNNER_NAME,
+            runner: process.env.RUNNER_NAME, scope: process.env.MAGE_SCOPE,
             conditions: 'Persistent qualified runner; shared storage/network load and caches not independently controlled'
           }, null, 2));
           JS
           npm run build
       - name: Verify selection contracts
-        if: ${{ !cancelled() && !contains(github.event.head_commit.message, '[mage baseline]') && steps.build.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:verification-batches
-      - name: Capture original seed-68 Chromium baseline
-        if: contains(github.event.head_commit.message, '[mage baseline]') && steps.build.outcome == 'success'
-        run: npm run test:browser -- -c playwright.extended.config.ts -g 'Mage legal progression' --project desktop --diagnostics
-      - name: Capture original seed-68 WebKit baseline
-        if: ${{ !cancelled() && contains(github.event.head_commit.message, '[mage baseline]') && steps.build.outcome == 'success' }}
-        run: npm run test:browser -- -c playwright.extended-webkit.config.ts -g 'Mage legal progression' --project desktop-webkit --diagnostics
       - name: Focused production Chromium
-        if: ${{ !cancelled() && !contains(github.event.head_commit.message, '[mage baseline]') && steps.build.outcome == 'success' }}
+        if: ${{ !cancelled() && inputs.scope != 'progression' && steps.build.outcome == 'success' }}
         run: npm run test:browser -- -c playwright.regression.config.ts tests/dungeon.spec.ts -g 'Mage' --diagnostics
       - name: Focused production WebKit
-        if: ${{ !cancelled() && !contains(github.event.head_commit.message, '[mage baseline]') && steps.build.outcome == 'success' }}
+        if: ${{ !cancelled() && inputs.scope != 'progression' && steps.build.outcome == 'success' }}
         run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon.spec.ts -g 'Mage' --diagnostics
       - name: Retained Mage picker
-        if: ${{ !cancelled() && !contains(github.event.head_commit.message, '[mage baseline]') && steps.build.outcome == 'success' }}
+        if: ${{ !cancelled() && inputs.scope != 'progression' && steps.build.outcome == 'success' }}
         run: npm run test:browser -- -c playwright.fixtures.config.ts tests/ability-picker.spec.ts -g 'Mage real' --diagnostics
       - name: Complete earned Mage progression Chromium
-        if: ${{ !cancelled() && !contains(github.event.head_commit.message, '[mage baseline]') && steps.build.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:browser -- -c playwright.extended.config.ts -g 'Mage legal progression' --diagnostics
       - name: Complete earned Mage progression WebKit
-        if: ${{ !cancelled() && !contains(github.event.head_commit.message, '[mage baseline]') && steps.build.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:browser -- -c playwright.extended-webkit.config.ts -g 'Mage legal progression' --diagnostics
       - uses: actions/upload-artifact@v4
         if: always()
