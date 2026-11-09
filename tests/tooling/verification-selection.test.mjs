@@ -4,13 +4,19 @@ import { captureSelections, compareSelections, discoverSelection, desktopOnlySta
 import { createPlan, exactCoverage } from '../../scripts/verification-batches.mjs';
 
 let before, after;
-test('real discoveries preserve every retained ID and special mode, with exactly 23 chromium and the approved desktop-only mappings', () => {
+test('real discoveries preserve every retained ID and special mode, with exactly 24 chromium and the approved desktop-only mappings', () => {
   before = captureSelections({ allProfiles: true });
   after = captureSelections();
   const comparison = compareSelections(before, after);
-  assert.equal(comparison.beforeCount - comparison.afterCount, 23);
+  assert.equal(comparison.beforeCount - comparison.afterCount, 24);
   assert.equal(comparison.mappings.filter(row => row.classification === '@canonical').length, 18);
-  assert.equal(comparison.mappings.filter(row => row.effectiveUse?.hasTouch).length, 5);
+  assert.equal(comparison.mappings.filter(row => row.effectiveUse?.hasTouch).length, 6);
+  const radial = comparison.mappings.filter(row => row.removed.file === 'battle-radial.spec.ts');
+  assert.equal(radial.length, 1);
+  assert.equal(radial[0].classification, '@fixed-viewport');
+  assert.equal(radial[0].removed.project, 'mobile-landscape');
+  assert.equal(radial[0].retained.project, 'mobile-portrait');
+  assert.deepEqual(radial[0].effectiveUse.viewport, { width: 1280, height: 720 });
   const desktopOnly = comparison.mappings.filter(row => row.classification === 'desktop-only');
   assert.equal(desktopOnly.filter(row => row.stage.startsWith('telemetry')).length, 56);
   assert.equal(desktopOnly.filter(row => row.stage === 'assets-root-dev').length, 52);
@@ -62,7 +68,7 @@ test('new unclassified cases keep all existing profiles without rewriting histor
     candidate.selections.chromium.tests.push(added);
   }
   const compared = compareSelections(original, candidate);
-  assert.equal(compared.beforeCount - compared.afterCount, 23);
+  assert.equal(compared.beforeCount - compared.afterCount, 24);
 });
 
 test('real nine-batch discovery partitions the entire reduced default selection', () => {
