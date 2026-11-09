@@ -149,6 +149,11 @@ export class BattleSelection {
     const text = plan
       ? (plan.ok ? `Move to (${this.planMove!.to.x}, ${this.planMove!.to.y}) + ability · ${previewText(plan.preview)}` : previewText(plan))
       : previewText(this.session.prepare(command));
+    return this.reviewText(command, text);
+  }
+
+  /** Add the shared command warnings/effects without preparing an intent. */
+  reviewText(command: Command, text: string): string {
     if (command.type !== 'useAbility') return text;
     const ability = this.session.catalog.abilities[command.abilityId];
     const effect = ability.kind === 'guardedAttack' ? ` · −${ability.attackPenalty} attack / +${ability.armorClassBonus} AC until your next turn` : '';

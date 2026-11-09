@@ -27,6 +27,12 @@ export async function combatSkin(page:Page): Promise<'radial'|'rail'> {
   return (await page.evaluate(() => document.body.dataset.combatSkin)) === 'radial' ? 'radial' : 'rail';
 }
 
+/** Finish panel layout, ResizeObserver and rendering before projecting a changed layout. */
+export async function settledReport(page:Page) {
+  await page.evaluate(()=>new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve())))));
+  return JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
+}
+
 export async function boardPoint(page:Page, cell:{x:number;y:number}) {
   const report=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
   const tile=report.tiles.find((entry:{x:number;y:number})=>entry.x===cell.x && entry.y===cell.y);

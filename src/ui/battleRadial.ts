@@ -1,6 +1,7 @@
 import type { AbilityId, CellPosition } from '../content/types';
 import type { Point } from '../geometry/iso';
-import { displayName, previewText } from './hud';
+import { displayName, previewText, shortcutHint } from './hud';
+import { BATTLE_KEYS, ownedAbilities, type Action } from './battleActions';
 import { BattleSelection, previewAction, selectableSpecials, type RadialSliceView } from './battleSelection';
 import { CARDINAL_SLICE, type RadialSliceId, cardinalFromVector, hubContains, specialSliceActivation } from './radialGesture';
 import { fitRadialLabels, stripUnavailablePrefix, uniqueHubLines } from './radialLabels';
@@ -28,6 +29,7 @@ export class BattleRadial {
   private readonly onInspect: () => void;
   private readonly onPlan: () => void;
   private readonly onCancel: () => void;
+  private readonly onPreview: () => void;
   constructor(
     private readonly selection: BattleSelection,
     callbacks: {
@@ -35,12 +37,14 @@ export class BattleRadial {
       inspect: () => void;
       plan: () => void;
       cancel: () => void;
+      preview: () => void;
     },
   ) {
     this.onCommit = callbacks.commit;
     this.onInspect = callbacks.inspect;
     this.onPlan = callbacks.plan;
     this.onCancel = callbacks.cancel;
+    this.onPreview = callbacks.preview;
     this.root = document.createElement('div');
     this.root.id = 'battle-radial';
     this.root.hidden = true;
@@ -64,9 +68,12 @@ export class BattleRadial {
         if (this.mode !== 'tap' || button.disabled) return;
         this.activate(slice);
       }, { signal });
+      button.addEventListener('focus', () => {
+        if (this.mode === 'tap' && !button.disabled) this.aim(slice);
+      }, { signal });
       // Opening or repositioning the menu can put a slice under a stationary pointer.
       button.addEventListener('pointermove', () => {
-        if (this.mode === 'tap' && !button.disabled && this.aimed !== slice) this.aim(slice);
+        if (this.mode === 'tap' && !button.disabled && this.aimed !== slice) button.focus({ preventScroll: true });
       }, { signal });
     });
     this.root.querySelector('#battle-radial-hub')!.addEventListener('click', () => {
@@ -76,20 +83,48 @@ export class BattleRadial {
 
   get open(): boolean { return !this.root.hidden; }
 
+  /** Aim existing controls without using their click/commit path. */
+  focusShortcut(cell: CellPosition, slice: 'move' | 'attack' | 'special', origin: Point, abilityId?: AbilityId): boolean {
+    if (this.selection.planning && !this.selection.planMove && slice !== 'move') return false;
+    if (this.mode === 'hold' || this.selection.slices(cell).find(view => view.id === slice)?.disabled) return false;
+    if (abilityId && !selectableSpecials(this.selection.session, cell, this.selection.planMove).some(ability => ability.id === abilityId)) return false;
+    this.selection.session.clearPrepared();
+    this.selection.selectedCell = cell;
+    this.selection.followUp = null;
+    if (!this.open || this.cell?.x !== cell.x || this.cell?.y !== cell.y) this.show(cell, { mode: 'tap', origin });
+    this.subOpen = Boolean(abilityId);
+    this.aim(slice);
+    const button = abilityId
+      ? this.root.querySelector<HTMLButtonElement>(`[data-radial-ability="${abilityId}"]`)
+      : this.root.querySelector<HTMLButtonElement>(`[data-slice="${slice}"]`);
+    if (!button || button.disabled || button.closest('[hidden]')) return false;
+    button.focus();
+    return true;
+  }
+
+  confirmShortcut(): boolean {
+    const button = document.activeElement;
+    if (!this.open || this.mode !== 'tap' || !(button instanceof HTMLButtonElement) ||
+        !this.root.contains(button) || button.disabled || button.closest('[hidden]')) return false;
+    if (button.dataset.slice && button.dataset.slice !== this.aimed) return false;
+    if (button.dataset.radialAbility && button.getAttribute('aria-pressed') !== 'true') return false;
+    button.click();
+    return true;
+  }
+
   show(cell: CellPosition, options: RadialOpenOptions): void {
     this.cell = cell;
     this.mode = options.mode;
     this.subOpen = false;
     this.leftHub = false;
     this.root.hidden = false;
+    this.root.setAttribute('aria-label', `Battle actions at cell (${cell.x}, ${cell.y})`);
     const def = this.selection.planning && this.selection.planMove ? 'attack' : this.selection.defaultSlice(cell);
     // The press remains the hold cancel point even when the menu moves.
     this.anchor = options.origin;
     // Render first: fitted labels can change the Plan control's height.
     this.aim(def);
     this.reposition();
-    const live = document.querySelector('#battle-preview');
-    if (live) live.textContent = this.announce();
     if (options.mode === 'tap') {
       const focusId = def === 'plan' ? 'battle-radial-plan' : `battle-radial-${def}`;
       this.root.querySelector<HTMLButtonElement>(`#${focusId}:not(:disabled)`)?.focus();
@@ -191,12 +226,6 @@ export class BattleRadial {
     return this.cell ? (this.selection.planning && this.selection.planMove ? 'attack' : this.selection.defaultSlice(this.cell)) : 'move';
   }
 
-  private announce(): string {
-    const slice = this.slices().find(entry => entry.id === (this.aimed === 'hub' ? this.defaultId() : this.aimed));
-    const cell = this.cell;
-    return cell ? `Cell (${cell.x}, ${cell.y}). ${slice ? `${slice.label}: ${slice.detail}` : 'Choose an action'}` : 'Choose an action';
-  }
-
   private slices(): RadialSliceView[] {
     return this.cell ? this.selection.slices(this.cell) : [];
   }
@@ -211,6 +240,18 @@ export class BattleRadial {
       }
     } else if (slice !== 'hub') this.subOpen = false;
     this.render();
+    if (slice !== 'hub') {
+      if (slice === 'special' && this.cell) {
+        const specials = selectableSpecials(this.selection.session, this.cell, this.selection.planMove);
+        const offered = specials.find(ability => ability.id === this.selection.lastUsedSpecial()) ?? specials[0];
+        if (offered) { this.highlightChip(offered.id); return; }
+      }
+      this.review(slice === 'move' ? 'move' : slice === 'attack' ? 'basic' : null,
+        this.slices().find(view => view.id === slice)!.detail);
+    } else {
+      this.review(this.leftHub ? null : this.selection.selectedAction,
+        this.leftHub ? 'Release to cancel · Nothing commits' : `Release to confirm · ${this.slices().find(view => view.isDefault)?.detail ?? ''}`);
+    }
   }
 
   private activate(slice: RadialSliceId): 'commit' | 'cancel' | 'open-sub' | 'inspect' | 'plan' | 'none' {
@@ -265,18 +306,37 @@ export class BattleRadial {
     return button?.dataset.radialAbility as AbilityId | undefined ?? null;
   }
 
+  private specialReview(abilityId: AbilityId) {
+    const self = this.selection.session.catalog.abilities[abilityId]?.kind === 'secondWind';
+    const needsTarget = Boolean(this.selection.planning && this.selection.planMove && !self);
+    const {command, preview} = needsTarget ? {command:null,preview:null} : previewAction(this.selection.session, abilityId,
+      self ? this.selection.session.active.cell : this.cell!, this.selection.planMove);
+    const detail = needsTarget ? 'Choose a target' : preview ? previewText(preview) : 'Unavailable target';
+    const prefix = !needsTarget && this.selection.planning && this.selection.planMove
+      ? `Move to (${this.selection.planMove.to.x}, ${this.selection.planMove.to.y}) + ability`
+      : displayName(abilityId);
+    const text = `${prefix} · ${detail}`;
+    return {preview,detail,message:command ? this.selection.reviewText(command,text) : text};
+  }
+
   private highlightChip(abilityId: AbilityId): void {
     this.root.querySelectorAll<HTMLButtonElement>('[data-radial-ability]').forEach(button => {
       button.setAttribute('aria-pressed', String(button.dataset.radialAbility === abilityId));
     });
     if (!this.cell) return;
-    if (this.selection.planning && this.selection.planMove) {
-      this.paintHub(displayName(abilityId), 'Choose a target');
-      return;
-    }
-    const preview = previewAction(this.selection.session, abilityId, this.cell, this.selection.planMove).preview;
-    const lines = uniqueHubLines(displayName(abilityId), preview ? previewText(preview) : '', preview && !preview.ok ? previewText(preview) : null, Boolean(preview && !preview.ok));
-    this.paintHub(lines.title, lines.subtitle);
+    const {preview,detail,message} = this.specialReview(abilityId);
+    const lines = uniqueHubLines(displayName(abilityId),detail,preview && !preview.ok ? detail : null,Boolean(preview && !preview.ok));
+    this.paintHub(lines.title,lines.subtitle);
+    this.review(abilityId,message);
+  }
+
+  /** The fitted hub and full HUD follow the same aim/focus in both gesture modes. */
+  private review(action: Action | null, message: string): void {
+    if (!this.open) return;
+    if (this.selection.selectedAction !== action || action === null) this.selection.session.clearPrepared();
+    this.selection.selectedAction = action;
+    this.selection.message = message;
+    this.onPreview();
   }
 
   private render(): void {
@@ -292,24 +352,28 @@ export class BattleRadial {
       button.querySelector('span')!.textContent = visible && visible.toLowerCase() !== view.label.toLowerCase() ? visible : '';
       const preview = view.disabled ? view.reason ?? view.detail : view.detail;
       button.setAttribute('aria-label', view.disabled ? `${view.label}, unavailable: ${preview}` : `${view.label}, ${preview}`);
+      const key = view.id === 'move' ? BATTLE_KEYS.move : view.id === 'attack' ? BATTLE_KEYS.basic : view.id === 'special' ? BATTLE_KEYS.ability : null;
+      if (key) shortcutHint(button, key, view.label);
     }
     const sub = this.root.querySelector<HTMLElement>('#battle-radial-sub')!;
     const specials = selectableSpecials(this.selection.session, this.cell, this.selection.planMove);
-    const followUp = Boolean(this.selection.planning && this.selection.planMove);
-    sub.hidden = !this.subOpen || specials.length < 2;
+    sub.hidden = !this.subOpen || specials.length === 0;
     this.root.dataset.subOpen = String(!sub.hidden);
     if (!sub.hidden) {
       const last = this.selection.lastUsedSpecial();
       sub.replaceChildren(...specials.map((ability, index) => {
-        const preview = followUp ? null : previewAction(this.selection.session, ability.id, this.cell!, this.selection.planMove).preview;
+        const review = this.specialReview(ability.id);
         const button = document.createElement('button');
         button.type = 'button';
         button.dataset.radialAbility = ability.id;
         button.className = `battle-radial-sub n${index + 1}`;
         button.setAttribute('aria-pressed', String(ability.id === last || (!last && index === 0)));
-        const detail = followUp ? 'Choose a target' : (preview ? previewText(preview) : '');
+        const detail = review.detail;
         button.innerHTML = `<strong>${displayName(ability.id)}</strong><span>${ability.id === last ? 'Last used' : stripUnavailablePrefix(detail)}</span>`;
-        button.setAttribute('aria-label', `${displayName(ability.id)}, ${detail}`);
+        button.setAttribute('aria-label', `${displayName(ability.id)}, ${review.message}`);
+        const shortcutIndex = ownedAbilities(this.selection.session).findIndex(owned => owned.id === ability.id);
+        if (shortcutIndex >= 0 && shortcutIndex < 9) shortcutHint(button, String(shortcutIndex + 1), displayName(ability.id));
+        button.addEventListener('focus', () => this.highlightChip(ability.id));
         button.addEventListener('click', () => { if (this.mode === 'tap') this.pickSpecial(ability.id); });
         return button;
       }));

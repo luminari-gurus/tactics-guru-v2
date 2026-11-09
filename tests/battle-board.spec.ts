@@ -1,4 +1,4 @@
-import { confirmRestart } from './helpers/battlePolicy';
+import { confirmRestart, settledReport } from './helpers/battlePolicy';
 import { expect, test, type Page } from './helpers/forceRailControls';
 import { standaloneCatalog as battleCatalog } from './helpers/playerPolicy';
 import { buildBoardPresentation } from '../src/geometry/boardPresentation';
@@ -229,12 +229,6 @@ test('right-click cancels a prepared move through the existing action path and r
   expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
   expect(errors).toEqual([]);
 });
-
-async function settledReport(page: Page) {
-  // Let panel layout, ResizeObserver and the next render finish before using coordinates.
-  await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))));
-  return report(page);
-}
 
 test('layout clamping resets overlap history when the actual camera changes',async({page})=>{
   await page.setViewportSize({width:750,height:342});

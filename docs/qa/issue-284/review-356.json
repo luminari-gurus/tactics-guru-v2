@@ -1,0 +1,3355 @@
+{
+  "reviewedHead": "afab96c8d86e99a73b102cebee594eadb6f95d4a",
+  "base": "a6e9a2fa81047351f170b9a1451ccc806f3b0c93",
+  "testedCheckout": {
+    "head": "3477878dc9cd64c8623dcfb9ec0e694fe922371e",
+    "dirty": true,
+    "note": "Final working-tree inputs are bound by the 333 source/test/tooling hashes below. Publication is verified against normalized Git blob identities; see PR #356 for the resulting head and merge."
+  },
+  "environment": {
+    "node": "v24.22.1",
+    "playwright": "1.64.1",
+    "platform": "win32",
+    "release": "10.0.26300",
+    "browsers": {
+      "chromium": {
+        "executable": "C:\\Users\\apexw\\AppData\\Local\\ms-playwright\\chromium-1248\\chrome-win64\\chrome.exe",
+        "override": false,
+        "channel": "chromium",
+        "version": "156.0.8078.4",
+        "passed": true
+      },
+      "webkit": {
+        "executable": "C:\\Users\\apexw\\AppData\\Local\\ms-playwright\\webkit-2370\\Playwright.exe",
+        "override": false,
+        "channel": null,
+        "version": "27.2",
+        "passed": true
+      }
+    }
+  },
+  "workers": 1,
+  "retries": 0,
+  "physicalDevicesTested": false,
+  "sourceSha256": {
+    "baseline": "verification.json#sourceSha256",
+    "overrides": {
+      "src/phaser/BattleScene.ts": "f84db549ab637e1d4dc4f64080fc828f08b40abde02bf03b782142c6d85c7fff",
+      "src/ui/battleRadial.ts": "eda4fbeddc1d3a519ed83b1e96ac6a3c0f29fa51d0040b63546b6767c3cd55d8",
+      "src/ui/battleSelection.ts": "114df6b285248255d6bfb62f3f4b53f1a44c40df0f8592d7548ad13e902256ab",
+      "src/ui/hud.ts": "8712bfbebebddc3c23a9aee82ccec26470bd747f14d85b4f582ca24787b26cf6",
+      "tests/ability-picker.spec.ts": "bea9444095f1b3273718fdbef42f9dde86bbfd14ac3375daf1df6f993847e2b2",
+      "tests/battle-board.spec.ts": "7f58aeacaabf985143610d8ab6572ed16ccb7a30866c96919505b7dbc2993f28",
+      "tests/fixtures/abilities/main.ts": "f3d46bee404028ef3eb6ed22bca078ded1deea8ae2ba1cfb4cf51fda77b1b8a6",
+      "tests/helpers/battlePolicy.ts": "464c8867f37cd941923c7f11bee370013cbe5794b51a58d1721d392c7292707c"
+    },
+    "totalInputs": 333,
+    "normalizedGitBlobManifest": {
+      "path": "tmp/pr356-qualified-git-blobs.json",
+      "sha256": "ca519490d16a6095b6a96f5db085bdab192b519a1fea1097b4de86dc51b5dfef"
+    }
+  },
+  "results": [
+    {
+      "report": "tmp/pr356-qualified-abilities.json",
+      "sha256": "a35b377965e3f4f9bd709d437a0560ac95ae0688357a7cd33c0fcf50b4008784",
+      "mode": "development fixture",
+      "command": "node node_modules/@playwright/test/cli.js test -c playwright.fixtures.config.ts tests/ability-picker.spec.ts",
+      "config": "playwright.fixtures.config.ts",
+      "stats": {
+        "startTime": "2026-11-09T16:19:30.496Z",
+        "duration": 177318.91,
+        "expected": 108,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial Tab review matches the ability actually confirmed",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial ability shortcuts cannot cast before choosing a planned destination",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial pointer aiming and native Enter share the full review",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 held radial aim keeps the full review aligned with release",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial shortcuts use the moved cursor after switching from rail",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 self-heal plan has a complete review before confirmation",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 friendly radial tap requires review before damage",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 friendly radial plan requires review before damage",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 friendly radial hold requires review before damage",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial review preserves the shared friendly-fire warning",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 friendly confirmation rejects a replacement prepared command",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "keyboard-only shortcuts select fighter learned abilities and preserve resource locks",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "keyboard-only shortcuts select ranger learned abilities and preserve resource locks",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "keyboard-only shortcuts select mage learned abilities and preserve resource locks",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "keyboard-only shortcuts use canonical radial ability numbers without casting unavailable alternatives",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "keyboard-only shortcuts keep radial S aligned with the offered Special and A with Basic attack",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "Mage real learned picker consolidates Arc Bolt and gates Frost Snare at level three",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "Mage real Frost Snare preserves keyboard touch previews cancellation inspection and fresh reload without attack audio",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "Ranger learned actions follow level one, two and three through the real picker",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "Ranger mark_target preserves keyboard touch preview cancellation inspection and fresh reload",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "Ranger pinning_shot preserves keyboard touch preview cancellation inspection and fresh reload",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "Fighter healing and Taunt preserve keyboard touch cancellation inspection and fresh reload",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "fighter explicit later ability survives inspection/layout and cancels without mutation",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "ranger explicit later ability survives inspection/layout and cancels without mutation",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "mage explicit later ability survives inspection/layout and cancels without mutation",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "friendly missile confirmation supports Cancel and Escape then one deliberate damage action",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "progression XP 0 gates learned fixture actions and resets on reload",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "progression XP 60 gates learned fixture actions and resets on reload",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "progression XP 180 gates learned fixture actions and resets on reload",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial multiple specials remain reachable on a narrow viewport",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial Frost Snare label fits at a readable font size",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial hold keeps edge actions visible and cancels at the original press",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial Special does not commit when choices appear on a narrow screen",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial shifted hold can aim Special and still cancel at the press",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial compact landscape keeps every slice reachable on tap and hold",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial compact landscape keeps Special choices reachable",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial Tab review matches the ability actually confirmed",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial ability shortcuts cannot cast before choosing a planned destination",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial pointer aiming and native Enter share the full review",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 held radial aim keeps the full review aligned with release",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial shortcuts use the moved cursor after switching from rail",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 self-heal plan has a complete review before confirmation",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 friendly radial tap requires review before damage",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 friendly radial plan requires review before damage",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 friendly radial hold requires review before damage",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial review preserves the shared friendly-fire warning",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 friendly confirmation rejects a replacement prepared command",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "keyboard-only shortcuts select fighter learned abilities and preserve resource locks",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "keyboard-only shortcuts select ranger learned abilities and preserve resource locks",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "keyboard-only shortcuts select mage learned abilities and preserve resource locks",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "keyboard-only shortcuts use canonical radial ability numbers without casting unavailable alternatives",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "keyboard-only shortcuts keep radial S aligned with the offered Special and A with Basic attack",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "Mage real learned picker consolidates Arc Bolt and gates Frost Snare at level three",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "Mage real Frost Snare preserves keyboard touch previews cancellation inspection and fresh reload without attack audio",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "Ranger learned actions follow level one, two and three through the real picker",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "Ranger mark_target preserves keyboard touch preview cancellation inspection and fresh reload",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "Ranger pinning_shot preserves keyboard touch preview cancellation inspection and fresh reload",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "Fighter healing and Taunt preserve keyboard touch cancellation inspection and fresh reload",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "fighter explicit later ability survives inspection/layout and cancels without mutation",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "ranger explicit later ability survives inspection/layout and cancels without mutation",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "mage explicit later ability survives inspection/layout and cancels without mutation",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "friendly missile confirmation supports Cancel and Escape then one deliberate damage action",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "progression XP 0 gates learned fixture actions and resets on reload",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "progression XP 60 gates learned fixture actions and resets on reload",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "progression XP 180 gates learned fixture actions and resets on reload",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial multiple specials remain reachable on a narrow viewport",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial Frost Snare label fits at a readable font size",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial hold keeps edge actions visible and cancels at the original press",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial Special does not commit when choices appear on a narrow screen",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial shifted hold can aim Special and still cancel at the press",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial compact landscape keeps every slice reachable on tap and hold",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial compact landscape keeps Special choices reachable",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial Tab review matches the ability actually confirmed",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial ability shortcuts cannot cast before choosing a planned destination",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial pointer aiming and native Enter share the full review",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 held radial aim keeps the full review aligned with release",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial shortcuts use the moved cursor after switching from rail",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 self-heal plan has a complete review before confirmation",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 friendly radial tap requires review before damage",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 friendly radial plan requires review before damage",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 friendly radial hold requires review before damage",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial review preserves the shared friendly-fire warning",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 friendly confirmation rejects a replacement prepared command",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "keyboard-only shortcuts select fighter learned abilities and preserve resource locks",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "keyboard-only shortcuts select ranger learned abilities and preserve resource locks",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "keyboard-only shortcuts select mage learned abilities and preserve resource locks",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "keyboard-only shortcuts use canonical radial ability numbers without casting unavailable alternatives",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "keyboard-only shortcuts keep radial S aligned with the offered Special and A with Basic attack",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "Mage real learned picker consolidates Arc Bolt and gates Frost Snare at level three",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "Mage real Frost Snare preserves keyboard touch previews cancellation inspection and fresh reload without attack audio",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "Ranger learned actions follow level one, two and three through the real picker",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "Ranger mark_target preserves keyboard touch preview cancellation inspection and fresh reload",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "Ranger pinning_shot preserves keyboard touch preview cancellation inspection and fresh reload",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "Fighter healing and Taunt preserve keyboard touch cancellation inspection and fresh reload",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "fighter explicit later ability survives inspection/layout and cancels without mutation",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "ranger explicit later ability survives inspection/layout and cancels without mutation",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "mage explicit later ability survives inspection/layout and cancels without mutation",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "friendly missile confirmation supports Cancel and Escape then one deliberate damage action",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "progression XP 0 gates learned fixture actions and resets on reload",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "progression XP 60 gates learned fixture actions and resets on reload",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "progression XP 180 gates learned fixture actions and resets on reload",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial multiple specials remain reachable on a narrow viewport",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial Frost Snare label fits at a readable font size",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial hold keeps edge actions visible and cancels at the original press",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial Special does not commit when choices appear on a narrow screen",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial shifted hold can aim Special and still cancel at the press",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial compact landscape keeps every slice reachable on tap and hold",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial compact landscape keeps Special choices reachable",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        }
+      ]
+    },
+    {
+      "report": "tmp/pr356-qualified-webkit-fixtures.json",
+      "sha256": "e371054d08f12f1761110dfca5c015d299723cec2a478f1694f8b9f76c9668b4",
+      "mode": "development fixture",
+      "command": "node node_modules/@playwright/test/cli.js test -c tmp/issue284-abilities-webkit.config.ts --grep 'review356|radial|keyboard-only'",
+      "config": "tmp/issue284-abilities-webkit.config.ts",
+      "stats": {
+        "startTime": "2026-11-09T16:22:28.218Z",
+        "duration": 98857.82400000001,
+        "expected": 46,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial Tab review matches the ability actually confirmed",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial ability shortcuts cannot cast before choosing a planned destination",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial pointer aiming and native Enter share the full review",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 held radial aim keeps the full review aligned with release",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial shortcuts use the moved cursor after switching from rail",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 self-heal plan has a complete review before confirmation",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 friendly radial tap requires review before damage",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 friendly radial plan requires review before damage",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 friendly radial hold requires review before damage",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial review preserves the shared friendly-fire warning",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 friendly confirmation rejects a replacement prepared command",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "keyboard-only shortcuts select fighter learned abilities and preserve resource locks",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "keyboard-only shortcuts select ranger learned abilities and preserve resource locks",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "keyboard-only shortcuts select mage learned abilities and preserve resource locks",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "keyboard-only shortcuts use canonical radial ability numbers without casting unavailable alternatives",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "keyboard-only shortcuts keep radial S aligned with the offered Special and A with Basic attack",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial multiple specials remain reachable on a narrow viewport",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial Frost Snare label fits at a readable font size",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial hold keeps edge actions visible and cancels at the original press",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial Special does not commit when choices appear on a narrow screen",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial shifted hold can aim Special and still cancel at the press",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial compact landscape keeps every slice reachable on tap and hold",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial compact landscape keeps Special choices reachable",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial Tab review matches the ability actually confirmed",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial ability shortcuts cannot cast before choosing a planned destination",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial pointer aiming and native Enter share the full review",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 held radial aim keeps the full review aligned with release",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial shortcuts use the moved cursor after switching from rail",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 self-heal plan has a complete review before confirmation",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 friendly radial tap requires review before damage",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 friendly radial plan requires review before damage",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 friendly radial hold requires review before damage",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial review preserves the shared friendly-fire warning",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 friendly confirmation rejects a replacement prepared command",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "keyboard-only shortcuts select fighter learned abilities and preserve resource locks",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "keyboard-only shortcuts select ranger learned abilities and preserve resource locks",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "keyboard-only shortcuts select mage learned abilities and preserve resource locks",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "keyboard-only shortcuts use canonical radial ability numbers without casting unavailable alternatives",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "keyboard-only shortcuts keep radial S aligned with the offered Special and A with Basic attack",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial multiple specials remain reachable on a narrow viewport",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial Frost Snare label fits at a readable font size",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial hold keeps edge actions visible and cancels at the original press",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial Special does not commit when choices appear on a narrow screen",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial shifted hold can aim Special and still cancel at the press",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial compact landscape keeps every slice reachable on tap and hold",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial compact landscape keeps Special choices reachable",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        }
+      ]
+    },
+    {
+      "report": "tmp/pr356-final-production.json",
+      "sha256": "836d1ef81ca06583d40edcde9d7b0e35bab1e3430553a318a0d87d4a6a3dc402",
+      "mode": "ordinary production preview",
+      "command": "node node_modules/@playwright/test/cli.js test -c playwright.regression.config.ts tests/battle-radial.spec.ts tests/battle-loop.spec.ts tests/battle-board.spec.ts --grep 'radial|keyboard-only|undo and compound plan|keyboard selection|occluded archer exposed|right-click cancels|layout clamping resets|temporary HUD expansion|viewport resize recenters'",
+      "config": "playwright.regression.config.ts",
+      "stats": {
+        "startTime": "2026-11-09T16:24:07.456Z",
+        "duration": 257372.186,
+        "expected": 151,
+        "skipped": 3,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "file": "tests/battle-board.spec.ts",
+          "title": "occluded archer exposed art selects the same legal target as the dropdown",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-board.spec.ts",
+          "title": "right-click cancels a prepared move through the existing action path and respects modal locks",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-board.spec.ts",
+          "title": "layout clamping resets overlap history when the actual camera changes",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-board.spec.ts",
+          "title": "temporary HUD expansion does not leave the battle camera zoomed",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-board.spec.ts",
+          "title": "viewport resize recenters a camera capped by temporary HUD reflow",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-board.spec.ts",
+          "title": "occluded archer exposed art selects the same legal target as the dropdown",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-board.spec.ts",
+          "title": "right-click cancels a prepared move through the existing action path and respects modal locks",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-board.spec.ts",
+          "title": "layout clamping resets overlap history when the actual camera changes",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-board.spec.ts",
+          "title": "temporary HUD expansion does not leave the battle camera zoomed",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-board.spec.ts",
+          "title": "viewport resize recenters a camera capped by temporary HUD reflow",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-board.spec.ts",
+          "title": "occluded archer exposed art selects the same legal target as the dropdown",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-board.spec.ts",
+          "title": "right-click cancels a prepared move through the existing action path and respects modal locks",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-board.spec.ts",
+          "title": "layout clamping resets overlap history when the actual camera changes",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-board.spec.ts",
+          "title": "temporary HUD expansion does not leave the battle camera zoomed",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-board.spec.ts",
+          "title": "viewport resize recenters a camera capped by temporary HUD reflow",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "undo and compound plan use the live HUD without bypassing review",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "keyboard selection, confirmation lock, touch and restart discard old gestures and previews",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "keyboard-only shortcuts select preview confirm and wait once without replacing native keys",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "keyboard-only shortcuts yield to editing modifiers composition handled events and dialogs",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "keyboard-only shortcuts respect presentation visibility and repeated scene replacement",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "keyboard-only movement, attack confirmation and Wait use the shared decision flow",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "undo and compound plan use the live HUD without bypassing review",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "keyboard selection, confirmation lock, touch and restart discard old gestures and previews",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "keyboard-only shortcuts select preview confirm and wait once without replacing native keys",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "keyboard-only shortcuts yield to editing modifiers composition handled events and dialogs",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "keyboard-only shortcuts respect presentation visibility and repeated scene replacement",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "keyboard-only movement, attack confirmation and Wait use the shared decision flow",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "undo and compound plan use the live HUD without bypassing review",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "keyboard selection, confirmation lock, touch and restart discard old gestures and previews",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "keyboard-only shortcuts select preview confirm and wait once without replacing native keys",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "keyboard-only shortcuts yield to editing modifiers composition handled events and dialogs",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "keyboard-only shortcuts respect presentation visibility and repeated scene replacement",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "keyboard-only movement, attack confirmation and Wait use the shared decision flow",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold opens labelled slices on a reachable tile",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial tap fallback opens the same radial without requiring a hold",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "keyboard-only shortcuts aim radial movement before one explicit confirmation",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "keyboard-only shortcuts leave held radial gestures and skin changes under existing control",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial tap fallback is dismissed without a command when the page is hidden",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hub cancel records no command after leaving a slice",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial End turn is docked at 48 px and commits immediately",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "pan vs hold: a 20 px drag before 300 ms pans and never opens the radial",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial special commits the only legal special without a sub-ring",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold release on the hub commits the default move in one step",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold on an unavailable slice dismisses without committing",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold accepts a planned destination and opens the follow-up choices",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold handles unavailable slices and planned destinations with native touch",
+          "project": "desktop",
+          "status": "skipped",
+          "skip": [
+            "Native touch holds use Chromium CDP."
+          ]
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "plan move slice reopens the radial at the chosen tile",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "undo and danger remain reachable beside the radial End turn control",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "prefers-reduced-motion skips the hold timer and still opens via tap fallback",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "orientation change keeps the radial End turn control usable",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial labels stay on one line without overflowing",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial plan specials can be chosen after a destination",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "keyboard-only shortcuts retain radial plan specials and follow-up confirmation",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial special tap waits for a sub-ring choice after hovering",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold aiming continues when a slice leaves the board region",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "combat controls persist Radial across a reload",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold dismisses when a second touch lands on the overlay",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold dismisses on a native second touch over the overlay",
+          "project": "desktop",
+          "status": "skipped",
+          "skip": [
+            "Chromium touch emulation uses CDP; other profiles cover overlay interruption separately."
+          ]
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial invalid reselection clears the previous command before switching to rail",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial switching to rail preserves a valid unchanged selection",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial tap fallback dialog dismissal clears the prepared action",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial tap fallback inspect clears the prepared action",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial switching to rail applies for the page when saving fails",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial plan cancellation stays available while choosing a destination or target",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial compact landscape fits controls and keeps tap and hold usable at 300px",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial compact landscape fits controls and keeps tap and hold usable at 234px",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial compact hold can inspect at the inner edge of the slice",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial resize dismisses an open tap menu without committing or stranding it",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial resize cancels a held gesture and ignores the trailing release",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial stays open on a layout reflow without a viewport resize",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial resize cancels an unconfirmed plan when its menu is open",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial resize cancels a native touch hold without accepting a command",
+          "project": "desktop",
+          "status": "skipped",
+          "skip": [
+            "Chromium native touch uses CDP; other profiles cover the resize path separately."
+          ]
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "desktop radial preference replaces the side rail with a bottom dock @canonical",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold opens labelled slices on a reachable tile",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial tap fallback opens the same radial without requiring a hold",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "keyboard-only shortcuts aim radial movement before one explicit confirmation",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "keyboard-only shortcuts leave held radial gestures and skin changes under existing control",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial tap fallback is dismissed without a command when the page is hidden",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hub cancel records no command after leaving a slice",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial End turn is docked at 48 px and commits immediately",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "pan vs hold: a 20 px drag before 300 ms pans and never opens the radial",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial special commits the only legal special without a sub-ring",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold release on the hub commits the default move in one step",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold on an unavailable slice dismisses without committing",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold accepts a planned destination and opens the follow-up choices",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold handles unavailable slices and planned destinations with native touch",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "plan move slice reopens the radial at the chosen tile",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "undo and danger remain reachable beside the radial End turn control",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "prefers-reduced-motion skips the hold timer and still opens via tap fallback",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "orientation change keeps the radial End turn control usable",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial labels stay on one line without overflowing",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial plan specials can be chosen after a destination",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "keyboard-only shortcuts retain radial plan specials and follow-up confirmation",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial special tap waits for a sub-ring choice after hovering",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold aiming continues when a slice leaves the board region",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "combat controls persist Radial across a reload",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold dismisses when a second touch lands on the overlay",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold dismisses on a native second touch over the overlay",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial invalid reselection clears the previous command before switching to rail",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial switching to rail preserves a valid unchanged selection",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial tap fallback dialog dismissal clears the prepared action",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial tap fallback inspect clears the prepared action",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial switching to rail applies for the page when saving fails",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial plan cancellation stays available while choosing a destination or target",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial compact landscape fits controls and keeps tap and hold usable at 300px",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial compact landscape fits controls and keeps tap and hold usable at 234px",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial compact hold can inspect at the inner edge of the slice",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial resize dismisses an open tap menu without committing or stranding it",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial resize cancels a held gesture and ignores the trailing release",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial stays open on a layout reflow without a viewport resize",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial resize cancels an unconfirmed plan when its menu is open",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial resize cancels a native touch hold without accepting a command",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold opens labelled slices on a reachable tile",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial tap fallback opens the same radial without requiring a hold",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "keyboard-only shortcuts aim radial movement before one explicit confirmation",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "keyboard-only shortcuts leave held radial gestures and skin changes under existing control",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial tap fallback is dismissed without a command when the page is hidden",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hub cancel records no command after leaving a slice",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial End turn is docked at 48 px and commits immediately",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "pan vs hold: a 20 px drag before 300 ms pans and never opens the radial",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial special commits the only legal special without a sub-ring",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold release on the hub commits the default move in one step",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold on an unavailable slice dismisses without committing",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold accepts a planned destination and opens the follow-up choices",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold handles unavailable slices and planned destinations with native touch",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "plan move slice reopens the radial at the chosen tile",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "undo and danger remain reachable beside the radial End turn control",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "prefers-reduced-motion skips the hold timer and still opens via tap fallback",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "orientation change keeps the radial End turn control usable",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial labels stay on one line without overflowing",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial plan specials can be chosen after a destination",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "keyboard-only shortcuts retain radial plan specials and follow-up confirmation",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial special tap waits for a sub-ring choice after hovering",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold aiming continues when a slice leaves the board region",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "combat controls persist Radial across a reload",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold dismisses when a second touch lands on the overlay",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold dismisses on a native second touch over the overlay",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial invalid reselection clears the previous command before switching to rail",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial switching to rail preserves a valid unchanged selection",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial tap fallback dialog dismissal clears the prepared action",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial tap fallback inspect clears the prepared action",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial switching to rail applies for the page when saving fails",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial plan cancellation stays available while choosing a destination or target",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial compact landscape fits controls and keeps tap and hold usable at 300px",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial compact landscape fits controls and keeps tap and hold usable at 234px",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial compact hold can inspect at the inner edge of the slice",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial resize dismisses an open tap menu without committing or stranding it",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial resize cancels a held gesture and ignores the trailing release",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial stays open on a layout reflow without a viewport resize",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial resize cancels an unconfirmed plan when its menu is open",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial resize cancels a native touch hold without accepting a command",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial menu battle preserves its accepted state through Continue",
+          "project": "desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial menu battle preserves its accepted state through Continue",
+          "project": "mobile-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial menu battle preserves its accepted state through Continue",
+          "project": "mobile-landscape",
+          "status": "passed",
+          "skip": []
+        }
+      ]
+    },
+    {
+      "report": "tmp/pr356-final-webkit-production.json",
+      "sha256": "470c7da5a28460340627c56ccf6c99a3f27785284316ac1d58da1f443ec92177",
+      "mode": "ordinary production preview",
+      "command": "node node_modules/@playwright/test/cli.js test -c playwright.device-acceptance.config.ts tests/battle-radial.spec.ts tests/battle-loop.spec.ts tests/battle-board.spec.ts --grep 'radial|keyboard-only|undo and compound plan|keyboard selection|temporary HUD expansion|viewport resize recenters'",
+      "config": "playwright.device-acceptance.config.ts",
+      "stats": {
+        "startTime": "2026-11-09T16:28:25.269Z",
+        "duration": 165299.845,
+        "expected": 74,
+        "skipped": 6,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "file": "tests/battle-board.spec.ts",
+          "title": "temporary HUD expansion does not leave the battle camera zoomed",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-board.spec.ts",
+          "title": "viewport resize recenters a camera capped by temporary HUD reflow",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-board.spec.ts",
+          "title": "temporary HUD expansion does not leave the battle camera zoomed",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-board.spec.ts",
+          "title": "viewport resize recenters a camera capped by temporary HUD reflow",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "keyboard-only shortcuts select preview confirm and wait once without replacing native keys",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "keyboard-only shortcuts yield to editing modifiers composition handled events and dialogs",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "keyboard-only shortcuts respect presentation visibility and repeated scene replacement",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "keyboard-only movement, attack confirmation and Wait use the shared decision flow",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "keyboard-only shortcuts select preview confirm and wait once without replacing native keys",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "keyboard-only shortcuts yield to editing modifiers composition handled events and dialogs",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "keyboard-only shortcuts respect presentation visibility and repeated scene replacement",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "keyboard-only movement, attack confirmation and Wait use the shared decision flow",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold opens labelled slices on a reachable tile",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial tap fallback opens the same radial without requiring a hold",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "keyboard-only shortcuts aim radial movement before one explicit confirmation",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "keyboard-only shortcuts leave held radial gestures and skin changes under existing control",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial tap fallback is dismissed without a command when the page is hidden",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hub cancel records no command after leaving a slice",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial End turn is docked at 48 px and commits immediately",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold release on the hub commits the default move in one step",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold on an unavailable slice dismisses without committing",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold accepts a planned destination and opens the follow-up choices",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold handles unavailable slices and planned destinations with native touch",
+          "project": "acceptance-webkit-portrait",
+          "status": "skipped",
+          "skip": [
+            "Native touch holds use Chromium CDP."
+          ]
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "undo and danger remain reachable beside the radial End turn control",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "orientation change keeps the radial End turn control usable",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial labels stay on one line without overflowing",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial plan specials can be chosen after a destination",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "keyboard-only shortcuts retain radial plan specials and follow-up confirmation",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial special tap waits for a sub-ring choice after hovering",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold aiming continues when a slice leaves the board region",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold dismisses when a second touch lands on the overlay",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold dismisses on a native second touch over the overlay",
+          "project": "acceptance-webkit-portrait",
+          "status": "skipped",
+          "skip": [
+            "Chromium touch emulation uses CDP; other profiles cover overlay interruption separately."
+          ]
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial invalid reselection clears the previous command before switching to rail",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial switching to rail preserves a valid unchanged selection",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial tap fallback dialog dismissal clears the prepared action",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial tap fallback inspect clears the prepared action",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial switching to rail applies for the page when saving fails",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial plan cancellation stays available while choosing a destination or target",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial compact landscape fits controls and keeps tap and hold usable at 300px",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial compact landscape fits controls and keeps tap and hold usable at 234px",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial resize dismisses an open tap menu without committing or stranding it",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial resize cancels a held gesture and ignores the trailing release",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial stays open on a layout reflow without a viewport resize",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial resize cancels an unconfirmed plan when its menu is open",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial resize cancels a native touch hold without accepting a command",
+          "project": "acceptance-webkit-portrait",
+          "status": "skipped",
+          "skip": [
+            "Chromium native touch uses CDP; other profiles cover the resize path separately."
+          ]
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold opens labelled slices on a reachable tile",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial tap fallback opens the same radial without requiring a hold",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "keyboard-only shortcuts aim radial movement before one explicit confirmation",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "keyboard-only shortcuts leave held radial gestures and skin changes under existing control",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial tap fallback is dismissed without a command when the page is hidden",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hub cancel records no command after leaving a slice",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial End turn is docked at 48 px and commits immediately",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold release on the hub commits the default move in one step",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold on an unavailable slice dismisses without committing",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold accepts a planned destination and opens the follow-up choices",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold handles unavailable slices and planned destinations with native touch",
+          "project": "acceptance-webkit-landscape",
+          "status": "skipped",
+          "skip": [
+            "Native touch holds use Chromium CDP."
+          ]
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "undo and danger remain reachable beside the radial End turn control",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "orientation change keeps the radial End turn control usable",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial labels stay on one line without overflowing",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial plan specials can be chosen after a destination",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "keyboard-only shortcuts retain radial plan specials and follow-up confirmation",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial special tap waits for a sub-ring choice after hovering",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold aiming continues when a slice leaves the board region",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold dismisses when a second touch lands on the overlay",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial hold dismisses on a native second touch over the overlay",
+          "project": "acceptance-webkit-landscape",
+          "status": "skipped",
+          "skip": [
+            "Chromium touch emulation uses CDP; other profiles cover overlay interruption separately."
+          ]
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial invalid reselection clears the previous command before switching to rail",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial switching to rail preserves a valid unchanged selection",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial tap fallback dialog dismissal clears the prepared action",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial tap fallback inspect clears the prepared action",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial switching to rail applies for the page when saving fails",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial plan cancellation stays available while choosing a destination or target",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial compact landscape fits controls and keeps tap and hold usable at 300px",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial compact landscape fits controls and keeps tap and hold usable at 234px",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial resize dismisses an open tap menu without committing or stranding it",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial resize cancels a held gesture and ignores the trailing release",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial stays open on a layout reflow without a viewport resize",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial resize cancels an unconfirmed plan when its menu is open",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial resize cancels a native touch hold without accepting a command",
+          "project": "acceptance-webkit-landscape",
+          "status": "skipped",
+          "skip": [
+            "Chromium native touch uses CDP; other profiles cover the resize path separately."
+          ]
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial menu battle preserves its accepted state through Continue",
+          "project": "acceptance-webkit-portrait",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-radial.spec.ts",
+          "title": "radial menu battle preserves its accepted state through Continue",
+          "project": "acceptance-webkit-landscape",
+          "status": "passed",
+          "skip": []
+        }
+      ]
+    }
+  ],
+  "standardLocal": {
+    "command": "npm run verify:pr",
+    "receipt": "verification-receipts/pr/1794240452962-19768",
+    "receiptSha256": "28aa8f22a4f4349c1f93f87ca09f27823e9c74acd588e3a452df8cce3b97fa0f",
+    "durationMs": 105899,
+    "stages": [
+      {
+        "id": "tooling",
+        "status": "passed",
+        "durationMs": 8183.079000000001
+      },
+      {
+        "id": "units",
+        "status": "passed",
+        "durationMs": 33631.3231
+      },
+      {
+        "id": "typecheck",
+        "status": "passed",
+        "durationMs": 4011.962800000001
+      },
+      {
+        "id": "build-integration",
+        "status": "passed",
+        "durationMs": 7325.2528999999995
+      },
+      {
+        "id": "bundle",
+        "status": "passed",
+        "durationMs": 4234.6564
+      },
+      {
+        "id": "journeys",
+        "status": "passed",
+        "durationMs": 48499.5267
+      }
+    ],
+    "passedUnits": 1244,
+    "coreJourneys": {
+      "report": "verification-receipts/pr/1794240452962-19768/journeys.json",
+      "sha256": "1bf00a6aaa6c038f659e5746263a0c6b8ac2e01ed3845778b7a42876f8d91d08",
+      "mode": "ordinary production preview",
+      "command": "npm run verify:pr (selected core journeys)",
+      "config": "playwright.config.ts",
+      "stats": {
+        "startTime": "2026-11-09T16:08:31.059Z",
+        "duration": 44839.669,
+        "expected": 7,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "complete legal authored battle seed 2 reaches playerWin through controls and replays",
+          "project": "pr-desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/battle-loop.spec.ts",
+          "title": "real touch previews a board move, modal backdrop captures it, and suspend resumes exactly once",
+          "project": "pr-touch",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/boot.spec.ts",
+          "title": "missing engine chunk reports a recoverable startup error on battle",
+          "project": "pr-desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/dungeon.spec.ts",
+          "title": "read-only entry, keyboard new dungeon, real action and active resume",
+          "project": "pr-desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/dungeon.spec.ts",
+          "title": "read-only entry, keyboard new dungeon, real action and active resume",
+          "project": "pr-webkit",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/main-menu.spec.ts",
+          "title": "main menu: New Game starts immediately when no dungeon save exists",
+          "project": "pr-desktop",
+          "status": "passed",
+          "skip": []
+        },
+        {
+          "file": "tests/run-progression.spec.ts",
+          "title": "run battle undo survives reload and a legal terminal journey",
+          "project": "pr-desktop",
+          "status": "passed",
+          "skip": []
+        }
+      ]
+    },
+    "reuse": "Standard run used the final runtime. Only tests/ability-picker.spec.ts and tests/fixtures/abilities/main.ts changed afterward, to expose/wait for actual fixture readiness. Tooling, unit, production-build and core-journey inputs remain unchanged. Final typecheck and complete affected dev fixture checks ran again; prior broader fixture failures are not relabeled as passes.",
+    "finalTypecheck": {
+      "command": "npm run typecheck",
+      "log": "tmp/pr356-final-types-3.log",
+      "sha256": "71682df857aca07688d276bd068ffa17a01f5634c099fe6548e792e175e1d44a"
+    }
+  },
+  "temporaryWebkitConfig": {
+    "path": "tmp/issue284-abilities-webkit.config.ts",
+    "sha256": "5b3143fc713273cdc1a3d31ca11499b410cf2e64af3efc90823ff5eb55b482c1",
+    "source": "import {defineConfig} from '@playwright/test';\nimport fixtures from '../playwright.fixtures.config';\nimport acceptance from '../playwright.device-acceptance.config';\nimport {resolve} from 'node:path';\nexport default defineConfig({...fixtures,testDir:resolve(process.cwd(),'tests'),testMatch:'**/ability-picker.spec.ts',\nwebServer:{command:'npm run dev -- --port 4173 --strictPort',cwd:process.cwd(),url:'http://127.0.0.1:4173',reuseExistingServer:false},projects:acceptance.projects});\n"
+  },
+  "build": {
+    "indexSha256": "f352b0ff23a5ce8478e6170271b11a45cd2d5574aa397b6083868eb5aff64f47",
+    "applicationFilesSha256": "df94bed4a134d305b767b6c71e5a0cf091332c51d3599d09ee4d160ff821b180"
+  },
+  "findings": [
+    {
+      "url": "https://github.com/luminari-gurus/tactics-guru-v2/pull/356#discussion_r4513991857",
+      "fix": "One radial preview publication for Tab, pointer/native activation and held release; update all three direct constructor harnesses."
+    },
+    {
+      "url": "https://github.com/luminari-gurus/tactics-guru-v2/pull/356#discussion_r4513991882",
+      "fix": "Reject non-Move shortcuts before choosing a plan destination."
+    },
+    {
+      "url": "https://github.com/luminari-gurus/tactics-guru-v2/pull/356#discussion_r4513991892",
+      "fix": "Keyboard shortcuts target the latest cursor after changing skins."
+    },
+    {
+      "url": "https://github.com/luminari-gurus/tactics-guru-v2/pull/356#discussion_r4514181885",
+      "fix": "Share tactical self-heal description across chip, accessible name, hub and full HUD."
+    },
+    {
+      "url": "https://github.com/luminari-gurus/tactics-guru-v2/pull/356#discussion_r4514181899",
+      "fix": "Reuse shared warning/range/effect formatting; explicit friendly radial dialog bound to the exact state and intent/plan; cancellation preserves state/RNG and stale acceptance commits nothing."
+    },
+    {
+      "url": "https://github.com/luminari-gurus/tactics-guru-v2/pull/356#issuecomment-6744561962",
+      "fix": "Share the existing camera render checkpoint, expose the real fixture scene-ready callback, wait for it before input and settle every skin switch before projected taps."
+    }
+  ],
+  "retainedFailures": [
+    {
+      "report": "tmp/pr356-red.json",
+      "sha256": "c098f3d7d8ac0b1e78dc3df3185b694d533d0e552cb8c94eb58ea4d8c43bba3f",
+      "note": "Original afab96c: two valid product failures; the third used an invalid unprojected fixture, rejected as proof and replaced by cursor-red.",
+      "stats": {
+        "startTime": "2026-11-09T14:38:50.825Z",
+        "duration": 32908.999,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 3,
+        "flaky": 0
+      },
+      "failedTests": [
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial Tab review matches the ability actually confirmed",
+          "project": "desktop",
+          "status": "failed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial ability shortcuts cannot cast before choosing a planned destination",
+          "project": "desktop",
+          "status": "failed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial shortcuts use the moved cursor after switching from rail",
+          "project": "desktop",
+          "status": "failed",
+          "skip": []
+        }
+      ]
+    },
+    {
+      "report": "tmp/pr356-cursor-red.json",
+      "sha256": "189841447a08ae60e67b5585d993ff134e4f64f82ccab4e775d18397f8326fa0",
+      "note": "Original afab96c: corrected valid cursor witness.",
+      "stats": {
+        "startTime": "2026-11-09T14:43:00.739Z",
+        "duration": 18030.097,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "failedTests": [
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial shortcuts use the moved cursor after switching from rail",
+          "project": "desktop",
+          "status": "failed",
+          "skip": []
+        }
+      ]
+    },
+    {
+      "report": "tmp/pr356-pointer-red.json",
+      "sha256": "888716e2d48d607bb7e636f369b0b238b45b6d9071191358b8b3951ee2cd9d9f",
+      "note": "Original afab96c: native Enter accepts the wrong aimed action.",
+      "stats": {
+        "startTime": "2026-11-09T14:47:29.933Z",
+        "duration": 20765.067,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "failedTests": [
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial pointer aiming and native Enter share the full review",
+          "project": "desktop",
+          "status": "failed",
+          "skip": []
+        }
+      ]
+    },
+    {
+      "report": "tmp/pr356-held-red.json",
+      "sha256": "f5794b210bfd384507992edd05a7f265a4e1805d77f1b0e11d5bf81991e99ca9",
+      "note": "Original afab96c: held release accepts a different action than the full review.",
+      "stats": {
+        "startTime": "2026-11-09T14:50:39.256Z",
+        "duration": 17035.883,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "failedTests": [
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 held radial aim keeps the full review aligned with release",
+          "project": "desktop",
+          "status": "failed",
+          "skip": []
+        }
+      ]
+    },
+    {
+      "report": "tmp/pr356-semantic-red.json",
+      "sha256": "f53a0b6f356aa901bf3ba4f140dfb00e0c7221f0279b6d79ca0aa7fc6a57bddf",
+      "note": "Pre-formatter repair: self-heal plan and friendly warning failures accepted real commands.",
+      "stats": {
+        "startTime": "2026-11-09T14:59:41.090Z",
+        "duration": 20204.652000000002,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 2,
+        "flaky": 0
+      },
+      "failedTests": [
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 self-heal plan has a complete review before confirmation",
+          "project": "desktop",
+          "status": "failed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial review preserves the shared friendly-fire warning",
+          "project": "desktop",
+          "status": "failed",
+          "skip": []
+        }
+      ]
+    },
+    {
+      "report": "tmp/pr356-webkit-fixtures.json",
+      "sha256": "78ed00c38cfa6b7b207ab349e613fb708aed252fd206cb42395788818df6ed8b",
+      "note": "3477878: 36 pass, two fail before font assertions; published-camera/layout race.",
+      "stats": {
+        "startTime": "2026-11-09T15:20:12.566Z",
+        "duration": 76567.266,
+        "expected": 36,
+        "skipped": 0,
+        "unexpected": 2,
+        "flaky": 0
+      },
+      "failedTests": [
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial Frost Snare label fits at a readable font size",
+          "project": "acceptance-webkit-portrait",
+          "status": "failed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial Frost Snare label fits at a readable font size",
+          "project": "acceptance-webkit-landscape",
+          "status": "failed",
+          "skip": []
+        }
+      ]
+    },
+    {
+      "report": "tmp/pr356-friendly-layout-red.json",
+      "sha256": "20b7e05c9c6f551d2e6b85af94f457c58e00f6f1b496d9b83384781faab11462",
+      "note": "Pre-dialog repair: six genuine friendly activation failures; two passing layout probes are diagnostic observations, not acceptance.",
+      "stats": {
+        "startTime": "2026-11-09T15:45:41.574Z",
+        "duration": 42846.133,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 6,
+        "flaky": 0
+      },
+      "failedTests": [
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 friendly radial tap requires review before damage",
+          "project": "acceptance-webkit-portrait",
+          "status": "failed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 friendly radial plan requires review before damage",
+          "project": "acceptance-webkit-portrait",
+          "status": "failed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 friendly radial hold requires review before damage",
+          "project": "acceptance-webkit-portrait",
+          "status": "failed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 friendly radial tap requires review before damage",
+          "project": "acceptance-webkit-landscape",
+          "status": "failed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 friendly radial plan requires review before damage",
+          "project": "acceptance-webkit-landscape",
+          "status": "failed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 friendly radial hold requires review before damage",
+          "project": "acceptance-webkit-landscape",
+          "status": "failed",
+          "skip": []
+        }
+      ]
+    },
+    {
+      "report": "tmp/pr356-final-witnesses.json",
+      "sha256": "54ebdcda027b8687205fbc1b1beb364f734a4e2eb7c271be52bb832053ac88ce",
+      "note": "Before driver repair: 20 pass and two mixed-pointer failures before usable controls.",
+      "stats": {
+        "startTime": "2026-11-09T15:56:52.914Z",
+        "duration": 115396.638,
+        "expected": 20,
+        "skipped": 0,
+        "unexpected": 2,
+        "flaky": 0
+      },
+      "failedTests": [
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial pointer aiming and native Enter share the full review",
+          "project": "acceptance-webkit-portrait",
+          "status": "timedOut",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial pointer aiming and native Enter share the full review",
+          "project": "acceptance-webkit-landscape",
+          "status": "timedOut",
+          "skip": []
+        }
+      ]
+    },
+    {
+      "report": "tmp/pr356-final-webkit-fixtures.json",
+      "sha256": "9cfef09567f7e792041193e4d57c162ff34c6906c9e0720ba09dbad034e4b123",
+      "note": "Final runtime, before fixture readiness signal: 43 pass and three setup/input failures.",
+      "stats": {
+        "startTime": "2026-11-09T16:13:05.891Z",
+        "duration": 149886.906,
+        "expected": 43,
+        "skipped": 0,
+        "unexpected": 3,
+        "flaky": 0
+      },
+      "failedTests": [
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "keyboard-only shortcuts keep radial S aligned with the offered Special and A with Basic attack",
+          "project": "acceptance-webkit-portrait",
+          "status": "failed",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "review356 radial ability shortcuts cannot cast before choosing a planned destination",
+          "project": "acceptance-webkit-landscape",
+          "status": "timedOut",
+          "skip": []
+        },
+        {
+          "file": "tests/ability-picker.spec.ts",
+          "title": "radial Special does not commit when choices appear on a narrow screen",
+          "project": "acceptance-webkit-landscape",
+          "status": "timedOut",
+          "skip": []
+        }
+      ]
+    }
+  ],
+  "invalidInterruptedAttempt": {
+    "log": "tmp/pr356-ready-abilities.log",
+    "sha256": "4ff72aeda6c2c5ad7d044f21a7e455d11eb0985f239e1a9bb9f37cd042a09694",
+    "note": "Mistaken wait on fixture status text: the fixture ignored that callback and the label remained Loading. Ten failures were observed and the owned run was stopped during case 11. No complete JSON receipt; not acceptance. Replaced with the real scene callback publishing existing data-ready."
+  },
+  "labelBaseComparisons": [
+    {
+      "head": "a6e9a2fa81047351f170b9a1451ccc806f3b0c93",
+      "report": "tmp/pr356-base-label.json",
+      "sha256": "f381857a6bb9da60c2ce9893d5edc56b85fe2094c64a1c83f65d551d536f5171",
+      "stats": {
+        "startTime": "2026-11-09T15:32:27.994Z",
+        "duration": 15036.695000000002,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "note": "Isolated labels passed on each literal baseline; this does not erase the broader ordering failures."
+    },
+    {
+      "head": "afab96c8d86e99a73b102cebee594eadb6f95d4a",
+      "report": "tmp/pr356-head-label.json",
+      "sha256": "4690594e79c83cf32fa1459e28af10f16ffc160e028ab9fc56d728c2de934ff5",
+      "stats": {
+        "startTime": "2026-11-09T15:36:55.943Z",
+        "duration": 7205.517,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "note": "Isolated labels passed on each literal baseline; this does not erase the broader ordering failures."
+    },
+    {
+      "head": "3477878dc9cd64c8623dcfb9ec0e694fe922371e",
+      "report": "tmp/pr356-fix-label-isolated.json",
+      "sha256": "e0646271945c64bbc4d3e78842605061b03bb2a2a7dc41b9b061ca87274e7231",
+      "stats": {
+        "startTime": "2026-11-09T15:39:59.027Z",
+        "duration": 6977.009,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "note": "Isolated labels passed on each literal baseline; this does not erase the broader ordering failures."
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "review-356-self-plan.png",
+      "sha256": "c6e67046e8e84effd2abba922adfae993b2646c8f72756e47e06292ffd8d97b3",
+      "source": "tmp/pr356-qualified-abilities/",
+      "visuallyReviewed": true
+    },
+    {
+      "file": "review-356-friendly.png",
+      "sha256": "5773c583f438aadbd3a1184636ccd8523637234422787256c96ea83faf551f6a",
+      "source": "tmp/pr356-qualified-abilities/",
+      "visuallyReviewed": true
+    },
+    {
+      "file": "review-356-focus.png",
+      "sha256": "49fd71eef459befff35f207dcecc40f239018e06fcbb2be96cd29b4970560077",
+      "source": "tmp/pr356-qualified-abilities/",
+      "visuallyReviewed": true
+    }
+  ]
+}

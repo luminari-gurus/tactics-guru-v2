@@ -3,6 +3,7 @@ import type { BattleSession } from '../app/BattleSession';
 import type { Command } from '../domain/types';
 
 export type Action = 'move' | 'basic' | AbilityId;
+export const BATTLE_KEYS = { move: 'm', basic: 'a', ability: 's', wait: 'w', confirm: 'c', cancel: 'Escape' } as const;
 export function ownedAbilities(session: BattleSession) {
   return Object.values(session.catalog.abilities).filter(a=>a.id!=='ability:basic_attack' && a.owners.includes(session.active.defId))
     .sort((a,b)=>a.id<b.id?-1:a.id>b.id?1:0);

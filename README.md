@@ -88,6 +88,19 @@ Between encounters, use **Healing Draughts** or equip an **Aiming Charm** or
 Click or tap to select, drag to pan, and use the wheel or pinch to zoom. On the
 focused battle board, arrows navigate, **Enter** selects and **Escape** cancels.
 Dungeon exploration supports arrows/WASD, adjacent-cell taps and direction buttons.
+Battle shortcuts: **M** Move, **A** Basic attack, **S** the selected learned ability,
+**1–9** learned abilities in the displayed order, **W** immediate Wait / End turn,
+**C** confirm and **Escape** cancel. Selection previews an action; it does not cast.
+Enter/Space retain board selection and native control activation. The HUD's
+**Keyboard shortcuts** disclosure lists the current hero's bindings. Shortcuts
+yield while editing fields/selects, using modifiers or dialogs, and never repeat
+an action from a held key.
+With radial controls, choose the target first using the board cursor, then use
+an action/ability shortcut to aim its enabled control and read the preview. **C**
+or native activation confirms it; selecting a numbered ability never casts it.
+In the radial skin, **S** aims the legal ability currently offered by **Special**;
+number keys retain their displayed learned-ability order even at an illegal target.
+Radial actions that damage an ally show a friendly-fire dialog before committing.
 Sound starts off; **Enable sound** turns on battle cues.
 
 ### Pick up where you left off

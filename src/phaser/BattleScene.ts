@@ -17,7 +17,8 @@ import { menuReturnLink } from '../ui/menuReturn';
 import { track } from '../telemetry/telemetry';
 import { hoverPreview } from '../ui/targetPreview';
 import { previewDraught } from '../domain/turns';
-import { BattleSelection } from '../ui/battleSelection';
+import { BattleSelection, selectableSpecials } from '../ui/battleSelection';
+import { BATTLE_KEYS, friendlyFire } from '../ui/battleActions';
 import { BattleRadial, clientPointFromCanvas } from '../ui/battleRadial';
 import { resolveCombatControlsSkin, watchCombatControls, type CombatSkin } from '../ui/combatControls';
 import { lightHaptic, type RadialSliceId } from '../ui/radialGesture';
@@ -148,8 +149,6 @@ export class BattleScene extends Phaser.Scene {
       const aimed=followUp ? 'attack' : selection.defaultSlice(cell);
       if(!followUp && aimed!=='inspect' && aimed!=='plan')selection.aimSlice(cell,aimed);
       radial.show(cell,{mode,origin});
-      const liveRegion=document.querySelector('#battle-preview');
-      if(liveRegion)liveRegion.textContent=`Cell (${cell.x}, ${cell.y}). ${radial.root.getAttribute('aria-label')}`;
     };
     const select=(cell:CellPosition|null)=>{
       if(!live || !ready || dialogs.open || session.phase!=='player')return;
@@ -183,6 +182,7 @@ export class BattleScene extends Phaser.Scene {
     };
     const board=new BoardRenderer(this,catalog,session.state.mapId,select,this.host?undefined:this.variant?.style);
     const radial=new BattleRadial(selection,{
+      preview:refresh,
       commit:(cell,slice,abilityId)=>commitSlice(cell,slice,abilityId),
       inspect:()=>{
         const unit=selection.selectedCell?session.state.units.find(u=>u.hp>0&&u.cell.x===selection.selectedCell!.x&&u.cell.y===selection.selectedCell!.y):null;
@@ -257,9 +257,20 @@ export class BattleScene extends Phaser.Scene {
     const confirm=()=>{
       if(session.phase!=='player' || (!session.pending && !session.pendingPlan) || dialogs.open)return;
       const focused=document.activeElement===hud.root.querySelector('#battle-review');
-      const compound=Boolean(session.pendingPlan);
-      void present(compound?session.confirmPlan():session.confirm(),compound);
-      if(focused)document.querySelector<HTMLElement>('#fit-restart')?.focus();
+      const reviewed=session.state,intent=session.pending,plan=session.pendingPlan;
+      const accept=()=>{
+        if(!live || document.hidden || dialogs.open || session.phase!=='player' || session.state!==reviewed || session.pending!==intent || session.pendingPlan!==plan)return;
+        const compound=Boolean(plan);
+        void present(compound?session.confirmPlan():session.confirm(),compound);
+        if(focused)document.querySelector<HTMLElement>('#fit-restart')?.focus();
+      };
+      const command=plan?.ability??intent;
+      if(skin==='radial' && command && friendlyFire(session,command)){
+        dialogs.showChoices('Friendly fire?',selection.message,[
+          {id:'battle-friendly-cancel',label:'Cancel',run:()=>cancel()},
+          {id:'battle-friendly-confirm',label:'Confirm friendly action',run:accept},
+        ],()=>cancel());
+      }else accept();
     };
     const cancel=()=>{if(dialogs.open || session.phase!=='player')return;clear();refresh();hud.focusAction();};
     const applySkin=()=>{skin=resolveCombatControlsSkin();hud.applySkin(skin);if(skin!=='radial')radial.hide();refresh();};
@@ -319,8 +330,26 @@ export class BattleScene extends Phaser.Scene {
       select(cursor);
     };
     canvas.addEventListener('keydown',key);
-    const escape=(event:KeyboardEvent)=>{if(event.key==='Escape' && !event.defaultPrevented && !dialogs.open && ready && session.phase==='player'){cancel();event.preventDefault();}};
-    document.addEventListener('keydown',escape);
+    const shortcut=(event:KeyboardEvent)=>{
+      if(!live || !ready || document.hidden || dialogs.open || document.querySelector('dialog[open]') || session.phase!=='player' || event.defaultPrevented)return;
+      if(event.key==='Escape'){cancel();event.preventDefault();return;}
+      if(event.repeat || event.isComposing || event.ctrlKey || event.altKey || event.metaKey || event.shiftKey)return;
+      if(event.composedPath().some(target=>target instanceof HTMLElement &&
+        (target.isContentEditable || target.matches('input, textarea, select, [role="textbox"]'))))return;
+      const key=event.key.toLowerCase();
+      if(skin==='rail' || key===BATTLE_KEYS.wait){if(hud.shortcut(key))event.preventDefault();return;}
+      if(key===BATTLE_KEYS.confirm){if(radial.confirmShortcut())event.preventDefault();return;}
+      const cell=cursor;
+      const specials=key===BATTLE_KEYS.ability?selectableSpecials(session,cell,selection.planMove):[];
+      const ability=key===BATTLE_KEYS.ability?(specials.find(a=>a.id===selection.lastUsedSpecial())??specials[0])?.id
+        :/^[1-9]$/.test(key)?hud.ability.options[Number(key)-1]?.value:undefined;
+      const slice=key===BATTLE_KEYS.move?'move':key===BATTLE_KEYS.basic?'attack':ability?'special':null;
+      if(slice && radial.focusShortcut(cell,slice,cellOrigin(cell),ability as AbilityId|undefined)){
+        if(ability)hud.ability.value=ability;
+        board.resetPicking();hovered=null;refresh();event.preventDefault();
+      }
+    };
+    document.addEventListener('keydown',shortcut);
     const visibility=()=>{if(document.hidden){if(movingPresentation){if(planInFlight)planInterrupted=true;session.cancel();}measurements.frame(performance.now(),false);animation?.cancel();removeInput.reset();if(radial.open){clearRadial();radial.hide();}refresh();}else {refresh();pump();}};
     document.addEventListener('visibilitychange',visibility);
     const drawable=document.querySelector<HTMLElement>('#battle-board-region')!;
@@ -361,7 +390,7 @@ export class BattleScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{
       live=false;ready=false;this.game.events.off(Phaser.Core.Events.POST_RENDER,onRender);audio.destroy();setBattleAudioDiagnostics(null);session.dispose();animation?.cancel();radial.dispose();hud.dispose();removeInput();stopSkinWatch();observer.disconnect();
       canvas.removeEventListener('keydown',key);canvas.removeAttribute('tabindex');canvas.removeAttribute('aria-label');
-      document.removeEventListener('keydown',escape);canvas.style.clipPath='';
+      document.removeEventListener('keydown',shortcut);canvas.style.clipPath='';
       document.removeEventListener('visibilitychange',visibility);this.scale.off(Phaser.Scale.Events.RESIZE,fit);this.game.events.off(Phaser.Core.Events.POST_RENDER,onReady);
       delete game.dataset.battleReport;delete game.dataset.session;delete game.dataset.phase;
       delete document.body.dataset.combatSkin;document.body.classList.remove('battle-skin-radial','battle-skin-rail');

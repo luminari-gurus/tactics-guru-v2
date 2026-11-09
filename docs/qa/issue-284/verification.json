@@ -1,0 +1,1370 @@
+{
+  "testedSource": "3daa5d738be84c305b09bec268fd59ba6b6eb7fb",
+  "base": "a6e9a2fa81047351f170b9a1451ccc806f3b0c93",
+  "environment": {
+    "createdAt": "2026-11-09T13:57:27.648Z",
+    "commit": "3daa5d738be84c305b09bec268fd59ba6b6eb7fb",
+    "node": "v24.22.1",
+    "playwright": "1.64.1",
+    "platform": "win32",
+    "release": "10.0.26300",
+    "arch": "x64",
+    "browsers": {
+      "chromium": {
+        "executable": "C:\\Users\\apexw\\AppData\\Local\\ms-playwright\\chromium-1248\\chrome-win64\\chrome.exe",
+        "override": false,
+        "channel": "chromium",
+        "version": "156.0.8078.4",
+        "passed": true
+      },
+      "webkit": {
+        "executable": "C:\\Users\\apexw\\AppData\\Local\\ms-playwright\\webkit-2370\\Playwright.exe",
+        "override": false,
+        "channel": null,
+        "version": "27.2",
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  "workers": 1,
+  "retries": 0,
+  "physicalDevicesTested": false,
+  "results": [
+    {
+      "name": "chromium",
+      "mode": "production preview",
+      "config": "playwright.regression.config.ts",
+      "grep": "keyboard-only|keyboard selection, confirmation lock|radial tap fallback|radial hub cancel|radial switching to rail|radial plan specials|undo and compound plan|signature animations|turn handoff",
+      "stats": {
+        "startTime": "2026-11-09T13:50:50.930Z",
+        "duration": 100839.967,
+        "expected": 51,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "report": "tmp/issue284-chromium.json",
+      "sha256": "e4c08babcf53b81ec77680d62b9fbc832c31180cd7eb924954af9e2ea345bc44",
+      "tests": [
+        {
+          "project": "desktop",
+          "title": "undo and compound plan use the live HUD without bypassing review",
+          "status": "passed"
+        },
+        {
+          "project": "desktop",
+          "title": "keyboard selection, confirmation lock, touch and restart discard old gestures and previews",
+          "status": "passed"
+        },
+        {
+          "project": "desktop",
+          "title": "keyboard-only shortcuts select preview confirm and wait once without replacing native keys",
+          "status": "passed"
+        },
+        {
+          "project": "desktop",
+          "title": "keyboard-only shortcuts yield to editing modifiers composition handled events and dialogs",
+          "status": "passed"
+        },
+        {
+          "project": "desktop",
+          "title": "keyboard-only shortcuts respect presentation visibility and repeated scene replacement",
+          "status": "passed"
+        },
+        {
+          "project": "desktop",
+          "title": "keyboard-only movement, attack confirmation and Wait use the shared decision flow",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "undo and compound plan use the live HUD without bypassing review",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "keyboard selection, confirmation lock, touch and restart discard old gestures and previews",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "keyboard-only shortcuts select preview confirm and wait once without replacing native keys",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "keyboard-only shortcuts yield to editing modifiers composition handled events and dialogs",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "keyboard-only shortcuts respect presentation visibility and repeated scene replacement",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "keyboard-only movement, attack confirmation and Wait use the shared decision flow",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "undo and compound plan use the live HUD without bypassing review",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "keyboard selection, confirmation lock, touch and restart discard old gestures and previews",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "keyboard-only shortcuts select preview confirm and wait once without replacing native keys",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "keyboard-only shortcuts yield to editing modifiers composition handled events and dialogs",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "keyboard-only shortcuts respect presentation visibility and repeated scene replacement",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "keyboard-only movement, attack confirmation and Wait use the shared decision flow",
+          "status": "passed"
+        },
+        {
+          "project": "desktop",
+          "title": "radial tap fallback opens the same radial without requiring a hold",
+          "status": "passed"
+        },
+        {
+          "project": "desktop",
+          "title": "keyboard-only shortcuts aim radial movement before one explicit confirmation",
+          "status": "passed"
+        },
+        {
+          "project": "desktop",
+          "title": "keyboard-only shortcuts leave held radial gestures and skin changes under existing control",
+          "status": "passed"
+        },
+        {
+          "project": "desktop",
+          "title": "radial tap fallback is dismissed without a command when the page is hidden",
+          "status": "passed"
+        },
+        {
+          "project": "desktop",
+          "title": "radial hub cancel records no command after leaving a slice",
+          "status": "passed"
+        },
+        {
+          "project": "desktop",
+          "title": "radial plan specials can be chosen after a destination",
+          "status": "passed"
+        },
+        {
+          "project": "desktop",
+          "title": "keyboard-only shortcuts retain radial plan specials and follow-up confirmation",
+          "status": "passed"
+        },
+        {
+          "project": "desktop",
+          "title": "radial switching to rail preserves a valid unchanged selection",
+          "status": "passed"
+        },
+        {
+          "project": "desktop",
+          "title": "radial tap fallback dialog dismissal clears the prepared action",
+          "status": "passed"
+        },
+        {
+          "project": "desktop",
+          "title": "radial tap fallback inspect clears the prepared action",
+          "status": "passed"
+        },
+        {
+          "project": "desktop",
+          "title": "radial switching to rail applies for the page when saving fails",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "radial tap fallback opens the same radial without requiring a hold",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "keyboard-only shortcuts aim radial movement before one explicit confirmation",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "keyboard-only shortcuts leave held radial gestures and skin changes under existing control",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "radial tap fallback is dismissed without a command when the page is hidden",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "radial hub cancel records no command after leaving a slice",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "radial plan specials can be chosen after a destination",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "keyboard-only shortcuts retain radial plan specials and follow-up confirmation",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "radial switching to rail preserves a valid unchanged selection",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "radial tap fallback dialog dismissal clears the prepared action",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "radial tap fallback inspect clears the prepared action",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "radial switching to rail applies for the page when saving fails",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "radial tap fallback opens the same radial without requiring a hold",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "keyboard-only shortcuts aim radial movement before one explicit confirmation",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "keyboard-only shortcuts leave held radial gestures and skin changes under existing control",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "radial tap fallback is dismissed without a command when the page is hidden",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "radial hub cancel records no command after leaving a slice",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "radial plan specials can be chosen after a destination",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "keyboard-only shortcuts retain radial plan specials and follow-up confirmation",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "radial switching to rail preserves a valid unchanged selection",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "radial tap fallback dialog dismissal clears the prepared action",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "radial tap fallback inspect clears the prepared action",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "radial switching to rail applies for the page when saving fails",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "webkit",
+      "mode": "production preview",
+      "config": "playwright.device-acceptance.config.ts",
+      "grep": "keyboard-only|radial tap fallback|radial switching to rail",
+      "stats": {
+        "startTime": "2026-11-09T13:52:45.350Z",
+        "duration": 62715.407,
+        "expected": 26,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "report": "tmp/issue284-webkit.json",
+      "sha256": "2ab74be738633f9943b1ea139373b597c1ee75e275150ed678c39dabbd354f99",
+      "tests": [
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "keyboard-only shortcuts select preview confirm and wait once without replacing native keys",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "keyboard-only shortcuts yield to editing modifiers composition handled events and dialogs",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "keyboard-only shortcuts respect presentation visibility and repeated scene replacement",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "keyboard-only movement, attack confirmation and Wait use the shared decision flow",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "keyboard-only shortcuts select preview confirm and wait once without replacing native keys",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "keyboard-only shortcuts yield to editing modifiers composition handled events and dialogs",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "keyboard-only shortcuts respect presentation visibility and repeated scene replacement",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "keyboard-only movement, attack confirmation and Wait use the shared decision flow",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "radial tap fallback opens the same radial without requiring a hold",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "keyboard-only shortcuts aim radial movement before one explicit confirmation",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "keyboard-only shortcuts leave held radial gestures and skin changes under existing control",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "radial tap fallback is dismissed without a command when the page is hidden",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "keyboard-only shortcuts retain radial plan specials and follow-up confirmation",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "radial switching to rail preserves a valid unchanged selection",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "radial tap fallback dialog dismissal clears the prepared action",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "radial tap fallback inspect clears the prepared action",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "radial switching to rail applies for the page when saving fails",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "radial tap fallback opens the same radial without requiring a hold",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "keyboard-only shortcuts aim radial movement before one explicit confirmation",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "keyboard-only shortcuts leave held radial gestures and skin changes under existing control",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "radial tap fallback is dismissed without a command when the page is hidden",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "keyboard-only shortcuts retain radial plan specials and follow-up confirmation",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "radial switching to rail preserves a valid unchanged selection",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "radial tap fallback dialog dismissal clears the prepared action",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "radial tap fallback inspect clears the prepared action",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "radial switching to rail applies for the page when saving fails",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "fixtures",
+      "mode": "dev",
+      "config": "playwright.fixtures.config.ts",
+      "grep": "keyboard touch|real learned picker|keyboard-only shortcuts",
+      "stats": {
+        "startTime": "2026-11-09T13:54:46.560Z",
+        "duration": 65907.756,
+        "expected": 27,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "report": "tmp/issue284-fixtures.json",
+      "sha256": "7dfc5067628d3cbde17a1c7000f6d3a5c4482a961b4c29609d30b313b73f16f8",
+      "tests": [
+        {
+          "project": "desktop",
+          "title": "keyboard-only shortcuts select fighter learned abilities and preserve resource locks",
+          "status": "passed"
+        },
+        {
+          "project": "desktop",
+          "title": "keyboard-only shortcuts select ranger learned abilities and preserve resource locks",
+          "status": "passed"
+        },
+        {
+          "project": "desktop",
+          "title": "keyboard-only shortcuts select mage learned abilities and preserve resource locks",
+          "status": "passed"
+        },
+        {
+          "project": "desktop",
+          "title": "keyboard-only shortcuts use canonical radial ability numbers without casting unavailable alternatives",
+          "status": "passed"
+        },
+        {
+          "project": "desktop",
+          "title": "Mage real learned picker consolidates Arc Bolt and gates Frost Snare at level three",
+          "status": "passed"
+        },
+        {
+          "project": "desktop",
+          "title": "Mage real Frost Snare preserves keyboard touch previews cancellation inspection and fresh reload without attack audio",
+          "status": "passed"
+        },
+        {
+          "project": "desktop",
+          "title": "Ranger mark_target preserves keyboard touch preview cancellation inspection and fresh reload",
+          "status": "passed"
+        },
+        {
+          "project": "desktop",
+          "title": "Ranger pinning_shot preserves keyboard touch preview cancellation inspection and fresh reload",
+          "status": "passed"
+        },
+        {
+          "project": "desktop",
+          "title": "Fighter healing and Taunt preserve keyboard touch cancellation inspection and fresh reload",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "keyboard-only shortcuts select fighter learned abilities and preserve resource locks",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "keyboard-only shortcuts select ranger learned abilities and preserve resource locks",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "keyboard-only shortcuts select mage learned abilities and preserve resource locks",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "keyboard-only shortcuts use canonical radial ability numbers without casting unavailable alternatives",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "Mage real learned picker consolidates Arc Bolt and gates Frost Snare at level three",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "Mage real Frost Snare preserves keyboard touch previews cancellation inspection and fresh reload without attack audio",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "Ranger mark_target preserves keyboard touch preview cancellation inspection and fresh reload",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "Ranger pinning_shot preserves keyboard touch preview cancellation inspection and fresh reload",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "Fighter healing and Taunt preserve keyboard touch cancellation inspection and fresh reload",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "keyboard-only shortcuts select fighter learned abilities and preserve resource locks",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "keyboard-only shortcuts select ranger learned abilities and preserve resource locks",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "keyboard-only shortcuts select mage learned abilities and preserve resource locks",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "keyboard-only shortcuts use canonical radial ability numbers without casting unavailable alternatives",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "Mage real learned picker consolidates Arc Bolt and gates Frost Snare at level three",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "Mage real Frost Snare preserves keyboard touch previews cancellation inspection and fresh reload without attack audio",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "Ranger mark_target preserves keyboard touch preview cancellation inspection and fresh reload",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "Ranger pinning_shot preserves keyboard touch preview cancellation inspection and fresh reload",
+          "status": "passed"
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "Fighter healing and Taunt preserve keyboard touch cancellation inspection and fresh reload",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "fixtures-webkit",
+      "mode": "dev",
+      "config": "tmp/issue284-abilities-webkit.config.ts",
+      "grep": "keyboard-only shortcuts",
+      "stats": {
+        "startTime": "2026-11-09T13:55:52.949Z",
+        "duration": 27611.695,
+        "expected": 8,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "report": "tmp/issue284-fixtures-webkit.json",
+      "sha256": "760ee6ab7d0cf3f06182fb3ed18f0f487ebaa48edcf0ced4d9bbb3e59200bffc",
+      "tests": [
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "keyboard-only shortcuts select fighter learned abilities and preserve resource locks",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "keyboard-only shortcuts select ranger learned abilities and preserve resource locks",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "keyboard-only shortcuts select mage learned abilities and preserve resource locks",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "keyboard-only shortcuts use canonical radial ability numbers without casting unavailable alternatives",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "keyboard-only shortcuts select fighter learned abilities and preserve resource locks",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "keyboard-only shortcuts select ranger learned abilities and preserve resource locks",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "keyboard-only shortcuts select mage learned abilities and preserve resource locks",
+          "status": "passed"
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "keyboard-only shortcuts use canonical radial ability numbers without casting unavailable alternatives",
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "localStandard": {
+    "source": "b7dad6add89ffb1f3aa64f78f2706d638e3395ab",
+    "dirty": "M README.md\n M docs/ongoing-projects/plan.md\n M src/phaser/BattleScene.ts\n M src/style.css\n M src/ui/battleActions.ts\n M src/ui/battleRadial.ts\n M src/ui/hud.ts\n M tests/ability-picker.spec.ts\n M tests/battle-loop.spec.ts\n M tests/battle-radial.spec.ts\n M tests/dungeon.spec.ts\n M tests/run-progression.spec.ts\n?? openspec/changes/issue-284-desktop-shortcuts/",
+    "implementationCommit": "be7ec0b5c12720b594b002f9722f7d523fbccf98",
+    "stages": [
+      {
+        "id": "tooling",
+        "status": "passed",
+        "durationMs": 10798.1257
+      },
+      {
+        "id": "units",
+        "status": "passed",
+        "durationMs": 38392.034499999994
+      },
+      {
+        "id": "typecheck",
+        "status": "passed",
+        "durationMs": 3995.9977
+      },
+      {
+        "id": "build-integration",
+        "status": "passed",
+        "durationMs": 7724.7337999999945
+      },
+      {
+        "id": "bundle",
+        "status": "passed",
+        "durationMs": 4335.757900000004
+      },
+      {
+        "id": "journeys",
+        "status": "passed",
+        "durationMs": 47242.90819999999
+      }
+    ],
+    "units": 1244,
+    "buildIntegrations": 2,
+    "coreJourneys": 7,
+    "elapsedSeconds": 112.5,
+    "note": "Pre-merge evidence; final merged source has fresh types, bundle and all focused browser checks. Current-head CI is a separate gate."
+  },
+  "initialCiFailure": {
+    "url": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42628928524",
+    "artifact": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42628928524/artifacts/13678744670",
+    "failed": "collector-owned preview accepts owned HTTP with silent output/startup and releases the port for reuse",
+    "message": "Preview readiness deadline exceeded",
+    "note": "Fixture and collector source unchanged from main; no historical failure attribution or passing CI is inferred from local results."
+  },
+  "sourceSha256": {
+    "index.html": "217a0e3d39571bd7f0eedc1f37154a1ad2215898bedf15d0a50980487b89badf",
+    "package-lock.json": "4d80074e809f307cab721dfbbcb4963e2a2ca6d617328aeea6450aed96d0d9d6",
+    "package.json": "0d41768a8f8862c8a3fd6ec7aa9b9b2485f3944ec5eb8ef8d0f40e7437721cc9",
+    "playwright.abilities.config.ts": "d20e741b0fec5c063ddc6012a19b704ffd124eb7162797becdf1ddb372634d6a",
+    "playwright.config.ts": "49da2e9599f9b6bacc19c7d7f79be4d82323ceaebf2a4d7ee9a8c47cb9c0bd8f",
+    "playwright.device-acceptance.config.ts": "5133841ca7edd424a2d74b87cc5969f6d02d2e282a0f5af53e7f4d8825a9af2f",
+    "playwright.encounters.config.ts": "3fa7a752987e693247f52f5cca08b37da2a3b94e2b7a7ef4bdd5c492401dd437",
+    "playwright.exploration.config.ts": "374726805388ad66178716d4c6fd47b248eaaa261f6f3e75bd0e541447d1b858",
+    "playwright.extended-webkit.config.ts": "bc1d9010ef4378bb3b758d0b023c31ce6a88a79c718d2e8a297eccd3223de317",
+    "playwright.extended.config.ts": "3c7e4b2e9bbdad513356c2edc3f05b7b73c1e57cef994f719923459fc704e9f8",
+    "playwright.fixtures.config.ts": "420abf0e08e395a3ac89d72db84a94fe4d73acb67682bc861b0d6f47fbcd64c6",
+    "playwright.health-bars.config.ts": "596f762a12bd320ef1bcaefcae8661bb64ed6a9a114dce791863e88fa30f5ed1",
+    "playwright.pr.config.ts": "ab9d0e2c47869d1d09425414352692ac5811e107292ba7a3572df46a89db4e8f",
+    "playwright.prefix-assets.config.ts": "d6b9e6b81ffac0baf2ad64c7613d9923a9901778a2817946dc7517fee39d7bb1",
+    "playwright.regression.config.ts": "b2eccd0d4465a40a6b0204759f36db4e3c7dd4d866e3dea88417fdfde6bdff03",
+    "playwright.run-items.config.ts": "6e264c956b4e741f266fddfe5b81c957aa77781129f62064e5052d0a9034c326",
+    "playwright.setup-smoke.config.ts": "82aa94e19c46bada8050821a26fa8628d344a893fd368622c31c28deee67896e",
+    "playwright.telemetry.config.ts": "46b7fdc96544d56a398e5cdaaf5e018629c96c97fefb178d5173917a825765a2",
+    "scripts/battle-audio-inventory.ts": "3d8967ce7fb3588f5987a3fb5241eeedac479da58de2329cdbbc8b0e0bf1452b",
+    "scripts/browser-check.mjs": "cf3e539f938b214014fd85e418d5804fd9ebe8f14ee6dc7bf190dd8dafe45e73",
+    "scripts/browser-test.mjs": "42f82f946f4b6c8484feb6aff0129074c5d8db14e153d09bf27f7cc8aea80080",
+    "scripts/evaluate-fit.ts": "f940ffc79ac0134601d34fc2a45213dba28254cf9f9f3b210bec8aaa7db825e8",
+    "scripts/generate-battle-audio.py": "4dab24545d61ceae1aed9a82b4fa0f3e8636794233e4422fecdcb01fa1c83236",
+    "scripts/measure-battle-audio.ts": "7f27e1787e3fc56b3e1d535882d43c907842343aff9062002c6c51f437c3d3af",
+    "scripts/measure-fit-controls.ts": "4c065c8bf499652778bb9b0790827ff26af0fe4d9102c3777833085d20846c10",
+    "scripts/measure-fit-evaluate.ts": "d9074efc425f7db8a0ab3f7045f4c79c21e80ccdfb2768b40944fa8c76b89664",
+    "scripts/measure-fit-options.ts": "d43b9b8cdcb31c36a7dba8a62be929a7c41becfac9a1e9671f72b589384a783a",
+    "scripts/measure-fit-preview.ts": "3c64be91bf3bd38463ca0060425014f30aba9b5d27613c0f136a6598fcfccb0a",
+    "scripts/measure-fit.ts": "853312b89375b7a4eff17b99c0bd5c931d6da9c2c90f6f544d8b038e2fd2558b",
+    "scripts/measure-save-envelope.ts": "7a226b31b65ed10957abcc40c057142c3ff41ee69d8c67b837d4a7593cb2159b",
+    "scripts/posthog-release.mjs": "5e3aaaa2e67627147945c4d6a26852ecc95dffd2ca2d1219a781ff9d921eb218",
+    "scripts/verification-batches.json": "71c9b5fc85416324cfb9272d5d41ace236ab73bd8ddcb61136d44cfb97871f8e",
+    "scripts/verification-batches.mjs": "14cfc5806879ffae23c56937265d6b37d545294a10df480ca45a6966a22716df",
+    "scripts/verification-playwright-reporter.mjs": "a7fb4f96a7b265b997e6d3707269edf036b2464128f67aebaf7045bf0619d3ae",
+    "scripts/verification-processes.mjs": "feac886ae66cf92eb980beeb9627d00362b685d38b923297093152d56242fe83",
+    "scripts/verification-report.mjs": "5b89be43d9de277787f725ee5e85c52095af6408ad5bb0beb5247f90c2f3ea77",
+    "scripts/verification-selection.mjs": "571c7dd9a1980e0146f31dd31c852d2d1817eecfdd09836b518cce87ab5c886f",
+    "scripts/verification-timings.mjs": "f1e548dcd166448fb6ea79e24ec91422c5d79e2b078e96c6240afd27f28d8062",
+    "scripts/verification-vitest-reporter.mjs": "15380f711585e92214a5164af996b2425bf13b7738acced7670821af56e6f050",
+    "scripts/verify-full.mjs": "0cf4fb56363831cb1c6fdc9eacf5ca13f74e6494db6803fbf627e6be23556523",
+    "scripts/verify-pr.mjs": "6b98e113f13848b1fcb267950ce80a9ccca2d005b66c627c90beea191a028499",
+    "src/app/BattlePersistence.ts": "9534277ce1e58ac1464e9664778ee47b26fb94588f03d81cb4b7c8b51522b6ed",
+    "src/app/BattleSession.ts": "690fb6f302141757f8ee81fe06d24bcccdc286c707f77b4f5fd9894a2bea6797",
+    "src/app/DungeonSession.ts": "88736553829a91773d2f60ea018e9088b66ef6608465a74ac2539cdfd6603bff",
+    "src/app/RunItemSession.ts": "af5180af7f38bff69c0e2385486888b4cd244ba8cb96acec9819dbe4fc75d3bd",
+    "src/app/entry.ts": "2c6608eb768f070fa70b05a20ed09a76efbaa3c210fc7fcc49ae1321aa01dd22",
+    "src/app/menuSaves.ts": "ea74b43095b7f001630a925ecce952c93c445b9659f840454347057bda18c353",
+    "src/app/routes.ts": "bef78cc4a0f974ff85d3a1ecbbbdb185a3b280cb06f7025d3c9eb17ad6d58457",
+    "src/app/runContext.ts": "3a98214a7f10d05c22181a11cd420c5232f6f6f29fa16aad87af0c4668841e4c",
+    "src/app/startBattleApp.ts": "9d4342044650f897524db2e5ab3c68a4c76068fd95f6d70ccf8b1a374e738c12",
+    "src/app/startDungeonApp.ts": "944115071a5ba1d467b369e667d53c82710c37db09800f800ceb578d9d3694cd",
+    "src/app/startRunApp.ts": "84e070b737791ddb96572aecb5438c0b1008c2b6c9fd5b0c72d81bb4e43df1e3",
+    "src/audio/battleCues.ts": "5c8d0a1d8f50cb218ac427d6a2c2aa864d8c637b4ecbdc5bcbce8c6776c0cf91",
+    "src/content/abilities.ts": "47546f3f3bc2687f711ddff1976b8a1104a5c2670f808bfd65aec5265b77bdf6",
+    "src/content/assets.ts": "f3652e154f0d1b900c6dd659bcd45efcb00ede304987a1d7720bbd9792421e3b",
+    "src/content/battlefieldTypes.ts": "1d5f9e0f1c8ecfb1061a5c3862e681dc6b8a4429f4c6bd4d0f10ff1b22c65178",
+    "src/content/catalog.ts": "3b7d95539ad57abb28fa768687d72762568976e6201894f2d9c56bff78f1bebc",
+    "src/content/constants.ts": "275444628c6a13d14830e21ad54672f08356d3b2b2f759ad2b8a8bf87d71f3fd",
+    "src/content/desertAssets.ts": "9fc6df3271d650cc528a029e2eb8b492d545322a0d044258c376c02ae28e8748",
+    "src/content/desertCatalog.ts": "dda70c31ae3a622c2626e19e6d5a9e5536498d7315dd72b960153dadc7aca08b",
+    "src/content/dungeon.ts": "b61586cffe14837b7a9a02967be6e8b600b006250ad0c876bf705ecf6e0d305c",
+    "src/content/dungeonEncounters.ts": "95e425db7ce5ded5e35e399a33123ff3cbe0b1379876c360dafe62fc06b4ca8b",
+    "src/content/encounters.ts": "bc72024007ab383a0eddcf988817ccf9d7cb70f4a8c7ca8b283b96dc878bea63",
+    "src/content/forestRuins.ts": "f95e996a3c8abb73c699fc72435f5f45547352bdc6d4d113f52a97a620a47ecf",
+    "src/content/itemTypes.ts": "8ea3d6cd80f6a39dd8a9dac05029d404b767ff2e5d322a8bd233e42786931545",
+    "src/content/items.ts": "d4471a5e08151a07334eb2deb27fbc4ccc8013ed1bd767cee053fade167ef6bf",
+    "src/content/progression.ts": "43f2eaeb720cfffe77c9e79c28f415ed79e80ce24ce0421902dd7a9978221369",
+    "src/content/qbertPyramid.ts": "3336b39c49c3e158798b479bd2ab188880f869a0384354c2115e22b7bf7bc696",
+    "src/content/ruinedApproach.ts": "61d6f931af9ee40b466acdcddec151b0d060107808df5a9828614393e41966de",
+    "src/content/standaloneCatalog.ts": "89657f168120eee4178607a15bab0339ca2a9eccb34515c959dfc0ccd9722ecb",
+    "src/content/types.ts": "976fb39e6e28c17fcaecfcfe11fb485b6a718845771ef804b0f07fe502b40f9b",
+    "src/content/validate.ts": "2cc2e544086a2d7c6e1a70bc429046b65675ddc6542322a5943ec00b8e1d231f",
+    "src/content/validateItems.ts": "a07dd1e5bed7dc5dbc652dbc2ea1a1e17dd69ff845b04deddfd69c70c614eb9b",
+    "src/content/woodlandCrossing.ts": "e33568d149f8fea4061232d72b38d2c9d9d68596c659a40a65d98730faeef660",
+    "src/diagnostics/applicationLoadFailure.ts": "e5e4fac59855241e71177135428fd63171451818b3375c2cfa2d67aba337eac0",
+    "src/diagnostics/audioState.ts": "cb32bf78bd7142ba437697078c71f50a4cd887d3d03bdb5b98f7eaa61796391f",
+    "src/diagnostics/boardFixture.ts": "c5cf2e0ae533ff0ea83252c2a3a873fd1fe131d0a1101f40022221f0be079bcb",
+    "src/diagnostics/browser.ts": "78a5a1b8b8219514de355a9334a72131cd86523d8e7e4780761bfe3713b96bca",
+    "src/diagnostics/measurements.ts": "5ed799458ef37993b9e09c51da4321a35506b702df921840591bbef01a426bc7",
+    "src/diagnostics/proofAssets.ts": "b308d53fb427085c3fc15454e233f85298e86bed72387ba26d15e138cba516df",
+    "src/diagnostics/scriptedMove.ts": "0d733335c9a2f9f39997265c3027c43821c1dd26ae4b832f05cff799d50615a6",
+    "src/domain/ai.ts": "a4fd5d77bb79555f099a9866c410aef5fa6a9ed847ecd1143c9c663c12c54e4d",
+    "src/domain/battle.ts": "9daa58854f0c4b23593604baa767c7325277f517840bc80ca6380713903cc83e",
+    "src/domain/battlefield.ts": "873a591eada40a37a81f5c59c3157cfa34a4a08cc97850d26aa2e61129bc1185",
+    "src/domain/battlefieldValidation.ts": "2b955ff31f61f192068b0e9fdb46a59a3fb7217e5fe8a4e3c892311595942de4",
+    "src/domain/combat.ts": "86af36a384d2b94b9508d6adb7afe7bb3b6d17662aca85fb7e12b24631c767d6",
+    "src/domain/constants.ts": "1e44185636d6aa0a88298f2e394f862913f2e49acc13f3aaae8486a89cf43320",
+    "src/domain/contentIdentity.ts": "8debe271ea4755b8063fa985e24b96009c285e0c6c0b4d78d64a10aea8d01002",
+    "src/domain/draughts.ts": "f628ac8cded291c1f9873b7d4270e8199b1f2aa5582144e6635072dd8eeb807b",
+    "src/domain/dungeon.ts": "8ee06e7bcb81634b976c093883654f31cc672f3cac3dd0576dba10d0ed583367",
+    "src/domain/dungeonEncounters.ts": "9706afbec3b71c07c79826923ff1bd3a01e98ebc9025428775b1385b949c7a34",
+    "src/domain/dungeonSaveEnvelope.ts": "781212b8b2c18b874c044bb63704cf749659df7b94f852ac456ce4599abb5e52",
+    "src/domain/effects.ts": "37bbecedc272d98737c369d474f11fc08873b5080e9d7815301d71c6a56cc4b4",
+    "src/domain/exploration.ts": "59a7083ebd7bcd14f35c14b4448cb99d59cb25ae2e111e53267f62e8461cdb1c",
+    "src/domain/grid.ts": "9964d2f4f582bafb6b0b54a8ea47668b70c6956274d58183d3f71a2081c7169f",
+    "src/domain/items.ts": "10fe277950fbbe94afa53a63d6c53cd022f02b1ba1e47f7b9b31fb35c4c25ead",
+    "src/domain/movementEdge.ts": "167538673dfcc4822fa52ba0cfe8d30c8c0d2200f1c4c13001d48bba49c3da31",
+    "src/domain/movementUndo.ts": "684463de1d8c000c046ed8ca67f1670c59c041e0af195b3d84ee87a1ee4a96cb",
+    "src/domain/progression.ts": "ef6706c49c53eb5e9824ce3724b1b30cb361ef06b9f617d2862f2955b51cbe01",
+    "src/domain/rewards.ts": "ccb3993012df4fb7575b04c399447a962f879984958f96b5d99d3f40131bc249",
+    "src/domain/rng.ts": "d962b6aadf7f89d6ffcb0e506eaf7ba7778e0d90f27960b9b046f917c156af44",
+    "src/domain/routes.ts": "e141580ded38bc4a0f07b6338c21e2d6239d2b980c58a7f76fabb802ddd17c7b",
+    "src/domain/run.ts": "f4ef1e950aa15f0d4abad60cf054b64a29b0e4c3d043fcc532ba51bd527c516c",
+    "src/domain/runBattle.ts": "8e419d32693f3542694a64d99ef37a77a5771f5b9ff059c12c31e7a119a88615",
+    "src/domain/runSaveEnvelope.ts": "96a5c4a6028be1fa0e79177900a42d95f63adc5f5d2ce53608b7a53b016ecd48",
+    "src/domain/saveEnvelope.ts": "f2ef271fb66982b8bb957b8a5d661a797551dadb3525e7dcb2289eb3160815bd",
+    "src/domain/tacticalPlan.ts": "f92b14a66e1c74993a3d960f0fa64be345388e03dd24f5824e43e452aa78e85f",
+    "src/domain/targeting.ts": "e6fd495d0fc0bbb241ca51d349f924cfd9f9b2fbb1fc9852004110dfbd0301d5",
+    "src/domain/threat.ts": "5243be5652e18b54bd35466dd4fcf3e75376a0056213c12db1455123f1e51336",
+    "src/domain/turns.ts": "9b5b459bd70a61e1d2677e9afc0b1abf7aff35090fc5e1d85332a7fe28646ce6",
+    "src/domain/types.ts": "5597573620c339302cab152f0c851505d3607421ac11de03da85f8281d648b25",
+    "src/domain/validation.ts": "db2c07d783b2a382794ce5be0413b74fef59b7bafb3804c563843b20d5fe7327",
+    "src/geometry/boardPresentation.ts": "2a5526862b8eba5dd5f8a610f52b903ef2b9fce53e6d988ab582b2635eb897d5",
+    "src/geometry/canopy.ts": "b69b41888f6cab81891536428d812dc3e88ccfecd80ca7ba3eb09cfaf3ad2b23",
+    "src/geometry/iso.ts": "94f33e4819a53e695e087acdde96a08b436b696a90167fecf0015cee3c2007f5",
+    "src/geometry/picking.ts": "45008cf3754c3b6056850ece8def78fdbe2964e1daa57d79f8896d4fc0fc7537",
+    "src/main.ts": "fad86f3475181c173fcfb3f88b87f3f1eb4daccc9408f270daa9ed5d5d68c9be",
+    "src/map/art.ts": "18f1b5f275245e0771d224ac6dbaac3dc9b862a32bc6152e202abb7499f67c67",
+    "src/map/biomes.ts": "29fa28b68a0fe6ab91843b028fcec4a7ef538be8250903fc3fcd883d7abdbdd1",
+    "src/map/generate.ts": "5bb3ebf81d7ea01f8ffcd12de0d95a03f07d6cfd21857d9b34c032af5c284fad",
+    "src/map/movement.ts": "31d152ea26a9c80ce58b73039213bda61506181b95c38c93b75a2182e3f37a3c",
+    "src/map/state.ts": "da6f8583bb6b3399e5107f04056f5ee6434b08a21a4d55284e42d1b536910352",
+    "src/map/style.css": "36c813ac96901151b805bf446453acaa18f6ab3514e1c3ce6e92438a73d104df",
+    "src/map/view.ts": "c45b3510a4d43ee1a7db7e131e6a94d11e3c4af561fdd797da2aa5978945b2db",
+    "src/persistence/battleStorage.ts": "8f59ab814c8d48342a5354a1e28ad170794e15f5440947d63ed943569d0249fd",
+    "src/persistence/dungeonStorage.ts": "e8eb359e3a27617bbc98fae221f7c043be883eaefce5368df95f0af18d9f9eac",
+    "src/persistence/runStorage.ts": "c268df15cf95270bb1bc059070ea112308f4a65db74d5e084798883f58389c29",
+    "src/phaser/BattleAudio.ts": "39e97d6bf85ecc339534c1863e3565929aa4be89d4e8b946dca1c476878aff2e",
+    "src/phaser/BattleScene.ts": "7e6398387a61bc7d49d351072f5740cd33f262fe1edaa5890c6a056519df8d2b",
+    "src/phaser/BoardInput.ts": "c584dd838993cc407b02f029613f8c5bf2a626732338b2ebf36e7007f8794460",
+    "src/phaser/BoardRenderer.ts": "3e5be64445369a467cc737bd3bad313240260deecd58f9220707d4bdb7b7b196",
+    "src/phaser/ContentSmokeScene.ts": "7577e5364502eca5236a32ac22adfa45d0623ad9fa925846a6445242d9859e51",
+    "src/phaser/FitScene.ts": "c7172abe67bf8ceb8fe77d924dadcd6f4102de6bad959db4ca0221eb24744859",
+    "src/phaser/ProofAudio.ts": "c0ee62ce825ac2374b275a2645c2b67125d92813b04497a67332995679c9ca70",
+    "src/phaser/ProofBoardRenderer.ts": "c035ec117ec9f923261fe7bf6f4f274b2960506d308c5a44f7e5b0daf523920d",
+    "src/phaser/abilityPresentation.ts": "677be1bdff6b68de1cf60c16b82f6c1bc88cbb678651272c7bccc933999eeb22",
+    "src/phaser/contentLoading.ts": "f5a56fe3ea40c47b2a2b4beccab48367d3d3bec108b98463d26820a7a87cbbc4",
+    "src/phaser/healthBar.ts": "00aa78fbc2fd0b94e3af7ad2aaf0f8f8a7f70f84196ef816b79db31c7f453921",
+    "src/phaser/start.ts": "5c6811015a4bfcdc0aae0c155483284cfee9e8f5c303b645e52d20a4fff077cf",
+    "src/style.css": "c386eed4372aa37178e817a3cc72771045a1b1d9cb1a30ddee340862c2e8505e",
+    "src/telemetry/browser.ts": "2cc77a7d29f7869af3fe55f22e975b4a95cf5744aa75b934534e22dfaadaa44f",
+    "src/telemetry/preferences.css": "ef8b9c2a9ea4bf53e49411c01bdc63f0b0a0c38f0040c96c56d084a728cac459",
+    "src/telemetry/preferences.ts": "6736e35dd28b0100228a8716b48330460630232d6db5dcd8e786dabb5b6442c6",
+    "src/telemetry/privacy.ts": "580b7762947011f226d1091f17d005951f7112a1b66e08efdee1f4224895cf58",
+    "src/telemetry/telemetry.ts": "097a62ec9673742a0d365bcfea9923d6f8678b2aa89578d42f747dd995543c0b",
+    "src/telemetry/transport.ts": "e7b814e0c54323344efb69caa95e572290a36da64fd87c493a06d9ec6d0dfc8d",
+    "src/terrain/materials.ts": "141f0f45e30294dc32ed0afdf036bc65c7d5d0f78718841def6d6a32a7d670fb",
+    "src/ui/battleActions.ts": "02574a345383e27b198cab9c975c3cf2298f8cfef4487e6efe9740cdd0fee616",
+    "src/ui/battleLayout.ts": "3b494452f84f80cf91eec4cb4f73bf55db51753b8e9509b2e5f24b5059552a34",
+    "src/ui/battleRadial.ts": "08fcb32511a21c319b528b8ba841da4f6a6a6d7664d122d21e178839c9e3d910",
+    "src/ui/battleSelection.ts": "8b235c32f954ac9f80e27388200826d40938844cbb62a23c6db21ec6b0693a3d",
+    "src/ui/combatControls.ts": "18726661dc7e9df6da74695a42730656b538c88b1ccfd58a7ac82b47621330de",
+    "src/ui/dialogs.ts": "0862dfc1052996f4c0430de088df187e26664d8a5bd3545aa781002253e59c51",
+    "src/ui/dungeon.css": "f41baa686b4a3a584e9ec78eb8c1e38641569c2713a7824b985b0b0808af4086",
+    "src/ui/dungeon.ts": "64e3c073d0d148a488457b2c11ec8919db32c8d0b3e00c76c62dda8eb042d2ba",
+    "src/ui/dungeonMap.ts": "960f0d6c6603f3dc81cf69f18ac996b2ba33f178b021f47791ba732e438d8898",
+    "src/ui/gameError.ts": "40da4f5ee92222c40f82b63c073356dc5d9dd62082425f902798c3451be638ca",
+    "src/ui/hud.ts": "63a77b866215f70252e58d371e97513689edd96cbdbe4469e11c000bfa22fcf6",
+    "src/ui/mainMenu.css": "40b4d770bffbe7f807c01b73f7dd80294d56a507dd3172a354b49f39306c4f3f",
+    "src/ui/mainMenu.ts": "84b1d4c49128a0e8342f7212ab1e6eb519b8b1c35ac2535a2b39ece8cc2120ae",
+    "src/ui/menuReturn.ts": "4bc16f2deabb5216fc1c6e44e06ce7fa2151d668e70d2f50bb7b372069fe7f0f",
+    "src/ui/persistence.ts": "ab8722d3e2259ec387c56e1c633f18b6e5a3f8ec7e3bfd0cf1669fda8e08de77",
+    "src/ui/publicAssetUrl.ts": "abdc0cfa8971cc00d77fcf11d72616bcf9d05fa6cb5fe890e6d2f11353068128",
+    "src/ui/radialGesture.ts": "c08592bde824feb81406329a64fffc92e57eec6c0484cddab007ba6fcabbe06b",
+    "src/ui/radialLabels.ts": "84278f4424e7b0879233f3b4c12024dbc8a684aad657dc46905637e726347200",
+    "src/ui/runFlow.css": "c3221a04e9138212ec5889dee3090d93352cf5d2754debadcfcb800039bdf671",
+    "src/ui/runItems.css": "d5209511bd1f7455df1d2672fcf0832af5d00c3479f9e19a3a4743e42021f800",
+    "src/ui/runItems.ts": "e45605531c795ebdfba2992945348c5d8f2b2d1ba40243ccaaec2399ce8702f4",
+    "src/ui/targetPreview.ts": "33a14fbb81cec4a34850ebac9e26710ba69ba30759db694dbf5a480b73117306",
+    "src/ui/testingProgress.ts": "f007495a75ae5f76afc9320993382bf08ea44280091d1b89fb3c9d9a030bec1b",
+    "tests/ability-picker.spec.ts": "42accae1beb438c51d7bfc5840421ae4dd17c081cbe28b24fa084349989c279e",
+    "tests/assets.spec.ts": "2ad260b5e4db19bd30a3442b811ef360fd780a96366a1a9dc44dd6b822da8a1c",
+    "tests/audio.spec.ts": "e5346ef007c76f6d252f43aa7560f1ad59c5e267cd1373f27a54992fbd561fcc",
+    "tests/authored-encounters.spec.ts": "b1375d0fc9906b7cbb4fafe462218d786c8ae2969fd5fb3d8db69380ca356e7a",
+    "tests/battle-animations.spec.ts": "2236b4f906c40b9efe3bf5000b6b8b635a31ed4cc52ee3aacfb3516ba14ec313",
+    "tests/battle-audio.spec.ts": "97b1be8c5eae97012d51ea2ed542f0924994bd9a12b4ce2467aa3c7b29cb5b4c",
+    "tests/battle-board.spec.ts": "f3fbd1743025d97742c1d26c650ffa6cb03a8ccea607566505b1453b950ac41b",
+    "tests/battle-loop.spec.ts": "832f372b87b19769d22f2e435a7f934150923285d1d672dea90b4c57752f5416",
+    "tests/battle-persistence.spec.ts": "acfd4cc2b6d5439f89fa688f911e6ebfc9ca5c42575bd4666b454c8c01b65b12",
+    "tests/battle-radial.spec.ts": "33a00593d8394ba089407fa6f049e04773328909ad6675972a24716fe3b30214",
+    "tests/board.spec.ts": "9f23281436ef5d16f675c69ebeb5a3063fe49ddcea57d079bbdc86b28f211d84",
+    "tests/boot.spec.ts": "31f45d3215aaa721af7aa3d095153f43c0c613e5ad3527da1beb4ef4de2e631c",
+    "tests/content-loading.spec.ts": "d4470b2e7cdecc7bdea9c0496f35109aab93a7d9da6751f175d6d76474d5b33e",
+    "tests/dungeon-exploration.spec.ts": "9b61e89e927ceb9c5f26cdb734e34f0591eccb06bf025769648176f7f82bf49b",
+    "tests/dungeon-extended.spec.ts": "e581ba12908156261dfa9d69675a272712785c2b400e3391280abcf5675ea853",
+    "tests/dungeon-lifecycle.spec.ts": "ba0a236801ac2f0242ec878ec228cac3f04d8c3ed403988e7dd8b50497940be3",
+    "tests/dungeon.spec.ts": "67be9aa31df3b97c6882bb29e72113c4fe46ffca2ee8eca5b31d525516f6d8a4",
+    "tests/engine-fit.spec.ts": "1db99383067327d262244c18c00b44fd18f1fe2aae293eee70bcf1497e7d822c",
+    "tests/fixtures/abilities/index.html": "cc410e9780bcd8f7c6e2134aac2a3352a388d7893aefd5fa428646b04bbd91f9",
+    "tests/fixtures/abilities/main.ts": "60b40687e8b6991914803b3e52e1903ef7483aeb4b632aef29d0bb72b36a23a6",
+    "tests/fixtures/encounters/index.html": "1aeef75ad341d9f313c44caeb37d1747465bad89ebbbcfcfee0e930bffbaa050",
+    "tests/fixtures/encounters/main.ts": "66b88fcbc55b5c06eda1a34a2a92252255d320075b1da4ccd45063f1ccc0844d",
+    "tests/fixtures/run-items/index.html": "c37ddb14040d6fbcffe2c4ca2237cc7d00c3ecb29e8b48dbba4fdd19d36124dd",
+    "tests/fixtures/run-items/main.ts": "bb058887a6fcddcf75453446f1f62062a384a9ed2b66ea4f589b3413c2d50c15",
+    "tests/fixtures/saves/issue-165/README.md": "94714e4837402f9f9240be86d01e52a01f93503262494afce4daebf4d306c6f3",
+    "tests/fixtures/saves/issue-165/battle.json": "b66ae5cce1e3eb1312653f7ee2980c5995b2f7ccdc76fd5754e53c34285c8143",
+    "tests/fixtures/saves/issue-165/dungeon.json": "3bafd83794f77099623f85f74fb9dab8962976578c44adcd15baa873a33d5842",
+    "tests/fixtures/saves/issue-165/run.json": "f77a10f0f770e5bd5a533d69eb0e234b337eb8f8f1ded681faa3dc4f463e52e1",
+    "tests/fixtures/saves/issue-166/README.md": "de8b49eaf441ba004bfe5444931e4d9fdfe50136dedb51035103a5144ad237b7",
+    "tests/fixtures/saves/issue-166/battle.json": "8ba7beac57461794a1d9e4d863eaee4f527138e2cac3affabc24f7834710aefe",
+    "tests/fixtures/saves/issue-166/dungeon-main8.json": "457ce164f860fbc9ad5e83b64e8f8ee447819ba4ffe9d1a4745d7022f5dfec93",
+    "tests/fixtures/saves/issue-166/dungeon.json": "f4699c6f8ccdfc281332a9f3642c08e6fc713f4a895296759c4fcb9ae9a47aca",
+    "tests/fixtures/saves/issue-166/run.json": "e934b96cd1df2bcc18279d2db676799600785de12e16a0969609e18f7cbbe731",
+    "tests/fixtures/saves/issue-172/dungeon-active.json": "199c33ab63da21afbf6eb91761c57ce6166486386a30bc3fbaf8b7436cf5bade",
+    "tests/fixtures/saves/issue-172/dungeon-reward.json": "b5a8b524e355bd8c72efc40fc408feee850280753823127d80cfc5d80e81a188",
+    "tests/fixtures/saves/issue-172/run-active.json": "5145ceb15779c3283c47fec51ab2d2b72448210a77ae972a9e5de35364f17599",
+    "tests/fixtures/saves/issue-172/run-reward.json": "226bbadc37e2286f8d56538275acb2608e0abe3b7a878a6dd633ff8bda092c0c",
+    "tests/grass-surface.spec.ts": "7ebba6c2fc1deebddc583b74fac02c1ae8ffcda353fb9f144150836f1ca51236",
+    "tests/guarded-effects.spec.ts": "0b1eae6821940593a5de80ec18603de2ed92524c777fc3468a1042603ed10688",
+    "tests/helpers/abilityCatalog.ts": "b2b3a304c87a6c5db87c56211a0d4cd1624ce26d15e596b33cab660889841120",
+    "tests/helpers/applicationLoadDiagnostics.ts": "aa2fb07a2864c8f56f246af96a6740043c541c9b44c619ceda433ed3f28bd884",
+    "tests/helpers/battleModuleFaultServer.ts": "172eaee090063cc29eec2d998d15451b46678338d9fbc66f2159a7aa21bd2288",
+    "tests/helpers/battlePolicy.ts": "88f0538f4828c777d2b2de96d47e0882a67b3342393a7c62839a59877d2682a7",
+    "tests/helpers/coreGraphics.ts": "bebafdf48aaa9b1f6e1b40187ee917e42e15c5ef9ca89de4a050a3e14c17d5ea",
+    "tests/helpers/dungeonEntropy.ts": "0e38a0cb2be813ee07aeb5acadbb713f684d292bc78472be56f71b0eaaa99866",
+    "tests/helpers/dungeonFixtures.ts": "a2d282bf03ebf12785fd4a0a6b43b771f1d59de92a3e8e17c5210273de8e6959",
+    "tests/helpers/dungeonTraversal.ts": "3c8525d87831608373e04cf63aa33e879bd7c77d05406abad3b6ee5c525815f7",
+    "tests/helpers/forceRailControls.ts": "995363d2a5aad6a25e4fb36715bd234eff29e1bb185e65797b83461895e379c5",
+    "tests/helpers/guardedBoundary.ts": "43bf3b7d4583f80442f43153a7117c6cef9bacafbfcb36d7a2adf034d4af7848",
+    "tests/helpers/menuFixtures.ts": "8efb65602711e3d5a59209b3c7991cd8729ded3d91498c75f55bb753742bef2d",
+    "tests/helpers/playerPolicy.ts": "d95cc04792adbf39b9206575bc4158fe2ed412bf2929a0a72fd300fde5cc3dcf",
+    "tests/helpers/runItemFixtures.ts": "6ef75f29e7f4054ef51bd6dea7c64fd10dc8b956ecc74f148f0c0844a5dc9370",
+    "tests/helpers/runRecoveryFixtures.ts": "918e0a293d343d0b4f2bc226e5cdac96ecc255cc8e5c10fadf6cd8325838074f",
+    "tests/helpers/saveFixtures.ts": "2e48c8dcd988650743d6f83cb43b94198aa515834e5ec10c206fb460206de7bb",
+    "tests/helpers/startupDiagnostics.ts": "040f02e8737151d8d240fe83e394771c87918f48e16f8fb4b0b6072ed144b856",
+    "tests/helpers/startupObserver.ts": "956a54a1a5d9ad328ee0f309ef526a3bcc8ed2bdfae1826b5569c92480b4b547",
+    "tests/input.spec.ts": "1b66ad4d7c0b41b738f2fa6de7c616a2543326d410e7c928cb092c49dbf371a1",
+    "tests/integration/buildHeaders.test.ts": "a726870f48a35ef7c0df7670d8ca2501b90498b57eedb385fddddb1144feb6de",
+    "tests/layout.spec.ts": "e442f14bf8e1a3045562f465d8c19662465d89ebb87c59417480edf3c7f9937b",
+    "tests/lifecycle.spec.ts": "d3abf093b3bbed800d9b03dc71f833a0a717aeaa4f3768274a121795ebd2da55",
+    "tests/main-menu.spec.ts": "6c27b4a8146ce1dc6c8364fc5565d87a25a42f7d8d6dde2d1dabe5ec4434c0ca",
+    "tests/move.spec.ts": "88cfc8c343f3eb4a218f93cad18bffcd5a2d56d889132455ccce5604819f4596",
+    "tests/opacity.spec.ts": "2ada0960fb7d48a678347f64ed41328a5ded267cabb60dec29fe57094e8b75c2",
+    "tests/overworld-map.spec.ts": "08ecf913118fab7e25c08268da40669a4337d948e2e7b8c60ac4339721f9935d",
+    "tests/procedural-grids.spec.ts": "b3fb46796feedb2ce58c886e3600bff81fd5e9ae0d8998b3ee1f2758324e2cf0",
+    "tests/public-asset-base.spec.ts": "10d0006bfae7319e8a9f4f58926c4387a8e8eb477e5f542cd1c46c727105a68f",
+    "tests/qbert.spec.ts": "b31754f635c0f17eafe9037a7e162a142913c35cff9cf59ecaa5f183ffc9f9f2",
+    "tests/run-items.spec.ts": "71f918aacad16ece8e14c7427caf6195978db321a733a3f16c4d6c0e373549cb",
+    "tests/run-progression.spec.ts": "1443bee2392ec0c2ddf7297b2c873b17e07138387de7b196f8ac626627b29534",
+    "tests/telemetry.spec.ts": "a57e5d7b8c2977a506b29641ef7b6761a801d3ef15a5dc1f8ad0b8e3d84ea804",
+    "tests/terrain-materials.spec.ts": "5e4fbcabad76c50b1fac9f19b90f638dbd0d4dbfd7ed29c7e142de5c0f8d52dc",
+    "tests/tooling/browser-diagnostics.test.mjs": "de97fdc3af1c4138d33427f7998f07519a9748bd67fc98ac0892a58c349b5cf2",
+    "tests/tooling/risk-gate.test.mjs": "a04711fb2683e8a8610163364554f74993fb2cb9b1d17b29158b1a7b78dfd138",
+    "tests/tooling/verification-batches.test.mjs": "c75fe51676cfd3e0fc62c02b9ea7dd6480655c60f5d0c1c0cb1a7086ee17d1c3",
+    "tests/tooling/verification-browser.test.mjs": "095f9099592e1c548061b05177e42317964222780155a6ead30d2d60c30bde0b",
+    "tests/tooling/verification-processes.test.mjs": "2dc6abfa1af65d9f24946dc68f2f924b340a777fca857a65b8f2cc45ffcfe163",
+    "tests/tooling/verification-reporters.test.mjs": "54c58ca10a8fd5597b3e1eaeaa16dd4b535c3e21b1a9c56981e9a75d5592caf3",
+    "tests/tooling/verification-selection.test.mjs": "5d037897a36d315a18c1b4d808afdb6227a02f5b81278e063e80f6d8cbf8d5a5",
+    "tests/tooling/verification-timings.test.mjs": "7de982a4325907afe4e3c8ebeadc34eea46c840a371a0af9fcb2a19cdd60d703",
+    "tests/tooling/verify-full.test.mjs": "7021ebf41b7c55cd12921877a1c2a11b8ef8b019bdb05d25a5c4123995ff7792",
+    "tests/tooling/verify-pr.test.mjs": "566c9bb506a3197b3e0d025b5868448cc934d0685006481302871859eda64022",
+    "tests/unit-health-bars.spec.ts": "b8fe69ed88cd747d34fda243ccba79f072de5131dacb7d1a7940bd7ed3389b12",
+    "tests/unit/RunItemSession.test.ts": "34f8442034481e1955e82d1492e0098d37262208449cc24b955f54ead30d6f2c",
+    "tests/unit/__snapshots__/authoredEncounters.test.ts.snap": "d2d92689447dfb3674035aa6e4bd3b4d76b6a148a58491bece687ff2fc829bac",
+    "tests/unit/__snapshots__/battlefield.test.ts.snap": "f8fac2780d3dfd375b87f1c63b3418ae66d84e9c6b722c56e085e3f01a66efea",
+    "tests/unit/__snapshots__/dungeonEncounters.test.ts.snap": "2bb3b68bd4de0d73011dbddfb6c3fe31bce46150ed11df7887989b19df4529ca",
+    "tests/unit/abilities.test.ts": "beb73e0754218fd721ca98bd451dfea81e89cd335da07d2c07500f9f1dd0f0f5",
+    "tests/unit/abilityFixtureProgression.test.ts": "39658688de58658b5d63c89e478142112181e1285c5294953f17d6871d140320",
+    "tests/unit/abilityValidation.test.ts": "cfabab7fe91c8a7518044c9d1bb809b8ea30fad6f5b230991105770e64ce81ed",
+    "tests/unit/ai.test.ts": "9751098dd4a295fe08d7bc90f44e9cb83dbc42835c70231ed3a12ad1b6c76157",
+    "tests/unit/applicationLoadDiagnostics.test.ts": "791d59208315e86ce0ae64e667f64798f0daf5b5c091c19c5cfba49647caf608",
+    "tests/unit/applicationLoadFailure.test.ts": "0e26c879bbc73d3f8711a1467792ab5b583414bdd76d863d5e184c3e5bf2b816",
+    "tests/unit/audioState.test.ts": "dc210650d635cc2fc34174041701df2d97a39db4737aff58f421f77fc0bde955",
+    "tests/unit/authoredContent.test.ts": "930aeba905adac10963a64fd288d6bae699fecc811e504468cc08aa94b25511e",
+    "tests/unit/authoredEncounters.test.ts": "bf3db8a5c43e8cc9d80d9f62db5883211cacb3917affb9b52e44d0d8ec50ac39",
+    "tests/unit/battleActions.test.ts": "c2405080727f3e628438721ad260ab532257921467ffeaef3b80d99e11585d33",
+    "tests/unit/battleAudio.test.ts": "970ff1016dfaac611a2b88b58897ed85b7eaed4759d75a7471e848683e54925c",
+    "tests/unit/battleAudioInventory.test.ts": "9a4035c2acb1f2a1508ff602a49ba29b62ac814452bd0f91caee6fd1e1826cf3",
+    "tests/unit/battleCues.test.ts": "62d1bf30ac222c1990cfdef3b341ef4c4ac9c906af1f4cf81db89b282f90508f",
+    "tests/unit/battlePersistence.test.ts": "25521da1c0a730473798c7db1b2a185c5c6c7b58f9075566003f89b88d7e5210",
+    "tests/unit/battleSelection.test.ts": "0d74f4a7342afac90071c2a46f2741e44de9911ae90d54f36ab412d582e93d34",
+    "tests/unit/battleSession.test.ts": "1714b523f991165d939ec3225024028feb83511df3b2f5d0ceec79dfad8a0d03",
+    "tests/unit/battleStorage.test.ts": "b633076338bc23b6ad826e1f7921a0bb72b49f9f2e1c3d61c7b562786743a508",
+    "tests/unit/battlefield.test.ts": "b28d07341bd8e8b82a861cd6dbc2d85dd69bf0b21896e43c79bf2be3d86cc730",
+    "tests/unit/battlefieldContinuation.test.ts": "39efe0958435827f88287ea27d5df95e89cacd787ca0ff8d25a4348499dc22c6",
+    "tests/unit/battlefieldCorpus.test.ts": "811a767bfbc4790fc9e1c9e1dc961944cc0cd45ce2954ef0b7789ca49800b550",
+    "tests/unit/battlefieldSimulation.test.ts": "24cf7ec1177bfbfef8842bf4df8a7e236b05af8939ffb36d728e2bcb6f3fc84f",
+    "tests/unit/battlefieldSources.test.ts": "a0835e8c2219f10641c217e659e268cb9992d81e81d622d4da353547a5f774f8",
+    "tests/unit/boardCamera.test.ts": "b582e5bb195fe3ff4908de71a1ec610ad8e8d330d9875b0738eb08173ab90003",
+    "tests/unit/boardPresentation.test.ts": "67527eeea0ca23c6896eb75a26c4d09d329ab6bf8ff81d1ff5f61c17ab0cb6b9",
+    "tests/unit/canopy.test.ts": "6ecb01218476074627924a4ae9b56a24b98d6f875b6f472ca9d606e3922f09ad",
+    "tests/unit/combat.test.ts": "b9f156daeb8a93b3cc98bdaff3621f12b96fa334763e0dec0d2416d3958512dc",
+    "tests/unit/combatControls.test.ts": "65f0ef679640ea59b6f1dc0aabfa9b56431ed9250dde06b22314ac57f69a4216",
+    "tests/unit/content.test.ts": "99388720895544e1577749639250fe3e23fde17ea6ba1b764053d1163364ab24",
+    "tests/unit/contentContract.test.ts": "9f5a3a8db40531cb79ce1ccde449effcb854bc5d250d93a0f748c2a94dbad2d5",
+    "tests/unit/domainBoundary.test.ts": "f3d770ba058f4099f60d09b7b75a57ac75c0d4e73fa937661ec9f6dc094fba73",
+    "tests/unit/dungeon.test.ts": "c12bf72955803288719ba8a3f7bf42719206ff92ce12a97d913e60b8e0c16a8c",
+    "tests/unit/dungeonBattle.test.ts": "fcdb4b7a3850643ad5f024d71769f0ef8132154829667d0b0b6a17d1ac98eede",
+    "tests/unit/dungeonEncounters.test.ts": "2a4299c8bd94610553b546945e5960b789a66d80565d82e7cc673cb59159a6ef",
+    "tests/unit/dungeonEntropy.test.ts": "8aac466583bfd2bfedbbdecb45fd766bb593f42541a228ff5071c446b7e9939f",
+    "tests/unit/dungeonProgressionBoundary.test.ts": "de01dc60c135b7a7ebcf7412bdf528f7b85384fced7422089cc98e8d86957a1d",
+    "tests/unit/exploration.test.ts": "c81e9fe4542e58f3b2810f7ba00357f6ffbd64f07a1f77a70db23c2ff3a9a855",
+    "tests/unit/fixtures/contentContract.ts": "77758f6036eea5617c54dc75df955764adcfdc13b6c0c5df7cb499f1e5163204",
+    "tests/unit/grid.test.ts": "cf91ad4924937595571fe48be9b308d019308c20b35a0b81bd997da621bc3880",
+    "tests/unit/healthBar.test.ts": "ea8283ca82826f222a9f20d77c60feb041c086bd2bbb3da6d798b95e59d7653a",
+    "tests/unit/input.test.ts": "10b5b9663c25a76b6c488103a01c3df1551fbc64e2c2a4b9697dd7e5adb507c5",
+    "tests/unit/iso.test.ts": "897db5fd29e821293c344f7064d47c52175a7e2a7efe288fd6e03e376a6696a8",
+    "tests/unit/itemCommands.test.ts": "825d614ff57ca4bd5c082c4590f2ad9a6b4be772c72bd130ccf925901b5dfe34",
+    "tests/unit/items.test.ts": "77320e7191bd66ced08ad0bd9f9bfb12ec29108f4640f19933d257d127831faa",
+    "tests/unit/measureFitOptions.test.ts": "af066456ccf1a9efc146e779283ad5668c30e0d5ab8a9d7082b40b929e55ef8b",
+    "tests/unit/measureFitPreview.test.ts": "0fec44abe1423317997fca99a13d7e3adf4178eaf3e003ad68ea36d2614a246b",
+    "tests/unit/measurements.test.ts": "2cab42f9e963dc7d472b3d6b8829126f2b010a7869183f173bc4a3f6d6f32458",
+    "tests/unit/menuSaves.test.ts": "64d5a9fa0ba95b6853b841414f486af8d78cc8e2d7499293b9da3af5a3de5c2a",
+    "tests/unit/move.test.ts": "3ae9bd9de4453424ea0f88eda98f32082e3e1a941e97af1c629606cc48617766",
+    "tests/unit/movementUndo.test.ts": "bab4664f00beac1932ea7311b53acffb6ff2bda9f2080ac25cb1c1764295191d",
+    "tests/unit/overworldMap.test.ts": "aa02594011aa5747dae2d029a834656c4563aef72fa8f1e88447b19fddddba6b",
+    "tests/unit/picking.test.ts": "6c09d5d3ef1038c19cfa91194bee97ed6dd9cb0784abfa513dc017d77c27403c",
+    "tests/unit/progression.test.ts": "e619219ef1db743a627db8a0a871359b54e749f367ee19fd75321cbbc5488eae",
+    "tests/unit/proofAssetExports.test.ts": "ff3333d95a0b5c110c3c0ac98a574425951529e6d0445b4067d5ddf59727cccb",
+    "tests/unit/qbertPyramid.test.ts": "214d663d2434d9b6eee8773315ac23baad2bd0821ec47bc2218135da3d6bca58",
+    "tests/unit/radialGesture.test.ts": "b89ab210b78864e7e1090ce5b709006361692b8d8ff4c994d9068104910ce742",
+    "tests/unit/radialLabels.test.ts": "9cc017fb3bc0f01e4b5c027c3ab15881117d19fe54811a396217e93f7d277416",
+    "tests/unit/rewards.test.ts": "2d2a25e9f7dd74ee8d25fc8516185a5fdc0e8c036e466d8b724ae1a78dd17997",
+    "tests/unit/rng.test.ts": "b3a1974c1ba01183498b8e8f0dc1020a4c72527502b8c220d73099897a20706f",
+    "tests/unit/routes.test.ts": "e908ffd439a11fd4adf88e2422e023cc4530afd02e7918584ac07c107af993a5",
+    "tests/unit/run.test.ts": "e79e788d0285a4de6a42da0d7989e22d07c08e8a429e3564fa88060c08d3e97c",
+    "tests/unit/runBattle.test.ts": "6cb1c06aeb41d79028f9060e0193c067287387e8b39f11199aadd64020a18e8e",
+    "tests/unit/runRecoveryFixtures.test.ts": "4c416c60ee2815a6d83b4dcc61678f255a213673dbc12fd989ba579766ac73d3",
+    "tests/unit/runSaveEnvelope.test.ts": "a7fa515e80146bcd17dfd836989b466bd26a6c8eb9ce6b192fe8556964e8ad85",
+    "tests/unit/runStorage.test.ts": "0320dfc7f3e1714dcf14747ea1e290d9210fd06281fd978d6d5043dcc82fb44e",
+    "tests/unit/saveEnvelope.test.ts": "09fbf77483b4850640b870b233003db2bcd42663796756773e68e1f735f184e0",
+    "tests/unit/state.test.ts": "b7bedc83462e39e4af6ee9b8b841017bb08d8022d7cd9b15ea34070bdf7e83b2",
+    "tests/unit/tacticalPlan.test.ts": "8ea1c0f4ded154ea8138160e7b0c9f911d850548029e91088d54645b2c2a08e5",
+    "tests/unit/targeting.test.ts": "2171bbeb823c6cfb3acd00765a2081e6b5fb13b5862b0a1653c8bec520654d00",
+    "tests/unit/telemetry.test.ts": "009c5b8d32893c69155154db9bdca422dbc191cadd050c83d2b0323ae134069a",
+    "tests/unit/threat.test.ts": "227af50a50a45410bcea5d624cbe0f7dbb7873633010ad96eb03c32276021fe8",
+    "tests/unit/turns.test.ts": "368c29ae4b9ed13ab8c7adf9415f6bacecdd795c2ce33dfb8bfbc86d30f33187",
+    "tsconfig.domain.json": "94b255ca7ab890df804d9e4b06d9ed62b5f0e01a9f77ace3ac9798d47572591e",
+    "tsconfig.json": "0dd83947555cc594acbd955a45ef4789e9387a99cff759b460fd988a6e5c97da",
+    "vite.config.ts": "3daba3291dcfb3b897cf4b6985c162ac71894019d67c5966d81392e2e026a10e",
+    "vitest.all.config.ts": "46e39525da304339468cb43d31cd4500212f81ad71e35158b51cb90023bbef71",
+    "vitest.build.config.ts": "58f3bccff5edbe319cd611271e23c88dcef213109057c41c26e0619f2235d84e",
+    "vitest.config.ts": "8b967780731d5b199a8eff59c600789b2ccc84584d523c07796b8c896e09c2cf"
+  },
+  "temporaryWebkitConfig": "import {defineConfig} from '@playwright/test';\nimport fixtures from '../playwright.fixtures.config';\nimport acceptance from '../playwright.device-acceptance.config';\nimport {resolve} from 'node:path';\nexport default defineConfig({...fixtures,testDir:resolve(process.cwd(),'tests'),testMatch:'**/ability-picker.spec.ts',\nwebServer:{command:'npm run dev -- --port 4173 --strictPort',cwd:process.cwd(),url:'http://127.0.0.1:4173',reuseExistingServer:false},projects:acceptance.projects});\n",
+  "build": {
+    "indexSha256": "31eaac30ebe626f8c535fc4fabc91f5c1b4da327b66c4b6ae1f91e229e2147c7",
+    "applicationFilesSha256": "5c5617d7cc67c8cfd1982fe72795889cfd19ee78809f12b8aa80b26dfa8386d3"
+  },
+  "finalCorrection": {
+    "testedCheckout": "40af1a0b1830f707faa8a49d30e86b0f543e9890",
+    "dirty": " M README.md\n M docs/ongoing-projects/plan.md\n M openspec/changes/issue-284-desktop-shortcuts/specs/battle-controls/spec.md\n M openspec/changes/issue-284-desktop-shortcuts/tasks.md\n M src/phaser/BattleScene.ts\n M src/ui/hud.ts\n M tests/ability-picker.spec.ts\n",
+    "changedInputs": [
+      "src/phaser/BattleScene.ts",
+      "src/ui/hud.ts",
+      "tests/ability-picker.spec.ts"
+    ],
+    "sha256Overrides": {
+      "src/phaser/BattleScene.ts": "b06c08011fe9ac0fcccdca26e5ff5baf9dc57fab3f5675c97feb2f3e3d1a2b59",
+      "src/ui/hud.ts": "8712bfbebebddc3c23a9aee82ccec26470bd747f14d85b4f582ca24787b26cf6",
+      "tests/ability-picker.spec.ts": "5521404add63ac950ead7ce25c4816eb54d738d722244b26e0621b3c16d4c845"
+    },
+    "results": [
+      {
+        "name": "final-production",
+        "group": "chromium",
+        "config": "playwright.regression.config.ts",
+        "grep": "keyboard-only shortcuts",
+        "stats": {
+          "startTime": "2026-11-09T14:06:01.787Z",
+          "duration": 41111.908,
+          "expected": 18,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "report": "tmp/issue284-final-production.json",
+        "sha256": "d92edd83c61cd7700d8da4c0ac3e77b77313f321440455d4a11c17f34930b3d7",
+        "tests": [
+          {
+            "project": "desktop",
+            "title": "keyboard-only shortcuts select preview confirm and wait once without replacing native keys",
+            "status": "passed"
+          },
+          {
+            "project": "desktop",
+            "title": "keyboard-only shortcuts yield to editing modifiers composition handled events and dialogs",
+            "status": "passed"
+          },
+          {
+            "project": "desktop",
+            "title": "keyboard-only shortcuts respect presentation visibility and repeated scene replacement",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-portrait",
+            "title": "keyboard-only shortcuts select preview confirm and wait once without replacing native keys",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-portrait",
+            "title": "keyboard-only shortcuts yield to editing modifiers composition handled events and dialogs",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-portrait",
+            "title": "keyboard-only shortcuts respect presentation visibility and repeated scene replacement",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-landscape",
+            "title": "keyboard-only shortcuts select preview confirm and wait once without replacing native keys",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-landscape",
+            "title": "keyboard-only shortcuts yield to editing modifiers composition handled events and dialogs",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-landscape",
+            "title": "keyboard-only shortcuts respect presentation visibility and repeated scene replacement",
+            "status": "passed"
+          },
+          {
+            "project": "desktop",
+            "title": "keyboard-only shortcuts aim radial movement before one explicit confirmation",
+            "status": "passed"
+          },
+          {
+            "project": "desktop",
+            "title": "keyboard-only shortcuts leave held radial gestures and skin changes under existing control",
+            "status": "passed"
+          },
+          {
+            "project": "desktop",
+            "title": "keyboard-only shortcuts retain radial plan specials and follow-up confirmation",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-portrait",
+            "title": "keyboard-only shortcuts aim radial movement before one explicit confirmation",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-portrait",
+            "title": "keyboard-only shortcuts leave held radial gestures and skin changes under existing control",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-portrait",
+            "title": "keyboard-only shortcuts retain radial plan specials and follow-up confirmation",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-landscape",
+            "title": "keyboard-only shortcuts aim radial movement before one explicit confirmation",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-landscape",
+            "title": "keyboard-only shortcuts leave held radial gestures and skin changes under existing control",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-landscape",
+            "title": "keyboard-only shortcuts retain radial plan specials and follow-up confirmation",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "name": "final-webkit",
+        "group": "webkit",
+        "config": "playwright.device-acceptance.config.ts",
+        "grep": "keyboard-only shortcuts",
+        "stats": {
+          "startTime": "2026-11-09T14:06:43.314Z",
+          "duration": 34139.044,
+          "expected": 12,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "report": "tmp/issue284-final-webkit.json",
+        "sha256": "44932f26779473ebf171aa08456f1a59f8bb94d883f3cb4031ad705f0fb62997",
+        "tests": [
+          {
+            "project": "acceptance-webkit-portrait",
+            "title": "keyboard-only shortcuts select preview confirm and wait once without replacing native keys",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-portrait",
+            "title": "keyboard-only shortcuts yield to editing modifiers composition handled events and dialogs",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-portrait",
+            "title": "keyboard-only shortcuts respect presentation visibility and repeated scene replacement",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-landscape",
+            "title": "keyboard-only shortcuts select preview confirm and wait once without replacing native keys",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-landscape",
+            "title": "keyboard-only shortcuts yield to editing modifiers composition handled events and dialogs",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-landscape",
+            "title": "keyboard-only shortcuts respect presentation visibility and repeated scene replacement",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-portrait",
+            "title": "keyboard-only shortcuts aim radial movement before one explicit confirmation",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-portrait",
+            "title": "keyboard-only shortcuts leave held radial gestures and skin changes under existing control",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-portrait",
+            "title": "keyboard-only shortcuts retain radial plan specials and follow-up confirmation",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-landscape",
+            "title": "keyboard-only shortcuts aim radial movement before one explicit confirmation",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-landscape",
+            "title": "keyboard-only shortcuts leave held radial gestures and skin changes under existing control",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-landscape",
+            "title": "keyboard-only shortcuts retain radial plan specials and follow-up confirmation",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "name": "final-fixtures",
+        "group": "fixtures",
+        "config": "playwright.fixtures.config.ts",
+        "grep": "keyboard-only shortcuts.*radial",
+        "stats": {
+          "startTime": "2026-11-09T14:04:56.136Z",
+          "duration": 32160.718,
+          "expected": 6,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "report": "tmp/issue284-final-fixtures.json",
+        "sha256": "cb4cd5b723dc5cee5f985d6bc4abcfaef6b5d12f0f8e5bfd21823851cff22c00",
+        "tests": [
+          {
+            "project": "desktop",
+            "title": "keyboard-only shortcuts use canonical radial ability numbers without casting unavailable alternatives",
+            "status": "passed"
+          },
+          {
+            "project": "desktop",
+            "title": "keyboard-only shortcuts keep radial S aligned with the offered Special and A with Basic attack",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-portrait",
+            "title": "keyboard-only shortcuts use canonical radial ability numbers without casting unavailable alternatives",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-portrait",
+            "title": "keyboard-only shortcuts keep radial S aligned with the offered Special and A with Basic attack",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-landscape",
+            "title": "keyboard-only shortcuts use canonical radial ability numbers without casting unavailable alternatives",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-landscape",
+            "title": "keyboard-only shortcuts keep radial S aligned with the offered Special and A with Basic attack",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "name": "final-fixtures-webkit",
+        "group": "fixtures-webkit",
+        "config": "tmp/issue284-abilities-webkit.config.ts",
+        "grep": "keyboard-only shortcuts.*radial",
+        "stats": {
+          "startTime": "2026-11-09T14:07:17.853Z",
+          "duration": 21853.022,
+          "expected": 4,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "report": "tmp/issue284-final-fixtures-webkit.json",
+        "sha256": "df21740b6f5d019505fdd44687c69bf101204799cf8debe8eb30df69b66b588c",
+        "tests": [
+          {
+            "project": "acceptance-webkit-portrait",
+            "title": "keyboard-only shortcuts use canonical radial ability numbers without casting unavailable alternatives",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-portrait",
+            "title": "keyboard-only shortcuts keep radial S aligned with the offered Special and A with Basic attack",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-landscape",
+            "title": "keyboard-only shortcuts use canonical radial ability numbers without casting unavailable alternatives",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-landscape",
+            "title": "keyboard-only shortcuts keep radial S aligned with the offered Special and A with Basic attack",
+            "status": "passed"
+          }
+        ]
+      }
+    ],
+    "reuse": "Initial pointer/native-control and rail ability cases remain bound to 3daa5d7. Only the radial S selection branch, help wording and expanded fixture change; all new shortcuts and affected full-map/lifecycle paths are freshly checked. The full 333-file snapshot was rechecked; only the three listed runtime/test inputs differ.",
+    "build": {
+      "indexSha256": "4af47c5dab21057c4113f2b2ed5b5cef8102d3ce3f618a59e5d65234b15d7887",
+      "applicationFilesSha256": "7f973a7caa2f26605b1a4571d80f7abdea9a442c311fd0cd2b296bb700a29df4"
+    }
+  },
+  "intermediateCiPass": {
+    "head": "40af1a0b1830f707faa8a49d30e86b0f543e9890",
+    "url": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42630279039",
+    "seconds": 204.6,
+    "note": "All standard stages and seven core journeys passed before the final S correction. A new current-head run remains required."
+  },
+  "finalCi": {
+    "head": "9329ff0ed2912466dab6fe695de06322ece3dc4a",
+    "ciCheckout": "3047fcd36c41a083d7bde2b1ac37e470f9568fa2",
+    "tree": "8a1c17f2fb6088f0ce0f9710da8d1f0b151ee860",
+    "identical": true,
+    "url": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42631947486",
+    "artifact": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42631947486/artifacts/13680857744",
+    "status": "passed",
+    "commandSeconds": 196.6,
+    "units": 1244,
+    "buildIntegrations": 2,
+    "coreJourneys": 7,
+    "runner": "unraid-tactics-01",
+    "note": "All standard stages pass. CI synthetic merge tree equals the published implementation. Later checklist/receipt-only changes preserve every recorded runtime/test/tooling hash."
+  }
+}
