@@ -96,6 +96,7 @@ export class BattleScene extends Phaser.Scene {
     const selection=new BattleSelection(session);
     let live=true,ready=false,outcomeShown=false,initialFit=true,skin:CombatSkin=resolveCombatControlsSkin();
     let movingPresentation=false,planInFlight=false,planInterrupted=false;
+    let presentationStart:Presentation['before']|null=null;
     let threatState: typeof session.state | null=null, threatIds: readonly number[]=[], threats: readonly Threat[] | null=null;
     let hovered:CellPosition|null=null;
     let region:BoardRegion={x:0,y:0,width:0,height:0};
@@ -125,7 +126,7 @@ export class BattleScene extends Phaser.Scene {
       }
       const danger=selection.showDanger && session.phase==='player'?session.state.units.filter(u=>threatIds.includes(u.id)).map(u=>u.cell):[];
       board.present(session.state,reach?.ok?reach.cells.map(c=>c.cell):[],selected,preview?.ok?preview.path:[],selection.overlays(),hover,danger);
-      hud.render(action,selected,message,selection.showDanger && session.phase==='player',threats,selection.planning && !radial.open,selection.planning?selection.planMove:null);
+      hud.render(action,selected,message,selection.showDanger && session.phase==='player',threats,selection.planning && !radial.open,selection.planning?selection.planMove:null,presentationStart);
       const caption=document.querySelector('#battle-board-caption')!;
       // Picking changes independently of the cached controls. Compose a fresh
       // caption so hover cannot accumulate hints or retain a cleared hint.
@@ -231,6 +232,7 @@ export class BattleScene extends Phaser.Scene {
     {reducedMotion:()=>matchMedia('(prefers-reduced-motion: reduce)').matches});
     const present=async(step:Presentation|null,followPlan=false)=>{
       if(!step){refresh();return;}
+      presentationStart=step.before;
       if(followPlan){planInFlight=true;planInterrupted=false;}
       clear(followPlan);selection.selectedCell=null;removeInput.reset();hud.append(step.events);audio.present(step.token,step.events);
       refresh();animation=board.animate(step.before,step.after,step.events);
@@ -239,6 +241,7 @@ export class BattleScene extends Phaser.Scene {
       // Suspension may finish presentation early, but never resolve the command again.
       await animation.done;if(!live)return;animation=null;
       if(moving)measurements.workload('move',performance.now(),0);movingPresentation=false;
+      presentationStart=null;
       session.finishPresentation(step.token);cursor=session.active.cell;
       if(followPlan){
         planInFlight=false;
