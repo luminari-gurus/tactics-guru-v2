@@ -297,6 +297,17 @@ emulation accurately and retain any real platform failure.
   focused/extended Mage matrix on the qualified runner; retain all failures and
   source identities, update OpenSpec/evidence and mark both PRs ready only after
   their gates pass. No merge, release tag or deployment is part of this work.
+- Local production-browser iteration exposed a mismatch in the new missile
+  fixture's expected command shape: the HUD uses a single-target command and
+  expands it into two missiles. The fixture now uses that actual command form;
+  exact event/state assertions remain. Both focused cases pass locally on
+  desktop Chromium/WebKit (4/4), with red/green receipts retained. A temporary
+  preview-command/cwd override bypassed the missing local npm command without
+  changing shipped configs. Qualified Linux/mobile acceptance remains required.
+- Cancel obsolete `904e82b` browser/duplicate PR runs after this demonstrated
+  fixture correction, preserving their incomplete state, then qualify the new
+  head. Retry #358's zero-job service failures on the same handles now that
+  GitHub is admitting jobs again. Do not relabel those failures as product tests.
 
 Estimated time **for me: 2–3 hours** of elapsed implementation and affected
 verification after work begins, excluding self-hosted runner queue time:

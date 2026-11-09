@@ -55,7 +55,7 @@ for(const abilityId of ['ability:frost_snare','ability:magic_missile'] as const)
    .toEqual({ok:true,state:accepted.state,events:accepted.events});
  if(abilityId==='ability:frost_snare') {
    expect(accepted.state.rng).toEqual(before.state.rng);expect(accepted.state.units.map(u=>u.hp)).toEqual(before.state.units.map(u=>u.hp));
-   expect(accepted.events).toContainEqual({type:'movementBlocked',unitId:'unitId' in fixture.command.target?fixture.command.target.unitId:0,sourceId:fixture.command.unitId,abilityId});
+   expect(accepted.events).toContainEqual({type:'movementBlocked',unitId:fixture.command.target.unitId,sourceId:fixture.command.unitId,abilityId});
  } else expect(accepted.events.filter(e=>e.type==='missileRolled')).toHaveLength(2);
  const saved=await snapshot(page),slots=await page.evaluate(keys=>keys.map(key=>localStorage.getItem(key)),[DUNGEON_KEYS.primary,DUNGEON_KEYS.backup]);
  await page.reload();await continueSavedDungeon(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');

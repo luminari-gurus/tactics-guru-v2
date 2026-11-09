@@ -136,3 +136,24 @@ passing test evidence; subsequent qualification must still run every gate.
 Complete focused/extended browser execution and final acceptance remain pending.
 Physical hardware was not requested; describe device emulation accurately and
 retain engine/platform failures.
+
+### Focused fixture correction
+
+While GitHub was rejecting qualification jobs, local Windows desktop iteration
+used the existing production browser configs with only the preview command/cwd
+overridden in ignored scratch configs (direct Node/Vite, because npm is absent
+on the Windows PATH). The first scratch command failed before browser startup
+due to its cwd; correcting the task-local cwd started the intended preview.
+
+The first real Chromium run passed Snare but failed missile event equality:
+the HUD records `{unitId: target}`, while the new fixture had expected
+`{missileTargets: [target, target]}`. Both produced the same state, but exact
+event payloads correctly differed. The fixture now uses the actual HUD's
+single-target command, which authoritative level-three resolution expands to
+two missiles. No event assertion was normalized, omitted or relaxed.
+
+After that correction, both focused cases passed on desktop Chromium and desktop
+WebKit (4/4, zero retries/skips). Portable red and green reports are in
+`iteration/`. These are local iteration results, not the required qualified
+Linux six-profile matrix. Old-head CI attempts are superseded by this concrete
+fixture change; cancellation preserves them as incomplete, never passing proof.

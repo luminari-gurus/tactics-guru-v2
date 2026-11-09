@@ -303,7 +303,7 @@ export function stagedMageAbility(abilityId:'ability:frost_snare'|'ability:magic
   for(const target of initial.units.filter(u=>u.side==='enemy'))for(const cell of map.cells) {
     if(!built.catalog.terrains[cell.terrainId].walkable||initial.units.some(u=>u.id!==mage.id&&u.cell.x===cell.x&&u.cell.y===cell.y))continue;
     const battle={...initial,activeIndex:initial.initiative.indexOf(mage.id),units:initial.units.map(u=>u.id===mage.id?{...u,cell:{x:cell.x,y:cell.y}}:u)};
-    const command={type:'useAbility' as const,unitId:mage.id,abilityId,target:abilityId==='ability:magic_missile'?{missileTargets:[target.id,target.id]}:{unitId:target.id}};
+    const command={type:'useAbility' as const,unitId:mage.id,abilityId,target:{unitId:target.id}};
     if(!previewAbility(battle,command,built.catalog).ok)continue;
     return {state:checkedDungeon(readDungeon({...entry,activeBattle:battle})),command};
   }
