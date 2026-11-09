@@ -1,214 +1,187 @@
 # Issue #316 — Resilient Mage acceptance fixtures
 
-Planning date: 2026-11-09 (Asia/Jerusalem).
-
+Updated: 2026-11-09 (Asia/Jerusalem). Owner: @moshehbenavraham.
 Issue: [#316](https://github.com/luminari-gurus/tactics-guru-v2/issues/316).
-
-Owner: @moshehbenavraham, verified through the authenticated GitHub identity and assigned on the issue.
-
-Base: `origin/main` at `6aad368761e6684d88d9b3eb5b3cacc53a615c90`.
-
 Branch: [`branch/issue-316-mage-acceptance-fixtures`](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-316-mage-acceptance-fixtures).
+Original main base: `6aad368761e6684d88d9b3eb5b3cacc53a615c90`.
 
-Status: implementation authorized by the caller on 2026-11-09. OpenSpec change
-[`issue-316-mage-acceptance-fixtures`](../../openspec/changes/issue-316-mage-acceptance-fixtures/proposal.md)
-tracks implementation. No runtime changes are planned.
+**Status:** code is implemented and published. Standard verification passes.
+The qualified six-profile Mage progression matrix is still running; #357 stays
+draft until its complete result accounting is verified. The caller explicitly
+authorized implementation, autonomous repairs, commits/pushes, incremental PRs
+and OpenSpec on November 9. No additional implementation approval is needed.
 
-The previous plan is preserved byte-for-byte in
-[issue-284-desktop-shortcuts-plan.md](issue-284-desktop-shortcuts-plan.md).
-Its historical evidence and status statements remain historical; PR #356 is now
-merged. Update its two OpenSpec source pointers to the preserved filename.
+Review stack:
 
-## Selection and availability
+- [PR #358](https://github.com/luminari-gurus/tactics-guru-v2/pull/358),
+  `branch/fix-radial-selection-contract` → main, is **ready for review**.
+- [PR #357](https://github.com/luminari-gurus/tactics-guru-v2/pull/357), the issue
+  branch → #358's branch, contains the Mage implementation and remains draft.
+- Both have appropriate feature/risk labels. Keep #316 open until the complete
+  reviewed implementation merges. No merge, release tag or production operation
+  is part of this handoff.
 
-Reviewed all **50 open issues**, including those without `ready for work`, their
-bodies/assignments/labels, relevant discussions, all **2 open PRs**, remote
-branches, and native issue dependency/branch relationships. REST inventory and
-GraphQL `totalCount: 50` / `hasNextPage: false` agree. No open issue has a native
-blocking relationship recorded; body-level prerequisites still apply.
+The [OpenSpec tasks](../../openspec/changes/issue-316-mage-acceptance-fixtures/tasks.md)
+track completion; strict validation passes. `skip_specs: true` applies because
+this is verification work with unchanged product requirements. The
+[QA record](../qa/issue-316/README.md) retains detailed assertions, identities,
+failures, timings and portable receipts. The former #284 plan is preserved
+unchanged in [its archive](issue-284-desktop-shortcuts-plan.md); its two OpenSpec
+pointers were corrected when this plan replaced it.
 
-Choose #316 for a bounded verification improvement with concrete acceptance,
-confirmed code consumers and no overlapping published work. It removes coupling
-that already required replacing seed 46 with 68 after encounter-contact changes,
-and improves confidence in later dungeon movement and Mage work. It does not
-formally unblock another issue; no dependency is invented for ranking it.
+## Outcome and required acceptance
 
-Availability comparison:
+Make focused Mage ability/replay/resume verification independent of a fortunate
+movement seed, while retaining the full legal journey from an unplayed
+level-one party through earned level three, Frost Snare, multiple missiles and
+legal terminal cleanup. Every original issue gate remains required:
 
-- **Existing ownership:** #85, #128, #161, #162, #184, #200, #208, #219, #254,
-  #258 and #306 are assigned to @dubstylee. Preserve those assignments. The
-  highest-leverage effect/UI foundation trackers are therefore not available for
-  an independent pickup. #208 also retains its isolated-runner-capacity blocker.
-- **Already published work:** #291/#302 have changes on `fix/qa-next-three`;
-  #292/#298/#304 on `fix/top-five-bugs`; #296/#307/#312 have dedicated fix
-  branches. #303 overlaps merged encounter-contact PR #314 and retained QA
-  branches. Their remaining review, qualification or reconciliation is not a
-  reason to create competing implementations. #268 already has an investigation
-  branch, with the original startup cause still unresolved.
-- **Larger or undecided candidates:** #170 is a content epic requiring bounded
-  biome issues; #176 is useful foundation for #270 but needs coordinated record,
-  duration and terminal-boundary design. #167/#168/#169/#171 need their remaining
-  effect contracts; #173/#174/#175 require acquisition/reward/unlock decisions.
-  #178/#182/#185/#261/#262/#287 retain explicit design choices. #179/#180/#181
-  are lower-priority convenience work with policy/asset choices. #199 is an epic,
-  not a focused implementation increment.
-- **Other unassigned reports:** #299/#308 aggregate distinct polish/design
-  changes; #301/#313/#320/#323 leave defeat, recovery or reward policy open.
-  #311 is a smaller discoverability improvement. #318 deserves a controlled
-  reproduction: current `combatStats` subtracts Weakened once, while attack
-  preview separately applies elevation. That is an attribution uncertainty,
-  not proof that the reported defect is fixed or caused by height.
+1. Focused checks use explicitly staged valid battle state and run independently
+   of full dungeon traversal. Staging must never be called earned progression.
+2. A complete real-input journey still earns level three and witnesses both
+   abilities; retain all original assertions and all six engine/device profiles.
+3. Evaluate a bounded deterministic pure selector with an explicit range, shared
+   selected seed/witness, recorded exclusions and a clear exhaustion error.
+   Unexpected simulation/replay errors must propagate, not become another seed.
+4. Preserve exact state/events/RNG replay, active-battle reload without historical
+   effects, actual Snare movement rejection and correct expiry, multiple missile
+   rolls and legal terminal status cleanup.
+5. Record per-profile browser time and pure-selection overhead against the
+   existing 600,000 ms per-case budget. Retain failures/incomplete attempts;
+   change neither deadlines nor gameplay to obtain a witness.
 
-No readiness labels were changed: no newly examined unready issue was promoted
-without resolving its concrete uncertainty. The caller's instruction permits
-selection regardless of label; #316 independently meets the readiness checks.
-Immediately before claiming it, it was open, unassigned, already ready, with no
-native blockers/linked branch and no matching remote branch/open PR.
+## Scope and ablation
 
-PR [#314](https://github.com/luminari-gurus/tactics-guru-v2/pull/314) is merged at
-`c7b35cf1373474fcd764d1037c53681cd09bcc95`, confirmed an ancestor of this base.
-Its [review](https://github.com/luminari-gurus/tactics-guru-v2/pull/314#pullrequestreview-5789933339)
-is the issue's source. There is no outstanding implementation prerequisite.
-Existing unrelated worktrees and remote branches remain untouched.
+**Keep:** the complete legal earned journey, exact assertions, current
+preview/session/save authority and original device/engine coverage. A staged
+level-three fight cannot establish earned XP, traversal or reward preparation.
 
-## Outcome
+**Simplify:** one Mage-specific pure selector beside the existing journey;
+existing validated save/HUD and picker fixtures for focused checks. No persistent
+seed cache, generic search framework, extra fixture route or new dependency.
 
-Make focused Mage ability, replay and resume verification runnable independently
-of a fortunate dungeon movement seed, while retaining a complete legal journey
-from an unplayed level-one party through earned level three, Frost Snare,
-multiple Magic Missiles and a legal terminal outcome. Preserve every current
-assertion or explicitly map it to equally strong proof.
+**Drop:** balance changes, content changes, production UI/save/RNG changes,
+configuration surfaces, sharding, broad timing captures and unrelated cleanup.
+The seven-case ordinary PR selection stays unchanged. Existing browser configs,
+workers 1 and retries 0 remain. The task-scoped self-hosted workflow supplies the
+needed extended selection without changing general CI policy.
 
-## Non-goals
+The only additional repair is the separately reviewable #358 prerequisite. Its
+literal-main selection failure was reproduced. The narrow-landscape witness
+regains all three profiles. The radial dock witness makes its original 1280×720
+viewport explicit and uses one checked Pixel landscape-to-portrait equivalence.
+The original 23 approved mappings remain; the exact current count is 24. Original
+assertions/deadlines remain, and all six explicit browser controls were executed.
 
-Do not change gameplay, balance, encounter contact, movement/RNG ordering,
-progression, saves, production UI, dependencies, timeouts, retries or workers.
-Do not implement #313, create a generic seed-search framework, introduce a new
-fixture route, broaden the seven-case PR allowlist, or run a full baseline.
-No merge, deployment or PR creation is part of this planning handoff.
+## Implemented files and consumers
 
-## Source findings and affected files
+- [dungeonFixtures.ts](../../tests/helpers/dungeonFixtures.ts):
+  `selectMageJourney` defaults to candidates 64–79 inclusive, ascending, with at
+  most 16 pure simulations, exact qualification/replay and no fallback. It
+  returns range, exclusion reasons and witness together. Its small optional
+  simulator seam makes negative unit tests independent of future lucky seeds.
+  `stagedMageAbility` validates current-format level/position staging and uses
+  the same single-target command as the HUD; level-three resolution supplies
+  two missiles.
+- [dungeonBattle.test.ts](../../tests/unit/dungeonBattle.test.ts): shared real
+  selection plus deterministic bounds, exclusions, exhaustion, unexpected
+  failures and replay-divergence coverage. The original earned replay assertions
+  and separate low-HP Snare continuation fixture remain.
+- [dungeon-extended.spec.ts](../../tests/dungeon-extended.spec.ts): uses the shared
+  returned seed consistently and attaches selection/timing evidence. Every
+  original earned-progression, inspection, replay, reload and terminal assertion
+  remains. The deadline is still 600,000 ms.
+- [dungeon.spec.ts](../../tests/dungeon.spec.ts): two explicit staged production
+  HUD casts prove exact effects/state/events/RNG, replay, active reload with no
+  historical events, and byte-identical primary/backup slots.
+- Existing `ability-picker.spec.ts`, `abilities.test.ts`, player policy and
+  traversal helpers keep preview/cancel, keyboard/touch, inspection, actual
+  immobilized-move rejection, expiry and progression boundary coverage.
+- [Unchanged-consumer comparison](../qa/issue-316/unchanged-consumers.json)
+  confirms seven complete shared helper bodies, including Fighter/Ranger/Shaman,
+  traversal and preparation, match the planning base. Their affected earned-unit
+  witnesses pass. Extended discovery retains all three heroes on both engines;
+  no new full Fighter/Ranger browser certification is claimed.
+- [Mage qualification workflow](../../.github/workflows/issue-316-mage-acceptance.yml),
+  OpenSpec, this plan and QA receipts provide execution and the handoff. #358
+  owns its selection script, exact-count/device-equivalence contracts, two layout
+  cases, policy clarification and scoped runner workflow.
 
-- [tests/helpers/dungeonFixtures.ts](../../tests/helpers/dungeonFixtures.ts):
-  `mageJourney(seed)` simulates real spatial steps and accepted session commands;
-  bounded traversal, floor and turn loops already exist. Extend this helper with
-  the smallest Mage-specific selection/qualification function.
-- [tests/helpers/playerPolicy.ts](../../tests/helpers/playerPolicy.ts):
-  `mageDecision` attempts one legal Snare, then uses the established policy.
-  Inspect and reuse it; no policy change is planned. Fighter/Ranger consumers of
-  the same helper module must retain their behavior.
-- [tests/unit/dungeonBattle.test.ts](../../tests/unit/dungeonBattle.test.ts):
-  the earned Mage case calls `mageJourney(68)`; a separate staged continuation
-  case already covers Snare roundtrip/cleanup. Extend these existing cases and
-  add only selector boundary/failure coverage that is missing.
-- [tests/dungeon-extended.spec.ts](../../tests/dungeon-extended.spec.ts):
-  the Mage journey repeats seed 68 at witness creation, fresh dungeon creation
-  and receipt writing. Use one returned selection throughout. Retain its
-  600,000 ms budget and full earned-progression, replay, reload and terminal gates.
-- [tests/dungeon.spec.ts](../../tests/dungeon.spec.ts): existing explicitly staged
-  menu-save tests at XP 0/180 provide the focused production route and durable
-  save pattern. Extend this surface for the missing cast/resume integration.
-- Reuse [tests/ability-picker.spec.ts](../../tests/ability-picker.spec.ts),
-  [tests/unit/abilities.test.ts](../../tests/unit/abilities.test.ts) and
-  [tests/helpers/dungeonTraversal.ts](../../tests/helpers/dungeonTraversal.ts).
-  They already own real-picker Snare interactions, actual immobilized-move
-  rejection/expiry, and keyboard/touch dungeon traversal. Avoid duplicating them.
-- Record final assertion mapping, exact commands, durations, chosen seed/range,
-  rejected-candidate reasons, source/build identity and failures in
-  `docs/qa/issue-316/README.md` and test attachments. Update this plan's progress.
+## Verified evidence
 
-Planning publication touches this file, the unchanged previous-plan archive and
-the two #284 OpenSpec pointer corrections. Implementation should touch only the
-test/helper/evidence files above, the requested OpenSpec artifacts and one
-task-scoped self-hosted qualification workflow. Existing browser configurations
-remain unchanged. The workflow is necessary to select these extended cases on
-the qualified runner; existing manual jobs do not expose this selection.
+- Exact-base [run 42670137498](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42670137498)
+  checked out clean `1a02557` on VM-02. Original seed-68 desktop Chromium passed
+  in 438.973 s and desktop WebKit in 211.504 s, with zero retries/skips/flakes.
+  [Baseline receipts](../qa/issue-316/baseline/summary.json) preserve this source.
+- Candidate simulation and full qualification costs are separate. Raw simulation
+  of all 16 candidates took ~13.7 s locally. Full per-candidate qualification of
+  the entire fixed interval took ~16.0 s on Windows/Node 24.22.1, including replay
+  and explicit ordinary nonqualification. Seeds 68 and 78 fully qualify; default
+  ascending selection chooses 68. See [measured range](../qa/issue-316/qualified-range-cost.json).
+  These figures are not a cross-host or browser speedup claim.
+- Final implementation [standard run 42675477861](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42675477861)
+  passed **1,245 units, both types, two build integrations, bundle and seven core
+  journeys** in 276.174 s. Actual synthetic merge `a0a0964` has tree
+  `ee1f37434749297c2b970ec5951bff9540069b19`, verified equal to tested head
+  `bcc523c`. [Receipt](../qa/issue-316/pr-bcc523c-summary.json).
+- #358's qualified run 42675291510 passed **31 batch/selection contracts and six
+  actual browser controls** on VM-01. Standard run 42675302736 passed 1,244 units,
+  both types/build integrations, bundle and seven core journeys in 245.834 s.
+  Its synthetic merge tree equals implementation `8c199ba`. Later `36c2f26`
+  changes only documentation/receipts. [Repair record](../qa/radial-selection-contract.md).
+- Exact discovery preserves the seven core and nine-per-engine extended cases.
+  Initial Mage work adds only two staged cases per production profile. After the
+  separately verified prerequisite, stacked discovery is 1,185 Chromium and 183
+  WebKit-exploration cases; these are discovery counts, not executed full suites.
+- Local iteration failures and corrections are retained in QA: a staging-helper
+  type inference error, temporary preview cwd error, and the missile fixture's
+  vector-versus-single-target event mismatch. Exact assertions were preserved.
+  Both focused cases then passed on desktop Chromium/WebKit (4/4).
+- GitHub internal-service failures created no jobs/tests; canceled obsolete-head
+  attempts remain incomplete. Their records are not application failures or
+  passing acceptance. Current qualified execution is authoritative.
 
-## Ablation decisions
+## Live verification and continuation
 
-**Keep** the full legal journey: a staged level-three battle cannot prove earned
-XP, traversal, reward choices or encounter-to-encounter progression. Keep exact
-state/events/RNG, active-battle reload, no historical event replay, movement-block
-expiry and terminal cleanup gates.
+The remaining matrix is **[run 42675462523](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42675462523)**
+at clean implementation `bcc523c`, on qualified VM-02. Selection contracts,
+focused production Chromium/WebKit and retained picker steps succeeded. Full
+Chromium earned progression started at 18:41:54 UTC; WebKit follows serially.
+The final JSON results/counts must be inspected before completing the tasks.
 
-**Simplify** seed handling into one Mage-specific pure helper shared by unit and
-browser consumers, using current session/content rules. Reuse existing staged
-production-save and picker fixtures for focused checks. The caller subsequently
-requested OpenSpec: use its proposal/design/tasks with `skip_specs: true` because
-product requirements do not change. This plan remains the session handoff.
+The existing local watcher is exec session **40420** and writes
+`tmp/issue316-mage-watch.log`. Re-poll that handle or the same GitHub run. An
+observation timeout is not a stopped run; never restart because observation
+expired. Later local/published changes are documentation/receipts only and do
+not invalidate the tested runtime/test inputs.
 
-**Drop** generalized journey search, new configuration/dependencies, new fixture
-routes, persistent/generated seed caches, CI sharding and balance adjustments.
-No accepted criterion depends on them. Do not remove existing assertions just
-to shorten the run; any moved assertion needs an explicit replacement mapping.
+Next actions:
 
-**Investigate during implementation** the bounded selector's real cost and
-candidate qualification. It must fail visibly when no candidate qualifies; a
-fallback to seed 68 or a caught unexpected helper exception would hide failure.
+1. Wait for this existing run's authoritative terminal state. Preserve any
+   failure and repair its cause without retries, looser deadlines or lost gates.
+2. Download its `issue-316-mage-42675462523-1` artifact. Inspect all final reports:
+   expected union **36 browser cases** = 12 focused production Chromium + 12
+   focused WebKit + 6 retained picker + 3 full Chromium + 3 full WebKit.
+   Require zero unexpected/skipped/flaky/retried cases. Validate selected seed,
+   range, rejected candidates and exact journey receipts for every full profile.
+3. Compare each full case's complete duration, including selection/setup, to
+   600,000 ms. Record actual measured overhead and retained runner/cache limits.
+4. Retain portable raw/derived receipts, source/build identity and a final audit
+   of all five acceptance bullets. Check off OpenSpec only after proof exists.
+5. Commit/push the final plan/evidence, preserve the stack and labels, change
+   #357 to `Closes #316` only when all criteria pass, and mark it ready for review.
+   Keep the issue open until merge. Do not merge or archive OpenSpec here.
+6. Verify remote parity, clean owned worktree, PR states and absence of unresolved
+   implementation feedback. Remove only owned scratch configs/probe scripts;
+   preserve unrelated worktrees and required recovery evidence. Complete the
+   active goal only after the entire requested review handoff is achieved.
 
-## Implementation sequence
+## Commands and execution policy
 
-1. **Capture the unchanged contract and baseline.** Record source identity,
-   exact selected test IDs and the seed-68 Mage witness's duration/result on the
-   qualified self-hosted runner. Inventory every current assertion against the
-   existing units, staged picker and full production journey. Retain red or
-   incomplete attempts; do not turn this into a whole-suite timing capture.
-2. **Evaluate bounded deterministic selection.** Start with a documented fixed
-   candidate interval **64–79 inclusive**, ascending, which includes the current
-   witness. Run only pure Node-side simulation, not trial browser play. Qualify
-   a candidate only if the Mage actually earns level three, both abilities are
-   witnessed, histories replay exactly and the required expiry/terminal cleanup
-   is reachable. Return the chosen seed and witness together; unit/browser
-   consumers use the same helper and all receipts use that returned seed.
-   Record ordinary nonqualifying outcomes/reasons; unexpected rejected commands,
-   invalid states or simulation errors fail immediately. Exhaustion produces a
-   clear error naming the range and unmet gates. Measure worst-case bounded
-   work before retaining this interval; do not increase test timeouts to fit it.
-   Keep any process-local reuse minimal and tied to unchanged current inputs.
-3. **Isolate focused production integration.** Use validated current-format
-   staged level-three dungeon entries for a small Snare/missile witness through
-   the actual HUD. Label this staging honestly. Verify accepted action effects,
-   exact state/events/RNG and saved active-boundary reload with empty historical
-   events; retain exact missile count/rolls and Snare cleanup proof. Existing
-   pure tests continue to prove immobilized movement is rejected atomically and
-   expiry occurs on the correct accepted turn. Reuse existing picker coverage
-   for preview/cancel, keyboard/touch and inspection rather than cloning it.
-4. **Retain the full earned journey and qualify the change.** Replace only its
-   duplicated seed literals with the shared selected witness. Start from an
-   unplayed level-one state and enact all movement, commands and preparation
-   through real inputs. Keep exact replay, active reload and legal terminal
-   assertions. Record per-profile duration and pure selection overhead against
-   the existing ten-minute per-case budget, including setup/search cost.
-5. **Publish one focused implementation PR under the caller's 2026-11-09
-   implementation authorization.** Run the checks below, audit every issue bullet and the final diff,
-   attach the source-bound evidence, and use `Closes #316` only when all gates
-   pass. If delivery needs an incomplete increment, use `Refs #316`, state what
-   remains and keep the issue open. Do not close it with this planning commit.
-
-## Proof and acceptance mapping
-
-1. **Focused checks independent of movement seed:** staged production HUD/save
-   witness in `dungeon.spec.ts`, existing real-picker cases and relevant pure
-   ability/continuation tests. Run these without selecting the extended journey.
-2. **Earned level three and both abilities:** retained complete Mage extended
-   journey starts fresh, traverses legally and earns XP; no staged state is
-   presented as proof of this criterion.
-3. **Bounded shared selection:** unit checks for deterministic choice, inclusive
-   range limits, nonqualifying candidates, exhaustion and unexpected failure;
-   actual-current-content witness used by both consumers. Record selection in
-   attachments; no browser retry/search loop or hidden failed assertion.
-4. **Replay, reload, Snare, missiles and cleanup:** exact state/event/RNG replay
-   in unit and complete browser histories; real active-battle reload; existing
-   actual movement rejection/target-turn expiry tests; at least two real missile
-   rolls; status cleared at the legal terminal boundary. Audit old-to-new proof
-   explicitly if an assertion moves.
-5. **Runtime without weakened gates:** per-case browser and selector durations,
-   unchanged 600,000 ms deadline, workers 1, retries 0, all failures/incomplete
-   attempts retained. Do not promise a speedup before measuring it.
-
-During iteration use the smallest changed helper/unit case and one focused
-browser profile. PR readiness follows [verification-policy.md](../verification-policy.md)
-for **test tooling/selection** and affected lifecycle consumers:
+Apply [verification-policy.md](../verification-policy.md) to the affected test
+and lifecycle consumers. Iteration uses the narrowest relevant unit/browser
+case; final readiness includes the union below and exact discovery comparisons.
+Production-preview commands follow a successful source-bound build.
 
 ```sh
 npm run test:unit -- tests/unit/dungeonBattle.test.ts tests/unit/abilities.test.ts tests/unit/dungeonProgressionBoundary.test.ts
@@ -222,143 +195,27 @@ npm run test:extended:webkit -- -g 'Mage legal progression'
 git diff --check
 ```
 
-Run the new focused cases under both existing Chromium and WebKit production
-configs; their final titles must match the documented `Mage` filter. Discover
-each command with `--list` before execution. Capture exact before/after IDs for
-changed selections: retain all three extended journeys on each engine's three
-profiles and the seven-case PR allowlist. New focused cases remain in the
-existing `dungeon.spec.ts` suite/batches. Recheck unchanged Fighter/Ranger helper
-consumers and their discovery; their current full browser journeys may reuse
-valid source-bound evidence when their inputs are unchanged. Expand execution
-only for a concrete changed consumer or failure.
+Use qualified self-hosted capacity and its per-VM lock, serial browser/GPU work,
+workers 1/retries 0 and no GitHub-hosted fallback. Desktop and mobile
+portrait/landscape Chromium/WebKit emulation satisfy acceptance under AGENTS.md;
+no physical hardware was requested. The original developer capability was
+`CAN_TEST_MOBILE=android`, not a claim that hardware was tested.
 
-`verify:pr` supplies all fast units, both type scopes, root/prefix build
-integrations, the ordinary production bundle and seven core journeys. Build
-before focused production-preview commands and bind every result to the same
-relevant source/build inputs. Reuse unchanged coverage with its original
-identity; focused passes do not erase historical failures.
+Reuse evidence only with unchanged relevant inputs and original source identity.
+A documentation-only final commit needs link/command/whitespace checks, not a
+new application matrix. Preserve failures and indirect/unexecuted limitations.
 
-Use the qualified self-hosted runner and its existing exclusive browser lock;
-execute browser/GPU workloads serially with no GitHub-hosted fallback. The
-unchanged developer capability is `CAN_TEST_MOBILE=android`, but this task does
-not require physical hardware. Desktop, portrait and landscape Playwright
-Chromium/WebKit emulation satisfy device acceptance under AGENTS.md. Describe
-emulation accurately and retain any real platform failure.
+## Planning provenance
 
-## Estimate and handoff
+The initial selection reviewed all 50 open issues regardless of readiness label,
+all two open PRs, assignments, body/native prerequisites and published branches.
+#316 was bounded, unowned and unblocked; high-leverage foundations were assigned
+elsewhere and several smaller reports already had fixes. No readiness labels
+were changed. [The original planning snapshot](https://github.com/luminari-gurus/tactics-guru-v2/blob/1a02557e76041e307ddf172d39ddc3e477ac967d/docs/ongoing-projects/plan.md)
+retains the full inventory and rationale. PR #314's merged contact fix is an
+ancestor of the base; it is not reopened by this work.
 
-### Implementation progress — 2026-11-09
-
-- The caller explicitly authorized implementation, autonomous fixes, commits,
-  pushes, incremental PRs and OpenSpec. The OpenSpec change is valid with
-  `skip_specs: true` (test refactor; no product requirements changed).
-- Baseline workflow source `d687e6d` is published. Live run
-  [42670137498](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42670137498)
-  checks out exact `1a02557` on VM-02 and measures the original seed-68 desktop
-  Chromium/WebKit journey. Preserve its actual result; no broad capture was
-  started and no app/test timeout was increased.
-- `selectMageJourney` searches at most 16 candidates, records exclusions and
-  checks the actual earned/replayed terminal witness. Default first qualifying
-  seed remains 68; 78 is a second qualifying candidate in the measured interval.
-  One-time simulation of all 16 candidates took ~13.7 seconds locally; default
-  selection plus retained unit replay took ~4.3 seconds. No browser speedup is
-  claimed. Failure-path tests inject synthetic results only at this helper's
-  small test seam; production/browser selection uses actual simulation.
-- Two focused production cases now stage validated level/position boundaries
-  and enact Snare/multiple missiles through the real HUD, checking exact
-  effects/replay and active reload with unchanged save bytes. Their browser
-  qualification is pending. All old extended assertions and the original
-  low-HP continuation fixture remain intact.
-- Exact discovery comparison adds six staged cases to each engine's production
-  matrix and removes/changes none. Each extended configuration remains nine;
-  ordinary PR selection remains seven. Affected iteration units passed 72/72;
-  both type scopes and direct local bundle pass after fixing a staging-helper
-  type inference error. Final current-source standard/browser checks are still
-  required. See [QA record](../qa/issue-316/README.md) for identities and limits.
-- Published implementation `5e3df8b` as draft PR
-  [#357](https://github.com/luminari-gurus/tactics-guru-v2/pull/357), labeled
-  enhancement/risk:medium. Its ordinary PR verification passed 1,245 units, two
-  build integrations, both types, bundle and seven core journeys in 204.9 s.
-  Actual synthetic merge tree was verified equal to the published source tree.
-- Baseline run 42670137498 is complete: both exact-base desktop cases passed,
-  Chromium 438.973 s and WebKit 211.504 s on VM-02, with zero retries/skips.
-  Portable source/full result receipts are in `docs/qa/issue-316/baseline/`.
-- Broader selection contracts exposed two pre-existing unregistered reduction
-  tags on literal main. A separate repair PR
-  [#358](https://github.com/luminari-gurus/tactics-guru-v2/pull/358) restores two
-  mobile executions and makes the radial dock's original desktop viewport
-  explicit at 1280×720. One checked fixed-viewport equivalence extends the exact
-  count from 23 to 24; assertions, filter mechanics and deadlines remain. It has
-  bug/risk:medium labels; all six local selection contracts and all six explicit
-  browser-control cases pass. The Mage
-  branch incorporates the repair and #357 stacks above #358; qualified layout
-  and Linux shell-contract execution remains pending.
-- GitHub rejected several qualification/PR attempts with an Internal server
-  error before creating any job. Preserve those zero-test attempts; one ordinary
-  PR retry succeeded. Mage dedicated browser qualification has not yet run.
-- Next: qualify the separate selection repair and the complete current-source
-  focused/extended Mage matrix on the qualified runner; retain all failures and
-  source identities, update OpenSpec/evidence and mark both PRs ready only after
-  their gates pass. No merge, release tag or deployment is part of this work.
-- Local production-browser iteration exposed a mismatch in the new missile
-  fixture's expected command shape: the HUD uses a single-target command and
-  expands it into two missiles. The fixture now uses that actual command form;
-  exact event/state assertions remain. Both focused cases pass locally on
-  desktop Chromium/WebKit (4/4), with red/green receipts retained. A temporary
-  preview-command/cwd override bypassed the missing local npm command without
-  changing shipped configs. Qualified Linux/mobile acceptance remains required.
-- Cancel obsolete `904e82b` browser/duplicate PR runs after this demonstrated
-  fixture correction, preserving their incomplete state, then qualify the new
-  head. Retry #358's zero-job service failures on the same handles now that
-  GitHub is admitting jobs again. Do not relabel those failures as product tests.
-- Prerequisite **PR #358 is ready for review**. Qualified run 42675291510 passed
-  all 31 batch/selection contracts and six real browser-control executions.
-  Its ordinary PR run 42675302736 passed 1,244 units, both types, two build
-  integrations, bundle and seven core journeys in 245.8 s. Synthetic merge tree
-  equals implementation `8c199ba`; the later `36c2f26` commit adds only receipts.
-  The Mage branch incorporates that handoff without changing relevant inputs.
-- Current Mage qualification **42675462523** is live on tested implementation
-  `bcc523c`: selection contracts, focused Chromium/WebKit and the retained
-  picker steps succeeded, and full earned progression is running. The wrapper's
-  final JSON/skip/retry counts still need inspection before checking those
-  OpenSpec tasks complete. Watch the existing run rather than restarting it;
-  the local watcher is session 40420 and writes `tmp/issue316-mage-watch.log`.
-- Final ordinary Mage PR run **42675477861** tests the same implementation.
-  Verify its terminal result and source tree, then retain both that receipt and
-  the complete Mage matrix in the QA record. Only after every acceptance gate
-  passes should #357 become ready and use `Closes #316`.
-
-Estimated time **for me: 2–3 hours** of elapsed implementation and affected
-verification after work begins, excluding self-hosted runner queue time:
-
-- 20–30 minutes: baseline/assertion mapping and selector qualification design.
-- 40–60 minutes: bounded helper and focused unit/browser changes.
-- 60–90 minutes: serial engine/profile qualification, fixes, receipts and PR.
-
-The main uncertainty is extended-journey/browser time and whether the candidate
-range supplies a qualifying witness cheaply. If measurement exposes a real
-problem, update the plan and report it without changing gameplay, deadlines or
-acceptance. The historical seed-68 acceptance remains attached to its original
-source and is not claimed as a fresh run here.
-
-Planning validation includes source/config/path inspection, identical archived
-Git content and Git whitespace/link checks. Discovery initially rejected the
-anchored `^Mage legal progression` filter because Playwright matches the full
-title path; the commands above use the corrected unanchored filter. No
-application build, feature test or browser acceptance is claimed for this
-documentation-only handoff.
-
-Planning publication checks:
-
-- Corrected Mage extended discovery passes: **3 Chromium + 3 WebKit** cases.
-- Existing focused production `Mage` discovery passes: **6 Chromium + 6 WebKit**
-  cases; existing `Mage real` picker discovery passes: **6 Chromium** cases.
-- Ordinary PR selection remains **7** journeys; the unfiltered Chromium extended
-  configuration still discovers all **9** Mage/Ranger/Fighter cases.
-- All local plan links/paths resolve, the archived plan has identical Git content
-  and `git diff --check` passes.
-- GitHub `createLinkedBranch` created this branch at the recorded base. A fresh
-  issue readback confirms the native Development association with #316, and the
-  local tracking branch uses that exact remote ref. The plan commit is pushed
-  to this branch as the final handoff step; final SHA/parity is reported in chat
-  and the pickup comment, avoiding a self-referential commit hash in this file.
+Initial implementation/verification estimate was **2–3 hours**, excluding runner
+queue time. Code work is complete; the remaining work is current-source browser
+qualification and the final review handoff. Do not trade acceptance for a nicer
+time estimate or call a selected seed a gameplay fix.

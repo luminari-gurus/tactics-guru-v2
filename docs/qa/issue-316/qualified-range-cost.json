@@ -1,0 +1,115 @@
+{
+  "source": "9826fc48f9c2e8a7397c5cd848d080adc6cee4f0",
+  "node": "v24.22.1",
+  "platform": "win32",
+  "method": "Each candidate 64–79 fully qualified through selectMageJourney([seed,seed]); only explicit ordinary nonqualification is classified, unexpected errors fail",
+  "totalMs": 16006.428100000005,
+  "rows": [
+    {
+      "seed": 64,
+      "outcome": "nonqualifying",
+      "durationMs": 1079.7828,
+      "detail": "No qualifying Mage journey in 64–64: 64: earned level three, Frost Snare, multiple missiles"
+    },
+    {
+      "seed": 65,
+      "outcome": "nonqualifying",
+      "durationMs": 868.5038,
+      "detail": "No qualifying Mage journey in 65–65: 65: earned level three, Frost Snare, multiple missiles"
+    },
+    {
+      "seed": 66,
+      "outcome": "nonqualifying",
+      "durationMs": 658.8121000000001,
+      "detail": "No qualifying Mage journey in 66–66: 66: earned level three, Frost Snare, multiple missiles"
+    },
+    {
+      "seed": 67,
+      "outcome": "nonqualifying",
+      "durationMs": 735.8013000000001,
+      "detail": "No qualifying Mage journey in 67–67: 67: earned level three, Frost Snare, multiple missiles"
+    },
+    {
+      "seed": 68,
+      "outcome": "qualifies",
+      "durationMs": 1661.545,
+      "attempts": [
+        {
+          "seed": 68,
+          "missing": []
+        }
+      ]
+    },
+    {
+      "seed": 69,
+      "outcome": "nonqualifying",
+      "durationMs": 1584.6014000000005,
+      "detail": "No qualifying Mage journey in 69–69: 69: earned level three, Frost Snare, multiple missiles"
+    },
+    {
+      "seed": 70,
+      "outcome": "nonqualifying",
+      "durationMs": 1892.9229000000005,
+      "detail": "No qualifying Mage journey in 70–70: 70: earned level three, Frost Snare, multiple missiles"
+    },
+    {
+      "seed": 71,
+      "outcome": "nonqualifying",
+      "durationMs": 720.7975000000006,
+      "detail": "No qualifying Mage journey in 71–71: 71: earned level three, Frost Snare, multiple missiles"
+    },
+    {
+      "seed": 72,
+      "outcome": "nonqualifying",
+      "durationMs": 895.5541000000012,
+      "detail": "No qualifying Mage journey in 72–72: 72: earned level three, Frost Snare, multiple missiles"
+    },
+    {
+      "seed": 73,
+      "outcome": "nonqualifying",
+      "durationMs": 863.6093999999994,
+      "detail": "No qualifying Mage journey in 73–73: 73: earned level three, Frost Snare, multiple missiles"
+    },
+    {
+      "seed": 74,
+      "outcome": "nonqualifying",
+      "durationMs": 849.8752999999997,
+      "detail": "No qualifying Mage journey in 74–74: 74: earned level three, Frost Snare, multiple missiles"
+    },
+    {
+      "seed": 75,
+      "outcome": "nonqualifying",
+      "durationMs": 614.2989000000016,
+      "detail": "No qualifying Mage journey in 75–75: 75: earned level three, Frost Snare, multiple missiles"
+    },
+    {
+      "seed": 76,
+      "outcome": "nonqualifying",
+      "durationMs": 469.4988000000012,
+      "detail": "No qualifying Mage journey in 76–76: 76: earned level three, Frost Snare, multiple missiles"
+    },
+    {
+      "seed": 77,
+      "outcome": "nonqualifying",
+      "durationMs": 854.0475000000006,
+      "detail": "No qualifying Mage journey in 77–77: 77: earned level three, Frost Snare, multiple missiles"
+    },
+    {
+      "seed": 78,
+      "outcome": "qualifies",
+      "durationMs": 1384.3022999999994,
+      "attempts": [
+        {
+          "seed": 78,
+          "missing": []
+        }
+      ]
+    },
+    {
+      "seed": 79,
+      "outcome": "nonqualifying",
+      "durationMs": 872.4750000000004,
+      "detail": "No qualifying Mage journey in 79–79: 79: earned level three, Frost Snare, multiple missiles"
+    }
+  ]
+}

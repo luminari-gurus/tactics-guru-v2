@@ -1,0 +1,102 @@
+{
+  "run": 42675477861,
+  "testedHead": "bcc523cc2dc0d9f1e8660be880ac156964ddd90e",
+  "actualSource": "a0a0964e8fb936f8718f2f83a39740417e794154",
+  "tree": "ee1f37434749297c2b970ec5951bff9540069b19",
+  "dirty": "",
+  "node": "v24.22.1",
+  "durationMs": 276174,
+  "units": {
+    "total": 1245,
+    "passed": 1245,
+    "failed": 0
+  },
+  "buildIntegrations": {
+    "total": 2,
+    "passed": 2
+  },
+  "coreJourneys": {
+    "startTime": "2026-11-09T18:44:11.052Z",
+    "duration": 170158.36000000002,
+    "expected": 7,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "stages": [
+    {
+      "id": "tooling",
+      "status": "passed",
+      "durationMs": 8416.681997,
+      "command": [
+        "npm",
+        "exec",
+        "--no",
+        "--",
+        "node",
+        "--test",
+        "tests/tooling/verify-pr.test.mjs",
+        "tests/tooling/verify-full.test.mjs"
+      ]
+    },
+    {
+      "id": "units",
+      "status": "passed",
+      "durationMs": 83214.464836,
+      "command": [
+        "npm",
+        "run",
+        "test:unit",
+        "--",
+        "--reporter=json",
+        "--outputFile=/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/pr/1794249745076-1198501/units.json"
+      ]
+    },
+    {
+      "id": "typecheck",
+      "status": "passed",
+      "durationMs": 1988.8454679999995,
+      "command": [
+        "npm",
+        "run",
+        "typecheck"
+      ]
+    },
+    {
+      "id": "build-integration",
+      "status": "passed",
+      "durationMs": 10113.432352999997,
+      "command": [
+        "npm",
+        "run",
+        "test:build",
+        "--",
+        "--reporter=json",
+        "--outputFile=/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/pr/1794249745076-1198501/build-integration.json"
+      ]
+    },
+    {
+      "id": "bundle",
+      "status": "passed",
+      "durationMs": 1284.4095500000112,
+      "command": [
+        "npm",
+        "run",
+        "build:bundle"
+      ]
+    },
+    {
+      "id": "journeys",
+      "status": "passed",
+      "durationMs": 171130.99245699996,
+      "command": [
+        "npm",
+        "test",
+        "--",
+        "--reporter=line,json",
+        "--output=/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/pr/1794249745076-1198501/artifacts"
+      ]
+    }
+  ],
+  "fullReceipt": "pr-bcc523c-full-summary.json.gz"
+}
