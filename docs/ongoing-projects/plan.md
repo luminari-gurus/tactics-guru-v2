@@ -1,150 +1,257 @@
-# Issue #297 — Keep proof diagnostics out of gameplay
+# Issue #284 — Desktop keyboard shortcuts
 
-Planning date: 2026-11-07 (Asia/Jerusalem). [Issue #297](https://github.com/luminari-gurus/tactics-guru-v2/issues/297), assigned to `@moshehbenavraham`. Base: `origin/main` at `4148eb1043163587de30eb1243d4eee717b248bf`. Work branch: `branch/issue-297-hide-gameplay-diagnostics`.
+Planning date: 2026-11-09 (Asia/Jerusalem).
+Issue: [#284](https://github.com/luminari-gurus/tactics-guru-v2/issues/284).
+Owner: @moshehbenavraham, verified from the authenticated GitHub identity and assigned on the issue.
+Base: `origin/main` at `130c5ccffc491f893da8e598b8c008898fa92138`.
+Branch: [`branch/issue-284-desktop-shortcuts`](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-284-desktop-shortcuts).
+Status: planning handoff only; application code and tests have not been implemented.
+The previous plan is preserved unchanged in [the #297 plan](issue-297-hide-gameplay-diagnostics-plan.md).
 
-Status: implementation and affected qualification are complete; [PR #338](https://github.com/luminari-gurus/tactics-guru-v2/pull/338) is the review handoff, labeled `bug` and `risk:medium`. The caller authorized implementation on 2026-11-07. [OpenSpec tasks](../../openspec/changes/issue-297-hide-gameplay-diagnostics/tasks.md) track the delivered scope; do not archive or merge without the subsequent review workflow. The previous #172 plan is preserved in [issue-172-combat-consumables-revival-plan.md](issue-172-combat-consumables-revival-plan.md).
+## Why this item
 
-## Selection and readiness
+Reviewed the complete accessible backlog: **51 open issues**, including bodies, labels,
+assignees and relevant discussions; **3 open PRs**; the current remote branches; and
+merged work on current main. GitHub returned `totalCount: 51` and
+`hasNextPage: false`. Native blocked-by and linked-branch relationships were empty
+for these issues, so body-level prerequisites and active work were also considered.
+The exact `ready for work` label was a signal, not an eligibility restriction.
+No backlog labels or other people's assignments were changed.
 
-Reviewed all **59 open issues**, including bodies, labels and assignees, the relevant discussions, all **four open PRs**, 48 remote branches, current main and existing planning artifacts. GitHub's issue connection reports `totalCount: 59`, `hasNextPage: false`. Native blocked-by and linked-branch relationships were checked for all 59; they are empty, so body-level dependencies and active branch/PR evidence still govern eligibility. The authenticated login is `moshehbenavraham`, independently verified through the connector and GitHub API.
+#284 is the strongest bounded implementation choice: it improves ordinary player
+interaction, has concrete observable acceptance criteria, uses a shipped shared
+action/ability model, has no outstanding prerequisite, and has no active branch/PR.
+It is more actionable than an unresolved mechanics/UX decision and more directly
+player-facing than the next test-fixture refactor. This is a judgment of current
+impact, certainty and delivery size, not a claim that every unchosen issue is blocked.
 
-GitHub Project draft items could not be inspected: the available credential lacks `read:project`, and the connector has no Projects capability. This selection covers the accessible issue backlog and repository work; it does not claim an audit of inaccessible draft cards.
+Backlog accounting, with each of the 51 issues represented once:
 
-Choose #297 because its later [dungeon report](https://github.com/luminari-gurus/tactics-guru-v2/issues/297#issuecomment-6667078355) identifies persistent production-facing controls as well as a first-load flash. Both have concrete source causes, no prerequisite or product decision is outstanding, and no existing PR/branch covers the fix. It repairs shared player-facing startup and a repeatable dungeon UI leak with a small change. No evidenced unclaimed foundation issue currently unlocks more immediately actionable downstream work: #161's remaining mechanics are assigned elsewhere, #170 requires separate biome-pack issues, and #174 still needs reward/economy decisions.
+- **Selected:** #284.
+- **Already assigned to another owner:** #85, #128, #161, #162, #184, #200,
+  #208, #219, #254, #258, #306. Some are acceptance trackers with substantial
+  merged implementation; their remaining criteria and existing owners are retained.
+- **Existing branch/PR coverage:** #296 and #307 have matching remote fix branches;
+  #312 is covered by active [PR #355](https://github.com/luminari-gurus/tactics-guru-v2/pull/355).
+  The other open PRs are deployment draft #12 and design draft #237.
+- **Other concrete candidates:** #298 (recovery layout), #316 (Mage fixture
+  resilience). #316 is the strongest verification-reliability follow-up, but its
+  bounded seed search and ten-minute complete journey have more uncertainty.
+- **Need current symptom/intent attribution before prescribing a fix:** #291,
+  #292, #302, #303, #304, #318. Testing routes intentionally do not persist;
+  #302 has a later marker-association report beyond the removed list; #304's
+  requested item name is already present in current dungeon confirmation code.
+  #318 still needs basic-attack versus Guarded Strike attribution.
+- **Product decisions, scope decomposition or remaining mechanics/consumer
+  contracts:** #167, #168, #169, #170, #171, #173, #174, #175, #176, #178,
+  #179, #180, #181, #182, #185, #199, #261, #262, #270, #287, #299, #301,
+  #308, #311, #313, #320, #323. These vary in readiness; for example, #170 is an
+  epic requiring biome issues, while #176/#270 need aligned record/counter and
+  terminal-boundary decisions. They are not excluded merely by parent references.
+- **Investigation already has a separate branch and needs recurrence/root-cause
+  evidence:** #268.
 
-The readiness pass considered unlabeled work equally. Added and read back the exact `ready for work` label on [#316](https://github.com/luminari-gurus/tactics-guru-v2/issues/316): its prerequisite #314 is merged, the current Mage helper still uses the seed-68 witness, and the issue defines bounded fixture/replay/progression and timing acceptance. #327's XP-picker reduction is already merged and does not complete that journey-resilience work. #316 remains unassigned and is the strongest follow-up for verification reliability; #297 has the clearer immediate player impact and smaller implementation uncertainty.
+GitHub Projects draft cards could not be audited: the credential returned
+`INSUFFICIENT_SCOPES` for `projectsV2`, requiring `read:project`. Available
+connector tools do not expose Projects. This selection covers all accessible
+repository issues and work, without claiming inaccessible draft cards were checked.
 
-Backlog accounting at selection, covering each open issue once:
+## Outcome and non-goals
 
-- Selected: #297.
-- Other bounded UX candidates: #284, #293, #294, #296, #307, #309, #311, #312. Some need confirmation of existing intended UI behavior; #309 is especially small but has less impact than the confirmed diagnostic leak.
-- Newly ready: #316.
-- Investigations needing cause/reproduction evidence: #257, #258, #268, #303, #306, #318, #322. In particular, `combatStats()` subtracts Weakened once; Guarded Strike adds its separate attack penalty, so #318's apparent double penalty is not yet a confirmed rules defect. Stair generation already excludes the entry/exit cells; #322 needs its actual arrival trigger identified before prescribing a placement fix.
-- Product decisions, epic decomposition, or remaining prerequisite/consumer contracts: #167, #168, #169, #170, #171, #173, #174, #175, #176, #178, #179, #180, #181, #182, #185, #199, #261, #262, #270, #287, #299, #301, #308, #313, #320, #323. Existing readiness labels do not remove those scope/dependency checks. Do not treat the parent references themselves as blockers.
-- Already assigned to another owner or active work: #85, #128, #161, #162, #184, #200, #208, #219, #254. Retain their assignments and acceptance records; an open tracker can represent remaining acceptance after substantial merged implementation.
-- Active fix PRs: #295 → #337; #324 → #334. Do not duplicate them. The other open PRs are design draft #237 and the separately gated SSH alternative #12.
-- Open reports whose corresponding fixes are already on main: #291 → #330, #292 → #333, #298 → #336, #302 → #331, #304 → #335. Leave issue closure and any remaining acceptance to those deliveries.
+**Outcome:** common battle actions have discoverable, context-safe desktop
+shortcuts. Action/ability selection remains a preview; only explicit confirmation
+or the existing immediate Wait action can commit. Both selectable control skins
+retain their existing interaction model. Standalone, run-hosted and dungeon-hosted
+battles use the same implementation.
 
-## Outcome
+**Non-goals:** rebinding/preferences, a global input framework, new exploration or
+menu shortcuts, new combat actions, ability-picker redesign, gameplay/balance,
+RNG, save-format or telemetry changes. Existing arrow/WASD exploration controls,
+Tab navigation, native activation and pointer/touch gestures remain in use.
+No deployment or merge is part of this handoff.
 
-Player-facing production routes show only a neutral loading/error state during boot and their proper gameplay UI after initialization. Proof-scene restart wording, fixture buttons, tree-opacity controls, diagnostic movement/audio controls, measurement panels and diagnostic landmark names never appear during ordinary menu, battle, run or dungeon use, including a cold load and dungeon battle re-entry.
+## Source findings and dependencies
 
-Keep intentional diagnostic entry points (`?scene=proof` and `?scene=content-smoke`) functional for existing QA and performance tools. These are explicitly selected test scenes, distinct from controls leaking into gameplay. Preserve the route resolver's first-scene-value and `/qbert` behavior. Preserve player restart/new-game, recovery, battle sound, privacy, targeting and accessibility controls.
+- [BattleScene](../../src/phaser/BattleScene.ts) owns the live session, readiness,
+  input locks, shared action callbacks, canvas Arrow/Enter/Space selection,
+  document Escape cancellation, skin changes and shutdown cleanup.
+- [BattleHud](../../src/ui/hud.ts) renders availability, the native learned-ability
+  picker, Confirm/Cancel and immediate Wait. Dynamic renders rewrite several
+  labels, so shortcut hints must survive those updates and layout changes.
+- [BattleSelection](../../src/ui/battleSelection.ts) already owns action/target
+  previews and plans. [battleActions](../../src/ui/battleActions.ts) provides
+  deterministically ordered owned abilities; there is no need for another list
+  or another legality evaluator.
+- [BattleRadial](../../src/ui/battleRadial.ts) has real disabled buttons, target-first
+  previews, a special submenu and tap/hold state. Letter/number selection must not
+  call its commit methods or simulate a held pointer release.
+- [BattleDialogs](../../src/ui/dialogs.ts) owns modal focus and native cancellation.
+  Shortcuts yield while a dialog is open and never activate recovery/reset choices.
+- #162 remains assigned to its owner for its broader acceptance; the shipped
+  picker and Fighter/Ranger/Mage consumers already provide the integration needed
+  here. Completing #162 is not a prerequisite for these shortcuts. This task does
+  not claim to close that tracker.
+- PR #355 edits some of the same shared files. Check its status and relevant diff
+  before implementation/rebase; retain its turn/presentation locks and tests.
 
-## Findings on the planning base, now repaired
+## Selected keyboard contract
 
-- [index.html](../../index.html) renders `#fit-panel` with the label `Proof scene diagnostics`, a visible `Restart proof scene` button, open Board controls and Measurements before any module has loaded. CSS is imported by route modules, so late hiding cannot prevent the initial HTML exposure.
-- [mountBattleLayout()](../../src/ui/battleLayout.ts) moves every existing panel child under `#battle-scroll`. [startDungeonApp.ts](../../src/app/startDungeonApp.ts) calls it before battle entry, then tries `#fit-panel > details` when starting a battle. Those details are no longer direct children, so they remain visible. The dungeon owner also never replaces the diagnostic panel label.
-- [startBattleApp.ts](../../src/app/startBattleApp.ts) and [startRunApp.ts](../../src/app/startRunApp.ts) hide direct-child details before reparenting and set player-facing labels. They must still work after changing the default HTML visibility. [main.ts](../../src/main.ts) reports application-import failure through `#fit-status`; hiding that live status with the diagnostic UI would break recovery.
-- Main menu and map entry replace/hide the shell after loading. Explicit proof/content-smoke scenes, [FitScene.ts](../../src/phaser/FitScene.ts), `window.fitDiagnostics`, layout/boot tests and performance collection consume the existing diagnostic IDs. Preserve those contracts rather than deleting the diagnostic subsystem.
+- **M:** select Move.
+- **A:** select Basic attack.
+- **S:** select the currently chosen learned ability; do not cast it.
+- **1–9:** select the corresponding learned ability in the existing ordered owned
+  list. Show that order and each binding in help/picker hints. Do not renumber by
+  target legality, hard-code hero names or expose unlearned abilities. Further
+  abilities remain reachable through the native picker; current heroes fit the keys.
+- **W:** invoke the existing enabled Wait / End turn control, once, immediately.
+- **C:** confirm the currently valid reviewed action through the existing confirm
+  path. Without a valid preview, do nothing.
+- **Escape:** retain existing cancel/clear and modal behavior.
+- **Arrow keys and Enter/Space:** retain board cursor/selection and native control
+  activation. C is deliberately separate because Enter already selects a board
+  cell and activates focused buttons/selects.
 
-## Non-goals
+For the rail, reuse the same action/picker and confirm callbacks as the visible
+controls, including disabled-action checks. For the radial skin, preserve its
+**target-first** model: use the current selected/cursor cell, open its existing
+menu in tap mode as needed, and aim/focus the matching enabled slice or learned
+special while showing its existing preview. M/A/S/numbers do not commit; C (or
+native Enter/Space on the focused button) activates that reviewed enabled control.
+Opening a multi-ability submenu is not casting. Map numbers to canonical owned
+IDs; an unavailable or absent target-specific special must never select another
+ability. Retain follow-up targeting and plan confirmation semantics.
 
-No combat, balance, seed, RNG, movement, save-format, telemetry-schema or routing-policy changes. No HUD redesign, broad scroll fix, removal of the Discovered places list (#309), general debug framework, new dependency, new configuration switch or new verification infrastructure. Do not close #308's separate scroll report merely because removing these controls may help it. Keep #295/#324 layout/camera work separate.
+Accept shortcuts only for the active, ready, visible battle in player phase.
+Ignore already handled events, IME composition, repeat keydowns and Ctrl/Alt/Meta/
+Shift combinations. Do not intercept input, textarea, select, contenteditable or
+textbox editing, including descendants. Guard modal/hidden/inactive state before
+reading an action; do not suppress ordinary browser keys for a rejected shortcut.
+Remove the scene's listener on shutdown so restart, scene replacement and return
+from a dungeon battle cannot accumulate handlers.
 
-## Files and implementation
+Provide compact per-control hints (tooltips and `aria-keyshortcuts` where valid),
+plus a native keyboard-accessible **Keyboard shortcuts** disclosure with the full
+map and context rules. Hints must reflect active skin/ability ordering and remain
+readable on narrow screens. Reuse the existing HUD tool area and modal owner;
+a new help service or persistent setting is unnecessary.
 
-Use one focused implementation PR. Per the caller's explicit continuation request, use the repository's OpenSpec workflow with a compact proposal, startup spec, design and tracked tasks. The original implementation scope stays unchanged.
+## Implementation and files
 
-1. **Default HTML to the player-facing state.** In `index.html`, retain a visible generic live loading/error status and stable shared gameplay nodes. Mark proof-only sections hidden in the markup, including before JavaScript or styles arrive, and use neutral initial landmark/restart wording. Keep visibility rules effective after layout reparenting. Do not hide the only error announcement or depend solely on post-load CSS.
-2. **Reveal diagnostics deliberately.** In `src/app/startBattleApp.ts`, reveal the existing proof controls and diagnostic wording only for the explicit proof scene; preserve content-smoke's restricted status output. Keep normal standalone and Q*bert gameplay controls correctly named and available. Reuse the existing scene decision and element IDs.
-3. **Keep gameplay owners consistent.** In `src/app/startDungeonApp.ts`, set the dungeon's player-facing panel name and use stable IDs or a scoped marker for diagnostic visibility, independent of direct-child topology. Verify subsequent battle starts after `mountBattleLayout()` cannot reveal the controls. Inspect `src/app/startRunApp.ts` and `src/ui/battleLayout.ts` as consumers; edit them only if the default visibility change needs corresponding initialization. Prefer static defaults plus the existing owner paths over another global state manager.
-4. **Add only missing behavioral proof.** Extend existing `tests/main-menu.spec.ts`, `tests/boot.spec.ts` and `tests/dungeon.spec.ts` as appropriate for the pre-module shell and dungeon re-entry regression. Reuse existing helpers and legal gameplay journeys. Retain proof-scene layout/boot and content-smoke checks. Update the existing startup/QA documentation only where it describes changed behavior; record final exact-source evidence with the implementation.
+Deliver one focused implementation PR for #284; do not bundle other QA issues.
+All six acceptance bullets belong to this increment. Use `Closes #284` only after
+all are verified; otherwise use `Refs #284` and record the exact remaining gates.
 
-Likely production edits are `index.html`, `src/app/startBattleApp.ts` and `src/app/startDungeonApp.ts`. Additional initialization, CSS or test/config edits require the traced consumer above, not cleanup preference.
+1. **Bind the existing actions safely.** Update
+   [BattleScene](../../src/phaser/BattleScene.ts) and
+   [BattleHud](../../src/ui/hud.ts). Give pointer controls and shortcuts the same
+   bounded callbacks and availability checks. Keep one scene-owned listener;
+   extend the existing Escape handling rather than installing competing handlers.
+   Reuse the same fixed key descriptions for dispatch and displayed hints.
+2. **Cover both skins.** Add only the bounded keyboard aim/focus/submenu entry
+   methods needed in [BattleRadial](../../src/ui/battleRadial.ts). Reuse current
+   previews, disabled controls and activation. Do not add a second selection or
+   legality model; change shared selection/actions only if a demonstrated consumer
+   gap requires it. Skin switching clears stale keyboard review consistently.
+3. **Make bindings discoverable.** Add HUD hints/disclosure and only necessary
+   spacing in [style.css](../../src/style.css). Update the existing player-control
+   instructions in [README](../../README.md). Keep action labels/accessibility
+   names and modal focus coherent through rerenders and scene disposal.
+4. **Prove the actual interactions.** Extend existing
+   [battle-loop tests](../../tests/battle-loop.spec.ts),
+   [ability-picker tests](../../tests/ability-picker.spec.ts) and
+   [radial tests](../../tests/battle-radial.spec.ts). Reuse their legal battle
+   policy, real ability fixtures and snapshots. Prefix new relevant production
+   test titles with `keyboard-only shortcuts` so the existing WebKit acceptance
+   grep includes them; confirm that by discovery. Extend existing unit tests
+   only if shared pure selection/action behavior changes.
 
-## Proof and acceptance gates
+## Proof mapped to acceptance
 
-- **Before scripts/styles and while imports are delayed:** inspect the served initial shell and a controlled delayed-module navigation to `/`, saved menu modes, `/battle`, `/run` and `/dungeon`. A visible generic status is allowed; every listed diagnostic control and diagnostic landmark is absent from the visible/accessibility UI. Repeat the affected cold-start case with mobile emulation and capture a screenshot.
-- **Actual gameplay:** start a saved dungeon from the menu, enter a battle, make a legal reviewed action, finish the encounter through the existing journey and enter another battle. Assert the diagnostic controls stay hidden after reparenting/re-entry, panel naming is correct, and gameplay action, sound, restart and recovery controls remain usable. Cover desktop keyboard plus native touch portrait/landscape, including the ordinary run/standalone consumers. Reuse existing complete legal battle/run/dungeon tests rather than introducing a new simulated gameplay engine.
-- **Recovery:** the existing missing-engine-chunk cases still show a visible recoverable alert with reload guidance. Also cover route-module failure if a changed visibility boundary affects `main.ts`'s catch. Delayed/failed startup must not expose proof controls or leave a blank screen.
-- **Diagnostics remain intentional:** `?scene=proof` still exposes working fixtures, movement, sound and measurements; `?scene=content-smoke` retains its status/content/failure behavior. Preserve repeated `scene` parameter precedence and Q*bert semantics. Explicit diagnostics remain testable in production preview and development.
-- **Regression scope:** both TypeScript scopes, production build/content validation and root/prefix build integrations are required because the shared HTML/bootstrap changes. Run ordinary `verify:pr`, then only additional affected startup/layout/run/dungeon/proof cases and the relevant WebKit consumers. This plan does not require a full regression or performance recapture unless implementation reveals a broader behavioral or loading-budget change.
+- **Bindings and UI equivalence:** M/A/S/numbers select the same available action
+  as controls; targeting, C, Escape and W follow a legal move/attack/Wait sequence.
+  Assert selection/preview changes leave authoritative state, RNG, command count
+  and saves unchanged; accepted confirmation advances exactly once. Complete the
+  existing legal battle/replay journey and cover shared run/dungeon consumers.
+- **Hints/discovery:** keyboard-only access to the full map; correct accessible
+  hints after actor changes, earned unlocks, skin switch and restart. Check desktop
+  and narrow portrait/landscape layout without obscuring action controls.
+- **Locks:** spent Move/Action, exhausted healing, unavailable targets, enemy turn,
+  animation, loading, terminal battle and repeated keydowns reject dispatch.
+  Hold W/C across actor/presentation transitions and prove no second command.
+- **Context:** text input, textarea, contenteditable, native select typeahead,
+  IME/modifiers, focused native buttons, inspection/log/help/recovery and restart
+  dialogs yield correctly. No handler remains on the menu or exploration map.
+- **Existing behavior:** preserve arrows, native Enter/Space, Tab/Shift+Tab and
+  Escape focus restoration; rail pointer/touch, radial tap/hold/cancel, plan/follow-up,
+  skin switching and repeated hosted encounter entry. Verify reload/resume does
+  not introduce duplicate listeners or accepted commands.
+- **Browser proof:** desktop keyboard coverage plus affected native-touch portrait/
+  landscape and WebKit cases. Browser/device emulation is sufficient under
+  [AGENTS.md](../../AGENTS.md); local `CAN_TEST_MOBILE` is `android`, which
+  declares access only. No physical-device testing is required or claimed.
 
-Commands to use during implementation, selecting exact test titles after discovery:
+Follow [verification policy](../verification-policy.md): focused iteration, then
+PR readiness for shared UI/input consumers. No full regression or new performance
+capture is required unless a discovered change demonstrates broader impact.
 
-```sh
-npm run typecheck
-npm run build
-npm run test:build
-npm run test:regression -- --list tests/main-menu.spec.ts tests/boot.spec.ts tests/dungeon.spec.ts tests/layout.spec.ts tests/content-loading.spec.ts
-npm run test:regression -- tests/main-menu.spec.ts tests/boot.spec.ts tests/dungeon.spec.ts tests/layout.spec.ts tests/content-loading.spec.ts --grep '<affected exact titles>'
-npm exec -- playwright test -c playwright.device-acceptance.config.ts --list
-npm exec -- playwright test -c playwright.exploration.config.ts --list
+Current command entry points (run sequentially for browser/server ownership):
+
+~~~sh
+npm run test:unit -- tests/unit/battleActions.test.ts tests/unit/battleSelection.test.ts tests/unit/combatControls.test.ts tests/unit/radialGesture.test.ts
+npm run test:regression -- tests/battle-loop.spec.ts tests/battle-radial.spec.ts tests/battle-board.spec.ts --grep 'keyboard-only|keyboard selection, confirmation lock|radial tap fallback|radial hub cancel|radial switching to rail' --list
+npm run test:fixtures -- tests/ability-picker.spec.ts --grep 'keyboard touch|real learned picker|keyboard-only shortcuts' --list
+npm exec -- playwright test -c playwright.device-acceptance.config.ts --grep 'keyboard-only|radial tap fallback|radial switching to rail' --list
 npm run verify:pr
+npm run test:regression -- tests/battle-loop.spec.ts tests/battle-radial.spec.ts tests/battle-board.spec.ts --grep 'keyboard-only|keyboard selection, confirmation lock|radial tap fallback|radial hub cancel|radial switching to rail'
+npm run test:fixtures -- tests/ability-picker.spec.ts --grep 'keyboard touch|real learned picker|keyboard-only shortcuts'
+npm exec -- playwright test -c playwright.device-acceptance.config.ts --grep 'keyboard-only|radial tap fallback|radial switching to rail'
 git diff --check
-```
+~~~
 
-Use discovery to confirm selected project/test IDs before each focused run. Existing WebKit acceptance selects main-menu/standalone/run checks; exploration config owns dungeon checks. Add bounded selected tests to those existing configs only if a new title would otherwise be omitted. Prefix preview needs its matching successful build and existing asset configuration. Retain failed/skipped/incomplete runs and exact commit/build, browser, OS, worker and retry identity under the [verification policy](../verification-policy.md); focused recovery does not erase an earlier failure.
-
-Browser/device emulation is sufficient under [AGENTS.md](../../AGENTS.md). Local `CAN_TEST_MOBILE` parses as `android`; no physical platform is required for this task and no hardware test is claimed. Browser CI uses the self-hosted runner with one worker and no automatic hosted fallback. The planning-only commit claimed no execution; actual qualification follows below.
+`verify:pr` includes all fast units/content, both TypeScript scopes, both build
+integrations, the production build and seven core journeys. Use that successful
+root build for preview suites; fixtures use their own dev server. After discovery,
+add only missing affected consumers (for example a new hosted-entry witness),
+and account for every criterion above. Tests outside the seven-journey core must
+use the explicit regression/fixture/WebKit commands. Keep workers:1 and current
+assertions/timeouts; browser CI uses self-hosted capacity without hosted fallback.
+Retain exact source/build/runtime/project identities and failures/incomplete runs.
+Do not claim focused reruns erase earlier failures.
 
 ## Ablation decisions
 
-- **Keep** HTML-level hiding: JavaScript-only cleanup leaves the reported cold-load flash possible.
-- **Keep** the visible generic status and explicit proof reveal: hiding the entire shell or deleting diagnostics breaks real error handling and existing QA consumers.
-- **Simplify** dungeon hiding to stable elements and player-facing naming: the current direct-child selector is invalid after the existing layout move. No new ownership/visibility framework is necessary.
-- **Keep** one pre-module witness and real repeated dungeon battle checks: a DOM/helper assertion after startup cannot prove no initial flash or later re-exposure.
-- **Drop** generalized feature flags, diagnostic service refactors, unrelated panel scrolling and broad full-matrix/performance repetition. No #297 requirement depends on them.
+- **Keep** centralized scene gating and cleanup: otherwise letters can dispatch
+  during typing, dialogs, presentation or a later scene, violating criteria 3–5.
+- **Simplify** to the existing HUD callbacks, owned-ability ordering and radial
+  preview/buttons: a parallel command or ability registry could diverge from UI
+  legality and learned state. A fixed shared key description is enough.
+- **Keep** a separate confirm key and explicit radial aiming: reusing global Enter
+  or clicking a radial slice while selecting would bypass selection/confirmation.
+- **Keep** both skins and shared hosted consumers: users can explicitly choose
+  either skin, and all three battle hosts instantiate the same scene.
+- **Keep** actual keyboard, native-select, touch and repeated-entry witnesses:
+  a key lookup unit test cannot prove default browser behavior or listener lifetime.
+- **Drop** configurable bindings, preference migrations, app-wide event buses,
+  new dependencies, exploration/menu key remapping and unrelated cleanup. None
+  supplies a #284 requirement. Reuse existing test files/configs rather than new
+  infrastructure or the full regression matrix by default.
 
-## Planning validation
+## Estimate and planning validation
 
-Local Markdown link/path validation passed for both plan files, and the archived #172 plan matches the previous committed content after line-ending normalization. `git diff --check` passed. Playwright discovery succeeded: the five named Chromium regression files select 215 cases, WebKit acceptance selects 204, and WebKit exploration selects 168. These are discovery counts, not executed browser results or a recommendation to run every selected case for this fix. The work branch was created from the recorded base and linked natively to #297 using GitHub's `createLinkedBranch` mutation.
+**My estimated implementation time: 3–5 hours of active agent work**, including
+about 1.5–2.5 hours for guarded action/radial wiring and hints, 1–1.5 hours for
+focused regression witnesses, and 0.5–1 hour for affected qualification and PR
+preparation. CI queueing, external runner outages and human review are additional.
+The main uncertainty is radial focus/confirmation and native key-event ordering;
+a source-attributed broader defect would require a revised estimate, not extra
+scope silently included here.
 
-## Implementation progress — 2026-11-07
-
-- The caller explicitly authorized implementation and requested OpenSpec. Change `issue-297-hide-gameplay-diagnostics` is valid under strict validation; its three tasks cover startup, repeated dungeon gameplay and integrated delivery.
-- Implemented native hidden defaults, neutral initial wording, explicit proof reveal, shared gameplay restart/caption reveal and dungeon panel naming. Removed the three obsolete direct-child diagnostic-hiding loops. No rules, saves, scene selection or dependencies changed.
-- New desktop regressions failed on the unchanged application: visible proof restart before modules and missing dungeon panel naming (`tmp/issue297-red.log`). The first fixed-build run retained two test-setup failures: the saved New Game seed was 29 instead of the unsaved witness's 28, and held stylesheets blocked the screenshot. The saved test now draws 27 to obtain playable seed 28 through the existing collision rule; styles are aborted while scripts are held. Neither repair changes gameplay or timeouts.
-- Root build passed both TypeScript scopes and 226 content checks. `tmp/issue297-focused-desktop.json` records **3/3 passes**, one worker, zero retries: delayed startup across nine routes, route-import recovery for all three game modes, and the saved legal three-battle/floor-travel journey. Battle screenshot visually reviewed: no proof tools overlap the playfield. Cross-device, explicit-proof and core qualification remain pending.
-- Local commands need the existing npm wrapper at `C:/Users/apexw/.codex/tmp/issue163-tools` on PATH. OpenSpec 1.14.1 is cached at `C:/Users/apexw/AppData/Local/npm-cache/_npx/c37562604d2d088d/node_modules/@fission-ai/openspec/bin/openspec.js`. Baseline content checks rewrote snapshot line endings; only those generated normalization changes were restored after confirming identical normalized content. Restore them again after later units if needed; never commit them.
-- Implementation source is committed and pushed as `ea70451`; [PR #338](https://github.com/luminari-gurus/tactics-guru-v2/pull/338) is open with `bug` and `risk:medium`, temporarily draft during qualification. Self-hosted [PR verification](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42319614188) passed for that commit.
-- Local `verify:pr` passed in 106.9 seconds: 1,233 units, both types, two build integrations and seven core journeys. Receipt: `verification-receipts/pr/1794012062004-16564/summary.json`. Two earlier command attempts remain failed: bundled Node was not discoverable by npm exec (fixed with an ignored local node shim), then LF-only workflow parsing saw autocrlf CRLF bytes (restored the four unchanged workflows to their committed LF bytes). These are environment corrections; no workflow or tooling assertion was changed.
-- Additional Chromium qualification passed **59/59**, no skips/retries: `tmp/issue297-ui-chromium.json`, with exact discovery in `tmp/issue297-ui-chromium-discovery.json`. It covers delayed startup, import/engine recovery, explicit proof fixture/opacity/move/audio/measurements, content smoke, shared HUD/run restart and Q*bert precedence on desktop and native-touch portrait/landscape. Three existing consumer cases gained explicit hidden-diagnostic/restart assertions. Application/build inputs remain those of `ea70451`; only these assertions and handoff artifacts differ. Mobile/WebKit repeated encounters, development and prefix preview remain pending.
-- Touch dungeon qualification retained one portrait pass and a landscape setup failure from reading the seed before New Game mounted the map. An explicit `#dungeon-map` visible wait fixes that setup race; the landscape case passed alone (`tmp/issue297-dungeon-landscape-recovery.json`). The saved legal commands, assertions and timeouts were retained; the successful portrait evidence is reused because its map was already ready at that same boundary.
-- WebKit's eight-case UI selection retained six passes and two timeouts in the delayed-startup screenshot harness (`tmp/issue297-ui-webkit.json`). All cold-shell assertions passed, but WebKit required navigation to settle for a screenshot. The harness now rejects the held modules after inspecting each shell, so no application code executes while screenshotting. Exact recovery passed both WebKit orientations (`tmp/issue297-startup-webkit-recovery.json`) and all three Chromium profiles (`tmp/issue297-startup-chromium-final.json`). No assertion or timeout was relaxed.
-- WebKit dungeon qualification passed **6/6** in six minutes, one worker and zero retries (`tmp/issue297-dungeon-webkit.json`): all desktop/portrait/landscape saved three-battle journeys and active resume checks. Both implementation tasks are complete; the final delivery checks are recorded next. Production source has not changed since `ea70451`. Current selection discovery is 1,126 broad Chromium cases, 208 WebKit acceptance cases and 171 WebKit exploration cases; these inventory counts are not executed full-matrix claims.
-
-## Final qualification and handoff
-
-All required runtime gates are covered. Final checks passed: both TypeScript scopes after the last test edits; explicit WebKit proof boot **1/1**; root development **8/8**; `/prototype/` production preview **4/4**, including native touch. The ordinary root build was restored successfully and its HTML SHA-256 again matches the earlier qualified root (`67cf434b62dfac1a75130936ebc065d079d468f7598f884555fd1a79c0309c6c`). All successful final selections have zero skips or retries. Earlier failed captures remain failed with their targeted recoveries recorded above.
-
-Environment: Windows x64 `10.0.26300`, Node `24.22.1`, Playwright `1.64.1`, Chromium `156.0.8078.4` revision 1248, WebKit `27.2` revision 2370; one browser worker. These are browser/device emulation results. No physical-device, full-regression or new performance-budget claim is made. Development Vite/Phaser warnings are retained in logs; no renderer or warning-suppression change was added.
-
-[Verification summary and exact selectors](../qa/issue-297/verification.json), [receipt manifest](../qa/issue-297/manifest.json) and compressed original reports under `docs/qa/issue-297/` preserve source/build inputs, successful selections, failed attempts and recovery. Desktop, touch portrait, WebKit landscape, explicit proof and cold-shell screenshots were visually reviewed; representative [desktop](../qa/issue-297/desktop.png), [touch portrait](../qa/issue-297/touch-portrait.png), [WebKit landscape](../qa/issue-297/webkit-landscape.png), [proof](../qa/issue-297/proof.png) and [cold shell](../qa/issue-297/cold-start.png) images are retained.
-
-Production, asset, dependency, build and browser configuration inputs still match `ea70451a3b13c495c6874a93ec62a42c14d64a85`. Subsequent changes add only explicit assertions in existing consumer cases, the two described test readiness/capture repairs, QA evidence, OpenSpec progress and documentation. Reuse follows that input comparison: unchanged core cases and units retain their passing source-bound results; changed harness cases have exact fresh recovery. The final PR checks provide current-head CI status. No acceptance item remains deferred.
-
-Completion audit: initial HTML and delayed/failed imports retain only player-facing status; repeated dungeon battles and resume keep diagnostics hidden and preserve controls; standalone/run/Q*bert and explicit proof/content-smoke consumers pass; root/prefix and development delivery pass; OpenSpec validates strictly; the published branch and issue remain linked. One focused PR completes #297. Leave review, merge, release tags and deployment to a subsequent instruction.
-
-## Estimate and delivery
-
-Estimated time for **me**: **2–3 hours** to implement the visibility/naming repair and focused regressions, plus **1–2 hours** for affected browser/build qualification, review and PR preparation: **3–5 hours total**, excluding runner queue/unavailability and unrelated pre-existing failures. This is an estimate, not execution evidence.
-
-The original planning delivery is complete at `be97c75`. Continue implementation on the same branch, keep this document and OpenSpec tasks current, commit and push coherent work, and open a focused labeled PR. Do not create a release tag or deploy for this UI repair.
-
-## Adversarial review and merge continuation — 2026-11-07
-
-The caller authorized independent adversarial review, repairs, local verification, merge and safe Git cleanup. The live PR base remains main at `4148eb1`; head `5e27e8a` is conflict-free. Existing review threads and submitted reviews are empty; the maintainer comment's CI follow-up is satisfied by successful run `42322069196`. Automated review summaries were not used as correctness evidence.
-
-**Finding:** [manual review 5809152891](https://github.com/luminari-gurus/tactics-guru-v2/pull/338#pullrequestreview-5809152891) reports invisible post-mount and preparation errors. Three browser probes on `5e27e8a` confirmed hidden `#fit-status` alerts for late run/dungeon module exceptions and the run's preparation-screen runtime error handler. Raw probes are retained in `tmp/issue297-review/`; this is an observed current-head gap, without a claim that the PR introduced it.
-
-**Outcome:** error feedback remains visible when a preparation/loading screen owns the UI, including repeated errors, while saves and hidden diagnostics are preserved. **Non-goals:** no new renderer recovery, fatal-state manager, storage format or gameplay behavior. **Files:** `src/main.ts`, `src/app/startRunApp.ts`, one small `src/ui/gameError.ts` presentation helper and existing main-menu browser tests. **Proof:** post-evaluation module fault injection and actual run error-event dispatch, visible/in-viewport alert, deduplication and unchanged save bytes on Chromium/touch/WebKit; normal import-failure and core consumer checks remain required.
-
-Ablation: keep one helper because both the entry catch and run error handler need this same concrete behavior. Reuse the current battle status for pre-mount/active-battle failures; add only one alert to the visible owner screen. Do not unhide the battle shell or diagnostics, duplicate route controllers, add configuration, or rerun unrelated complete progression matrices.
-
-The visible-owner fix passes **12 Chromium** cases across desktop/native-touch portrait/landscape and **8 WebKit** cases across both orientations. The three new cases failed before the fix and now prove in-viewport recovery, repeated-error deduplication, unchanged saved bytes and hidden diagnostics. Screenshots were inspected. One initial test typing error was corrected with a literal tuple annotation; its failed build log is retained. Current discovery is 1,135 broad Chromium and 214 WebKit acceptance cases, not execution of those full matrices.
-
-An additional [P2 review finding 5809182451](https://github.com/luminari-gurus/tactics-guru-v2/pull/338#pullrequestreview-5809182451) confirms that the LF-only PR workflow contract fails on byte-equivalent CRLF workflows. The isolated LF check passed and CRLF check failed; all original workflow bytes were restored. Deliver that unrelated test-only repair in a companion PR, then merge its main base into this branch. The gameplay change does not include an unrelated parser workaround.
-
-### Review disposition and merge readiness
-
-All three substantive P2 findings are verified and addressed:
-
-- Visible-owner error feedback is repaired in `e0506a1`; stronger cases in `4fc9202` preserve both primary and backup bytes. The original three probes and regression cases failed before repair. Current Chromium **31/31**, WebKit **8/8**, development **4/4**, prefix error **4/4**, prefix asset **4/4** and rebuilt-root smoke **5/5** selections pass with zero skips/retries. Screenshots show the alert in the visible preparation screen.
-- CRLF fixture parsing is repaired in merged [#339](https://github.com/luminari-gurus/tactics-guru-v2/pull/339) and [#340](https://github.com/luminari-gurus/tactics-guru-v2/pull/340). The PR, risk-gate and final automatic-batch fixture paths now cover LF/CRLF while retaining every positive/negative guard. Original failure logs and the 140-pass/one-failure aggregate are preserved; that independent discovery failure is resolved by the next item.
-- The [nine missing Q*bert IDs](https://github.com/luminari-gurus/tactics-guru-v2/pull/338#issuecomment-6700609532) blocked full capture preparation. Merged [#341](https://github.com/luminari-gurus/tactics-guru-v2/pull/341) gives the runner a current manifest, assigns those cases once per profile, preserves all old assignments/job identities/budgets, and leaves historical timing data untouched. All **141** affected Node contracts pass both normally and with physical CRLF inputs; all **9** Q*bert browser cases passed. On the final combined branch the real-discovery contract again passes with all 1,135 canonical cases assigned exactly once.
-
-The only base-integration conflict was documentation counts: retain this branch's 1,135-case inventory and main's current-manifest guidance. Merge commits preserve the tested receipt SHAs; no rebase, history rewrite, release tag or version bump is needed. Production/content/dependency/browser-config blobs still match `e0506a1`. Reuse the passing source-bound `c96345c` PR check (1,233 units, both types, two builds and seven core journeys; 108.5 seconds) for unchanged application/core inputs. Fresh combined Node checks cover the changed tooling/configuration, and final typecheck/browser cases cover the stronger fault assertions.
-
-[Review completion and provenance](../qa/issue-297/review/completion.json) and the [review receipt manifest](../qa/issue-297/review/manifest.json) retain commands, source hashes, original failures and passing recoveries. Existing maintainer CI follow-up is answered with these local results; the caller explicitly made remote CI waiting a non-gate. All current review details are addressed; merge the qualified head, verify main/issue closure, then delete only merged, unreferenced, unchanged refs. Retain worktrees with unmerged commits, unpublished QA or ownership by another chat. Record the final merge and cleanup on the PR/issue.
+Planning validation: existing production command discovery selected **27 cases**
+across the three Chromium profiles; the fixture filter selected **15 cases** across
+those profiles. These are discovered existing cases, not executed tests or proof
+of the future feature. The prose-only handoff requires link/path consistency,
+archive preservation, diff checks and published commit/branch/issue readback;
+application/browser execution belongs to implementation. The branch was created
+with GitHub's native linked-branch mutation, attaching it to #284 in Development.
+No production state was changed and no application verification is claimed by
+this planning commit.
