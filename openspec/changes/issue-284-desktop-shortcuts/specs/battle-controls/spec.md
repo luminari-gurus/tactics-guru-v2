@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: Battle action shortcuts
-An active battle SHALL support M for Move, A for Basic attack, S for the selected learned ability, 1–9 for ordered learned abilities, W for immediate Wait, C for confirmation and Escape for cancellation. Selection SHALL NOT execute an action. Disabled actions and invalid previews SHALL NOT dispatch commands.
+An active battle SHALL support M for Move, A for Basic attack, S for the selected rail ability or offered radial Special, 1–9 for ordered learned abilities, W for immediate Wait, C for confirmation and Escape for cancellation. Selection SHALL NOT execute an action. Disabled actions and invalid previews SHALL NOT dispatch commands.
 
 #### Scenario: Select and confirm in the rail
 - **WHEN** a player selects an available action or learned ability with its shortcut and chooses a legal target
@@ -14,6 +14,7 @@ An active battle SHALL support M for Move, A for Basic attack, S for the selecte
 #### Scenario: Stable learned ability numbering
 - **WHEN** an actor's abilities or a target's legality change
 - **THEN** numbered hints match the actor's ordered learned list in both skins, an unavailable number cannot fall through to another ability, and unlearned abilities remain unavailable
+- **AND** radial S aims the legal ability currently offered by Special, even when the first learned ability is illegal at this target
 
 #### Scenario: Existing confirmation and planning
 - **WHEN** shortcuts are used with a prepared move, ability, compound plan or follow-up target

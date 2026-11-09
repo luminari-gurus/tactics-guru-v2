@@ -17,7 +17,7 @@ import { menuReturnLink } from '../ui/menuReturn';
 import { track } from '../telemetry/telemetry';
 import { hoverPreview } from '../ui/targetPreview';
 import { previewDraught } from '../domain/turns';
-import { BattleSelection } from '../ui/battleSelection';
+import { BattleSelection, selectableSpecials } from '../ui/battleSelection';
 import { BATTLE_KEYS } from '../ui/battleActions';
 import { BattleRadial, clientPointFromCanvas } from '../ui/battleRadial';
 import { resolveCombatControlsSkin, watchCombatControls, type CombatSkin } from '../ui/combatControls';
@@ -329,9 +329,11 @@ export class BattleScene extends Phaser.Scene {
       const key=event.key.toLowerCase();
       if(skin==='rail' || key===BATTLE_KEYS.wait){if(hud.shortcut(key))event.preventDefault();return;}
       if(key===BATTLE_KEYS.confirm){if(radial.confirmShortcut())event.preventDefault();return;}
-      const ability=key===BATTLE_KEYS.ability?hud.ability.value:/^[1-9]$/.test(key)?hud.ability.options[Number(key)-1]?.value:undefined;
-      const slice=key===BATTLE_KEYS.move?'move':key===BATTLE_KEYS.basic?'attack':ability?'special':null;
       const cell=selection.selectedCell??cursor;
+      const specials=key===BATTLE_KEYS.ability?selectableSpecials(session,cell,selection.planMove):[];
+      const ability=key===BATTLE_KEYS.ability?(specials.find(a=>a.id===selection.lastUsedSpecial())??specials[0])?.id
+        :/^[1-9]$/.test(key)?hud.ability.options[Number(key)-1]?.value:undefined;
+      const slice=key===BATTLE_KEYS.move?'move':key===BATTLE_KEYS.basic?'attack':ability?'special':null;
       if(slice && radial.focusShortcut(cell,slice,cellOrigin(cell),ability as AbilityId|undefined)){
         if(ability)hud.ability.value=ability;
         board.resetPicking();hovered=null;refresh();event.preventDefault();

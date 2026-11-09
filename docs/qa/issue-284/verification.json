@@ -1052,5 +1052,304 @@
   "build": {
     "indexSha256": "31eaac30ebe626f8c535fc4fabc91f5c1b4da327b66c4b6ae1f91e229e2147c7",
     "applicationFilesSha256": "5c5617d7cc67c8cfd1982fe72795889cfd19ee78809f12b8aa80b26dfa8386d3"
+  },
+  "finalCorrection": {
+    "testedCheckout": "40af1a0b1830f707faa8a49d30e86b0f543e9890",
+    "dirty": " M README.md\n M docs/ongoing-projects/plan.md\n M openspec/changes/issue-284-desktop-shortcuts/specs/battle-controls/spec.md\n M openspec/changes/issue-284-desktop-shortcuts/tasks.md\n M src/phaser/BattleScene.ts\n M src/ui/hud.ts\n M tests/ability-picker.spec.ts\n",
+    "changedInputs": [
+      "src/phaser/BattleScene.ts",
+      "src/ui/hud.ts",
+      "tests/ability-picker.spec.ts"
+    ],
+    "sha256Overrides": {
+      "src/phaser/BattleScene.ts": "b06c08011fe9ac0fcccdca26e5ff5baf9dc57fab3f5675c97feb2f3e3d1a2b59",
+      "src/ui/hud.ts": "8712bfbebebddc3c23a9aee82ccec26470bd747f14d85b4f582ca24787b26cf6",
+      "tests/ability-picker.spec.ts": "5521404add63ac950ead7ce25c4816eb54d738d722244b26e0621b3c16d4c845"
+    },
+    "results": [
+      {
+        "name": "final-production",
+        "group": "chromium",
+        "config": "playwright.regression.config.ts",
+        "grep": "keyboard-only shortcuts",
+        "stats": {
+          "startTime": "2026-11-09T14:06:01.787Z",
+          "duration": 41111.908,
+          "expected": 18,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "report": "tmp/issue284-final-production.json",
+        "sha256": "d92edd83c61cd7700d8da4c0ac3e77b77313f321440455d4a11c17f34930b3d7",
+        "tests": [
+          {
+            "project": "desktop",
+            "title": "keyboard-only shortcuts select preview confirm and wait once without replacing native keys",
+            "status": "passed"
+          },
+          {
+            "project": "desktop",
+            "title": "keyboard-only shortcuts yield to editing modifiers composition handled events and dialogs",
+            "status": "passed"
+          },
+          {
+            "project": "desktop",
+            "title": "keyboard-only shortcuts respect presentation visibility and repeated scene replacement",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-portrait",
+            "title": "keyboard-only shortcuts select preview confirm and wait once without replacing native keys",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-portrait",
+            "title": "keyboard-only shortcuts yield to editing modifiers composition handled events and dialogs",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-portrait",
+            "title": "keyboard-only shortcuts respect presentation visibility and repeated scene replacement",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-landscape",
+            "title": "keyboard-only shortcuts select preview confirm and wait once without replacing native keys",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-landscape",
+            "title": "keyboard-only shortcuts yield to editing modifiers composition handled events and dialogs",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-landscape",
+            "title": "keyboard-only shortcuts respect presentation visibility and repeated scene replacement",
+            "status": "passed"
+          },
+          {
+            "project": "desktop",
+            "title": "keyboard-only shortcuts aim radial movement before one explicit confirmation",
+            "status": "passed"
+          },
+          {
+            "project": "desktop",
+            "title": "keyboard-only shortcuts leave held radial gestures and skin changes under existing control",
+            "status": "passed"
+          },
+          {
+            "project": "desktop",
+            "title": "keyboard-only shortcuts retain radial plan specials and follow-up confirmation",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-portrait",
+            "title": "keyboard-only shortcuts aim radial movement before one explicit confirmation",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-portrait",
+            "title": "keyboard-only shortcuts leave held radial gestures and skin changes under existing control",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-portrait",
+            "title": "keyboard-only shortcuts retain radial plan specials and follow-up confirmation",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-landscape",
+            "title": "keyboard-only shortcuts aim radial movement before one explicit confirmation",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-landscape",
+            "title": "keyboard-only shortcuts leave held radial gestures and skin changes under existing control",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-landscape",
+            "title": "keyboard-only shortcuts retain radial plan specials and follow-up confirmation",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "name": "final-webkit",
+        "group": "webkit",
+        "config": "playwright.device-acceptance.config.ts",
+        "grep": "keyboard-only shortcuts",
+        "stats": {
+          "startTime": "2026-11-09T14:06:43.314Z",
+          "duration": 34139.044,
+          "expected": 12,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "report": "tmp/issue284-final-webkit.json",
+        "sha256": "44932f26779473ebf171aa08456f1a59f8bb94d883f3cb4031ad705f0fb62997",
+        "tests": [
+          {
+            "project": "acceptance-webkit-portrait",
+            "title": "keyboard-only shortcuts select preview confirm and wait once without replacing native keys",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-portrait",
+            "title": "keyboard-only shortcuts yield to editing modifiers composition handled events and dialogs",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-portrait",
+            "title": "keyboard-only shortcuts respect presentation visibility and repeated scene replacement",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-landscape",
+            "title": "keyboard-only shortcuts select preview confirm and wait once without replacing native keys",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-landscape",
+            "title": "keyboard-only shortcuts yield to editing modifiers composition handled events and dialogs",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-landscape",
+            "title": "keyboard-only shortcuts respect presentation visibility and repeated scene replacement",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-portrait",
+            "title": "keyboard-only shortcuts aim radial movement before one explicit confirmation",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-portrait",
+            "title": "keyboard-only shortcuts leave held radial gestures and skin changes under existing control",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-portrait",
+            "title": "keyboard-only shortcuts retain radial plan specials and follow-up confirmation",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-landscape",
+            "title": "keyboard-only shortcuts aim radial movement before one explicit confirmation",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-landscape",
+            "title": "keyboard-only shortcuts leave held radial gestures and skin changes under existing control",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-landscape",
+            "title": "keyboard-only shortcuts retain radial plan specials and follow-up confirmation",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "name": "final-fixtures",
+        "group": "fixtures",
+        "config": "playwright.fixtures.config.ts",
+        "grep": "keyboard-only shortcuts.*radial",
+        "stats": {
+          "startTime": "2026-11-09T14:04:56.136Z",
+          "duration": 32160.718,
+          "expected": 6,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "report": "tmp/issue284-final-fixtures.json",
+        "sha256": "cb4cd5b723dc5cee5f985d6bc4abcfaef6b5d12f0f8e5bfd21823851cff22c00",
+        "tests": [
+          {
+            "project": "desktop",
+            "title": "keyboard-only shortcuts use canonical radial ability numbers without casting unavailable alternatives",
+            "status": "passed"
+          },
+          {
+            "project": "desktop",
+            "title": "keyboard-only shortcuts keep radial S aligned with the offered Special and A with Basic attack",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-portrait",
+            "title": "keyboard-only shortcuts use canonical radial ability numbers without casting unavailable alternatives",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-portrait",
+            "title": "keyboard-only shortcuts keep radial S aligned with the offered Special and A with Basic attack",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-landscape",
+            "title": "keyboard-only shortcuts use canonical radial ability numbers without casting unavailable alternatives",
+            "status": "passed"
+          },
+          {
+            "project": "mobile-landscape",
+            "title": "keyboard-only shortcuts keep radial S aligned with the offered Special and A with Basic attack",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "name": "final-fixtures-webkit",
+        "group": "fixtures-webkit",
+        "config": "tmp/issue284-abilities-webkit.config.ts",
+        "grep": "keyboard-only shortcuts.*radial",
+        "stats": {
+          "startTime": "2026-11-09T14:07:17.853Z",
+          "duration": 21853.022,
+          "expected": 4,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "report": "tmp/issue284-final-fixtures-webkit.json",
+        "sha256": "df21740b6f5d019505fdd44687c69bf101204799cf8debe8eb30df69b66b588c",
+        "tests": [
+          {
+            "project": "acceptance-webkit-portrait",
+            "title": "keyboard-only shortcuts use canonical radial ability numbers without casting unavailable alternatives",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-portrait",
+            "title": "keyboard-only shortcuts keep radial S aligned with the offered Special and A with Basic attack",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-landscape",
+            "title": "keyboard-only shortcuts use canonical radial ability numbers without casting unavailable alternatives",
+            "status": "passed"
+          },
+          {
+            "project": "acceptance-webkit-landscape",
+            "title": "keyboard-only shortcuts keep radial S aligned with the offered Special and A with Basic attack",
+            "status": "passed"
+          }
+        ]
+      }
+    ],
+    "reuse": "Initial pointer/native-control and rail ability cases remain bound to 3daa5d7. Only the radial S selection branch, help wording and expanded fixture change; all new shortcuts and affected full-map/lifecycle paths are freshly checked. The full 333-file snapshot was rechecked; only the three listed runtime/test inputs differ.",
+    "build": {
+      "indexSha256": "4af47c5dab21057c4113f2b2ed5b5cef8102d3ce3f618a59e5d65234b15d7887",
+      "applicationFilesSha256": "7f973a7caa2f26605b1a4571d80f7abdea9a442c311fd0cd2b296bb700a29df4"
+    }
+  },
+  "intermediateCiPass": {
+    "head": "40af1a0b1830f707faa8a49d30e86b0f543e9890",
+    "url": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42630279039",
+    "seconds": 204.6,
+    "note": "All standard stages and seven core journeys passed before the final S correction. A new current-head run remains required."
   }
 }

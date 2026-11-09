@@ -16,6 +16,7 @@ The approved plan is `docs/ongoing-projects/plan.md`; see proposal.md for motiva
 - Extend document-level keyboard ownership in the scene. Keep canvas arrows/Enter/Space and modal Escape precedence. Ignore repeats/composition/modifiers/editable targets before new action dispatch; dispose bindings with the existing scene cleanup.
 - Use C to confirm because Enter/Space already select board cells and activate native controls. Do not synthesize native key events.
 - For radial selection, aim/focus existing slices or canonical ability-ID chips in tap mode. Only C/native activation commits. A held pointer gesture is not a keyboard target; do not let a key cause its later release to commit. Use canonical owned order for numeric keys even though target-specific submenu choices are filtered.
+- Radial S follows the existing legal/last-used Special offer, matching its visible hint. Rail S follows the native picker. Exact number keys never fall back to a different legal ability; this matters when Frost Snare is illegal at range one but Magic Missile is offered.
 - Reuse the HUD's native details disclosure and title/aria-keyshortcuts hints. Keep existing labels usable by assistive technology and touch. No help modal or preference migration.
 - Extend existing battle-loop, ability-picker and radial suites. Use existing legal policy, save snapshots, dev fixtures and native browser events. New production titles start with `keyboard-only shortcuts` to join the existing WebKit grep. No new browser config or blanket full regression.
 

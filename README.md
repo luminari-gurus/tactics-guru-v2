@@ -98,6 +98,8 @@ an action from a held key.
 With radial controls, choose the target first using the board cursor, then use
 an action/ability shortcut to aim its enabled control and read the preview. **C**
 or native activation confirms it; selecting a numbered ability never casts it.
+In the radial skin, **S** aims the legal ability currently offered by **Special**;
+number keys retain their displayed learned-ability order even at an illegal target.
 Sound starts off; **Enable sound** turns on battle cues.
 
 ### Pick up where you left off

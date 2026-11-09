@@ -66,12 +66,27 @@ test('keyboard-only shortcuts use canonical radial ability numbers without casti
   expect(accepted.events.some(event=>event.type==='abilityUsed'&&event.abilityId==='ability:frost_snare')).toBe(true);
   await page.keyboard.press('1');await page.keyboard.press('2');await page.keyboard.press('c');
   expect((await readSession(page)).state).toEqual(accepted.state);
+});
+
+test('keyboard-only shortcuts keep radial S aligned with the offered Special and A with Basic attack',async({page})=>{
+  await page.addInitScript(()=>{(globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';});
+  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const canvas=page.locator('canvas');
   // At range one Frost Snare is unavailable, but Magic Missile keeps key 2.
-  await page.reload();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const fresh=await readSession(page);await canvas.focus();await page.keyboard.press('ArrowRight');await page.keyboard.press('1');
   await expect(page.locator('#battle-radial')).toBeHidden();expect((await readSession(page)).state).toEqual(fresh.state);
+  await page.keyboard.press('s');await expect(page.locator('[data-radial-ability="ability:magic_missile"]')).toBeFocused();
+  await expect(page.locator('#battle-preview')).toContainText('force damage');
+  expect((await readSession(page)).state).toEqual(fresh.state);
+  await page.keyboard.press('Escape');
   await page.keyboard.press('2');await expect(page.locator('[data-radial-ability="ability:magic_missile"]')).toBeFocused();
   await page.keyboard.press('Escape');expect((await readSession(page)).state).toEqual(fresh.state);
+  await page.keyboard.press('a');await expect(page.locator('#battle-radial-attack')).toBeFocused();
+  await expect(page.locator('#battle-preview')).toContainText('Hit');
+  expect((await readSession(page)).state).toEqual(fresh.state);
+  await page.keyboard.press('c');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  expect((await readSession(page)).state.commandCount).toBe(fresh.state.commandCount+1);
 });
 
 test('Mage real learned picker consolidates Arc Bolt and gates Frost Snare at level three',async({page})=>{
