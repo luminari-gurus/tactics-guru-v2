@@ -2,7 +2,7 @@ import type { Threat } from '../domain/threat';
 import { combatStats, guardedEffect, markSource, movementBlockSource, tauntSource, weakenedSource, weakenedImmune } from '../domain/effects';
 import { saveFaceCounts } from '../domain/combat';
 import type { CellPosition } from '../content/types';
-import type { BattleEvent, UnitState, Command } from '../domain/types';
+import type { BattleEvent, BattleState, UnitState, Command } from '../domain/types';
 import { previewTacticalPlan } from '../domain/tacticalPlan';
 import { previewMovement } from '../domain/grid';
 import { D20_SIDES, NATURAL_AUTO_MISS, NATURAL_CRITICAL } from '../domain/constants';
@@ -191,14 +191,15 @@ export class BattleHud {
     const labels={muted:'Sound off',loading:'Loading sound',unavailable:'Sound unavailable',hidden:'Sound paused while hidden',unlocking:'Unlocking sound',blocked:'Sound blocked',ready:'Sound on'};
     this.root.querySelector('#battle-sound-status')!.textContent=labels[snapshot.status]+(snapshot.error?`: ${snapshot.error}`:'');
   }
-  render(action:Action|null, selected:CellPosition|null, message:string, danger=false, threats:readonly Threat[] | null=null, planWaiting=false, planMove:Extract<Command,{type:'move'}>|null=null) {
+  render(action:Action|null, selected:CellPosition|null, message:string, danger=false, threats:readonly Threat[] | null=null, planWaiting=false, planMove:Extract<Command,{type:'move'}>|null=null, presentationStart:BattleState|null=null) {
     // Hover refreshes only change the board. Rebuilding the live controls during
     // a pointer gesture can disturb native select interaction and scroll anchoring.
-    const inputs = [this.session.state, this.session.phase, this.session.pending, this.session.pendingPlan,
+    const inputs = [this.session.state, this.session.phase, presentationStart, this.session.pending, this.session.pendingPlan,
       this.session.error, action, selected?.x, selected?.y, message, danger, threats, planWaiting, planMove?.to.x, planMove?.to.y, this.skin];
     if (inputs.every((value, i) => Object.is(value, this.lastRender[i]))) return;
     this.lastRender = inputs;
     const s=this.session, enabled=s.phase==='player', actor=s.active;
+    const presenting=s.phase==='presenting';
     const showPlanCancel=this.skin==='radial' && planWaiting && enabled;
     this.root.dataset.planWaiting=String(showPlanCancel);
     this.root.querySelector<HTMLButtonElement>('#battle-plan-cancel')!.hidden=!showPlanCancel;
@@ -223,15 +224,25 @@ export class BattleHud {
       draught.disabled = !!reason;
       draught.textContent = `Healing Draught ×${remaining}${reason ? ` · ${reason}` : ''}`;
     }
-    this.actorRoot.querySelector('#battle-active')!.textContent=`${s.state.outcome==='ongoing'?'':s.state.outcome==='playerWin'?'Victory · ':'Defeat · '}Round ${s.state.round} · ${actor.side==='player'?'Your turn':'Enemy turn'}${s.phase==='presenting'?' · Resolving action (Animating)':s.phase==='error'?' · Battle stopped':''}`;
-    this.actorRoot.querySelector('#battle-actor-name')!.textContent=info.name;
-    this.actorRoot.querySelector('#battle-hp')!.textContent=`HP ${actor.hp}/${info.def.stats.maxHp}`;
-    this.actorRoot.querySelectorAll<HTMLImageElement>('.battle-portrait').forEach(img=>{img.hidden=img.dataset.unitType!==actor.defId;});
-    (this.actorRoot.querySelector('.battle-health span') as HTMLElement).style.width=`${100*actor.hp/info.def.stats.maxHp}%`;
-    this.actorRoot.querySelector('#battle-stats')!.textContent=`AC ${info.armorClass} · Accuracy ${info.accuracy>=0?'+':''}${info.accuracy}`;
-    this.actorRoot.querySelector('#battle-status')!.textContent=info.status;
-    this.actorRoot.querySelector('#battle-budgets')!.textContent=`Move ${actor.hasMoved?'spent':'ready'} / Action ${actor.hasActed?'spent':'ready'}`;
-    const locked=s.phase==='presenting'?'Resolving action. Gameplay is locked until presentation finishes.':s.phase==='enemy'?'Enemy turn. Hero actions are unavailable.':s.phase==='ended'?'Battle complete. Gameplay is unavailable.':s.phase==='error'?'Battle stopped. Use recovery or restart.':'';
+    // End Turn commits the next actor and round before the board finishes the handoff.
+    const displayActor = presentationStart
+      ? s.state.units.find(unit=>unit.id===presentationStart.initiative[presentationStart.activeIndex])!
+      : actor;
+    const displayInfo = displayActor===actor ? info : unitFeedback(s,displayActor);
+    const outcome = s.state.outcome==='ongoing'?'':s.state.outcome==='playerWin'?'Victory · ':'Defeat · ';
+    this.actorRoot.querySelector('#battle-active')!.textContent=presenting
+      ? `Round ${presentationStart?.round ?? s.state.round} · Resolving action (Animating)`
+      : `${outcome}Round ${s.state.round} · ${actor.side==='player'?'Your turn':'Enemy turn'}${s.phase==='error'?' · Battle stopped':''}`;
+    this.actorRoot.querySelector('#battle-actor-name')!.textContent=displayInfo.name;
+    this.actorRoot.querySelector('#battle-hp')!.textContent=`HP ${displayActor.hp}/${displayInfo.def.stats.maxHp}`;
+    this.actorRoot.querySelectorAll<HTMLImageElement>('.battle-portrait').forEach(img=>{img.hidden=img.dataset.unitType!==displayActor.defId;});
+    (this.actorRoot.querySelector('.battle-health span') as HTMLElement).style.width=`${100*displayActor.hp/displayInfo.def.stats.maxHp}%`;
+    this.actorRoot.querySelector('#battle-stats')!.textContent=`AC ${displayInfo.armorClass} · Accuracy ${displayInfo.accuracy>=0?'+':''}${displayInfo.accuracy}`;
+    this.actorRoot.querySelector('#battle-status')!.textContent=displayInfo.status;
+    this.actorRoot.querySelector('#battle-budgets')!.textContent=presenting
+      ? 'Move locked / Action locked'
+      : `Move ${actor.hasMoved?'spent':'ready'} / Action ${actor.hasActed?'spent':'ready'}`;
+    const locked=presenting?'Resolving action. Gameplay is locked until presentation finishes.':s.phase==='enemy'?'Enemy turn. Hero actions are unavailable.':s.phase==='ended'?'Battle complete. Gameplay is unavailable.':s.phase==='error'?'Battle stopped. Use recovery or restart.':'';
     const abilities=ownedAbilities(s),key=abilities.map(a=>a.id).join('|');
     if(key!==this.abilityKey){this.abilityKey=key;this.ability.replaceChildren(...abilities.map(a=>new Option(displayName(a.id),a.id)));}
     if(action?.startsWith('ability:'))this.ability.value=action;
