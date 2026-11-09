@@ -6,6 +6,15 @@ OpenSpec: [tasks](../../../openspec/changes/issue-316-mage-acceptance-fixtures/t
 Original source: `1a02557e76041e307ddf172d39ddc3e477ac967d` (runtime/tests equal
 to main `6aad368`); baseline workflow publication: `d687e6d`.
 
+**Final functional status:** all five issue acceptance gates are proven at repair
+`debe0ef`: 1,245 units, both types/build integrations, seven core journeys and a
+source-bound union of **36 affected browser cases**. All six freshly requalified
+progression profiles finish below 600 seconds, with no skipped/flaky/retried
+cases. [Final proof](qualification-42687875604/summary.json),
+[reuse validation](evidence-reuse.json) and [requirement audit](acceptance-audit.json)
+are authoritative. Historical failed attempts below remain failed. Final Git/PR
+publication is being completed; no application matrix needs repeating for prose.
+
 ## Scope and preserved assertions
 
 No runtime, content, dependency, gameplay, save format, browser project, retry,
@@ -72,7 +81,7 @@ record the actual selected range, rejected outcomes, seed and selection duration
 - Affected unit run: 72 passed, 0 failed, across `dungeonBattle.test.ts`,
   `abilities.test.ts` and `dungeonProgressionBoundary.test.ts`. This iteration
   preceded restoration of the original unchanged low-HP continuation fixture;
-  final current-source qualification remains required.
+  final current-source qualification was still required at that iteration.
 - The first typecheck exposed an inferred `{}` map index in the new staging
   helper. An explicit existing `ContentCatalog` type fixed it; both type scopes
   then passed, and a direct local production bundle succeeded. Existing Vite
@@ -99,9 +108,10 @@ deadline; no before/after speedup is claimed.
 
 The task-scoped `Issue 316 Mage acceptance` workflow reserves
 `tactics-browser-tactics-browser-02`, following the existing qualified runner
-pattern. Final publication will run focused production Mage cases on all six
-profiles, the existing Chromium picker cases and all six extended Mage cases
-serially. PR verification independently reserves VM-01 for the standard gate.
+pattern. Initial all-scope qualification ran focused production Mage cases on all
+six profiles, existing Chromium picker cases and all six extended Mage cases
+serially. The scoped progression repair then requalified the changed six cases.
+PR verification independently reserves VM-01 for the standard gate.
 Per-case ten-minute budgets remain unchanged; the 80-minute enclosing job budget
 accounts for the serial union and setup, not a longer test deadline.
 
@@ -141,15 +151,14 @@ failed with **Internal server error** annotations before any job/test existed.
 The standard retry succeeded. These attempts are not application failures or
 passing test evidence; subsequent qualification must still run every gate.
 
-Complete focused/extended browser execution and final acceptance remain pending.
+At that stage complete focused/extended execution and final acceptance were pending.
 Physical hardware was not requested; describe device emulation accurately and
 retain engine/platform failures.
 
-Current Mage run [42675462523](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42675462523)
-at `bcc523c` is live. Focused Chromium/WebKit and picker steps succeeded, but the
-full six-profile earned-progression matrix and actual final case accounting are
-still pending. Subsequent handoff commits change only documentation/receipts;
-they do not invalidate those runtime/test inputs or justify another matrix run.
+The initial Mage run [42675462523](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42675462523)
+at `bcc523c` completed with the one deadline failure detailed below. Its 30
+focused/picker passes are retained only after explicit input/runtime validation;
+its full progression cases were requalified after the observer repair.
 
 ### Focused fixture correction
 
@@ -190,20 +199,19 @@ screenshot. That does not make its deadline failure pass. Its selection took
 
 The 351 MB diagnostic trace lacks its ZIP central directory, consistent with
 interrupted finalization. [Original trace identity](qualification-42675462523/desktop-trace.json)
-records its hash and retained local path; a separate copy is being recovered.
+records its hash and retained local path; event data was recovered separately.
 The raw original is not modified or committed as a huge Git blob. It is also in
-the run's 14-day artifact. Trace timing must establish whether execution or final
-capture/teardown consumed the deadline before choosing a repair.
+the run's 14-day artifact. The recovered timing below established a substantial
+observation cost before the targeted repair was chosen.
 
 A pure component measurement confirmed per-command catalog reconstruction costs
 ~1.76 s locally across 145 player commands, and cached/uncached choices produce
 the same commands and terminal states. This is not a browser attribution; no
 cache or gameplay change was added in response to that small component cost.
 
-OpenSpec focused task 2.2 is complete. Full six-profile/budget task 2.3 and final
-handoff remain open; PR #357 stays draft. Reuse only results whose relevant
-inputs remain unchanged after the targeted repair, and retain this original
-failed run rather than describing a later rerun as a clean original matrix.
+At this failure, focused task 2.2 was complete while full progression and handoff
+remained open. The later repair retains this original failed run and reuses only
+results whose relevant inputs remain unchanged.
 
 ### Trace-guided observation repair
 
@@ -223,8 +231,45 @@ same predicates and timeouts; no state is cached or advanced by observation.
 All original commands, assertions, six profiles, trace mode and deadlines remain.
 
 Both TypeScript scopes and exact extended/core discovery pass locally. All six
-progression profiles must be requalified because their observer changed. The
+progression profiles were requalified because their observer changed. The
 30 focused/picker cases remain reusable at their original source: their tests,
 helpers, runtime, configuration and arguments are unchanged. The scoped manual
 workflow supports `all` or `progression` for this concrete recovery; the latter
 executes both complete three-profile engines, with diagnostics retained.
+
+## Final source-bound acceptance
+
+[Run 42687875604](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42687875604)
+passed all **six complete progression cases** at `debe0ef`, workers 1/retries 0,
+with no skipped/flaky/unexpected cases. All reports, source, environment, journey
+records and logs are in [the final qualification](qualification-42687875604/summary.json).
+Each case enacts the same five-battle seed-68 journey from level one/XP zero,
+reaches Mage level three, uses both abilities, validates exact replay/active
+reload and terminates with blocked/expired flags and clean status boundaries.
+
+Complete case durations, including the 7.908–8.192 s selection work:
+
+- Chromium desktop: **507.168 s**; portrait: **274.547 s**; landscape: **306.371 s**.
+- WebKit desktop: **216.799 s**; portrait: **203.648 s**; landscape: **208.347 s**.
+
+All are below **600 s**, with the original diagnostics, assertions and deadlines.
+Persistent host caches/background workloads remain recorded conditions; these
+are acceptance measurements, not a controlled cross-run speedup claim.
+
+[Reuse validation](evidence-reuse.json) proves the 30 focused/picker passes remain
+valid: all 246 relevant file hashes and exact commands match, as do VM-02,
+Node 24.22.2, Playwright 1.64.1, OS/arch, executable paths, overrides and browser
+versions (Chromium 156.0.8078.4/WebKit 27.2). The separate VM-01 standard verifier
+uses its recorded Node 24.22.1. The accepted browser union is **30 unchanged
+focused/picker cases + 6 freshly qualified progression cases = 36**. The five
+old passing progression results were not reused after their observer changed.
+
+[Standard run 42687175365](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42687175365)
+passed 1,245 units, both types, two build integrations, bundle and seven core
+journeys in **199.342 s**. [The stage receipt](pr-debe0ef-summary.json) records
+synthetic merge `b17443a`; its tree `4a3dfda631c1db37530fc35e2300e4227fb769d7`
+equals published repair `debe0ef`. The [requirement audit](acceptance-audit.json)
+maps every original gate to direct evidence. Subsequent work changes only
+documentation/receipts and PR/OpenSpec handoff state, so no runtime matrix is
+repeated for those edits. Review #358 before the stacked #357; keep #316 open
+until merge. The original failed matrix remains failed and preserved.

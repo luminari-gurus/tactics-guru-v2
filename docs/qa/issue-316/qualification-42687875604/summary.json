@@ -1,0 +1,100 @@
+{
+  "run": 42687875604,
+  "source": "debe0effe319e859ef79b66334a5e181bf7d0991",
+  "node": "v24.22.2",
+  "runner": "unraid-tactics-02",
+  "scope": "progression",
+  "totals": {
+    "passed": 6,
+    "unexpected": 0,
+    "skipped": 0,
+    "flaky": 0,
+    "retries": 0
+  },
+  "cases": [
+    {
+      "project": "desktop",
+      "durationMs": 507168,
+      "budgetMs": 600000,
+      "selectionMs": 8060.231651,
+      "seed": 68,
+      "range": [
+        64,
+        79
+      ],
+      "battles": 5,
+      "outcome": "defeat",
+      "retries": 0
+    },
+    {
+      "project": "mobile-portrait",
+      "durationMs": 274547,
+      "budgetMs": 600000,
+      "selectionMs": 8191.850154999999,
+      "seed": 68,
+      "range": [
+        64,
+        79
+      ],
+      "battles": 5,
+      "outcome": "defeat",
+      "retries": 0
+    },
+    {
+      "project": "mobile-landscape",
+      "durationMs": 306371,
+      "budgetMs": 600000,
+      "selectionMs": 8138.502191,
+      "seed": 68,
+      "range": [
+        64,
+        79
+      ],
+      "battles": 5,
+      "outcome": "defeat",
+      "retries": 0
+    },
+    {
+      "project": "desktop-webkit",
+      "durationMs": 216799,
+      "budgetMs": 600000,
+      "selectionMs": 7926.121528000001,
+      "seed": 68,
+      "range": [
+        64,
+        79
+      ],
+      "battles": 5,
+      "outcome": "defeat",
+      "retries": 0
+    },
+    {
+      "project": "portrait-webkit",
+      "durationMs": 203648,
+      "budgetMs": 600000,
+      "selectionMs": 8074.059356,
+      "seed": 68,
+      "range": [
+        64,
+        79
+      ],
+      "battles": 5,
+      "outcome": "defeat",
+      "retries": 0
+    },
+    {
+      "project": "landscape-webkit",
+      "durationMs": 208347,
+      "budgetMs": 600000,
+      "selectionMs": 7907.542366,
+      "seed": 68,
+      "range": [
+        64,
+        79
+      ],
+      "battles": 5,
+      "outcome": "defeat",
+      "retries": 0
+    }
+  ]
+}

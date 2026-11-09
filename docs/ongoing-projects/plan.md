@@ -5,9 +5,10 @@ Issue: [#316](https://github.com/luminari-gurus/tactics-guru-v2/issues/316).
 Branch: [`branch/issue-316-mage-acceptance-fixtures`](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-316-mage-acceptance-fixtures).
 Original main base: `6aad368761e6684d88d9b3eb5b3cacc53a615c90`.
 
-**Status:** code is implemented and published. Standard verification passes.
-The first qualified matrix has 35 passes and one desktop Chromium deadline
-failure under investigation; #357 remains draft. The caller explicitly
+**Status:** all implementation and functional acceptance gates pass. The complete
+source-bound audit is retained; final evidence publication and PR-ready handoff
+are being completed. The first matrix's desktop timeout remains preserved.
+The caller explicitly
 authorized implementation, autonomous repairs, commits/pushes, incremental PRs
 and OpenSpec on November 9. No additional implementation approval is needed.
 
@@ -141,54 +142,59 @@ assertions/deadlines remain, and all six explicit browser controls were executed
   attempts remain incomplete. Their records are not application failures or
   passing acceptance. Current qualified execution is authoritative.
 
-## Current failure and continuation
+## Final qualification and review handoff
 
-**[Run 42675462523](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42675462523)**
-at clean `bcc523c` on VM-02 is terminal: **35 passed, 1 failed**, no skips, flakes
-or test retries. All 24 focused production and six picker cases pass. Both mobile
-Chromium and all three WebKit complete journeys pass. Desktop Chromium hit the
-600,000 ms deadline and then a 30,000 ms teardown deadline (639,262 ms total).
+The first matrix, **[42675462523](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42675462523)**
+at `bcc523c`, remains **35 passed, 1 failed**. Desktop Chromium exceeded the
+600,000 ms deadline and then teardown (639,262 ms total). Its original trace,
+hash, event stream, raw reports and terminal receipts remain in the QA record.
+Do not describe that original run as clean after a later repair.
 
-The failed case wrote its complete five-battle terminal receipt and screenshot.
-Its selection took 9.808 s. Its 351 MB trace is truncated; keep the original.
-The intact event stream has been extracted: 1,530 full snapshot/session reads
-consumed ~276 s. The observer now returns fresh phase/count fields from the same
-DOM records in one call per status poll, retaining full decision/assertion state,
-both original poll conditions, tracing and deadlines. Strict types and unchanged
-exact discovery pass; all six progression profiles require requalification.
-Full accounting, source, all raw reports and journey receipts are retained in
-`docs/qa/issue-316/qualification-42675462523/`. The full download completed under
-`tmp/issue316-qualified-bcc523c/`. Watch session 40420 and recovery session 61118
-have ended. The unmodified raw trace is identified by SHA-256 in the QA record.
-Do not claim that the original 35/36 run is green after a later repair.
+The trace identified ~276 s across 1,530 full snapshot/session reads. The small
+observer repair returns fresh phase/count fields from the same DOM records,
+retaining full decision/assertion state, both readiness polls, real inputs,
+diagnostics and deadlines. No mutable state cache or gameplay change was added.
 
-Next actions:
+Repair source **`debe0effe319e859ef79b66334a5e181bf7d0991`** is fully qualified:
 
-1. Publish the compact-observer repair and let ordinary PR verification finish.
-   Then dispatch the scoped manual workflow on the issue branch with
-   `scope=progression`, avoiding overlap with our own VM-01 verification work.
-   The old baseline remains preserved in its exact historical workflow/source.
-2. Requalify all six invalidated progression cases on the qualified runner.
-   Preserve the
-   complete acceptance union: **36 browser cases** = 12 focused production
-   Chromium + 12 focused WebKit + 6 picker + 3 full Chromium + 3 full WebKit.
-   Require zero unexpected/skipped/flaky/retried cases in final affected proof;
-   reuse only unchanged relevant inputs and clearly identify each source/run.
-   The 30 focused/picker tests and their dependencies are unchanged and retain
-   their original passing evidence. Use the existing manual workflow command:
-   `gh workflow run issue-316-mage-acceptance.yml --ref branch/issue-316-mage-acceptance-fixtures -f scope=progression`.
-3. Compare each full case's complete duration, including selection/setup, to
-   600,000 ms. Record actual measured overhead and retained runner/cache limits.
-4. Retain portable raw/derived receipts, source/build identity and a final audit
-   of all five acceptance bullets. Check off OpenSpec only after proof exists.
-5. Commit/push the final plan/evidence, preserve the stack and labels, change
-   #357 to `Closes #316` only when all criteria pass, and mark it ready for review.
-   Keep the issue open until merge. Do not merge or archive OpenSpec here.
-6. Verify remote parity, clean owned worktree, PR states and absence of unresolved
-   implementation feedback. Remove only owned scratch configs/probe scripts;
-   preserve unrelated worktrees and required recovery evidence. Complete the
-   active goal only after the entire requested review handoff is achieved.
+- [Standard run 42687175365](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42687175365):
+  **1,245 units, both types, two build integrations, bundle and seven core
+  journeys**, all passed in 199.342 s. Synthetic merge `b17443a` has tree
+  `4a3dfda631c1db37530fc35e2300e4227fb769d7`, verified equal to the repair head.
+- [Progression run 42687875604](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42687875604):
+  **six complete legal journeys passed**, one worker, no skips/flakes/retries.
+  It retained diagnostics and the 600,000 ms deadline. Total case times:
+  Chromium desktop **507.168 s**, portrait **274.547 s**, landscape **306.371 s**;
+  WebKit desktop **216.799 s**, portrait **203.648 s**, landscape **208.347 s**.
+  Each receipt starts at level one/XP zero, ends after five legal battles at the
+  required terminal boundary, uses both abilities, and records blocked/expired.
+  Selection took 7.908–8.192 s, included in each complete duration.
+- [Reuse audit](../qa/issue-316/evidence-reuse.json): **30 earlier focused/picker
+  passes** remain valid. All 246 relevant source files and all commands match;
+  both runs use VM-02, Node 24.22.2, Playwright 1.64.1, Chromium 156.0.8078.4 and
+  WebKit 27.2, with identical OS/browser/override records. The distinct VM-01
+  standard verifier uses its separately recorded Node 24.22.1.
 
+The accepted browser union is **36 cases**, explicitly composed from those
+unchanged 30 and the six fresh progression cases. The five earlier passing full
+journeys are not reused after their observer changed. Raw/derived proof is in
+[the final qualification](../qa/issue-316/qualification-42687875604/summary.json)
+and [the requirement audit](../qa/issue-316/acceptance-audit.json). This is affected
+scope acceptance, not an executed 1,185-case full regression or physical-device
+certification. Persistent caches/background loads remain recorded limits; no
+controlled cross-run speedup is claimed.
+
+All qualification jobs are terminal and no diagnostic observer remains live.
+Watch sessions 40420/20178 ended; their transient API observation errors did not
+restart target jobs. Automatic documentation-head PR checks may still run.
+Required failure evidence is retained; only owned scratch configs/probes are
+eligible for cleanup.
+
+Remaining publication steps: push the final evidence, use `Closes #316` on the
+fully qualified #357, mark it ready, record the final OpenSpec handoff, and verify
+remote parity/clean owned worktree/PR states. Keep #316 open until merge and do
+not merge or archive the OpenSpec change as part of this task. After these steps,
+no implementation work remains; the review order is #358 then #357.
 ## Commands and execution policy
 
 Apply [verification-policy.md](../verification-policy.md) to the affected test
@@ -229,6 +235,5 @@ retains the full inventory and rationale. PR #314's merged contact fix is an
 ancestor of the base; it is not reopened by this work.
 
 Initial implementation/verification estimate was **2–3 hours**, excluding runner
-queue time. Code work is complete; the remaining work is current-source browser
-qualification and the final review handoff. Do not trade acceptance for a nicer
-time estimate or call a selected seed a gameplay fix.
+queue time. Code and verification are complete; only the final review handoff is
+being published. The selected seed is fixture evidence, not a gameplay fix.

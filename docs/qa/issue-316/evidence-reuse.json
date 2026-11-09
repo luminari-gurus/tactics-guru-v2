@@ -1,0 +1,82 @@
+{
+  "fromRun": 42675462523,
+  "fromSource": "bcc523cc2dc0d9f1e8660be880ac156964ddd90e",
+  "toSource": "debe0effe319e859ef79b66334a5e181bf7d0991",
+  "retainedRunner": "unraid-tactics-02",
+  "retainedNode": "v24.22.2",
+  "standardVerifierNode": "v24.22.1",
+  "runtimeValidation": "Verified against completed run 42687875604: same VM-02, Node patch, Playwright, OS/arch and exact browser executable/version/override records.",
+  "checkedPaths": [
+    "src",
+    "public",
+    "scripts",
+    "tests/helpers",
+    "tests/dungeon.spec.ts",
+    "tests/ability-picker.spec.ts",
+    "tests/fixtures/abilities",
+    "package.json",
+    "package-lock.json",
+    "index.html",
+    "vite.config.ts",
+    "playwright.regression.config.ts",
+    "playwright.exploration.config.ts",
+    "playwright.fixtures.config.ts"
+  ],
+  "gitBlobDifferences": [],
+  "commands": [
+    {
+      "name": "Focused production Chromium",
+      "command": "npm run test:browser -- -c playwright.regression.config.ts tests/dungeon.spec.ts -g 'Mage' --diagnostics"
+    },
+    {
+      "name": "Focused production WebKit",
+      "command": "npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon.spec.ts -g 'Mage' --diagnostics"
+    },
+    {
+      "name": "Retained Mage picker",
+      "command": "npm run test:browser -- -c playwright.fixtures.config.ts tests/ability-picker.spec.ts -g 'Mage real' --diagnostics"
+    }
+  ],
+  "reusedCases": 30,
+  "retainedReports": [
+    {
+      "run": "run-Gnuuuc",
+      "passed": 12
+    },
+    {
+      "run": "run-Ys8zh2",
+      "passed": 12
+    },
+    {
+      "run": "run-dxRRXx",
+      "passed": 6
+    }
+  ],
+  "invalidatedCases": "All six Mage progression profiles: observer changed; fresh proof required from 42687875604.",
+  "buildIdentity": "Git build metadata changes; gameplay/content/save/runtime and retained test/config/helper sources are byte-identical. No cross-build binary-identity claim.",
+  "qualificationNode": "v24.22.2",
+  "commonInputFiles": 246,
+  "runtime": {
+    "node": "v24.22.2",
+    "playwright": "1.64.1",
+    "platform": "linux",
+    "release": "6.8.0-147-generic",
+    "arch": "x64",
+    "browsers": {
+      "chromium": {
+        "executable": "/home/actions/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome",
+        "override": false,
+        "channel": "chromium",
+        "version": "156.0.8078.4",
+        "passed": true
+      },
+      "webkit": {
+        "executable": "/home/actions/.cache/ms-playwright/webkit-2370/pw_run.sh",
+        "override": false,
+        "channel": null,
+        "version": "27.2",
+        "passed": true
+      }
+    }
+  }
+}
