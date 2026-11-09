@@ -125,8 +125,10 @@ tags using the existing classification path. The radial dock's desktop viewport
 is explicit at 1280×720, with one checked fixed-viewport equivalence; the original
 23 mappings remain and the current exact count is 24. All six local selection
 contracts and all six explicit browser control cases pass. Qualified Linux
-batch contracts and all six
-affected browser executions remain pending. The Mage branch incorporates that
+run 42675291510 also passed all **31 batch/selection contracts and six real
+control cases**, and PR verification 42675302736 passed **1,244 units, both
+types/build integrations and seven core journeys** in 245.8 s. PR #358 is ready
+for review with its full portable receipts. The Mage branch incorporates that
 separate prerequisite and stacks #357 above it. Its two restored mobile
 executions, two title changes and explicit viewport mapping are distinct from
 the Mage discovery additions. The initial unrestricted radial-landscape
@@ -142,6 +144,12 @@ passing test evidence; subsequent qualification must still run every gate.
 Complete focused/extended browser execution and final acceptance remain pending.
 Physical hardware was not requested; describe device emulation accurately and
 retain engine/platform failures.
+
+Current Mage run [42675462523](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42675462523)
+at `bcc523c` is live. Focused Chromium/WebKit and picker steps succeeded, but the
+full six-profile earned-progression matrix and actual final case accounting are
+still pending. Subsequent handoff commits change only documentation/receipts;
+they do not invalidate those runtime/test inputs or justify another matrix run.
 
 ### Focused fixture correction
 

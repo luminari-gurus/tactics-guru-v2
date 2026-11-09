@@ -311,6 +311,22 @@ emulation accurately and retain any real platform failure.
   fixture correction, preserving their incomplete state, then qualify the new
   head. Retry #358's zero-job service failures on the same handles now that
   GitHub is admitting jobs again. Do not relabel those failures as product tests.
+- Prerequisite **PR #358 is ready for review**. Qualified run 42675291510 passed
+  all 31 batch/selection contracts and six real browser-control executions.
+  Its ordinary PR run 42675302736 passed 1,244 units, both types, two build
+  integrations, bundle and seven core journeys in 245.8 s. Synthetic merge tree
+  equals implementation `8c199ba`; the later `36c2f26` commit adds only receipts.
+  The Mage branch incorporates that handoff without changing relevant inputs.
+- Current Mage qualification **42675462523** is live on tested implementation
+  `bcc523c`: selection contracts, focused Chromium/WebKit and the retained
+  picker steps succeeded, and full earned progression is running. The wrapper's
+  final JSON/skip/retry counts still need inspection before checking those
+  OpenSpec tasks complete. Watch the existing run rather than restarting it;
+  the local watcher is session 40420 and writes `tmp/issue316-mage-watch.log`.
+- Final ordinary Mage PR run **42675477861** tests the same implementation.
+  Verify its terminal result and source tree, then retain both that receipt and
+  the complete Mage matrix in the QA record. Only after every acceptance gate
+  passes should #357 become ready and use `Closes #316`.
 
 Estimated time **for me: 2–3 hours** of elapsed implementation and affected
 verification after work begins, excluding self-hosted runner queue time:

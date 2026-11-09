@@ -15,7 +15,7 @@ plan's complete acceptance remains required; no product spec changes apply.
 
 ## 3. Integration and review handoff
 
-- [ ] 3.1 Qualify the separate prerequisite PR #358 restoring mobile executions excluded by unregistered layout tags; verify the exact-main reproduction, selection contracts and all six affected browser cases without changing assertions or classification policy.
+- [x] 3.1 Qualify the separate prerequisite PR #358 restoring mobile executions excluded by unregistered layout tags; verify the exact-main reproduction, the explicit fixed-viewport equivalence and all six affected browser control cases with original assertions/deadlines preserved.
 - [ ] 3.2 Pass affected units, both type scopes/build integrations, core PR journeys and exact selection contracts; audit all issue/plan gates against current-source evidence, update the plan/QA record, push and open a correctly labeled focused PR ready for review.
 
 ## Workflow follow-up
