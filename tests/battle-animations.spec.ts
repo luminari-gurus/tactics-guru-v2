@@ -234,6 +234,8 @@ for(const kind of kinds)test(`${kind}: real controls, travel/impact, transformed
   const point=await page.evaluate(()=>{const r=document.querySelector('#battle-board-region')!.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height*0.6};});
   await page.mouse.move(point.x,point.y);await page.mouse.wheel(0,-80);
   await prepareSignature(page,fixture,keyboard);await confirmFrozen(page);
+  await expect(page.locator('#battle-active')).toHaveText(`Round ${fixture.before.round} · Resolving action (Animating)`);
+  await expect(page.locator('#battle-budgets')).toHaveText('Move locked / Action locked');
   const accepted=await readSession(page),saved=await stored(page);
   expect(accepted.state).toEqual(fixture.after);expect(accepted.events).toEqual(fixture.events);
   expect(accepted.continuation!.commands).toEqual([fixture.command]);
@@ -260,6 +262,8 @@ for(const kind of kinds)test(`${kind}: real controls, travel/impact, transformed
   writeFileSync(info.outputPath('animation.json'),JSON.stringify({viewport:page.viewportSize(),fixture,travel:capture(travel),impact:capture(impact)},null,2));
   expect((await readSession(page)).state).toEqual(accepted.state);expect(await stored(page)).toEqual(saved);
   await page.clock.runFor(500);await ready(page);
+  await expect(page.locator('#battle-active')).toHaveText(`Round ${fixture.after.round} · Your turn`);
+  await expect(page.locator('#battle-budgets')).toContainText('Action spent');
   expect((await report(page)).effect).toBeNull();expect((await report(page)).objectCount).toBe(baseline);
   expect((await readSession(page)).state).toEqual(fixture.after);expect(await stored(page)).toEqual(saved);expect(errors).toEqual([]);
 });
@@ -478,7 +482,15 @@ test('active bob: presentation, actor change, hidden page and restart restore an
   await page.clock.runFor(800); await ready(page);
   await expect.poll(async () => { await page.clock.runFor(100); return (await bobFrame(page)).actor.bobOffset; }).toBeLessThan(-0.2);
   const previousId = (await report(page)).activeId;
+  const previousRound = (await readSession(page)).state.round;
+  const previousName = await page.locator('#battle-actor-name').textContent();
   await press(page, '#battle-next');
+  const handoff = await readSession(page);
+  expect(handoff.phase).toBe('presenting');
+  expect(handoff.state.initiative[handoff.state.activeIndex]).not.toBe(previousId);
+  await expect(page.locator('#battle-active')).toHaveText(`Round ${previousRound} · Resolving action (Animating)`);
+  await expect(page.locator('#battle-actor-name')).toHaveText(previousName!);
+  await expect(page.locator('#battle-budgets')).toHaveText('Move locked / Action locked');
   // Settle on live frames without granting more than the original 3s of
   // animation time. Keep this bound local; other readiness checks are unchanged.
   const actorTransitionStarted = await page.evaluate(() => Date.now());
