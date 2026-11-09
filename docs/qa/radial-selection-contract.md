@@ -29,7 +29,24 @@ The task-scoped workflow runs all batch/selection contracts and an explicit
 all-profile control for these two witnesses, including the equivalent omitted
 radial execution (six actual cases). The control removes only project selection
 filters; assertions, devices, workers, retries and deadlines remain unchanged.
-Current-source qualified results remain pending before review readiness.
+Qualified Linux results now pass at `8c199ba99698df3554c8f0703bdd5dd884c3c939`:
+
+- [Selection run 42675291510](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42675291510)
+  on `unraid-tactics-01`: all **31 batch/selection contracts** and **6/6 actual
+  control cases**, workers 1/retries 0, no skips/flakes/failures. Browser duration
+  was 38,985 ms. The radial cases use the explicitly named 1280×720 viewport;
+  the narrow-landscape corpus retains its original viewport/input assertions.
+- [PR verification 42675302736](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42675302736):
+  **1,244 units**, both types, **2 build integrations**, bundle and **7 core
+  journeys** passed in 245,834 ms. The actual synthetic merge `9c91abf` has tree
+  `4b318f07af655e8acee1c879a7773a5a557ec30f`, verified equal to the published head.
+
+[Portable receipts](radial-selection/) include the full qualified browser report,
+stage receipt and logs. Earlier zero-job GitHub service failures and the local
+scope failure remain distinct; this is not a full-regression or physical-device
+claim. Only this documentation/receipt update follows the tested code, so the
+relevant inputs are unchanged. PR #358 is ready for review; merge is not part of
+this implementation handoff.
 
 Local Windows iteration passed all six selection contracts and all six explicit
 control cases (18.9 seconds, one worker, zero retries/skips) after the viewport
