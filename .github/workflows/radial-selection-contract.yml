@@ -1,0 +1,38 @@
+name: Radial selection contract
+on:
+  push:
+    branches: [branch/fix-radial-selection-contract]
+    paths: ['tests/**', 'scripts/**', '*config*', 'package*.json', '.github/workflows/radial-selection-contract.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: tactics-browser-tactics-browser-01
+  queue: max
+  cancel-in-progress: false
+jobs:
+  selection:
+    if: github.repository == 'luminari-gurus/tactics-guru-v2' && github.ref == 'refs/heads/branch/fix-radial-selection-contract'
+    runs-on: [self-hosted, tactics-browser, tactics-browser-01]
+    timeout-minutes: 10
+    steps:
+      - run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run setup:browsers
+      - run: npm run test:verification-batches
+      - run: npm run build
+      - run: npm run test:browser -- -c playwright.regression.config.ts tests/battle-radial.spec.ts tests/battle-loop.spec.ts -g 'radial preference replaces the side rail|narrow landscape battle stacks controls' --diagnostics
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: radial-selection-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/
+          retention-days: 14
+          if-no-files-found: warn
