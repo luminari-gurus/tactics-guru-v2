@@ -10,8 +10,8 @@
 
 ## 3. Integrated qualification and review
 
-- [ ] 3.1 Verify all issue criteria and shared standalone/run/dungeon consumers using the approved affected Chromium/touch/WebKit scope, complete legal core journeys, screenshot review and verify:pr; retain source-bound results and failures in plan.md.
-- [ ] 3.2 Validate OpenSpec, review the final diff, commit/push and open a labeled focused PR; verify remote parity, issue linkage, review readiness and the plan's continuation references.
+- [x] 3.1 Verify all issue criteria and shared standalone/run/dungeon consumers using the approved affected Chromium/touch/WebKit scope, complete legal core journeys, screenshot review and verify:pr; retain source-bound results and failures in plan.md.
+- [x] 3.2 Validate OpenSpec, review the final diff, commit/push and open a labeled focused PR; verify remote parity, issue linkage, review readiness and the plan's continuation references.
 
 ## Workflow follow-up
 

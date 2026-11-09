@@ -1351,5 +1351,20 @@
     "url": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42630279039",
     "seconds": 204.6,
     "note": "All standard stages and seven core journeys passed before the final S correction. A new current-head run remains required."
+  },
+  "finalCi": {
+    "head": "9329ff0ed2912466dab6fe695de06322ece3dc4a",
+    "ciCheckout": "3047fcd36c41a083d7bde2b1ac37e470f9568fa2",
+    "tree": "8a1c17f2fb6088f0ce0f9710da8d1f0b151ee860",
+    "identical": true,
+    "url": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42631947486",
+    "artifact": "https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42631947486/artifacts/13680857744",
+    "status": "passed",
+    "commandSeconds": 196.6,
+    "units": 1244,
+    "buildIntegrations": 2,
+    "coreJourneys": 7,
+    "runner": "unraid-tactics-01",
+    "note": "All standard stages pass. CI synthetic merge tree equals the published implementation. Later checklist/receipt-only changes preserve every recorded runtime/test/tooling hash."
   }
 }
