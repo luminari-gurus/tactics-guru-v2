@@ -121,11 +121,17 @@ tags on literal main `6aad368`. The exact base reproduces the radial omission;
 after that first tag repair, the second narrow-landscape omission becomes
 visible. Compressed original/base/intermediate/green logs are retained here.
 PR [#358](https://github.com/luminari-gurus/tactics-guru-v2/pull/358) removes both
-tags without changing assertions or approved classification policy. All six
-local selection contracts pass; qualified Linux batch contracts and all six
+tags using the existing classification path. The radial dock's desktop viewport
+is explicit at 1280×720, with one checked fixed-viewport equivalence; the original
+23 mappings remain and the current exact count is 24. All six local selection
+contracts and all six explicit browser control cases pass. Qualified Linux
+batch contracts and all six
 affected browser executions remain pending. The Mage branch incorporates that
-separate prerequisite and stacks #357 above it. Its three restored mobile
-executions and two title renames are distinct from the Mage discovery additions.
+separate prerequisite and stacks #357 above it. Its two restored mobile
+executions, two title changes and explicit viewport mapping are distinct from
+the Mage discovery additions. The initial unrestricted radial-landscape
+iteration failed its desktop-layout assumption; its correction and red/green
+receipts remain in the separate repair record.
 
 GitHub service failures are preserved separately: #357 standard run attempt 1,
 Mage qualification 42671820980 (attempts 1 and 2), and manual run 42672732211

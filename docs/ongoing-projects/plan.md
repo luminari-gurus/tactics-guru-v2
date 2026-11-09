@@ -285,9 +285,12 @@ emulation accurately and retain any real platform failure.
   Portable source/full result receipts are in `docs/qa/issue-316/baseline/`.
 - Broader selection contracts exposed two pre-existing unregistered reduction
   tags on literal main. A separate repair PR
-  [#358](https://github.com/luminari-gurus/tactics-guru-v2/pull/358) restores three
-  mobile executions without changing assertions/filters/deadlines. It has
-  bug/risk:medium labels and all six local selection contracts pass. The Mage
+  [#358](https://github.com/luminari-gurus/tactics-guru-v2/pull/358) restores two
+  mobile executions and makes the radial dock's original desktop viewport
+  explicit at 1280×720. One checked fixed-viewport equivalence extends the exact
+  count from 23 to 24; assertions, filter mechanics and deadlines remain. It has
+  bug/risk:medium labels; all six local selection contracts and all six explicit
+  browser-control cases pass. The Mage
   branch incorporates the repair and #357 stacks above #358; qualified layout
   and Linux shell-contract execution remains pending.
 - GitHub rejected several qualification/PR attempts with an Internal server
