@@ -1,10 +1,125 @@
 import {expect,test} from './helpers/forceRailControls';
-import { readSession, playCommand, tapBoard } from './helpers/battlePolicy';
+import { readSession, playCommand, tapBoard, boardPoint } from './helpers/battlePolicy';
 import { abilityCatalog } from './helpers/abilityCatalog';
 import { progressHero, projectProgression } from '../src/domain/progression';
 import { HERO_IDS } from '../src/content/constants';
 import { previewMovement } from '../src/domain/grid';
 import { COMBAT_CONTROLS_KEY } from '../src/ui/combatControls';
+
+test('review356 radial Tab review matches the ability actually confirmed',async({page})=>{
+  await page.addInitScript(()=>{(globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';});
+  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await page.locator('canvas').focus();await page.keyboard.press('ArrowRight');await page.keyboard.press('ArrowRight');await page.keyboard.press('1');
+  await expect(page.locator('[data-radial-ability="ability:frost_snare"]')).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(page.locator('[data-radial-ability="ability:magic_missile"]')).toBeFocused();
+  const shown=await page.locator('#battle-preview').innerText();
+  await page.screenshot({path:test.info().outputPath('radial-review-before-confirm.png')});
+  await page.keyboard.press('c');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const accepted=await readSession(page);
+  expect(accepted.events.some(event=>event.type==='abilityUsed'&&event.abilityId==='ability:magic_missile')).toBe(true);
+  await test.info().attach('radial-review',{body:JSON.stringify({shown,events:accepted.events}),contentType:'application/json'});
+  expect(shown).toContain('Magic Missile');
+  expect(shown).toContain('force damage');
+});
+
+test('review356 radial ability shortcuts cannot cast before choosing a planned destination',async({page})=>{
+  await page.addInitScript(()=>{(globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';});
+  await page.goto('/tests/fixtures/abilities/index.html?hero=fighter&xp=180&real&injured');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const before=await readSession(page);
+  await tapBoard(page,{x:0,y:0});await page.locator('#battle-radial-plan').click();
+  await page.locator('canvas').focus();await page.keyboard.press('2');await page.keyboard.press('c');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const after=await readSession(page);
+  await test.info().attach('plan-shortcut',{body:JSON.stringify({before:before.state,after:after.state,events:after.events}),contentType:'application/json'});
+  expect(after.state).toEqual(before.state);
+});
+
+test('review356 radial pointer aiming and native Enter share the full review',async({page})=>{
+  await page.addInitScript(()=>{(globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';});
+  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await tapBoard(page,{x:1,y:0});
+  await page.locator('#battle-radial-special').hover();
+  const shown=await page.locator('#battle-preview').innerText();
+  await page.keyboard.press('Enter');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const accepted=await readSession(page);
+  await test.info().attach('mixed-input',{body:JSON.stringify({shown,events:accepted.events}),contentType:'application/json'});
+  expect(accepted.events.some(event=>event.type==='abilityUsed'&&event.abilityId==='ability:magic_missile')).toBe(true);
+  expect(shown).toContain('force damage');
+});
+
+test('review356 held radial aim keeps the full review aligned with release',async({page})=>{
+  await page.addInitScript(()=>{(globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';});
+  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const point=await boardPoint(page,{x:1,y:0});await page.mouse.move(point.x,point.y);await page.mouse.down();
+  await expect(page.locator('#battle-radial')).toBeVisible();
+  const box=(await page.locator('#battle-radial-special').boundingBox())!;
+  await page.mouse.move(box.x+box.width/2,box.y+box.height/2);
+  const shown=await page.locator('#battle-preview').innerText();
+  await page.mouse.up();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const accepted=await readSession(page);
+  await test.info().attach('held-review',{body:JSON.stringify({shown,events:accepted.events}),contentType:'application/json'});
+  expect(accepted.events.some(event=>event.type==='abilityUsed'&&event.abilityId==='ability:magic_missile')).toBe(true);
+  expect(shown).toContain('force damage');
+});
+
+test('review356 radial shortcuts use the moved cursor after switching from rail',async({page})=>{
+  await page.goto('/tests/fixtures/abilities/index.html?hero=mage');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const before=await readSession(page),actor=before.state.units.find(u=>u.id===before.state.initiative[before.state.activeIndex])!;
+  const cells=await page.locator('#battle-target option').evaluateAll(options=>options
+    .filter(option=>!(option as HTMLOptionElement).disabled&&(option as HTMLOptionElement).value)
+    .map(option=>{const [x,y]=(option as HTMLOptionElement).value.split(',').map(Number);return{x,y};}));
+  const old=cells.find(c=>cells.some(n=>Math.abs(n.x-c.x)+Math.abs(n.y-c.y)===1))!;
+  const next=cells.find(n=>Math.abs(n.x-old.x)+Math.abs(n.y-old.y)===1)!;
+  await page.locator('#battle-target').selectOption(`${old.x},${old.y}`);
+  await page.evaluate(()=>{delete (globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls;});
+  await page.locator('#battle-overflow summary').click();await page.getByRole('radio',{name:'Radial',exact:true}).check();
+  await expect(page.locator('body')).toHaveAttribute('data-combat-skin','radial');
+  await page.locator('canvas').focus();
+  await page.keyboard.press(next.x!==old.x?(next.x>old.x?'ArrowRight':'ArrowLeft'):(next.y>old.y?'ArrowDown':'ArrowUp'));
+  await page.keyboard.press('m');await page.keyboard.press('c');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const after=await readSession(page),actual=after.state.units.find(u=>u.id===actor.id)!.cell;
+  await test.info().attach('cursor-shortcut',{body:JSON.stringify({old,next,actual}),contentType:'application/json'});
+  expect(actual).toEqual(next);
+});
+
+test('review356 self-heal plan has a complete review before confirmation',async({page})=>{
+  await page.addInitScript(()=>{(globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';});
+  await page.goto('/tests/fixtures/abilities/index.html?hero=fighter&xp=180&real&injured');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const before=await readSession(page);
+  await tapBoard(page,{x:0,y:0});await page.locator('#battle-radial-plan').click();
+  const value=await page.locator('#battle-target option').nth(1).getAttribute('value');
+  const [x,y]=value!.split(',').map(Number);await tapBoard(page,{x,y});
+  await page.keyboard.press('2');const shown=await page.locator('#battle-preview').innerText();
+  await page.screenshot({path:test.info().outputPath('self-plan-before-confirm.png')});
+  await page.keyboard.press('c');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const after=await readSession(page);expect(after.state.commandCount).toBe(before.state.commandCount+2);
+  expect(after.events.some(event=>event.type==='healed')).toBe(true);
+  await test.info().attach('self-plan-review',{body:JSON.stringify({shown,events:after.events}),contentType:'application/json'});
+  expect(shown).toContain(`Move to (${x}, ${y})`);expect(shown).toContain('Heal');
+});
+
+test('review356 radial review preserves the shared friendly-fire warning',async({page})=>{
+  await page.addInitScript(()=>{(globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';});
+  await page.goto('/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const before=await readSession(page),fighter=before.state.units.find(u=>u.defId==='fighter')!;
+  await page.locator('canvas').focus();for(let i=0;i<4;i++)await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('2');await expect(page.locator('[data-radial-ability="ability:magic_missile"]')).toBeFocused();
+  const shown=await page.locator('#battle-preview').innerText();
+  await page.screenshot({path:test.info().outputPath('friendly-review-before-confirm.png')});
+  await page.keyboard.press('c');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const after=await readSession(page);expect(after.state.units.find(u=>u.id===fighter.id)!.hp).toBeLessThan(fighter.hp);
+  await test.info().attach('friendly-review',{body:JSON.stringify({shown,events:after.events}),contentType:'application/json'});
+  expect(shown).toContain('Friendly fire');expect(shown).toContain('fighter');
+});
 
 for(const hero of ['fighter','ranger','mage'] as const)test(`keyboard-only shortcuts select ${hero} learned abilities and preserve resource locks`,async({page})=>{
   const expected={fighter:['guarded_strike','second_wind','taunt'],ranger:['high_shot','mark_target','pinning_shot'],mage:['frost_snare','magic_missile']}[hero].map(id=>`ability:${id}`);
@@ -370,7 +485,7 @@ test('radial hold keeps edge actions visible and cancels at the original press',
     const model=new BattleSelection(abilitySession('mage'));
     let cancelled=0;
     const committed:string[]=[];
-    const radial=new BattleRadial(model,{commit:(_cell:unknown,slice:string)=>{committed.push(slice);},inspect:()=>{},plan:()=>{},cancel:()=>{cancelled++;}});
+    const radial=new BattleRadial(model,{commit:(_cell:unknown,slice:string)=>{committed.push(slice);},inspect:()=>{},plan:()=>{},cancel:()=>{cancelled++;},preview:()=>{}});
     const result=[];
     const root=radial.root as HTMLElement;
     for(const origin of [{x:8,y:8},{x:312,y:8},{x:8,y:560},{x:312,y:560}]) {
@@ -450,7 +565,7 @@ test('radial shifted hold can aim Special and still cancel at the press', async 
     const model=new BattleSelection(abilitySession('mage'));
     const commits:string[]=[];
     let cancels=0;
-    const radial=new BattleRadial(model,{commit:(_cell:unknown,slice:string,ability?:string)=>commits.push(`${slice}:${ability}`),inspect:()=>{},plan:()=>{},cancel:()=>cancels++});
+    const radial=new BattleRadial(model,{commit:(_cell:unknown,slice:string,ability?:string)=>commits.push(`${slice}:${ability}`),inspect:()=>{},plan:()=>{},cancel:()=>cancels++,preview:()=>{}});
     const root=radial.root as HTMLElement;
     const origin={x:282,y:280};
     const target={x:262,y:280};
@@ -499,7 +614,7 @@ test('radial compact landscape keeps every slice reachable on tap and hold', asy
     const {abilitySession}=await import(/* @vite-ignore */ fixturePath);
     document.querySelector('#battle-radial')?.remove();
     const commits:string[]=[];
-    const radial=new BattleRadial(new BattleSelection(abilitySession('mage')),{commit:(_cell:unknown,slice:string)=>commits.push(slice),inspect:()=>{},plan:()=>{},cancel:()=>{}});
+    const radial=new BattleRadial(new BattleSelection(abilitySession('mage')),{commit:(_cell:unknown,slice:string)=>commits.push(slice),inspect:()=>{},plan:()=>{},cancel:()=>{},preview:()=>{}});
     const root=radial.root as HTMLElement;
     const layouts=[];
     for(const mode of ['tap','hold'] as const) for(const origin of [{x:8,y:8},{x:560,y:8},{x:8,y:292},{x:560,y:292}]) {

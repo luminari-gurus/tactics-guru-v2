@@ -20,6 +20,18 @@ An active battle SHALL support M for Move, A for Basic attack, S for the selecte
 - **WHEN** shortcuts are used with a prepared move, ability, compound plan or follow-up target
 - **THEN** the existing preview, confirmation, cancellation and atomic rejection rules remain effective, and W retains its documented immediate end-turn behavior
 
+#### Scenario: Focus and pointer handoff
+- **WHEN** native Tab, pointer aiming or a held gesture changes the reviewed radial action
+- **THEN** the full HUD and compact hub describe the action that C, native activation or release will accept, without spending state or RNG while reviewing
+
+#### Scenario: Complete plan and friendly-target review
+- **WHEN** a self-heal plan or friendly-target ability is reviewed
+- **THEN** the full review includes the move/heal consequences or shared friendly-fire warning before confirmation, while offensive plans retain their target-choice step
+
+#### Scenario: Plan ordering and current cursor
+- **WHEN** a player is still choosing a planned destination or moves the board cursor after changing control skins
+- **THEN** non-move shortcuts cannot bypass the destination step, and keyboard actions use the latest cursor rather than the retained earlier selection
+
 ### Requirement: Context-safe shortcut ownership
 Action shortcuts SHALL apply only to a ready, visible, player-controlled battle. They SHALL yield to handled events, IME composition, repeated keydowns, modifier combinations, editable controls and open dialogs. Existing native arrows, Enter/Space, Tab navigation and modal Escape behavior SHALL remain available.
 

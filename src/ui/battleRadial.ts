@@ -1,7 +1,7 @@
 import type { AbilityId, CellPosition } from '../content/types';
 import type { Point } from '../geometry/iso';
 import { displayName, previewText, shortcutHint } from './hud';
-import { BATTLE_KEYS, ownedAbilities } from './battleActions';
+import { BATTLE_KEYS, ownedAbilities, type Action } from './battleActions';
 import { BattleSelection, previewAction, selectableSpecials, type RadialSliceView } from './battleSelection';
 import { CARDINAL_SLICE, type RadialSliceId, cardinalFromVector, hubContains, specialSliceActivation } from './radialGesture';
 import { fitRadialLabels, stripUnavailablePrefix, uniqueHubLines } from './radialLabels';
@@ -29,6 +29,7 @@ export class BattleRadial {
   private readonly onInspect: () => void;
   private readonly onPlan: () => void;
   private readonly onCancel: () => void;
+  private readonly onPreview: () => void;
   constructor(
     private readonly selection: BattleSelection,
     callbacks: {
@@ -36,12 +37,14 @@ export class BattleRadial {
       inspect: () => void;
       plan: () => void;
       cancel: () => void;
+      preview: () => void;
     },
   ) {
     this.onCommit = callbacks.commit;
     this.onInspect = callbacks.inspect;
     this.onPlan = callbacks.plan;
     this.onCancel = callbacks.cancel;
+    this.onPreview = callbacks.preview;
     this.root = document.createElement('div');
     this.root.id = 'battle-radial';
     this.root.hidden = true;
@@ -70,7 +73,7 @@ export class BattleRadial {
       }, { signal });
       // Opening or repositioning the menu can put a slice under a stationary pointer.
       button.addEventListener('pointermove', () => {
-        if (this.mode === 'tap' && !button.disabled && this.aimed !== slice) this.aim(slice);
+        if (this.mode === 'tap' && !button.disabled && this.aimed !== slice) button.focus({ preventScroll: true });
       }, { signal });
     });
     this.root.querySelector('#battle-radial-hub')!.addEventListener('click', () => {
@@ -82,12 +85,12 @@ export class BattleRadial {
 
   /** Aim existing controls without using their click/commit path. */
   focusShortcut(cell: CellPosition, slice: 'move' | 'attack' | 'special', origin: Point, abilityId?: AbilityId): boolean {
+    if (this.selection.planning && !this.selection.planMove && slice !== 'move') return false;
     if (this.mode === 'hold' || this.selection.slices(cell).find(view => view.id === slice)?.disabled) return false;
     if (abilityId && !selectableSpecials(this.selection.session, cell, this.selection.planMove).some(ability => ability.id === abilityId)) return false;
     this.selection.session.clearPrepared();
     this.selection.selectedCell = cell;
     this.selection.followUp = null;
-    this.selection.selectedAction = abilityId ?? (slice === 'move' ? 'move' : 'basic');
     if (!this.open || this.cell?.x !== cell.x || this.cell?.y !== cell.y) this.show(cell, { mode: 'tap', origin });
     this.subOpen = Boolean(abilityId);
     this.aim(slice);
@@ -96,12 +99,6 @@ export class BattleRadial {
       : this.root.querySelector<HTMLButtonElement>(`[data-slice="${slice}"]`);
     if (!button || button.disabled || button.closest('[hidden]')) return false;
     button.focus();
-    if (abilityId) this.highlightChip(abilityId);
-    // The fitted hub may omit long text; the HUD retains the full review.
-    const preview = abilityId ? previewAction(this.selection.session, abilityId, cell, this.selection.planMove).preview : null;
-    this.selection.message = abilityId
-      ? `${displayName(abilityId)} · ${this.selection.planning && this.selection.planMove ? 'Choose a target' : preview ? previewText(preview) : 'Unavailable target'}`
-      : this.slices().find(view => view.id === slice)!.detail;
     return true;
   }
 
@@ -121,14 +118,13 @@ export class BattleRadial {
     this.subOpen = false;
     this.leftHub = false;
     this.root.hidden = false;
+    this.root.setAttribute('aria-label', `Battle actions at cell (${cell.x}, ${cell.y})`);
     const def = this.selection.planning && this.selection.planMove ? 'attack' : this.selection.defaultSlice(cell);
     // The press remains the hold cancel point even when the menu moves.
     this.anchor = options.origin;
     // Render first: fitted labels can change the Plan control's height.
     this.aim(def);
     this.reposition();
-    const live = document.querySelector('#battle-preview');
-    if (live) live.textContent = this.announce();
     if (options.mode === 'tap') {
       const focusId = def === 'plan' ? 'battle-radial-plan' : `battle-radial-${def}`;
       this.root.querySelector<HTMLButtonElement>(`#${focusId}:not(:disabled)`)?.focus();
@@ -230,12 +226,6 @@ export class BattleRadial {
     return this.cell ? (this.selection.planning && this.selection.planMove ? 'attack' : this.selection.defaultSlice(this.cell)) : 'move';
   }
 
-  private announce(): string {
-    const slice = this.slices().find(entry => entry.id === (this.aimed === 'hub' ? this.defaultId() : this.aimed));
-    const cell = this.cell;
-    return cell ? `Cell (${cell.x}, ${cell.y}). ${slice ? `${slice.label}: ${slice.detail}` : 'Choose an action'}` : 'Choose an action';
-  }
-
   private slices(): RadialSliceView[] {
     return this.cell ? this.selection.slices(this.cell) : [];
   }
@@ -250,6 +240,18 @@ export class BattleRadial {
       }
     } else if (slice !== 'hub') this.subOpen = false;
     this.render();
+    if (slice !== 'hub') {
+      if (slice === 'special' && this.cell) {
+        const specials = selectableSpecials(this.selection.session, this.cell, this.selection.planMove);
+        const offered = specials.find(ability => ability.id === this.selection.lastUsedSpecial()) ?? specials[0];
+        if (offered) { this.highlightChip(offered.id); return; }
+      }
+      this.review(slice === 'move' ? 'move' : slice === 'attack' ? 'basic' : null,
+        this.slices().find(view => view.id === slice)!.detail);
+    } else {
+      this.review(this.leftHub ? null : this.selection.selectedAction,
+        this.leftHub ? 'Release to cancel · Nothing commits' : `Release to confirm · ${this.slices().find(view => view.isDefault)?.detail ?? ''}`);
+    }
   }
 
   private activate(slice: RadialSliceId): 'commit' | 'cancel' | 'open-sub' | 'inspect' | 'plan' | 'none' {
@@ -309,13 +311,30 @@ export class BattleRadial {
       button.setAttribute('aria-pressed', String(button.dataset.radialAbility === abilityId));
     });
     if (!this.cell) return;
-    if (this.selection.planning && this.selection.planMove) {
+    const self = this.selection.session.catalog.abilities[abilityId]?.kind === 'secondWind';
+    if (this.selection.planning && this.selection.planMove && !self) {
       this.paintHub(displayName(abilityId), 'Choose a target');
+      this.review(abilityId, `${displayName(abilityId)} · Choose a target`);
       return;
     }
-    const preview = previewAction(this.selection.session, abilityId, this.cell, this.selection.planMove).preview;
+    const {command, preview} = previewAction(this.selection.session, abilityId,
+      self ? this.selection.session.active.cell : this.cell, this.selection.planMove);
     const lines = uniqueHubLines(displayName(abilityId), preview ? previewText(preview) : '', preview && !preview.ok ? previewText(preview) : null, Boolean(preview && !preview.ok));
     this.paintHub(lines.title, lines.subtitle);
+    const prefix = this.selection.planning && this.selection.planMove
+      ? `Move to (${this.selection.planMove.to.x}, ${this.selection.planMove.to.y}) + ability`
+      : displayName(abilityId);
+    const text = `${prefix} · ${preview ? previewText(preview) : 'Unavailable target'}`;
+    this.review(abilityId, command ? this.selection.reviewText(command, text) : text);
+  }
+
+  /** The fitted hub and full HUD follow the same aim/focus in both gesture modes. */
+  private review(action: Action | null, message: string): void {
+    if (!this.open) return;
+    if (this.selection.selectedAction !== action || action === null) this.selection.session.clearPrepared();
+    this.selection.selectedAction = action;
+    this.selection.message = message;
+    this.onPreview();
   }
 
   private render(): void {

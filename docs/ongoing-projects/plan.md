@@ -7,10 +7,90 @@ Base: `origin/main` at `130c5ccffc491f893da8e598b8c008898fa92138`.
 Branch: [`branch/issue-284-desktop-shortcuts`](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-284-desktop-shortcuts).
 Status: implementation authorized by the caller on 2026-11-09. OpenSpec change
 [`issue-284-desktop-shortcuts`](../../openspec/changes/issue-284-desktop-shortcuts/proposal.md)
-tracks this approved plan. **Implementation and qualification are complete.**
-[PR #356](https://github.com/luminari-gurus/tactics-guru-v2/pull/356) is ready for
-review, labeled `enhancement` and `risk:medium`. OpenSpec is 4/4 complete; retain
-the change for review rather than archiving it. Final delivery evidence is below.
+tracks this approved plan. **Adversarial review corrections are in progress.**
+[PR #356](https://github.com/luminari-gurus/tactics-guru-v2/pull/356) is undergoing
+the caller-authorized independent review/fix/merge workflow. The original four
+implementation tasks are complete; the review correction tasks below track the
+current work. Earlier implementation/qualification evidence remains historical.
+
+## PR #356 adversarial review — 2026-11-09
+
+The caller authorized independent adversarial review, posting every valid finding,
+fixes, local verification, merge and safe Git cleanup. This supersedes the prior
+review-only handoff. Main and the PR base both remain `a6e9a2f`; the reviewed head
+is `afab96c`. No pre-existing dirty work was present. Existing PR discussions were
+read: no manual reviews/threads existed; automated review and risk comments were
+not used as proof of correctness.
+
+Five P2 findings are posted in [review 5827504020](https://github.com/luminari-gurus/tactics-guru-v2/pull/356#pullrequestreview-5827504020)
+and [review 5827759684](https://github.com/luminari-gurus/tactics-guru-v2/pull/356#pullrequestreview-5827759684):
+
+- Native Tab changes a radial ability's focus/hub, but the full HUD retains the
+  preceding ability. The red witness accepted Magic Missile while showing Frost
+  Snare's no-damage review.
+- Radial ability shortcuts bypass the shared plan's destination prerequisite.
+  Injured Fighter, Plan move, 2/C accepts standalone Second Wind: command count
+  0→1, HP 20→27, action and single use consumed with no movement.
+- Rail-to-radial switching preserves a selected cell; subsequent arrow movement
+  updates the cursor, but M/C still targets the old cell. Red witness committed
+  (0,1) after the cursor moved to legal (1,1).
+- A valid self-targeted move/heal plan says only “Choose a target” before C
+  immediately accepts both commands. It needs the actual compound review.
+- Radial Magic Missile can damage the allied Fighter without the friendly-fire
+  warning supplied by the existing shared selection formatter.
+
+**Outcome:** resolve all findings and preserve all original shortcut, native-input,
+hold, planning, persistence and host contracts. **Non-goals:** a new input system,
+new dependencies or unrelated cleanup. **Files:** radial/scene, existing ability
+regressions and direct radial harnesses, this plan/OpenSpec/evidence. **Proof:**
+retain before/after browser results, run the callback's direct harness consumers,
+affected Chromium/WebKit controls, standalone/run/dungeon journeys and local PR
+verification; do not wait on optional GitHub job latency as an implementation gate.
+
+Ablation: use one preview publication path for tap-menu focus/aim changes and the
+existing scene refresh callback for both tap/focus and held aim, so the full HUD cannot contradict a release. Add the existing plan
+prerequisite and use the already-synchronized cursor for keyboard targets. Update
+the three direct `BattleRadial` browser harness call sites explicitly when adding
+the callback. No source-text assertions or parallel command path are needed.
+
+Red evidence: `tmp/pr356-red.json`/log for the first two; the initial third witness
+used an unprojected catalog and was rejected as invalid fixture evidence. Its
+corrected witness reads legal destinations from the actual native target control
+and fails in `tmp/pr356-cursor-red.json`. All product repros use valid dev states;
+no production state was mutated.
+
+The same first finding also reproduces pointer→native Enter and hold→release: the unchanged code accepted Basic attack after hovering Special, and accepted Magic Missile while held aim still showed the Basic attack review. Both are recorded on the finding's PR thread and retained in `tmp/pr356-pointer-red.json` / `tmp/pr356-held-red.json`. Five focused desktop witnesses now pass (`tmp/pr356-focused-green.json`). The obsolete direct preview DOM writes/announcement helper were removed; the radial group retains the target coordinates in its accessible name.
+
+The additional self-plan and friendly-target cases failed after accepting their
+real commands (`tmp/pr356-semantic-red.json`). The repair reuses the existing
+selection warning/range/effect formatter through a pure `reviewText` method and
+the existing tactical-plan preview for self-healing. This also retains Guarded
+Strike's established tradeoff text. All seven concrete desktop witnesses now pass
+(`tmp/pr356-all-findings-green.json`). The earlier local `verify:pr` passed in
+109.9 seconds, but predates this final formatter repair; final-source validation
+is recorded separately below. No deadlines/assertions were relaxed.
+
+Delivery decision: keep the normal merge commit rather than rewriting the reviewed
+history; this preserves the source-bound commits and qualifications. No release
+tag is warranted for this feature merge. After the qualified head is merged,
+verify #284's closure and the published tree, fast-forward the caller checkout,
+and remove only exact merged branch heads with no open PR or active checkout.
+Use expected-head leases for remote deletion. Preserve worktrees with unique
+commits, local changes/config or retained raw qualification evidence. The final
+merge/cleanup readback is recorded on PR #356 after those actions actually occur;
+it is not pre-marked complete in a source checkbox.
+
+Final review source passed local `verify:pr` in **112.2 seconds** (all units,
+both TypeScript scopes, both build integrations, bundle and seven core journeys),
+plus **93/93** risk-gate tooling checks. Receipts:
+`verification-receipts/pr/1794236752127-61024/` and `tmp/pr356-risk-gate.log`.
+The full ability suite passed **96/96** on desktop/Pixel portrait/landscape,
+including all seven repros and all three direct radial harnesses. Production
+radial/keyboard/plan consumers passed **136**, with **3 expected skips** for
+device-specific native touch/CDP cases; no failed/flaky cases. Raw JSON/logs:
+`tmp/pr356-abilities-all.*`, `tmp/pr356-production-consumers.*`. WebKit is the
+remaining local engine gate. The source/test/tooling SHA-256 snapshot is
+`tmp/pr356-review-inputs.json`; later prose changes do not invalidate it.
 The previous plan is preserved unchanged in [the #297 plan](issue-297-hide-gameplay-diagnostics-plan.md).
 
 ## Why this item

@@ -149,8 +149,6 @@ export class BattleScene extends Phaser.Scene {
       const aimed=followUp ? 'attack' : selection.defaultSlice(cell);
       if(!followUp && aimed!=='inspect' && aimed!=='plan')selection.aimSlice(cell,aimed);
       radial.show(cell,{mode,origin});
-      const liveRegion=document.querySelector('#battle-preview');
-      if(liveRegion)liveRegion.textContent=`Cell (${cell.x}, ${cell.y}). ${radial.root.getAttribute('aria-label')}`;
     };
     const select=(cell:CellPosition|null)=>{
       if(!live || !ready || dialogs.open || session.phase!=='player')return;
@@ -184,6 +182,7 @@ export class BattleScene extends Phaser.Scene {
     };
     const board=new BoardRenderer(this,catalog,session.state.mapId,select,this.host?undefined:this.variant?.style);
     const radial=new BattleRadial(selection,{
+      preview:refresh,
       commit:(cell,slice,abilityId)=>commitSlice(cell,slice,abilityId),
       inspect:()=>{
         const unit=selection.selectedCell?session.state.units.find(u=>u.hp>0&&u.cell.x===selection.selectedCell!.x&&u.cell.y===selection.selectedCell!.y):null;
@@ -329,7 +328,7 @@ export class BattleScene extends Phaser.Scene {
       const key=event.key.toLowerCase();
       if(skin==='rail' || key===BATTLE_KEYS.wait){if(hud.shortcut(key))event.preventDefault();return;}
       if(key===BATTLE_KEYS.confirm){if(radial.confirmShortcut())event.preventDefault();return;}
-      const cell=selection.selectedCell??cursor;
+      const cell=cursor;
       const specials=key===BATTLE_KEYS.ability?selectableSpecials(session,cell,selection.planMove):[];
       const ability=key===BATTLE_KEYS.ability?(specials.find(a=>a.id===selection.lastUsedSpecial())??specials[0])?.id
         :/^[1-9]$/.test(key)?hud.ability.options[Number(key)-1]?.value:undefined;
