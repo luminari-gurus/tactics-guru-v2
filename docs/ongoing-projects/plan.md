@@ -282,6 +282,12 @@ after Q*bert was added; 25 menu and the other ten Chromium cases passed. Q*bert 
 split into its own fully audited group, retaining original case IDs/assertions,
 all five conditions and unchanged deadlines. The affected selection is now
 33 Chromium + 22 WebKit cases. Superseded captures remain failed/incomplete.
+The next capture (42829329281) localized remaining desktop timeouts to the later
+diagnostic battle entry in the original seven-route sweep; the isolated Q*bert
+cases and mobile/full-run cases passed. Ordinary and diagnostic entries are now
+separate complete audit groups, with all original route assertions and all five
+storage conditions preserved. The latest authored selection is 39 Chromium +
+26 WebKit cases; no timeout or retry was changed.
 
 **My implementation estimate: 4–6 hours total**, including focused regression,
 browser evidence, documentation and preparing the three reviewable PRs. First

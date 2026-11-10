@@ -85,3 +85,14 @@ Original journey case IDs/assertions and all deadlines remain. The focused
 selection is now 33 Chromium + 22 WebKit cases. Runs 42828913970 and the superseded
 queued capture are canceled for this test repair; failures/incomplete runs remain
 retained rather than relabeled as passing. Fresh qualification is required.
+
+Run 42829329281 also failed the two desktop journey sweeps at the later diagnostic
+`?scene=battle` entry, after reaching the overall 30-second case deadline; Q*bert,
+mobile isolation and legal run cases passed. The original seven-entry sweep is
+now split into ordinary routes and diagnostic entries, retaining the same audit
+body, all five storage conditions, actual commands/restart/reload/history checks
+and the final saved-menu checks. Each group's starting saved bytes are identical
+because the audit proves earlier routes leave them unchanged. Original journey
+titles remain for the four ordinary routes; three diagnostic routes receive
+explicit companion cases. The selection is 39 Chromium + 26 WebKit cases. No
+assertion, route, condition, per-case deadline, worker policy or retry is removed.
