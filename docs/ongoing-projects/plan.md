@@ -269,6 +269,12 @@ one new continuation unit because fixture construction simulated a complete lega
 defeat inside the default five-second unit budget. The unit now stages validated
 terminal data; complete legal defeat remains a browser obligation. Preserve run
 42826784671 as failed and qualify the repaired source without raising deadlines.
+Retention/replacement regressions were reproduced and repaired: a frozen result
+must keep its seal even after eviction and an accepted/refused replacement.
+Known frozen results now skip pending preparation entirely. A real terminal
+transition seals its own pending intent, so a later refused replacement cannot
+remove that protection. No schema field or additional recovery layer was added.
+
 The history observer now notifies only when its visible status changes. Successful
 receipt writes have no new status to display; rebuilding the active controls on
 every successful write could detach an in-progress confirmation/double-click.

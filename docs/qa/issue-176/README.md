@@ -67,6 +67,11 @@ is retained under `tmp/issue-176/run-42826784671/`; this failed run remains fail
 The unit now uses an explicitly staged, validated terminal snapshot and a distinct
 valid backup. The real full-health/legal defeat still runs in existing browser
 witnesses. No timeout, gameplay rule or assertion was relaxed.
+Two retention regression variants initially failed: failed or accepted replacement
+could clear an evicted terminal result's seal, letting Continue recreate it.
+Known frozen results now skip pending preparation; a real terminal transition
+also seals its own pending intent. Three bounded unit cases cover accepted,
+refused and racing outcomes after 100 opposite-mode records, without new fields.
 The history observer was also simplified to notify only on a visible status
 change, preserving active controls during successful receipt writes. Runs
 42827503310 was canceled while queued for this runtime repair. Run 42826784471

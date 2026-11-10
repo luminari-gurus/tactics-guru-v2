@@ -42,6 +42,8 @@ export class RunHistory {
     let staged = false;
     await this.commit(history => {
       const previous = history.receipts[this.mode];
+      if (previous?.kind === 'sealed' && previous.id === record.id ||
+        history.records.some(row => row.mode === record.mode && row.id === record.id)) return history;
       // An explicit review of the still-active old identity can replace its canceled intent.
       // A saved new identity is evidence the prior replacement was accepted.
       if (previous?.kind === 'pending') {
