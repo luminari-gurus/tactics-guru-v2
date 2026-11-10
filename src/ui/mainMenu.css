@@ -23,4 +23,11 @@
 .menu-dialog a { display:flex; padding:.5rem 0; }
 .menu-dialog > button { margin-top:1rem; }
 .menu-dialog input { width:1.25rem; height:1.25rem; }
+.run-records-list { padding-inline-start:1.5rem; }
+.run-records-list li { border-top:1px solid #71806b; padding:.75rem 0; overflow-wrap:anywhere; }
+.run-records-list h3 { margin:0 0 .35rem; font-size:1rem; }
+.run-records-list time { color:#c1c9b0; font-size:.85rem; }
+.run-records-list p { margin:.35rem 0; }
+.run-records-actions,[data-records-confirm] { display:flex; flex-wrap:wrap; gap:.65rem; margin-top:1rem; }
+[data-records-confirm] p { flex-basis:100%; }
 @media (max-height:550px) { .menu-content > nav[aria-label='Main menu'] { margin-top:1.5rem; } .menu-title { max-width:22rem; margin-top:0; } }

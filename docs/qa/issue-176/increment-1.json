@@ -1,0 +1,355 @@
+{
+  "head": "35cb55dc9e50d4aaade5ee7bfd3ec098c3bf2248",
+  "testedMerge": "c241544dcf4d09519a42117a641c2f2613ef9977",
+  "dirty": false,
+  "inputHash": "2f8a4deb2241ddbee5944b02cff14cd0a51853636beabb0d8f10b6f6e0534ed6",
+  "node": "v24.22.2",
+  "runner": "unraid-tactics-02",
+  "conditions": "Qualified persistent runner; unrelated host load and caches not independently controlled",
+  "runs": {
+    "pr": 42824142789,
+    "focused": 42824143064
+  },
+  "units": {
+    "total": 1257,
+    "passed": 1257,
+    "failed": 0,
+    "pending": 0
+  },
+  "buildIntegrations": {
+    "total": 2,
+    "passed": 2
+  },
+  "core": {
+    "startTime": "2026-11-10T13:25:40.192Z",
+    "duration": 123919.791,
+    "expected": 7,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "stages": [
+    {
+      "id": "tooling",
+      "status": "passed",
+      "durationMs": 9154.686603
+    },
+    {
+      "id": "units",
+      "status": "passed",
+      "durationMs": 67252.869876
+    },
+    {
+      "id": "typecheck",
+      "status": "passed",
+      "durationMs": 1390.7600149999926
+    },
+    {
+      "id": "build-integration",
+      "status": "passed",
+      "durationMs": 7108.343737000003
+    },
+    {
+      "id": "bundle",
+      "status": "passed",
+      "durationMs": 913.5803190000006
+    },
+    {
+      "id": "journeys",
+      "status": "passed",
+      "durationMs": 124611.243036
+    }
+  ],
+  "focused": [
+    {
+      "id": "6584249e185c6ba36dd3-ae79674f970c42beac1e",
+      "file": "main-menu.spec.ts",
+      "title": "main menu: records empty state is read-only and keyboard focus returns to the invoker",
+      "project": "desktop",
+      "outcome": "expected",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration": 600
+        }
+      ]
+    },
+    {
+      "id": "6584249e185c6ba36dd3-905ae8e4ce7eeefb284d",
+      "file": "main-menu.spec.ts",
+      "title": "main menu: records display and reviewed export restore reset preserve active saves",
+      "project": "desktop",
+      "outcome": "expected",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration": 1053
+        }
+      ]
+    },
+    {
+      "id": "6584249e185c6ba36dd3-e59ea63d62d7346930d9",
+      "file": "main-menu.spec.ts",
+      "title": "main menu: records unavailable storage is honest and leaves gameplay navigation usable",
+      "project": "desktop",
+      "outcome": "expected",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration": 512
+        }
+      ]
+    },
+    {
+      "id": "6584249e185c6ba36dd3-81530483099b09665fd9",
+      "file": "main-menu.spec.ts",
+      "title": "main menu: read-only root, separate artwork and isolated loading",
+      "project": "desktop",
+      "outcome": "expected",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration": 890
+        }
+      ]
+    },
+    {
+      "id": "6584249e185c6ba36dd3-68fd05b6127280468d31",
+      "file": "main-menu.spec.ts",
+      "title": "main menu: records empty state is read-only and keyboard focus returns to the invoker",
+      "project": "mobile-portrait",
+      "outcome": "expected",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration": 596
+        }
+      ]
+    },
+    {
+      "id": "6584249e185c6ba36dd3-c064462333227b5567c0",
+      "file": "main-menu.spec.ts",
+      "title": "main menu: records display and reviewed export restore reset preserve active saves",
+      "project": "mobile-portrait",
+      "outcome": "expected",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration": 1348
+        }
+      ]
+    },
+    {
+      "id": "6584249e185c6ba36dd3-282030929a16d6fd69af",
+      "file": "main-menu.spec.ts",
+      "title": "main menu: records unavailable storage is honest and leaves gameplay navigation usable",
+      "project": "mobile-portrait",
+      "outcome": "expected",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration": 479
+        }
+      ]
+    },
+    {
+      "id": "6584249e185c6ba36dd3-5298dc09e132a0d2b320",
+      "file": "main-menu.spec.ts",
+      "title": "main menu: read-only root, separate artwork and isolated loading",
+      "project": "mobile-portrait",
+      "outcome": "expected",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration": 1524
+        }
+      ]
+    },
+    {
+      "id": "6584249e185c6ba36dd3-7c53421120dc9c61a5f9",
+      "file": "main-menu.spec.ts",
+      "title": "main menu: records empty state is read-only and keyboard focus returns to the invoker",
+      "project": "mobile-landscape",
+      "outcome": "expected",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration": 630
+        }
+      ]
+    },
+    {
+      "id": "6584249e185c6ba36dd3-81754c3ac1ca4f07ed34",
+      "file": "main-menu.spec.ts",
+      "title": "main menu: records display and reviewed export restore reset preserve active saves",
+      "project": "mobile-landscape",
+      "outcome": "expected",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration": 1637
+        }
+      ]
+    },
+    {
+      "id": "6584249e185c6ba36dd3-09df5b6e4d0652a762a4",
+      "file": "main-menu.spec.ts",
+      "title": "main menu: records unavailable storage is honest and leaves gameplay navigation usable",
+      "project": "mobile-landscape",
+      "outcome": "expected",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration": 548
+        }
+      ]
+    },
+    {
+      "id": "6584249e185c6ba36dd3-4341f7b579e7438d2afd",
+      "file": "main-menu.spec.ts",
+      "title": "main menu: read-only root, separate artwork and isolated loading",
+      "project": "mobile-landscape",
+      "outcome": "expected",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration": 1606
+        }
+      ]
+    },
+    {
+      "id": "6584249e185c6ba36dd3-5891ae6e542c15fdb806",
+      "file": "main-menu.spec.ts",
+      "title": "main menu: records empty state is read-only and keyboard focus returns to the invoker",
+      "project": "acceptance-webkit-portrait",
+      "outcome": "expected",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration": 780
+        }
+      ]
+    },
+    {
+      "id": "6584249e185c6ba36dd3-696779a756e853e7baee",
+      "file": "main-menu.spec.ts",
+      "title": "main menu: records display and reviewed export restore reset preserve active saves",
+      "project": "acceptance-webkit-portrait",
+      "outcome": "expected",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration": 2964
+        }
+      ]
+    },
+    {
+      "id": "6584249e185c6ba36dd3-9f7c972493aee667a0b1",
+      "file": "main-menu.spec.ts",
+      "title": "main menu: records unavailable storage is honest and leaves gameplay navigation usable",
+      "project": "acceptance-webkit-portrait",
+      "outcome": "expected",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration": 1094
+        }
+      ]
+    },
+    {
+      "id": "6584249e185c6ba36dd3-4bcfa102c78d61d91405",
+      "file": "main-menu.spec.ts",
+      "title": "main menu: read-only root, separate artwork and isolated loading",
+      "project": "acceptance-webkit-portrait",
+      "outcome": "expected",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration": 2382
+        }
+      ]
+    },
+    {
+      "id": "6584249e185c6ba36dd3-6833e4133f04933d345a",
+      "file": "main-menu.spec.ts",
+      "title": "main menu: records empty state is read-only and keyboard focus returns to the invoker",
+      "project": "acceptance-webkit-landscape",
+      "outcome": "expected",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration": 781
+        }
+      ]
+    },
+    {
+      "id": "6584249e185c6ba36dd3-8d857a31e5e967b37001",
+      "file": "main-menu.spec.ts",
+      "title": "main menu: records display and reviewed export restore reset preserve active saves",
+      "project": "acceptance-webkit-landscape",
+      "outcome": "expected",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration": 2403
+        }
+      ]
+    },
+    {
+      "id": "6584249e185c6ba36dd3-6068fd1ddc21f6ed6bb0",
+      "file": "main-menu.spec.ts",
+      "title": "main menu: records unavailable storage is honest and leaves gameplay navigation usable",
+      "project": "acceptance-webkit-landscape",
+      "outcome": "expected",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration": 1137
+        }
+      ]
+    },
+    {
+      "id": "6584249e185c6ba36dd3-2579d1422ddd0da3df1a",
+      "file": "main-menu.spec.ts",
+      "title": "main menu: read-only root, separate artwork and isolated loading",
+      "project": "acceptance-webkit-landscape",
+      "outcome": "expected",
+      "attempts": [
+        {
+          "status": "passed",
+          "retry": 0,
+          "duration": 2318
+        }
+      ]
+    }
+  ],
+  "rawSha256": {
+    "tmp/issue-176/run-42824143064/issue-176-records-42824143064-1/issue-176/source.json": "b790cc00bcfb2436982fd87ff7b052fd1000fe136291d34a6bd8dadf577e1b99",
+    "tmp/issue-176/run-42824143064/issue-176-records-42824143064-1/browser-runs/run-lBbHNC/results.json": "a79fc8ce64424cce33d23c49f08f1bb744cdd5e0cdb9ffd9d43c69dec0e7643a",
+    "tmp/issue-176/run-42824143064/issue-176-records-42824143064-1/browser-runs/run-NPelDN/results.json": "0da96424a7ad7eebe2f78d0317b62020632d76e4d1b7e2ae70740df5725a4bf6",
+    "tmp/issue-176/run-42824142789/pr-verification-42824142789-1/1794317053687-1396654/summary.json": "c33d44513817c2661b378e7f63d56592c747f4264a062fdd24ae8566bb6c7f54",
+    "tmp/issue-176/run-42824142789/pr-verification-42824142789-1/1794317053687-1396654/units.json": "2d53d8f3d4fc8579e345b91ab26f76a49a38a5d6a5ae3b171d1fef71952d44c8",
+    "tmp/issue-176/run-42824142789/pr-verification-42824142789-1/1794317053687-1396654/build-integration.json": "63617a903c33510f6462af59cd628793aaf98af42877426a1c77e0781cc50899",
+    "tmp/issue-176/run-42824142789/pr-verification-42824142789-1/1794317053687-1396654/journeys.json": "81ad491f54c034ca5bf153578ac156739b43ed79272d591d3a975b4b68f711db"
+  },
+  "visualReview": "Desktop, Pixel portrait and landscape records recovery screenshots inspected; readable wrapping, vertical scrolling and no horizontal clipping; keyboard/touch export, restore/reset and save-byte checks pass."
+}

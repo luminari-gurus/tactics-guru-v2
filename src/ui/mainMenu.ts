@@ -3,6 +3,7 @@ import { menuGameHref, routeHref } from '../app/routes';
 import { bothDungeonSlotsMissing, createDungeonStorage } from '../persistence/dungeonStorage';
 import { mountTelemetryPreferences } from '../telemetry/preferences';
 import { mountCombatControlsPreference } from './combatControls';
+import { mountRunRecords } from './runRecords';
 import './mainMenu.css';
 export const menuDefinition = [
   { id: 'continue', label: 'Continue' }, { id: 'new', label: 'New Game' },
@@ -28,9 +29,11 @@ export function startMainMenu() {
   const body = element('div'); const close = element('button', 'Close'); close.type = 'button';
   dialog.append(heading, body, close);
   let invoker: HTMLElement | null = null;
+  let disposeContent = () => {};
   const restore = () => { if (invoker?.isConnected && !invoker.matches(':disabled')) invoker.focus(); };
-  close.onclick = () => dialog.close(); dialog.addEventListener('close', restore);
+  close.onclick = () => dialog.close(); dialog.addEventListener('close', () => { disposeContent(); disposeContent = () => {}; restore(); });
   function show(label: string, fill: () => void) {
+    disposeContent(); disposeContent = () => {};
     invoker = document.activeElement as HTMLElement; heading.textContent = label; body.replaceChildren(); fill(); dialog.showModal();
   }
   // Match native dialog focus behavior on WebKit's button-skipping Tab policy.
@@ -87,7 +90,7 @@ export function startMainMenu() {
         body.append(confirm);
       });
     },
-    records: () => show('Hall of Records', () => body.append(element('p', 'Records are not collected yet. Future records will be stored on this device.'))),
+    records: () => show('Hall of Records', () => { disposeContent = mountRunRecords(body); }),
     settings: () => show('Settings', () => {
       body.append(element('p', 'Use the in-game Sound controls to enable or mute audio. Sound starts after your interaction.'));
       mountCombatControlsPreference(body);
