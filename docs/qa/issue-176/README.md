@@ -80,3 +80,23 @@ Original journey case IDs/assertions and all deadlines remain. The focused
 selection is now 33 Chromium + 22 WebKit cases. Runs 42828913970 and the superseded
 queued capture are canceled for this test repair; failures/incomplete runs remain
 retained rather than relabeled as passing. Fresh qualification is required.
+
+## Increment 3 — dungeon recording (qualification pending)
+
+Based on authored PR #360 at `9a2c326`, in its isolated dungeon worktree. The
+dungeon owner records accepted defeat/terminal Continue and confirmed replacement
+through the existing root-menu handoff and in-flow controls. No active-save format
+or combat/RNG changes. Local focused checks pass 123 units across dungeon,
+RunItemSession, runBattle, RunHistory and model/storage, plus both type scopes.
+
+New session checks verify staged terminal admission and exact save bytes,
+continued descent without a record, reviewed old identity versus a placeholder,
+stale/partial reset, null-storage gating, history denial and an exploration race.
+Staged unit fixtures are not earned-play proof.
+
+Final browser discovery selects 73 cases: 21 Chromium + 14 WebKit menu cases;
+24 Chromium cases for full legal dungeon defeat, full first floor/descent/return,
+actual BFCache and testing isolation; six WebKit dungeon and eight WebKit isolation
+cases. Unchanged authored long journeys are qualified separately on PR #360's
+relevant inputs. No case timeout/retry change or hosted fallback is added.
+Browser execution and final issue acceptance remain unverified until recorded.

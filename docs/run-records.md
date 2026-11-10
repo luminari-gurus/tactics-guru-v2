@@ -44,9 +44,11 @@ interruption, Continue of the validated new identity finalizes the old record;
 Continue of the old identity cancels that intent. Unknown identities keep an honest
 unresolved status. History failure cannot prevent a new game.
 
-Dungeon recording remains in the next increment; the empty state alone is not
-evidence that issue #176 is complete. Planned dungeon endings are defeat or
-confirmed replacement. Floor/guardian wins, stairs, backtracking, menu return and
+The dungeon increment uses that same boundary for defeat, explicit terminal
+Continue and confirmed replacement through either the in-flow dialog or root-menu
+New Game handoff. Both reviewed slots are rechecked, and a newly accepted
+exploration step is preserved if it races replacement preparation.
+Floor/guardian wins, stairs, backtracking, menu return and
 page closure do not end the endless dungeon. Dedicated testing routes and
 standalone battles do not create run records. See the active
 [implementation plan](ongoing-projects/plan.md) for acceptance and current progress.

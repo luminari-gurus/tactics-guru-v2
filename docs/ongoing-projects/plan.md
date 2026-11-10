@@ -4,8 +4,10 @@ Date: 2026-11-10 (Asia/Jerusalem). Assigned to @moshehbenavraham.
 Issue: [#176](https://github.com/luminari-gurus/tactics-guru-v2/issues/176).
 Related follow-up: [#270](https://github.com/luminari-gurus/tactics-guru-v2/issues/270).
 Branch: [`branch/issue-176-local-records`](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-176-local-records).
-Current implementation branch: `branch/issue-176-authored-records`, based on the
-review-ready first increment at `7d73d35`; its PR will target the branch above.
+Authored branch: `branch/issue-176-authored-records` / PR #360, based on the
+review-ready first increment at `7d73d35`.
+Current implementation branch: `branch/issue-176-dungeon-records`, based on
+PR #360 at `9a2c326`; its PR targets the authored branch.
 Base: `origin/main`, `491f92a080d8577aca882c3e48ddaf910cf30369`.
 OpenSpec: [proposal](../../openspec/changes/issue-176-local-records/proposal.md),
 [design](../../openspec/changes/issue-176-local-records/design.md),
@@ -15,7 +17,7 @@ OpenSpec: [proposal](../../openspec/changes/issue-176-local-records/proposal.md)
 **Status:** implementation authorized on 2026-11-10. The caller requested autonomous
 implementation, verification, commits/pushes and focused labeled PRs as each chunk
 is ready, stacking dependent increments. Using OpenSpec change `issue-176-local-records`;
-5/9 implementation tasks complete. No merge or deployment is authorized.
+6/9 implementation tasks complete. No merge or deployment is authorized.
 The previous plan is preserved byte-for-byte in
 [the #316 handoff](issue-316-mage-acceptance-fixtures-plan.md).
 
@@ -276,6 +278,32 @@ after Q*bert was added; 25 menu and the other ten Chromium cases passed. Q*bert 
 split into its own fully audited group, retaining original case IDs/assertions,
 all five conditions and unchanged deadlines. The affected selection is now
 33 Chromium + 22 WebKit cases. Superseded captures remain failed/incomplete.
+
+### Increment 3 in progress — 2026-11-10
+
+Dungeon defeat, explicit terminal Continue and reviewed replacement now reuse the
+same RunHistory helper. The root-menu New Game handoff and in-flow replacement
+both await the same owner method; no startup placeholder is recorded. A complete
+slot review is rechecked before deleting either dungeon save. A newly accepted
+exploration step invalidates an in-flight replacement, preserving that step.
+Record/storage denial remains nonfatal and visible. Focused iteration passes
+123 units across both journey owners, history/model/storage and battle integration,
+plus both TypeScript scopes.
+
+Task 3.1 is complete. Final browser/PR gates 3.2/3.3 and authored browser gate 2.2
+remain open. The final selection adds full-health legal defeat and complete first
+floor/descent/backtrack witnesses on three Chromium and three WebKit profiles,
+real concurrent root-menu replacements, and actual cached-return checks for both
+journey modes on Chromium. WebKit uses its real reload/Continue journeys, without
+a claim of WebKit BFCache. It repeats the affected testing-entry audit after the
+dungeon owner change and reuses unchanged authored gameplay evidence rather than
+executing the long authored outcome loop again. The final selection is 73 cases;
+original case budgets stay unchanged.
+
+Dungeon worktree: `C:/Users/apexw/.codex/worktrees/issue-176-dungeon/Tactics-Guru`.
+The caller's checkout remains on the authored branch so prerequisite fixes can be
+committed and merged forward without disturbing dungeon work. Both use the same
+approved OpenSpec change. No release tag, merge or production operation occurred.
 
 **My implementation estimate: 4–6 hours total**, including focused regression,
 browser evidence, documentation and preparing the three reviewable PRs. First

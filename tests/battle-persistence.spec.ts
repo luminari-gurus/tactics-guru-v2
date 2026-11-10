@@ -431,6 +431,33 @@ test.describe('browser history with BFCache enabled',()=>{
     }));
   });
 
+  for(const mode of ['run','dungeon'] as const)test(`cached ${mode} record history preserves the replacement and one old result`,async({page,baseURL})=>{
+    const slots=mode==='run'?RUN_STORAGE_KEYS:DUNGEON_KEYS,text=menuFixture(mode);
+    const old=JSON.parse(text).payload,oldId=mode==='run'?old.items.run.id:old.id;
+    const first=new URL(`./?game=${mode}&history=records-first`,baseURL).href,map=new URL('map',baseURL).href;
+    await page.goto('./');await page.evaluate(({slots,text})=>{localStorage.setItem(slots.primary,text);localStorage.setItem(slots.backup,text);},{slots,text});
+    await page.goto(first);
+    const continueJourney=async()=>{
+      await page.getByRole('button',{name:`Continue saved ${mode}`,exact:true}).click();
+      await expect(page.locator(mode==='run'?'#run-start-encounter':'#dungeon-map')).toBeVisible();
+    };
+    await continueJourney();await page.goto(map);await expect(page.locator('#map-grid span')).toHaveCount(400);
+    await page.goto(new URL(`./?game=${mode}`,baseURL).href);
+    if(mode==='run'){await page.locator('#run-start').click();await page.locator('#run-confirm-new').click();}
+    else {await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();}
+    await expect(page.locator(mode==='run'?'#run-start-encounter':'#dungeon-map')).toBeVisible();
+    const saved=await page.evaluate(slots=>[localStorage.getItem(slots.primary),localStorage.getItem(slots.backup)],slots);
+    const history=await page.evaluate(key=>localStorage.getItem(key),RUN_RECORD_KEYS.primary);
+    expect(JSON.parse(history!).records).toMatchObject([{id:oldId,outcome:'abandoned'}]);
+    await page.goBack({waitUntil:'commit'});await expect(page).toHaveURL(map);await page.goBack({waitUntil:'commit'});
+    await expect(page.getByRole('button',{name:`Continue saved ${mode}`,exact:true})).toBeVisible();
+    expect(await page.evaluate(()=>sessionStorage.getItem('test:bfcache-return'))).toBe(first);
+    expect(await page.evaluate(key=>localStorage.getItem(key),RUN_RECORD_KEYS.primary)).toBe(history);
+    await continueJourney();
+    expect(await page.evaluate(slots=>[localStorage.getItem(slots.primary),localStorage.getItem(slots.backup)],slots)).toEqual(saved);
+    expect(await page.evaluate(key=>localStorage.getItem(key),RUN_RECORD_KEYS.primary)).toBe(history);
+  });
+
   for(const cached of ['battle','recovery dialog'])test(`cached ${cached} cannot overwrite either slot of its replacement`,async({page,baseURL})=>{
     const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
     const first=new URL('./?game=battle&history=first',baseURL).href,map=new URL('map',baseURL).href;

@@ -360,9 +360,34 @@ test('main menu: New Game confirms over the menu and preserves other save famili
  await expect(page.locator('#main-menu')).toBeVisible();await expect(page.getByRole('dialog')).toContainText('Start new dungeon?');
  await page.getByRole('button',{name:'Close',exact:true}).click();await expect(page.getByRole('button',{name:'New Game',exact:true})).toBeFocused();
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.dungeon.primary)).toBe(text);
+ expect(await page.evaluate(key=>localStorage.getItem(key),RUN_RECORD_KEYS.primary)).toBeNull();
  await page.getByRole('button',{name:'New Game',exact:true}).click();await page.getByRole('dialog').getByRole('button',{name:'Start new dungeon',exact:true}).click();
  await expect(page.locator('#dungeon-screen')).toContainText('Floor 1');await expect(page.locator('dialog')).not.toBeVisible();
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.battle.primary)).toBe('battle sentinel');
+ await expect.poll(()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)??'{"records":[]}').records,RUN_RECORD_KEYS.primary))
+  .toMatchObject([{id:JSON.parse(text).payload.id,mode:'dungeon',outcome:'abandoned'}]);
+});
+
+test('main menu: records concurrent confirmed dungeon replacements retain one immutable old result',async({page,context,isMobile})=>{
+ const saved=menuFixture('dungeon'),id=JSON.parse(saved).payload.id;
+ await page.goto('./');await page.evaluate(({keys,saved})=>{
+  localStorage.setItem(keys.primary,saved);localStorage.setItem(keys.backup,saved);
+ },{keys:DUNGEON_KEYS,saved});
+ const other=await context.newPage(),errors:string[]=[];
+ for(const tab of [page,other])tab.on('pageerror',error=>errors.push(error.message));
+ const activate=async(tab:Page,label:string)=>{const target=tab.getByRole('button',{name:label,exact:true});if(isMobile)await target.tap();else await target.click();};
+ try{
+  await Promise.all([page.reload(),other.goto('./')]);
+  await Promise.all([activate(page,'New Game'),activate(other,'New Game')]);
+  for(const tab of [page,other])await expect(tab.getByRole('dialog')).toContainText('Start new dungeon?');
+  await Promise.all([activate(page,'Start new dungeon'),activate(other,'Start new dungeon')]);
+  const history=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)??'{"records":[]}').records,RUN_RECORD_KEYS.primary);
+  await expect.poll(history).toMatchObject([{id,mode:'dungeon',outcome:'abandoned'}]);
+  await expect.poll(()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)??'{"payload":{}}').payload.id,DUNGEON_KEYS.primary)).not.toBe(id);
+  await page.goto('./');await activate(page,'Hall of Records');
+  await expect(page.getByRole('dialog').getByRole('listitem')).toHaveCount(1);
+  expect(await history()).toHaveLength(1);expect(errors).toEqual([]);
+ }finally{await other.close();}
 });
 test('main menu: New Game starts immediately when no dungeon save exists',async({page})=>{
  await page.addInitScript(({keys})=>{localStorage.setItem(keys.battle.primary,'battle sentinel');localStorage.setItem(keys.run.primary,'run sentinel');},{keys});
