@@ -267,6 +267,11 @@ one new continuation unit because fixture construction simulated a complete lega
 defeat inside the default five-second unit budget. The unit now stages validated
 terminal data; complete legal defeat remains a browser obligation. Preserve run
 42826784671 as failed and qualify the repaired source without raising deadlines.
+The history observer now notifies only when its visible status changes. Successful
+receipt writes have no new status to display; rebuilding the active controls on
+every successful write could detach an in-progress confirmation/double-click.
+The original focused browser run and superseded queued run are retained as
+incomplete when canceled for this runtime repair, not relabeled as passing.
 
 **My implementation estimate: 4–6 hours total**, including focused regression,
 browser evidence, documentation and preparing the three reviewable PRs. First

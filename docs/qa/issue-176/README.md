@@ -67,3 +67,8 @@ is retained under `tmp/issue-176/run-42826784671/`; this failed run remains fail
 The unit now uses an explicitly staged, validated terminal snapshot and a distinct
 valid backup. The real full-health/legal defeat still runs in existing browser
 witnesses. No timeout, gameplay rule or assertion was relaxed.
+The history observer was also simplified to notify only on a visible status
+change, preserving active controls during successful receipt writes. Runs
+42826784471 (in progress) and 42827503310 (queued) are superseded by this runtime
+repair and deliberately canceled; their incomplete evidence is retained. Fresh
+qualification is required for the changed observer behavior.

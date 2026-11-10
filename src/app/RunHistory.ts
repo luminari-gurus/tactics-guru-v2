@@ -11,8 +11,9 @@ export class RunHistory {
   private notify() { try { this.onChange?.(); } catch { /* An observer cannot undo a history write. */ } }
   private commit(update: (history: RunRecords) => RunRecords): Promise<RecordsWrite> {
     const work = this.store.mutate(update).then(result => {
-      this.status = result.ok ? '' : `Run history could not be confirmed (${result.reason}). Review Hall of Records; gameplay is unaffected.`;
-      this.notify(); return result;
+      const status = result.ok ? '' : `Run history could not be confirmed (${result.reason}). Review Hall of Records; gameplay is unaffected.`;
+      if (this.status !== status) { this.status = status; this.notify(); }
+      return result;
     });
     this.pending = Promise.all([this.pending, work]).then(() => {});
     return work;
