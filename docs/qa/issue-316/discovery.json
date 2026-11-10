@@ -1,0 +1,138 @@
+{
+  "summaries": [
+    {
+      "config": "playwright.regression.config.ts",
+      "before": 1177,
+      "after": 1183,
+      "removed": 0,
+      "changed": 0,
+      "added": [
+        {
+          "id": "e0f8639c387951b6a797-69b8f986752654fb7c95",
+          "file": "dungeon.spec.ts",
+          "title": "staged Mage ability:frost_snare accepts exact effects replay and saved active reload",
+          "project": "desktop",
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "e0f8639c387951b6a797-b186c987dfe7c1030cc5",
+          "file": "dungeon.spec.ts",
+          "title": "staged Mage ability:magic_missile accepts exact effects replay and saved active reload",
+          "project": "desktop",
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "e0f8639c387951b6a797-4372c5ade899c196ea31",
+          "file": "dungeon.spec.ts",
+          "title": "staged Mage ability:frost_snare accepts exact effects replay and saved active reload",
+          "project": "mobile-portrait",
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "e0f8639c387951b6a797-b5e3ab6097c7bfb009a8",
+          "file": "dungeon.spec.ts",
+          "title": "staged Mage ability:magic_missile accepts exact effects replay and saved active reload",
+          "project": "mobile-portrait",
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "e0f8639c387951b6a797-6e7f1626cc69c9f0186c",
+          "file": "dungeon.spec.ts",
+          "title": "staged Mage ability:frost_snare accepts exact effects replay and saved active reload",
+          "project": "mobile-landscape",
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "e0f8639c387951b6a797-2760c830e82316e019ce",
+          "file": "dungeon.spec.ts",
+          "title": "staged Mage ability:magic_missile accepts exact effects replay and saved active reload",
+          "project": "mobile-landscape",
+          "expectedStatus": "passed"
+        }
+      ]
+    },
+    {
+      "config": "playwright.exploration.config.ts",
+      "before": 177,
+      "after": 183,
+      "removed": 0,
+      "changed": 0,
+      "added": [
+        {
+          "id": "e0f8639c387951b6a797-a368607f19455c1c96a2",
+          "file": "dungeon.spec.ts",
+          "title": "staged Mage ability:frost_snare accepts exact effects replay and saved active reload",
+          "project": "desktop-webkit",
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "e0f8639c387951b6a797-46d8582ca3fd1c4ca9ed",
+          "file": "dungeon.spec.ts",
+          "title": "staged Mage ability:magic_missile accepts exact effects replay and saved active reload",
+          "project": "desktop-webkit",
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "e0f8639c387951b6a797-551e031274da77ef3589",
+          "file": "dungeon.spec.ts",
+          "title": "staged Mage ability:frost_snare accepts exact effects replay and saved active reload",
+          "project": "portrait-webkit",
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "e0f8639c387951b6a797-5568566d98a37a831845",
+          "file": "dungeon.spec.ts",
+          "title": "staged Mage ability:magic_missile accepts exact effects replay and saved active reload",
+          "project": "portrait-webkit",
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "e0f8639c387951b6a797-77f7f098b7ec3652e8a9",
+          "file": "dungeon.spec.ts",
+          "title": "staged Mage ability:frost_snare accepts exact effects replay and saved active reload",
+          "project": "landscape-webkit",
+          "expectedStatus": "passed"
+        },
+        {
+          "id": "e0f8639c387951b6a797-2e9f080efc6859bc3fb6",
+          "file": "dungeon.spec.ts",
+          "title": "staged Mage ability:magic_missile accepts exact effects replay and saved active reload",
+          "project": "landscape-webkit",
+          "expectedStatus": "passed"
+        }
+      ]
+    },
+    {
+      "config": "playwright.fixtures.config.ts",
+      "before": 141,
+      "after": 141,
+      "removed": 0,
+      "changed": 0,
+      "added": []
+    },
+    {
+      "config": "playwright.extended.config.ts",
+      "before": 9,
+      "after": 9,
+      "removed": 0,
+      "changed": 0,
+      "added": []
+    },
+    {
+      "config": "playwright.extended-webkit.config.ts",
+      "before": 9,
+      "after": 9,
+      "removed": 0,
+      "changed": 0,
+      "added": []
+    },
+    {
+      "config": "playwright.pr.config.ts",
+      "before": 7,
+      "after": 7,
+      "removed": 0,
+      "changed": 0,
+      "added": []
+    }
+  ]
+}

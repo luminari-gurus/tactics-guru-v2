@@ -1,0 +1,54 @@
+{
+  "run": 42687175365,
+  "head": "debe0effe319e859ef79b66334a5e181bf7d0991",
+  "actualSource": "b17443a1096c70ee8b54a95196a30e017bfae453",
+  "tree": "4a3dfda631c1db37530fc35e2300e4227fb769d7",
+  "node": "v24.22.1",
+  "dirty": "",
+  "durationMs": 199342,
+  "units": {
+    "total": 1245,
+    "passed": 1245
+  },
+  "coreJourneys": {
+    "startTime": "2026-11-09T19:51:53.957Z",
+    "duration": 124613.077,
+    "expected": 7,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "stages": [
+    {
+      "id": "tooling",
+      "status": "passed",
+      "durationMs": 5778.440206
+    },
+    {
+      "id": "units",
+      "status": "passed",
+      "durationMs": 58727.8089
+    },
+    {
+      "id": "typecheck",
+      "status": "passed",
+      "durationMs": 1382.7995260000025
+    },
+    {
+      "id": "build-integration",
+      "status": "passed",
+      "durationMs": 7214.114719999998
+    },
+    {
+      "id": "bundle",
+      "status": "passed",
+      "durationMs": 919.8381720000034
+    },
+    {
+      "id": "journeys",
+      "status": "passed",
+      "durationMs": 125302.90285700001
+    }
+  ],
+  "fullReceipt": "pr-debe0ef-full-summary.json.gz"
+}

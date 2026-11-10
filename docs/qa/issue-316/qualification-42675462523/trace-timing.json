@@ -1,0 +1,319 @@
+{
+  "context": {
+    "version": 10,
+    "type": "context-options",
+    "origin": "testRunner",
+    "browserName": "",
+    "playwrightVersion": "1.64.1",
+    "options": {},
+    "platform": "linux",
+    "wallTime": 1794249717061,
+    "monotonicTime": 2540.262,
+    "sdkLanguage": "javascript",
+    "testTimeout": 600000,
+    "annotations": []
+  },
+  "counts": {
+    "events": 6304,
+    "calls": 3151
+  },
+  "longest": [
+    {
+      "title": "After Hooks",
+      "method": "hook",
+      "start": 603440.602,
+      "end": 642000.224,
+      "durationMs": 38559.62200000009
+    },
+    {
+      "title": "Fixture \"context\"",
+      "method": "fixture",
+      "start": 603441.848,
+      "end": 641990.902,
+      "durationMs": 38549.054000000004
+    },
+    {
+      "title": "Expect \"poll toBe\"",
+      "method": "expect",
+      "start": 267363.997,
+      "end": 269981.307,
+      "durationMs": 2617.3099999999977
+    },
+    {
+      "title": "Expect \"poll toBe\"",
+      "method": "expect",
+      "start": 300517.876,
+      "end": 302009.926,
+      "durationMs": 1492.0499999999884
+    },
+    {
+      "title": "Expect \"toHaveAttribute\"",
+      "method": "expect",
+      "start": 13472.916,
+      "end": 14807.228,
+      "durationMs": 1334.312
+    },
+    {
+      "title": "Expect \"poll toBe\"",
+      "method": "expect",
+      "start": 578404.253,
+      "end": 579680.499,
+      "durationMs": 1276.2459999999264
+    },
+    {
+      "title": "Expect \"poll toBe\"",
+      "method": "expect",
+      "start": 384671.873,
+      "end": 385902.649,
+      "durationMs": 1230.7759999999544
+    },
+    {
+      "title": "Click",
+      "method": "pw:api",
+      "start": 543748.156,
+      "end": 544975.801,
+      "durationMs": 1227.6450000000186
+    },
+    {
+      "title": "Click",
+      "method": "pw:api",
+      "start": 480864.016,
+      "end": 482062.355,
+      "durationMs": 1198.3389999999781
+    },
+    {
+      "title": "Click",
+      "method": "pw:api",
+      "start": 382962.649,
+      "end": 384156.803,
+      "durationMs": 1194.1540000000386
+    },
+    {
+      "title": "Click",
+      "method": "pw:api",
+      "start": 528028.244,
+      "end": 529210.005,
+      "durationMs": 1181.7610000000568
+    },
+    {
+      "title": "Click",
+      "method": "pw:api",
+      "start": 466503.142,
+      "end": 467671.145,
+      "durationMs": 1168.003000000026
+    },
+    {
+      "title": "Click",
+      "method": "pw:api",
+      "start": 495013.949,
+      "end": 496174.146,
+      "durationMs": 1160.1969999999856
+    },
+    {
+      "title": "Click",
+      "method": "pw:api",
+      "start": 486120.872,
+      "end": 487279.317,
+      "durationMs": 1158.445000000007
+    },
+    {
+      "title": "Click",
+      "method": "pw:api",
+      "start": 450441.238,
+      "end": 451594.412,
+      "durationMs": 1153.173999999999
+    },
+    {
+      "title": "Click",
+      "method": "pw:api",
+      "start": 566936.159,
+      "end": 568085.646,
+      "durationMs": 1149.4869999999646
+    },
+    {
+      "title": "Click",
+      "method": "pw:api",
+      "start": 557055.759,
+      "end": 558200.549,
+      "durationMs": 1144.7900000000373
+    },
+    {
+      "title": "Click",
+      "method": "pw:api",
+      "start": 573366.204,
+      "end": 574509.905,
+      "durationMs": 1143.701000000001
+    }
+  ],
+  "lastApi": [
+    {
+      "title": "Get attribute \"data-dungeon-snapshot\"",
+      "method": "pw:api",
+      "start": 597352.781,
+      "end": 597540.374,
+      "durationMs": 187.59299999999348
+    },
+    {
+      "title": "Get attribute \"data-session\"",
+      "method": "pw:api",
+      "start": 597542.548,
+      "end": 597745.595,
+      "durationMs": 203.0470000000205
+    },
+    {
+      "title": "Evaluate",
+      "method": "pw:api",
+      "start": 597768.045,
+      "end": 597934.857,
+      "durationMs": 166.81199999991804
+    },
+    {
+      "title": "Click",
+      "method": "pw:api",
+      "start": 597937.342,
+      "end": 598942.498,
+      "durationMs": 1005.1560000000754
+    },
+    {
+      "title": "Get attribute \"data-dungeon-snapshot\"",
+      "method": "pw:api",
+      "start": 598945.434,
+      "end": 599190.535,
+      "durationMs": 245.10100000002421
+    },
+    {
+      "title": "Get attribute \"data-session\"",
+      "method": "pw:api",
+      "start": 599191.766,
+      "end": 599453.846,
+      "durationMs": 262.0800000000745
+    },
+    {
+      "title": "Get attribute \"data-dungeon-snapshot\"",
+      "method": "pw:api",
+      "start": 599458.306,
+      "end": 599702.902,
+      "durationMs": 244.59600000001956
+    },
+    {
+      "title": "Get attribute \"data-session\"",
+      "method": "pw:api",
+      "start": 599704.043,
+      "end": 599860.569,
+      "durationMs": 156.52600000007078
+    },
+    {
+      "title": "Get attribute \"data-dungeon-snapshot\"",
+      "method": "pw:api",
+      "start": 599863.563,
+      "end": 600033.153,
+      "durationMs": 169.59000000008382
+    },
+    {
+      "title": "Get attribute \"data-dungeon-snapshot\"",
+      "method": "pw:api",
+      "start": 600036.41,
+      "end": 600195.212,
+      "durationMs": 158.80200000002515
+    },
+    {
+      "title": "Get attribute \"data-session\"",
+      "method": "pw:api",
+      "start": 600196.319,
+      "end": 600359.044,
+      "durationMs": 162.72499999997672
+    },
+    {
+      "title": "Get attribute \"data-dungeon-snapshot\"",
+      "method": "pw:api",
+      "start": 600362.635,
+      "end": 600540.186,
+      "durationMs": 177.55099999997765
+    },
+    {
+      "title": "Get attribute \"data-session\"",
+      "method": "pw:api",
+      "start": 600542.98,
+      "end": 600695.923,
+      "durationMs": 152.9429999999702
+    },
+    {
+      "title": "Evaluate",
+      "method": "pw:api",
+      "start": 600717.588,
+      "end": 600843.456,
+      "durationMs": 125.86800000001676
+    },
+    {
+      "title": "Click",
+      "method": "pw:api",
+      "start": 600845.347,
+      "end": 601647.789,
+      "durationMs": 802.4420000000391
+    },
+    {
+      "title": "Get attribute \"data-dungeon-snapshot\"",
+      "method": "pw:api",
+      "start": 601650.374,
+      "end": 601787.127,
+      "durationMs": 136.75300000002608
+    },
+    {
+      "title": "Get attribute \"data-session\"",
+      "method": "pw:api",
+      "start": 601787.916,
+      "end": 602011.777,
+      "durationMs": 223.86100000003353
+    },
+    {
+      "title": "Get attribute \"data-dungeon-snapshot\"",
+      "method": "pw:api",
+      "start": 602014.411,
+      "end": 602172.309,
+      "durationMs": 157.8980000000447
+    },
+    {
+      "title": "Get attribute \"data-dungeon-snapshot\"",
+      "method": "pw:api",
+      "start": 602175.447,
+      "end": 602268.692,
+      "durationMs": 93.24499999999534
+    },
+    {
+      "title": "Get attribute \"data-dungeon-battle-record\"",
+      "method": "pw:api",
+      "start": 602271.287,
+      "end": 602301.325,
+      "durationMs": 30.037999999942258
+    },
+    {
+      "title": "Get attribute \"data-dungeon-snapshot\"",
+      "method": "pw:api",
+      "start": 603439.319,
+      "end": 603464.4,
+      "durationMs": 25.081000000005588
+    },
+    {
+      "title": "Get attribute \"data-dungeon-snapshot\"",
+      "method": "pw:api",
+      "start": 603464.864,
+      "end": 603496.141,
+      "durationMs": 31.277000000001863
+    },
+    {
+      "title": "Screenshot",
+      "method": "pw:api",
+      "start": 603499.008,
+      "end": 603776.933,
+      "durationMs": 277.92499999993015
+    },
+    {
+      "title": "Close context",
+      "method": "pw:api",
+      "start": 641981.176,
+      "end": 641990.84,
+      "durationMs": 9.663999999989755
+    }
+  ],
+  "unfinished": []
+}

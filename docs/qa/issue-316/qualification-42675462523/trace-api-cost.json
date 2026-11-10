@@ -1,0 +1,38 @@
+{
+  "run": 42675462523,
+  "source": "bcc523cc2dc0d9f1e8660be880ac156964ddd90e",
+  "eventSource": "test.trace extracted intact with bsdtar fast-read from the original truncated ZIP",
+  "groups": {
+    "Other API": {
+      "calls": 211,
+      "durationMs": 54802.537999999724,
+      "maxMs": 652.2019999999902
+    },
+    "Evaluate": {
+      "calls": 146,
+      "durationMs": 24124.489999999794,
+      "maxMs": 236.85800000000745
+    },
+    "Click": {
+      "calls": 242,
+      "durationMs": 214465.7040000001,
+      "maxMs": 1227.6450000000186
+    },
+    "Get attribute \"data-dungeon-snapshot\"": {
+      "calls": 864,
+      "durationMs": 146731.42900000123,
+      "maxMs": 365.32700000004843
+    },
+    "Get attribute \"data-session\"": {
+      "calls": 666,
+      "durationMs": 129678.52400000047,
+      "maxMs": 354.13000000000466
+    },
+    "Get attribute \"data-dungeon-battle-record\"": {
+      "calls": 5,
+      "durationMs": 107.40299999993294,
+      "maxMs": 30.79800000000978
+    }
+  },
+  "interpretation": "Sequential API durations identify repeated full snapshot/session attribute reads as a major observation cost. The last terminal screenshot completes near the deadline; the truncated ZIP adds a separate teardown failure. No assertion or timeout is waived."
+}

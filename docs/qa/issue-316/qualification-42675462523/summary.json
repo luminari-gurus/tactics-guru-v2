@@ -1,0 +1,565 @@
+{
+  "run": 42675462523,
+  "source": {
+    "commit": "bcc523cc2dc0d9f1e8660be880ac156964ddd90e",
+    "inputHash": "f0bdb6f141681c5260ce5b1d8c5700cbd450236a59d7b8da5566f02680ad298d",
+    "dirty": false
+  },
+  "node": "v24.22.2",
+  "runner": "unraid-tactics-02",
+  "conditions": "Persistent qualified runner; shared storage/network load and caches not independently controlled",
+  "totals": {
+    "passed": 35,
+    "failed": 1,
+    "skipped": 0,
+    "flaky": 0,
+    "retries": 0
+  },
+  "reports": [
+    {
+      "run": "run-68v3e5",
+      "stats": {
+        "startTime": "2026-11-09T19:03:00.695Z",
+        "duration": 658376.345,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "workers": 1,
+      "tests": [
+        {
+          "title": "Mage legal progression journey earns level three uses Frost Snare and multiple missiles and resumes",
+          "project": "desktop-webkit",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 243350,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "Mage legal progression journey earns level three uses Frost Snare and multiple missiles and resumes",
+          "project": "portrait-webkit",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 204625,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "Mage legal progression journey earns level three uses Frost Snare and multiple missiles and resumes",
+          "project": "landscape-webkit",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 206726,
+              "errors": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run": "run-Gnuuuc",
+      "stats": {
+        "startTime": "2026-11-09T18:38:12.320Z",
+        "duration": 75112.21,
+        "expected": 12,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "workers": 1,
+      "tests": [
+        {
+          "title": "menu dungeon restores Mage XP 0, caster level and exact active boundary",
+          "project": "desktop",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 7646,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "menu dungeon restores Mage XP 180, caster level and exact active boundary",
+          "project": "desktop",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 7454,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "staged Mage ability:frost_snare accepts exact effects replay and saved active reload",
+          "project": "desktop",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 9618,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "staged Mage ability:magic_missile accepts exact effects replay and saved active reload",
+          "project": "desktop",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 9527,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "menu dungeon restores Mage XP 0, caster level and exact active boundary",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4449,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "menu dungeon restores Mage XP 180, caster level and exact active boundary",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4119,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "staged Mage ability:frost_snare accepts exact effects replay and saved active reload",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4917,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "staged Mage ability:magic_missile accepts exact effects replay and saved active reload",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 5451,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "menu dungeon restores Mage XP 0, caster level and exact active boundary",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3860,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "menu dungeon restores Mage XP 180, caster level and exact active boundary",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3646,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "staged Mage ability:frost_snare accepts exact effects replay and saved active reload",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4451,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "staged Mage ability:magic_missile accepts exact effects replay and saved active reload",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 5198,
+              "errors": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run": "run-WhkeVE",
+      "stats": {
+        "startTime": "2026-11-09T18:41:55.274Z",
+        "duration": 1264627.671,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "workers": 1,
+      "tests": [
+        {
+          "title": "Mage legal progression journey earns level three uses Frost Snare and multiple missiles and resumes",
+          "project": "desktop",
+          "status": "unexpected",
+          "attempts": [
+            {
+              "status": "timedOut",
+              "retry": 0,
+              "durationMs": 639262,
+              "errors": [
+                {
+                  "message": "\u001b[31mTest timeout of 600000ms exceeded.\u001b[39m"
+                },
+                {
+                  "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Mage legal progression journey earns level three uses Frost Snare and multiple missiles and resumes",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 292559,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "Mage legal progression journey earns level three uses Frost Snare and multiple missiles and resumes",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 297838,
+              "errors": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run": "run-Ys8zh2",
+      "stats": {
+        "startTime": "2026-11-09T18:39:28.277Z",
+        "duration": 54468.739,
+        "expected": 12,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "workers": 1,
+      "tests": [
+        {
+          "title": "menu dungeon restores Mage XP 0, caster level and exact active boundary",
+          "project": "desktop-webkit",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3199,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "menu dungeon restores Mage XP 180, caster level and exact active boundary",
+          "project": "desktop-webkit",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3558,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "staged Mage ability:frost_snare accepts exact effects replay and saved active reload",
+          "project": "desktop-webkit",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4618,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "staged Mage ability:magic_missile accepts exact effects replay and saved active reload",
+          "project": "desktop-webkit",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 5292,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "menu dungeon restores Mage XP 0, caster level and exact active boundary",
+          "project": "portrait-webkit",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3750,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "menu dungeon restores Mage XP 180, caster level and exact active boundary",
+          "project": "portrait-webkit",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3909,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "staged Mage ability:frost_snare accepts exact effects replay and saved active reload",
+          "project": "portrait-webkit",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4336,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "staged Mage ability:magic_missile accepts exact effects replay and saved active reload",
+          "project": "portrait-webkit",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 5090,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "menu dungeon restores Mage XP 0, caster level and exact active boundary",
+          "project": "landscape-webkit",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3954,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "menu dungeon restores Mage XP 180, caster level and exact active boundary",
+          "project": "landscape-webkit",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 3505,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "staged Mage ability:frost_snare accepts exact effects replay and saved active reload",
+          "project": "landscape-webkit",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 4259,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "staged Mage ability:magic_missile accepts exact effects replay and saved active reload",
+          "project": "landscape-webkit",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 5180,
+              "errors": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run": "run-dxRRXx",
+      "stats": {
+        "startTime": "2026-11-09T18:40:23.759Z",
+        "duration": 90473.306,
+        "expected": 6,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "workers": 1,
+      "tests": [
+        {
+          "title": "Mage real learned picker consolidates Arc Bolt and gates Frost Snare at level three",
+          "project": "desktop",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 14419,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "Mage real Frost Snare preserves keyboard touch previews cancellation inspection and fresh reload without attack audio",
+          "project": "desktop",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 23130,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "Mage real learned picker consolidates Arc Bolt and gates Frost Snare at level three",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 8981,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "Mage real Frost Snare preserves keyboard touch previews cancellation inspection and fresh reload without attack audio",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 14324,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "Mage real learned picker consolidates Arc Bolt and gates Frost Snare at level three",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 9771,
+              "errors": []
+            }
+          ]
+        },
+        {
+          "title": "Mage real Frost Snare preserves keyboard touch previews cancellation inspection and fresh reload without attack audio",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 15172,
+              "errors": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
