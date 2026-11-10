@@ -270,8 +270,12 @@ terminal data; complete legal defeat remains a browser obligation. Preserve run
 The history observer now notifies only when its visible status changes. Successful
 receipt writes have no new status to display; rebuilding the active controls on
 every successful write could detach an in-progress confirmation/double-click.
-The original focused browser run and superseded queued run are retained as
-incomplete when canceled for this runtime repair, not relabeled as passing.
+The superseded queued capture was canceled. Original focused run 42826784471
+finished failed before cancellation: two desktop isolation sweeps exceeded 30s
+after Q*bert was added; 25 menu and the other ten Chromium cases passed. Q*bert is
+split into its own fully audited group, retaining original case IDs/assertions,
+all five conditions and unchanged deadlines. The affected selection is now
+33 Chromium + 22 WebKit cases. Superseded captures remain failed/incomplete.
 
 **My implementation estimate: 4–6 hours total**, including focused regression,
 browser evidence, documentation and preparing the three reviewable PRs. First

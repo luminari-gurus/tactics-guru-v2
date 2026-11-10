@@ -69,6 +69,14 @@ valid backup. The real full-health/legal defeat still runs in existing browser
 witnesses. No timeout, gameplay rule or assertion was relaxed.
 The history observer was also simplified to notify only on a visible status
 change, preserving active controls during successful receipt writes. Runs
-42826784471 (in progress) and 42827503310 (queued) are superseded by this runtime
-repair and deliberately canceled; their incomplete evidence is retained. Fresh
-qualification is required for the changed observer behavior.
+42827503310 was canceled while queued for this runtime repair. Run 42826784471
+finished before cancellation: it passed all 25 menu cases and 10/12 Chromium
+run/isolation cases, but the two desktop isolation sweeps exceeded their unchanged
+30-second case budget. WebKit outcome/isolation was blocked by that stage failure.
+Adding Q*bert to the already long multi-route sweep caused the scope to outgrow
+the budget. Q*bert is now a separate case group using the same complete storage
+audit, all five existing conditions, real turn/restart, reload and menu checks.
+Original journey case IDs/assertions and all deadlines remain. The focused
+selection is now 33 Chromium + 22 WebKit cases. Runs 42828913970 and the superseded
+queued capture are canceled for this test repair; failures/incomplete runs remain
+retained rather than relabeled as passing. Fresh qualification is required.

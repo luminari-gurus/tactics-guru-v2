@@ -29,7 +29,10 @@ declare global {
     testingSaveAudit: { calls: string[]; snapshot: () => Record<string, string | null> };
   }
 }
-for(const condition of ['missing','valid','corrupt','backup-only','unavailable'] as const) test(`testing routes: fresh play never accesses ${condition} saved games`,async({page})=>{
+for(const group of ['journeys','qbert'] as const)
+for(const condition of ['missing','valid','corrupt','backup-only','unavailable'] as const) test(group==='journeys'
+  ?`testing routes: fresh play never accesses ${condition} saved games`
+  :`testing routes: Qbert never accesses ${condition} saved games`,async({page})=>{
   const families={battle:keys,run:RUN_STORAGE_KEYS,dungeon:DUNGEON_KEYS};
   const values:Record<string,string>={'isolation-unrelated':'preserve'};
   for(const mode of ['battle','run','dungeon'] as const)for(const slot of ['primary','backup'] as const){
@@ -69,10 +72,9 @@ for(const condition of ['missing','valid','corrupt','backup-only','unavailable']
     expect(await page.evaluate(()=>window.testingSaveAudit.snapshot())).toEqual(expected);
     await expect(page.getByRole('button',{name:/Continue saved|Save recovery|Play unsaved/})).toHaveCount(0);
   };
-  const entries=[
+  const entries=group==='qbert'?[['qbert','./qbert?game=run&entry=continue']]:[
     ['battle','./battle/?game=dungeon&entry=continue'],['run','./run?game=battle&entry=recovery'],
     ['dungeon','./dungeon?game=run&entry=new'],['map','./map?game=dungeon&entry=new'],
-    ['qbert','./qbert?game=run&entry=continue'],
     ['battle','./?scene=battle&game=run&entry=continue'],['proof','./?scene=proof&game=dungeon&entry=new'],
     ['content-smoke','./?scene=content-smoke&game=run&entry=recovery'],
   ];
@@ -91,6 +93,10 @@ for(const condition of ['missing','valid','corrupt','backup-only','unavailable']
       await expect.poll(async()=>(await readSession(page)).state.commandCount).toBeGreaterThan(before.state.commandCount);
       await page.locator('#fit-restart').click();
       await expect.poll(async()=>JSON.parse(await page.locator('#game').getAttribute('data-session')??'null')?.state.seed).toBe(2);
+    }else if(mode==='qbert'){
+      const before=await readSession(page);await page.locator('#battle-next').click();
+      await expect.poll(async()=>(await readSession(page)).state.commandCount).toBeGreaterThan(before.state.commandCount);
+      await page.locator('#fit-restart').click();await ready();
     }else if(mode==='run'){
       await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();
       await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await page.locator('#battle-next').click();
