@@ -85,7 +85,8 @@ jobs:
           npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon.spec.ts -g 'dungeon battle undo survives reload and a legal defeat journey|saved menu dungeon keeps proof tools hidden' --diagnostics
       - name: Verify final testing isolation in WebKit
         if: endsWith(github.head_ref || github.ref_name, 'dungeon-records')
-        run: npm run test:browser -- -c playwright.device-acceptance.config.ts tests/battle-persistence.spec.ts -g 'testing routes: (fresh play|Qbert) never accesses (valid|unavailable)' --diagnostics
+        run: |
+          npm run test:browser -- -c playwright.device-acceptance.config.ts tests/battle-persistence.spec.ts -g 'testing routes: (fresh play|Qbert) never accesses (valid|unavailable)' --diagnostics
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -108,3 +108,8 @@ existing save owner makes its decision before rendering that warning. The same
 unit passes without changing deadlines, and the unavailable-history browser case
 now drives two real root-menu New Games, verifying accepted new identity, saved
 bytes and visible history failure. This is a required nonfatal-history repair.
+
+Initial final-increment workflow validation failed before execution: the new
+single-line command contained an unquoted YAML colon in the grep expression.
+It is now a block command, and the workflow is checked with the available YAML
+parser and actionlint. These configuration failures are not browser evidence.
