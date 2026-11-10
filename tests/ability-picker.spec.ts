@@ -748,9 +748,41 @@ test('radial Special does not commit when choices appear on a narrow screen', as
   await special.dispatchEvent('pointerenter');
   await expect(page.locator('#battle-radial-sub')).toBeHidden();
   const before=await readSession(page);
+  await page.evaluate(() => {
+    const rows:Record<string,unknown>[]=[];
+    (globalThis as {__tacticsGuruIssue311NativeEvents?:Record<string,unknown>[]}).__tacticsGuruIssue311NativeEvents=rows;
+    const element=(target:EventTarget|null)=>target instanceof Element?{
+      tag:target.tagName,id:target.id,slice:target.closest<HTMLElement>('[data-slice]')?.dataset.slice??null,
+      ability:target.closest<HTMLElement>('[data-radial-ability]')?.dataset.radialAbility??null,
+    }:null;
+    const state=()=>{
+      const radial=document.querySelector<HTMLElement>('#battle-radial'),sub=document.querySelector<HTMLElement>('#battle-radial-sub');
+      return {active:element(document.activeElement),aim:radial?.dataset.aim??null,subOpen:radial?.dataset.subOpen??null,
+        hidden:radial?.hidden??null,subHidden:sub?.hidden??null,count:sub?.querySelectorAll('button').length??0};
+    };
+    const observe=(event:Event)=>{
+      const capabilities=(event as MouseEvent&{sourceCapabilities?:{firesTouchEvents?:boolean}|null}).sourceCapabilities;
+      const input={type:event.type,timeStamp:event.timeStamp,pointerType:event instanceof PointerEvent?event.pointerType:null,
+        pointerId:event instanceof PointerEvent?event.pointerId:null,buttons:event instanceof MouseEvent?event.buttons:null,
+        button:event instanceof MouseEvent?event.button:null,isTrusted:event.isTrusted,firesTouchEvents:capabilities?.firesTouchEvents??null,
+        target:element(event.target)};
+      rows.push({...input,phase:'capture',at:performance.now(),defaultPrevented:event.defaultPrevented,...state()});
+      queueMicrotask(()=>rows.push({...input,phase:'microtask',at:performance.now(),defaultPrevented:event.defaultPrevented,...state()}));
+    };
+    for(const type of ['pointerover','pointerenter','pointermove','pointerdown','pointerup','pointercancel','pointerout','pointerleave',
+      'mouseover','mouseenter','mousemove','mousedown','mouseup','click','mouseout','mouseleave','touchstart','touchmove','touchend','touchcancel',
+      'focus','focusin','blur','focusout'])document.addEventListener(type,observe,{capture:true,passive:true});
+  });
   if(isMobile) await special.tap(); else await special.click();
+  const nativeEvents=await page.evaluate(()=>(globalThis as {__tacticsGuruIssue311NativeEvents?:Record<string,unknown>[]}).__tacticsGuruIssue311NativeEvents);
+  await test.info().attach('issue-311-native-special-events',{body:JSON.stringify(nativeEvents,null,2),contentType:'application/json'});
   const choices=page.locator('#battle-radial-sub button');
-  await expect(choices).toHaveCount(3);
+  try {
+    await expect(choices).toHaveCount(3);
+  } finally {
+    const settledNativeEvents=await page.evaluate(()=>(globalThis as {__tacticsGuruIssue311NativeEvents?:Record<string,unknown>[]}).__tacticsGuruIssue311NativeEvents);
+    await test.info().attach('issue-311-native-special-events-after-count',{body:JSON.stringify(settledNativeEvents,null,2),contentType:'application/json'});
+  }
   await expect(choices.first()).toBeVisible();
   await expect(page.locator('#battle-radial-attack')).toBeHidden();
   await expect(page.locator('#battle-radial-special')).toBeVisible();
