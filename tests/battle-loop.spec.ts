@@ -804,7 +804,7 @@ test('accepted rail and dock preserve drawable floors, readable controls and foc
   writeFileSync(info.outputPath('responsive-measurements.json'),JSON.stringify(measurements,null,2));expect(errors).toEqual([]);
 });
 
-test('narrow landscape battle stacks controls below a usable board @fixed-viewport', async ({ page }) => {
+test('narrow landscape battle stacks controls below a usable board', async ({ page }) => {
  for (const viewport of [{width:320,height:200},{width:400,height:300},{width:480,height:320}]) {
   await page.setViewportSize(viewport);
   await page.goto('./battle');

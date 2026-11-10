@@ -98,7 +98,8 @@ export const canonicalCases = new Map([
 export const layoutCases = [ [390,844], [844,390], [360,640], [915,412], [1280,720] ]
   .map(([width, height]) => `controls stay at least 44 px and reachable at ${width}x${height}`);
 const classification = test => canonicalCases.get(test.file)?.includes(test.title) ? '@canonical'
-  : test.file === 'layout.spec.ts' && layoutCases.includes(test.title) ? '@fixed-viewport' : null;
+  : (test.file === 'layout.spec.ts' && layoutCases.includes(test.title)
+    || test.file === 'battle-radial.spec.ts' && test.title === 'radial preference replaces the side rail with a bottom dock at 1280x720') ? '@fixed-viewport' : null;
 const identity = test => JSON.stringify([test.project, test.id]);
 function unique(tests) {
   const map = new Map(tests.map(test => [identity(test), test]));
@@ -182,7 +183,7 @@ export function compareSelections(before, after) {
     }
     for (const key of remaining.keys()) assert.ok(old.has(key), 'Unexpected extra selected ID');
   }
-  assert.equal(mappings.filter(row => row.classification === '@canonical' || row.classification === '@fixed-viewport').length, 23,
+  assert.equal(mappings.filter(row => row.classification === '@canonical' || row.classification === '@fixed-viewport').length, 24,
     'Unexpected chromium reduction count');
   return { beforeCount: before.selections.chromium.tests.length, afterCount: after.selections.chromium.tests.length, mappings };
 }

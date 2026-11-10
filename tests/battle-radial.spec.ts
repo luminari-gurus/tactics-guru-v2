@@ -882,7 +882,8 @@ test('radial resize cancels a native touch hold without accepting a command', as
 });
 
 
-test('desktop radial preference replaces the side rail with a bottom dock @canonical', async ({ page }) => {
+test('radial preference replaces the side rail with a bottom dock at 1280x720', {tag:'@fixed-viewport'}, async ({ page }) => {
+  await page.setViewportSize({width:1280,height:720});
   await ready(page);
   const board = (await page.locator('#battlefield').boundingBox())!;
   const dock = (await page.locator('#fit-panel').boundingBox())!;
