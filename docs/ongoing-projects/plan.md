@@ -7,7 +7,7 @@ Branch: [`branch/issue-176-local-records`](https://github.com/luminari-gurus/tac
 Authored branch: `branch/issue-176-authored-records` / PR #360, based on the
 review-ready first increment at `7d73d35`.
 Current implementation branch: `branch/issue-176-dungeon-records`, based on
-PR #360 at `9a2c326`; its PR targets the authored branch.
+PR #360, including its retention and isolation repairs; its PR targets the authored branch.
 Base: `origin/main`, `491f92a080d8577aca882c3e48ddaf910cf30369`.
 OpenSpec: [proposal](../../openspec/changes/issue-176-local-records/proposal.md),
 [design](../../openspec/changes/issue-176-local-records/design.md),
@@ -313,7 +313,7 @@ real concurrent root-menu replacements, and actual cached-return checks for both
 journey modes on Chromium. WebKit uses its real reload/Continue journeys, without
 a claim of WebKit BFCache. It repeats the affected testing-entry audit after the
 dungeon owner change and reuses unchanged authored gameplay evidence rather than
-executing the long authored outcome loop again. The final selection is 73 cases;
+executing the long authored outcome loop again. The final selection is 83 cases;
 original case budgets stay unchanged.
 
 Dungeon worktree: `C:/Users/apexw/.codex/worktrees/issue-176-dungeon/Tactics-Guru`.

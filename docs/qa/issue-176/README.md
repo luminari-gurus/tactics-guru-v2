@@ -99,9 +99,9 @@ continued descent without a record, reviewed old identity versus a placeholder,
 stale/partial reset, null-storage gating, history denial and an exploration race.
 Staged unit fixtures are not earned-play proof.
 
-Final browser discovery selects 73 cases: 21 Chromium + 14 WebKit menu cases;
-24 Chromium cases for full legal dungeon defeat, full first floor/descent/return,
-actual BFCache and testing isolation; six WebKit dungeon and eight WebKit isolation
+Final browser discovery selects 83 cases: 21 Chromium + 14 WebKit menu cases;
+30 Chromium cases for full legal dungeon defeat, full first floor/descent/return,
+actual BFCache and testing isolation; six WebKit dungeon and 12 WebKit isolation
 cases. Unchanged authored long journeys are qualified separately on PR #360's
 relevant inputs. No case timeout/retry change or hosted fallback is added.
 Browser execution and final issue acceptance remain unverified until recorded.
@@ -118,6 +118,15 @@ Initial final-increment workflow validation failed before execution: the new
 single-line command contained an unquoted YAML colon in the grep expression.
 It is now a block command, and the workflow is checked with the available YAML
 parser and actionlint. These configuration failures are not browser evidence.
+Actionlint's known older-schema warnings for `concurrency.queue` and the two
+verified custom self-hosted labels are excluded explicitly; all other checks pass.
+
+Run 42831528324 passed 19/21 Chromium menu cases; the two mobile concurrent-confirm
+cases queried storage before their destination navigation settled. The witness
+now awaits both actual destination documents and boot readiness before querying,
+then proves a nonempty new saved identity. Its simultaneous native confirmations,
+unchanged deadline and zero retries remain. WebKit/dungeon stages were blocked by
+that failed menu stage and are not claimed to have run.
 ## Authored isolation follow-up
 
 Run 42829329281 also failed the two desktop journey sweeps at the later diagnostic

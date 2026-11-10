@@ -391,10 +391,13 @@ test('main menu: records concurrent confirmed dungeon replacements retain one im
   await Promise.all([page.reload(),other.goto('./')]);
   await Promise.all([activate(page,'New Game'),activate(other,'New Game')]);
   for(const tab of [page,other])await expect(tab.getByRole('dialog')).toContainText('Start new dungeon?');
-  await Promise.all([activate(page,'Start new dungeon'),activate(other,'Start new dungeon')]);
+  await Promise.all([page.waitForURL(/\?game=dungeon/,{waitUntil:'domcontentloaded'}),other.waitForURL(/\?game=dungeon/,{waitUntil:'domcontentloaded'}),
+    activate(page,'Start new dungeon'),activate(other,'Start new dungeon')]);
+  for(const tab of [page,other])await expect(tab.locator('#dungeon-screen')).toHaveAttribute('data-boot','ready');
   const history=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)??'{"records":[]}').records,RUN_RECORD_KEYS.primary);
   await expect.poll(history).toMatchObject([{id,mode:'dungeon',outcome:'abandoned'}]);
-  await expect.poll(()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)??'{"payload":{}}').payload.id,DUNGEON_KEYS.primary)).not.toBe(id);
+  const currentId=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)??'{"payload":{}}').payload.id,DUNGEON_KEYS.primary);
+  await expect.poll(currentId).toMatch(/^[A-Za-z0-9-]{1,64}$/);expect(await currentId()).not.toBe(id);
   await page.goto('./');await activate(page,'Hall of Records');
   await expect(page.getByRole('dialog').getByRole('listitem')).toHaveCount(1);
   expect(await history()).toHaveLength(1);expect(errors).toEqual([]);
