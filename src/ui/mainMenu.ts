@@ -76,7 +76,7 @@ export function startMainMenu() {
         return;
       }
       show('Start new dungeon?', () => {
-        body.append(element('p', 'Replace only this device’s dungeon save with a full party and empty inventory? Export saved progress first if needed.'));
+        body.append(element('p', 'End this unfinished journey and replace only this device’s dungeon save with a full party and empty inventory? Export saved progress first if needed.'));
         const confirm = element('button', 'Start new dungeon'); confirm.type = 'button';
         confirm.onclick = () => {
           try {

@@ -9,6 +9,7 @@ import { dungeonBattle, startDungeonBattle, acceptDungeonBattle, freshDungeon, t
 import { progressHero } from '../src/domain/progression';
 import { encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
+import { RUN_RECORD_KEYS } from '../src/persistence/runRecordsStorage';
 import { COMBAT_CONTROLS_KEY } from '../src/ui/combatControls';
 import { readSession,playCommand,playUndo } from './helpers/battlePolicy';
 import { playerDecision, fighterDecision } from './helpers/playerPolicy';
@@ -20,6 +21,9 @@ import type { Command, BattleEvent } from '../src/domain/types';
 
 const fixedSeedTest = test.extend({ pinDungeonSeed: 28 });
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
+async function historyRows(page:Page){return page.evaluate(keys=>{
+ const text=localStorage.getItem(keys.primary);return text?JSON.parse(text).records:[];
+},RUN_RECORD_KEYS);}
 
 // UI witnesses straddle the Frost Snare gate; exact XP/HP/caster projections and
 // forged save rejection live in dungeonProgressionBoundary.test.ts.
@@ -72,7 +76,7 @@ for(const saved of [false,true])(saved?test.extend({pinDungeonSeed:27}):fixedSee
  const errors:string[]=[];let taunted=false;page.on('pageerror',error=>errors.push(error.message));
  if(!saved)await page.addInitScript(()=>{
   const get=Storage.prototype.getItem,set=Storage.prototype.setItem,remove=Storage.prototype.removeItem;
-  const gameKey=(key:string)=>key.startsWith('tactics-guru:phaser:')||key==='tactics-guru:menu-new-dungeon-review';
+  const gameKey=(key:string)=>key.startsWith('tactics-guru:phaser:')||key.startsWith('tactics-guru:records:')||key==='tactics-guru:menu-new-dungeon-review';
   Storage.prototype.getItem=function(key){if(gameKey(key))throw Error('Testing saved-game read');return get.call(this,key);};
   Storage.prototype.setItem=function(key,value){if(gameKey(key))throw Error('Testing saved-game write');set.call(this,key,value);};
   Storage.prototype.removeItem=function(key){if(gameKey(key))throw Error('Testing saved-game removal');remove.call(this,key);};
@@ -104,6 +108,7 @@ for(const saved of [false,true])(saved?test.extend({pinDungeonSeed:27}):fixedSee
    await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||(await readSession(page))?.phase==='player';}).toBe(true);
   }
   const finished=await snapshot(page);expect(finished.phase).not.toBe('defeat');expect(finished.floors[0].completed).toBe(slot+1);
+  if(saved)expect(await historyRows(page)).toEqual([]);
   for(let i=0;i<20;i++){
    const s=await snapshot(page),command=journeyPreparation(s);if(!command)break;
    if(command.type==='claimReward')await page.getByRole('button',{name:`Claim ${dungeonContent.items[command.itemId].label}`,exact:true}).click();
@@ -116,7 +121,14 @@ for(const saved of [false,true])(saved?test.extend({pinDungeonSeed:27}):fixedSee
  const second=await snapshot(page);expect(second.depth).toBe(2);expect(second.party).toEqual(cleared.party);expect(second.ownership).toEqual(cleared.ownership);
  await reenterDungeonStair(page,'ascend',isMobile?'touch':'keyboard');
  const returned=await snapshot(page);expect(returned.depth).toBe(1);expect(returned.floors[0].completed).toBe(3);expect(returned.party).toEqual(cleared.party);expect(returned.ownership).toEqual(cleared.ownership);
- await expect(page.getByRole('button',{name:'Save recovery',exact:true})).toHaveCount(saved?1:0);expect(errors).toEqual([]);
+ await expect(page.getByRole('button',{name:'Save recovery',exact:true})).toHaveCount(saved?1:0);
+ if(saved){
+  expect(await historyRows(page)).toEqual([]);
+  await page.getByRole('link',{name:'Main menu',exact:true}).last().click();
+  await page.getByRole('button',{name:'Hall of Records',exact:true}).click();
+  await expect(page.getByRole('dialog').getByRole('status')).toHaveText('No finished journeys recorded yet.');
+ }
+ expect(errors).toEqual([]);
 });
 
 // Use the same legal New Game seed as the complete saved first-floor journey above.
@@ -362,10 +374,16 @@ fixedSeedTest('dungeon battle undo survives reload and a legal defeat journey',a
   await expect.poll(async()=>{const state=await snapshot(page);return state.phase!=='battle'||(await readSession(page)).phase==='player';}).toBe(true);
  }
  await expect(page.getByRole('heading',{name:/Dungeon defeat/})).toBeVisible();
+ const ended=await snapshot(page);
+ await expect.poll(()=>historyRows(page)).toMatchObject([{id:ended.id,outcome:'defeat'}]);
+ const recorded=await historyRows(page),slots=await page.evaluate(keys=>[localStorage.getItem(keys.primary),localStorage.getItem(keys.backup)],DUNGEON_KEYS);
  await page.reload();await continueSavedDungeon(page);
  await expect(page.getByRole('heading',{name:/Dungeon defeat/})).toBeVisible();
+ expect(await snapshot(page)).toEqual(ended);expect(await historyRows(page)).toEqual(recorded);
+ expect(await page.evaluate(keys=>[localStorage.getItem(keys.primary),localStorage.getItem(keys.backup)],DUNGEON_KEYS)).toEqual(slots);
  await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();
  await expect(page.getByRole('heading',{name:/Dungeon · Floor 1/})).toBeVisible();
+ expect(await historyRows(page)).toEqual(recorded);
 });
 fixedSeedTest('read-only entry, keyboard new dungeon, real action and active resume',async({page,isMobile})=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));

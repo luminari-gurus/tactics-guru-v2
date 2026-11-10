@@ -19,9 +19,9 @@ all acceptance gates. Checkboxes represent implemented and verified work only.
 
 ## 3. Dungeon endings and complete acceptance — PR 3
 
-- [ ] 3.1 Integrate dungeon defeat and accepted replacement through the existing session/app and root-menu handoff; verify unfinished/terminal distinctions, placeholder exclusion, cancel/stale/partial reset behavior, continued descent/backtracking and pending-receipt recovery in focused session units, and update documentation alongside the change.
-- [ ] 3.2 Extend existing dungeon/menu/lifecycle browser cases to prove a legal defeat, one immutable record after reload, root-menu and in-flow replacement, no record on guardian/floor win or menu departure, active-save isolation and a bounded two-tab history-write case; run desktop/touch portrait/landscape and relevant WebKit selections and retain exact-source results and failures.
-- [ ] 3.3 Audit every #176 criterion and spec scenario against the final combined inputs; run required PR/affected persistence checks, strict OpenSpec validation, links and git diff --check, record evidence/reuse/limitations and publish the last focused PR using Closes #176 only if all criteria are verified. Keep #270 open for its separate statistics requirements.
+- [x] 3.1 Integrate dungeon defeat and accepted replacement through the existing session/app and root-menu handoff; verify unfinished/terminal distinctions, placeholder exclusion, cancel/stale/partial reset behavior, continued descent/backtracking and pending-receipt recovery in focused session units, and update documentation alongside the change.
+- [x] 3.2 Extend existing dungeon/menu/lifecycle browser cases to prove a legal defeat, one immutable record after reload, root-menu and in-flow replacement, no record on guardian/floor win or menu departure, active-save isolation and a bounded two-tab history-write case; run desktop/touch portrait/landscape and relevant WebKit selections and retain exact-source results and failures.
+- [x] 3.3 Audit every #176 criterion and spec scenario against the final combined inputs; run required PR/affected persistence checks, strict OpenSpec validation, links and git diff --check, record evidence/reuse/limitations and publish the last focused PR using Closes #176 only if all criteria are verified. Keep #270 open for its separate statistics requirements.
 
 ## Workflow follow-up
 

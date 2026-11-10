@@ -48,9 +48,17 @@ explicit unsaved play or denied active-save locks. Encounter entry stays disable
 until replacement's final history mutation finishes. Preparatory history feedback
 does not invalidate the save owner's reviewed confirmation.
 
-Dungeon recording remains in the next increment; the empty state alone is not
-evidence that issue #176 is complete. Planned dungeon endings are defeat or
-confirmed replacement. Floor/guardian wins, stairs, backtracking, menu return and
+The dungeon increment uses that same boundary for defeat, explicit terminal
+Continue and confirmed replacement through either the in-flow dialog or root-menu
+New Game handoff. Both reviewed slots are rechecked, and a newly accepted
+exploration step is preserved if it races replacement preparation.
+Floor/guardian wins, stairs, backtracking, menu return and
 page closure do not end the endless dungeon. Dedicated testing routes and
 standalone battles do not create run records. See the active
 [implementation plan](ongoing-projects/plan.md) for acceptance and current progress.
+
+Explicit unsaved dungeon play also admits a journey before its first move; accepted
+defeat or confirmed replacement can record it even if active saving is disabled or
+conflicted. Replacement keeps exploration and pending battle loading paused until
+its history boundary finishes. Reload recovery lets native dungeon engine imports
+request restored modules directly, retaining other preload hints.

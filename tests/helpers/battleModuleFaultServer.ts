@@ -10,7 +10,7 @@ interface ControlledAsset {
 }
 
 /** A real HTTP fault on the existing build, without Playwright request interception. */
-export async function startBattleModuleFaultServer() {
+export async function startBattleModuleFaultServer(target: 'battle-entry' | 'dungeon-engine' = 'battle-entry') {
   // Only the recovery witness starts another preview server; discovery and the
   // other main-menu tests do not import Vite or change their server lifecycle.
   const { preview } = await import('vite');
@@ -24,10 +24,14 @@ export async function startBattleModuleFaultServer() {
         async configurePreviewServer(server) {
           owned = server;
           base = server.config.base;
+          const pattern = target === 'battle-entry' ? /^startBattleApp-[A-Za-z0-9_-]{8}\.js$/
+            : /^(?:start|BattleScene)-[A-Za-z0-9_-]{8}\.js$/;
           const files = (await readdir(resolve(server.config.root, server.config.build.outDir, 'assets'), { withFileTypes: true }))
-            .filter(file => file.isFile() && /^startBattleApp-[A-Za-z0-9_-]{8}\.js$/.test(file.name))
+            .filter(file => file.isFile() && pattern.test(file.name))
             .map(file => file.name).sort();
-          if (files.length !== 1) throw new Error('Expected one built battle application entry');
+          if (target === 'battle-entry' ? files.length !== 1
+            : !files.some(file => file.startsWith('start-')) || !files.some(file => file.startsWith('BattleScene-')))
+            throw new Error(`Unexpected built modules for ${target}`);
           for (const file of files) assets.set(`${base}assets/${file}`, {
             file: `assets/${file}`, blocked: 0, allowed: 0,
             responses: { '200': 0, '304': 0, '503': 0, other: 0 },
@@ -59,6 +63,7 @@ export async function startBattleModuleFaultServer() {
     const origin = `http://127.0.0.1:${address.port}`;
     return {
       battleURL: `${origin}${base}?game=battle`,
+      dungeonURL: `${origin}${base}?game=dungeon`,
       allowImport() { unavailable = false; },
       isModuleURL(raw: string) {
         try { const url = new URL(raw); return url.origin === origin && assets.has(url.pathname); }

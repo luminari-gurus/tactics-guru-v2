@@ -6,6 +6,7 @@ import { DungeonMap, dungeonBiomeLabel, dungeonEncounterLabel } from '../ui/dung
 import '../style.css';
 import { mountTelemetryPreferences } from '../telemetry/preferences';
 import { DungeonSession } from './DungeonSession';
+import { RunHistory } from './RunHistory';
 import { freshDungeon, FloorCache, newDungeonSeed, type DungeonState } from '../domain/dungeon';
 import { bothDungeonSlotsMissing, createDungeonStorage } from '../persistence/dungeonStorage';
 import { dungeonElement as el, renderDungeon } from '../ui/dungeon';
@@ -16,17 +17,18 @@ import { diagnosticsSnapshot } from '../diagnostics/browser';
 function newSeed(previous?: number) {
  return newDungeonSeed(()=>crypto.getRandomValues(new Uint32Array(1))[0],previous);
 }
-const storage=appEntry.persistent?createDungeonStorage():null,session=new DungeonSession(freshDungeon(crypto.randomUUID(),newSeed()),storage),cache=new FloorCache();
+const storage=appEntry.persistent?createDungeonStorage():null,session=new DungeonSession(freshDungeon(crypto.randomUUID(),newSeed()),storage,storage?new RunHistory('dungeon'):null),cache=new FloorCache();
 const screen=el('main');screen.id='dungeon-screen';screen.dataset.boot='loading';document.body.append(screen);
 const shell=document.querySelector<HTMLElement>('#battle-shell')!,panel=document.querySelector<HTMLElement>('#fit-panel')!,container=document.querySelector<HTMLElement>('#game')!,status=document.querySelector<HTMLElement>('#fit-status')!,controls=document.querySelector<HTMLElement>('#battle-controls')!,restart=document.querySelector<HTMLButtonElement>('#fit-restart')!,persistence=document.querySelector<HTMLElement>('#battle-persistence')!;
 let live=true,playing=false,startup=true,loading=false,loadError=false,loadGeneration=0,host:RunBattleHost|null=null;
+let replacing=false;
 let engine: ReturnType<typeof import('../phaser/start').createGame> | null = null;
 let deferredStart: (()=>void) | null = null;
 const sound={enabled:false};
 const dialogs=new BattleDialogs(()=>{host?.modalTransition();queueMicrotask(()=>deferredStart?.());},()=>requestNew(),()=>screen.querySelector<HTMLElement>('h1')?.focus());
 panel.setAttribute('aria-label','Dungeon battle controls');
 mountBattleLayout();window.fitDiagnostics=diagnosticsSnapshot;
-const mapView=new DungeonMap(destination=>{if(!live||playing||loading||loadError||dialogs.open)return;if(session.step({...session.spatialBoundary,destination})&&session.phase==='battle')start();},()=>!live||playing||loading||loadError||dialogs.open);
+const mapView=new DungeonMap(destination=>{if(!live||playing||loading||loadError||replacing||dialogs.open)return;if(session.step({...session.spatialBoundary,destination})&&session.phase==='battle')start();},()=>!live||playing||loading||loadError||replacing||dialogs.open);
 function button(label:string,run:()=>void){const n=el('button',label);n.type='button';n.onclick=run;return n;}
 function evidence(state:DungeonState=session.snapshot){container.dataset.dungeonSnapshot=JSON.stringify(state);container.dataset.dungeonBattleRecord=JSON.stringify(session.completedBattle);}
 function stop(){loadGeneration++;deferredStart=null;loading=false;loadError=false;playing=false;host=null;engine?.scene.stop('battle');controls.hidden=true;container.style.visibility='hidden';}
@@ -34,7 +36,11 @@ function render(){
  if(!live)return;const state=session.snapshot;evidence(state);
  if(playing){persistence.querySelector('span')!.textContent=session.status;return;}
  shell.hidden=true;panel.hidden=true;screen.hidden=false;
- if(loading){
+ if(replacing){
+  const title=el('h1','Starting new dungeon');title.tabIndex=-1;
+  const message=el('p','Preparing your next journey.');message.setAttribute('role','status');
+  screen.replaceChildren(title,message);
+ }else if(loading){
   const title=el('h1','Loading encounter');title.tabIndex=-1;
   const message=el('p','Preparing the battle.');message.setAttribute('role','status');
   screen.replaceChildren(title,message,button('Start new dungeon',requestNew));
@@ -66,16 +72,27 @@ function render(){
  mountTelemetryPreferences(screen);
 }
 function requestNew(){
- if(dialogs.open||!live)return;
+ if(dialogs.open||!live||replacing)return;
  if(!storage){
   if(startup)session.save();else session.restart(crypto.randomUUID(),newSeed(session.snapshot.seed));
   startup=false;stop();render();screen.querySelector<HTMLElement>('h1')?.focus();return;
  }
  const review=session.inspect();
- dialogs.showChoices('Start new dungeon?','Replace only this device’s dungeon save with a full party and empty inventory? Export saved progress first if needed.',[
-  {id:'dungeon-confirm-new',label:'Start new dungeon',run:()=>{if(session.replace(review,crypto.randomUUID(),newSeed(session.snapshot.seed))){startup=false;stop();render();screen.querySelector<HTMLElement>('h1')?.focus();if(session.hasUnsavedProgress)recovery();}else recovery();}},
+ dialogs.showChoices('Start new dungeon?','End this unfinished journey and replace only this device’s dungeon save with a full party and empty inventory? Export saved progress first if needed.',[
+  {id:'dungeon-confirm-new',label:'Start new dungeon',run:()=>replace(review)},
   {id:'dungeon-cancel-new',label:'Cancel',run:()=>{render();screen.querySelector<HTMLElement>('h1')?.focus();}},
  ]);
+}
+async function replace(review:ReturnType<DungeonSession['inspect']>){
+ if(!live||replacing)return;
+ replacing=true;
+ try {
+  const accepted=await session.replace(review,crypto.randomUUID(),newSeed(session.snapshot.seed));
+  replacing=false;
+  if(!live)return;
+  if(accepted){startup=false;stop();render();screen.querySelector<HTMLElement>('h1')?.focus();if(session.hasUnsavedProgress)recovery();}
+  else {render();recovery();}
+ }finally{replacing=false;}
 }
 function recovery(){
  // Opening recovery should not scroll the exploration page behind the modal.
@@ -96,7 +113,7 @@ function recovery(){
 }
 function whenVisible(generation:number,run:()=>void){
  if(!live||generation!==loadGeneration)return;
- if(document.hidden||dialogs.open){deferredStart=()=>whenVisible(generation,run);return;}
+ if(document.hidden||dialogs.open||replacing){deferredStart=()=>whenVisible(generation,run);return;}
  deferredStart=null;
  try {run();}catch {failedLoad(generation);}
 }
@@ -105,7 +122,7 @@ function failedLoad(generation:number){
  stop();loadError=true;render();screen.querySelector<HTMLElement>('#dungeon-load-error')?.focus();
 }
 async function start(){
- if(!live||playing||loading)return;
+ if(!live||playing||loading||replacing)return;
  // Lock before committing the encounter or awaiting code, so repeated input cannot enter twice.
  const generation=++loadGeneration;loading=true;loadError=false;
  container.dataset.ready='false';delete container.dataset.phase;
@@ -158,9 +175,7 @@ if(entryIntent==='new'){
  const review=session.inspect();
  const matches=(['primary','backup'] as const).every(slot=>review[slot].status!=='unavailable' && approved?.[slot]?.status===review[slot].status && approved?.[slot]?.text===review[slot].text);
  const empty=bothDungeonSlotsMissing(review);
- if((matches || empty) && session.replace(review,crypto.randomUUID(),newSeed(session.snapshot.seed))){
-  startup=false;stop();render();screen.querySelector<HTMLElement>('h1')?.focus();if(session.hasUnsavedProgress)recovery();
- }else if(matches || empty)recovery();
+ if(matches || empty)void replace(review);
  else requestNew();
 }
 else if(entryIntent==='recovery')recovery();

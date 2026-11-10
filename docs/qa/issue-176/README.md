@@ -86,6 +86,49 @@ selection is now 33 Chromium + 22 WebKit cases. Runs 42828913970 and the superse
 queued capture are canceled for this test repair; failures/incomplete runs remain
 retained rather than relabeled as passing. Fresh qualification is required.
 
+## Increment 3 — dungeon recording (qualification pending)
+
+Based on authored PR #360 at `9a2c326`, in its isolated dungeon worktree. The
+dungeon owner records accepted defeat/terminal Continue and confirmed replacement
+through the existing root-menu handoff and in-flow controls. No active-save format
+or combat/RNG changes. Local focused checks pass 123 units across dungeon,
+RunItemSession, runBattle, RunHistory and model/storage, plus both type scopes.
+
+New session checks verify staged terminal admission and exact save bytes,
+continued descent without a record, reviewed old identity versus a placeholder,
+stale/partial reset, null-storage gating, history denial and an exploration race.
+Staged unit fixtures are not earned-play proof.
+
+Final browser discovery selects 83 cases: 21 Chromium + 14 WebKit menu cases;
+30 Chromium cases for full legal dungeon defeat, full first floor/descent/return,
+actual BFCache and testing isolation; six WebKit dungeon and 12 WebKit isolation
+cases. Unchanged authored long journeys are qualified separately on PR #360's
+relevant inputs. No case timeout/retry change or hosted fallback is added.
+Browser execution and final issue acceptance remain unverified until recorded.
+
+A new real-owner failure regression initially failed: startup rendering re-inspects
+the dungeon save, so a preparatory history-warning notification invalidated its
+own reviewed replacement token. Preparatory status now updates quietly; the
+existing save owner makes its decision before rendering that warning. The same
+unit passes without changing deadlines, and the unavailable-history browser case
+now drives two real root-menu New Games, verifying accepted new identity, saved
+bytes and visible history failure. This is a required nonfatal-history repair.
+
+Initial final-increment workflow validation failed before execution: the new
+single-line command contained an unquoted YAML colon in the grep expression.
+It is now a block command, and the workflow is checked with the available YAML
+parser and actionlint. These configuration failures are not browser evidence.
+Actionlint's known older-schema warnings for `concurrency.queue` and the two
+verified custom self-hosted labels are excluded explicitly; all other checks pass.
+
+Run 42831528324 passed 19/21 Chromium menu cases; the two mobile concurrent-confirm
+cases queried storage before their destination navigation settled. The witness
+now awaits both actual destination documents and boot readiness before querying,
+then proves a nonempty new saved identity. Its simultaneous native confirmations,
+unchanged deadline and zero retries remain. WebKit/dungeon stages were blocked by
+that failed menu stage and are not claimed to have run.
+## Authored isolation follow-up
+
 Run 42829329281 also failed the two desktop journey sweeps at the later diagnostic
 `?scene=battle` entry, after reaching the overall 30-second case deadline; Q*bert,
 mobile isolation and legal run cases passed. The original seven-entry sweep is
@@ -113,6 +156,45 @@ every runtime/test/config input relevant to these results. Dungeon gates remain
 in PR #361; the issue stays open. The shared physical host's unrelated processes
 were not independently controlled, so serialized success does not erase prior
 resource-sensitive failures or claim a generally repaired host.
+
+## Remaining final qualification
+
+Run 42840048098 passed 35 menu cases and 27 other Chromium cases, including all
+six actual BFCache returns, route isolation and complete legal dungeon defeats.
+The full-floor extension failed: mobile inherited its Save recovery assertion
+after the new menu navigation; desktop reached the original 300-second battle
+budget. The assertion now precedes navigation, preserving both original and new
+checks. The failed run remains failed. Only the repaired three Chromium full-floor
+cases and the 18 previously blocked WebKit cases run next on otherwise idle
+qualified capacity. Other 62 passes are reused: runtime/helpers/config and their
+test bodies are unchanged. No timeout, retry or gameplay change is made.
+
+## Complete issue acceptance
+
+Qualified functional head `003be9bad3afc25a264f05ce3b95bd5e8e441b0e`, clean tested
+merge `6dd0e291661a7527745e3626fcff9b9ad7625ea7`:
+
+- [Remaining qualification 42845257735, attempt 2](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42845257735/attempts/2): **21/21 passed**, zero failures/skips/test retries/flakes. The repaired complete floor, descent/backtracking and empty-history checks passed on three Chromium and three WebKit profiles; WebKit legal defeat and all isolation groups passed. VM-01 was idle during this run. The desktop case kept its original 300s deadline.
+- The final **83-case acceptance set is accounted for across 62 retained passes and 21 fresh passes**. This is not a clean single 83-case run: 42840048098 remains failed with its original three failures. Production/helpers/config and other test bodies are unchanged; the only browser-test repair reorders one assertion within the re-executed full-floor case.
+- [Current standard verification 42845257864](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42845257864): **1,279 units, both TypeScript scopes, both build integrations, production build and 7/7 core journeys passed**, no failures/pending/skipped/retried cases. Unit time was 60.28s. Earlier resource-sensitive failures remain recorded.
+- [Final portable receipt](increment-3.json) and [83 case records](increment-3-cases.jsonl) retain source/build inputs, exact case identities, attempts, per-stage outcomes and report hashes. Runtime is Linux x64, Node 24.22.2, Playwright 1.64.1, Chromium 156.0.8078.4 and WebKit 27.2. Browser evidence is desktop/native-touch emulation, not physical devices.
+- Real selection/batch contracts: 30 checks passed locally on Windows; the existing POSIX shell-guard check could not spawn sh there and passed unchanged under WSL Node 24.15.0. All original profiles, nine whole-file partitions and the 24 approved equivalence mappings are retained. No contract or assertion was weakened for the local shell limitation.
+
+### Acceptance mapping
+
+1. **Immutable schema/identity/counters:** runRecords model units and actual authored victory/defeat records prove stable mode/ID, exact supported counters and frozen first results. Eviction plus accepted/refused/racing replacement regressions preserve seals. Floor projection uses validated unique completion counts; the descent/replacement unit checks deepest visited floor.
+2. **Once at real endings; endless dungeon remains open:** authored legal wins/losses, explicit terminal Continue/restart, dungeon legal defeat, root-menu and in-flow replacement all pass. The complete first-floor/guardian/descent/backtrack/menu witness proves no false completion. Repeated callbacks and interrupted pending intents have targeted unit coverage; actual cached returns and concurrent native confirmations pass.
+3. **Storage/recovery/sorting/retention/menu:** bounded model/storage units, missing/corrupt/future/unavailable data, exact reviewed export/restore/reset, 100-entry retention and first-result sorting pass. Real keyboard/touch recovery preserves active-save bytes.
+4. **Device-local scope and separation:** the menu states browser-local best-effort persistence. No backend/account/economy or active-save format change. Record-only recovery and testing-entry spies preserve all active-save families.
+5. **Repeated/continued/corrupt/unavailable and accessible UI:** the 65 authored and final 83-case coverage sets include terminal reload/Continue, continued descent, all testing routes/diagnostics, unavailable history that still permits real New Game, two tabs and actual Chromium BFCache. Records screenshots and complete-journey board snapshots were inspected. WebKit uses actual reload/Continue; no WebKit BFCache or physical-device claim is made.
+
+All nine OpenSpec tasks are complete. The final documentation handoff and retirement
+of the one-off execution workflow preserve every functional source/test/config
+input; relevant evidence is reused under the policy. All cases remain in their
+explicit regression matrices and documented CLI commands. Full unrelated release
+regression/performance recertification was not run. No PR merge, release tag or
+production operation is part of this handoff. #176 remains open until reviewed
+work merges; #270 remains separate for richer statistics.
 
 ## Independent merge review — authored increment
 
@@ -148,3 +230,91 @@ Final handoff edits affect documentation only. Earlier five-profile battle/rule,
 replay and route-isolation evidence remains retained for unchanged consumers;
 the changed replacement and terminal integration has the fresh evidence above.
 No full unrelated release/performance recertification or physical device is claimed.
+
+## Independent merge review — dungeon and final integration
+
+The November 10 maintenance request explicitly authorizes review, fixes, verification,
+merge and safe cleanup. PR #359 merged as `39d461f`; PR #360 merged as `c88de9f`.
+PR #361 incorporates both and preserves the authored repairs. Two documentation
+conflicts were resolved by retaining original qualification and new review evidence.
+
+Eight substantive findings across the stack were reproduced, posted on their PRs
+and fixed. The three authored findings are above. The five dungeon/integration
+findings are:
+
+1. `DungeonSession.save`: unsaved play or a conflicting active save omitted an
+   accepted defeat. History now submits independently of active-save success.
+2. `startDungeonApp`: the new map/encounter could accept input during the final
+   replacement history write, then lose its scene on replacement completion.
+   A brief starting state and input guards cover that interval, including queued
+   events retained by the old map.
+3. `DungeonSession.playUnsaved`: explicit unsaved play before the first move was
+   mistaken for an unadmitted placeholder when replaced. The explicit choice now
+   admits that journey and its abandonment.
+4. `startDungeonApp.whenVisible`: an old pending engine import could mount a
+   discarded battle during the final history write. The existing deferred-start
+   mechanism now waits through replacement; successful replacement invalidates it.
+5. `vite.config.ts:108`: pre-existing failed dungeon-engine modulepreloads prevented
+   WebKit Reload/Continue recovery. The unchanged test failed three times on exact
+   pre-PR main `c88de9f`. A real no-store HTTP 503 also failed three times on the
+   reviewed source: server receipts recorded four 503s and zero new requests after
+   availability returned. The existing preload exclusion now covers engine-family
+   imports while retaining other dependency hints. The same HTTP case passed three
+   times after the fix, with restored 200/304 requests and exact saved identity/RNG.
+
+Owner/input fixes are in `9dd630a`, deferred loading and the shared test gate in
+`4e99d24`, and preload recovery in final functional source
+`4b88f7e728a4ecdb08e17e21392d53443b084e9a`.
+Both original automated inline findings have fix/verification replies and are resolved.
+No new dependency, active-save format, combat rule or general fallback was added.
+
+### Final verification and evidence reuse
+
+- Actual local `npm run verify:pr` passed all six stages in **111.15 seconds** on
+  clean `4b88f7e`: tooling, **1,285/1,285 units**, both TypeScript scopes, **2/2
+  root/prefix build integrations**, production bundle and **7/7 core journeys**.
+  The app runtime uses an ignored wrapper to the installed npm CLI; stage logs
+  and the source-bound summary are in `verification-receipts/pr/1794333335621-86852/`.
+- Final affected loading cases: **21 Chromium + 21 WebKit passed**. These cover
+  real HTTP unavailability/recovery, delayed/repeated entry, recovery close,
+  restart, pagehide/visibility, adoption and replacement during a pending import.
+  The existing battle-entry HTTP fixture consumer also passed **3 Chromium + 2
+  WebKit** cases. All relevant normal/default and engine-target fixture consumers ran.
+- The [review receipt](review-361.json) and [case ledger](review-361-cases.jsonl)
+  account for **122 unique qualified browser cases: 54 on final functional source
+  and 68 retained with explicit equivalence**. This is not a clean single aggregate
+  run. Every selected case has one passing attempt, retries zero and one worker.
+- The retained set includes 35 ordinary records/root-menu cases, 15 corrected
+  replacement-gate cases, six actual Chromium BFCache journeys and 12 full-health
+  dungeon defeat/full-floor/guardian/descent/backtrack journeys on all three
+  Chromium and all three WebKit profiles. Domain/content/persistence/owner and
+  rendered gameplay inputs are unchanged. The added deferred condition is inactive
+  during those healthy imports; the final hint change alters fetch scheduling,
+  with healthy/current loader behavior requalified by the final core/loading cases.
+  Reuse covers state, counters and saves, never timing equivalence. Authored complete
+  victory/defeat evidence from #360 remains valid for its unchanged consumers.
+- **93 risk-gate checks** passed. Selection/batch contracts retain the seven core
+  journeys, all broad profiles, nine partitions and 24 approved mappings. Thirty
+  checks passed on Windows; the unchanged POSIX guard lacked `sh` there and passed
+  separately under WSL. The Windows command remains recorded as failed, not relabeled.
+- Desktop and mobile records screenshots, legal dungeon boards and the bounded
+  replacement screen were inspected. Evidence is browser/device emulation. Actual
+  Chromium BFCache is exercised; WebKit BFCache and physical devices are not claimed.
+
+Raw reports, logs, traces, screenshots and HTTP receipts are retained under
+`tmp/issue-176-review/`. Custom investigation configs placed JSON reports under
+its nested `tmp/issue-176-review/361/` directory; the receipt records exact paths.
+Original RED owner/input/loading cases, the old instance-interceptor WebKit
+failures, unavailable-module failures, exact-base failures and unsuccessful route-drain
+experiment remain available. The corrected prototype interceptor passed five
+deliberate repeat investigations, then all affected ordinary profiles. The initial
+HTTP-fixture adaptation's two-chunk assumption failed setup; actual engine facades
+and bodies are controlled as two named families, with observed HTTP responses verified.
+No timeout, assertion, worker, test retry or acceptance gate was relaxed.
+
+All issue #176 criteria and nine OpenSpec tasks are accounted for by the original
+acceptance mapping plus this review. The issue was reopened after premature closure
+with the first increment and is completed with the final merge. #270 remains separate.
+Final handoff changes documentation only. Full unrelated release regression and
+performance recertification were not run; no claim of generally repaired host timing
+or manual production deployment is made. Existing Vite loader/chunk-size advisories remain.

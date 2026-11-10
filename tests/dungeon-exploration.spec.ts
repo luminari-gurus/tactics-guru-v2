@@ -19,6 +19,8 @@ import { atCell, atEncounter, atStairApproach, dungeonCapacityFixture, priorDung
 import { LEGACY_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
 import { freshExploration, movableExploration } from '../src/domain/exploration';
 import { encodeDungeon, utf8Bytes } from '../src/domain/dungeonSaveEnvelope';
+import { holdFinalRecordsWrite } from './helpers/recordsWriteGate';
+import { startBattleModuleFaultServer } from './helpers/battleModuleFaultServer';
 
 const fixedSeedTest = test.extend({ pinDungeonSeed: 28 });
 test.beforeEach(async ({ context }) => { await installRailControls(context); });
@@ -583,10 +585,10 @@ test('closing on each wandering encounter holds contact and saves the matching b
 });
 
 const dungeonEngineModule=/\/(?:start|BattleScene)-[^/]+\.js(?:\?.*)?$|\/src\/phaser\/(?:start|BattleScene)\.ts(?:\?.*)?$/;
-async function loadEncounterWithoutEngine(page:Page,id:string){
+async function loadEncounterWithoutEngine(page:Page,id:string,url='./?game=dungeon'){
  const initial=atEncounter(freshDungeon(id,1)),encoded=encodeDungeon(initial);
  if(!encoded.ok)throw Error(encoded.reason);
- await page.goto('./?game=dungeon');
+ await page.goto(url);
  await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
  await page.reload();await continueSavedDungeon(page);
  await expect(page.locator('#dungeon-map')).toBeVisible();
@@ -608,15 +610,16 @@ async function finishRequestedDungeonModules(page:Page,requested:Set<string>){
  },urls);
 }
 
-test('unavailable battle modules preserve dungeon exploration, recovery and the saved encounter',async({page})=>{
+test('unavailable battle modules preserve dungeon exploration, recovery and the saved encounter',async({page},info)=>{
  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
- let blocked=0;
- await page.route(dungeonEngineModule,route=>{blocked++;return route.abort();});
- const initial=await loadEncounterWithoutEngine(page,'lazy-engine-unavailable');
- expect(blocked).toBe(0);
+ const server=await startBattleModuleFaultServer('dungeon-engine');
+ try {
+ const initial=await loadEncounterWithoutEngine(page,'lazy-engine-unavailable',server.dungeonURL);
+ expect(server.receipt().blocked).toBe(0);
  await page.getByRole('button',{name:'Enter encounter',exact:true}).click();
  await expect(page.locator('#dungeon-load-error')).toContainText('Could not load the encounter');
- expect(blocked).toBeGreaterThan(0);
+ expect(server.receipt().blocked).toBeGreaterThan(0);
+ expect(server.receipt().assets.some(asset=>asset.responses['503']>0)).toBe(true);
  const pending=await dungeonSnapshot(page),saved=await dungeonSlots(page);
  expect(pending.id).toBe(initial.id);expect(pending.phase).toBe('battle');expect(pending.revision).toBe(initial.revision+1);
  expect(JSON.parse(saved.primary!).payload).toEqual(pending);
@@ -625,13 +628,19 @@ test('unavailable battle modules preserve dungeon exploration, recovery and the 
  await page.locator('#dungeon-map').focus();await page.keyboard.press('ArrowRight');
  expect(await dungeonSnapshot(page)).toEqual(pending);expect(await dungeonSlots(page)).toEqual(saved);
  await expect(page.locator('canvas')).toHaveCount(0);
- await page.unroute(dungeonEngineModule);
+ server.allowImport();
  await page.getByRole('button',{name:'Reload page',exact:true}).click();
  await continueSavedDungeon(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const resumed=await dungeonSnapshot(page);
  expect(resumed.id).toBe(pending.id);expect(resumed.depth).toBe(pending.depth);
  expect(resumed.activeBattle!.seed).toBe(pending.activeBattle!.seed);
+ expect(server.receipt().allowed).toBeGreaterThan(0);
+ expect(server.receipt().assets.filter(asset=>asset.blocked>0).every(asset=>asset.responses['200']+asset.responses['304']>0)).toBe(true);
  expect(errors).toEqual([]);
+ }finally {
+  writeFileSync(info.outputPath('module-http-fault.json'),JSON.stringify(server.receipt(),null,2));
+  await server.close();
+ }
 });
 
 test('delayed dungeon loading locks repeated entry and waits for recovery to close',async({page})=>{
@@ -702,6 +711,29 @@ for(const interruption of ['restart','pagehide','visible'] as const)test(interru
    await expect(page.locator('canvas')).toHaveCount(1);
   }else await expect(page.locator('canvas')).toHaveCount(0);
   expect(errors).toEqual([]);
+ }finally {release();}
+});
+
+test('pending dungeon engine cannot mount during the final replacement history write', async ({ page }) => {
+ let release!:()=>void; const requests=new Set<string>();
+ const gate=new Promise<void>(resolve=>{release=resolve;});
+ await page.route(dungeonEngineModule,async route=>{requests.add(route.request().url());await gate;await route.continue();});
+ try {
+  const initial=await loadEncounterWithoutEngine(page,'lazy-engine-records-replacement');
+  await page.getByRole('button',{name:'Enter encounter',exact:true}).click();
+  await expect.poll(()=>requests.size).toBeGreaterThan(0);
+  const releaseHistory=await holdFinalRecordsWrite(page);
+  await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();
+  await page.locator('#dungeon-confirm-new').click();
+  await expect(page.locator('html')).toHaveAttribute('data-records-held','yes');
+  const retained=await dungeonSnapshot(page); expect(retained.id).not.toBe(initial.id);
+  release();await finishRequestedDungeonModules(page,requests);
+  await expect(page.locator('canvas')).toHaveCount(0);
+  expect(await dungeonSnapshot(page)).toEqual(retained);
+  await releaseHistory();
+  await expect(page.locator('#dungeon-map')).toBeVisible();
+  await expect(page.locator('canvas')).toHaveCount(0);
+  expect(await dungeonSnapshot(page)).toEqual(retained);
  }finally {release();}
 });
 

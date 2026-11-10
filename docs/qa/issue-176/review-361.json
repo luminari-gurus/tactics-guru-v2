@@ -1,0 +1,345 @@
+{
+  "finalFunctionalSource": "4b88f7e728a4ecdb08e17e21392d53443b084e9a",
+  "sourceInputs": {
+    "owned": {
+      "commit": "9dd630a7a02cf38e4920197bf9a21a70335cdcf6",
+      "inputHash": "55ccbb48c542551bfa72e67c43b2336bbca9c3c0d3305453138d887265c706f2",
+      "dirty": false
+    },
+    "loading": {
+      "commit": "4e99d24a08aedb4c90e4d0b988ec656e9b255f0a",
+      "inputHash": "c6c23a8905fc609409b7607881dfbcb83551fc832cdb5b88bb78c009bc50d5e3",
+      "dirty": false
+    },
+    "final": {
+      "commit": "4b88f7e728a4ecdb08e17e21392d53443b084e9a",
+      "inputHash": "9769dea84d365387786284aaf714edabc8fc59deda738d2660d666a6692e92c5",
+      "dirty": false
+    }
+  },
+  "environment": {
+    "os": "Windows x64",
+    "node": "v24.22.1",
+    "playwright": "1.64.1",
+    "browsers": [
+      {
+        "name": "chromium",
+        "revision": "1248",
+        "installByDefault": true,
+        "browserVersion": "156.0.8078.4",
+        "title": "Chrome for Testing"
+      },
+      {
+        "name": "webkit",
+        "revision": "2370",
+        "installByDefault": true,
+        "revisionOverrides": {
+          "mac14": "2251",
+          "mac14-arm64": "2251"
+        },
+        "browserVersion": "27.2",
+        "title": "WebKit"
+      }
+    ],
+    "workers": 1,
+    "retries": 0,
+    "physicalDevices": false,
+    "conditions": "Local functional verification; no isolated-host performance claim."
+  },
+  "standard": {
+    "path": "verification-receipts/pr/1794333335621-86852/summary.json",
+    "sha256": "d65cf27bdea6d3ff5650f4d04f9448841c4434e968f5d804dffd9a4e828bd94d",
+    "durationMs": 111150,
+    "stages": [
+      {
+        "id": "tooling",
+        "status": "passed",
+        "durationMs": 14072.0687
+      },
+      {
+        "id": "units",
+        "status": "passed",
+        "durationMs": 33028.7485
+      },
+      {
+        "id": "typecheck",
+        "status": "passed",
+        "durationMs": 4693.423199999997
+      },
+      {
+        "id": "build-integration",
+        "status": "passed",
+        "durationMs": 7876.583900000005
+      },
+      {
+        "id": "bundle",
+        "status": "passed",
+        "durationMs": 4923.9162
+      },
+      {
+        "id": "journeys",
+        "status": "passed",
+        "durationMs": 46542.3554
+      }
+    ],
+    "units": {
+      "passed": 1285,
+      "total": 1285,
+      "sha256": "c4a32be958796ab9bd79d905c212c6eab2c31e30b856a10ce68d8406f6f61d2e"
+    },
+    "buildIntegrationSha256": "3388dfd54c052876d97abfc7f018068fd1c5189d1dd634afc5fa76d2bfcd56da",
+    "indexSha256": "fa2db0d202c7f5aa6414486ca94161e9b338799b06cc2ddb797786fd0b3e79fa"
+  },
+  "coverage": {
+    "qualifiedUniqueCases": 122,
+    "finalSourceCases": 54,
+    "retainedEquivalentCases": 68,
+    "singleCleanAggregateRun": false
+  },
+  "reports": [
+    {
+      "path": "tmp/issue-176-review/361/recovery-webkit-entry.json",
+      "sha256": "1f45841d2d4ac96743fe08568e868941ca0e662f3cc948ada13bd3786b2d84c8",
+      "source": "4b88f7e728a4ecdb08e17e21392d53443b084e9a",
+      "originalStats": {
+        "startTime": "2026-11-10T18:00:17.900Z",
+        "duration": 6809.239,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "selectedPassingCases": 2
+    },
+    {
+      "path": "tmp/issue-176-review/361/webkit-menu.json",
+      "sha256": "a191fd6bccb626d744beff04cb7f24d09930f24233df52857c3f8a4b14e32f96",
+      "source": "9dd630a7a02cf38e4920197bf9a21a70335cdcf6",
+      "originalStats": {
+        "startTime": "2026-11-10T17:24:01.382Z",
+        "duration": 44439.488999999994,
+        "expected": 19,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "selectedPassingCases": 14
+    },
+    {
+      "path": "tmp/issue-176-review/361/final-webkit-regressions.json",
+      "sha256": "b2b036a935ef5229fab38c0f7f3532404da17743f81ef8b92999009515f1a936",
+      "source": "4e99d24a08aedb4c90e4d0b988ec656e9b255f0a",
+      "originalStats": {
+        "startTime": "2026-11-10T17:38:20.927Z",
+        "duration": 15198.552,
+        "expected": 6,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "selectedPassingCases": 6
+    },
+    {
+      "path": "tmp/issue-176-review/361/recovery-webkit-loading.json",
+      "sha256": "d9258a799f77576ad49989bf25153b20f6bc0f07686734e430247a7951c2ed22",
+      "source": "4b88f7e728a4ecdb08e17e21392d53443b084e9a",
+      "originalStats": {
+        "startTime": "2026-11-10T17:59:28.149Z",
+        "duration": 41244.937000000005,
+        "expected": 21,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "selectedPassingCases": 21
+    },
+    {
+      "path": "tmp/issue-176-review/361/webkit-dungeon.json",
+      "sha256": "7bbae0e2628e14c4cc0d2b8af4c5e315f4ccf8e2f5b8f5fcfe22f8e7882f31f0",
+      "source": "9dd630a7a02cf38e4920197bf9a21a70335cdcf6",
+      "originalStats": {
+        "startTime": "2026-11-10T17:30:04.875Z",
+        "duration": 430363.093,
+        "expected": 6,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "selectedPassingCases": 6
+    },
+    {
+      "path": "tmp/issue-176-review/361/cached-records.json",
+      "sha256": "4c6bfc15afaa597ee59ce2093f154a886cc1c6e4fbff7bba1bb01e1cf734cc3a",
+      "source": "9dd630a7a02cf38e4920197bf9a21a70335cdcf6",
+      "originalStats": {
+        "startTime": "2026-11-10T17:25:30.875Z",
+        "duration": 10767.921,
+        "expected": 6,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "selectedPassingCases": 6
+    },
+    {
+      "path": "tmp/issue-176-review/361/recovery-chromium-loading.json",
+      "sha256": "b249137c74b9f028a64f64e54bc640c9e9cbe58ae4445542adaa1346ea982602",
+      "source": "4b88f7e728a4ecdb08e17e21392d53443b084e9a",
+      "originalStats": {
+        "startTime": "2026-11-10T17:58:58.303Z",
+        "duration": 29460.329,
+        "expected": 21,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "selectedPassingCases": 21
+    },
+    {
+      "path": "tmp/issue-176-review/361/chromium-dungeon.json",
+      "sha256": "2b9baea428c02a2c289ce9ce3af294f386a570ac12500067b9487fa13c40d656",
+      "source": "9dd630a7a02cf38e4920197bf9a21a70335cdcf6",
+      "originalStats": {
+        "startTime": "2026-11-10T17:25:42.057Z",
+        "duration": 262422.061,
+        "expected": 6,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "selectedPassingCases": 6
+    },
+    {
+      "path": "tmp/issue-176-review/361/recovery-chromium-entry.json",
+      "sha256": "b54e2878254dda20af4ebf54717f2e31e7d29a30950fbea485fa5e4951983c05",
+      "source": "4b88f7e728a4ecdb08e17e21392d53443b084e9a",
+      "originalStats": {
+        "startTime": "2026-11-10T18:00:09.764Z",
+        "duration": 7727.381,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "selectedPassingCases": 3
+    },
+    {
+      "path": "tmp/issue-176-review/361/chromium-menu.json",
+      "sha256": "39e2daa7280bdd074373bb209b055f180875af9c7377c65ac6b2d4fad3480fa9",
+      "source": "9dd630a7a02cf38e4920197bf9a21a70335cdcf6",
+      "originalStats": {
+        "startTime": "2026-11-10T17:23:15.854Z",
+        "duration": 45019.256,
+        "expected": 30,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "selectedPassingCases": 21
+    },
+    {
+      "path": "tmp/issue-176-review/361/final-chromium-regressions.json",
+      "sha256": "d0458c9697bd0b7c004ddaa6c999298d700f25d06ebd97e2e4c0107c56389d6e",
+      "source": "4e99d24a08aedb4c90e4d0b988ec656e9b255f0a",
+      "originalStats": {
+        "startTime": "2026-11-10T17:38:04.536Z",
+        "duration": 15946.332,
+        "expected": 9,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "selectedPassingCases": 9
+    },
+    {
+      "path": "verification-receipts/pr/1794333335621-86852/journeys.json",
+      "sha256": "408505feb175ec1150ecdbd00751f91174b89210f86659a92c48cfa1c7484f37",
+      "source": "4b88f7e728a4ecdb08e17e21392d53443b084e9a",
+      "originalStats": {
+        "startTime": "2026-11-10T17:56:41.713Z",
+        "duration": 42101.109,
+        "expected": 7,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "selectedPassingCases": 7
+    }
+  ],
+  "reuse": {
+    "owned": "53 cases retain unchanged domain/content/persistence/model/owner and rendered gameplay inputs. Cached-map/menu paths do not import the dungeon engine; authored entries retain their prior hint plan. Legal floor/defeat cases exercise healthy assets with replacing=false during engine import. Reuse covers legal state/counter/save results, not timing. Final core/loading cases requalify the changed loader on all affected engines.",
+    "loading": "15 prototype-gated replacement cases preserve their body/helper and owner inputs. The final preload exclusion only affects later dungeon engine imports after the held replacement boundary; post-release loading has separate final-source proof.",
+    "failures": "Original failed reports remain failed. Only explicitly selected passing cases qualify the coverage set; no clean single 122-case aggregate, blanket retry, deadline relaxation or performance equivalence is claimed."
+  },
+  "preservedEvidence": [
+    {
+      "path": "tmp/issue-176-review/361/red-units.log",
+      "sha256": "4aeb77868ecfdb980b1ab3ffe83f277751312e0ce7ff3b7c4643680410a99a36"
+    },
+    {
+      "path": "tmp/issue-176-review/361/red-unsaved-start.log",
+      "sha256": "1529985506e98ecce2300d7a06ccbb0768ecab4e2567270275208491b3c25294"
+    },
+    {
+      "path": "tmp/issue-176-review/361/red-browser.json",
+      "sha256": "b5a8248ccc55570bb675325464cf0c5edacf9078307f2f16bdd20a6ab3f005c0"
+    },
+    {
+      "path": "tmp/issue-176-review/361/red-queued-event.json",
+      "sha256": "3f217dc6ce74f958eee6ebf79e79862918ad826ec9f44f01d840a0cc20a3c267"
+    },
+    {
+      "path": "tmp/issue-176-review/tmp/issue-176-review/361/red-loading.json",
+      "sha256": "2ba115a786c8dc0168d57a5d9033cadb40739e2ac1b8c508e6646026eb5d4f34"
+    },
+    {
+      "path": "tmp/issue-176-review/361/webkit-menu.json",
+      "sha256": "a191fd6bccb626d744beff04cb7f24d09930f24233df52857c3f8a4b14e32f96"
+    },
+    {
+      "path": "tmp/issue-176-review/tmp/issue-176-review/361/webkit-investigation.json",
+      "sha256": "39882c4f70d5a76a1cd001a39e50466f780c6239ba5a45680425a43a1245f0d6"
+    },
+    {
+      "path": "tmp/issue-176-review/tmp/issue-176-review/361/webkit-prototype-investigation.json",
+      "sha256": "928cbb36a028c60cfde886a4f6432746ab132327e91ce7f9023295f5861ee815"
+    },
+    {
+      "path": "tmp/issue-176-review/361/final-webkit-loading.json",
+      "sha256": "e8ce1838d7713bb054db31d02db7f12ec6cdf7db71a442386e812db0e251bda0"
+    },
+    {
+      "path": "tmp/issue-176-review/tmp/issue-176-review/361/exact-base-webkit.json",
+      "sha256": "ba4c63decff0b93d0a5ccbbb0cc01f9d01d9ce9fa28f63b12e6b080547e2ef88"
+    },
+    {
+      "path": "tmp/issue-176-review/tmp/issue-176-review/361/route-drain-exact-base.json",
+      "sha256": "fcd3cc221020e7ca57579db47d2517098f5449b9c371bc934d4d815a8f1bd9ad"
+    },
+    {
+      "path": "tmp/issue-176-review/tmp/issue-176-review/361/http-module-recovery.json",
+      "sha256": "42f18789733683dd2bb0719a68013967c01467358b95c94766a54707ce0b8d49"
+    },
+    {
+      "path": "tmp/issue-176-review/tmp/issue-176-review/361/http-module-recovery-v2.json",
+      "sha256": "9ed3a4ddd71311dbdd576853954e3eb464bb98517313da63a7f7b6d8638352d0"
+    },
+    {
+      "path": "tmp/issue-176-review/tmp/issue-176-review/361/green-http-module-recovery.json",
+      "sha256": "cc1c5f0b1f5756434ddab3ccf8032dd9692f13dcd7baa9eba83dd94dc0a53c30"
+    },
+    {
+      "path": "tmp/issue-176-review/361/selection-contracts.log",
+      "sha256": "b13230c83b04fb36e7ac001155080d1ae47b59cac89c437c7815cf6e3a642659"
+    },
+    {
+      "path": "tmp/issue-176-review/361/posix-guard.log",
+      "sha256": "841a9b0152bfaf862053522ab07cb1afad2acaccd08f7153a9113870ab127a2c"
+    }
+  ],
+  "limitations": [
+    "No unrelated full release regression or performance recertification.",
+    "Device evidence is emulation. Chromium BFCache is exercised; WebKit BFCache is not claimed.",
+    "Existing POSIX guard lacks sh on Windows; the identical case passed separately under WSL."
+  ]
+}
