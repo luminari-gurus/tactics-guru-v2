@@ -182,10 +182,10 @@ test('review356 friendly confirmation rejects a replacement prepared command',as
   expect((await readSession(page)).state).toEqual(before.state);
 });
 
-for(const hero of ['fighter','ranger','mage'] as const)test(`keyboard-only shortcuts select ${hero} learned abilities and preserve resource locks`,async({page})=>{
+for(const hero of ['fighter','ranger','mage'] as const)test(`direct ability controls expose ${hero} learned actions without committing`,async({page,hasTouch})=>{
   const expected=learnedControls[hero].map(([id])=>`ability:${id}`);
   await abilityReady(page,`/tests/fixtures/abilities/index.html?hero=${hero}&xp=180&real&injured`);
-  const before=await readSession(page),picker=page.locator('#battle-ability'),canvas=page.locator('canvas');
+  const before=await readSession(page),picker=page.locator('#battle-ability');
   expect(await picker.locator('option').evaluateAll(options=>options.map(option=>(option as HTMLOptionElement).value))).toEqual(expected);
   const direct=page.locator('.battle-actions [data-action^="ability:"]');
   expect(await direct.evaluateAll(buttons=>buttons.map(button=>(button as HTMLElement).dataset.action))).toEqual(expected);
@@ -196,10 +196,20 @@ for(const hero of ['fighter','ranger','mage'] as const)test(`keyboard-only short
     const button=abilityButton(page,ability),name=learnedControls[hero][index][1];
     await expect(page.getByRole('button',{name,exact:true})).toHaveCount(1);
     await expect(button).toBeVisible();await expect(button).toBeEnabled();
-    if(test.info().project.use.hasTouch)await button.tap();else {await button.focus();await page.keyboard.press('Space');await expect(button).toBeFocused();}
+    if(hasTouch)await button.tap();else {await button.focus();await page.keyboard.press('Space');await expect(button).toBeFocused();}
     await expect(picker).toHaveValue(ability);await expect(button).toHaveAttribute('aria-pressed','true');
     expect((await readSession(page)).state).toEqual(before.state);
     expect(await button.evaluate((node,original)=>node===original,nodes[index])).toBe(true);
+  }
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saves);
+});
+
+for(const hero of ['fighter','ranger','mage'] as const)test(`keyboard-only shortcuts select ${hero} learned abilities and preserve resource locks`,async({page})=>{
+  const expected=learnedControls[hero].map(([id])=>`ability:${id}`);
+  await abilityReady(page,`/tests/fixtures/abilities/index.html?hero=${hero}&xp=180&real&injured`);
+  const before=await readSession(page),picker=page.locator('#battle-ability'),canvas=page.locator('canvas');
+  const saves=await page.evaluate(()=>JSON.stringify(localStorage));
+  for(const [index,ability] of expected.entries()){
     await canvas.focus();await page.keyboard.press(String(index+1));
     await expect(picker).toHaveValue(ability);
     await expect(abilityButton(page,ability)).toHaveAttribute('aria-pressed','true');
@@ -222,7 +232,11 @@ for(const hero of ['fighter','ranger','mage'] as const)test(`keyboard-only short
   expect(accepted.events.some(event=>event.type==='abilityUsed'&&event.abilityId===ability)).toBe(true);
   await page.keyboard.press(String(index+1));await page.keyboard.press('s');await page.keyboard.press('c');
   expect((await readSession(page)).state).toEqual(accepted.state);
+});
+
+for(const hero of ['fighter','ranger','mage'] as const)test(`keyboard-only shortcuts reject ${hero} unlearned abilities at level one`,async({page})=>{
   await abilityReady(page,`/tests/fixtures/abilities/index.html?hero=${hero}&xp=0&real`);
+  const picker=page.locator('#battle-ability'),direct=page.locator('.battle-actions [data-action^="ability:"]'),canvas=page.locator('canvas');
   await expect(picker.locator('option')).toHaveCount(1);
   await expect(direct).toHaveCount(1);
   const locked=await readSession(page);
@@ -289,7 +303,9 @@ test('direct ability controls fit the desktop rail and compact touch layouts',as
       expect((await readSession(page)).state).toEqual(before.state);
       await page.locator('#battle-target').selectOption(hero==='fighter'?'0,0':'2,0');
       await expect(page.locator('#battle-review')).toBeEnabled();
-      await page.locator('#battle-party').click();await page.locator('#inspection-close').click();
+      await page.locator('#battle-party').focus();
+      if(hasTouch)await page.locator('#battle-party').tap();else await page.locator('#battle-party').click();
+      await page.locator('#inspection-close').click();
       await expect(page.locator('#battle-party')).toBeFocused();await expect(page.locator('#battle-review')).toBeEnabled();
       await page.locator('#battle-cancel').click();expect((await readSession(page)).state).toEqual(before.state);
       await expect(page.locator('#battle-move')).toBeFocused();

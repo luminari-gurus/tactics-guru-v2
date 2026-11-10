@@ -72,7 +72,9 @@ export class BattleRadial {
         if (this.mode === 'tap' && !button.disabled) this.aim(slice);
       }, { signal });
       // Opening or repositioning the menu can put a slice under a stationary pointer.
-      button.addEventListener('pointermove', () => {
+      button.addEventListener('pointermove', event => {
+        // Touch activates through click; hover focus can rewrite the menu before that activation.
+        if (event.pointerType === 'touch') return;
         if (this.mode === 'tap' && !button.disabled && this.aimed !== slice) button.focus({ preventScroll: true });
       }, { signal });
     });

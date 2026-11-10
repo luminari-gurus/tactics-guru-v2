@@ -18,9 +18,10 @@ jobs:
     steps:
       - name: Check host disposition
         run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
-      - uses: actions/checkout@v4
+      - name: Check out exact comparison base
+        uses: actions/checkout@v4
         with:
-          ref: ${{ github.sha }}
+          ref: dafdeb3f38e7d5be9d73b91101cf020fb2e5401d
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@v4
@@ -29,42 +30,9 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run setup:browsers && npm run check:browsers
-      - name: Record source identity
+      - name: Record exact base and WebKit profile
         run: |
-          mkdir -p verification-receipts/issue-311
-          node --input-type=module <<'JS'
-          import { writeFileSync } from 'node:fs';
-          import { sourceIdentity } from './scripts/verification-report.mjs';
-          writeFileSync('verification-receipts/issue-311/source.json', JSON.stringify({
-            source: sourceIdentity(process.cwd()), node: process.version, runner: process.env.RUNNER_NAME,
-            conditions: 'Qualified persistent runner; browser/device emulation; shared host load and caches not independently controlled'
-          }, null, 2));
-          JS
-      - name: Build the application
-        id: build
-        run: npm run build
-      - name: Verify learned ability fixtures on Chromium
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: |
-          selection=(-c playwright.fixtures.config.ts tests/ability-picker.spec.ts)
-          npx --no-install playwright test "${selection[@]}" --list | tee verification-receipts/issue-311/chromium-fixtures-selection.txt
-          npm run test:browser -- "${selection[@]}" --diagnostics
-      - name: Verify affected desktop HUD consumers
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: |
-          selection=(-c playwright.regression.config.ts tests/battle-loop.spec.ts tests/battle-board.spec.ts tests/battle-animations.spec.ts tests/guarded-effects.spec.ts tests/unit-health-bars.spec.ts tests/dungeon-lifecycle.spec.ts --project=desktop -g 'QA: hover refresh preserves controls and first-click Confirm and Wait|default Move initializes once per usable player turn and preserves explicit choices|keyboard-only movement, attack confirmation and Wait use the shared decision flow|keyboard-only shortcuts yield to editing modifiers composition handled events and dialogs|live actor, inspection and cancellation remain independent of pending intent|accepted rail and dock preserve drawable floors, readable controls and focus at five sizes|occluded archer exposed art selects the same legal target as the dropdown|real controls, travel/impact, transformed anchors and exactly one accepted result|shared Guarded lifecycle and saved feedback: standalone hit|health follows (damage|defeat) presentation, cancellation and save resume|restart during accepted presentation discards old callbacks and history|visibility interruption finishes an accepted terminal presentation exactly once')
-          npx --no-install playwright test "${selection[@]}" --list | tee verification-receipts/issue-311/desktop-consumers-selection.txt
-          npm run test:browser -- "${selection[@]}" --diagnostics
-      - name: Preserve radial touch and HUD reflow boundaries
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: |
-          selection=(-c playwright.regression.config.ts tests/battle-radial.spec.ts tests/battle-board.spec.ts -g 'radial hold opens labelled slices on a reachable tile|radial tap fallback opens the same radial without requiring a hold|radial hub cancel records no command after leaving a slice|radial special commits the only legal special without a sub-ring|radial special tap waits for a sub-ring choice after hovering|radial invalid reselection clears the previous command before switching to rail|radial switching to rail preserves a valid unchanged selection|radial preference replaces the side rail with a bottom dock at 1280x720|temporary HUD expansion does not leave the battle camera zoomed|viewport resize recenters a camera capped by temporary HUD reflow')
-          npx --no-install playwright test "${selection[@]}" --list | tee verification-receipts/issue-311/chromium-radial-selection.txt
-          npm run test:browser -- "${selection[@]}" --diagnostics
-      - name: Verify named abilities on WebKit touch profiles
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: |
-          mkdir -p tmp
+          mkdir -p tmp verification-receipts/issue-311
           cat > tmp/issue-311-abilities-webkit.config.ts <<'TS'
           import { devices } from '@playwright/test';
           import base from '../playwright.fixtures.config';
@@ -77,17 +45,124 @@ jobs:
           };
           TS
           cp tmp/issue-311-abilities-webkit.config.ts verification-receipts/issue-311/
-          selection=(-c tmp/issue-311-abilities-webkit.config.ts -g 'direct ability|keyboard-only shortcuts select (fighter|ranger|mage) learned abilities and preserve resource locks|Ranger mark_target preserves keyboard touch preview cancellation inspection and fresh reload|Fighter healing and Taunt preserve keyboard touch cancellation inspection and fresh reload|radial multiple specials remain reachable on a narrow viewport|radial Special does not commit when choices appear on a narrow screen|radial compact landscape keeps Special choices reachable')
-          npx --no-install playwright test "${selection[@]}" --list | tee verification-receipts/issue-311/webkit-fixtures-selection.txt
+          node --input-type=module <<'JS'
+          import { writeFileSync } from 'node:fs';
+          import { sourceIdentity } from './scripts/verification-report.mjs';
+          writeFileSync('verification-receipts/issue-311/base-source.json', JSON.stringify({
+            source: sourceIdentity(process.cwd()), node: process.version, runner: process.env.RUNNER_NAME,
+            purpose: 'Exact-base diagnostic; a failure is retained and is not passing head evidence'
+          }, null, 2));
+          JS
+      - name: Diagnose native Special tap on exact base
+        id: baseline
+        continue-on-error: true
+        run: |
+          selection=(-c tmp/issue-311-abilities-webkit.config.ts -g 'radial Special does not commit when choices appear on a narrow screen')
+          npx --no-install playwright test "${selection[@]}" --list | tee verification-receipts/issue-311/base-selection.txt
+          npm run test:browser -- "${selection[@]}" --diagnostics
+      - name: Preserve baseline outcome separately
+        if: always()
+        run: |
+          mkdir -p verification-receipts/issue-311
+          printf '%s\n' '${{ steps.baseline.outcome }}' > verification-receipts/issue-311/base-outcome.txt
+          if [ -d verification-receipts/browser-runs ]; then
+            mv verification-receipts/browser-runs verification-receipts/issue-311/base-browser-runs
+          fi
+      - name: Upload exact-base diagnostic immediately
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-311-base-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/issue-311/
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Restore exact implementation head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          clean: false
+          fetch-depth: 0
+          persist-credentials: false
+      - run: npm ci
+      - name: Record implementation source identity
+        run: |
+          node --input-type=module <<'JS'
+          import { writeFileSync } from 'node:fs';
+          import { sourceIdentity } from './scripts/verification-report.mjs';
+          writeFileSync('verification-receipts/issue-311/source.json', JSON.stringify({
+            source: sourceIdentity(process.cwd()), node: process.version, runner: process.env.RUNNER_NAME,
+            conditions: 'Qualified persistent runner; browser/device emulation; shared host load and caches not independently controlled',
+            priorRun: '42880704287: 187 passed / 5 failed; original receipts remain immutable',
+            reuse: 'Unchanged passing rail-only consumer paths retain prior evidence; changed direct-control cases and radial input paths run again'
+          }, null, 2));
+          JS
+      - name: Build the implementation
+        id: build
+        run: npm run build
+      - name: Verify the failing native WebKit tap paths
+        id: native
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          selection=(-c tmp/issue-311-abilities-webkit.config.ts -g 'direct ability controls stay hidden across radial turns and restore with the rail|radial Special does not commit when choices appear on a narrow screen')
+          npx --no-install playwright test "${selection[@]}" --list | tee verification-receipts/issue-311/native-repair-selection.txt
+          npm run test:browser -- "${selection[@]}" --diagnostics
+      - name: Upload native repair evidence immediately
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-311-native-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Verify bounded direct and keyboard controls on Chromium
+        id: chromium_controls
+        if: ${{ !cancelled() && steps.native.outcome == 'success' }}
+        run: |
+          selection=(-c playwright.fixtures.config.ts tests/ability-picker.spec.ts -g 'direct ability|keyboard-only shortcuts (select|reject) (fighter|ranger|mage)|radial Special does not commit when choices appear on a narrow screen')
+          npx --no-install playwright test "${selection[@]}" --list | tee verification-receipts/issue-311/chromium-controls-selection.txt
+          npm run test:browser -- "${selection[@]}" --diagnostics
+      - name: Verify bounded direct and keyboard controls on WebKit
+        id: webkit_controls
+        if: ${{ !cancelled() && steps.native.outcome == 'success' }}
+        run: |
+          selection=(-c tmp/issue-311-abilities-webkit.config.ts -g 'direct ability|keyboard-only shortcuts (select|reject) (fighter|ranger|mage)' --grep-invert 'direct ability controls stay hidden across radial turns and restore with the rail')
+          npx --no-install playwright test "${selection[@]}" --list | tee verification-receipts/issue-311/webkit-controls-selection.txt
+          npm run test:browser -- "${selection[@]}" --diagnostics
+      - name: Upload control evidence before broader qualification
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-311-controls-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Qualify Chromium radial review and gestures
+        if: ${{ !cancelled() && steps.native.outcome == 'success' && steps.chromium_controls.outcome == 'success' && steps.webkit_controls.outcome == 'success' }}
+        run: |
+          selection=(-c playwright.fixtures.config.ts tests/ability-picker.spec.ts -g 'review356|keyboard-only shortcuts (use canonical radial|keep radial S)|radial (multiple specials|Frost Snare|hold keeps|shifted hold|compact landscape)')
+          npx --no-install playwright test "${selection[@]}" --list | tee verification-receipts/issue-311/chromium-review-selection.txt
+          npm run test:browser -- "${selection[@]}" --diagnostics
+      - name: Qualify WebKit radial review and gestures
+        if: ${{ !cancelled() && steps.native.outcome == 'success' && steps.chromium_controls.outcome == 'success' && steps.webkit_controls.outcome == 'success' }}
+        run: |
+          selection=(-c tmp/issue-311-abilities-webkit.config.ts -g 'review356|keyboard-only shortcuts (use canonical radial|keep radial S)|radial (multiple specials|Frost Snare|hold keeps|shifted hold|compact landscape)')
+          npx --no-install playwright test "${selection[@]}" --list | tee verification-receipts/issue-311/webkit-review-selection.txt
+          npm run test:browser -- "${selection[@]}" --diagnostics
+      - name: Preserve production Chromium radial and camera behavior
+        if: ${{ !cancelled() && steps.native.outcome == 'success' && steps.chromium_controls.outcome == 'success' && steps.webkit_controls.outcome == 'success' }}
+        run: |
+          selection=(-c playwright.regression.config.ts tests/battle-radial.spec.ts tests/battle-board.spec.ts -g 'radial hold opens labelled slices on a reachable tile|radial tap fallback opens the same radial without requiring a hold|radial hub cancel records no command after leaving a slice|radial special commits the only legal special without a sub-ring|radial special tap waits for a sub-ring choice after hovering|radial invalid reselection clears the previous command before switching to rail|radial switching to rail preserves a valid unchanged selection|radial preference replaces the side rail with a bottom dock at 1280x720|temporary HUD expansion does not leave the battle camera zoomed|viewport resize recenters a camera capped by temporary HUD reflow')
+          npx --no-install playwright test "${selection[@]}" --list | tee verification-receipts/issue-311/chromium-radial-selection.txt
           npm run test:browser -- "${selection[@]}" --diagnostics
       - name: Preserve production WebKit radial and camera behavior
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.native.outcome == 'success' && steps.chromium_controls.outcome == 'success' && steps.webkit_controls.outcome == 'success' }}
         run: |
           selection=(-c playwright.device-acceptance.config.ts tests/battle-radial.spec.ts tests/battle-board.spec.ts -g 'radial hold opens labelled slices on a reachable tile|radial tap fallback opens the same radial without requiring a hold|radial hub cancel records no command after leaving a slice|radial special tap waits for a sub-ring choice after hovering|radial switching to rail preserves a valid unchanged selection|temporary HUD expansion does not leave the battle camera zoomed|viewport resize recenters a camera capped by temporary HUD reflow')
           npx --no-install playwright test "${selection[@]}" --list | tee verification-receipts/issue-311/webkit-radial-selection.txt
           npm run test:browser -- "${selection[@]}" --diagnostics
-      - uses: actions/upload-artifact@v4
+      - name: Upload final source-bound acceptance evidence
         if: always()
+        uses: actions/upload-artifact@v4
         with:
           name: issue-311-abilities-${{ github.run_id }}-${{ github.run_attempt }}
           path: verification-receipts/
