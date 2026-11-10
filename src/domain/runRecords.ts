@@ -79,5 +79,5 @@ export function appendRunRecord(history: RunRecords, record: RunRecord): RunReco
   const receipt = history.receipts[record.mode];
   if (history.records.some(r => recordKey(r) === recordKey(record)) || receipt?.kind === 'sealed' && receipt.id === record.id) return history;
   return { ...history, records: [...history.records, { ...record }].sort(compareRunRecords).slice(0, RECORD_LIMIT),
-    receipts: { ...history.receipts, [record.mode]: { kind: 'sealed', id: record.id } } };
+    receipts: { ...history.receipts, [record.mode]: receipt?.kind === 'pending' ? receipt : { kind: 'sealed', id: record.id } } };
 }

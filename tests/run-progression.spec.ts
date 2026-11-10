@@ -11,6 +11,10 @@ test.use({launchOptions:async({browserName},use)=>{
 }});
 import {legalDefeatSaves} from './helpers/runRecoveryFixtures';
 import {RUN_STORAGE_KEYS} from '../src/persistence/runStorage';
+import {RUN_RECORD_KEYS} from '../src/persistence/runRecordsStorage';
+async function historyRows(page:Page){return page.evaluate(keys=>{
+ const text=localStorage.getItem(keys.primary);return text?JSON.parse(text).records:[];
+},RUN_RECORD_KEYS);}
 async function loadLegalDefeat(page:Page){
  await test.step('reach legal outcome',async()=>{
   const {primary,backup}=legalDefeatSaves();
@@ -69,9 +73,13 @@ test('run battle undo survives reload and a legal terminal journey',async({page,
  expect((await readSession(page)).state).toEqual(restored);await expect(page.locator('#battle-undo')).toBeDisabled();
  await fight(page,true);await expect(page.getByRole('heading',{name:'Run defeat',exact:true})).toBeVisible();
  const ended=await snapshot(page);await page.keyboard.press('c');await page.keyboard.press('w');
+ await expect.poll(()=>historyRows(page)).toMatchObject([{id:ended.items.run.id,outcome:'defeat'}]);
+ const recorded=await historyRows(page);
  expect(await snapshot(page)).toEqual(ended);
  await page.reload();await page.locator('#run-continue').click();await expect(page.getByRole('heading',{name:'Run defeat',exact:true})).toBeVisible();
+ expect(await historyRows(page)).toEqual(recorded);
  await page.locator('#run-new').click();await expect(page.locator('#run-start-encounter')).toBeVisible();
+ expect(await historyRows(page)).toEqual(recorded);
 });
 test('legal run outcomes, earned rewards, terminal resume and fresh restart',async({page})=>{
  test.setTimeout(300000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await start(page);await page.locator('#battle-sound').click();const records=[];let usedDraught=false;
@@ -110,13 +118,16 @@ test('legal run outcomes, earned rewards, terminal resume and fresh restart',asy
   }
  }
  const final=await snapshot(page);await expect(page.getByRole('heading',{name:final.items.run.phase==='victory'?'Run victory':'Run defeat',exact:true})).toBeVisible();
+ await expect.poll(()=>historyRows(page)).toMatchObject([{id:final.items.run.id,outcome:final.items.run.phase}]);
+ const recordedHistory=await historyRows(page);
  expect(usedDraught).toBe(true);
  expect(final.items.ownership.consumables.some(stack=>stack.itemId==='item:healing_draught')).toBe(false);
  await page.screenshot({path:test.info().outputPath('run-terminal.png')});
  writeFileSync(test.info().outputPath('run-records.json'),JSON.stringify(records,null,2));
  await page.reload();await page.locator('#run-continue').click();expect(await snapshot(page)).toEqual(final);
+ expect(await historyRows(page)).toEqual(recordedHistory);
  await page.locator('#run-new').dblclick();await expect(page.locator('#run-start-encounter')).toBeVisible();const fresh=await snapshot(page);expect(fresh.items.run.seed).toBe(14);expect(fresh.items.run.id).not.toBe(final.items.run.id);expect(fresh.items.ownership).toEqual({consumables:[],equipment:[],assignments:[]});expect(fresh.items.run.party.every(h=>h.hp===runContext.catalog.heroes[h.heroId].stats.maxHp)).toBe(true);
- expect(errors).toEqual([]);
+ expect(await historyRows(page)).toEqual(recordedHistory);expect(errors).toEqual([]);
 });
 test('testing routes: an earned combat draught stays in the transient authored run',async({page})=>{
  test.setTimeout(300000);

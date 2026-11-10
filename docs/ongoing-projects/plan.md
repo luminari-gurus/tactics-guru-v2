@@ -4,6 +4,8 @@ Date: 2026-11-10 (Asia/Jerusalem). Assigned to @moshehbenavraham.
 Issue: [#176](https://github.com/luminari-gurus/tactics-guru-v2/issues/176).
 Related follow-up: [#270](https://github.com/luminari-gurus/tactics-guru-v2/issues/270).
 Branch: [`branch/issue-176-local-records`](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-176-local-records).
+Current implementation branch: `branch/issue-176-authored-records`, based on the
+review-ready first increment at `7d73d35`; its PR will target the branch above.
 Base: `origin/main`, `491f92a080d8577aca882c3e48ddaf910cf30369`.
 OpenSpec: [proposal](../../openspec/changes/issue-176-local-records/proposal.md),
 [design](../../openspec/changes/issue-176-local-records/design.md),
@@ -13,7 +15,7 @@ OpenSpec: [proposal](../../openspec/changes/issue-176-local-records/proposal.md)
 **Status:** implementation authorized on 2026-11-10. The caller requested autonomous
 implementation, verification, commits/pushes and focused labeled PRs as each chunk
 is ready, stacking dependent increments. Using OpenSpec change `issue-176-local-records`;
-4/9 implementation tasks complete. No merge or deployment is authorized.
+5/9 implementation tasks complete. No merge or deployment is authorized.
 The previous plan is preserved byte-for-byte in
 [the #316 handoff](issue-316-mage-acceptance-fixtures-plan.md).
 
@@ -237,6 +239,28 @@ recheck capacity at execution. This is not a reservation or future-availability 
 - Browser evidence and PR handoff are recorded in
   [the issue QA record](../qa/issue-176/README.md). Later recording increments
   remain unimplemented, and #176/#270 stay open.
+
+### Increment 2 in progress — 2026-11-10
+
+The authored owner now gates recording by persistent entry, records accepted
+terminal states and explicit terminal Continue, and awaits bounded replacement
+receipts around the existing validated replacement. Replacement is asynchronous;
+its actual active-save mutation remains serialized under the existing run lock.
+Startup placeholders and testing sessions never record. The new shared
+`RunHistory` application helper owns history effects only; it has a real second
+consumer in the planned dungeon increment. No active-save migration was added.
+
+Focused iteration passes 43 units and both type scopes, including real accepted
+defeat, exact terminal continuation, immutable first result, pending recovery,
+failed/stale replacements, a changed-live-state race and null-storage gating.
+Task 2.1 is complete; browser proof and PR readiness (2.2) are still pending.
+The task-scoped workflow
+extends the existing legal run/outcome and route-isolation cases rather than
+creating another full-journey harness. Existing five storage-condition variants
+remain configured; the bounded affected browser selection executes valid and
+unavailable storage across all direct/diagnostic routes, including Q*bert.
+The expanded job allows 45 minutes for 45 focused selections on one VM; original
+per-case deadlines, retries 0 and the ordinary PR job's budget are unchanged.
 
 **My implementation estimate: 4–6 hours total**, including focused regression,
 browser evidence, documentation and preparing the three reviewable PRs. First

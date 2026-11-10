@@ -43,3 +43,18 @@ Tasks 1.1–1.4 are complete. Authored-run and dungeon lifecycle, route-history
 isolation, replacements and complete legal outcomes belong to the next two
 increments, with all original issue gates retained. No physical-device,
 performance recertification, merge or production operation is claimed.
+
+## Increment 2 — authored recording (qualification pending)
+
+Based on ready PR #359 at `7d73d35`. Focused local checks pass 43 units across
+RunHistory, RunItemSession, runBattle and record model/storage, plus both type scopes.
+New checks include exact terminal Continue, a staged valid victory continuation
+(explicitly not earned-play proof), real accepted defeat, pending receipt before
+replacement, accepted/canceled/stale/partial/racing replacement, interrupted intent
+reconciliation and unavailable history that does not block the new game.
+
+Browser discovery retains existing IDs and selects 27 Chromium + 18 WebKit cases:
+records/menu/replacement; complete legal run outcomes and legal defeat; valid and
+unavailable-storage isolation across all direct/diagnostic entries, now including
+records keys and Q*bert. All five original storage-condition variants remain
+configured. Browser execution is pending; task 2.2 remains unchecked.

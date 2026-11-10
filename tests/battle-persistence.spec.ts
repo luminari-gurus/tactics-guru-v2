@@ -13,6 +13,8 @@ import type { BattleState } from '../src/domain/types';
 import { menuFixture } from './helpers/menuFixtures';
 import { RUN_STORAGE_KEYS } from '../src/persistence/runStorage';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
+import { RUN_RECORD_KEYS, encodeRunRecords } from '../src/persistence/runRecordsStorage';
+import { emptyRunRecords } from '../src/domain/runRecords';
 
 // Playwright disables BFCache by default; persistence coverage must include cached documents.
 test.use({launchOptions:async({browserName},use)=>{
@@ -34,13 +36,17 @@ for(const condition of ['missing','valid','corrupt','backup-only','unavailable']
     if(condition==='missing'||condition==='backup-only'&&slot==='primary')continue;
     values[families[mode][slot]]=condition==='corrupt'?'broken saved bytes':menuFixture(mode);
   }
+  for(const slot of ['primary','backup'] as const){
+    if(condition==='missing'||condition==='backup-only'&&slot==='primary')continue;
+    values[RUN_RECORD_KEYS[slot]]=condition==='corrupt'?'broken history bytes':encodeRunRecords(emptyRunRecords())!;
+  }
   // Harness setup precedes the application spy; subsequent assertion reads bypass it explicitly.
   await page.goto('./');
   await page.evaluate(values=>{
     for(const [key,text]of Object.entries(values))localStorage.setItem(key,text);
     sessionStorage.setItem('tactics-guru:menu-new-dungeon-review','review sentinel');
   },values);
-  const progressKeys=Object.values(families).flatMap(slots=>Object.values(slots));
+  const progressKeys=[...Object.values(families).flatMap(slots=>Object.values(slots)),...Object.values(RUN_RECORD_KEYS)];
   const expected=Object.fromEntries([...progressKeys,'isolation-unrelated'].map(key=>[key,values[key]??null]));
   expected['tactics-guru:menu-new-dungeon-review']='review sentinel';
   await page.addInitScript(({progressKeys,unavailable})=>{
@@ -66,13 +72,14 @@ for(const condition of ['missing','valid','corrupt','backup-only','unavailable']
   const entries=[
     ['battle','./battle/?game=dungeon&entry=continue'],['run','./run?game=battle&entry=recovery'],
     ['dungeon','./dungeon?game=run&entry=new'],['map','./map?game=dungeon&entry=new'],
+    ['qbert','./qbert?game=run&entry=continue'],
     ['battle','./?scene=battle&game=run&entry=continue'],['proof','./?scene=proof&game=dungeon&entry=new'],
     ['content-smoke','./?scene=content-smoke&game=run&entry=recovery'],
   ];
   for(const [mode,url]of entries)await test.step(mode+' '+url,async()=>{
     await page.goto(url);
     const ready=async()=>{
-      if(mode==='battle')await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+      if(mode==='battle'||mode==='qbert')await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
       else if(mode==='run')await expect(page.locator('#run-start')).toBeVisible();
       else if(mode==='dungeon')await expect(page.getByRole('button',{name:'Start new dungeon',exact:true})).toBeVisible();
       else if(mode==='map')await expect(page.locator('#map-grid span')).toHaveCount(400);

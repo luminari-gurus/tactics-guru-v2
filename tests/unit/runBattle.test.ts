@@ -12,6 +12,8 @@ import { encodeBattleSave } from '../../src/domain/saveEnvelope';
 import { decodeRunSave, readRunSnapshot } from '../../src/domain/runSaveEnvelope';
 import { BASE_REPLAY_FORMAT_VERSION } from '../../src/domain/constants';
 import { previousItemCatalog } from '../../src/content/items';
+import { RunHistory } from '../../src/app/RunHistory';
+import { createRunRecordsStorage, selectedRunRecords } from '../../src/persistence/runRecordsStorage';
 
 function memory(fail?: (key:string)=>void) {
  const data = new Map<string,string>();
@@ -116,7 +118,7 @@ it('run-specific replay rejects altered HP/initiative/seed and preserves exact c
  const command=session.phase==='enemy'?planEnemyTurn(session.state,session.active.id,session.catalog):{ok:true as const,commands:[playerDecision(session.state,session.catalog)]};assert(command.ok);
  expect(dispatch(session.state,command.commands[0],session.catalog)).toEqual(dispatch(restored.session.state,command.commands[0],restored.session.catalog));
 });
-it('owned legal defeat commits once, rejects obsolete sessions, restores boundaries and resets safely',()=>{
+it('owned legal defeat commits once, rejects obsolete sessions, restores boundaries and resets safely',async()=>{
  // Explicit near-defeat entry boundary: this case tests ownership/save lifecycle,
  // not a full-health playthrough (covered by the representative-run case below).
  // All defeat commands still pass through the real battle/session/storage code.
@@ -125,25 +127,28 @@ it('owned legal defeat commits once, rejects obsolete sessions, restores boundar
   party:prepared.items.run.party.map(hero=>({...hero,hp:hero.heroId==='fighter'?1:0})),
  }}};
  const {storage,data}=memory();const saves=vi.spyOn(storage,'save');
- const controller=new RunItemSession(injured,runContext,storage);
+ const records=createRunRecordsStorage(()=>({getItem:k=>data.get(k)??null,setItem:(k,v)=>{data.set(k,v);},removeItem:k=>{data.delete(k);}}),async action=>action());
+ const history=new RunHistory('run',records,()=>100);
+ const controller=new RunItemSession(injured,runContext,storage,undefined,history);
  const battle=controller.startEncounter()!;expect(controller.startEncounter()).toBe(battle);
  expect(battle.state.units.filter(unit=>unit.side==='player').map(unit=>unit.hp)).toEqual([1]);
  fight(battle,true);expect(controller.snapshot.items.run.phase).toBe('defeat');expect(controller.snapshot.activeBattle).toBeNull();
+ await history.whenIdle();expect(selectedRunRecords(records.inspect())?.records).toMatchObject([{id:injured.items.run.id,outcome:'defeat',recordedAt:100}]);
  const ended=controller.snapshot;const saveCount=saves.mock.calls.length;
  expect(ended.items.run.revision).toBe(injured.items.run.revision+1);
  expect(battle.nextEnemy()).toBeNull();expect(controller.snapshot).toEqual(ended);expect(saves).toHaveBeenCalledTimes(saveCount);
  const restored=new RunItemSession(freshRunSnapshot('placeholder',2,runContext),runContext,storage);const load=restored.inspect();assert(load.ok);expect(restored.continue(load)).toBe(true);expect(restored.snapshot).toEqual(ended);
- const review=controller.inspect();expect(controller.replace(review,'new-legal',2)).toBe(true);expect(controller.snapshot.items.run.encounterIndex).toBe(0);expect(controller.snapshot.items.ownership.equipment).toEqual([]);
- expect(controller.replace(review,'another',3)).toBe(false);expect(controller.snapshot.items.run.seed).toBe(2);expect(battle.phase).toBe('disposed');
+ const review=controller.inspect();expect(await controller.replace(review,'new-legal',2)).toBe(true);expect(controller.snapshot.items.run.encounterIndex).toBe(0);expect(controller.snapshot.items.ownership.equipment).toEqual([]);
+ expect(await controller.replace(review,'another',3)).toBe(false);expect(controller.snapshot.items.run.seed).toBe(2);expect(battle.phase).toBe('disposed');
  expect(data.has(RUN_STORAGE_KEYS.primary)).toBe(true);controller.dispose();expect(controller.startEncounter()).toBeNull();
 });
-it('active restore preserves entry HP and next RNG while partial reset preserves live state and exportable bytes',()=>{
+it('active restore preserves entry HP and next RNG while partial reset preserves live state and exportable bytes',async()=>{
  let fail=false;const {storage,data}=memory(k=>{if(fail && k===RUN_STORAGE_KEYS.primary)throw Error('denied');});
  const controller=new RunItemSession(preparedSnapshot(),runContext,storage);const battle=controller.startEncounter()!;
  const step=battle.phase==='enemy'?battle.nextEnemy():(battle.prepare(playerDecision(battle.state,battle.catalog)),battle.confirm());assert(step);battle.finishPresentation(step.token);
  const saved=controller.snapshot;const restored=new RunItemSession(preparedSnapshot(),runContext,storage);const review=restored.inspect();assert(review.ok);assert(restored.continue(review));const loaded=restored.startEncounter()!;
  expect(loaded.state).toEqual(saved.activeBattle);expect(loaded.replay).toBeNull();expect(loaded.events).toEqual([]);
- const reset=controller.inspect();const bytes=[...data.values()];fail=true;expect(controller.replace(reset,'replacement',4)).toBe(false);expect(controller.snapshot).toEqual(saved);expect(controller.status).toContain('Reset incomplete');expect(controller.recoveryTexts(controller.inspect()).map(v=>v.text)).toEqual(expect.arrayContaining(bytes));
+ const reset=controller.inspect();const bytes=[...data.values()];fail=true;expect(await controller.replace(reset,'replacement',4)).toBe(false);expect(controller.snapshot).toEqual(saved);expect(controller.status).toContain('Reset incomplete');expect(controller.recoveryTexts(controller.inspect()).map(v=>v.text)).toEqual(expect.arrayContaining(bytes));
 });
 it('replays a legal representative run to a reproducible terminal outcome',()=>{
  let completed=false;

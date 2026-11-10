@@ -100,6 +100,35 @@ test('main menu: records unavailable storage is honest and leaves gameplay navig
   await expect(page.getByRole('button', { name: 'New Game', exact: true })).toBeEnabled();
 });
 
+test('main menu: records authored replacement waits for confirmation and freezes the old journey', async ({ page, isMobile }) => {
+  const saved = preparedSnapshot(), text = encodeRunSave(saved, runContext); if (!text.ok) throw Error('Invalid run fixture');
+  const battle = menuFixture('battle');
+  await page.addInitScript(({ run, battleKeys, text, battle }) => {
+    if (sessionStorage.getItem('test:replacement-seeded')) return;
+    localStorage.setItem(run.primary, text); localStorage.setItem(run.backup, text);
+    localStorage.setItem(battleKeys.primary, battle); sessionStorage.setItem('test:replacement-seeded', 'yes');
+  }, { run: keys.run, battleKeys: keys.battle, text: text.text, battle });
+  await page.goto('./?game=run'); await page.locator('#run-continue').click(); await page.locator('#run-start-encounter').click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  const history = () => page.evaluate(slots => {
+    const value = localStorage.getItem(slots.primary); return value ? JSON.parse(value).records : [];
+  }, RUN_RECORD_KEYS);
+  const activate = async (selector: string) => { const target = page.locator(selector); if (isMobile) await target.tap(); else await target.click(); };
+  const before = await page.evaluate(slots => [localStorage.getItem(slots.primary), localStorage.getItem(slots.backup)], keys.run);
+  await activate('#fit-restart'); await activate('#run-cancel-new'); expect(await history()).toEqual([]);
+  expect(await page.evaluate(slots => [localStorage.getItem(slots.primary), localStorage.getItem(slots.backup)], keys.run)).toEqual(before);
+  await activate('#fit-restart'); await activate('#run-confirm-new');
+  await expect(page.locator('#run-start-encounter')).toBeVisible();
+  expect(await history()).toMatchObject([{ id: saved.items.run.id, outcome: 'abandoned', battlesWon: 1 }]);
+  const recorded = await history();
+  await page.reload(); await page.locator('#run-continue').click(); expect(await history()).toEqual(recorded);
+  expect(await page.evaluate(key => localStorage.getItem(key), keys.battle.primary)).toBe(battle);
+  await page.getByRole('link', { name: 'Main menu', exact: true }).last().click();
+  await page.getByRole('button', { name: 'Hall of Records', exact: true }).click();
+  await expect(page.getByRole('dialog').getByRole('listitem')).toHaveCount(1);
+  await expect(page.getByRole('dialog')).toContainText('Three-encounter run · Abandoned');
+});
+
 test('main menu: startup hides proof tools before application modules run',async({page})=>{
  let release!:()=>void;
  let held:Promise<void>;

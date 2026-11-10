@@ -3,7 +3,93 @@ import { RunItemSession } from '../../src/app/RunItemSession';
 import { activeSnapshot, preparedSnapshot, rewardSnapshot, runContext } from '../helpers/runItemFixtures';
 import { createRunStorage, RUN_STORAGE_KEYS } from '../../src/persistence/runStorage';
 import { freshRunSnapshot } from '../../src/domain/runBattle';
+import { RunHistory } from '../../src/app/RunHistory';
+import { createRunRecordsStorage, RUN_RECORD_KEYS, selectedRunRecords } from '../../src/persistence/runRecordsStorage';
+import { decodeRunSave, encodeRunSave } from '../../src/domain/runSaveEnvelope';
+import { legalDefeatSaves } from '../helpers/runRecoveryFixtures';
+import { runBoundaryId, transitionRun } from '../../src/domain/run';
 const unavailable = () => createRunStorage(runContext, () => null);
+function historyFixture() {
+  const data = new Map<string, string>(); let failRemoval = false;
+  const provider = () => ({ getItem: (key: string) => data.get(key) ?? null,
+    setItem: (key: string, text: string) => { data.set(key, text); }, removeItem: (key: string) => {
+      if (failRemoval && key === RUN_STORAGE_KEYS.primary) throw Error('partial reset'); data.delete(key);
+    } });
+  const storage = createRunStorage(runContext, provider), records = createRunRecordsStorage(provider, async action => action());
+  const history = new RunHistory('run', records, () => 100);
+  return { data, storage, records, history, fail() { failRemoval = true; } };
+}
+it('records explicit terminal Continue once while preserving exact saved slots and state', async () => {
+  const f = historyFixture(), ended = legalDefeatSaves();
+  f.data.set(RUN_STORAGE_KEYS.primary, ended.primary); f.data.set(RUN_STORAGE_KEYS.backup, ended.backup);
+  const session = new RunItemSession(preparedSnapshot(), runContext, f.storage, undefined, f.history);
+  expect(f.data.has(RUN_RECORD_KEYS.primary)).toBe(false); // Construction/inspection cannot record a placeholder.
+  assert(session.continue(session.inspect())); await f.history.whenIdle();
+  expect(session.snapshot).toEqual(ended.ended);
+  expect(selectedRunRecords(f.records.inspect())?.records).toMatchObject([{ id: ended.ended.items.run.id, outcome: 'defeat', recordedAt: 100 }]);
+  const bytes = [f.data.get(RUN_STORAGE_KEYS.primary), f.data.get(RUN_STORAGE_KEYS.backup)];
+  assert(session.continue(session.inspect())); await f.history.whenIdle();
+  expect(selectedRunRecords(f.records.inspect())?.records).toHaveLength(1);
+  expect([f.data.get(RUN_STORAGE_KEYS.primary), f.data.get(RUN_STORAGE_KEYS.backup)]).toEqual(bytes);
+  const read = decodeRunSave(bytes[0]!, runContext); assert(read.ok); expect(read.state).toEqual(session.snapshot);
+});
+it('admits a staged valid victory on explicit Continue without rewriting either active-save slot', async () => {
+  const f = historyFixture(), initial = freshRunSnapshot('victory-restore', 13, runContext); let run = initial.items.run;
+  // Terminal-continuation fixture only; the browser legal-outcome journey retains earned-play proof.
+  for (let index = 0; index < 3; index++) {
+    const won = transitionRun(run, { type: 'completeBattle', runId: run.id, revision: run.revision,
+      encounterId: run.encounters[index], boundaryId: runBoundaryId(run), outcome: 'victory', party: run.party }, runContext.definition, runContext.catalog);
+    assert(won.ok); run = won.state;
+    if (run.phase === 'reward') {
+      const next = transitionRun(run, { type: 'acknowledgeReward', runId: run.id, revision: run.revision,
+        encounterId: run.encounters[index], boundaryId: runBoundaryId(run) }, runContext.definition, runContext.catalog);
+      assert(next.ok); run = next.state;
+    }
+  }
+  const saved = { ...initial, items: { ...initial.items, run } }, encoded = encodeRunSave(saved, runContext); assert(encoded.ok);
+  f.data.set(RUN_STORAGE_KEYS.primary, encoded.text); f.data.set(RUN_STORAGE_KEYS.backup, encoded.text);
+  const session = new RunItemSession(initial, runContext, f.storage, undefined, f.history);
+  assert(session.continue(session.inspect())); await f.history.whenIdle();
+  expect(selectedRunRecords(f.records.inspect())?.records).toMatchObject([{ id: run.id, outcome: 'victory', battlesWon: 3 }]);
+  expect(session.snapshot).toEqual(saved); expect(f.data.get(RUN_STORAGE_KEYS.primary)).toBe(encoded.text); expect(f.data.get(RUN_STORAGE_KEYS.backup)).toBe(encoded.text);
+});
+it('records accepted replacement but neither stale review nor partial reset invents an abandonment', async () => {
+  for (const failure of ['none', 'stale', 'partial'] as const) {
+    const f = historyFixture(), before = preparedSnapshot(); assert(f.storage.save(before).ok);
+    const session = new RunItemSession(before, runContext, f.storage, undefined, f.history);
+    assert(session.continue(session.inspect())); await f.history.whenIdle();
+    const review = session.inspect();
+    if (failure === 'stale') session.inspect();
+    if (failure === 'partial') f.fail();
+    expect(await session.replace(review, 'new-recorded-run', 14)).toBe(failure === 'none');
+    await f.history.whenIdle();
+    const history = selectedRunRecords(f.records.inspect());
+    expect(history?.records ?? []).toHaveLength(failure === 'none' ? 1 : 0);
+    expect(history?.receipts.run?.kind).not.toBe('pending');
+    if (failure === 'none') expect(history?.records[0]).toMatchObject({ id: before.items.run.id, outcome: 'abandoned', battlesWon: 1 });
+    else expect(session.snapshot).toEqual(before);
+  }
+});
+it('does not record an initial placeholder and fully gates an injected recorder for a testing run', async () => {
+  const f = historyFixture(), initial = freshRunSnapshot('unadmitted', 13, runContext);
+  const session = new RunItemSession(initial, runContext, f.storage, undefined, f.history);
+  expect(await session.replace(session.inspect(), 'fresh-admitted', 14)).toBe(true);
+  expect(f.data.has(RUN_RECORD_KEYS.primary)).toBe(false);
+  const testing = new RunItemSession(initial, runContext, null, undefined,
+    new RunHistory('run', createRunRecordsStorage(() => { throw Error('Testing route touched history'); })));
+  expect(testing.history).toBeNull(); testing.startNew(); expect(testing.restart('temporary-new', 14)).toBe(true);
+});
+it('refuses replacement if gameplay changes while its history receipt is being prepared', async () => {
+  const f = historyFixture(), before = preparedSnapshot(); assert(f.storage.save(before).ok);
+  const session = new RunItemSession(before, runContext, f.storage, undefined, f.history);
+  assert(session.continue(session.inspect())); await f.history.whenIdle();
+  const replacing = session.replace(session.inspect(), 'new-after-race', 14);
+  assert(session.dispatch({ ...session.boundary(), type: 'useItem', itemId: 'item:healing_draught', heroId: 'fighter' }).ok);
+  const changed = session.snapshot;
+  expect(await replacing).toBe(false); expect(session.snapshot).toEqual(changed);
+  expect(selectedRunRecords(f.records.inspect())?.records).toEqual([]);
+  expect(session.status).toContain('run changed while confirming');
+});
 it('can retry after reviewed removal of a primary corrupted during play', () => {
   const data = new Map<string,string>();
   const storage = createRunStorage(runContext,()=>({getItem:key=>data.get(key)??null,
@@ -73,16 +159,16 @@ it('uses once and restores a reviewed saved boundary without mutating RNG', () =
   expect(restored.dispatch(use).ok).toBe(false); expect(restored.snapshot).toEqual(after);
 });
 
-for(const choice of ['continue','replace'] as const)it(`keeps explicit unsaved item boundaries and retries from writing until reviewed ${choice}`,()=>{
+for(const choice of ['continue','replace'] as const)it(`keeps explicit unsaved item boundaries and retries from writing until reviewed ${choice}`,async()=>{
   const data=new Map<string,string>();let deny=false;
   const storage=createRunStorage(runContext,()=>({getItem:k=>{if(deny)throw new DOMException('Denied','SecurityError');return data.get(k)??null;},setItem:(k,v)=>{data.set(k,v);},removeItem:k=>{data.delete(k);}}));
   const saved=freshRunSnapshot('saved-run',14,runContext);assert(storage.save(saved).ok);const before=[...data];
   deny=true;const s=new RunItemSession(rewardSnapshot(),runContext,storage);s.playUnsaved();s.inspect();deny=false;
   const command={...s.boundary(),type:'claimReward' as const,offerId:s.snapshot.items.offer!.id,itemId:s.snapshot.items.offer!.options[0].itemId};
   expect(s.dispatch(command).ok).toBe(true);expect(s.save()).toEqual({ok:false,reason:'unsaved'});expect([...data]).toEqual(before);
-  const stale=s.inspect();const current=s.inspect();expect(s.continue(stale)).toBe(false);expect(s.replace(stale,'new-run',15)).toBe(false);expect(s.isUnsavedOnly).toBe(true);
+  const stale=s.inspect();const current=s.inspect();expect(s.continue(stale)).toBe(false);expect(await s.replace(stale,'new-run',15)).toBe(false);expect(s.isUnsavedOnly).toBe(true);
   if(choice==='continue'){expect(s.continue(current)).toBe(true);expect(s.snapshot).toEqual(saved);}
-  else expect(s.replace(current,'new-run',15)).toBe(true);
+  else expect(await s.replace(current,'new-run',15)).toBe(true);
   expect(s.isUnsavedOnly).toBe(false);expect(s.save().ok).toBe(true);
   expect(JSON.parse(data.get(RUN_STORAGE_KEYS.primary)!).payload.items.run.id).toBe(choice==='continue'?'saved-run':'new-run');
 });
