@@ -44,7 +44,7 @@ isolation, replacements and complete legal outcomes belong to the next two
 increments, with all original issue gates retained. No physical-device,
 performance recertification, merge or production operation is claimed.
 
-## Increment 2 — authored recording (qualification pending)
+## Increment 2 — authored recording (qualified)
 
 Based on ready PR #359 at `7d73d35`. Focused local checks pass 43 units across
 RunHistory, RunItemSession, runBattle and record model/storage, plus both type scopes.
@@ -57,7 +57,7 @@ Browser discovery retains existing IDs and selects 27 Chromium + 18 WebKit cases
 records/menu/replacement; complete legal run outcomes and legal defeat; valid and
 unavailable-storage isolation across all direct/diagnostic entries, now including
 records keys and Q*bert. All five original storage-condition variants remain
-configured. Browser execution is pending; task 2.2 remains unchecked.
+configured. Later coverage-preserving splits and the final result are recorded below.
 
 Initial standard run [42826784671](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42826784671)
 failed one of 1,269 units: the new terminal-Continue unit synthesized an entire
@@ -139,3 +139,20 @@ because the audit proves earlier routes leave them unchanged. Original journey
 titles remain for the four ordinary routes; three diagnostic routes receive
 explicit companion cases. The selection is 39 Chromium + 26 WebKit cases. No
 assertion, route, condition, per-case deadline, worker policy or retry is removed.
+
+### Final authored result
+
+Head `eaf85f74597946aa48c065fe1373b170c892b5ff`, clean merge
+`1d58eb67c2376e1f2e0b2e1f2d6392ef3f852cc4`:
+
+- [Browser qualification 42833420673](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42833420673): **39 Chromium + 26 WebKit passed**, no failures/skips/retries/flakes. The complete legal authored journey won all three encounters on all five profiles. Separate complete legal defeat, terminal reload/Continue, restart, abandonment and storage-isolation witnesses passed.
+- [PR verification 42833420593, attempt 2](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42833420593/attempts/2): **1,272 units, both types, both build integrations and 7/7 core journeys passed**. Both VMs were idle before this controlled run, with VM-02 browser work held. The unit phase took 59.26s. The failed first attempt took 122.85s and timed out one unchanged survivor fixture and two unchanged biome cases at the original 5s budget; it remains failed.
+- [Portable receipt](increment-2.json) and [case records](increment-2-cases.jsonl) retain exact identity, counts, stages, victory witnesses, IDs/attempts and raw report hashes. Complete artifacts are downloaded under ignored `tmp/issue-176/run-42833420673/` and `run-42833420593-attempt2/`.
+
+Task 2.2 is complete and PR #360 is ready for review. The one-off execution
+workflow is retired after qualification; the same CLI commands and all cases
+remain configured. Final documentation/workflow-retirement changes preserve
+every runtime/test/config input relevant to these results. Dungeon gates remain
+in PR #361; the issue stays open. The shared physical host's unrelated processes
+were not independently controlled, so serialized success does not erase prior
+resource-sensitive failures or claim a generally repaired host.

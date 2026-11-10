@@ -1,0 +1,157 @@
+{
+  "head": "eaf85f74597946aa48c065fe1373b170c892b5ff",
+  "testedMerge": "1d58eb67c2376e1f2e0b2e1f2d6392ef3f852cc4",
+  "dirty": false,
+  "inputHash": "3dc8d34e655a01477405799ad7c8d3527c492da78dfad842ef301a0eeb01990a",
+  "node": "v24.22.2",
+  "runner": "unraid-tactics-02",
+  "conditions": "Qualified persistent runner; unrelated host load and caches not independently controlled",
+  "focusedRun": 42833420673,
+  "cases": 65,
+  "results": [
+    {
+      "path": "browser-runs\\run-8pulqR\\results.json",
+      "stats": {
+        "startTime": "2026-11-10T14:28:36.284Z",
+        "duration": 27936.267,
+        "expected": 10,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    },
+    {
+      "path": "browser-runs\\run-Az4fcK\\results.json",
+      "stats": {
+        "startTime": "2026-11-10T14:27:57.667Z",
+        "duration": 35650.148,
+        "expected": 15,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    },
+    {
+      "path": "browser-runs\\run-nPIEa8\\results.json",
+      "stats": {
+        "startTime": "2026-11-10T14:40:14.775Z",
+        "duration": 383130.119,
+        "expected": 16,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    },
+    {
+      "path": "browser-runs\\run-Qvgzhp\\results.json",
+      "stats": {
+        "startTime": "2026-11-10T14:29:07.398Z",
+        "duration": 665569.66,
+        "expected": 24,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    }
+  ],
+  "victoryJourneys": [
+    {
+      "path": "browser-runs\\run-nPIEa8\\artifacts\\run-progression-legal-run--1de6b-al-resume-and-fresh-restart-acceptance-webkit-landscape\\run-records.json",
+      "encounters": 3,
+      "finalOutcome": "playerWin"
+    },
+    {
+      "path": "browser-runs\\run-nPIEa8\\artifacts\\run-progression-legal-run--1de6b-al-resume-and-fresh-restart-acceptance-webkit-portrait\\run-records.json",
+      "encounters": 3,
+      "finalOutcome": "playerWin"
+    },
+    {
+      "path": "browser-runs\\run-Qvgzhp\\artifacts\\run-progression-legal-run--1de6b-al-resume-and-fresh-restart-desktop\\run-records.json",
+      "encounters": 3,
+      "finalOutcome": "playerWin"
+    },
+    {
+      "path": "browser-runs\\run-Qvgzhp\\artifacts\\run-progression-legal-run--1de6b-al-resume-and-fresh-restart-mobile-landscape\\run-records.json",
+      "encounters": 3,
+      "finalOutcome": "playerWin"
+    },
+    {
+      "path": "browser-runs\\run-Qvgzhp\\artifacts\\run-progression-legal-run--1de6b-al-resume-and-fresh-restart-mobile-portrait\\run-records.json",
+      "encounters": 3,
+      "finalOutcome": "playerWin"
+    }
+  ],
+  "caseFile": "increment-2-cases.jsonl",
+  "rawSha256": {
+    "issue-176\\source.json": "a301a3c807be7d11b2bc663d57f9aa8563e0ea18577f1499f0d64f23cfc24b84",
+    "browser-runs\\run-8pulqR\\results.json": "8696e487916dc33d5fd12e72c147853b1fe49a257b61011e1acea74871c40063",
+    "browser-runs\\run-Az4fcK\\results.json": "39ca34e7b5e3a93a817107ede797dcdcd690f3dd8babb6ed8bcca4158dd12587",
+    "browser-runs\\run-nPIEa8\\results.json": "c9817a7fb080c30e84e67d8fc98d644ef70be1d5419287dbcaec887fe63fa023",
+    "browser-runs\\run-Qvgzhp\\results.json": "ce6beeea09430a8ae37cf2bfb603c0ae9b3faa261a20389e2060156022ea7b01"
+  },
+  "prVerification": {
+    "run": 42833420593,
+    "attempt": 2,
+    "source": "1d58eb67c2376e1f2e0b2e1f2d6392ef3f852cc4",
+    "dirty": "",
+    "node": "v24.22.1",
+    "stages": [
+      {
+        "id": "tooling",
+        "status": "passed",
+        "durationMs": 13367.835648
+      },
+      {
+        "id": "units",
+        "status": "passed",
+        "durationMs": 59260.354294
+      },
+      {
+        "id": "typecheck",
+        "status": "passed",
+        "durationMs": 1477.3883439999918
+      },
+      {
+        "id": "build-integration",
+        "status": "passed",
+        "durationMs": 7310.526987000005
+      },
+      {
+        "id": "bundle",
+        "status": "passed",
+        "durationMs": 953.8673509999935
+      },
+      {
+        "id": "journeys",
+        "status": "passed",
+        "durationMs": 138694.98803799998
+      }
+    ],
+    "units": {
+      "total": 1272,
+      "passed": 1272,
+      "failed": 0,
+      "pending": 0
+    },
+    "buildIntegrations": {
+      "total": 2,
+      "passed": 2
+    },
+    "core": {
+      "startTime": "2026-11-10T14:50:41.371Z",
+      "duration": 137977.525,
+      "expected": 7,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "conditions": "Both registered VMs idle before rerun; VM-02 browser work held while VM-01 verified. Unrelated physical-host processes were not independently controlled.",
+    "previousAttempt": "Attempt 1 failed three unchanged CPU-heavy cases at the unchanged 5000ms per-unit budget; it remains failed.",
+    "rawSha256": {
+      "summary.json": "8cdd3c4787bef501e0dad81541a0665479746478226d04670e6ce3edbd13357d",
+      "units.json": "1c2c3c5f5eed782ad9fe2007a009bd6d9bbb15083c2a06297f9c8ea9b7304b26",
+      "build-integration.json": "07fcb4c442da4b397d0b6979265464838b1d4a944b15e0b54c4b9e441bdf880b",
+      "journeys.json": "ff54f4fadb395581ff80a4eb56afdea8b4b9df7c50d32125f790900f17dc2209"
+    }
+  }
+}

@@ -52,6 +52,10 @@ eviction. Keep only the receipts needed by the current owned journey per mode;
 no unbounded tombstone list or per-action journal. Retention intentionally discards
 old history. Manually restoring arbitrary external archives is not a supported
 import feature and cannot reconstruct discarded history.
+Known frozen results skip pending preparation entirely. A newly accepted terminal
+result seals its own matching pending intent. Accepted/refused replacement must
+retain that seal so Continue cannot resurrect an evicted result; no extra schema
+field or tombstone mechanism is required.
 
 ### Finalize from accepted owners
 

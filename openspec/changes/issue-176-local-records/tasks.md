@@ -15,7 +15,7 @@ all acceptance gates. Checkboxes represent implemented and verified work only.
 ## 2. Authored-run terminal and replacement boundaries — PR 2
 
 - [x] 2.1 Integrate persistent-entry-gated recording with accepted authored victory/defeat, explicit terminal Continue and reviewed replacement, including bounded pending replacement reconciliation; verify repeated callbacks, cancellation, stale review, partial failure and nonfatal history failure in affected session/storage units.
-- [ ] 2.2 Extend existing real-input run/menu witnesses to prove a complete legal ending, terminal reload/Continue deduplication, confirmed abandonment, byte-preserved saves/RNG and no historical effects; verify relevant Chromium and WebKit profiles plus records-key isolation on every testing entry, update the contract/QA evidence and publish a proportionally verified Refs #176 PR leaving dungeon gates open.
+- [x] 2.2 Extend existing real-input run/menu witnesses to prove a complete legal ending, terminal reload/Continue deduplication, confirmed abandonment, byte-preserved saves/RNG and no historical effects; verify relevant Chromium and WebKit profiles plus records-key isolation on every testing entry, update the contract/QA evidence and publish a proportionally verified Refs #176 PR leaving dungeon gates open.
 
 ## 3. Dungeon endings and complete acceptance — PR 3
 
