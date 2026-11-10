@@ -121,13 +121,14 @@ for(const saved of [false,true])(saved?test.extend({pinDungeonSeed:27}):fixedSee
  const second=await snapshot(page);expect(second.depth).toBe(2);expect(second.party).toEqual(cleared.party);expect(second.ownership).toEqual(cleared.ownership);
  await reenterDungeonStair(page,'ascend',isMobile?'touch':'keyboard');
  const returned=await snapshot(page);expect(returned.depth).toBe(1);expect(returned.floors[0].completed).toBe(3);expect(returned.party).toEqual(cleared.party);expect(returned.ownership).toEqual(cleared.ownership);
+ await expect(page.getByRole('button',{name:'Save recovery',exact:true})).toHaveCount(saved?1:0);
  if(saved){
   expect(await historyRows(page)).toEqual([]);
   await page.getByRole('link',{name:'Main menu',exact:true}).last().click();
   await page.getByRole('button',{name:'Hall of Records',exact:true}).click();
   await expect(page.getByRole('dialog').getByRole('status')).toHaveText('No finished journeys recorded yet.');
  }
- await expect(page.getByRole('button',{name:'Save recovery',exact:true})).toHaveCount(saved?1:0);expect(errors).toEqual([]);
+ expect(errors).toEqual([]);
 });
 
 // Use the same legal New Game seed as the complete saved first-floor journey above.

@@ -156,3 +156,15 @@ every runtime/test/config input relevant to these results. Dungeon gates remain
 in PR #361; the issue stays open. The shared physical host's unrelated processes
 were not independently controlled, so serialized success does not erase prior
 resource-sensitive failures or claim a generally repaired host.
+
+## Remaining final qualification
+
+Run 42840048098 passed 35 menu cases and 27 other Chromium cases, including all
+six actual BFCache returns, route isolation and complete legal dungeon defeats.
+The full-floor extension failed: mobile inherited its Save recovery assertion
+after the new menu navigation; desktop reached the original 300-second battle
+budget. The assertion now precedes navigation, preserving both original and new
+checks. The failed run remains failed. Only the repaired three Chromium full-floor
+cases and the 18 previously blocked WebKit cases run next on otherwise idle
+qualified capacity. Other 62 passes are reused: runtime/helpers/config and their
+test bodies are unchanged. No timeout, retry or gameplay change is made.
