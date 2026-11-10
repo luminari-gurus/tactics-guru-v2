@@ -3,6 +3,7 @@ import { RunHistory } from '../../src/app/RunHistory';
 import { createRunRecordsStorage, RUN_RECORD_KEYS, selectedRunRecords } from '../../src/persistence/runRecordsStorage';
 import { appendRunRecord, emptyRunRecords, type RunRecord } from '../../src/domain/runRecords';
 const old: RunRecord = { mode: 'run', id: 'old-run', outcome: 'abandoned', recordedAt: 100, battlesWon: 1, floorsCleared: null, deepestFloor: null };
+const live: RunRecord = { ...old, id: 'unsaved-run', battlesWon: 0 };
 function fixture() {
   const data = new Map<string, string>(), store = createRunRecordsStorage(() => ({ getItem: key => data.get(key) ?? null,
     setItem: (key, text) => { data.set(key, text); }, removeItem: key => { data.delete(key); } }), async action => action());
@@ -70,4 +71,59 @@ it('an accepted terminal result keeps its seal when a racing replacement is refu
   })).ok);
   await f.history.resume(old.id,{...terminal,recordedAt:10000});
   expect(f.read()?.records.some(r=>r.id===old.id)).toBe(false);
+});
+it.each([false, true])('stages the saved/live pair together and publishes neither until accepted=%s', async accepted => {
+  const f = fixture();
+  expect(await f.history.replace(old, 'paired-new', async () => {
+    expect(f.read()?.receipts.run).toEqual({ kind: 'pending', record: old, other: live, newId: 'paired-new' });
+    expect(f.read()?.records).toEqual([]); return accepted;
+  }, live)).toBe(accepted);
+  expect(f.read()?.records).toEqual(accepted ? [old, live] : []);
+  expect(f.read()?.receipts.run?.kind).not.toBe('pending');
+});
+it.each(['old-run', 'unsaved-run', 'paired-new', 'unknown'])('reconciles both interrupted summaries against %s', async currentId => {
+  const f = fixture();
+  await expect(f.history.replace(old, 'paired-new', async () => { throw Error('interrupted'); }, live)).rejects.toThrow('interrupted');
+  expect(f.read()?.records).toEqual([]);
+  await f.history.resume(currentId, null);
+  expect(f.read()?.records).toEqual(currentId === 'paired-new' ? [old, live] : []);
+  expect(f.read()?.receipts.run?.kind === 'pending').toBe(currentId === 'unknown');
+  if (currentId === 'paired-new') {
+    await f.history.resume(currentId, null); expect(f.read()?.records).toEqual([old, live]);
+  }
+});
+it.each([false, true])('preserves an evicted frozen saved result through a live companion, accepted=%s', async accepted => {
+  const f = fixture(), terminal = { ...old, outcome: 'defeat' as const }, companion = { ...live, recordedAt: 1000 };
+  let history = appendRunRecord(emptyRunRecords(), terminal);
+  for (let i = 0; i < 100; i++) history = appendRunRecord(history, { ...terminal, mode: 'dungeon', id: `other-${i}`,
+    recordedAt: 200 + i, floorsCleared: 0, deepestFloor: 1 });
+  assert((await f.store.mutate(() => history)).ok);
+  expect(await f.history.replace({ ...terminal, recordedAt: 9999 }, 'paired-new', async () => {
+    const receipt = f.read()?.receipts.run; assert(receipt?.kind === 'pending');
+    expect(receipt.sealed).toEqual({ kind: 'sealed', id: old.id });
+    expect(f.read()?.records.some(row => row.id === old.id)).toBe(false); return accepted;
+  }, companion)).toBe(accepted);
+  expect(f.read()?.records.some(row => row.id === live.id)).toBe(accepted);
+  assert((await f.store.mutate(h => {
+    for (let i = 0; i < 100; i++) h = appendRunRecord(h, { ...terminal, mode: 'dungeon', id: `later-${i}`,
+      recordedAt: 2000 + i, floorsCleared: 0, deepestFloor: 1 });
+    return h;
+  })).ok);
+  await f.history.resume(old.id, { ...terminal, recordedAt: 10000 });
+  if (accepted) await f.history.resume(live.id, { ...live, outcome: 'defeat', recordedAt: 10000 });
+  expect(f.read()?.records.every(row => row.mode === 'dungeon')).toBe(true);
+});
+it('retains both frozen identities when the live companion ends while replacement is refused', async () => {
+  const f = fixture(), savedEnd = { ...old, outcome: 'defeat' as const }, liveEnd = { ...live, outcome: 'defeat' as const };
+  await f.history.record(savedEnd);
+  expect(await f.history.replace(savedEnd, 'paired-new', async () => { await f.history.record(liveEnd); return false; }, live)).toBe(false);
+  expect(f.read()?.records).toEqual([savedEnd, liveEnd]);
+  assert((await f.store.mutate(h => {
+    for (let i = 0; i < 100; i++) h = appendRunRecord(h, { ...savedEnd, mode: 'dungeon', id: `evict-${i}`,
+      recordedAt: 1000 + i, floorsCleared: 0, deepestFloor: 1 });
+    return h;
+  })).ok);
+  await f.history.resume(old.id, { ...savedEnd, recordedAt: 9999 });
+  await f.history.resume(live.id, { ...liveEnd, recordedAt: 9999 });
+  expect(f.read()?.records.every(row => row.mode === 'dungeon')).toBe(true);
 });

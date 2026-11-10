@@ -135,12 +135,15 @@ export class DungeonSession {
     const expected = this.current;
     const selected = review.primary.status === 'valid' ? review.primary.state : review.backup.status === 'valid' ? review.backup.state : null;
     const old = this.started && (!selected || selected.id === this.current.id) ? this.current : selected;
-    const record = this.history && old ? dungeonRunRecord(old, this.history.now(), true) : null;
+    const recordedAt = this.history?.now();
+    const record = old && recordedAt !== undefined ? dungeonRunRecord(old, recordedAt, true) : null;
+    const other = this.started && old && old.id !== this.current.id && recordedAt !== undefined
+      ? dungeonRunRecord(this.current, recordedAt, true) : null;
     const perform = async () => {
       if (this.current !== expected) { this.report('Reset refused: the dungeon changed while confirming. Review again.'); return false; }
       return this.replaceNow(review, id, seed);
     };
-    return this.history ? this.history.replace(record, id, perform) : perform();
+    return this.history ? this.history.replace(record, id, perform, other) : perform();
   }
   private replaceNow(review: DungeonInspection, id: string, seed: number) {
     if (!this.storage || this.disposed || review !== this.review || id === this.current.id || seed === this.current.seed) return false;

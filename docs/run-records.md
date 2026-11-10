@@ -62,3 +62,12 @@ defeat or confirmed replacement can record it even if active saving is disabled 
 conflicted. Replacement keeps exploration and pending battle loading paused until
 its history boundary finishes. Reload recovery lets native dungeon engine imports
 request restored modules directly, retaining other preload hints.
+
+When New Game replaces a reviewed save while a different admitted journey is live,
+both ended identities are recorded together. Cancellation, stale review and partial
+reset record neither as abandoned. A pending history receipt carries at most two
+summaries; it finalizes both on Continue of the accepted new identity and cancels
+them on Continue of an old identity. It also retains up to two frozen-result IDs,
+so known results stay immutable through refusal, interruption and summary eviction.
+Legacy v1 single-summary receipts remain readable without an opening write. The
+extension uses the same bounded history namespace; active saves are unchanged.

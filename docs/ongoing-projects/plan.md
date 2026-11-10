@@ -316,3 +316,27 @@ once the stack is merged. #176 closes with all five criteria satisfied; #270 sta
 separate. Cleanup is limited to verified-safe stack branches and owned temporary
 worktrees. Raw QA artifacts and unrelated worktrees/branches with unique commits
 or uncertain ownership are retained.
+
+### Reopened paired-replacement correction
+
+Post-merge review on #361 found that New Game can end two different identities:
+the reviewed save and the separately admitted unsaved/live journey. Both actual
+owners reproduce one result instead of two on `dafdeb3`; stale and partial reset
+still correctly produce neither. #176 AC2 is reopened for the focused follow-up
+on `branch/issue-176-paired-replacement`.
+
+Outcome: preserve both ended summaries exactly once, including interrupted intent
+recovery and frozen-result retention. Non-goals: active-save migrations, new game
+rules, a general journal or new dependencies. Files: the existing run/dungeon
+owners, RunHistory, runRecords validation, their unit/browser consumers and these
+contract/QA documents. A pending receipt can contain at most two summaries and
+retain at most two sealed IDs; existing v1 single-summary receipts stay readable.
+The extra bounded fields prevent either discarded journey or its prior result
+from being lost during replacement. No separate service or fallback is needed.
+
+Proof: RED owner regressions; accepted/refused/interrupted pair tests; legacy and
+malformed-envelope checks; retention plus racing-terminal regression; real
+keyboard/touch menu flows on Chromium/WebKit, including reload before final history
+commit; proportional persistence checks and local PR verification. Preserve the
+original review's evidence and all new failures. #362 is active ability-rail work
+owned by another contributor and is deliberately excluded.
