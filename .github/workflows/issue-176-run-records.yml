@@ -66,18 +66,18 @@ jobs:
       - name: Verify authored outcomes and isolated testing entries in Chromium
         if: ${{ !endsWith(github.head_ref || github.ref_name, 'dungeon-records') }}
         run: |
-          npx --no-install playwright test -c playwright.regression.config.ts tests/run-progression.spec.ts tests/battle-persistence.spec.ts -g 'legal run outcomes|legal defeat reload|testing routes: (fresh play|Qbert) never accesses (valid|unavailable)' --list > verification-receipts/issue-176/authored-chromium-selection.txt
-          npm run test:browser -- -c playwright.regression.config.ts tests/run-progression.spec.ts tests/battle-persistence.spec.ts -g 'legal run outcomes|legal defeat reload|testing routes: (fresh play|Qbert) never accesses (valid|unavailable)' --diagnostics
+          npx --no-install playwright test -c playwright.regression.config.ts tests/run-progression.spec.ts tests/battle-persistence.spec.ts -g 'legal run outcomes|legal defeat reload|testing routes: (fresh play|diagnostic play|Qbert) never accesses (valid|unavailable)' --list > verification-receipts/issue-176/authored-chromium-selection.txt
+          npm run test:browser -- -c playwright.regression.config.ts tests/run-progression.spec.ts tests/battle-persistence.spec.ts -g 'legal run outcomes|legal defeat reload|testing routes: (fresh play|diagnostic play|Qbert) never accesses (valid|unavailable)' --diagnostics
       - name: Verify authored outcomes and isolated testing entries in WebKit
         if: ${{ !endsWith(github.head_ref || github.ref_name, 'dungeon-records') }}
         run: |
-          npx --no-install playwright test -c playwright.device-acceptance.config.ts tests/run-progression.spec.ts tests/battle-persistence.spec.ts -g 'legal run outcomes|legal defeat reload|testing routes: (fresh play|Qbert) never accesses (valid|unavailable)' --list > verification-receipts/issue-176/authored-webkit-selection.txt
-          npm run test:browser -- -c playwright.device-acceptance.config.ts tests/run-progression.spec.ts tests/battle-persistence.spec.ts -g 'legal run outcomes|legal defeat reload|testing routes: (fresh play|Qbert) never accesses (valid|unavailable)' --diagnostics
+          npx --no-install playwright test -c playwright.device-acceptance.config.ts tests/run-progression.spec.ts tests/battle-persistence.spec.ts -g 'legal run outcomes|legal defeat reload|testing routes: (fresh play|diagnostic play|Qbert) never accesses (valid|unavailable)' --list > verification-receipts/issue-176/authored-webkit-selection.txt
+          npm run test:browser -- -c playwright.device-acceptance.config.ts tests/run-progression.spec.ts tests/battle-persistence.spec.ts -g 'legal run outcomes|legal defeat reload|testing routes: (fresh play|diagnostic play|Qbert) never accesses (valid|unavailable)' --diagnostics
       - name: Verify final dungeon journeys, cached return and testing isolation in Chromium
         if: endsWith(github.head_ref || github.ref_name, 'dungeon-records')
         run: |
-          npx --no-install playwright test -c playwright.regression.config.ts tests/dungeon.spec.ts tests/battle-persistence.spec.ts -g 'dungeon battle undo survives reload and a legal defeat journey|saved menu dungeon keeps proof tools hidden|cached (run|dungeon) record history|testing routes: (fresh play|Qbert) never accesses (valid|unavailable)' --list > verification-receipts/issue-176/dungeon-chromium-selection.txt
-          npm run test:browser -- -c playwright.regression.config.ts tests/dungeon.spec.ts tests/battle-persistence.spec.ts -g 'dungeon battle undo survives reload and a legal defeat journey|saved menu dungeon keeps proof tools hidden|cached (run|dungeon) record history|testing routes: (fresh play|Qbert) never accesses (valid|unavailable)' --diagnostics
+          npx --no-install playwright test -c playwright.regression.config.ts tests/dungeon.spec.ts tests/battle-persistence.spec.ts -g 'dungeon battle undo survives reload and a legal defeat journey|saved menu dungeon keeps proof tools hidden|cached (run|dungeon) record history|testing routes: (fresh play|diagnostic play|Qbert) never accesses (valid|unavailable)' --list > verification-receipts/issue-176/dungeon-chromium-selection.txt
+          npm run test:browser -- -c playwright.regression.config.ts tests/dungeon.spec.ts tests/battle-persistence.spec.ts -g 'dungeon battle undo survives reload and a legal defeat journey|saved menu dungeon keeps proof tools hidden|cached (run|dungeon) record history|testing routes: (fresh play|diagnostic play|Qbert) never accesses (valid|unavailable)' --diagnostics
       - name: Verify final dungeon journeys in WebKit
         if: endsWith(github.head_ref || github.ref_name, 'dungeon-records')
         run: |
@@ -86,7 +86,7 @@ jobs:
       - name: Verify final testing isolation in WebKit
         if: endsWith(github.head_ref || github.ref_name, 'dungeon-records')
         run: |
-          npm run test:browser -- -c playwright.device-acceptance.config.ts tests/battle-persistence.spec.ts -g 'testing routes: (fresh play|Qbert) never accesses (valid|unavailable)' --diagnostics
+          npm run test:browser -- -c playwright.device-acceptance.config.ts tests/battle-persistence.spec.ts -g 'testing routes: (fresh play|diagnostic play|Qbert) never accesses (valid|unavailable)' --diagnostics
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -118,3 +118,15 @@ Initial final-increment workflow validation failed before execution: the new
 single-line command contained an unquoted YAML colon in the grep expression.
 It is now a block command, and the workflow is checked with the available YAML
 parser and actionlint. These configuration failures are not browser evidence.
+## Authored isolation follow-up
+
+Run 42829329281 also failed the two desktop journey sweeps at the later diagnostic
+`?scene=battle` entry, after reaching the overall 30-second case deadline; Q*bert,
+mobile isolation and legal run cases passed. The original seven-entry sweep is
+now split into ordinary routes and diagnostic entries, retaining the same audit
+body, all five storage conditions, actual commands/restart/reload/history checks
+and the final saved-menu checks. Each group's starting saved bytes are identical
+because the audit proves earlier routes leave them unchanged. Original journey
+titles remain for the four ordinary routes; three diagnostic routes receive
+explicit companion cases. The selection is 39 Chromium + 26 WebKit cases. No
+assertion, route, condition, per-case deadline, worker policy or retry is removed.

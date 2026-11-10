@@ -29,10 +29,11 @@ declare global {
     testingSaveAudit: { calls: string[]; snapshot: () => Record<string, string | null> };
   }
 }
-for(const group of ['journeys','qbert'] as const)
+for(const group of ['journeys','diagnostics','qbert'] as const)
 for(const condition of ['missing','valid','corrupt','backup-only','unavailable'] as const) test(group==='journeys'
   ?`testing routes: fresh play never accesses ${condition} saved games`
-  :`testing routes: Qbert never accesses ${condition} saved games`,async({page})=>{
+  :group==='qbert'?`testing routes: Qbert never accesses ${condition} saved games`
+  :`testing routes: diagnostic play never accesses ${condition} saved games`,async({page})=>{
   const families={battle:keys,run:RUN_STORAGE_KEYS,dungeon:DUNGEON_KEYS};
   const values:Record<string,string>={'isolation-unrelated':'preserve'};
   for(const mode of ['battle','run','dungeon'] as const)for(const slot of ['primary','backup'] as const){
@@ -72,12 +73,13 @@ for(const condition of ['missing','valid','corrupt','backup-only','unavailable']
     expect(await page.evaluate(()=>window.testingSaveAudit.snapshot())).toEqual(expected);
     await expect(page.getByRole('button',{name:/Continue saved|Save recovery|Play unsaved/})).toHaveCount(0);
   };
-  const entries=group==='qbert'?[['qbert','./qbert?game=run&entry=continue']]:[
+  const entries={journeys:[
     ['battle','./battle/?game=dungeon&entry=continue'],['run','./run?game=battle&entry=recovery'],
     ['dungeon','./dungeon?game=run&entry=new'],['map','./map?game=dungeon&entry=new'],
+  ],diagnostics:[
     ['battle','./?scene=battle&game=run&entry=continue'],['proof','./?scene=proof&game=dungeon&entry=new'],
     ['content-smoke','./?scene=content-smoke&game=run&entry=recovery'],
-  ];
+  ],qbert:[['qbert','./qbert?game=run&entry=continue']]}[group];
   for(const [mode,url]of entries)await test.step(mode+' '+url,async()=>{
     await page.goto(url);
     const ready=async()=>{
