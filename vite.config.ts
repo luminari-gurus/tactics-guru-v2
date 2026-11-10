@@ -26,8 +26,9 @@ const phaserDefines = {
 };
 
 // WebKit can retain a failed modulepreload across reloads (bug 270357).
-// Let the battle entry's import own its request while keeping dependency hints.
+// Let retryable entry/engine imports own their requests while keeping other dependency hints.
 const battleEntryChunk = /^assets\/startBattleApp-[\w-]{8}\.js$/;
+const dungeonEngineChunk = /(?:^|\/)(?:start|BattleScene)-[\w-]{8}\.js$/;
 
 /** Start only the selected game route's required requests while its entry script loads. */
 function gamePreloads(): Plugin {
@@ -104,7 +105,8 @@ export default defineConfig({
   build: {
     sourcemap: process.env.POSTHOG_SOURCEMAPS === 'true' ? 'hidden' : false,
     modulePreload: {
-      resolveDependencies: (_filename, dependencies) => dependencies.filter(file => !battleEntryChunk.test(file)),
+      resolveDependencies: (filename, dependencies) => dependencies.filter(file => !battleEntryChunk.test(file) &&
+        !(dungeonEngineChunk.test(filename) && dungeonEngineChunk.test(file))),
     },
   },
   resolve: { alias: [{ find: /^phaser$/, replacement: phaserArcade }] },
