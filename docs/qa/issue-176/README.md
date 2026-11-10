@@ -100,3 +100,11 @@ actual BFCache and testing isolation; six WebKit dungeon and eight WebKit isolat
 cases. Unchanged authored long journeys are qualified separately on PR #360's
 relevant inputs. No case timeout/retry change or hosted fallback is added.
 Browser execution and final issue acceptance remain unverified until recorded.
+
+A new real-owner failure regression initially failed: startup rendering re-inspects
+the dungeon save, so a preparatory history-warning notification invalidated its
+own reviewed replacement token. Preparatory status now updates quietly; the
+existing save owner makes its decision before rendering that warning. The same
+unit passes without changing deadlines, and the unavailable-history browser case
+now drives two real root-menu New Games, verifying accepted new identity, saved
+bytes and visible history failure. This is a required nonfatal-history repair.

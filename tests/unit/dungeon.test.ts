@@ -120,6 +120,8 @@ describe('dungeon run history boundaries', () => {
     const f = fixture(), old = fresh(); assert(f.storage.save(old).ok);
     const denied = new RunHistory('dungeon', createRunRecordsStorage(() => null, async action => action()));
     const session = new DungeonSession(old, f.storage, denied);
+    // Startup rendering inspects saves; a preparatory history warning must not invalidate its own review.
+    session.onChange = () => { session.inspect(); };
     assert(await session.replace(session.inspect(), 'after-denial', 14));
     expect(session.snapshot.id).toBe('after-denial'); expect(session.status).toContain('history could not be confirmed');
     expect(f.storage.inspect().primary.status).toBe('valid');

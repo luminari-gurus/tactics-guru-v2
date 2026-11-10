@@ -289,6 +289,10 @@ exploration step invalidates an in-flight replacement, preserving that step.
 Record/storage denial remains nonfatal and visible. Focused iteration passes
 123 units across both journey owners, history/model/storage and battle integration,
 plus both TypeScript scopes.
+A startup-warning regression was reproduced and repaired: defer the preparatory
+history notification until the save owner has decided, so rendering cannot
+invalidate its reviewed token. The warning remains in the status and the actual
+unavailable-history browser path now replaces a dungeon through the root menu.
 
 Task 3.1 is complete. Final browser/PR gates 3.2/3.3 and authored browser gate 2.2
 remain open. The final selection adds full-health legal defeat and complete first

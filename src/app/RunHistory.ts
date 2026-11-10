@@ -9,10 +9,10 @@ export class RunHistory {
   constructor(readonly mode: RecordMode, readonly store: RunRecordsStorage = createRunRecordsStorage(), readonly now: () => number = Date.now) {}
   whenIdle() { return this.pending; }
   private notify() { try { this.onChange?.(); } catch { /* An observer cannot undo a history write. */ } }
-  private commit(update: (history: RunRecords) => RunRecords): Promise<RecordsWrite> {
+  private commit(update: (history: RunRecords) => RunRecords, notify = true): Promise<RecordsWrite> {
     const work = this.store.mutate(update).then(result => {
       const status = result.ok ? '' : `Run history could not be confirmed (${result.reason}). Review Hall of Records; gameplay is unaffected.`;
-      if (this.status !== status) { this.status = status; this.notify(); }
+      if (this.status !== status) { this.status = status; if (notify) this.notify(); }
       return result;
     });
     this.pending = Promise.all([this.pending, work]).then(() => {});
@@ -52,7 +52,7 @@ export class RunHistory {
       }
       staged = true;
       return { ...history, receipts: { ...history.receipts, [this.mode]: { kind: 'pending', record, newId } } };
-    });
+    }, false); // A preparatory status must not rerender and invalidate the owner's reviewed save token.
     // History denial is nonfatal. The existing save owner still validates and accepts/refuses replacement.
     const accepted = await replace();
     await this.commit(history => {

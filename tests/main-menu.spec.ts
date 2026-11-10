@@ -98,6 +98,17 @@ test('main menu: records unavailable storage is honest and leaves gameplay navig
   await expect(dialog.getByRole('button', { name: 'Reset records', exact: true })).toHaveCount(0);
   if (isMobile) await dialog.getByRole('button', { name: 'Close', exact: true }).tap(); else await dialog.getByRole('button', { name: 'Close', exact: true }).click();
   await expect(page.getByRole('button', { name: 'New Game', exact: true })).toBeEnabled();
+  const newGame=async()=>{const target=page.getByRole('button',{name:'New Game',exact:true});if(isMobile)await target.tap();else await target.click();};
+  await newGame();await expect(page.locator('#dungeon-map')).toBeVisible();
+  const previous=JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!).id;
+  await page.getByRole('link',{name:'Main menu',exact:true}).last().click();await newGame();
+  const confirm=page.getByRole('dialog').getByRole('button',{name:'Start new dungeon',exact:true});
+  if(isMobile)await confirm.tap();else await confirm.click();
+  await expect(page.locator('#dungeon-map')).toBeVisible();
+  const current=JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);
+  expect(current.id).not.toBe(previous);
+  expect(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!).payload.id,DUNGEON_KEYS.primary)).toBe(current.id);
+  await expect(page.locator('#dungeon-screen')).toContainText('Run history could not be confirmed');
 });
 
 test('main menu: records authored replacement waits for confirmation and freezes the old journey', async ({ page, isMobile }) => {
