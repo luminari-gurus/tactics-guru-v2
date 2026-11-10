@@ -323,3 +323,17 @@ branch above, natively linked from the issue's Development section. The issue
 comment links the pushed plan and explains the incremental acceptance boundary.
 The planning commit is `0f1c2e9`. Implementation and verification progress will be
 recorded here and in the OpenSpec tasks as each increment is completed.
+
+### November 10 independent merge review
+
+PR #359 merged as `39d461f` after fresh local units/types/builds and 20
+Chromium/WebKit menu checks. PR #360 incorporates that main merge, preserving
+stack ancestry. Its review reproduces and repairs encounter entry during the
+final replacement write, terminal-history loss during unsaved/lock-denied play,
+and preparatory feedback invalidating the startup review token. The latter
+minimal fix is carried forward from #361 so this increment stands alone.
+The existing session, history adapter and regression harnesses cover these
+repairs; no additional abstraction, save format or rule change is needed.
+Original failed review regressions remain under `tmp/issue-176-review/360/`;
+the QA document records final verification before merge. Dungeon review and
+full issue closure remain on #361 until its independent review is complete.

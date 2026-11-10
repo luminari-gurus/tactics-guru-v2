@@ -113,3 +113,38 @@ every runtime/test/config input relevant to these results. Dungeon gates remain
 in PR #361; the issue stays open. The shared physical host's unrelated processes
 were not independently controlled, so serialized success does not erase prior
 resource-sensitive failures or claim a generally repaired host.
+
+## Independent merge review — authored increment
+
+PR #359 merged as `39d461f`. PR #360 merged that base without conflicts and
+fixes its verified review defects in `79196d91b01e7dcd85bbf0b030dda4cca3338039`:
+encounter entry during final replacement, terminal-history loss in explicit
+unsaved/active-save-lock-denied play, and a preparatory warning invalidating the
+startup review token. The last correction is carried forward from #361.
+
+Fresh Windows x64 / Node 24.22.1 / Playwright 1.64.1 verification, unchanged
+timeouts/retries/configs, one browser worker, ordinary root production preview:
+
+- RED: two delayed-final-write browser cases failed on enabled encounter entry;
+  three owner-level unit cases failed on the missing terminal record or refused
+  replacement. Original reports and contexts remain in the ignored review folder.
+- GREEN: all **1,275 units**, both TypeScript scopes, **2/2 root/prefix build
+  integrations**, production bundle and `git diff --check` passed.
+- `main menu: records` selection: **18 Chromium + 12 WebKit passed**, including
+  both new replacement regressions on desktop/Pixel portrait/landscape and
+  iPhone portrait/landscape. The disabled-handler negative case is also exercised.
+- Core config: **7/7 passed**. Focused desktop authored selection (`legal run
+  outcomes|cached run return|legal defeat reload|run startup preserves`):
+  **4/4 passed**, including the complete three-encounter journey. All **41**
+  browser cases have zero skipped, unexpected, flaky or retried cases.
+
+Direct Node entry points ran vitest, tsc, vite and Playwright. An ignored local
+`npm.cmd` wrapper points to the installed npm CLI so unchanged preview commands
+work in this app runtime. No dependency/config/source assertion was weakened.
+The existing large-chunk and future Vite loader advisories remain. Reports,
+logs, input hashes and screenshots are retained under `tmp/issue-176-review/360/`;
+the compact [review receipt](review-360.json) binds their hashes to tested inputs.
+Final handoff edits affect documentation only. Earlier five-profile battle/rule,
+replay and route-isolation evidence remains retained for unchanged consumers;
+the changed replacement and terminal integration has the fresh evidence above.
+No full unrelated release/performance recertification or physical device is claimed.
