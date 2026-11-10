@@ -168,3 +168,30 @@ checks. The failed run remains failed. Only the repaired three Chromium full-flo
 cases and the 18 previously blocked WebKit cases run next on otherwise idle
 qualified capacity. Other 62 passes are reused: runtime/helpers/config and their
 test bodies are unchanged. No timeout, retry or gameplay change is made.
+
+## Complete issue acceptance
+
+Qualified functional head `003be9bad3afc25a264f05ce3b95bd5e8e441b0e`, clean tested
+merge `6dd0e291661a7527745e3626fcff9b9ad7625ea7`:
+
+- [Remaining qualification 42845257735, attempt 2](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42845257735/attempts/2): **21/21 passed**, zero failures/skips/test retries/flakes. The repaired complete floor, descent/backtracking and empty-history checks passed on three Chromium and three WebKit profiles; WebKit legal defeat and all isolation groups passed. VM-01 was idle during this run. The desktop case kept its original 300s deadline.
+- The final **83-case acceptance set is accounted for across 62 retained passes and 21 fresh passes**. This is not a clean single 83-case run: 42840048098 remains failed with its original three failures. Production/helpers/config and other test bodies are unchanged; the only browser-test repair reorders one assertion within the re-executed full-floor case.
+- [Current standard verification 42845257864](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42845257864): **1,279 units, both TypeScript scopes, both build integrations, production build and 7/7 core journeys passed**, no failures/pending/skipped/retried cases. Unit time was 60.28s. Earlier resource-sensitive failures remain recorded.
+- [Final portable receipt](increment-3.json) and [83 case records](increment-3-cases.jsonl) retain source/build inputs, exact case identities, attempts, per-stage outcomes and report hashes. Runtime is Linux x64, Node 24.22.2, Playwright 1.64.1, Chromium 156.0.8078.4 and WebKit 27.2. Browser evidence is desktop/native-touch emulation, not physical devices.
+- Real selection/batch contracts: 30 checks passed locally on Windows; the existing POSIX shell-guard check could not spawn sh there and passed unchanged under WSL Node 24.15.0. All original profiles, nine whole-file partitions and the 24 approved equivalence mappings are retained. No contract or assertion was weakened for the local shell limitation.
+
+### Acceptance mapping
+
+1. **Immutable schema/identity/counters:** runRecords model units and actual authored victory/defeat records prove stable mode/ID, exact supported counters and frozen first results. Eviction plus accepted/refused/racing replacement regressions preserve seals. Floor projection uses validated unique completion counts; the descent/replacement unit checks deepest visited floor.
+2. **Once at real endings; endless dungeon remains open:** authored legal wins/losses, explicit terminal Continue/restart, dungeon legal defeat, root-menu and in-flow replacement all pass. The complete first-floor/guardian/descent/backtrack/menu witness proves no false completion. Repeated callbacks and interrupted pending intents have targeted unit coverage; actual cached returns and concurrent native confirmations pass.
+3. **Storage/recovery/sorting/retention/menu:** bounded model/storage units, missing/corrupt/future/unavailable data, exact reviewed export/restore/reset, 100-entry retention and first-result sorting pass. Real keyboard/touch recovery preserves active-save bytes.
+4. **Device-local scope and separation:** the menu states browser-local best-effort persistence. No backend/account/economy or active-save format change. Record-only recovery and testing-entry spies preserve all active-save families.
+5. **Repeated/continued/corrupt/unavailable and accessible UI:** the 65 authored and final 83-case coverage sets include terminal reload/Continue, continued descent, all testing routes/diagnostics, unavailable history that still permits real New Game, two tabs and actual Chromium BFCache. Records screenshots and complete-journey board snapshots were inspected. WebKit uses actual reload/Continue; no WebKit BFCache or physical-device claim is made.
+
+All nine OpenSpec tasks are complete. The final documentation handoff and retirement
+of the one-off execution workflow preserve every functional source/test/config
+input; relevant evidence is reused under the policy. All cases remain in their
+explicit regression matrices and documented CLI commands. Full unrelated release
+regression/performance recertification was not run. No PR merge, release tag or
+production operation is part of this handoff. #176 remains open until reviewed
+work merges; #270 remains separate for richer statistics.
