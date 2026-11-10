@@ -28,7 +28,7 @@ const sound={enabled:false};
 const dialogs=new BattleDialogs(()=>{host?.modalTransition();queueMicrotask(()=>deferredStart?.());},()=>requestNew(),()=>screen.querySelector<HTMLElement>('h1')?.focus());
 panel.setAttribute('aria-label','Dungeon battle controls');
 mountBattleLayout();window.fitDiagnostics=diagnosticsSnapshot;
-const mapView=new DungeonMap(destination=>{if(!live||playing||loading||loadError||dialogs.open)return;if(session.step({...session.spatialBoundary,destination})&&session.phase==='battle')start();},()=>!live||playing||loading||loadError||dialogs.open);
+const mapView=new DungeonMap(destination=>{if(!live||playing||loading||loadError||replacing||dialogs.open)return;if(session.step({...session.spatialBoundary,destination})&&session.phase==='battle')start();},()=>!live||playing||loading||loadError||replacing||dialogs.open);
 function button(label:string,run:()=>void){const n=el('button',label);n.type='button';n.onclick=run;return n;}
 function evidence(state:DungeonState=session.snapshot){container.dataset.dungeonSnapshot=JSON.stringify(state);container.dataset.dungeonBattleRecord=JSON.stringify(session.completedBattle);}
 function stop(){loadGeneration++;deferredStart=null;loading=false;loadError=false;playing=false;host=null;engine?.scene.stop('battle');controls.hidden=true;container.style.visibility='hidden';}
@@ -36,7 +36,11 @@ function render(){
  if(!live)return;const state=session.snapshot;evidence(state);
  if(playing){persistence.querySelector('span')!.textContent=session.status;return;}
  shell.hidden=true;panel.hidden=true;screen.hidden=false;
- if(loading){
+ if(replacing){
+  const title=el('h1','Starting new dungeon');title.tabIndex=-1;
+  const message=el('p','Preparing your next journey.');message.setAttribute('role','status');
+  screen.replaceChildren(title,message);
+ }else if(loading){
   const title=el('h1','Loading encounter');title.tabIndex=-1;
   const message=el('p','Preparing the battle.');message.setAttribute('role','status');
   screen.replaceChildren(title,message,button('Start new dungeon',requestNew));
@@ -84,9 +88,10 @@ async function replace(review:ReturnType<DungeonSession['inspect']>){
  replacing=true;
  try {
   const accepted=await session.replace(review,crypto.randomUUID(),newSeed(session.snapshot.seed));
+  replacing=false;
   if(!live)return;
   if(accepted){startup=false;stop();render();screen.querySelector<HTMLElement>('h1')?.focus();if(session.hasUnsavedProgress)recovery();}
-  else recovery();
+  else {render();recovery();}
  }finally{replacing=false;}
 }
 function recovery(){
@@ -117,7 +122,7 @@ function failedLoad(generation:number){
  stop();loadError=true;render();screen.querySelector<HTMLElement>('#dungeon-load-error')?.focus();
 }
 async function start(){
- if(!live||playing||loading)return;
+ if(!live||playing||loading||replacing)return;
  // Lock before committing the encounter or awaiting code, so repeated input cannot enter twice.
  const generation=++loadGeneration;loading=true;loadError=false;
  container.dataset.ready='false';delete container.dataset.phase;

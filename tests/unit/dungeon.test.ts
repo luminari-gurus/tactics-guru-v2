@@ -88,6 +88,28 @@ describe('dungeon run history boundaries', () => {
     expect(session.snapshot).toEqual(terminal);
     expect([f.m.getItem(DUNGEON_KEYS.primary), f.m.getItem(DUNGEON_KEYS.backup)]).toEqual(bytes);
   });
+  it.each(['unsaved', 'changed'] as const)('records a legally accepted defeat independently of active saves %s', async mode => {
+    const f = fixture(), initial = fresh(), injured = atEncounter({ ...initial,
+      party: initial.party.map(hero => ({ ...hero, hp: hero.heroId === 'fighter' ? 1 : 0 })),
+    });
+    const session = new DungeonSession(injured, f.storage, f.history);
+    if (mode === 'unsaved') session.playUnsaved();
+    const battle = session.startEncounter(); assert(battle);
+    if (mode === 'changed') {
+      const other = createDungeonStorage(() => f.m);
+      assert(other.save(freshDungeon('another-tab', 14)).ok);
+    }
+    const bytes = [f.m.getItem(DUNGEON_KEYS.primary), f.m.getItem(DUNGEON_KEYS.backup)];
+    for (let count = 0; count < 1000 && battle.phase !== 'ended'; count++) {
+      const step = battle.phase === 'enemy' ? battle.nextEnemy()
+        : (battle.prepare({ type: 'endTurn', unitId: battle.active.id }), battle.confirm());
+      assert(step); battle.finishPresentation(step.token);
+    }
+    expect(session.phase).toBe('defeat'); await f.history.whenIdle();
+    expect(f.rows()).toMatchObject([{ id: injured.id, outcome: 'defeat', recordedAt: 200, battlesWon: 0 }]);
+    expect([f.m.getItem(DUNGEON_KEYS.primary), f.m.getItem(DUNGEON_KEYS.backup)]).toEqual(bytes);
+    session.dispose();
+  });
   it('does not end a cleared floor or continued descent, and records the reviewed old journey rather than a placeholder', async () => {
     const f = fixture(), cleared = atStairApproach(clearFloor(fresh())); assert(f.storage.save(cleared).ok);
     const session = new DungeonSession(freshDungeon('placeholder', 14), f.storage, f.history);
@@ -115,6 +137,12 @@ describe('dungeon run history boundaries', () => {
     expect(f.m.getItem(RUN_RECORD_KEYS.primary)).toBeNull();
     const testing = new DungeonSession(fresh(), null, new RunHistory('dungeon', createRunRecordsStorage(() => { throw Error('History acquired'); })));
     expect(testing.history).toBeNull(); expect(testing.restart('temporary', 14)).toBe(true);
+  });
+  it('records replacement of an explicitly started unsaved dungeon before its first move', async () => {
+    const f = fixture(), initial = fresh(), session = new DungeonSession(initial, f.storage, f.history);
+    session.playUnsaved();
+    assert(await session.replace(session.inspect(), 'after-unsaved-start', 14)); await f.history.whenIdle();
+    expect(f.rows()).toMatchObject([{ id: initial.id, outcome: 'abandoned', battlesWon: 0 }]);
   });
   it('allows an accepted new dungeon when history is unavailable, without claiming its old record survived', async () => {
     const f = fixture(), old = fresh(); assert(f.storage.save(old).ok);

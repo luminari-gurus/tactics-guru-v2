@@ -176,6 +176,40 @@ for (const phase of ['preparation', 'terminal'] as const) test(`main menu: recor
   await expect(page.locator('#battle-actor')).toBeVisible();
 });
 
+test('main menu: records dungeon replacement withholds exploration until final history finishes', async ({ page }) => {
+  await page.goto('./'); await page.getByRole('button', { name: 'New Game', exact: true }).click();
+  await expect(page.locator('#dungeon-map')).toBeVisible();
+  const map = await page.locator('#dungeon-map').elementHandle(); if (!map) throw Error('Missing exploration map');
+  await page.evaluate(key => navigator.locks.request(key, () => {}), RUN_RECORD_KEYS.primary);
+  await page.evaluate(key => {
+    const request = navigator.locks.request.bind(navigator.locks); let count = 0;
+    navigator.locks.request = ((name: string, ...args: any[]) => {
+      if (name === key && ++count === 2) {
+        document.documentElement.dataset.recordsHeld = 'yes';
+        return new Promise(resolve => { (window as any).releaseRecords = () => resolve((request as any)(name, ...args)); });
+      }
+      return (request as any)(name, ...args);
+    }) as typeof navigator.locks.request;
+  }, RUN_RECORD_KEYS.primary);
+  await page.getByRole('button', { name: 'Start new dungeon', exact: true }).click();
+  await page.locator('#dungeon-confirm-new').click();
+  await expect(page.locator('html')).toHaveAttribute('data-records-held', 'yes');
+  const before = await page.locator('#game').getAttribute('data-dungeon-snapshot');
+  // A queued event from the detached old map must not move the newly installed journey.
+  await map.evaluate(node => { for (const key of ['ArrowUp', 'ArrowRight', 'ArrowDown', 'ArrowLeft']) {
+    node.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+  } });
+  expect(await page.locator('#game').getAttribute('data-dungeon-snapshot')).toBe(before);
+  await expect(page.getByRole('heading', { name: 'Starting new dungeon', exact: true })).toBeVisible();
+  await expect(page.locator('#dungeon-map')).not.toBeVisible();
+  await page.evaluate(() => (window as any).releaseRecords());
+  await expect(page.locator('#dungeon-map')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Starting new dungeon', exact: true })).toHaveCount(0);
+  await expect(page.locator('.dungeon-directions button:enabled').first()).toBeEnabled();
+  await page.locator('.dungeon-directions button:enabled').first().click();
+  expect(await page.locator('#game').getAttribute('data-dungeon-snapshot')).not.toBe(before);
+});
+
 test('main menu: startup hides proof tools before application modules run',async({page})=>{
  let release!:()=>void;
  let held:Promise<void>;

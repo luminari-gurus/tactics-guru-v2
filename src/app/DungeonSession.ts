@@ -42,15 +42,16 @@ export class DungeonSession {
   dispose() { this.disposed = true; this.battle?.dispose(); this.battle = null; this.onChange = null; if (this.history) this.history.onChange = null; }
   save() {
     if (this.disposed) return false;
+    // Accepted endings survive an independent active-save opt-out or conflict.
+    if (this.history) void this.history.record(dungeonRunRecord(this.current, this.history.now()));
     if (!this.storage) { this.report('Testing dungeon. Progress resets on reload.'); return false; }
     if (this.unsaved) { this.report('Playing unsaved. Floor travel requires saving; open Save recovery.'); return false; }
     const result = this.write(this.current);
     this.progressSaved = result.ok;
-    if (this.history && (result.ok || result.reason !== 'changed')) void this.history.record(dungeonRunRecord(this.current, this.history.now()));
     this.report(result.ok ? 'Dungeon saved on this device' : `Progress unsaved: ${result.reason}. Open Save recovery to retry or export.`);
     return result.ok;
   }
-  playUnsaved() { if (!this.storage) return; this.unsaved = true; this.report('Playing unsaved. Floor travel requires saving; open Save recovery.'); }
+  playUnsaved() { if (!this.storage) return; this.unsaved = true; this.started = true; this.report('Playing unsaved. Floor travel requires saving; open Save recovery.'); }
   private publishSpatial(candidate: ReturnType<typeof stepDungeon>) {
     if (!candidate.ok) { this.report(`Movement refused: ${{blockedStep:'Choose an adjacent walkable cell',staleBoundary:'The floor changed; choose again',wrongPhase:'Finish the current encounter or reward first',remoteEncounter:'Walk onto the available encounter marker',resourceLimit:'Progress has reached a storage or counter limit'}[candidate.reason] ?? 'This step is unavailable'}. Nothing changed.`); return false; }
     const traveling = candidate.state.depth !== this.current.depth;
