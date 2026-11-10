@@ -31,6 +31,11 @@ Recording SHALL follow accepted victory, defeat or explicit replacement of an un
 - **THEN** that old journey receives one abandonment record
 - **AND** cancellation, stale review or failed replacement creates no abandonment
 
+#### Scenario: Distinct admitted live journey and reviewed save
+- **WHEN** accepted replacement discards an admitted live journey and a different validated saved journey
+- **THEN** both ended identities receive their own immutable result without counting either twice
+- **AND** their bounded pending intent reconciles together after interruption, preserves frozen prior results, and remains readable alongside legacy single-journey receipts
+
 ### Requirement: Idempotent recovery
 Repeated callbacks, accepted terminal continuation and storage retries SHALL create at most one history entry per journey. Interrupted replacement SHALL preserve enough bounded recovery information to distinguish a pending operation from an accepted ending. Uncertainty SHALL be reported without inventing a result.
 

@@ -82,3 +82,20 @@ it('admits two bounded receipts and rejects duplicate keys, getters, sparse arra
   const read = readRunRecords(history)!; (read.records[0] as { id: string }).id = 'changed';
   expect(history.records[0].id).toBe('run-1');
 });
+it('accepts bounded paired intent/seals without changing legacy v1 receipts and rejects malformed extensions', () => {
+  const legacy = { ...emptyRunRecords(), receipts: { run: { kind: 'pending', record: recordFixture(), newId: 'next' }, dungeon: null } };
+  expect(readRunRecords(legacy)).toEqual(legacy);
+  const receipt = { ...legacy.receipts.run, other: recordFixture('unsaved'), sealed: { kind: 'sealed', id: 'frozen', otherId: 'also-frozen' } };
+  const paired = { ...legacy, receipts: { ...legacy.receipts, run: receipt } };
+  expect(readRunRecords(paired)).toEqual(paired);
+  for (const patch of [{ other: recordFixture('run-1') }, { other: recordFixture('next') }, { other: null },
+    { other: { ...recordFixture('unsaved'), mode: 'dungeon' } }, { extra: recordFixture('third') },
+    { sealed: { kind: 'sealed', id: 'frozen', otherId: 'frozen' } }, { sealed: { kind: 'sealed', id: 'frozen', otherId: ['a', 'b'] } },
+    { sealed: { kind: 'sealed', id: 'frozen', thirdId: 'third' } }, { sealed: null }]) {
+    expect(readRunRecords({ ...paired, receipts: { ...paired.receipts, run: { ...receipt, ...patch } } })).toBeNull();
+  }
+  const accessor = { ...receipt }; Object.defineProperty(accessor, 'other', { enumerable: true, get() { throw Error('getter'); } });
+  expect(readRunRecords({ ...paired, receipts: { ...paired.receipts, run: accessor } })).toBeNull();
+  const read = readRunRecords(paired)!; const copy = read.receipts.run; assert(copy?.kind === 'pending' && copy.other);
+  (copy.other as { id: string }).id = 'mutated'; expect(receipt.other.id).toBe('unsaved');
+});

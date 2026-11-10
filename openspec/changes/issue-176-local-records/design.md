@@ -46,16 +46,20 @@ Do not silently fall back to unlocked conflicting writes; report unavailable
 recording while allowing gameplay. Verify concurrent candidates in units and a
 bounded two-tab witness. This is not a claim of distributed transactional storage.
 
-A current-journey receipt records pending replacement or a sealed terminal key.
+A current-journey receipt records pending replacement or sealed result keys.
 It prevents a still-current old terminal save being reinserted after retention
-eviction. Keep only the receipts needed by the current owned journey per mode;
+eviction. A reviewed save and a different admitted unsaved journey can both be
+ended by one replacement. Keep at most two summaries and two frozen IDs in that
+mode's receipt; existing single-summary v1 receipts remain readable. There is
 no unbounded tombstone list or per-action journal. Retention intentionally discards
 old history. Manually restoring arbitrary external archives is not a supported
 import feature and cannot reconstruct discarded history.
-Known frozen results skip pending preparation entirely. A newly accepted terminal
-result seals its own matching pending intent. Accepted/refused replacement must
-retain that seal so Continue cannot resurrect an evicted result; no extra schema
-field or tombstone mechanism is required.
+Known frozen results skip pending preparation when all ended identities are already
+frozen. Staging an unknown companion carries the existing frozen IDs alongside the
+candidate pair. A racing accepted terminal result updates those seals without
+discarding the other pending summary. Accepted/refused replacement retains the
+seals so Continue cannot resurrect an evicted result. The optional companion and
+retained-seal fields are needed by these two actual roles, not a general journal.
 
 ### Finalize from accepted owners
 
@@ -67,17 +71,19 @@ and values on retry. A terminal save whose history write was lost can supply its
 summary again; the visible time is recording time, not a claim of original wall-clock
 completion time. Do not change saved combat bytes or replay historical events.
 
-For replacement, capture the exact validated old summary and expected reviewed
+For replacement, capture the exact validated old summaries and expected reviewed
 save identity before destructive work, persisting a small pending receipt when
 storage permits. Finalize abandonment only after the existing replacement method
 accepts the new identity. Canceled/stale/failed replacement does not finalize.
+The distinct admitted live journey is included with the reviewed saved journey;
+identical IDs are deduplicated and terminal results retain their actual outcome.
 After interruption, reconcile pending data against validated saved identities;
 if both identities are absent or otherwise ambiguous, retain it and show an
 unresolved status until an explicit reviewed choice supplies evidence. Do not
 infer abandonment solely from missing slots. A receipt-write failure must be
 visible but cannot block the already authorized new game or imply history survived.
 
-Record before discarding the old snapshot, through one small helper used by the
+Capture intent before discarding the old snapshots, through one small helper used by the
 in-flow replacement and root-menu destination handler. Returning to menu suspends;
 pagehide is cleanup, not an ending. Dungeon guardian/floor wins, stairs and
 backtracking never invoke terminal recording. Existing confirmation text should

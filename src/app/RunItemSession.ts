@@ -116,14 +116,17 @@ export class RunItemSession {
     const selected = review.selected?.state;
     const expected = this.current;
     const old = this.started && (!selected || selected.items.run.id === this.current.items.run.id) ? this.current : selected;
-    const record = this.history && old ? authoredRunRecord(old.items.run, this.history.now(), true) : null;
+    const recordedAt = this.history?.now();
+    const record = old && recordedAt !== undefined ? authoredRunRecord(old.items.run, recordedAt, true) : null;
+    const other = this.started && old && old.items.run.id !== this.current.items.run.id && recordedAt !== undefined
+      ? authoredRunRecord(this.current.items.run, recordedAt, true) : null;
     const perform = () => new Promise<boolean>(resolve => {
       this.queueWrite(() => {
         if (this.current !== expected) { this.report('Reset refused: the run changed while confirming. Review again.'); resolve(false); }
         else resolve(this.replaceNow(review, id, seed));
       }, () => resolve(false));
     });
-    return this.history ? this.history.replace(record, id, perform) : perform();
+    return this.history ? this.history.replace(record, id, perform, other) : perform();
   }
   private replaceNow(review: RunLoadResult, id: string, seed: number) {
     if (!this.storage || !/^[A-Za-z0-9-]{1,64}$/.test(id) || !isIntegerIn(seed, RULE_BOUNDS.uint32) || this.disposed || review !== this.review || !review.ok || id === this.current.items.run.id || seed === this.current.items.run.seed) return false;

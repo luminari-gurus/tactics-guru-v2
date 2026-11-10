@@ -25,5 +25,8 @@ all acceptance gates. Checkboxes represent implemented and verified work only.
 
 ## Workflow follow-up
 
+- [x] 3.4 Correct replacement of a distinct reviewed save and admitted live journey in both owners; validate the bounded paired intent and retained seals with legacy v1 compatibility, accepted/refused/interrupted/racing/eviction regressions, real menu reload recovery, final affected persistence checks and publish a qualified follow-up for #176.
+
 - Obtain review and merge authorization through the normal repository process; implementation authorization does not authorize merge or production changes.
+- The caller's maintenance authorization covers merging the qualified #176 follow-up, resolving its review thread, reconciling issue completion and verified-safe cleanup; finish these operations before declaring the maintenance goal complete.
 - Archive/sync this OpenSpec change only after the complete implementation is accepted and merged under the repository workflow.

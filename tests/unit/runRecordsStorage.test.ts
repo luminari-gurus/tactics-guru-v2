@@ -1,6 +1,7 @@
 import { assert, expect, it, vi } from 'vitest';
-import { appendRunRecord, emptyRunRecords, type RunRecord } from '../../src/domain/runRecords';
+import { appendRunRecord, emptyRunRecords, type RunRecord, type RunRecords } from '../../src/domain/runRecords';
 import { createRunRecordsStorage, encodeRunRecords, RECORDS_MAX_CODE_UNITS, RUN_RECORD_KEYS, selectedRunRecords, type RecordsLock } from '../../src/persistence/runRecordsStorage';
+import { canonical, hashJson } from '../../src/domain/contentIdentity';
 const direct: RecordsLock = async action => action();
 function memory() {
   const data = new Map<string, string>(), writes: string[] = [];
@@ -97,4 +98,36 @@ it('rejects an invalid mutation without touching storage', async () => {
   const m = memory(), store = createRunRecordsStorage(() => m, direct);
   expect(await store.mutate(h => ({ ...h, records: [{ ...record(), battlesWon: -1 }] }))).toEqual({ ok: false, reason: 'invalid' });
   expect(m.data.size).toBe(0);
+});
+it('reads exact legacy pending bytes without writing and round-trips a paired intent through recovery', async () => {
+  const m = memory(), body = { version: 1, records: [], receipts: {
+    run: { kind: 'pending', record: record(), newId: 'new-run' }, dungeon: null,
+  } };
+  const legacy = canonical({ ...body, digest: hashJson(body) }); m.data.set(RUN_RECORD_KEYS.primary, legacy);
+  const store = createRunRecordsStorage(() => m, direct);
+  expect(selectedRunRecords(store.inspect())).toEqual(body); expect(m.writes).toEqual([]);
+  assert((await store.mutate(history => ({ ...history, receipts: { ...history.receipts,
+    run: { kind: 'pending', record: record(), other: record('unsaved'), newId: 'new-run',
+      sealed: { kind: 'sealed', id: 'frozen', otherId: 'also-frozen' } },
+  } }))).ok);
+  const paired = m.data.get(RUN_RECORD_KEYS.primary)!; expect(paired.length).toBeLessThan(RECORDS_MAX_CODE_UNITS);
+  m.data.set(RUN_RECORD_KEYS.primary, 'corrupt'); m.data.set(RUN_RECORD_KEYS.backup, paired);
+  assert((await store.recover(store.inspect(), false)).ok);
+  expect(m.data.get(RUN_RECORD_KEYS.primary)).toBe(paired);
+  expect(selectedRunRecords(store.inspect())?.receipts.run).toMatchObject({ other: { id: 'unsaved' }, sealed: { otherId: 'also-frozen' } });
+});
+it('keeps 100 widest summaries and both paired receipts inside the existing envelope limit', async () => {
+  const wide = (mode: 'run' | 'dungeon', id: string): RunRecord => ({ mode, id: id.padEnd(64, 'x'),
+    outcome: mode === 'run' ? 'victory' : 'abandoned', recordedAt: 8_640_000_000_000_000,
+    battlesWon: mode === 'run' ? 3 : 8192 * 3, floorsCleared: mode === 'run' ? null : 8192,
+    deepestFloor: mode === 'run' ? null : 8192 });
+  const pending = (mode: 'run' | 'dungeon') => ({ kind: 'pending' as const,
+    record: wide(mode, 'saved'), other: wide(mode, 'live'), newId: 'new'.padEnd(64, 'x'),
+    sealed: { kind: 'sealed' as const, id: 'frozen'.padEnd(64, 'x'), otherId: 'also-frozen'.padEnd(64, 'x') } });
+  const history: RunRecords = { version: 1, records: Array.from({ length: 100 }, (_, i) => wide('dungeon', `row-${i}`)),
+    receipts: { run: pending('run'), dungeon: pending('dungeon') } };
+  const text = encodeRunRecords(history); assert(text); expect(text.length).toBeLessThan(RECORDS_MAX_CODE_UNITS);
+  const m = memory(), store = createRunRecordsStorage(() => m, direct);
+  assert((await store.mutate(() => history)).ok); expect(selectedRunRecords(store.inspect())?.records).toHaveLength(100);
+  expect(store.inspect().primary.status).toBe('valid');
 });

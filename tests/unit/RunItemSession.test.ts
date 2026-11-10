@@ -103,6 +103,26 @@ it('keeps the reviewed startup token valid when history preparation fails', asyn
   expect(session.snapshot.items.run.id).toBe('after-denied-history');
   expect(session.status).toContain('Run history could not be confirmed');
 });
+it.each(['accepted', 'stale', 'partial'] as const)('records the distinct saved and admitted unsaved run only when replacement is %s', async result => {
+  const f = historyFixture(), saved = preparedSnapshot(), live = freshRunSnapshot('unsaved-live-run', 23, runContext);
+  assert(f.storage.save(saved).ok);
+  const session = new RunItemSession(live, runContext, f.storage, undefined, f.history);
+  session.playUnsaved(); const before = session.snapshot, review = session.inspect();
+  if (result === 'stale') f.data.set(RUN_STORAGE_KEYS.primary, 'changed while reviewing');
+  if (result === 'partial') f.fail();
+  expect(await session.replace(review, 'after-distinct-runs', 24)).toBe(result === 'accepted');
+  await f.history.whenIdle();
+  const rows = selectedRunRecords(f.records.inspect())?.records ?? [];
+  if (result === 'accepted') {
+    expect(rows).toHaveLength(2);
+    expect(rows).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: saved.items.run.id, outcome: 'abandoned', battlesWon: 1 }),
+      expect.objectContaining({ id: live.items.run.id, outcome: 'abandoned', battlesWon: 0 }),
+    ]));
+    assert(session.continue(session.inspect())); await f.history.whenIdle();
+    expect(selectedRunRecords(f.records.inspect())?.records).toEqual(rows);
+  } else { expect(rows).toEqual([]); expect(session.snapshot).toEqual(before); }
+});
 it('can retry after reviewed removal of a primary corrupted during play', () => {
   const data = new Map<string,string>();
   const storage = createRunStorage(runContext,()=>({getItem:key=>data.get(key)??null,

@@ -122,6 +122,7 @@ test('main menu: records authored replacement waits for confirmation and freezes
   }, { run: keys.run, battleKeys: keys.battle, text: text.text, battle });
   await page.goto('./?game=run'); await page.locator('#run-continue').click(); await page.locator('#run-start-encounter').click();
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  await expect(page.locator('#battle-persistence')).toContainText('Run saved on this device');
   const history = () => page.evaluate(slots => {
     const value = localStorage.getItem(slots.primary); return value ? JSON.parse(value).records : [];
   }, RUN_RECORD_KEYS);
@@ -191,6 +192,69 @@ test('main menu: records dungeon replacement withholds exploration until final h
   await expect(page.locator('.dungeon-directions button:enabled').first()).toBeEnabled();
   await page.locator('.dungeon-directions button:enabled').first().click();
   expect(await page.locator('#game').getAttribute('data-dungeon-snapshot')).not.toBe(before);
+});
+
+for (const mode of ['run', 'dungeon'] as const) for (const completion of ['finished', 'interrupted'] as const)
+test(`main menu: records replacing distinct saved and unsaved ${mode} preserves both after ${completion} history`, async ({ page, isMobile }, info) => {
+  const slots = keys[mode], saved = menuFixture(mode), savedPayload = JSON.parse(saved).payload;
+  const savedId = mode === 'run' ? savedPayload.items.run.id : savedPayload.id, battle = menuFixture('battle');
+  await page.goto('./');
+  await page.evaluate(({ slots, saved, battleKeys, battle }) => {
+    localStorage.setItem(slots.primary, saved); localStorage.setItem(slots.backup, saved);
+    localStorage.setItem(battleKeys.primary, battle);
+  }, { slots, saved, battleKeys: keys.battle, battle });
+  await page.addInitScript(({ slots, mode }) => {
+    const get = Storage.prototype.getItem, flag = 'test:paired-storage-ready';
+    let ready = mode === 'dungeon' || sessionStorage.getItem(flag) === 'yes';
+    (window as any).restorePairedStorage = () => { ready = true; sessionStorage.setItem(flag, 'yes'); };
+    Storage.prototype.getItem = function(key) {
+      if (!ready && (key === slots.primary || key === slots.backup)) throw new DOMException('Denied', 'SecurityError');
+      return get.call(this, key);
+    };
+  }, { slots, mode });
+  await page.goto(`./?game=${mode}`);
+  const activate = async (target: ReturnType<Page['locator']>) => { if (isMobile) await target.tap(); else await target.click(); };
+  await activate(page.getByRole('button', { name: `Play unsaved ${mode}`, exact: true }));
+  if (mode === 'run') {
+    await activate(page.locator('#run-start-encounter')); await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  } else await expect(page.locator('#dungeon-map')).toBeVisible();
+  const snapshot = () => page.locator('#game').getAttribute(mode === 'run' ? 'data-run-snapshot' : 'data-dungeon-snapshot');
+  const live = JSON.parse((await snapshot())!), liveId = mode === 'run' ? live.items.run.id : live.id;
+  expect(liveId).not.toBe(savedId); await page.evaluate(() => (window as any).restorePairedStorage());
+  const history = () => page.evaluate(key => JSON.parse(localStorage.getItem(key) ?? '{"records":[]}'), RUN_RECORD_KEYS.primary);
+  const activeSlots = () => page.evaluate(slots => [localStorage.getItem(slots.primary), localStorage.getItem(slots.backup)], slots);
+  const before = await activeSlots(); expect(before).toEqual([saved, saved]);
+  const request = () => activate(mode === 'run' ? page.locator('#fit-restart') : page.getByRole('button', { name: 'Start new dungeon', exact: true }));
+  await request(); await activate(page.locator(mode === 'run' ? '#run-cancel-new' : '#dungeon-cancel-new'));
+  expect((await history()).records).toEqual([]); expect(await activeSlots()).toEqual(before);
+  const releaseHistory = await holdFinalRecordsWrite(page);
+  await request(); await activate(page.locator(mode === 'run' ? '#run-confirm-new' : '#dungeon-confirm-new'));
+  await expect(page.locator('html')).toHaveAttribute('data-records-held', 'yes');
+  const pending = (await history()).receipts[mode];
+  expect(pending).toMatchObject({ kind: 'pending', record: { id: savedId }, other: { id: liveId } });
+  expect((await history()).records).toEqual([]);
+  const nextPayload = JSON.parse((await activeSlots())[0]!).payload;
+  const nextId = mode === 'run' ? nextPayload.items.run.id : nextPayload.id;
+  expect([savedId, liveId]).not.toContain(nextId);
+  const continueCurrent = async () => {
+    await activate(page.getByRole('button', { name: `Continue saved ${mode}`, exact: true }));
+    await expect(page.locator(mode === 'run' ? '#run-start-encounter' : '#dungeon-map')).toBeVisible();
+  };
+  if (completion === 'interrupted') {
+    await page.reload(); expect((await history()).records).toEqual([]); await continueCurrent();
+  } else {
+    await releaseHistory(); await expect(page.locator(mode === 'run' ? '#run-start-encounter' : '#dungeon-map')).toBeVisible();
+  }
+  await expect.poll(async () => (await history()).records).toHaveLength(2);
+  const recorded = (await history()).records;
+  expect(recorded.map((row: RunRecord) => row.id).sort()).toEqual([savedId, liveId].sort());
+  expect(recorded.every((row: RunRecord) => row.mode === mode && row.outcome === 'abandoned')).toBe(true);
+  await page.reload(); await continueCurrent(); expect((await history()).records).toEqual(recorded);
+  expect(await page.evaluate(key => localStorage.getItem(key), keys.battle.primary)).toBe(battle);
+  await page.getByRole('link', { name: 'Main menu', exact: true }).last().click();
+  await activate(page.getByRole('button', { name: 'Hall of Records', exact: true }));
+  await expect(page.getByRole('dialog').getByRole('listitem')).toHaveCount(2);
+  await page.screenshot({ path: info.outputPath('paired-records.png'), fullPage: true });
 });
 
 test('main menu: startup hides proof tools before application modules run',async({page})=>{

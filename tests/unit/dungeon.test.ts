@@ -144,6 +144,26 @@ describe('dungeon run history boundaries', () => {
     assert(await session.replace(session.inspect(), 'after-unsaved-start', 14)); await f.history.whenIdle();
     expect(f.rows()).toMatchObject([{ id: initial.id, outcome: 'abandoned', battlesWon: 0 }]);
   });
+  it.each(['accepted', 'stale', 'partial'] as const)('records the distinct saved and admitted unsaved dungeon only when replacement is %s', async result => {
+    const f = fixture(), saved = fresh(), live = freshDungeon('unsaved-live-dungeon', 23);
+    assert(f.storage.save(saved).ok);
+    const session = new DungeonSession(live, f.storage, f.history);
+    session.playUnsaved(); const before = session.snapshot, review = session.inspect();
+    if (result === 'stale') f.m.setItem(DUNGEON_KEYS.primary, 'changed while reviewing');
+    if (result === 'partial') { const remove = f.m.removeItem; f.m.removeItem = key => {
+      if (key === DUNGEON_KEYS.primary) throw Error('partial removal'); remove(key);
+    }; }
+    expect(await session.replace(review, 'after-distinct-dungeons', 24)).toBe(result === 'accepted');
+    await f.history.whenIdle();
+    if (result === 'accepted') {
+      const rows = f.rows(); expect(rows).toHaveLength(2);
+      expect(rows).toEqual(expect.arrayContaining([
+        expect.objectContaining({ id: saved.id, outcome: 'abandoned' }),
+        expect.objectContaining({ id: live.id, outcome: 'abandoned' }),
+      ]));
+      assert(session.continue(session.inspect())); await f.history.whenIdle(); expect(f.rows()).toEqual(rows);
+    } else { expect(f.rows()).toEqual([]); expect(session.snapshot).toEqual(before); }
+  });
   it('allows an accepted new dungeon when history is unavailable, without claiming its old record survived', async () => {
     const f = fixture(), old = fresh(); assert(f.storage.save(old).ok);
     const denied = new RunHistory('dungeon', createRunRecordsStorage(() => null, async action => action()));
