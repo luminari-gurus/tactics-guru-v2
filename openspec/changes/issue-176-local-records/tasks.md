@@ -1,13 +1,14 @@
 # Tasks
 
-Planning is complete; implementation is not authorized by the planning request.
+Implementation authorized by the caller on 2026-11-10, including autonomous fixes,
+verification, commits/pushes and incremental labeled PRs. No merge/deployment.
 See [plan.md](../../../docs/ongoing-projects/plan.md) for the three-PR scope and
-all acceptance gates. Every checkbox below is implementation work still to do.
+all acceptance gates. Checkboxes represent implemented and verified work only.
 
 ## 1. Record model, storage and existing menu — PR 1
 
-- [ ] 1.1 Add the bounded immutable record schema and pure authored/dungeon projections; verify unique identity, conflicting duplicates, every phase, distinct floor counts, bounds and stable ordering in focused units.
-- [ ] 1.2 Implement the separate primary/backup history store, 100-entry retention and bounded pending/sealed receipts with injected providers and serialized verified writes; verify eviction, current-terminal deduplication, concurrent candidates, corrupt/future versions, quota/security/readback failures and preserved bytes in storage units.
+- [x] 1.1 Add the bounded immutable record schema and pure authored/dungeon projections; verify unique identity, conflicting duplicates, every phase, distinct floor counts, bounds and stable ordering in focused units.
+- [x] 1.2 Implement the separate primary/backup history store, 100-entry retention and bounded pending/sealed receipts with injected providers and serialized verified writes; verify eviction, current-terminal deduplication, concurrent candidates, corrupt/future versions, quota/security/readback failures and preserved bytes in storage units.
 - [ ] 1.3 Replace the existing menu placeholder with accessible history and honest empty/degraded/unavailable states plus explicit reviewed records-only recovery; document the contract in docs/run-records.md and verify keyboard focus, touch portrait/landscape, recovery cancellation and unchanged active-save bytes through the existing menu browser suite.
 - [ ] 1.4 Run proportional PR-readiness checks including verify:pr and affected Chromium/WebKit menu cases; record source/build identities, discovery and actual results in docs/qa/issue-176/README.md, then publish a focused PR with Refs #176 and the remaining recording work stated.
 
@@ -24,5 +25,5 @@ all acceptance gates. Every checkbox below is implementation work still to do.
 
 ## Workflow follow-up
 
-- Obtain review and merge authorization through the normal repository process; planning does not authorize implementation, merge or production changes.
+- Obtain review and merge authorization through the normal repository process; implementation authorization does not authorize merge or production changes.
 - Archive/sync this OpenSpec change only after the complete implementation is accepted and merged under the repository workflow.

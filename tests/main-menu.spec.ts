@@ -9,6 +9,8 @@ import { menuFixture, terminalMenuBattle, rewardRunFixture } from './helpers/men
 import { BATTLE_STORAGE_KEYS } from '../src/persistence/battleStorage';
 import { RUN_STORAGE_KEYS } from '../src/persistence/runStorage';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
+import { emptyRunRecords, type RunRecord } from '../src/domain/runRecords';
+import { encodeRunRecords, RUN_RECORD_KEYS } from '../src/persistence/runRecordsStorage';
 import { readSession, reviewDraught, playerDecision } from './helpers/battlePolicy';
 import { BattleSession } from '../src/app/BattleSession';
 import { encodeBattleSave } from '../src/domain/saveEnvelope';
@@ -23,6 +25,80 @@ const test = base.extend<{ applicationLoadDiagnostics: ApplicationLoadDiagnostic
  }, {auto:true}],
 });
 const keys={battle:BATTLE_STORAGE_KEYS,run:RUN_STORAGE_KEYS,dungeon:DUNGEON_KEYS};
+
+test('main menu: records empty state is read-only and keyboard focus returns to the invoker', async ({ page }) => {
+  await page.goto('./');
+  const invoker = page.getByRole('button', { name: 'Hall of Records', exact: true });
+  await invoker.focus(); await page.keyboard.press('Enter');
+  const dialog = page.getByRole('dialog', { name: 'Hall of Records', exact: true });
+  await expect(dialog.getByRole('status')).toHaveText('No finished journeys recorded yet.');
+  await expect(dialog).toContainText('Records stay on this device and browser');
+  expect(await page.evaluate(slots => [localStorage.getItem(slots.primary), localStorage.getItem(slots.backup)], RUN_RECORD_KEYS)).toEqual([null, null]);
+  await dialog.getByRole('button', { name: 'Close', exact: true }).focus(); await page.keyboard.press('Enter');
+  await expect(invoker).toBeFocused(); await expect(dialog).not.toBeVisible();
+});
+
+test('main menu: records display and reviewed export restore reset preserve active saves', async ({ page, isMobile }, info) => {
+  const rows: RunRecord[] = [
+    { mode: 'run', id: 'authored-example', outcome: 'defeat', recordedAt: Date.UTC(2026, 10, 10, 12), battlesWon: 1, floorsCleared: null, deepestFloor: null },
+    { mode: 'dungeon', id: 'dungeon-example', outcome: 'abandoned', recordedAt: Date.UTC(2026, 10, 10, 13), battlesWon: 6, floorsCleared: 2, deepestFloor: 3 },
+  ];
+  const encoded = encodeRunRecords({ ...emptyRunRecords(), records: rows })!;
+  const saved = menuFixture('run');
+  await page.addInitScript(({ records, encoded, run, saved }) => {
+    if (sessionStorage.getItem('test:records-seeded')) return;
+    localStorage.setItem(records.primary, 'preserved corrupt history'); localStorage.setItem(records.backup, encoded);
+    localStorage.setItem(run.primary, saved); localStorage.setItem(run.backup, saved);
+    sessionStorage.setItem('test:records-seeded', 'yes');
+  }, { records: RUN_RECORD_KEYS, encoded, run: keys.run, saved });
+  await page.goto('./');
+  const activate = async (label: string) => {
+    const target = page.getByRole('button', { name: label, exact: true });
+    if (isMobile) await target.tap(); else await target.click();
+  };
+  await activate('Hall of Records');
+  const dialog = page.getByRole('dialog', { name: 'Hall of Records', exact: true });
+  const list = dialog.getByRole('list', { name: 'Recent journeys' });
+  await expect(dialog.getByRole('status')).toContainText('History needs recovery');
+  await expect(list.getByRole('listitem')).toHaveCount(2);
+  await expect(list.getByRole('listitem').first()).toContainText('Dungeon · Abandoned');
+  await expect(list.getByRole('listitem').first()).toContainText('Battles won: 6 · Floors cleared: 2 · Deepest floor: 3');
+  const stored = () => page.evaluate(({ records, run }) => ({ primary: localStorage.getItem(records.primary), backup: localStorage.getItem(records.backup),
+    runPrimary: localStorage.getItem(run.primary), runBackup: localStorage.getItem(run.backup) }), { records: RUN_RECORD_KEYS, run: keys.run });
+  const before = await stored(); expect(before).toEqual({ primary: 'preserved corrupt history', backup: encoded, runPrimary: saved, runBackup: saved });
+  await page.screenshot({ path: info.outputPath('records-recovery.png'), fullPage: true });
+  expect(await dialog.evaluate(node => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
+  const download = page.waitForEvent('download'); await activate('Export primary history');
+  const exported = await download; expect(exported.suggestedFilename()).toBe('tactics-guru-records-primary.json');
+  expect(await readFile((await exported.path())!, 'utf8')).toBe('preserved corrupt history');
+  expect(await stored()).toEqual(before);
+  await activate('Reset records'); await activate('Cancel'); expect(await stored()).toEqual(before);
+  await activate('Restore reviewed history'); await expect(dialog.getByRole('status')).toContainText('Run history updated');
+  expect(await stored()).toEqual({ primary: encoded, backup: encoded, runPrimary: saved, runBackup: saved });
+  await activate('Reset records'); await activate('Confirm reset records');
+  await expect(dialog.getByRole('status')).toContainText('No finished journeys recorded yet.');
+  const cleared = await stored(); expect(cleared.primary).toBe(encodeRunRecords(emptyRunRecords())); expect(cleared.backup).toBe(cleared.primary);
+  expect(cleared.runPrimary).toBe(saved); expect(cleared.runBackup).toBe(saved);
+  await activate('Close'); await expect(page.getByRole('button', { name: 'Hall of Records', exact: true })).toBeFocused();
+});
+
+test('main menu: records unavailable storage is honest and leaves gameplay navigation usable', async ({ page, isMobile }) => {
+  await page.addInitScript(slots => {
+    const original = Storage.prototype.getItem;
+    Storage.prototype.getItem = function(key) {
+      if (key === slots.primary || key === slots.backup) throw new DOMException('Blocked', 'SecurityError');
+      return original.call(this, key);
+    };
+  }, RUN_RECORD_KEYS);
+  await page.goto('./');
+  const invoker = page.getByRole('button', { name: 'Hall of Records', exact: true });
+  if (isMobile) await invoker.tap(); else await invoker.click();
+  const dialog = page.getByRole('dialog', { name: 'Hall of Records', exact: true });
+  await expect(dialog.getByRole('status')).toHaveText('Run history storage is unavailable. You can still play.');
+  await expect(dialog.getByRole('button', { name: 'Reset records', exact: true })).toHaveCount(0);
+  if (isMobile) await dialog.getByRole('button', { name: 'Close', exact: true }).tap(); else await dialog.getByRole('button', { name: 'Close', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'New Game', exact: true })).toBeEnabled();
+});
 
 test('main menu: startup hides proof tools before application modules run',async({page})=>{
  let release!:()=>void;
@@ -206,7 +282,7 @@ test('main menu: read-only root, separate artwork and isolated loading',async({p
  await expect(page.getByRole('link',{name:'Three-encounter run',exact:true})).toHaveAttribute('href',/\?game=run$/);
  await expect(page.getByRole('link',{name:'Map inspection',exact:true})).toHaveAttribute('href',/\/map$/);
  expect(requests.some(url=>/\/start-[^/]+\.js|\.mp3|\.ogg|\/battle\/audio/.test(url))).toBe(false);
- await page.getByRole('button',{name:'Hall of Records'}).click();await expect(page.getByRole('dialog')).toContainText('Records are not collected yet');
+ await page.getByRole('button',{name:'Hall of Records'}).click();await expect(page.getByRole('dialog')).toContainText('No finished journeys recorded yet');
  await page.keyboard.press('Escape');await expect(page.getByRole('button',{name:'Hall of Records'})).toBeFocused();
  await page.getByRole('button',{name:'Settings',exact:true}).click();await expect(page.getByRole('dialog')).toContainText('Sound controls');
  await expect(page.getByRole('dialog')).toContainText('Combat controls');

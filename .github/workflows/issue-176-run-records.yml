@@ -1,0 +1,70 @@
+name: Issue 176 run records
+on:
+  pull_request:
+    paths:
+      - 'src/domain/runRecords.ts'
+      - 'src/persistence/runRecordsStorage.ts'
+      - 'src/ui/runRecords.ts'
+      - 'src/ui/mainMenu*'
+      - 'src/app/RunItemSession.ts'
+      - 'src/app/DungeonSession.ts'
+      - 'src/app/startRunApp.ts'
+      - 'src/app/startDungeonApp.ts'
+      - 'tests/main-menu.spec.ts'
+      - 'tests/run-progression.spec.ts'
+      - 'tests/dungeon*.spec.ts'
+      - '.github/workflows/issue-176-run-records.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: tactics-browser-tactics-browser-02
+  queue: max
+  cancel-in-progress: false
+jobs:
+  records:
+    if: >-
+      github.repository == 'luminari-gurus/tactics-guru-v2' &&
+      (github.event_name == 'workflow_dispatch' ||
+      (github.event.pull_request.head.repo.full_name == github.repository && startsWith(github.head_ref, 'branch/issue-176-')))
+    runs-on: [self-hosted, tactics-browser, tactics-browser-02]
+    timeout-minutes: 25
+    steps:
+      - name: Check host disposition
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run setup:browsers && npm run check:browsers
+      - name: Record source identity and build
+        run: |
+          mkdir -p verification-receipts/issue-176
+          node --input-type=module <<'JS'
+          import { writeFileSync } from 'node:fs';
+          import { sourceIdentity } from './scripts/verification-report.mjs';
+          writeFileSync('verification-receipts/issue-176/source.json', JSON.stringify({
+            source: sourceIdentity(process.cwd()), node: process.version, runner: process.env.RUNNER_NAME,
+            conditions: 'Qualified persistent runner; unrelated host load and caches not independently controlled'
+          }, null, 2));
+          JS
+          npm run build
+      - name: Discover and verify records in Chromium
+        run: |
+          npx --no-install playwright test -c playwright.regression.config.ts tests/main-menu.spec.ts -g 'main menu: (records|read-only root)' --list > verification-receipts/issue-176/chromium-selection.txt
+          npm run test:browser -- -c playwright.regression.config.ts tests/main-menu.spec.ts -g 'main menu: (records|read-only root)' --diagnostics
+      - name: Discover and verify records in WebKit
+        run: |
+          npx --no-install playwright test -c playwright.device-acceptance.config.ts tests/main-menu.spec.ts -g 'main menu: (records|read-only root)' --list > verification-receipts/issue-176/webkit-selection.txt
+          npm run test:browser -- -c playwright.device-acceptance.config.ts tests/main-menu.spec.ts -g 'main menu: (records|read-only root)' --diagnostics
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-176-records-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/
+          retention-days: 14
+          if-no-files-found: warn

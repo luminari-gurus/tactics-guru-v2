@@ -10,9 +10,10 @@ OpenSpec: [proposal](../../openspec/changes/issue-176-local-records/proposal.md)
 [requirements](../../openspec/changes/issue-176-local-records/specs/run-records/spec.md),
 [tasks](../../openspec/changes/issue-176-local-records/tasks.md).
 
-**Status:** planning only; application code and tests have not been changed.
-The caller requested selection, assignment, a published implementation plan and
-an estimate. Implementation is the next separately authorized step.
+**Status:** implementation authorized on 2026-11-10. The caller requested autonomous
+implementation, verification, commits/pushes and focused labeled PRs as each chunk
+is ready, stacking dependent increments. Using OpenSpec change `issue-176-local-records`;
+2/9 implementation tasks complete. No merge or deployment is authorized.
 The previous plan is preserved byte-for-byte in
 [the #316 handoff](issue-316-mage-acceptance-fixtures-plan.md).
 
@@ -207,6 +208,26 @@ recheck capacity at execution. This is not a reservation or future-availability 
 
 ## Estimate and handoff
 
+### Increment 1 progress — 2026-11-10
+
+- Model/projections and bounded primary/backup history adapter are implemented;
+  new model/storage units and existing menu-save units pass (21 tests), as do
+  both TypeScript scopes. Pure projections avoid importing dungeon runtime/content
+  into the menu bundle. No active save format changed.
+- Existing Hall of Records now renders immutable summaries, local scope,
+  empty/degraded/unavailable states, export and reviewed restore/reset. Browser
+  proof and the first PR's full check are pending, so tasks 1.3/1.4 remain open.
+- A task-scoped self-hosted workflow on VM-02 runs the three new menu cases plus
+  the affected existing read-only root/settings/focus case on Chromium and WebKit.
+  VM-01 retains normal `verify:pr`; both share existing runner concurrency groups.
+- Initial local iteration found a test assumption that Node lacked Web Locks;
+  Node 24 provides them, so the missing-lock test now explicitly removes navigator.
+  A staged terminal test also needed its null pending-reward discriminator.
+  Corrected focused checks pass; no assertion was weakened.
+- Browser evidence and PR handoff are recorded in
+  [the issue QA record](../qa/issue-176/README.md). Later recording increments
+  remain unimplemented, and #176/#270 stay open.
+
 **My implementation estimate: 4–6 hours total**, including focused regression,
 browser evidence, documentation and preparing the three reviewable PRs. First
 increment: about 60–90 minutes; authored integration: 60–90 minutes; dungeon,
@@ -218,4 +239,5 @@ reveals materially broader work.
 Planning publication is a documentation-only commit with `Refs #176`, on the
 branch above, natively linked from the issue's Development section. The issue
 comment links the pushed plan and explains the incremental acceptance boundary.
-No implementation, PR, merge or deployment is part of this planning handoff.
+The planning commit is `0f1c2e9`. Implementation and verification progress will be
+recorded here and in the OpenSpec tasks as each increment is completed.
