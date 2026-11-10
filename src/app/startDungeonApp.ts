@@ -113,7 +113,7 @@ function recovery(){
 }
 function whenVisible(generation:number,run:()=>void){
  if(!live||generation!==loadGeneration)return;
- if(document.hidden||dialogs.open){deferredStart=()=>whenVisible(generation,run);return;}
+ if(document.hidden||dialogs.open||replacing){deferredStart=()=>whenVisible(generation,run);return;}
  deferredStart=null;
  try {run();}catch {failedLoad(generation);}
 }

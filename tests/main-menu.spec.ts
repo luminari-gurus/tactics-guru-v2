@@ -17,6 +17,7 @@ import { encodeBattleSave } from '../src/domain/saveEnvelope';
 import { standaloneCatalog as battleCatalog } from './helpers/playerPolicy';
 import { startApplicationLoadDiagnostics, type ApplicationLoadDiagnostics } from './helpers/applicationLoadDiagnostics';
 import { startBattleModuleFaultServer } from './helpers/battleModuleFaultServer';
+import { holdFinalRecordsWrite } from './helpers/recordsWriteGate';
 
 const test = base.extend<{ applicationLoadDiagnostics: ApplicationLoadDiagnostics }>({
  applicationLoadDiagnostics: [async ({page},use,info) => {
@@ -151,16 +152,7 @@ for (const phase of ['preparation', 'terminal'] as const) test(`main menu: recor
   await page.reload(); await page.locator('#run-continue').click();
   // Finish the explicit Continue's history mutation before arming the two replacement writes.
   await page.evaluate(key => navigator.locks.request(key, () => {}), RUN_RECORD_KEYS.primary);
-  await page.evaluate(key => {
-    const request = navigator.locks.request.bind(navigator.locks); let count = 0;
-    navigator.locks.request = ((name: string, ...args: any[]) => {
-      if (name === key && ++count === 2) {
-        document.documentElement.dataset.recordsHeld = 'yes';
-        return new Promise(resolve => { (window as any).releaseRecords = () => resolve((request as any)(name, ...args)); });
-      }
-      return (request as any)(name, ...args);
-    }) as typeof navigator.locks.request;
-  }, RUN_RECORD_KEYS.primary);
+  const releaseHistory = await holdFinalRecordsWrite(page);
   if (phase === 'terminal') await page.locator('#run-new').click();
   else {
     await page.locator('#fit-restart').dispatchEvent('click');
@@ -170,7 +162,7 @@ for (const phase of ['preparation', 'terminal'] as const) test(`main menu: recor
   const enter = page.locator('#run-start-encounter'); await expect(enter).toBeDisabled();
   await enter.dispatchEvent('click');
   expect(JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!).activeBattle).toBeNull();
-  await page.evaluate(() => (window as any).releaseRecords());
+  await releaseHistory();
   await expect(enter).toBeEnabled(); await enter.click();
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   await expect(page.locator('#battle-actor')).toBeVisible();
@@ -181,16 +173,7 @@ test('main menu: records dungeon replacement withholds exploration until final h
   await expect(page.locator('#dungeon-map')).toBeVisible();
   const map = await page.locator('#dungeon-map').elementHandle(); if (!map) throw Error('Missing exploration map');
   await page.evaluate(key => navigator.locks.request(key, () => {}), RUN_RECORD_KEYS.primary);
-  await page.evaluate(key => {
-    const request = navigator.locks.request.bind(navigator.locks); let count = 0;
-    navigator.locks.request = ((name: string, ...args: any[]) => {
-      if (name === key && ++count === 2) {
-        document.documentElement.dataset.recordsHeld = 'yes';
-        return new Promise(resolve => { (window as any).releaseRecords = () => resolve((request as any)(name, ...args)); });
-      }
-      return (request as any)(name, ...args);
-    }) as typeof navigator.locks.request;
-  }, RUN_RECORD_KEYS.primary);
+  const releaseHistory = await holdFinalRecordsWrite(page);
   await page.getByRole('button', { name: 'Start new dungeon', exact: true }).click();
   await page.locator('#dungeon-confirm-new').click();
   await expect(page.locator('html')).toHaveAttribute('data-records-held', 'yes');
@@ -202,7 +185,7 @@ test('main menu: records dungeon replacement withholds exploration until final h
   expect(await page.locator('#game').getAttribute('data-dungeon-snapshot')).toBe(before);
   await expect(page.getByRole('heading', { name: 'Starting new dungeon', exact: true })).toBeVisible();
   await expect(page.locator('#dungeon-map')).not.toBeVisible();
-  await page.evaluate(() => (window as any).releaseRecords());
+  await releaseHistory();
   await expect(page.locator('#dungeon-map')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Starting new dungeon', exact: true })).toHaveCount(0);
   await expect(page.locator('.dungeon-directions button:enabled').first()).toBeEnabled();

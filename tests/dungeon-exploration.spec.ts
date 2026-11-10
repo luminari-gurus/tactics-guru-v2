@@ -19,6 +19,7 @@ import { atCell, atEncounter, atStairApproach, dungeonCapacityFixture, priorDung
 import { LEGACY_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
 import { freshExploration, movableExploration } from '../src/domain/exploration';
 import { encodeDungeon, utf8Bytes } from '../src/domain/dungeonSaveEnvelope';
+import { holdFinalRecordsWrite } from './helpers/recordsWriteGate';
 
 const fixedSeedTest = test.extend({ pinDungeonSeed: 28 });
 test.beforeEach(async ({ context }) => { await installRailControls(context); });
@@ -702,6 +703,29 @@ for(const interruption of ['restart','pagehide','visible'] as const)test(interru
    await expect(page.locator('canvas')).toHaveCount(1);
   }else await expect(page.locator('canvas')).toHaveCount(0);
   expect(errors).toEqual([]);
+ }finally {release();}
+});
+
+test('pending dungeon engine cannot mount during the final replacement history write', async ({ page }) => {
+ let release!:()=>void; const requests=new Set<string>();
+ const gate=new Promise<void>(resolve=>{release=resolve;});
+ await page.route(dungeonEngineModule,async route=>{requests.add(route.request().url());await gate;await route.continue();});
+ try {
+  const initial=await loadEncounterWithoutEngine(page,'lazy-engine-records-replacement');
+  await page.getByRole('button',{name:'Enter encounter',exact:true}).click();
+  await expect.poll(()=>requests.size).toBeGreaterThan(0);
+  const releaseHistory=await holdFinalRecordsWrite(page);
+  await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();
+  await page.locator('#dungeon-confirm-new').click();
+  await expect(page.locator('html')).toHaveAttribute('data-records-held','yes');
+  const retained=await dungeonSnapshot(page); expect(retained.id).not.toBe(initial.id);
+  release();await finishRequestedDungeonModules(page,requests);
+  await expect(page.locator('canvas')).toHaveCount(0);
+  expect(await dungeonSnapshot(page)).toEqual(retained);
+  await releaseHistory();
+  await expect(page.locator('#dungeon-map')).toBeVisible();
+  await expect(page.locator('canvas')).toHaveCount(0);
+  expect(await dungeonSnapshot(page)).toEqual(retained);
  }finally {release();}
 });
 
