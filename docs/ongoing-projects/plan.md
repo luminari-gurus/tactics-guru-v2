@@ -13,7 +13,7 @@ OpenSpec: [proposal](../../openspec/changes/issue-176-local-records/proposal.md)
 **Status:** implementation authorized on 2026-11-10. The caller requested autonomous
 implementation, verification, commits/pushes and focused labeled PRs as each chunk
 is ready, stacking dependent increments. Using OpenSpec change `issue-176-local-records`;
-2/9 implementation tasks complete. No merge or deployment is authorized.
+4/9 implementation tasks complete. No merge or deployment is authorized.
 The previous plan is preserved byte-for-byte in
 [the #316 handoff](issue-316-mage-acceptance-fixtures-plan.md).
 
@@ -215,8 +215,12 @@ recheck capacity at execution. This is not a reservation or future-availability 
   both TypeScript scopes. Pure projections avoid importing dungeon runtime/content
   into the menu bundle. No active save format changed.
 - Existing Hall of Records now renders immutable summaries, local scope,
-  empty/degraded/unavailable states, export and reviewed restore/reset. Browser
-  proof and the first PR's full check are pending, so tasks 1.3/1.4 remain open.
+  empty/degraded/unavailable states, export and reviewed restore/reset.
+  [PR #359](https://github.com/luminari-gurus/tactics-guru-v2/pull/359) supplies the
+  completed first increment, with enhancement and medium-risk classification.
+  Standard self-hosted verification passed 1,257 units, both type scopes, both
+  build integrations and seven core journeys; focused qualification passed all
+  20 Chromium/WebKit cases, with no skips, retries or flakes. Tasks 1.1–1.4 are done.
 - A task-scoped self-hosted workflow on VM-02 runs the three new menu cases plus
   the affected existing read-only root/settings/focus case on Chromium and WebKit.
   VM-01 retains normal `verify:pr`; both share existing runner concurrency groups.
@@ -224,6 +228,12 @@ recheck capacity at execution. This is not a reservation or future-availability 
   Node 24 provides them, so the missing-lock test now explicitly removes navigator.
   A staged terminal test also needed its null pending-reward discriminator.
   Corrected focused checks pass; no assertion was weakened.
+- Tested head is `35cb55d`, clean merge source `c241544`; final handoff edits are
+  documentation-only and preserve every runtime/test/config input. Browser
+  screenshots on desktop/Pixel portrait/landscape were inspected and remain
+  readable with vertical scrolling and no horizontal clipping. Exact identities,
+  report hashes, case IDs and source-bound timings are in
+  [the portable receipt](../qa/issue-176/increment-1.json).
 - Browser evidence and PR handoff are recorded in
   [the issue QA record](../qa/issue-176/README.md). Later recording increments
   remain unimplemented, and #176/#270 stay open.

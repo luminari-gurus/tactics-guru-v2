@@ -9,8 +9,8 @@ all acceptance gates. Checkboxes represent implemented and verified work only.
 
 - [x] 1.1 Add the bounded immutable record schema and pure authored/dungeon projections; verify unique identity, conflicting duplicates, every phase, distinct floor counts, bounds and stable ordering in focused units.
 - [x] 1.2 Implement the separate primary/backup history store, 100-entry retention and bounded pending/sealed receipts with injected providers and serialized verified writes; verify eviction, current-terminal deduplication, concurrent candidates, corrupt/future versions, quota/security/readback failures and preserved bytes in storage units.
-- [ ] 1.3 Replace the existing menu placeholder with accessible history and honest empty/degraded/unavailable states plus explicit reviewed records-only recovery; document the contract in docs/run-records.md and verify keyboard focus, touch portrait/landscape, recovery cancellation and unchanged active-save bytes through the existing menu browser suite.
-- [ ] 1.4 Run proportional PR-readiness checks including verify:pr and affected Chromium/WebKit menu cases; record source/build identities, discovery and actual results in docs/qa/issue-176/README.md, then publish a focused PR with Refs #176 and the remaining recording work stated.
+- [x] 1.3 Replace the existing menu placeholder with accessible history and honest empty/degraded/unavailable states plus explicit reviewed records-only recovery; document the contract in docs/run-records.md and verify keyboard focus, touch portrait/landscape, recovery cancellation and unchanged active-save bytes through the existing menu browser suite.
+- [x] 1.4 Run proportional PR-readiness checks including verify:pr and affected Chromium/WebKit menu cases; record source/build identities, discovery and actual results in docs/qa/issue-176/README.md, then publish a focused PR with Refs #176 and the remaining recording work stated.
 
 ## 2. Authored-run terminal and replacement boundaries — PR 2
 
