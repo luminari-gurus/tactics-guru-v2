@@ -262,6 +262,12 @@ unavailable storage across all direct/diagnostic routes, including Q*bert.
 The expanded job allows 45 minutes for 45 focused selections on one VM; original
 per-case deadlines, retries 0 and the ordinary PR job's budget are unchanged.
 
+PR #360 is open as a draft stacked on #359. Its initial standard check failed
+one new continuation unit because fixture construction simulated a complete legal
+defeat inside the default five-second unit budget. The unit now stages validated
+terminal data; complete legal defeat remains a browser obligation. Preserve run
+42826784671 as failed and qualify the repaired source without raising deadlines.
+
 **My implementation estimate: 4–6 hours total**, including focused regression,
 browser evidence, documentation and preparing the three reviewable PRs. First
 increment: about 60–90 minutes; authored integration: 60–90 minutes; dungeon,

@@ -58,3 +58,12 @@ records/menu/replacement; complete legal run outcomes and legal defeat; valid an
 unavailable-storage isolation across all direct/diagnostic entries, now including
 records keys and Q*bert. All five original storage-condition variants remain
 configured. Browser execution is pending; task 2.2 remains unchecked.
+
+Initial standard run [42826784671](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42826784671)
+failed one of 1,269 units: the new terminal-Continue unit synthesized an entire
+full-health defeat and exceeded the unchanged 5,000ms per-unit budget under the
+full parallel unit load. Dependent build/browser stages did not run. Its report
+is retained under `tmp/issue-176/run-42826784671/`; this failed run remains failed.
+The unit now uses an explicitly staged, validated terminal snapshot and a distinct
+valid backup. The real full-health/legal defeat still runs in existing browser
+witnesses. No timeout, gameplay rule or assertion was relaxed.

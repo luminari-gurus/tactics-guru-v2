@@ -6,7 +6,6 @@ import { freshRunSnapshot } from '../../src/domain/runBattle';
 import { RunHistory } from '../../src/app/RunHistory';
 import { createRunRecordsStorage, RUN_RECORD_KEYS, selectedRunRecords } from '../../src/persistence/runRecordsStorage';
 import { decodeRunSave, encodeRunSave } from '../../src/domain/runSaveEnvelope';
-import { legalDefeatSaves } from '../helpers/runRecoveryFixtures';
 import { runBoundaryId, transitionRun } from '../../src/domain/run';
 const unavailable = () => createRunStorage(runContext, () => null);
 function historyFixture() {
@@ -19,8 +18,12 @@ function historyFixture() {
   const history = new RunHistory('run', records, () => 100);
   return { data, storage, records, history, fail() { failRemoval = true; } };
 }
-it('records explicit terminal Continue once while preserving exact saved slots and state', async () => {
-  const f = historyFixture(), ended = legalDefeatSaves();
+it('records a staged terminal Continue once while preserving exact saved slots and state', async () => {
+  const f = historyFixture(), ready = preparedSnapshot();
+  const terminal = { ...ready, items: { ...ready.items, run: { ...ready.items.run, phase: 'defeat' as const,
+    pendingReward: null, revision: ready.items.run.revision + 1, party: ready.items.run.party.map(hero => ({ ...hero, hp: 0 })) } } };
+  const primary = encodeRunSave(terminal, runContext), backup = encodeRunSave(ready, runContext); assert(primary.ok && backup.ok);
+  const ended = { primary: primary.text, backup: backup.text, ended: terminal };
   f.data.set(RUN_STORAGE_KEYS.primary, ended.primary); f.data.set(RUN_STORAGE_KEYS.backup, ended.backup);
   const session = new RunItemSession(preparedSnapshot(), runContext, f.storage, undefined, f.history);
   expect(f.data.has(RUN_RECORD_KEYS.primary)).toBe(false); // Construction/inspection cannot record a placeholder.
