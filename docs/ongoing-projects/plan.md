@@ -6,6 +6,10 @@ Related follow-up: [#270](https://github.com/luminari-gurus/tactics-guru-v2/issu
 Branch: [`branch/issue-176-local-records`](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-176-local-records).
 Current implementation branch: `branch/issue-176-authored-records`, based on the
 review-ready first increment at `7d73d35`; its PR will target the branch above.
+Authored implementation and qualification are now complete in PR #360.
+Continue remaining dungeon/final acceptance work on the
+[frontier plan](https://github.com/luminari-gurus/tactics-guru-v2/blob/branch/issue-176-dungeon-records/docs/ongoing-projects/plan.md)
+in `C:/Users/apexw/.codex/worktrees/issue-176-dungeon/Tactics-Guru` (PR #361).
 Base: `origin/main`, `491f92a080d8577aca882c3e48ddaf910cf30369`.
 OpenSpec: [proposal](../../openspec/changes/issue-176-local-records/proposal.md),
 [design](../../openspec/changes/issue-176-local-records/design.md),
@@ -15,7 +19,7 @@ OpenSpec: [proposal](../../openspec/changes/issue-176-local-records/proposal.md)
 **Status:** implementation authorized on 2026-11-10. The caller requested autonomous
 implementation, verification, commits/pushes and focused labeled PRs as each chunk
 is ready, stacking dependent increments. Using OpenSpec change `issue-176-local-records`;
-5/9 implementation tasks complete. No merge or deployment is authorized.
+6/9 implementation tasks complete on this branch. No merge or deployment is authorized.
 The previous plan is preserved byte-for-byte in
 [the #316 handoff](issue-316-mage-acceptance-fixtures-plan.md).
 
@@ -240,7 +244,7 @@ recheck capacity at execution. This is not a reservation or future-availability 
   [the issue QA record](../qa/issue-176/README.md). Later recording increments
   remain unimplemented, and #176/#270 stay open.
 
-### Increment 2 in progress — 2026-11-10
+### Increment 2 complete — 2026-11-10
 
 The authored owner now gates recording by persistent entry, records accepted
 terminal states and explicit terminal Continue, and awaits bounded replacement
@@ -253,7 +257,7 @@ consumer in the planned dungeon increment. No active-save migration was added.
 Focused iteration passes 43 units and both type scopes, including real accepted
 defeat, exact terminal continuation, immutable first result, pending recovery,
 failed/stale replacements, a changed-live-state race and null-storage gating.
-Task 2.1 is complete; browser proof and PR readiness (2.2) are still pending.
+Tasks 2.1 and 2.2 are complete. PR #360 is ready for review, stacked on #359.
 The task-scoped workflow
 extends the existing legal run/outcome and route-isolation cases rather than
 creating another full-journey harness. Existing five storage-condition variants
@@ -288,6 +292,23 @@ cases and mobile/full-run cases passed. Ordinary and diagnostic entries are now
 separate complete audit groups, with all original route assertions and all five
 storage conditions preserved. The latest authored selection is 39 Chromium +
 26 WebKit cases; no timeout or retry was changed.
+
+Qualification now passes all 65 cases on `eaf85f7` / clean merge `1d58eb6`,
+including three-encounter victories on every selected Chromium/WebKit profile,
+legal defeats, terminal Continue/restart, confirmed abandonment and all entry
+isolation groups. Standard run 42833420593 attempt 2 passed all 1,272 units,
+both type scopes/build integrations and seven core journeys. Attempt 1 remains
+failed: three unchanged CPU-heavy cases exceeded 5s while the other VM rendered
+battles. With that browser VM held idle, the unchanged unit phase passed in
+59.26s versus 122.85s in the failed attempt. This is controlled qualification,
+not a claim that physical-host contention has been universally diagnosed.
+
+[Portable authored evidence](../qa/issue-176/increment-2.json) retains source,
+report hashes, complete victory witnesses and the exact 65 case IDs/attempts.
+The one-off workflow for these completed increments is retired after capturing
+evidence; all tests remain in their explicit regression matrices and CLI commands.
+Final handoff edits change only documentation and that temporary entry point,
+so runtime/test evidence is reused under the verification policy.
 
 **My implementation estimate: 4–6 hours total**, including focused regression,
 browser evidence, documentation and preparing the three reviewable PRs. First
