@@ -53,11 +53,11 @@ jobs:
             purpose: 'Exact-base diagnostic; a failure is retained and is not passing head evidence'
           }, null, 2));
           JS
-      - name: Diagnose native Special tap on exact base
+      - name: Diagnose held radial reviews on exact base
         id: baseline
         continue-on-error: true
         run: |
-          selection=(-c tmp/issue-311-abilities-webkit.config.ts -g 'radial Special does not commit when choices appear on a narrow screen')
+          selection=(-c tmp/issue-311-abilities-webkit.config.ts -g 'review356 held radial aim keeps the full review aligned with release|review356 friendly radial hold requires review before damage')
           npx --no-install playwright test "${selection[@]}" --list | tee verification-receipts/issue-311/base-selection.txt
           npm run test:browser -- "${selection[@]}" --diagnostics
       - name: Preserve baseline outcome separately
@@ -92,18 +92,18 @@ jobs:
           writeFileSync('verification-receipts/issue-311/source.json', JSON.stringify({
             source: sourceIdentity(process.cwd()), node: process.version, runner: process.env.RUNNER_NAME,
             conditions: 'Qualified persistent runner; browser/device emulation; shared host load and caches not independently controlled',
-            priorRun: '42880704287: 187 passed / 5 failed; original receipts remain immutable',
-            reuse: 'Unchanged passing rail-only consumer paths retain prior evidence; changed direct-control cases and radial input paths run again'
+            priorRun: '42891748707: 194 passed / 4 failed; original receipts remain immutable',
+            reuse: 'Run 42891748707 retains 56 passing control-stage cases and their layout screenshots. HUD, styles, and those test bodies are unchanged; the new scene change only retains caption height during held radial gestures. Requalify native tap, held review, radial gestures, resize cancellation, and camera paths here.'
           }, null, 2));
           JS
       - name: Build the implementation
         id: build
         run: npm run build
-      - name: Verify the failing native WebKit tap paths
+      - name: Verify native WebKit tap and held review paths
         id: native
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: |
-          selection=(-c tmp/issue-311-abilities-webkit.config.ts -g 'direct ability controls stay hidden across radial turns and restore with the rail|radial Special does not commit when choices appear on a narrow screen')
+          selection=(-c tmp/issue-311-abilities-webkit.config.ts -g 'direct ability controls stay hidden across radial turns and restore with the rail|radial Special does not commit when choices appear on a narrow screen|review356 held radial aim keeps the full review aligned with release|review356 friendly radial hold requires review before damage')
           npx --no-install playwright test "${selection[@]}" --list | tee verification-receipts/issue-311/native-repair-selection.txt
           npm run test:browser -- "${selection[@]}" --diagnostics
       - name: Upload native repair evidence immediately
@@ -114,51 +114,35 @@ jobs:
           path: verification-receipts/
           retention-days: 14
           if-no-files-found: warn
-      - name: Verify bounded direct and keyboard controls on Chromium
-        id: chromium_controls
-        if: ${{ !cancelled() && steps.native.outcome == 'success' }}
-        run: |
-          selection=(-c playwright.fixtures.config.ts tests/ability-picker.spec.ts -g 'direct ability|keyboard-only shortcuts (select|reject) (fighter|ranger|mage)|radial Special does not commit when choices appear on a narrow screen')
-          npx --no-install playwright test "${selection[@]}" --list | tee verification-receipts/issue-311/chromium-controls-selection.txt
-          npm run test:browser -- "${selection[@]}" --diagnostics
-      - name: Verify bounded direct and keyboard controls on WebKit
-        id: webkit_controls
-        if: ${{ !cancelled() && steps.native.outcome == 'success' }}
-        run: |
-          selection=(-c tmp/issue-311-abilities-webkit.config.ts -g 'direct ability|keyboard-only shortcuts (select|reject) (fighter|ranger|mage)' --grep-invert 'direct ability controls stay hidden across radial turns and restore with the rail')
-          npx --no-install playwright test "${selection[@]}" --list | tee verification-receipts/issue-311/webkit-controls-selection.txt
-          npm run test:browser -- "${selection[@]}" --diagnostics
-      - name: Upload control evidence before broader qualification
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: issue-311-controls-${{ github.run_id }}-${{ github.run_attempt }}
-          path: verification-receipts/
-          retention-days: 14
-          if-no-files-found: warn
       - name: Qualify Chromium radial review and gestures
-        if: ${{ !cancelled() && steps.native.outcome == 'success' && steps.chromium_controls.outcome == 'success' && steps.webkit_controls.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.native.outcome == 'success' }}
         run: |
           selection=(-c playwright.fixtures.config.ts tests/ability-picker.spec.ts -g 'review356|keyboard-only shortcuts (use canonical radial|keep radial S)|radial (multiple specials|Frost Snare|hold keeps|shifted hold|compact landscape)')
           npx --no-install playwright test "${selection[@]}" --list | tee verification-receipts/issue-311/chromium-review-selection.txt
           npm run test:browser -- "${selection[@]}" --diagnostics
       - name: Qualify WebKit radial review and gestures
-        if: ${{ !cancelled() && steps.native.outcome == 'success' && steps.chromium_controls.outcome == 'success' && steps.webkit_controls.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.native.outcome == 'success' }}
         run: |
           selection=(-c tmp/issue-311-abilities-webkit.config.ts -g 'review356|keyboard-only shortcuts (use canonical radial|keep radial S)|radial (multiple specials|Frost Snare|hold keeps|shifted hold|compact landscape)')
           npx --no-install playwright test "${selection[@]}" --list | tee verification-receipts/issue-311/webkit-review-selection.txt
           npm run test:browser -- "${selection[@]}" --diagnostics
       - name: Preserve production Chromium radial and camera behavior
-        if: ${{ !cancelled() && steps.native.outcome == 'success' && steps.chromium_controls.outcome == 'success' && steps.webkit_controls.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.native.outcome == 'success' }}
         run: |
-          selection=(-c playwright.regression.config.ts tests/battle-radial.spec.ts tests/battle-board.spec.ts -g 'radial hold opens labelled slices on a reachable tile|radial tap fallback opens the same radial without requiring a hold|radial hub cancel records no command after leaving a slice|radial special commits the only legal special without a sub-ring|radial special tap waits for a sub-ring choice after hovering|radial invalid reselection clears the previous command before switching to rail|radial switching to rail preserves a valid unchanged selection|radial preference replaces the side rail with a bottom dock at 1280x720|temporary HUD expansion does not leave the battle camera zoomed|viewport resize recenters a camera capped by temporary HUD reflow')
+          selection=(-c playwright.regression.config.ts tests/battle-radial.spec.ts tests/battle-board.spec.ts -g 'radial hold opens labelled slices on a reachable tile|radial tap fallback opens the same radial without requiring a hold|radial hub cancel records no command after leaving a slice|radial special commits the only legal special without a sub-ring|radial special tap waits for a sub-ring choice after hovering|radial invalid reselection clears the previous command before switching to rail|radial switching to rail preserves a valid unchanged selection|radial preference replaces the side rail with a bottom dock at 1280x720|temporary HUD expansion does not leave the battle camera zoomed|viewport resize recenters a camera capped by temporary HUD reflow|radial resize cancels a held gesture and ignores the trailing release|radial stays open on a layout reflow without a viewport resize|radial resize dismisses an open tap menu without committing or stranding it')
           npx --no-install playwright test "${selection[@]}" --list | tee verification-receipts/issue-311/chromium-radial-selection.txt
           npm run test:browser -- "${selection[@]}" --diagnostics
       - name: Preserve production WebKit radial and camera behavior
-        if: ${{ !cancelled() && steps.native.outcome == 'success' && steps.chromium_controls.outcome == 'success' && steps.webkit_controls.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.native.outcome == 'success' }}
         run: |
-          selection=(-c playwright.device-acceptance.config.ts tests/battle-radial.spec.ts tests/battle-board.spec.ts -g 'radial hold opens labelled slices on a reachable tile|radial tap fallback opens the same radial without requiring a hold|radial hub cancel records no command after leaving a slice|radial special tap waits for a sub-ring choice after hovering|radial switching to rail preserves a valid unchanged selection|temporary HUD expansion does not leave the battle camera zoomed|viewport resize recenters a camera capped by temporary HUD reflow')
+          selection=(-c playwright.device-acceptance.config.ts tests/battle-radial.spec.ts tests/battle-board.spec.ts -g 'radial hold opens labelled slices on a reachable tile|radial tap fallback opens the same radial without requiring a hold|radial hub cancel records no command after leaving a slice|radial special tap waits for a sub-ring choice after hovering|radial switching to rail preserves a valid unchanged selection|temporary HUD expansion does not leave the battle camera zoomed|viewport resize recenters a camera capped by temporary HUD reflow|radial resize cancels a held gesture and ignores the trailing release|radial stays open on a layout reflow without a viewport resize|radial resize dismisses an open tap menu without committing or stranding it')
           npx --no-install playwright test "${selection[@]}" --list | tee verification-receipts/issue-311/webkit-radial-selection.txt
+          npm run test:browser -- "${selection[@]}" --diagnostics
+      - name: Preserve native touch hold resize cancellation on Chromium
+        if: ${{ !cancelled() && steps.native.outcome == 'success' }}
+        run: |
+          selection=(-c playwright.regression.config.ts tests/battle-radial.spec.ts --project=mobile-portrait --project=mobile-landscape -g 'radial resize cancels a native touch hold without accepting a command')
+          npx --no-install playwright test "${selection[@]}" --list | tee verification-receipts/issue-311/chromium-native-hold-selection.txt
           npm run test:browser -- "${selection[@]}" --diagnostics
       - name: Upload final source-bound acceptance evidence
         if: always()

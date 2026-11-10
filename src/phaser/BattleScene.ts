@@ -103,6 +103,13 @@ export class BattleScene extends Phaser.Scene {
     let region:BoardRegion={x:0,y:0,width:0,height:0};
     let animation:{done:Promise<void>;cancel:()=>void}|null=null;
     const game=document.querySelector<HTMLElement>('#game')!;
+    const caption=document.querySelector<HTMLElement>('#battle-board-caption')!;
+    let captionHeightBeforeHold:string|null=null;
+    const restoreCaptionHeight=()=>{
+      if(captionHeightBeforeHold===null)return;
+      caption.style.height=captionHeightBeforeHold;
+      captionHeightBeforeHold=null;
+    };
     const canvas=this.game.canvas;canvas.tabIndex=0;canvas.setAttribute('aria-label','Battle board. Arrow keys navigate, Enter selects, Escape cancels.');
     let cursor:CellPosition=session.active.cell;
     const radialMode=()=>skin==='radial' && session.phase==='player' && !dialogs.open;
@@ -128,7 +135,6 @@ export class BattleScene extends Phaser.Scene {
       const danger=selection.showDanger && session.phase==='player'?session.state.units.filter(u=>threatIds.includes(u.id)).map(u=>u.cell):[];
       board.present(session.state,reach?.ok?reach.cells.map(c=>c.cell):[],selected,preview?.ok?preview.path:[],selection.overlays(),hover,danger);
       hud.render(action,selected,message,selection.showDanger && session.phase==='player',threats,selection.planning && !radial.open,selection.planning?selection.planMove:null,presentationStart);
-      const caption=document.querySelector('#battle-board-caption')!;
       // Picking changes independently of the cached controls. Compose a fresh
       // caption so hover cannot accumulate hints or retain a cleared hint.
       const captionText=board.pickingHint+(session.phase==='player' && action && action!=='move' && !session.active.hasActed
@@ -139,6 +145,7 @@ export class BattleScene extends Phaser.Scene {
       game.dataset.phase=session.phase;
       game.dataset.session=JSON.stringify({state:session.state,replay:session.replay,continuation:session.continuation,events:session.events,pending:session.pending,phase:session.phase});
       if(session.phase!=='player' || dialogs.open)radial.hide();
+      if(radial.mode!=='hold')restoreCaptionHeight();
       if(ready && !dialogs.open && session.phase==='ended' && !outcomeShown){outcomeShown=true;if(this.host){queueMicrotask(()=>{if(live)this.host?.ended();});return;}dialogs.showChoices(session.state.outcome==='playerWin'?'Victory':'Defeat','Battle complete. Restart for a fresh battle.',[{id:'dialog-restart',label:'Restart battle',run:()=>this.requestRestart()},...(returnToMenu?[{id:'save-main-menu',label:'Main menu',run:returnToMenu}]:[])],()=>{});}
     };
     const openRadial=(cell:CellPosition, mode:'hold'|'tap', origin:Point)=>{
@@ -219,6 +226,10 @@ export class BattleScene extends Phaser.Scene {
         // Plan destination and follow-up picking use the same selection path on release.
         if(!radialMode() || selection.planning)return false;
         const cell=board.cellAt(point);if(!cell)return false;
+        // Aiming changes the legend; keep that text scrollable in its current
+        // space so its own reflow cannot cancel the gesture through fit().
+        captionHeightBeforeHold=caption.style.height;
+        caption.style.height=getComputedStyle(caption).height;
         lightHaptic();
         openRadial(cell,'hold',clientFrom(point));
         refresh();
@@ -388,6 +399,7 @@ export class BattleScene extends Phaser.Scene {
     };
     this.game.events.on(Phaser.Core.Events.POST_RENDER,onRender);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{
+      restoreCaptionHeight();
       live=false;ready=false;this.game.events.off(Phaser.Core.Events.POST_RENDER,onRender);audio.destroy();setBattleAudioDiagnostics(null);session.dispose();animation?.cancel();radial.dispose();hud.dispose();removeInput();stopSkinWatch();observer.disconnect();
       canvas.removeEventListener('keydown',key);canvas.removeAttribute('tabindex');canvas.removeAttribute('aria-label');
       document.removeEventListener('keydown',shortcut);canvas.style.clipPath='';
