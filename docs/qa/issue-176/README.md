@@ -318,3 +318,67 @@ with the first increment and is completed with the final merge. #270 remains sep
 Final handoff changes documentation only. Full unrelated release regression and
 performance recertification were not run; no claim of generally repaired host timing
 or manual production deployment is made. Existing Vite loader/chunk-size advisories remain.
+
+## Post-merge paired-replacement correction — PR #363
+
+The final audit found an additional #361 review thread: replacing a distinct
+saved journey while playing an admitted unsaved journey recorded only the saved
+identity. Both actual owners reproduced it. #176 AC2 was reopened; the original
+merge receipts above remain historical evidence, rather than proof of this repair.
+
+Branch `branch/issue-176-paired-replacement`, runtime source
+`96a10c6c49a0ad5ad61a68868598773edfdd44ca`, fixes both owners and the shared
+history boundary. A pending receipt carries the two ended summaries together;
+accepted replacement or Continue of its validated new identity finalizes both.
+Old identities cancel intent and unknown identities retain it. Refusal, stale
+review and partial reset create neither abandonment. Up to two retained seals
+protect frozen results while staging an unknown companion and through racing
+terminal outcomes/eviction. Legacy v1 receipts remain readable without a write.
+The 100-summary and 100,000-code-unit bounds are unchanged. No active-save format,
+gameplay rule, dependency or general journal was added.
+
+### Follow-up proof
+
+- RED on merged-base inputs: accepted replacement in each real owner produced
+  one row rather than two; the four real desktop menu cases also reproduced the
+  missing companion intent. Refused/stale/partial cases produced no invented ends.
+  The retained browser build was `4b88f7e`, whose relevant functional inputs equal
+  base `dafdeb3`; no failed test is relabeled as passing.
+- **34 model/storage/history checks** cover accepted/refused pairs, four interrupted
+  identities, legacy bytes, strict malformed extensions, backup recovery, widest
+  bounded envelopes, previously frozen/evicted results and racing terminal seals.
+- Actual local `npm run verify:pr` on clean `96a10c6` passed all six stages in
+  **119.197 seconds**: **1,303/1,303 units**, both TypeScript scopes, two root/prefix
+  build integrations, production build and seven core journeys.
+- The [follow-up receipt](review-363.json) and [case ledger](review-363-cases.jsonl)
+  account for **94 unique qualified browser cases**: 70 menu cases, six actual
+  Chromium BFCache cases, five authored terminal/restart cases, six full legal
+  dungeon defeat/reload/restart cases and seven core journeys. Twenty cases are
+  the new saved/live pair's finished/interrupted flows on all five menu profiles.
+  Every qualifying attempt passed once with retries zero and workers one.
+- Both mode flows cancel first, preserving exact active-save bytes and empty
+  history; then inspect real persisted paired intent after the new save is written
+  but before final history commits. Reload at that interruption point plus explicit
+  Continue recovers both rows. Further reload/Continue preserves both first values
+  and timestamps, and the unrelated battle-save bytes remain unchanged.
+- An existing WebKit landscape cancellation test captured its baseline while the
+  initial run save was still queued. Its expected prepared frame was then compared
+  with the valid active-battle frame after Cancel. The executed startEncounter,
+  requestSave and save paths are unchanged from exact base `dafdeb3`; confirmed
+  replacement has not executed at the failure. This is exact-base source comparison,
+  not a claimed failing baseline browser run. Waiting for the existing durable-save
+  status before capturing bytes repairs the harness while retaining its equality
+  assertion. All five affected executions passed on `d573ac7` test inputs; runtime
+  inputs remain identical to `96a10c6`. The original 27-pass/one-failure WebKit
+  capture stays failed; qualifying coverage replaces all five changed executions.
+- Desktop authored/dungeon and narrow WebKit paired-records screenshots were
+  inspected. Device evidence is emulation; no physical hardware, WebKit BFCache,
+  full unrelated release regression or performance recertification is claimed.
+
+Raw reports, original failures and screenshots remain under
+`tmp/issue-176-review/paired-replacement/`. Standard receipts are under
+`verification-receipts/pr/1794342521996-49180/`. The code/asset/config/lockfile tree
+is identical between runtime qualification and the harness/documentation repair.
+This is not one clean aggregate browser run. The active owner work in draft #362
+is excluded; #237 and #12 retain their owner dispositions. The qualified follow-up
+is merged under the existing maintenance authorization before the goal completes.

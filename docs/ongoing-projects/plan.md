@@ -340,3 +340,16 @@ keyboard/touch menu flows on Chromium/WebKit, including reload before final hist
 commit; proportional persistence checks and local PR verification. Preserve the
 original review's evidence and all new failures. #362 is active ability-rail work
 owned by another contributor and is deliberately excluded.
+
+The correction is published in #363. Runtime source `96a10c6` passes actual local
+PR verification in 119.197 seconds (1,303 units, both types/build integrations,
+bundle, seven core journeys). Ninety-four qualified browser cases include all
+20 new finished/interrupted paired flows, records recovery, actual Chromium
+BFCache and legal terminal/restart journeys. One existing cancellation test's
+unsettled-save baseline was repaired on `d573ac7`; all five changed executions
+passed, while the failed capture remains retained. The
+[follow-up QA](../qa/issue-176/README.md) and
+[source-bound receipt](../qa/issue-176/review-363.json) record exact scope and limits.
+All ten implementation/verification tasks are complete; the maintenance goal
+separately requires the authorized follow-up merge, review resolution, issue
+reconciliation and safe branch cleanup.

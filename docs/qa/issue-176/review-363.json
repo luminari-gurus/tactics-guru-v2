@@ -1,0 +1,270 @@
+{
+  "runtimeSource": "96a10c6c49a0ad5ad61a68868598773edfdd44ca",
+  "runtimeInputHash": "b2b47101c8777f66e9a1b6673e0313673c589c6bd119bfbf5b02a1406b4826e5",
+  "harnessRepairSource": "d573ac7467f5af78158e81eaabcb6742556741ad",
+  "harnessRepairInputHash": "867f93c4fdb5f6eb452dbd2d9e0ba362a3667a3e2dabb3055a66919f4cb0e73b",
+  "environment": {
+    "os": "Windows x64",
+    "node": "v24.22.1",
+    "playwright": "1.64.1",
+    "browsers": [
+      {
+        "name": "chromium",
+        "revision": "1248",
+        "installByDefault": true,
+        "browserVersion": "156.0.8078.4",
+        "title": "Chrome for Testing"
+      },
+      {
+        "name": "webkit",
+        "revision": "2370",
+        "installByDefault": true,
+        "revisionOverrides": {
+          "mac14": "2251",
+          "mac14-arm64": "2251"
+        },
+        "browserVersion": "27.2",
+        "title": "WebKit"
+      }
+    ],
+    "workers": 1,
+    "retries": 0,
+    "physicalDevices": false
+  },
+  "standard": {
+    "path": "verification-receipts/pr/1794342521996-49180/summary.json",
+    "sha256": "fb76f23ebed8c3b8c06ebeb1384b4143a6e0ccfd900cbf919eb1462c6604e304",
+    "durationMs": 119197,
+    "stages": [
+      {
+        "id": "tooling",
+        "status": "passed",
+        "durationMs": 16572.3629
+      },
+      {
+        "id": "units",
+        "status": "passed",
+        "durationMs": 34482.56999999999
+      },
+      {
+        "id": "typecheck",
+        "status": "passed",
+        "durationMs": 5092.010500000004
+      },
+      {
+        "id": "build-integration",
+        "status": "passed",
+        "durationMs": 9170.392099999997
+      },
+      {
+        "id": "bundle",
+        "status": "passed",
+        "durationMs": 5137.530399999996
+      },
+      {
+        "id": "journeys",
+        "status": "passed",
+        "durationMs": 48730.30649999999
+      }
+    ],
+    "units": {
+      "passed": 1303,
+      "total": 1303,
+      "sha256": "ec7e71f330f85bcc64d14ac22ff6647ccfc137a2c9b0445a9f2f089b4015ef48"
+    },
+    "buildIntegrationSha256": "e42753904960ba9d1e9190df6bd684ab6d14a121da69d01ad2c9fc20b8197640",
+    "indexSha256": "944c29cbb8d795f8def781a95c46e8663015ee7b77fe0c3d1b0f91781a160f0f"
+  },
+  "coverage": {
+    "qualifiedUniqueCases": 94,
+    "singleCleanAggregateRun": false,
+    "pairedFinishedInterruptedCases": 20
+  },
+  "reports": [
+    {
+      "path": "tmp/issue-176-review/paired-replacement/chromium-menu.json",
+      "sha256": "3d9a93694a795a141760d8ac74a228fe266962bb2f31cf3838c7dff162194ec5",
+      "originalStats": {
+        "startTime": "2026-11-10T20:32:36.573Z",
+        "duration": 55032.773,
+        "expected": 42,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "selectedPassingCases": 39,
+      "excludedChangedCase": true,
+      "testSource": "96a10c6c49a0ad5ad61a68868598773edfdd44ca"
+    },
+    {
+      "path": "tmp/issue-176-review/paired-replacement/webkit-menu.json",
+      "sha256": "1dad1c2e553123ad158c0f646bb918380a16f644ac95c7d576e715ab7dbd9f9d",
+      "originalStats": {
+        "startTime": "2026-11-10T20:33:31.997Z",
+        "duration": 63934.091,
+        "expected": 27,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "selectedPassingCases": 26,
+      "excludedChangedCase": true,
+      "testSource": "96a10c6c49a0ad5ad61a68868598773edfdd44ca"
+    },
+    {
+      "path": "tmp/issue-176-review/paired-replacement/cached-records.json",
+      "sha256": "5fcb9eb2386701ec00c1534a5e909fea06512538aac6c29a6a7822678cdc6ed3",
+      "originalStats": {
+        "startTime": "2026-11-10T20:34:36.318Z",
+        "duration": 10790.296,
+        "expected": 6,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "selectedPassingCases": 6,
+      "excludedChangedCase": false,
+      "testSource": "96a10c6c49a0ad5ad61a68868598773edfdd44ca"
+    },
+    {
+      "path": "tmp/issue-176-review/paired-replacement/authored-terminal.json",
+      "sha256": "854ca76f2b048bf1b46bc11c77c3a564edc052aa871ea0709b713327a2723a09",
+      "originalStats": {
+        "startTime": "2026-11-10T20:34:47.532Z",
+        "duration": 44760.465,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "selectedPassingCases": 3,
+      "excludedChangedCase": false,
+      "testSource": "96a10c6c49a0ad5ad61a68868598773edfdd44ca"
+    },
+    {
+      "path": "tmp/issue-176-review/paired-replacement/webkit-authored-terminal.json",
+      "sha256": "a00c64251ddfee29f76d983d4949e93b2d5d60176a0679c0c6688de87cceb904",
+      "originalStats": {
+        "startTime": "2026-11-10T20:35:32.679Z",
+        "duration": 46959.033,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "selectedPassingCases": 2,
+      "excludedChangedCase": false,
+      "testSource": "96a10c6c49a0ad5ad61a68868598773edfdd44ca"
+    },
+    {
+      "path": "tmp/issue-176-review/paired-replacement/repaired-chromium.json",
+      "sha256": "e5ec0f201a4d67345b3b70504d337c796cd622b515216336965d323cee65207c",
+      "originalStats": {
+        "startTime": "2026-11-10T20:39:21.830Z",
+        "duration": 9332.722,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "selectedPassingCases": 3,
+      "excludedChangedCase": false,
+      "testSource": "d573ac7467f5af78158e81eaabcb6742556741ad"
+    },
+    {
+      "path": "tmp/issue-176-review/paired-replacement/repaired-webkit.json",
+      "sha256": "e30330e6edeb0705b7c59169050b9a96dd7e728bc19137eb26b164ac969172ed",
+      "originalStats": {
+        "startTime": "2026-11-10T20:39:31.629Z",
+        "duration": 9992.853000000001,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "selectedPassingCases": 2,
+      "excludedChangedCase": false,
+      "testSource": "d573ac7467f5af78158e81eaabcb6742556741ad"
+    },
+    {
+      "path": "tmp/issue-176-review/paired-replacement/dungeon-terminal.json",
+      "sha256": "9d956917b2ac4042d1904533efb39cc9f32be75911f7d58233e2b8eb634b8274",
+      "originalStats": {
+        "startTime": "2026-11-10T20:39:42.040Z",
+        "duration": 55194.607,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "selectedPassingCases": 3,
+      "excludedChangedCase": false,
+      "testSource": "d573ac7467f5af78158e81eaabcb6742556741ad"
+    },
+    {
+      "path": "tmp/issue-176-review/paired-replacement/webkit-dungeon-terminal.json",
+      "sha256": "410edbc2ac9924613a666d480ba10c991ba58c931a51f5be8d788c06643188e2",
+      "originalStats": {
+        "startTime": "2026-11-10T20:40:37.627Z",
+        "duration": 79424.051,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "selectedPassingCases": 3,
+      "excludedChangedCase": false,
+      "testSource": "d573ac7467f5af78158e81eaabcb6742556741ad"
+    },
+    {
+      "path": "verification-receipts/pr/1794342521996-49180/journeys.json",
+      "sha256": "ed548969a81bb67308b1d06d96b796e7904370be905f209caa709f47fb6734a6",
+      "originalStats": {
+        "startTime": "2026-11-10T20:29:54.047Z",
+        "duration": 44216.649000000005,
+        "expected": 7,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "selectedPassingCases": 7,
+      "excludedChangedCase": false,
+      "testSource": "96a10c6c49a0ad5ad61a68868598773edfdd44ca"
+    }
+  ],
+  "comparison": {
+    "base": "dafdeb3f38e7d5be9d73b91101cf020fb2e5401d",
+    "redBrowserBuild": "4b88f7e728a4ecdb08e17e21392d53443b084e9a",
+    "redBrowserEquivalence": "The retained build has identical relevant functional inputs to merged base dafdeb3. Two owner cases and four real-menu cases reproduce the lost live identity.",
+    "harnessFailure": "The old case captured a prepared-save baseline before its queued initial active-battle save completed. The executed startEncounter/requestSave/save paths are unchanged from exact base; confirmed replacement has not run at the failing assertion. This is source comparison, not a claimed failing baseline browser execution.",
+    "qualifiedReuse": "Production source/config/assets/fixtures/lockfile are unchanged between runtime source and harness repair. Only the affected cancellation case adds a durable save witness; all five executions rerun. Other passing bodies retain equivalent inputs. Original failed capture remains failed; no blanket retry or deadline/worker/assertion reduction."
+  },
+  "preservedEvidence": [
+    {
+      "path": "tmp/issue-176-review/paired-replacement/red-owners.log",
+      "sha256": "ca9a50fb3280ff8ce8fb05afb3aee65d4bf01c96020f52a87ee6a3d5d7d8c2c8"
+    },
+    {
+      "path": "tmp/issue-176-review/paired-replacement/red-browser.json",
+      "sha256": "605baa6def3f25dbef0eb6a867ba8443ccd19e323336bbc5bdb1102d01d9b1d0"
+    },
+    {
+      "path": "tmp/issue-176-review/paired-replacement/history-model-storage.log",
+      "sha256": "025aed0efbc1ca84182c09efd14156de311bea322199ca0b0d11ae39e8d60fbc"
+    },
+    {
+      "path": "tmp/issue-176-review/paired-replacement/model-final.log",
+      "sha256": "c531ef106e02ee8ac358d4cc5419908b0ba901e9a3ec0dea5b695fab15117c89"
+    },
+    {
+      "path": "tmp/issue-176-review/paired-replacement/webkit-menu.json",
+      "sha256": "1dad1c2e553123ad158c0f646bb918380a16f644ac95c7d576e715ab7dbd9f9d"
+    }
+  ],
+  "limitations": [
+    "No unrelated full release/performance recertification.",
+    "Browser/device emulation, not physical devices.",
+    "Actual Chromium BFCache is exercised; WebKit BFCache is not claimed.",
+    "The previous main review evidence remains historical; this receipt covers the paired replacement correction."
+  ]
+}
