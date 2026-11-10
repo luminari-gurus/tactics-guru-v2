@@ -122,6 +122,7 @@ test('main menu: records authored replacement waits for confirmation and freezes
   }, { run: keys.run, battleKeys: keys.battle, text: text.text, battle });
   await page.goto('./?game=run'); await page.locator('#run-continue').click(); await page.locator('#run-start-encounter').click();
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  await expect(page.locator('#battle-persistence')).toContainText('Run saved on this device');
   const history = () => page.evaluate(slots => {
     const value = localStorage.getItem(slots.primary); return value ? JSON.parse(value).records : [];
   }, RUN_RECORD_KEYS);
