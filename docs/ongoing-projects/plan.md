@@ -222,7 +222,9 @@ All are review-only changes with enhancement/medium-risk classification. Keep
 #176 open until the reviewed stack merges. The final PR uses Closes #176 because
 every acceptance criterion is proven; earlier increments retain Refs #176.
 #270 remains separate for its five full statistics, active playtime and best-run
-aggregation. No PR merge, release tag or production operation is authorized.
+aggregation. The initial implementation handoff excluded merge and production
+operations; the November 10 maintenance request separately authorizes review,
+fixes, verification, merge and safe cleanup.
 
 ### Verification and retained limits
 
@@ -287,3 +289,30 @@ repairs; no additional abstraction, save format or rule change is needed.
 Original failed review regressions remain under `tmp/issue-176-review/360/`;
 the QA document records final verification before merge. Dungeon review and
 full issue closure remain on #361 until its independent review is complete.
+
+### Final maintenance qualification
+
+Independent review fixed all eight substantive findings across #360/#361, including
+both automated inline findings: authored/dungeon replacement input races, terminal
+history lost during unsaved or failed active saving, preparatory token invalidation,
+unsaved dungeon admission, late discarded-engine mounting, and pre-existing WebKit
+failed-preload recovery. The existing sessions, deferred-start path and build
+exclusion supply the fixes. The shared prototype gate and HTTP fault fixture serve
+actual regression callers; no new production abstraction, dependency, save format
+or retry/fallback layer is needed.
+
+Final functional source is `4b88f7e`. Actual local `npm run verify:pr` passed in
+111.15 seconds: all 1,285 units, both types/build integrations, production bundle
+and seven core journeys. The final affected loader/HTTP consumers passed 47 cases.
+The [review QA](../qa/issue-176/README.md) and
+[portable receipt](../qa/issue-176/review-361.json) account for 122 unique browser
+cases (54 final-source and 68 retained with documented equivalence), all original
+failures, exact-base comparison and remaining limits. This is not one clean
+aggregate run; no acceptance criterion or original deadline is waived.
+
+#359 and #360 merged as `39d461f` and `c88de9f`. Consult #361's PR/issue timeline
+for the final merge SHA and completion state. The canonical continuation is `main`
+once the stack is merged. #176 closes with all five criteria satisfied; #270 stays
+separate. Cleanup is limited to verified-safe stack branches and owned temporary
+worktrees. Raw QA artifacts and unrelated worktrees/branches with unique commits
+or uncertain ownership are retained.

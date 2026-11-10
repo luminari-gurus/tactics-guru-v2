@@ -230,3 +230,91 @@ Final handoff edits affect documentation only. Earlier five-profile battle/rule,
 replay and route-isolation evidence remains retained for unchanged consumers;
 the changed replacement and terminal integration has the fresh evidence above.
 No full unrelated release/performance recertification or physical device is claimed.
+
+## Independent merge review — dungeon and final integration
+
+The November 10 maintenance request explicitly authorizes review, fixes, verification,
+merge and safe cleanup. PR #359 merged as `39d461f`; PR #360 merged as `c88de9f`.
+PR #361 incorporates both and preserves the authored repairs. Two documentation
+conflicts were resolved by retaining original qualification and new review evidence.
+
+Eight substantive findings across the stack were reproduced, posted on their PRs
+and fixed. The three authored findings are above. The five dungeon/integration
+findings are:
+
+1. `DungeonSession.save`: unsaved play or a conflicting active save omitted an
+   accepted defeat. History now submits independently of active-save success.
+2. `startDungeonApp`: the new map/encounter could accept input during the final
+   replacement history write, then lose its scene on replacement completion.
+   A brief starting state and input guards cover that interval, including queued
+   events retained by the old map.
+3. `DungeonSession.playUnsaved`: explicit unsaved play before the first move was
+   mistaken for an unadmitted placeholder when replaced. The explicit choice now
+   admits that journey and its abandonment.
+4. `startDungeonApp.whenVisible`: an old pending engine import could mount a
+   discarded battle during the final history write. The existing deferred-start
+   mechanism now waits through replacement; successful replacement invalidates it.
+5. `vite.config.ts:108`: pre-existing failed dungeon-engine modulepreloads prevented
+   WebKit Reload/Continue recovery. The unchanged test failed three times on exact
+   pre-PR main `c88de9f`. A real no-store HTTP 503 also failed three times on the
+   reviewed source: server receipts recorded four 503s and zero new requests after
+   availability returned. The existing preload exclusion now covers engine-family
+   imports while retaining other dependency hints. The same HTTP case passed three
+   times after the fix, with restored 200/304 requests and exact saved identity/RNG.
+
+Owner/input fixes are in `9dd630a`, deferred loading and the shared test gate in
+`4e99d24`, and preload recovery in final functional source
+`4b88f7e728a4ecdb08e17e21392d53443b084e9a`.
+Both original automated inline findings have fix/verification replies and are resolved.
+No new dependency, active-save format, combat rule or general fallback was added.
+
+### Final verification and evidence reuse
+
+- Actual local `npm run verify:pr` passed all six stages in **111.15 seconds** on
+  clean `4b88f7e`: tooling, **1,285/1,285 units**, both TypeScript scopes, **2/2
+  root/prefix build integrations**, production bundle and **7/7 core journeys**.
+  The app runtime uses an ignored wrapper to the installed npm CLI; stage logs
+  and the source-bound summary are in `verification-receipts/pr/1794333335621-86852/`.
+- Final affected loading cases: **21 Chromium + 21 WebKit passed**. These cover
+  real HTTP unavailability/recovery, delayed/repeated entry, recovery close,
+  restart, pagehide/visibility, adoption and replacement during a pending import.
+  The existing battle-entry HTTP fixture consumer also passed **3 Chromium + 2
+  WebKit** cases. All relevant normal/default and engine-target fixture consumers ran.
+- The [review receipt](review-361.json) and [case ledger](review-361-cases.jsonl)
+  account for **122 unique qualified browser cases: 54 on final functional source
+  and 68 retained with explicit equivalence**. This is not a clean single aggregate
+  run. Every selected case has one passing attempt, retries zero and one worker.
+- The retained set includes 35 ordinary records/root-menu cases, 15 corrected
+  replacement-gate cases, six actual Chromium BFCache journeys and 12 full-health
+  dungeon defeat/full-floor/guardian/descent/backtrack journeys on all three
+  Chromium and all three WebKit profiles. Domain/content/persistence/owner and
+  rendered gameplay inputs are unchanged. The added deferred condition is inactive
+  during those healthy imports; the final hint change alters fetch scheduling,
+  with healthy/current loader behavior requalified by the final core/loading cases.
+  Reuse covers state, counters and saves, never timing equivalence. Authored complete
+  victory/defeat evidence from #360 remains valid for its unchanged consumers.
+- **93 risk-gate checks** passed. Selection/batch contracts retain the seven core
+  journeys, all broad profiles, nine partitions and 24 approved mappings. Thirty
+  checks passed on Windows; the unchanged POSIX guard lacked `sh` there and passed
+  separately under WSL. The Windows command remains recorded as failed, not relabeled.
+- Desktop and mobile records screenshots, legal dungeon boards and the bounded
+  replacement screen were inspected. Evidence is browser/device emulation. Actual
+  Chromium BFCache is exercised; WebKit BFCache and physical devices are not claimed.
+
+Raw reports, logs, traces, screenshots and HTTP receipts are retained under
+`tmp/issue-176-review/`. Custom investigation configs placed JSON reports under
+its nested `tmp/issue-176-review/361/` directory; the receipt records exact paths.
+Original RED owner/input/loading cases, the old instance-interceptor WebKit
+failures, unavailable-module failures, exact-base failures and unsuccessful route-drain
+experiment remain available. The corrected prototype interceptor passed five
+deliberate repeat investigations, then all affected ordinary profiles. The initial
+HTTP-fixture adaptation's two-chunk assumption failed setup; actual engine facades
+and bodies are controlled as two named families, with observed HTTP responses verified.
+No timeout, assertion, worker, test retry or acceptance gate was relaxed.
+
+All issue #176 criteria and nine OpenSpec tasks are accounted for by the original
+acceptance mapping plus this review. The issue was reopened after premature closure
+with the first increment and is completed with the final merge. #270 remains separate.
+Final handoff changes documentation only. Full unrelated release regression and
+performance recertification were not run; no claim of generally repaired host timing
+or manual production deployment is made. Existing Vite loader/chunk-size advisories remain.

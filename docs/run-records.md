@@ -56,3 +56,9 @@ Floor/guardian wins, stairs, backtracking, menu return and
 page closure do not end the endless dungeon. Dedicated testing routes and
 standalone battles do not create run records. See the active
 [implementation plan](ongoing-projects/plan.md) for acceptance and current progress.
+
+Explicit unsaved dungeon play also admits a journey before its first move; accepted
+defeat or confirmed replacement can record it even if active saving is disabled or
+conflicted. Replacement keeps exploration and pending battle loading paused until
+its history boundary finishes. Reload recovery lets native dungeon engine imports
+request restored modules directly, retaining other preload hints.
