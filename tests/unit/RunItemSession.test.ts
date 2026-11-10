@@ -93,6 +93,16 @@ it('refuses replacement if gameplay changes while its history receipt is being p
   expect(selectedRunRecords(f.records.inspect())?.records).toEqual([]);
   expect(session.status).toContain('run changed while confirming');
 });
+it('keeps the reviewed startup token valid when history preparation fails', async () => {
+  const f = historyFixture(), before = preparedSnapshot(); assert(f.storage.save(before).ok);
+  const history = new RunHistory('run', createRunRecordsStorage(() => null, async action => action()));
+  const session = new RunItemSession(before, runContext, f.storage, undefined, history);
+  // The real startup renderer inspects saves while handling a status notification.
+  session.onChange = () => { session.inspect(); };
+  expect(await session.replace(session.inspect(), 'after-denied-history', 14)).toBe(true);
+  expect(session.snapshot.items.run.id).toBe('after-denied-history');
+  expect(session.status).toContain('Run history could not be confirmed');
+});
 it('can retry after reviewed removal of a primary corrupted during play', () => {
   const data = new Map<string,string>();
   const storage = createRunStorage(runContext,()=>({getItem:key=>data.get(key)??null,

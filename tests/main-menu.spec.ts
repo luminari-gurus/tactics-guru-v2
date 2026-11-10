@@ -140,6 +140,42 @@ test('main menu: records authored replacement waits for confirmation and freezes
   await expect(page.getByRole('dialog')).toContainText('Three-encounter run · Abandoned');
 });
 
+for (const phase of ['preparation', 'terminal'] as const) test(`main menu: records replacement guards encounter entry while final history waits from ${phase}`, async ({ page }) => {
+  const prepared = preparedSnapshot(), saved: RunSnapshot = phase === 'preparation' ? prepared : {
+    ...prepared, items: { ...prepared.items, run: { ...prepared.items.run, phase: 'defeat', pendingReward: null,
+      revision: prepared.items.run.revision + 1, party: prepared.items.run.party.map(hero => ({ ...hero, hp: 0 })) } },
+  };
+  const encoded = encodeRunSave(saved, runContext); if (!encoded.ok) throw Error('Invalid replacement fixture');
+  await page.goto('./?game=run');
+  await page.evaluate(({ key, text }) => localStorage.setItem(key, text), { key: keys.run.primary, text: encoded.text });
+  await page.reload(); await page.locator('#run-continue').click();
+  // Finish the explicit Continue's history mutation before arming the two replacement writes.
+  await page.evaluate(key => navigator.locks.request(key, () => {}), RUN_RECORD_KEYS.primary);
+  await page.evaluate(key => {
+    const request = navigator.locks.request.bind(navigator.locks); let count = 0;
+    navigator.locks.request = ((name: string, ...args: any[]) => {
+      if (name === key && ++count === 2) {
+        document.documentElement.dataset.recordsHeld = 'yes';
+        return new Promise(resolve => { (window as any).releaseRecords = () => resolve((request as any)(name, ...args)); });
+      }
+      return (request as any)(name, ...args);
+    }) as typeof navigator.locks.request;
+  }, RUN_RECORD_KEYS.primary);
+  if (phase === 'terminal') await page.locator('#run-new').click();
+  else {
+    await page.locator('#fit-restart').dispatchEvent('click');
+    await page.locator('#run-confirm-new').click();
+  }
+  await expect(page.locator('html')).toHaveAttribute('data-records-held', 'yes');
+  const enter = page.locator('#run-start-encounter'); await expect(enter).toBeDisabled();
+  await enter.dispatchEvent('click');
+  expect(JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!).activeBattle).toBeNull();
+  await page.evaluate(() => (window as any).releaseRecords());
+  await expect(enter).toBeEnabled(); await enter.click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  await expect(page.locator('#battle-actor')).toBeVisible();
+});
+
 test('main menu: startup hides proof tools before application modules run',async({page})=>{
  let release!:()=>void;
  let held:Promise<void>;

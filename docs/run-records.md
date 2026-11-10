@@ -43,6 +43,10 @@ Cancel, stale review and failed partial reset do not record abandonment. After a
 interruption, Continue of the validated new identity finalizes the old record;
 Continue of the old identity cancels that intent. Unknown identities keep an honest
 unresolved status. History failure cannot prevent a new game.
+Accepted authored endings submit history before active-save serialization, including
+explicit unsaved play or denied active-save locks. Encounter entry stays disabled
+until replacement's final history mutation finishes. Preparatory history feedback
+does not invalidate the save owner's reviewed confirmation.
 
 The dungeon increment uses that same boundary for defeat, explicit terminal
 Continue and confirmed replacement through either the in-flow dialog or root-menu
