@@ -1,7 +1,7 @@
 # Issue #316 verification record
 
 Issue: [#316](https://github.com/luminari-gurus/tactics-guru-v2/issues/316).
-Plan: [implementation handoff](../../ongoing-projects/plan.md).
+Plan: [implementation handoff](../../ongoing-projects/issue-316-mage-acceptance-fixtures-plan.md).
 OpenSpec: [tasks](../../../openspec/changes/issue-316-mage-acceptance-fixtures/tasks.md).
 Original source: `1a02557e76041e307ddf172d39ddc3e477ac967d` (runtime/tests equal
 to main `6aad368`); baseline workflow publication: `d687e6d`.

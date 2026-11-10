@@ -32,6 +32,6 @@ None. Existing combat, progression and persistence requirements are unchanged.
 
 Tests/helpers, affected units and production browser cases, one task-scoped
 self-hosted qualification workflow, portable QA evidence and the approved
-[plan](../../../docs/ongoing-projects/plan.md). No runtime, dependency, save,
+[plan](../../../docs/ongoing-projects/issue-316-mage-acceptance-fixtures-plan.md). No runtime, dependency, save,
 balance or test-budget changes. Branch: `branch/issue-316-mage-acceptance-fixtures`;
 base: `1a02557`. The caller authorized implementation and OpenSpec on 2026-11-09.
