@@ -1,7 +1,7 @@
 import { assert, expect, it } from 'vitest';
 import { RunHistory } from '../../src/app/RunHistory';
 import { createRunRecordsStorage, RUN_RECORD_KEYS, selectedRunRecords } from '../../src/persistence/runRecordsStorage';
-import type { RunRecord } from '../../src/domain/runRecords';
+import { appendRunRecord, emptyRunRecords, type RunRecord } from '../../src/domain/runRecords';
 const old: RunRecord = { mode: 'run', id: 'old-run', outcome: 'abandoned', recordedAt: 100, battlesWon: 1, floorsCleared: null, deepestFloor: null };
 function fixture() {
   const data = new Map<string, string>(), store = createRunRecordsStorage(() => ({ getItem: key => data.get(key) ?? null,
@@ -49,4 +49,25 @@ it('skips all history access for an unadmitted startup placeholder', async () =>
   const f = fixture();
   const result = await f.history.replace(null, 'new-run', async () => true);
   assert(result); expect(f.data.has(RUN_RECORD_KEYS.primary)).toBe(false); expect(f.data.has(RUN_RECORD_KEYS.backup)).toBe(false);
+});
+it.each([false,true])('keeps an evicted frozen result sealed after replacement accepts=%s', async accepted => {
+  const f = fixture(), terminal = { ...old, outcome: 'defeat' as const };
+  let history = appendRunRecord(emptyRunRecords(), terminal);
+  for(let i=0;i<100;i++) history=appendRunRecord(history,{...terminal,mode:'dungeon',id:`other-${i}`,recordedAt:200+i,floorsCleared:0,deepestFloor:1});
+  assert((await f.store.mutate(()=>history)).ok); expect(f.read()?.records.some(r=>r.id===old.id)).toBe(false);
+  expect(await f.history.replace({...terminal,recordedAt:9999},'after-frozen',async()=>accepted)).toBe(accepted);
+  await f.history.resume(old.id,{...terminal,recordedAt:10000});
+  expect(f.read()?.records.some(r=>r.id===old.id)).toBe(false);
+  expect(f.read()?.receipts.run).toEqual({kind:'sealed',id:old.id});
+});
+it('an accepted terminal result keeps its seal when a racing replacement is refused', async () => {
+  const f=fixture(),terminal={...old,outcome:'defeat' as const};
+  expect(await f.history.replace(old,'after-race',async()=>{await f.history.record(terminal);return false;})).toBe(false);
+  expect(f.read()?.records).toEqual([terminal]); expect(f.read()?.receipts.run).toEqual({kind:'sealed',id:old.id});
+  assert((await f.store.mutate(history=>{
+    for(let i=0;i<100;i++)history=appendRunRecord(history,{...terminal,mode:'dungeon',id:`later-${i}`,recordedAt:200+i,floorsCleared:0,deepestFloor:1});
+    return history;
+  })).ok);
+  await f.history.resume(old.id,{...terminal,recordedAt:10000});
+  expect(f.read()?.records.some(r=>r.id===old.id)).toBe(false);
 });
