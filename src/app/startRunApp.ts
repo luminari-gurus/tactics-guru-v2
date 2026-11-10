@@ -58,7 +58,7 @@ function stopBattle() {
 }
 function endBattle() {if(!live || !playing)return;stopBattle();render();screen.querySelector<HTMLElement>('h1')?.focus();}
 function startBattle() {
- if(!live || playing)return;
+ if(!live || playing || replacementPending)return;
  // Save callbacks during construction publish evidence, not a competing screen.
  playing=true;const session=controller.startEncounter();
  if(!session){playing=false;render();return;}
@@ -178,7 +178,9 @@ function renderActions() {
  actions.replaceChildren();
  if(!storage)actions.append(testingProgress('run'));
  const snapshot=controller.snapshot,run=snapshot.items.run;
- if(run.phase==='battle' && !snapshot.activeBattle) actions.append(button('Start encounter',startBattle,'run-start-encounter'));
+ if(run.phase==='battle' && !snapshot.activeBattle) {
+  const enter=button('Start encounter',startBattle,'run-start-encounter');enter.disabled=replacementPending;actions.append(enter);
+ }
  else if(run.phase==='victory' || run.phase==='defeat') {
   items.querySelector('h1')!.textContent=run.phase==='victory'?'Run victory':'Run defeat';
   actions.append(button('Start new run',()=>{

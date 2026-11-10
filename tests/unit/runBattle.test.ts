@@ -142,6 +142,24 @@ it('owned legal defeat commits once, rejects obsolete sessions, restores boundar
  expect(await controller.replace(review,'another',3)).toBe(false);expect(controller.snapshot.items.run.seed).toBe(2);expect(battle.phase).toBe('disposed');
  expect(data.has(RUN_STORAGE_KEYS.primary)).toBe(true);controller.dispose();expect(controller.startEncounter()).toBeNull();
 });
+it.each(['unsaved', 'lock-denied'] as const)('records an accepted authored defeat with active saves %s', async mode => {
+ const prepared = preparedSnapshot(), injured = { ...prepared, items: { ...prepared.items, run: { ...prepared.items.run,
+  party: prepared.items.run.party.map(hero => ({ ...hero, hp: hero.heroId === 'fighter' ? 1 : 0 })),
+ } } };
+ const { storage, data } = memory();
+ const records = createRunRecordsStorage(() => ({ getItem: k => data.get(k) ?? null,
+  setItem: (k, v) => { data.set(k, v); }, removeItem: k => { data.delete(k); } }), async action => action());
+ const history = new RunHistory('run', records, () => 100);
+ const controller = new RunItemSession(injured, runContext, storage,
+  mode === 'lock-denied' ? (_task, unavailable) => unavailable() : undefined, history);
+ if (mode === 'unsaved') controller.playUnsaved();
+ const battle = controller.startEncounter()!; fight(battle, true);
+ expect(controller.snapshot.items.run.phase).toBe('defeat');
+ await history.whenIdle();
+ expect(selectedRunRecords(records.inspect())?.records).toMatchObject([{ id: injured.items.run.id, outcome: 'defeat', recordedAt: 100 }]);
+ expect(data.has(RUN_STORAGE_KEYS.primary)).toBe(false); expect(data.has(RUN_STORAGE_KEYS.backup)).toBe(false);
+ controller.dispose();
+});
 it('active restore preserves entry HP and next RNG while partial reset preserves live state and exportable bytes',async()=>{
  let fail=false;const {storage,data}=memory(k=>{if(fail && k===RUN_STORAGE_KEYS.primary)throw Error('denied');});
  const controller=new RunItemSession(preparedSnapshot(),runContext,storage);const battle=controller.startEncounter()!;

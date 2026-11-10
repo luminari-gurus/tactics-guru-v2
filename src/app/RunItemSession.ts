@@ -209,7 +209,10 @@ export class RunItemSession {
     });
   }
   requestSave(done?:()=>void) {
+    if (this.disposed) return;
     const snapshot = this.current;
+    // An accepted ending belongs to history even when active saving is disabled or denied.
+    if (this.history && this.started) void this.history.record(authoredRunRecord(snapshot.items.run, this.history.now()));
     this.progressSaved = false;
     if (this.storage && this.serializeWrite && !this.unsavedOnly) this.report('Saving run…');
     this.queueWrite(() => {
@@ -232,7 +235,6 @@ export class RunItemSession {
     if (result.ok) this.expectedPrimary = this.storage.lastSavedText()!;
     if (result.ok || result.reason === 'changed') this.saveConflict = !result.ok;
     this.progressSaved = result.ok;
-    if (this.history && (result.ok || result.reason !== 'changed')) void this.history.record(authoredRunRecord(this.current.items.run, this.history.now()));
     if (!result.ok) reportFailure('save_write', { route: 'run', phase: this.current.items.run.phase, encounter: this.current.items.run.encounterIndex });
     this.report(result.ok ? 'Run saved on this device' : result.reason === 'storage'
       ? `Progress unsaved: storage ${result.kind}. Open Save recovery to retry.`
