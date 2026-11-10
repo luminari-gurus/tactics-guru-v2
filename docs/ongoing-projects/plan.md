@@ -4,6 +4,12 @@ Date: 2026-11-10 (Asia/Jerusalem). Assigned to @moshehbenavraham.
 Issue: [#176](https://github.com/luminari-gurus/tactics-guru-v2/issues/176).
 Related follow-up: [#270](https://github.com/luminari-gurus/tactics-guru-v2/issues/270).
 Branch: [`branch/issue-176-local-records`](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-176-local-records).
+Current implementation branch: `branch/issue-176-authored-records`, based on the
+review-ready first increment at `7d73d35`; its PR will target the branch above.
+Authored implementation and qualification are now complete in PR #360.
+Continue remaining dungeon/final acceptance work on the
+[frontier plan](https://github.com/luminari-gurus/tactics-guru-v2/blob/branch/issue-176-dungeon-records/docs/ongoing-projects/plan.md)
+in `C:/Users/apexw/.codex/worktrees/issue-176-dungeon/Tactics-Guru` (PR #361).
 Base: `origin/main`, `491f92a080d8577aca882c3e48ddaf910cf30369`.
 OpenSpec: [proposal](../../openspec/changes/issue-176-local-records/proposal.md),
 [design](../../openspec/changes/issue-176-local-records/design.md),
@@ -13,7 +19,7 @@ OpenSpec: [proposal](../../openspec/changes/issue-176-local-records/proposal.md)
 **Status:** implementation authorized on 2026-11-10. The caller requested autonomous
 implementation, verification, commits/pushes and focused labeled PRs as each chunk
 is ready, stacking dependent increments. Using OpenSpec change `issue-176-local-records`;
-4/9 implementation tasks complete. No merge or deployment is authorized.
+6/9 implementation tasks complete on this branch. No merge or deployment is authorized.
 The previous plan is preserved byte-for-byte in
 [the #316 handoff](issue-316-mage-acceptance-fixtures-plan.md).
 
@@ -238,6 +244,72 @@ recheck capacity at execution. This is not a reservation or future-availability 
   [the issue QA record](../qa/issue-176/README.md). Later recording increments
   remain unimplemented, and #176/#270 stay open.
 
+### Increment 2 complete — 2026-11-10
+
+The authored owner now gates recording by persistent entry, records accepted
+terminal states and explicit terminal Continue, and awaits bounded replacement
+receipts around the existing validated replacement. Replacement is asynchronous;
+its actual active-save mutation remains serialized under the existing run lock.
+Startup placeholders and testing sessions never record. The new shared
+`RunHistory` application helper owns history effects only; it has a real second
+consumer in the planned dungeon increment. No active-save migration was added.
+
+Focused iteration passes 43 units and both type scopes, including real accepted
+defeat, exact terminal continuation, immutable first result, pending recovery,
+failed/stale replacements, a changed-live-state race and null-storage gating.
+Tasks 2.1 and 2.2 are complete. PR #360 is ready for review, stacked on #359.
+The task-scoped workflow
+extends the existing legal run/outcome and route-isolation cases rather than
+creating another full-journey harness. Existing five storage-condition variants
+remain configured; the bounded affected browser selection executes valid and
+unavailable storage across all direct/diagnostic routes, including Q*bert.
+The expanded job allows 45 minutes for 45 focused selections on one VM; original
+per-case deadlines, retries 0 and the ordinary PR job's budget are unchanged.
+
+PR #360 is open as a draft stacked on #359. Its initial standard check failed
+one new continuation unit because fixture construction simulated a complete legal
+defeat inside the default five-second unit budget. The unit now stages validated
+terminal data; complete legal defeat remains a browser obligation. Preserve run
+42826784671 as failed and qualify the repaired source without raising deadlines.
+Retention/replacement regressions were reproduced and repaired: a frozen result
+must keep its seal even after eviction and an accepted/refused replacement.
+Known frozen results now skip pending preparation entirely. A real terminal
+transition seals its own pending intent, so a later refused replacement cannot
+remove that protection. No schema field or additional recovery layer was added.
+
+The history observer now notifies only when its visible status changes. Successful
+receipt writes have no new status to display; rebuilding the active controls on
+every successful write could detach an in-progress confirmation/double-click.
+The superseded queued capture was canceled. Original focused run 42826784471
+finished failed before cancellation: two desktop isolation sweeps exceeded 30s
+after Q*bert was added; 25 menu and the other ten Chromium cases passed. Q*bert is
+split into its own fully audited group, retaining original case IDs/assertions,
+all five conditions and unchanged deadlines. The affected selection is now
+33 Chromium + 22 WebKit cases. Superseded captures remain failed/incomplete.
+The next capture (42829329281) localized remaining desktop timeouts to the later
+diagnostic battle entry in the original seven-route sweep; the isolated Q*bert
+cases and mobile/full-run cases passed. Ordinary and diagnostic entries are now
+separate complete audit groups, with all original route assertions and all five
+storage conditions preserved. The latest authored selection is 39 Chromium +
+26 WebKit cases; no timeout or retry was changed.
+
+Qualification now passes all 65 cases on `eaf85f7` / clean merge `1d58eb6`,
+including three-encounter victories on every selected Chromium/WebKit profile,
+legal defeats, terminal Continue/restart, confirmed abandonment and all entry
+isolation groups. Standard run 42833420593 attempt 2 passed all 1,272 units,
+both type scopes/build integrations and seven core journeys. Attempt 1 remains
+failed: three unchanged CPU-heavy cases exceeded 5s while the other VM rendered
+battles. With that browser VM held idle, the unchanged unit phase passed in
+59.26s versus 122.85s in the failed attempt. This is controlled qualification,
+not a claim that physical-host contention has been universally diagnosed.
+
+[Portable authored evidence](../qa/issue-176/increment-2.json) retains source,
+report hashes, complete victory witnesses and the exact 65 case IDs/attempts.
+The one-off workflow for these completed increments is retired after capturing
+evidence; all tests remain in their explicit regression matrices and CLI commands.
+Final handoff edits change only documentation and that temporary entry point,
+so runtime/test evidence is reused under the verification policy.
+
 **My implementation estimate: 4–6 hours total**, including focused regression,
 browser evidence, documentation and preparing the three reviewable PRs. First
 increment: about 60–90 minutes; authored integration: 60–90 minutes; dungeon,
@@ -251,3 +323,17 @@ branch above, natively linked from the issue's Development section. The issue
 comment links the pushed plan and explains the incremental acceptance boundary.
 The planning commit is `0f1c2e9`. Implementation and verification progress will be
 recorded here and in the OpenSpec tasks as each increment is completed.
+
+### November 10 independent merge review
+
+PR #359 merged as `39d461f` after fresh local units/types/builds and 20
+Chromium/WebKit menu checks. PR #360 incorporates that main merge, preserving
+stack ancestry. Its review reproduces and repairs encounter entry during the
+final replacement write, terminal-history loss during unsaved/lock-denied play,
+and preparatory feedback invalidating the startup review token. The latter
+minimal fix is carried forward from #361 so this increment stands alone.
+The existing session, history adapter and regression harnesses cover these
+repairs; no additional abstraction, save format or rule change is needed.
+Original failed review regressions remain under `tmp/issue-176-review/360/`;
+the QA document records final verification before merge. Dungeon review and
+full issue closure remain on #361 until its independent review is complete.

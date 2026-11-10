@@ -43,3 +43,108 @@ Tasks 1.1–1.4 are complete. Authored-run and dungeon lifecycle, route-history
 isolation, replacements and complete legal outcomes belong to the next two
 increments, with all original issue gates retained. No physical-device,
 performance recertification, merge or production operation is claimed.
+
+## Increment 2 — authored recording (qualified)
+
+Based on ready PR #359 at `7d73d35`. Focused local checks pass 43 units across
+RunHistory, RunItemSession, runBattle and record model/storage, plus both type scopes.
+New checks include exact terminal Continue, a staged valid victory continuation
+(explicitly not earned-play proof), real accepted defeat, pending receipt before
+replacement, accepted/canceled/stale/partial/racing replacement, interrupted intent
+reconciliation and unavailable history that does not block the new game.
+
+Browser discovery retains existing IDs and selects 27 Chromium + 18 WebKit cases:
+records/menu/replacement; complete legal run outcomes and legal defeat; valid and
+unavailable-storage isolation across all direct/diagnostic entries, now including
+records keys and Q*bert. All five original storage-condition variants remain
+configured. Later coverage-preserving splits and the final result are recorded below.
+
+Initial standard run [42826784671](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42826784671)
+failed one of 1,269 units: the new terminal-Continue unit synthesized an entire
+full-health defeat and exceeded the unchanged 5,000ms per-unit budget under the
+full parallel unit load. Dependent build/browser stages did not run. Its report
+is retained under `tmp/issue-176/run-42826784671/`; this failed run remains failed.
+The unit now uses an explicitly staged, validated terminal snapshot and a distinct
+valid backup. The real full-health/legal defeat still runs in existing browser
+witnesses. No timeout, gameplay rule or assertion was relaxed.
+Two retention regression variants initially failed: failed or accepted replacement
+could clear an evicted terminal result's seal, letting Continue recreate it.
+Known frozen results now skip pending preparation; a real terminal transition
+also seals its own pending intent. Three bounded unit cases cover accepted,
+refused and racing outcomes after 100 opposite-mode records, without new fields.
+The history observer was also simplified to notify only on a visible status
+change, preserving active controls during successful receipt writes. Runs
+42827503310 was canceled while queued for this runtime repair. Run 42826784471
+finished before cancellation: it passed all 25 menu cases and 10/12 Chromium
+run/isolation cases, but the two desktop isolation sweeps exceeded their unchanged
+30-second case budget. WebKit outcome/isolation was blocked by that stage failure.
+Adding Q*bert to the already long multi-route sweep caused the scope to outgrow
+the budget. Q*bert is now a separate case group using the same complete storage
+audit, all five existing conditions, real turn/restart, reload and menu checks.
+Original journey case IDs/assertions and all deadlines remain. The focused
+selection is now 33 Chromium + 22 WebKit cases. Runs 42828913970 and the superseded
+queued capture are canceled for this test repair; failures/incomplete runs remain
+retained rather than relabeled as passing. Fresh qualification is required.
+
+Run 42829329281 also failed the two desktop journey sweeps at the later diagnostic
+`?scene=battle` entry, after reaching the overall 30-second case deadline; Q*bert,
+mobile isolation and legal run cases passed. The original seven-entry sweep is
+now split into ordinary routes and diagnostic entries, retaining the same audit
+body, all five storage conditions, actual commands/restart/reload/history checks
+and the final saved-menu checks. Each group's starting saved bytes are identical
+because the audit proves earlier routes leave them unchanged. Original journey
+titles remain for the four ordinary routes; three diagnostic routes receive
+explicit companion cases. The selection is 39 Chromium + 26 WebKit cases. No
+assertion, route, condition, per-case deadline, worker policy or retry is removed.
+
+### Final authored result
+
+Head `eaf85f74597946aa48c065fe1373b170c892b5ff`, clean merge
+`1d58eb67c2376e1f2e0b2e1f2d6392ef3f852cc4`:
+
+- [Browser qualification 42833420673](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42833420673): **39 Chromium + 26 WebKit passed**, no failures/skips/retries/flakes. The complete legal authored journey won all three encounters on all five profiles. Separate complete legal defeat, terminal reload/Continue, restart, abandonment and storage-isolation witnesses passed.
+- [PR verification 42833420593, attempt 2](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42833420593/attempts/2): **1,272 units, both types, both build integrations and 7/7 core journeys passed**. Both VMs were idle before this controlled run, with VM-02 browser work held. The unit phase took 59.26s. The failed first attempt took 122.85s and timed out one unchanged survivor fixture and two unchanged biome cases at the original 5s budget; it remains failed.
+- [Portable receipt](increment-2.json) and [case records](increment-2-cases.jsonl) retain exact identity, counts, stages, victory witnesses, IDs/attempts and raw report hashes. Complete artifacts are downloaded under ignored `tmp/issue-176/run-42833420673/` and `run-42833420593-attempt2/`.
+
+Task 2.2 is complete and PR #360 is ready for review. The one-off execution
+workflow is retired after qualification; the same CLI commands and all cases
+remain configured. Final documentation/workflow-retirement changes preserve
+every runtime/test/config input relevant to these results. Dungeon gates remain
+in PR #361; the issue stays open. The shared physical host's unrelated processes
+were not independently controlled, so serialized success does not erase prior
+resource-sensitive failures or claim a generally repaired host.
+
+## Independent merge review — authored increment
+
+PR #359 merged as `39d461f`. PR #360 merged that base without conflicts and
+fixes its verified review defects in `79196d91b01e7dcd85bbf0b030dda4cca3338039`:
+encounter entry during final replacement, terminal-history loss in explicit
+unsaved/active-save-lock-denied play, and a preparatory warning invalidating the
+startup review token. The last correction is carried forward from #361.
+
+Fresh Windows x64 / Node 24.22.1 / Playwright 1.64.1 verification, unchanged
+timeouts/retries/configs, one browser worker, ordinary root production preview:
+
+- RED: two delayed-final-write browser cases failed on enabled encounter entry;
+  three owner-level unit cases failed on the missing terminal record or refused
+  replacement. Original reports and contexts remain in the ignored review folder.
+- GREEN: all **1,275 units**, both TypeScript scopes, **2/2 root/prefix build
+  integrations**, production bundle and `git diff --check` passed.
+- `main menu: records` selection: **18 Chromium + 12 WebKit passed**, including
+  both new replacement regressions on desktop/Pixel portrait/landscape and
+  iPhone portrait/landscape. The disabled-handler negative case is also exercised.
+- Core config: **7/7 passed**. Focused desktop authored selection (`legal run
+  outcomes|cached run return|legal defeat reload|run startup preserves`):
+  **4/4 passed**, including the complete three-encounter journey. All **41**
+  browser cases have zero skipped, unexpected, flaky or retried cases.
+
+Direct Node entry points ran vitest, tsc, vite and Playwright. An ignored local
+`npm.cmd` wrapper points to the installed npm CLI so unchanged preview commands
+work in this app runtime. No dependency/config/source assertion was weakened.
+The existing large-chunk and future Vite loader advisories remain. Reports,
+logs, input hashes and screenshots are retained under `tmp/issue-176-review/360/`;
+the compact [review receipt](review-360.json) binds their hashes to tested inputs.
+Final handoff edits affect documentation only. Earlier five-profile battle/rule,
+replay and route-isolation evidence remains retained for unchanged consumers;
+the changed replacement and terminal integration has the fresh evidence above.
+No full unrelated release/performance recertification or physical device is claimed.

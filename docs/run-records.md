@@ -36,9 +36,20 @@ write only records keys, preserving active run, dungeon and battle saves.
 ## Incremental delivery
 
 The first increment supplies the model, persistence adapter and real menu view.
-Automatic recording is added in the dependent authored-run and dungeon increments;
-the empty state alone is not evidence that issue #176 is complete. Planned endings
-are authored victory/defeat and confirmed replacement, and dungeon defeat or
+The authored-run increment records accepted victory/defeat, explicit terminal
+Continue and confirmed replacement. A bounded pending receipt is saved before
+replacement; it is finalized only after the existing run owner accepts replacement.
+Cancel, stale review and failed partial reset do not record abandonment. After an
+interruption, Continue of the validated new identity finalizes the old record;
+Continue of the old identity cancels that intent. Unknown identities keep an honest
+unresolved status. History failure cannot prevent a new game.
+Accepted authored endings submit history before active-save serialization, including
+explicit unsaved play or denied active-save locks. Encounter entry stays disabled
+until replacement's final history mutation finishes. Preparatory history feedback
+does not invalidate the save owner's reviewed confirmation.
+
+Dungeon recording remains in the next increment; the empty state alone is not
+evidence that issue #176 is complete. Planned dungeon endings are defeat or
 confirmed replacement. Floor/guardian wins, stairs, backtracking, menu return and
 page closure do not end the endless dungeon. Dedicated testing routes and
 standalone battles do not create run records. See the active

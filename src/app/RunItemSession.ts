@@ -9,6 +9,8 @@ import { RULE_BOUNDS } from '../domain/constants';
 import { runBoundaryId } from '../domain/run';
 import { encodeRunSave, readRunSnapshot, type RunSaveContext, type RunSnapshot } from '../domain/runSaveEnvelope';
 import { createRunStorage, type RunLoadResult, type RunStorageSlot } from '../persistence/runStorage';
+import { authoredRunRecord } from '../domain/runRecords';
+import type { RunHistory } from './RunHistory';
 
 const rejectionText: Record<ItemFailure['reason'], string> = {
   invalidOwnership: 'The owned items are invalid', invalidItems: 'The item state is invalid',
@@ -28,6 +30,8 @@ export class RunItemSession {
   private progressSaved = false;
   private expectedPrimary: string | null = null;
   private saveConflict = false;
+  private started = false;
+  readonly history: RunHistory | null;
   get hasSaveConflict() { return this.saveConflict; }
   exportCurrent() { return encodeRunSave(this.current, this.context); }
   get isUnsavedOnly() { return this.unsavedOnly; }
@@ -35,19 +39,22 @@ export class RunItemSession {
   get hasUnsavedProgress() { return this.storage !== null && (this.unsavedOnly || !this.progressSaved); }
   private lastRecord: unknown = null;
   get completedBattle(): unknown { return JSON.parse(JSON.stringify(this.lastRecord)); }
-  status = 'Progress has not been saved';
+  private message = 'Progress has not been saved';
+  get status() { return this.history?.status ? `${this.message}. ${this.history.status}` : this.message; }
   onChange: (() => void) | null = null;
   constructor(initial: unknown, readonly context: RunSaveContext,
     readonly storage: ReturnType<typeof createRunStorage> | null = createRunStorage(context),
-    private readonly serializeWrite?: (task:()=>void, unavailable:()=>void)=>void) {
+    private readonly serializeWrite?: (task:()=>void, unavailable:()=>void)=>void, history: RunHistory | null = null) {
     const read = readRunSnapshot(initial, context);
     if (!read.ok) throw Error('Invalid run snapshot');
     this.current = read.state;
-    if (!storage) this.status = 'Testing run. Progress resets on reload.';
+    this.history = storage ? history : null;
+    if (this.history) this.history.onChange = () => { if (!this.disposed) this.report(this.message); };
+    if (!storage) this.message = 'Testing run. Progress resets on reload.';
   }
   get snapshot(): RunSnapshot { return JSON.parse(JSON.stringify(this.current)); }
   get activeSession() { return this.battle; }
-  dispose() { this.disposed = true; this.battle?.dispose(); this.battle = null; this.onChange = null; }
+  dispose() { this.disposed = true; this.battle?.dispose(); this.battle = null; this.onChange = null; if (this.history) this.history.onChange = null; }
   startEncounter(): BattleSession | null {
     if (this.disposed || this.current.items.run.phase !== 'battle') return null;
     if (this.battle && this.battle.phase !== 'disposed') return this.battle;
@@ -90,7 +97,7 @@ export class RunItemSession {
       ? BattleSession.fromSnapshot(catalog, this.current.activeBattle, accepted, battlefield)
       : BattleSession.fromRun(this.current.items, this.context, accepted);
     if (!created.ok) { reportFailure('encounter_start', { route: 'run', encounter: this.current.items.run.encounterIndex }); this.report('Could not start this encounter. Progress unchanged.'); return null; }
-    session = created.session; this.battle = session; session.progression = structuredClone(this.current.items.run.party);
+    session = created.session; this.battle = session; this.started = true; session.progression = structuredClone(this.current.items.run.party);
     if (session.state.outcome !== 'ongoing') { accepted(); return null; }
     this.current = { ...this.current, activeBattle: session.state, battlefield:battlefield }; this.review = null;
     if (!restoring) { track('encounter_started', { route: 'run', encounter: this.current.items.run.encounterIndex, phase: 'battle' }, `${this.current.items.run.id}:${this.current.items.run.encounterIndex}`); this.requestSave(); } return session;
@@ -104,7 +111,21 @@ export class RunItemSession {
     }
     return values;
   }
-  replace(review: RunLoadResult, id: string, seed: number) {
+  async replace(review: RunLoadResult, id: string, seed: number): Promise<boolean> {
+    if (!this.storage || this.disposed || review !== this.review || !review.ok) return false;
+    const selected = review.selected?.state;
+    const expected = this.current;
+    const old = this.started && (!selected || selected.items.run.id === this.current.items.run.id) ? this.current : selected;
+    const record = this.history && old ? authoredRunRecord(old.items.run, this.history.now(), true) : null;
+    const perform = () => new Promise<boolean>(resolve => {
+      this.queueWrite(() => {
+        if (this.current !== expected) { this.report('Reset refused: the run changed while confirming. Review again.'); resolve(false); }
+        else resolve(this.replaceNow(review, id, seed));
+      }, () => resolve(false));
+    });
+    return this.history ? this.history.replace(record, id, perform) : perform();
+  }
+  private replaceNow(review: RunLoadResult, id: string, seed: number) {
     if (!this.storage || !/^[A-Za-z0-9-]{1,64}$/.test(id) || !isIntegerIn(seed, RULE_BOUNDS.uint32) || this.disposed || review !== this.review || !review.ok || id === this.current.items.run.id || seed === this.current.items.run.seed) return false;
     const next = freshRunSnapshot(id, seed, this.context);
     const latest = this.storage.load();
@@ -137,11 +158,13 @@ export class RunItemSession {
     this.battle?.dispose(); this.battle = null; this.current = next; this.review = null; this.retained = []; this.lastRecord = null;
     this.unsavedOnly = false;
     this.saveConflict = false;
+    this.started = true;
     track('run_started', { route: 'run', phase: this.current.items.run.phase }, this.current.items.run.id);
     this.save();
   }
   startNew() {
     if (this.disposed) return;
+    this.started = true;
     track('run_started', { route: 'run', phase: this.current.items.run.phase }, this.current.items.run.id);
     this.requestSave();
   }
@@ -151,7 +174,7 @@ export class RunItemSession {
       boundaryId: runBoundaryId(run), itemRevision };
   }
   private report(message: string) {
-    this.status = message;
+    this.message = message;
     try { this.onChange?.(); } catch { /* Observers cannot undo committed state. */ }
   }
   dispatch(command: ItemCommand) {
@@ -164,6 +187,7 @@ export class RunItemSession {
     this.battle?.dispose(); this.battle = null;
     const encounter = this.current.items.run.encounterIndex;
     this.current = { items: result.state, activeBattle: null, battlefield:null };
+    this.started = true;
     if (command.type === 'claimReward') track('reward_chosen', { route: 'run', encounter, phase: 'reward',
       choice: rewardChoices.find(choice => `item:${choice}` === command.itemId) }, `${this.current.items.run.id}:${encounter}`);
     this.review = null;
@@ -175,7 +199,7 @@ export class RunItemSession {
     this.unsavedOnly = true; this.review = null; this.startNew();
   }
   queueWrite(task:()=>void, unavailable?:()=>void) {
-    const guarded = () => { if (!this.disposed) task(); };
+    const guarded = () => { if (!this.disposed) task(); else unavailable?.(); };
     if (!this.storage || !this.serializeWrite) { guarded(); return; }
     this.serializeWrite(guarded, () => {
       if (this.disposed) return;
@@ -185,7 +209,10 @@ export class RunItemSession {
     });
   }
   requestSave(done?:()=>void) {
+    if (this.disposed) return;
     const snapshot = this.current;
+    // An accepted ending belongs to history even when active saving is disabled or denied.
+    if (this.history && this.started) void this.history.record(authoredRunRecord(snapshot.items.run, this.history.now()));
     this.progressSaved = false;
     if (this.storage && this.serializeWrite && !this.unsavedOnly) this.report('Saving run…');
     this.queueWrite(() => {
@@ -233,6 +260,7 @@ export class RunItemSession {
     if (!checked.ok) return false;
     this.battle?.dispose(); this.battle = null;
     this.current = checked.state;
+    this.started = true;
     const primary = review.inspection.primary;
     if ('text' in primary) this.expectedPrimary = primary.text;
     this.review = null; this.unsavedOnly = false;
@@ -242,6 +270,7 @@ export class RunItemSession {
     this.progressSaved = !blocked;
     this.report((review.selected.slot === 'backup' ? 'Continued backup. Some progress may be lost.' : 'Continued saved run') +
       (blocked ? ' Progress unsaved until Save recovery resolves damaged or unreadable data.' : ''));
+    if (this.history) void this.history.resume(this.current.items.run.id, authoredRunRecord(this.current.items.run, this.history.now()));
     return true;
   }
   remove(slot: RunStorageSlot, review: RunLoadResult) {

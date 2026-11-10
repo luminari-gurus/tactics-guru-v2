@@ -1,0 +1,129 @@
+{
+  "testedCommit": "79196d91b01e7dcd85bbf0b030dda4cca3338039",
+  "inputHash": "748b37de24947655e044b87634110b9fcf262dd0c53831da9e950512b266f7c4",
+  "cleanFunctionalInputs": true,
+  "environment": {
+    "os": "Windows x64",
+    "node": "v24.22.1",
+    "playwright": "1.64.1",
+    "browsers": [
+      {
+        "name": "chromium",
+        "revision": "1248",
+        "installByDefault": true,
+        "browserVersion": "156.0.8078.4",
+        "title": "Chrome for Testing"
+      },
+      {
+        "name": "webkit",
+        "revision": "2370",
+        "installByDefault": true,
+        "revisionOverrides": {
+          "mac14": "2251",
+          "mac14-arm64": "2251"
+        },
+        "browserVersion": "27.2",
+        "title": "WebKit"
+      }
+    ],
+    "workers": 1,
+    "retries": 0,
+    "server": "ordinary root production preview",
+    "physicalDevices": false
+  },
+  "units": {
+    "passed": 1275,
+    "log": "tmp/issue-176-review/360/all-units.log",
+    "sha256": "2c803aa9bbf26c295d13c7b4cd177a7e3b7d4b39be86a1a3cfa35fc6961a14e2"
+  },
+  "types": "both scopes passed",
+  "buildIntegrations": {
+    "passed": 2,
+    "sha256": "8e9f3788bb1cc6d2ac1f5200bf28eb883995ed340f1179312ee237980c3b8a71"
+  },
+  "productionBuild": {
+    "passed": true,
+    "logSha256": "7127eb886f6d682d591e403d1598d4fae03fa3de8d5bdb1f43526a6287344b9a",
+    "indexSha256": "c281201957cd957b2522b601c1fc813a15d7ddb54ac1eac2d304249d926427b5"
+  },
+  "reports": [
+    {
+      "path": "tmp/issue-176-review/360/chromium-menu.json",
+      "sha256": "be22974bca370bdbd8d7ccf266b11d97699eb08f4b9b08df9a6c80edc7bc848e",
+      "stats": {
+        "startTime": "2026-11-10T17:10:54.238Z",
+        "duration": 22521.409,
+        "expected": 18,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "projects": [
+        "desktop",
+        "mobile-portrait",
+        "mobile-landscape"
+      ]
+    },
+    {
+      "path": "tmp/issue-176-review/360/webkit-menu.json",
+      "sha256": "da02592cdfa86287165332da5cd75be2cde527e8484608779b0e638f2b0744ce",
+      "stats": {
+        "startTime": "2026-11-10T17:11:17.189Z",
+        "duration": 24458.985999999997,
+        "expected": 12,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "projects": [
+        "acceptance-webkit-portrait",
+        "acceptance-webkit-landscape"
+      ]
+    },
+    {
+      "path": "tmp/issue-176-review/360/core.json",
+      "sha256": "52a87c5d5d51a46600e8928a039e62a178bc4b2582be512dd96e4694c9655091",
+      "stats": {
+        "startTime": "2026-11-10T17:11:57.191Z",
+        "duration": 44133.979,
+        "expected": 7,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "projects": [
+        "pr-desktop",
+        "pr-touch",
+        "pr-webkit"
+      ]
+    },
+    {
+      "path": "tmp/issue-176-review/360/legal-run.json",
+      "sha256": "7991f6065bcca5e8790509e2a7e248f4b10e842c9bbd79a06cc0089fb307aa70",
+      "stats": {
+        "startTime": "2026-11-10T17:12:41.731Z",
+        "duration": 69098.05099999999,
+        "expected": 4,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "projects": [
+        "desktop",
+        "mobile-portrait",
+        "mobile-landscape"
+      ]
+    }
+  ],
+  "redEvidence": [
+    {
+      "path": "tmp/issue-176-review/360/red-units.log",
+      "sha256": "ea96fb2cac8a8f8f90fd2065cb38883b3b28428b51b4ac819accfa18f4383eb7"
+    },
+    {
+      "path": "tmp/issue-176-review/360/red-browser.json",
+      "sha256": "820290c3f9a281ed27caa8391fe1bce1fdce991ab7ab714e6ee4b7d8e8cc7510"
+    }
+  ],
+  "scope": "41 fresh browser cases; retained evidence reused only for unchanged battle/rule/replay and route-isolation consumers. No full unrelated regression or performance recertification."
+}

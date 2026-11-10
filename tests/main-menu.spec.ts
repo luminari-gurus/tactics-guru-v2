@@ -100,6 +100,71 @@ test('main menu: records unavailable storage is honest and leaves gameplay navig
   await expect(page.getByRole('button', { name: 'New Game', exact: true })).toBeEnabled();
 });
 
+test('main menu: records authored replacement waits for confirmation and freezes the old journey', async ({ page, isMobile }) => {
+  const saved = preparedSnapshot(), text = encodeRunSave(saved, runContext); if (!text.ok) throw Error('Invalid run fixture');
+  const battle = menuFixture('battle');
+  await page.addInitScript(({ run, battleKeys, text, battle }) => {
+    if (sessionStorage.getItem('test:replacement-seeded')) return;
+    localStorage.setItem(run.primary, text); localStorage.setItem(run.backup, text);
+    localStorage.setItem(battleKeys.primary, battle); sessionStorage.setItem('test:replacement-seeded', 'yes');
+  }, { run: keys.run, battleKeys: keys.battle, text: text.text, battle });
+  await page.goto('./?game=run'); await page.locator('#run-continue').click(); await page.locator('#run-start-encounter').click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  const history = () => page.evaluate(slots => {
+    const value = localStorage.getItem(slots.primary); return value ? JSON.parse(value).records : [];
+  }, RUN_RECORD_KEYS);
+  const activate = async (selector: string) => { const target = page.locator(selector); if (isMobile) await target.tap(); else await target.click(); };
+  const before = await page.evaluate(slots => [localStorage.getItem(slots.primary), localStorage.getItem(slots.backup)], keys.run);
+  await activate('#fit-restart'); await activate('#run-cancel-new'); expect(await history()).toEqual([]);
+  expect(await page.evaluate(slots => [localStorage.getItem(slots.primary), localStorage.getItem(slots.backup)], keys.run)).toEqual(before);
+  await activate('#fit-restart'); await activate('#run-confirm-new');
+  await expect(page.locator('#run-start-encounter')).toBeVisible();
+  expect(await history()).toMatchObject([{ id: saved.items.run.id, outcome: 'abandoned', battlesWon: 1 }]);
+  const recorded = await history();
+  await page.reload(); await page.locator('#run-continue').click(); expect(await history()).toEqual(recorded);
+  expect(await page.evaluate(key => localStorage.getItem(key), keys.battle.primary)).toBe(battle);
+  await page.getByRole('link', { name: 'Main menu', exact: true }).last().click();
+  await page.getByRole('button', { name: 'Hall of Records', exact: true }).click();
+  await expect(page.getByRole('dialog').getByRole('listitem')).toHaveCount(1);
+  await expect(page.getByRole('dialog')).toContainText('Three-encounter run · Abandoned');
+});
+
+for (const phase of ['preparation', 'terminal'] as const) test(`main menu: records replacement guards encounter entry while final history waits from ${phase}`, async ({ page }) => {
+  const prepared = preparedSnapshot(), saved: RunSnapshot = phase === 'preparation' ? prepared : {
+    ...prepared, items: { ...prepared.items, run: { ...prepared.items.run, phase: 'defeat', pendingReward: null,
+      revision: prepared.items.run.revision + 1, party: prepared.items.run.party.map(hero => ({ ...hero, hp: 0 })) } },
+  };
+  const encoded = encodeRunSave(saved, runContext); if (!encoded.ok) throw Error('Invalid replacement fixture');
+  await page.goto('./?game=run');
+  await page.evaluate(({ key, text }) => localStorage.setItem(key, text), { key: keys.run.primary, text: encoded.text });
+  await page.reload(); await page.locator('#run-continue').click();
+  // Finish the explicit Continue's history mutation before arming the two replacement writes.
+  await page.evaluate(key => navigator.locks.request(key, () => {}), RUN_RECORD_KEYS.primary);
+  await page.evaluate(key => {
+    const request = navigator.locks.request.bind(navigator.locks); let count = 0;
+    navigator.locks.request = ((name: string, ...args: any[]) => {
+      if (name === key && ++count === 2) {
+        document.documentElement.dataset.recordsHeld = 'yes';
+        return new Promise(resolve => { (window as any).releaseRecords = () => resolve((request as any)(name, ...args)); });
+      }
+      return (request as any)(name, ...args);
+    }) as typeof navigator.locks.request;
+  }, RUN_RECORD_KEYS.primary);
+  if (phase === 'terminal') await page.locator('#run-new').click();
+  else {
+    await page.locator('#fit-restart').dispatchEvent('click');
+    await page.locator('#run-confirm-new').click();
+  }
+  await expect(page.locator('html')).toHaveAttribute('data-records-held', 'yes');
+  const enter = page.locator('#run-start-encounter'); await expect(enter).toBeDisabled();
+  await enter.dispatchEvent('click');
+  expect(JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!).activeBattle).toBeNull();
+  await page.evaluate(() => (window as any).releaseRecords());
+  await expect(enter).toBeEnabled(); await enter.click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  await expect(page.locator('#battle-actor')).toBeVisible();
+});
+
 test('main menu: startup hides proof tools before application modules run',async({page})=>{
  let release!:()=>void;
  let held:Promise<void>;

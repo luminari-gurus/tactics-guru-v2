@@ -9,6 +9,7 @@ import '../ui/runFlow.css';
 import { runSaveContext as context } from './runContext';
 import { freshRunSnapshot } from '../domain/runBattle';
 import { RunItemSession } from './RunItemSession';
+import { RunHistory } from './RunHistory';
 import { BattleDialogs, type DialogChoice } from '../ui/dialogs';
 import { mountRunItems } from '../ui/runItems';
 import { BattleScene, type RunBattleHost } from '../phaser/BattleScene';
@@ -19,7 +20,7 @@ import { mountBattleLayout } from '../ui/battleLayout';
 import { showGameError } from '../ui/gameError';
 
 const storage=appEntry.persistent?createRunStorage(context):null,initial=storage?.load();
-const controller = new RunItemSession(initial?.ok && initial.selected ? initial.selected.state : freshRunSnapshot(crypto.randomUUID(), 13, context), context,storage,serializeBrowserRunWrite);
+const controller = new RunItemSession(initial?.ok && initial.selected ? initial.selected.state : freshRunSnapshot(crypto.randomUUID(), 13, context), context,storage,serializeBrowserRunWrite,storage ? new RunHistory('run') : null);
 const container = document.querySelector<HTMLElement>('#game')!;
 const panel = document.querySelector<HTMLElement>('#fit-panel')!;
 const status = document.querySelector<HTMLElement>('#fit-status')!;
@@ -57,7 +58,7 @@ function stopBattle() {
 }
 function endBattle() {if(!live || !playing)return;stopBattle();render();screen.querySelector<HTMLElement>('h1')?.focus();}
 function startBattle() {
- if(!live || playing)return;
+ if(!live || playing || replacementPending)return;
  // Save callbacks during construction publish evidence, not a competing screen.
  playing=true;const session=controller.startEncounter();
  if(!session){playing=false;render();return;}
@@ -73,15 +74,17 @@ function startBattle() {
  evidence();
 }
 let replacementPending=false;
-function replace(review:RunLoadResult) {
+async function replace(review:RunLoadResult) {
  if(replacementPending)return;
  replacementPending=true;
- controller.queueWrite(()=>{
+ try {
+  const accepted=await controller.replace(review,crypto.randomUUID(),(controller.snapshot.items.run.seed+1)>>>0);
   replacementPending=false;
-  if(controller.replace(review,crypto.randomUUID(),(controller.snapshot.items.run.seed+1)>>>0)) {
+  if(!live)return;
+  if(accepted) {
    startup=false;stopBattle();render();screen.querySelector<HTMLElement>('h1')?.focus();
   } else {if(!playing)render();showRecovery();}
- },()=>{replacementPending=false;});
+ } finally {replacementPending=false;}
 }
 function requestNew() {
  if(!live || dialogs.open || replacementPending)return;
@@ -92,7 +95,7 @@ function requestNew() {
  }
  const review=controller.inspect();
  const cancel=()=>{if(startup){render();screen.querySelector<HTMLElement>('#run-start')?.focus();}else restart.focus();};
- dialogs.showChoices('Start new run?', 'Replace this run with a full party, empty inventory and a fresh seed? Export saved data first if needed.',[
+ dialogs.showChoices('Start new run?', 'End this unfinished journey and start with a full party, empty inventory and a fresh seed? Export saved data first if needed.',[
   {id:'run-confirm-new',label:'Start new run',run:()=>replace(review)},
   {id:'run-cancel-new',label:'Cancel',run:cancel},
  ],cancel);
@@ -175,7 +178,9 @@ function renderActions() {
  actions.replaceChildren();
  if(!storage)actions.append(testingProgress('run'));
  const snapshot=controller.snapshot,run=snapshot.items.run;
- if(run.phase==='battle' && !snapshot.activeBattle) actions.append(button('Start encounter',startBattle,'run-start-encounter'));
+ if(run.phase==='battle' && !snapshot.activeBattle) {
+  const enter=button('Start encounter',startBattle,'run-start-encounter');enter.disabled=replacementPending;actions.append(enter);
+ }
  else if(run.phase==='victory' || run.phase==='defeat') {
   items.querySelector('h1')!.textContent=run.phase==='victory'?'Run victory':'Run defeat';
   actions.append(button('Start new run',()=>{
