@@ -51,6 +51,10 @@ function boundary(kind:SignatureKind,outcome:Outcome='any',elevated=false,firstS
   throw Error(`No legal ${kind} ${outcome} boundary`);
 }
 type Boundary=ReturnType<typeof boundary>;
+function fixtureAbilitySelector(fixture:Boundary) {
+  if(fixture.command.type!=='useAbility')throw Error('Expected ability fixture');
+  return `[data-action="${fixture.command.abilityId}"]`;
+}
 const report=async(page:Page)=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
 const stored=(page:Page)=>page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),keys);
 const ready=(page:Page)=>expect(page.locator('#game')).toHaveAttribute('data-phase','player');
@@ -94,7 +98,7 @@ async function press(page:Page,selector:string,keyboard=false) {
   else await element.click();
 }
 async function prepareSignature(page:Page,fixture:Boundary,keyboard=false) {
-  await press(page,'[data-action="signature"]',keyboard);
+  await press(page,fixtureAbilitySelector(fixture),keyboard);
   const view=abilityPresentation(fixture.events).signature!,target=fixture.before.units.find(u=>u.id===view.targetId)!;
   if(keyboard){
     const actor=fixture.before.units.find(u=>u.id===view.actorId)!;
@@ -122,7 +126,7 @@ async function confirmFrozen(page:Page) {
 test('target overlays follow invalid selection, action changes, keyboard, cancellation and board taps without resolving commands',async({page},info)=>{
   const fixture=boundary('high_shot','any',true);await boot(page,fixture);
   const saved=await stored(page),initial=(await readSession(page)).state;
-  await press(page,'[data-action="signature"]');
+  await press(page,fixtureAbilitySelector(fixture));
   const actor=fixture.before.units.find(u=>u.id===fixture.command.unitId)!;
   await page.locator('canvas').focus();await page.keyboard.press('Enter');
   expect((await report(page)).targets.find((t:any)=>t.selected)).toEqual({cell:actor.cell,valid:false,selected:true,reason:'sameSide'});
@@ -144,12 +148,12 @@ test('target overlays follow invalid selection, action changes, keyboard, cancel
   expect((await report(page)).targets.find((t:any)=>t.selected)).toEqual({cell:target.cell,valid:true,selected:true,reason:null});
   await page.locator('#battle-cancel').click();
   expect((await report(page)).targets).toEqual([]);await expect(page.locator('#battle-review')).toBeDisabled();
-  await press(page,'[data-action="signature"]');await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
+  await press(page,fixtureAbilitySelector(fixture));await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
   await press(page,'[data-action="move"]');expect((await report(page)).targets).toEqual([]);
   await press(page,'[data-action="basic"]');expect((await report(page)).targets.length).toBeGreaterThan(0);
   await page.locator('#battle-cancel').click();expect((await report(page)).targets).toEqual([]);
   expect((await readSession(page)).state).toEqual(initial);expect(await stored(page)).toEqual(saved);
-  await press(page,'[data-action="signature"]');await page.locator('#fit-restart').click();await confirmRestart(page);await ready(page);
+  await press(page,fixtureAbilitySelector(fixture));await page.locator('#fit-restart').click();await confirmRestart(page);await ready(page);
   expect((await report(page)).targets).toEqual([]);
 });
 function aligned(r:any,fixture:Boundary) {
@@ -224,7 +228,7 @@ for(const kind of kinds)test(`${kind}: real controls, travel/impact, transformed
   const fixture=boundary(kind),keyboard=kind==='magic_missile';await boot(page,fixture);
   const baseline=(await report(page)).objectCount,savedBefore=await stored(page);
   // A signature aimed at its own actor must remain a rejected preview, with no cue or save.
-  await press(page,'[data-action="signature"]',keyboard);await page.locator('canvas').focus();await page.keyboard.press('Enter');
+  await press(page,fixtureAbilitySelector(fixture),keyboard);await page.locator('canvas').focus();await page.keyboard.press('Enter');
   await expect(page.locator('#battle-preview')).toContainText('Unavailable');await expect(page.locator('#battle-review')).toBeDisabled();
   expect((await report(page)).effect).toBeNull();expect((await readSession(page)).state).toEqual(fixture.before);expect(await stored(page)).toEqual(savedBefore);
   await press(page,'#battle-cancel',keyboard);
@@ -245,7 +249,7 @@ for(const kind of kinds)test(`${kind}: real controls, travel/impact, transformed
   // fallback intentionally open/confirm reset; held-key capture has its own regression.
   await expect(page.locator('#fit-restart')).toBeFocused();await page.locator('canvas').focus();
   await page.keyboard.press('Enter');await page.keyboard.press('Space');
-  await expect(page.locator('#battle-next')).toBeDisabled();await expect(page.locator('[data-action="signature"]')).toBeDisabled();
+  await expect(page.locator('#battle-next')).toBeDisabled();await expect(page.locator(fixtureAbilitySelector(fixture))).toBeDisabled();
   await page.clock.runFor(112);const travel=await report(page);aligned(travel,fixture);
   expect(travel.effect.progress).toBeGreaterThan(0);expect(travel.effect.progress).toBeLessThan(0.45);
   await page.screenshot({path:info.outputPath(`${kind}-travel.png`)});
@@ -357,7 +361,7 @@ test.describe('ability departure through real browser history',()=>{
 for(const ability of ['ability:basic_attack','ability:guarded_strike'] as const)test(`${ability}: spent action and effective Guarded feedback agree in actor and inspection`,async({page})=>{
   const fixture=boundary('guarded_strike');await boot(page,fixture);
   const command={...fixture.command,abilityId:ability} as Extract<Command,{type:'useAbility'}>;
-  await page.locator(ability==='ability:basic_attack'?'[data-action="basic"]':'[data-action="signature"]').click();
+  await page.locator(`[data-action="${ability==='ability:basic_attack'?'basic':ability}"]`).click();
   const targetId='unitId' in command.target?command.target.unitId:-1;
   const target=fixture.before.units.find(u=>u.id===targetId)!;
   await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
@@ -422,7 +426,7 @@ async function bobFrame(page: Page) {
 test('active bob: targets, cancel, inspection, camera and live reduced motion preserve authoritative state', async ({page}, info) => {
   const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
   await page.emulateMedia({reducedMotion: 'no-preference'});
-  await boot(page, boundary('magic_missile'));
+  const fixture=boundary('magic_missile');await boot(page,fixture);
   await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
   const initial = await readSession(page), saved = await stored(page);
   const {frame: baseline} = await bobFrame(page);
@@ -434,7 +438,7 @@ test('active bob: targets, cancel, inspection, camera and live reduced motion pr
   expect(Math.min(...offsets)).toBeLessThan(-1.9);
   expect(Math.max(...offsets)).toBeGreaterThan(-0.1);
   await page.screenshot({path: info.outputPath('active-bob.png')});
-  await press(page, '[data-action="signature"]', true);
+  await press(page,fixtureAbilitySelector(fixture),true);
   const enemy = initial.state.units.find(unit => unit.hp > 0 && unit.side === 'enemy')!;
   await page.locator('#battle-target').selectOption(`${enemy.cell.x},${enemy.cell.y}`);
   await page.clock.runFor(400);

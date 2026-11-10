@@ -42,7 +42,8 @@ test('occluded archer exposed art selects the same legal target as the dropdown'
   page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
   const state=await occlusionBoundary(page,28);
   expect(state.units.find(u=>u.id===5)).toMatchObject({defId:'goblin_archer',cell:{x:3,y:2},hp:8});
-  await page.locator('[data-action=signature]').click();
+  const abilityId=await page.locator('#battle-ability').inputValue();
+  await page.locator(`[data-action="${abilityId}"]`).click();
   await expect(page.locator('#battle-target option[value="3,2"]')).not.toContainText('Unavailable');
   await expect(page.locator('#battle-target option[value="4,6"]')).toContainText('Unavailable: Out Of Range');
   await page.locator('#battle-target').selectOption('3,2');

@@ -13,6 +13,13 @@ async function abilityReady(page:Page,url:string) {
   await settledReport(page);
 }
 
+const abilityButton=(page:Page,id:string)=>page.locator(`[data-action="${id}"]`);
+const learnedControls={
+  fighter:[['guarded_strike','Guarded Strike'],['second_wind','Second Wind'],['taunt','Taunt']],
+  ranger:[['high_shot','High Shot'],['mark_target','Mark Target'],['pinning_shot','Pinning Shot']],
+  mage:[['frost_snare','Frost Snare'],['magic_missile','Magic Missile']],
+} as const;
+
 test('review356 radial Tab review matches the ability actually confirmed',async({page})=>{
   await page.addInitScript(()=>{(globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';});
   await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
@@ -176,21 +183,32 @@ test('review356 friendly confirmation rejects a replacement prepared command',as
 });
 
 for(const hero of ['fighter','ranger','mage'] as const)test(`keyboard-only shortcuts select ${hero} learned abilities and preserve resource locks`,async({page})=>{
-  const expected={fighter:['guarded_strike','second_wind','taunt'],ranger:['high_shot','mark_target','pinning_shot'],mage:['frost_snare','magic_missile']}[hero].map(id=>`ability:${id}`);
+  const expected=learnedControls[hero].map(([id])=>`ability:${id}`);
   await abilityReady(page,`/tests/fixtures/abilities/index.html?hero=${hero}&xp=180&real&injured`);
   const before=await readSession(page),picker=page.locator('#battle-ability'),canvas=page.locator('canvas');
   expect(await picker.locator('option').evaluateAll(options=>options.map(option=>(option as HTMLOptionElement).value))).toEqual(expected);
+  const direct=page.locator('.battle-actions [data-action^="ability:"]');
+  expect(await direct.evaluateAll(buttons=>buttons.map(button=>(button as HTMLElement).dataset.action))).toEqual(expected);
+  await expect(page.locator('[data-action="signature"]')).toHaveCount(0);
+  const nodes=await direct.elementHandles();
   const saves=await page.evaluate(()=>JSON.stringify(localStorage));
   for(const [index,ability] of expected.entries()){
+    const button=abilityButton(page,ability),name=learnedControls[hero][index][1];
+    await expect(page.getByRole('button',{name,exact:true})).toHaveCount(1);
+    await expect(button).toBeVisible();await expect(button).toBeEnabled();
+    if(test.info().project.use.hasTouch)await button.tap();else {await button.focus();await page.keyboard.press('Space');await expect(button).toBeFocused();}
+    await expect(picker).toHaveValue(ability);await expect(button).toHaveAttribute('aria-pressed','true');
+    expect((await readSession(page)).state).toEqual(before.state);
+    expect(await button.evaluate((node,original)=>node===original,nodes[index])).toBe(true);
     await canvas.focus();await page.keyboard.press(String(index+1));
     await expect(picker).toHaveValue(ability);
-    await expect(page.locator('[data-action=signature]')).toHaveAttribute('aria-pressed','true');
+    await expect(abilityButton(page,ability)).toHaveAttribute('aria-pressed','true');
     await expect(page.locator('#battle-shortcuts ol')).toContainText(`${index+1}:`);
     expect((await readSession(page)).state).toEqual(before.state);
   }
   await page.keyboard.press('9');await expect(picker).toHaveValue(expected.at(-1)!);
   await page.keyboard.press('Escape');await page.keyboard.press('s');
-  await expect(page.locator('[data-action=signature]')).toHaveAttribute('aria-pressed','true');
+  await expect(abilityButton(page,expected.at(-1)!)).toHaveAttribute('aria-pressed','true');
   expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saves);
   const ability=hero==='fighter'?'ability:second_wind':hero==='ranger'?'ability:mark_target':'ability:frost_snare';
   const index=expected.indexOf(ability);
@@ -206,9 +224,125 @@ for(const hero of ['fighter','ranger','mage'] as const)test(`keyboard-only short
   expect((await readSession(page)).state).toEqual(accepted.state);
   await abilityReady(page,`/tests/fixtures/abilities/index.html?hero=${hero}&xp=0&real`);
   await expect(picker.locator('option')).toHaveCount(1);
+  await expect(direct).toHaveCount(1);
   const locked=await readSession(page);
   await canvas.focus();await page.keyboard.press('2');await page.keyboard.press('c');
   expect((await readSession(page)).state).toEqual(locked.state);
+});
+
+test('direct ability controls fit the desktop rail and compact touch layouts',async({page,hasTouch})=>{
+  test.setTimeout(90000);
+  const landscape=page.viewportSize()!.width>page.viewportSize()!.height;
+  const measurements=[];
+  for(const hero of ['fighter','ranger'] as const){
+    await abilityReady(page,`/tests/fixtures/abilities/index.html?hero=${hero}&xp=180&real&injured`);
+    if(!hasTouch){
+      // Remove the file's compatibility override to exercise actual Auto on a
+      // fine pointer, not merely another explicitly forced desktop Rail run.
+      await page.evaluate(key=>{
+        delete (globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls;
+        localStorage.removeItem(key);globalThis.dispatchEvent(new Event('combat-controls-change'));
+      },COMBAT_CONTROLS_KEY);
+      expect(await page.evaluate(()=>matchMedia('(pointer: coarse)').matches)).toBe(false);
+      expect(await page.evaluate(key=>localStorage.getItem(key),COMBAT_CONTROLS_KEY)).toBeNull();
+    }
+    await expect(page.locator('body')).toHaveAttribute('data-combat-skin','rail');
+    const before=await readSession(page);
+    const sizes=hasTouch?[landscape?[568,320]:[320,568]]:hero==='fighter'
+      ?[[1280,720],[1024,768],[800,600],[1024,500]]:[[1280,720]];
+    for(const [width,height] of sizes){
+      await page.setViewportSize({width,height});await settledReport(page);
+      const actions=page.locator('.battle-actions button:not([hidden])');
+      await expect(actions).toHaveCount(6);
+      expect(await actions.evaluateAll(buttons=>buttons.map(button=>(button as HTMLElement).dataset.action??button.id)))
+        .toEqual(['move','basic',...learnedControls[hero].map(([id])=>`ability:${id}`),'battle-next']);
+      const layout=await actions.evaluateAll(buttons=>{
+        const scroll=document.querySelector('#battle-scroll')!;
+        const board=document.querySelector('#battlefield')!.getBoundingClientRect();
+        const panel=document.querySelector('#fit-panel')!.getBoundingClientRect();
+        const controls=buttons.map(button=>{
+          button.scrollIntoView({block:'nearest'});
+          const bounds=button.getBoundingClientRect(),visible=scroll.getBoundingClientRect();
+          const label=button.querySelector('strong')!,range=document.createRange();range.selectNodeContents(label);
+          return {name:button.getAttribute('aria-label'),width:bounds.width,height:bounds.height,
+            inViewport:bounds.left>=0&&bounds.right<=innerWidth,
+            reachable:bounds.top>=visible.top&&bounds.bottom<=visible.bottom,
+            labelFits:[...range.getClientRects()].every(r=>r.left>=bounds.left&&r.right<=bounds.right&&r.top>=bounds.top&&r.bottom<=bounds.bottom)};
+        });
+        return {columns:getComputedStyle(document.querySelector('.battle-actions')!).gridTemplateColumns.split(' ').length,
+          overflow:document.documentElement.scrollWidth>innerWidth,
+          separate:board.right<=panel.left||board.bottom<=panel.top,controls};
+      });
+      expect(layout.columns).toBe(2);expect(layout.overflow).toBe(false);expect(layout.separate).toBe(true);
+      for(const control of layout.controls){
+        expect(control.width,control.name!).toBeGreaterThanOrEqual(44);expect(control.height,control.name!).toBeGreaterThanOrEqual(66);
+        expect(control.inViewport,control.name!).toBe(true);expect(control.reachable,control.name!).toBe(true);expect(control.labelFits,control.name!).toBe(true);
+      }
+      const ability=hero==='fighter'?'ability:second_wind':'ability:mark_target',button=abilityButton(page,ability);
+      await button.scrollIntoViewIfNeeded();await button.focus();
+      const scroll=await page.locator('#battle-scroll').evaluate(node=>node.scrollTop);
+      if(hasTouch)await button.tap();else await page.keyboard.press('Space');
+      await expect(page.locator('#battle-ability')).toHaveValue(ability);
+      await expect(button).toHaveAttribute('aria-pressed','true');
+      if(!hasTouch)await expect(button).toBeFocused();
+      expect(await page.locator('#battle-scroll').evaluate(node=>node.scrollTop)).toBe(scroll);
+      expect((await readSession(page)).state).toEqual(before.state);
+      await page.locator('#battle-target').selectOption(hero==='fighter'?'0,0':'2,0');
+      await expect(page.locator('#battle-review')).toBeEnabled();
+      await page.locator('#battle-party').click();await page.locator('#inspection-close').click();
+      await expect(page.locator('#battle-party')).toBeFocused();await expect(page.locator('#battle-review')).toBeEnabled();
+      await page.locator('#battle-cancel').click();expect((await readSession(page)).state).toEqual(before.state);
+      await expect(page.locator('#battle-move')).toBeFocused();
+      await page.locator('#battle-scroll').evaluate(node=>node.scrollTop=0);
+      await page.screenshot({path:test.info().outputPath(`direct-${hero}-${width}x${height}.png`)});
+      measurements.push({hero,width,height,hasTouch,...layout});
+    }
+  }
+  await test.info().attach('direct-ability-layouts',{body:JSON.stringify(measurements,null,2),contentType:'application/json'});
+});
+
+test('direct ability controls stay hidden across radial turns and restore with the rail',async({page,hasTouch})=>{
+  test.setTimeout(90000);
+  const activate=async(selector:string)=>hasTouch?page.locator(selector).tap():page.locator(selector).click();
+  for(const hero of ['fighter','ranger'] as const){
+    await abilityReady(page,`/tests/fixtures/abilities/index.html?hero=${hero}&xp=180&real&injured`);
+    const before=await readSession(page),actor=before.state.initiative[before.state.activeIndex];
+    await page.evaluate(()=>{delete (globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls;});
+    await page.locator('#battle-overflow summary').click();await page.getByRole('radio',{name:hasTouch?'Auto':'Radial',exact:true}).check();
+    await expect(page.locator('body')).toHaveAttribute('data-combat-skin','radial');await settledReport(page);
+    const direct=page.locator('.battle-actions [data-action^="ability:"]');
+    expect(await direct.count()).toBeGreaterThan(0);
+    for(const button of await direct.all())await expect(button).toBeHidden();
+    await tapBoard(page,hero==='fighter'?{x:0,y:0}:{x:2,y:0});
+    const special=page.locator('#battle-radial-special');await expect(special).toBeEnabled();
+    if(hero==='fighter'){
+      await expect(special).toContainText('Second Wind');
+    }else{
+      await activate('#battle-radial-special');
+      await expect(page.locator('[data-radial-ability="ability:mark_target"]')).toBeVisible();
+      await expect(page.locator('[data-radial-ability="ability:mark_target"]')).toHaveAccessibleName(/Mark Target/);
+    }
+    expect((await readSession(page)).state).toEqual(before.state);
+    await page.screenshot({path:test.info().outputPath(`radial-named-${hero}.png`)});
+    await activate(hero==='fighter'?'#battle-radial-special':'[data-radial-ability="ability:mark_target"]');
+    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    const accepted=await readSession(page);
+    expect(accepted.state.commandCount).toBe(before.state.commandCount+1);
+    expect(accepted.events.some(event=>event.type==='abilityUsed'&&event.abilityId===`ability:${hero==='fighter'?'second_wind':'mark_target'}`)).toBe(true);
+    await activate('#battle-next');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    const next=await readSession(page);expect(next.state.initiative[next.state.activeIndex]).not.toBe(actor);
+    // A different actor creates a different button set after applySkin ran.
+    const ids=await page.locator('#battle-ability option').evaluateAll(options=>options.map(option=>(option as HTMLOptionElement).value));
+    expect(await direct.evaluateAll(buttons=>buttons.map(button=>(button as HTMLElement).dataset.action))).toEqual(ids);
+    for(const button of await direct.all())await expect(button).toBeHidden();
+    if(await page.locator('#battle-overflow').getAttribute('open')===null)await activate('#battle-overflow summary');
+    await page.getByRole('radio',{name:'Rail',exact:true}).check();
+    await expect(page.locator('body')).toHaveAttribute('data-combat-skin','rail');
+    for(const button of await direct.all())await expect(button).toBeVisible();
+    const button=abilityButton(page,ids[0]);await button.click();
+    await expect(page.locator('#battle-ability')).toHaveValue(ids[0]);await expect(button).toHaveAttribute('aria-pressed','true');
+    expect((await readSession(page)).state).toEqual(next.state);
+  }
 });
 
 test('keyboard-only shortcuts use canonical radial ability numbers without casting unavailable alternatives',async({page})=>{
@@ -267,7 +401,7 @@ test('Mage real learned picker consolidates Arc Bolt and gates Frost Snare at le
 test('Mage real Frost Snare preserves keyboard touch previews cancellation inspection and fresh reload without attack audio',async({page,isMobile})=>{
   test.setTimeout(90000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
   await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
-  const picker=page.locator('#battle-ability'),button=page.locator('[data-action=signature]'),before=await readSession(page);
+  const picker=page.locator('#battle-ability'),button=abilityButton(page,'ability:frost_snare'),before=await readSession(page);
   if(isMobile)await page.locator('#battle-sound').tap();else{await page.locator('#battle-sound').focus();await page.keyboard.press('Enter');}
   await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().battleAudio)).toMatchObject({enabled:true,status:'ready',started:0});
   const storage=await page.evaluate(()=>JSON.stringify(localStorage));
@@ -303,7 +437,7 @@ test('Ranger learned actions follow level one, two and three through the real pi
 for(const ability of ['mark_target','pinning_shot'] as const)test(`Ranger ${ability} preserves keyboard touch preview cancellation inspection and fresh reload`,async({page,isMobile})=>{
   test.setTimeout(90000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
   await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=ranger&xp=180');
-  const picker=page.locator('#battle-ability'),button=page.locator('[data-action=signature]'),abilityId=`ability:${ability}`;
+  const abilityId=`ability:${ability}`,picker=page.locator('#battle-ability'),button=abilityButton(page,abilityId);
   const before=await readSession(page),storage=await page.evaluate(()=>JSON.stringify(localStorage));
   // Exercise no-roll controls with a real unlocked backend, so muted audio cannot
   // hide an accidental attack/magic cue in the presentation path.
@@ -343,11 +477,23 @@ for(const ability of ['mark_target','pinning_shot'] as const)test(`Ranger ${abil
 
 test('Fighter healing and Taunt preserve keyboard touch cancellation inspection and fresh reload',async({page,isMobile})=>{
   test.setTimeout(90000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=fighter&xp=180');
+  const full=await readSession(page),fullHeal=abilityButton(page,'ability:second_wind');
+  await expect(fullHeal).toBeVisible();await expect(fullHeal).toBeDisabled();await expect(fullHeal).toHaveAccessibleName('Second Wind');await expect(fullHeal).toContainText('Full health');
+  await abilityButton(page,'ability:guarded_strike').click();await page.locator('#battle-target').selectOption('1,0');await expect(page.locator('#battle-review')).toBeEnabled();
+  // An unavailable numeric selection must clear the previous legal attack,
+  // rather than leaving that old attack armed behind the disabled heal button.
+  await page.locator('canvas').focus();await page.keyboard.press('2');await expect(page.locator('#battle-ability')).toHaveValue('ability:second_wind');
+  expect((await readSession(page)).pending).toBeNull();await expect(page.locator('#battle-review')).toBeDisabled();await page.keyboard.press('s');await page.keyboard.press('c');
+  expect((await readSession(page)).state).toEqual(full.state);
+  await page.evaluate(()=>{(globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';globalThis.dispatchEvent(new Event('combat-controls-change'));});
+  await settledReport(page);await tapBoard(page,{x:0,y:0});await expect(page.locator('#battle-radial-special')).toBeDisabled();await page.keyboard.press('Escape');
+  expect((await readSession(page)).state).toEqual(full.state);
   await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=fighter&xp=180&injured');
-  const picker=page.locator('#battle-ability'),signature=page.locator('[data-action=signature]');
+  const picker=page.locator('#battle-ability'),secondWind=abilityButton(page,'ability:second_wind'),taunt=abilityButton(page,'ability:taunt');
   await expect(picker.locator('option[value="ability:second_wind"]')).toHaveCount(1);await expect(picker.locator('option[value="ability:taunt"]')).toHaveCount(1);
   const initial=await readSession(page);
-  await picker.selectOption('ability:second_wind');if(isMobile)await signature.tap();else await signature.click();
+  await picker.selectOption('ability:second_wind');if(isMobile)await secondWind.tap();else await secondWind.click();
   await page.locator('#battle-target').selectOption('0,0');await expect(page.locator('#battle-preview')).toContainText('Heal 7 HP');
   await expect(page.locator('#battle-preview')).not.toContainText('Friendly fire');await expect(page.locator('#battle-ability-info')).toContainText('1/1 use');
   await page.locator('#battle-party').click();await expect(page.getByRole('dialog')).toContainText('Second Wind 1/1');await page.locator('#inspection-close').click();
@@ -355,7 +501,7 @@ test('Fighter healing and Taunt preserve keyboard touch cancellation inspection 
   expect((await readSession(page)).state).toEqual(initial.state);
   await page.locator('#battle-review').scrollIntoViewIfNeeded();await page.screenshot({path:test.info().outputPath('fighter-heal-preview-narrow.png')});
   await page.setViewportSize(viewport);await page.keyboard.press('Escape');expect((await readSession(page)).pending).toBeNull();expect((await readSession(page)).state).toEqual(initial.state);
-  await signature.click();await page.locator('#battle-target').selectOption('0,0');
+  await secondWind.click();await page.locator('#battle-target').selectOption('0,0');
   if(isMobile)await page.locator('#battle-review').tap();else {await page.locator('#battle-review').focus();await page.keyboard.press('Enter');}
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const healed=await readSession(page);expect(healed.state.rng).toEqual(initial.state.rng);expect(healed.state.units.find(u=>u.defId==='fighter')).toMatchObject({hp:27,secondWindUsed:true,hasActed:true});
@@ -363,7 +509,7 @@ test('Fighter healing and Taunt preserve keyboard touch cancellation inspection 
   await page.locator('#battle-next').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   for(let i=0;i<8;i++) {const s=await readSession(page);if(s.state.units.find(u=>u.id===s.state.initiative[s.state.activeIndex])!.defId==='fighter')break;await page.locator('#battle-next').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');}
   let next=await readSession(page),fighter=next.state.units.find(u=>u.id===next.state.initiative[next.state.activeIndex])!;expect(fighter.defId).toBe('fighter');
-  await picker.selectOption('ability:second_wind');await expect(signature).toBeDisabled();await expect(page.locator('#battle-ability-info')).toContainText('Use exhausted');
+  await picker.selectOption('ability:second_wind');await expect(secondWind).toBeDisabled();await expect(secondWind).toContainText('Use exhausted');await expect(page.locator('#battle-ability-info')).toContainText('Use exhausted');
   let enemy=next.state.units.find(u=>u.side==='enemy' && u.hp>0 && Math.abs(u.cell.x-fighter.cell.x)+Math.abs(u.cell.y-fighter.cell.y)===1);
   if(!enemy){
     const base=abilityCatalog(2),catalog=projectProgression(HERO_IDS.map(id=>progressHero(id,180,1,base)),base),reach=previewMovement(next.state,fighter.id,catalog);if(!reach.ok)throw Error(reach.reason);
@@ -373,7 +519,16 @@ test('Fighter healing and Taunt preserve keyboard touch cancellation inspection 
     enemy=next.state.units.find(u=>u.side==='enemy' && u.hp>0 && Math.abs(u.cell.x-fighter.cell.x)+Math.abs(u.cell.y-fighter.cell.y)===1);
   }
   expect(enemy).toBeDefined();if(!enemy)throw Error('No adjacent enemy');
-  await picker.selectOption('ability:taunt');if(isMobile)await signature.tap();else await signature.click();
+  await abilityButton(page,'ability:guarded_strike').click();await page.locator('#battle-target').selectOption(`${enemy.cell.x},${enemy.cell.y}`);await expect(page.locator('#battle-review')).toBeEnabled();
+  await page.locator('canvas').focus();await page.keyboard.press('2');await expect(picker).toHaveValue('ability:second_wind');
+  expect((await readSession(page)).pending).toBeNull();await expect(page.locator('#battle-review')).toBeDisabled();await page.keyboard.press('c');
+  expect((await readSession(page)).state).toEqual(next.state);
+  await page.evaluate(()=>{(globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';globalThis.dispatchEvent(new Event('combat-controls-change'));});
+  await settledReport(page);await tapBoard(page,fighter.cell);await expect(page.locator('#battle-radial-special')).toBeDisabled();await page.keyboard.press('Escape');
+  expect((await readSession(page)).state).toEqual(next.state);
+  await page.evaluate(()=>{(globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='rail';globalThis.dispatchEvent(new Event('combat-controls-change'));});
+  await settledReport(page);
+  await picker.selectOption('ability:taunt');if(isMobile)await taunt.tap();else await taunt.click();
   await page.locator('#battle-target').selectOption(`${enemy.cell.x},${enemy.cell.y}`);await expect(page.locator('#battle-preview')).toContainText('no roll');
   await page.locator('#battle-review').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const taunted=await readSession(page);expect(taunted.state.rng).toEqual(next.state.rng);expect(taunted.state.units.find(u=>u.id===enemy.id)?.tauntedBy).toBe(fighter.id);
@@ -385,7 +540,7 @@ test('Fighter healing and Taunt preserve keyboard touch cancellation inspection 
 });
 for(const hero of ['fighter','ranger','mage'])test(`${hero} explicit later ability survives inspection/layout and cancels without mutation`,async({page,isMobile})=>{
   await abilityReady(page,`/tests/fixtures/abilities/index.html?hero=${hero}`);
-  const picker=page.locator('#battle-ability'),button=page.locator('[data-action=signature]');
+  const picker=page.locator('#battle-ability'),button=abilityButton(page,`ability:zz_${hero}`);
   await expect(picker.locator('option')).toHaveCount(2);
   const before=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
   if(isMobile)await picker.tap();else {await picker.focus();await page.keyboard.press('Space');}
@@ -429,7 +584,7 @@ test('friendly missile confirmation supports Cancel and Escape then one delibera
   await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=mage');
   const before=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
   for(const dismissal of ['cancel','escape']){
-    await page.locator('#battle-ability').selectOption('ability:zz_mage');await page.locator('[data-action=signature]').click();
+    await page.locator('#battle-ability').selectOption('ability:zz_mage');await abilityButton(page,'ability:zz_mage').click();
     await page.locator('#battle-target').selectOption('4,0');
     await expect(page.locator('#battle-preview')).toContainText('Friendly fire');
     if(dismissal==='cancel')await page.locator('#battle-cancel').click();else await page.keyboard.press('Escape');
@@ -437,7 +592,7 @@ test('friendly missile confirmation supports Cancel and Escape then one delibera
     expect(after.state).toEqual(before.state);expect(after.replay).toEqual(before.replay);expect(after.pending).toBeNull();
     expect(await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage)))).toEqual({[COMBAT_CONTROLS_KEY]:'rail'});
   }
-  await page.locator('[data-action=signature]').click();await page.locator('#battle-target').selectOption('4,0');
+  await abilityButton(page,'ability:zz_mage').click();await page.locator('#battle-target').selectOption('4,0');
   await page.locator('#battle-review').click();
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const after=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
@@ -458,7 +613,7 @@ for(const [xp,level,missiles,maxHp] of [[0,1,1,11],[60,2,1,15],[180,3,2,19]])tes
  await expect(picker.locator('option[value="ability:frost_snare"]')).toHaveCount(level>=3?1:0);
  await expect(picker.locator('option[value="ability:zz_mage"]')).toHaveCount(level===1?0:1);
  await page.locator('#battle-party').click();await expect(page.locator('#battle-dialog-message')).toContainText(`Level ${level}`);await page.locator('#inspection-close').click();
- await picker.selectOption('ability:magic_missile');await page.locator('[data-action=signature]').click();await page.locator('#battle-target').selectOption('1,0');await page.locator('#battle-review').click();
+ await picker.selectOption('ability:magic_missile');await abilityButton(page,'ability:magic_missile').click();await page.locator('#battle-target').selectOption('1,0');await page.locator('#battle-review').click();
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const before=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);expect(before.events.filter((e:{type:string})=>e.type==='missileRolled')).toHaveLength(missiles);
  await page.reload();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect((await readSession(page)).state).toEqual(initial.state);

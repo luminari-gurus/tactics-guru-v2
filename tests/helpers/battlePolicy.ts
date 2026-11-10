@@ -87,8 +87,7 @@ export async function playCommand(page:Page,command:Command){
     if(await chip.count()) await chip.click();
     return;
   }
-  if(command.type==='useAbility' && command.abilityId!=='ability:basic_attack')await page.locator('#battle-ability').selectOption(command.abilityId);
-  await page.locator(`[data-action="${command.type==='move'?'move':command.abilityId==='ability:basic_attack'?'basic':'signature'}"]`).click();
+  await page.locator(`[data-action="${command.type==='move'?'move':command.abilityId==='ability:basic_attack'?'basic':command.abilityId}"]`).click();
   await page.locator('#battle-target').selectOption(`${cell.x},${cell.y}`);
   await page.getByRole('button',{name:'Confirm action'}).click();
 }
