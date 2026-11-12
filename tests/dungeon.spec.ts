@@ -7,7 +7,7 @@ import type { Locator } from '@playwright/test';
 import { dungeonCapacityFixture, dungeonVictoryBoundary } from './helpers/dungeonFixtures';
 import { dungeonBattle, startDungeonBattle, acceptDungeonBattle, freshDungeon, type DungeonState } from '../src/domain/dungeon';
 import { progressHero } from '../src/domain/progression';
-import { encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
+import { decodeDungeon, encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { RUN_RECORD_KEYS } from '../src/persistence/runRecordsStorage';
 import { COMBAT_CONTROLS_KEY } from '../src/ui/combatControls';
@@ -714,6 +714,11 @@ test('character sheets show equipped charms by hero through equip, resume, and u
  await page.locator('#dungeon-item-confirm').click();
  await inspect('Ranger', charm);
  await inspect('Mage', 'Empty');
+ await expect.poll(async () => {
+  const text = await page.evaluate(key => localStorage.getItem(key), DUNGEON_KEYS.primary);
+  const saved = text === null ? null : decodeDungeon(text);
+  return saved?.ok ? saved.state.ownership.assignments : [];
+ }).toContainEqual({ heroId: 'ranger', slot: 'charm', instanceId: unassigned.instanceId });
  await page.reload();
  await continueSavedDungeon(page);
  await inspect('Ranger', charm);
