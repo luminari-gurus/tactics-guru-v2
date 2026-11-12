@@ -13,6 +13,24 @@ import { emptyItemOwnership } from '../../src/domain/items';
 import { previewSupportAbility } from '../../src/domain/combat';
 import { DRAUGHT_REPLAY_FORMAT_VERSION } from '../../src/domain/constants';
 import { RunItemSession } from '../../src/app/RunItemSession';
+import { freshRunStats } from '../../src/domain/runStats';
+import { hashJson } from '../../src/domain/contentIdentity';
+
+it('roundtrips stats in format 10, preserving partial coverage, and refuses malformed or downgraded stats', () => {
+  const snapshot = { ...activeSnapshot(), stats: { ...freshRunStats('since-upgrade'), enemiesKilled: 2, movesTaken: 4, activeMs: 12345 } };
+  const encoded = encodeRunSave(snapshot, runContext); assert(encoded.ok);
+  expect(JSON.parse(encoded.text).format).toBe(10);
+  expect(decodeRunSave(encoded.text, runContext)).toEqual({ ok: true, state: snapshot });
+  const envelope = JSON.parse(encoded.text);
+  for (const patch of [{ format: 8 }, { format: 9 }, { format: 11 },
+    { payload: { ...snapshot, stats: { ...snapshot.stats, activeMs: -1 } } },
+    { payload: { ...snapshot, stats: { ...snapshot.stats, version: 2 } } },
+    { payload: activeSnapshot() }]) {
+    const { digest: _, ...body } = { ...envelope, ...patch };
+    expect(decodeRunSave(JSON.stringify({ ...body, digest: hashJson(body) }), runContext).ok).toBe(false);
+  }
+  expect(readRunSnapshot({ ...snapshot, stats: undefined }, runContext).ok).toBe(false);
+});
 
 it.each(['active', 'reward'])('loads the exact pre-consumable run %s save and preserves its pending offer or battle', phase => {
   const text = readFileSync(`tests/fixtures/saves/issue-172/run-${phase}.json`, 'utf8');

@@ -11,6 +11,8 @@ import { encodeRunSave, readRunSnapshot, type RunSaveContext, type RunSnapshot }
 import { createRunStorage, type RunLoadResult, type RunStorageSlot } from '../persistence/runStorage';
 import { authoredRunRecord } from '../domain/runRecords';
 import type { RunHistory } from './RunHistory';
+import { acceptBattleStats, authoredWins, freshRunStats, type AcceptedBattle } from '../domain/runStats';
+import type { BattleState } from '../domain/types';
 
 const rejectionText: Record<ItemFailure['reason'], string> = {
   invalidOwnership: 'The owned items are invalid', invalidItems: 'The item state is invalid',
@@ -48,6 +50,7 @@ export class RunItemSession {
     const read = readRunSnapshot(initial, context);
     if (!read.ok) throw Error('Invalid run snapshot');
     this.current = read.state;
+    if (!storage) { const { stats: _, ...untracked } = this.current; this.current = untracked; }
     this.history = storage ? history : null;
     if (this.history) this.history.onChange = () => { if (!this.disposed) this.report(this.message); };
     if (!storage) this.message = 'Testing run. Progress resets on reload.';
@@ -75,7 +78,7 @@ export class RunItemSession {
     const battlefield = resolved.descriptor;
     let session: BattleSession;
     const entry = this.snapshot.items;
-    const accepted = () => {
+    const accepted = (_state?: BattleState, batch?: AcceptedBattle) => {
       if (this.disposed || this.battle !== session || session.phase === 'disposed') return;
       const next = session.state.outcome === 'ongoing'
         ? readRunSnapshot({ ...this.current, activeBattle: session.state, battlefield:battlefield }, this.context)
@@ -83,7 +86,9 @@ export class RunItemSession {
       if (!next.ok) { reportFailure('run_boundary', { route: 'run', encounter: this.current.items.run.encounterIndex }); this.report('Run boundary rejected. Progress unchanged.'); return; }
       if (session.state.outcome !== 'ongoing') this.lastRecord = { entry, state: session.state, replay: session.replay, continuation: session.continuation, events: session.events };
       const feedback = levelUpFeedback(this.current.items.run.party, next.state.items.run.party);
-      this.current = next.state; this.review = null;
+      this.current = this.storage && batch ? { ...next.state, stats: acceptBattleStats(
+        this.current.stats ?? freshRunStats('since-upgrade'), authoredWins(this.current.items.run), batch) } : next.state;
+      this.review = null;
       if (session.state.outcome !== 'ongoing') {
         const run = this.current.items.run;
         track('encounter_outcome', { route: 'run', encounter: run.encounterIndex, outcome: session.state.outcome === 'playerWin' ? 'victory' : 'defeat' }, `${run.id}:${run.encounterIndex}`);
@@ -130,7 +135,7 @@ export class RunItemSession {
   }
   private replaceNow(review: RunLoadResult, id: string, seed: number) {
     if (!this.storage || !/^[A-Za-z0-9-]{1,64}$/.test(id) || !isIntegerIn(seed, RULE_BOUNDS.uint32) || this.disposed || review !== this.review || !review.ok || id === this.current.items.run.id || seed === this.current.items.run.seed) return false;
-    const next = freshRunSnapshot(id, seed, this.context);
+    const next = freshRunSnapshot(id, seed, this.context, true);
     const latest = this.storage.load();
     if (!latest.ok || !(['primary','backup'] as const).every(slot => {
       const before = review.inspection[slot], now = latest.inspection[slot];
@@ -189,7 +194,7 @@ export class RunItemSession {
     if (!result.ok) { this.report(`${rejectionText[result.reason]}. Nothing changed.`); return result; }
     this.battle?.dispose(); this.battle = null;
     const encounter = this.current.items.run.encounterIndex;
-    this.current = { items: result.state, activeBattle: null, battlefield:null };
+    this.current = { ...this.current, items: result.state, activeBattle: null, battlefield:null };
     this.started = true;
     if (command.type === 'claimReward') track('reward_chosen', { route: 'run', encounter, phase: 'reward',
       choice: rewardChoices.find(choice => `item:${choice}` === command.itemId) }, `${this.current.items.run.id}:${encounter}`);

@@ -10,6 +10,7 @@ import { emptyItemOwnership, readRunItems, settleDraughts } from './items';
 import { createRewardOffer } from './rewards';
 import { readRunSnapshot, runBattleCatalog, resolveRunBattlefield, type RunSaveContext, type RunSnapshot } from './runSaveEnvelope';
 import type { BattleState } from './types';
+import { freshRunStats } from './runStats';
 
 /** The single canonical entry boundary for a run battle, including carried HP. */
 export function createRunBattle(input: unknown, context: RunSaveContext) {
@@ -42,10 +43,11 @@ export function replayRunBattle(input: unknown, entry: unknown, context: RunSave
   return replayCommandSequence(initial,read.replay.commands,created.catalog);
 }
 
-export function freshRunSnapshot(id: string, seed: number, context: RunSaveContext): RunSnapshot {
+export function freshRunSnapshot(id: string, seed: number, context: RunSaveContext, tracking = false): RunSnapshot {
   const run = createRun(id, seed, context.definition, context.catalog);
   if (!run.ok) throw Error('Invalid fresh run');
-  return { items: { run: run.state, ownership: emptyItemOwnership(), offer: null, itemRevision: 0 }, activeBattle: null, battlefield:null };
+  return { items: { run: run.state, ownership: emptyItemOwnership(), offer: null, itemRevision: 0 }, activeBattle: null, battlefield:null,
+    ...(tracking ? { stats: freshRunStats() } : {}) };
 }
 
 /** Caller must supply its owned accepted battle. This helper validates the aggregate before publication. */
@@ -62,5 +64,5 @@ export function completeRunBattle(snapshot: RunSnapshot, battle: BattleState, co
     party: run.party.map(hero => ({ ...hero, hp: battle.units.find(u => u.side === 'player' && u.defId === hero.heroId)?.hp ?? 0 })) },
     context.definition, context.catalog, battle.draughts);
   if (!next.ok) return next;
-  return readRunSnapshot({ items: { ...snapshot.items, ownership, run: next.state, offer: createRewardOffer(next.state, context.items) }, activeBattle: null, battlefield:null }, context);
+  return readRunSnapshot({ ...snapshot, items: { ...snapshot.items, ownership, run: next.state, offer: createRewardOffer(next.state, context.items) }, activeBattle: null, battlefield:null }, context);
 }

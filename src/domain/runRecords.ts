@@ -1,6 +1,7 @@
 import type { RunState } from './run';
 import type { DungeonState } from './dungeon';
 import { hasShape, isDenseArray, isPlainRecord } from './validation';
+import { authoredWins, dungeonProgressStats } from './runStats';
 
 export const RECORD_LIMIT = 100;
 export const RECORD_MODES = ['run', 'dungeon'] as const;
@@ -60,15 +61,14 @@ export function authoredRunRecord(run: RunState, recordedAt: number, abandoning 
   const terminal = run.phase === 'victory' || run.phase === 'defeat';
   if (!terminal && !abandoning) return null;
   return readRunRecord({ mode: 'run', id: run.id, outcome: terminal ? run.phase : 'abandoned', recordedAt,
-    battlesWon: run.phase === 'victory' ? 3 : run.encounterIndex + (run.phase === 'reward' ? 1 : 0),
+    battlesWon: authoredWins(run),
     floorsCleared: null, deepestFloor: null });
 }
 /** Validated floor.completed is the cardinality of its unique cleared slots. No dungeon/content runtime import. */
 export function dungeonRunRecord(state: DungeonState, recordedAt: number, abandoning = false): RunRecord | null {
   if (state.phase !== 'defeat' && !abandoning) return null;
   return readRunRecord({ mode: 'dungeon', id: state.id, outcome: state.phase === 'defeat' ? 'defeat' : 'abandoned', recordedAt,
-    battlesWon: state.floors.reduce((sum, f) => sum + f.completed, 0),
-    floorsCleared: state.floors.filter(f => f.completed === 3).length,
+    ...dungeonProgressStats(state),
     deepestFloor: Math.max(...state.floors.map(f => f.descriptor.depth)) });
 }
 

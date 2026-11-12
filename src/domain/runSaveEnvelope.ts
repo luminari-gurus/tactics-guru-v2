@@ -15,10 +15,12 @@ import { deriveRunSeed, type RunDefinition } from './run';
 import type { BattleState } from './types';
 import type { SaveFailure } from './saveEnvelope';
 import { hasShape } from './validation';
+import { readRunStats, type RunStats } from './runStats';
 
 export const RUN_SAVE_KIND = 'tactics-guru:run-snapshot';
 export const RUN_SAVE_FORMAT = 8;
 const DRAUGHT_RUN_SAVE_FORMAT = 9;
+const STATS_RUN_SAVE_FORMAT = 10;
 export const RUN_SAVE_MAX_CODE_UNITS = 32_768;
 /** Trusted validated definitions. Always pass the immutable BASE catalog. */
 export interface RunSaveContext {
@@ -27,7 +29,7 @@ export interface RunSaveContext {
   readonly catalog: ContentCatalog;
   readonly items: ItemCatalog;
 }
-export interface RunSnapshot { readonly items: RunItems; readonly activeBattle: BattleState | null; readonly battlefield: BattlefieldDescriptor | null }
+export interface RunSnapshot { readonly items: RunItems; readonly activeBattle: BattleState | null; readonly battlefield: BattlefieldDescriptor | null; readonly stats?: RunStats }
 export type RunSnapshotRead = { readonly ok: true; readonly state: RunSnapshot } | SaveFailure;
 
 /** Equipment is projected exactly once; absent heroes are removed from the encounter roster.
@@ -53,11 +55,15 @@ export function resolveRunBattlefield(items:RunItems, context:RunSaveContext) {
 
 export function readRunSnapshot(input: unknown, context: RunSaveContext): RunSnapshotRead {
   const invalid = { ok: false, reason: 'invalidState' } as const;
-  if (!hasShape(input, ['items','activeBattle','battlefield'])) return invalid;
+  const tracked = typeof input === 'object' && input !== null && Object.hasOwn(input, 'stats');
+  if (!hasShape(input, ['items','activeBattle','battlefield', ...(tracked ? ['stats'] : [])])) return invalid;
+  const stats = tracked ? readRunStats(input.stats) : null;
+  if (tracked && !stats) return invalid;
+  const tracking = stats ? { stats } : {};
   const checked = readRunItems(input.items, context.definition, context.catalog, context.items);
   if (!checked.ok) return invalid;
   const items = checked.state;
-  if (input.activeBattle === null) return input.battlefield === null ? { ok: true, state: { items, activeBattle: null, battlefield:null } } : invalid;
+  if (input.activeBattle === null) return input.battlefield === null ? { ok: true, state: { items, activeBattle: null, battlefield:null, ...tracking } } : invalid;
   const resolved=resolveRunBattlefield(items,context);
   if(!resolved?.ok || !sameBattlefield(input.battlefield,resolved.descriptor))return invalid;
   const catalog = runBattleCatalog(items, context);
@@ -67,7 +73,7 @@ export function readRunSnapshot(input: unknown, context: RunSaveContext): RunSna
     battle.state.seed !== deriveRunSeed(items.run.seed, 'encounter', items.run.encounterIndex)) return invalid;
   if (battle.state.units.some(u => u.side === 'player' && u.hp > encounterHpLimit(u,items.run.party.find(h => h.heroId === u.defId)!.hp,catalog,
     draughtHealing(battle.state.draughts,u.defId)))) return invalid;
-  return { ok: true, state: { items, activeBattle: battle.state, battlefield:resolved.descriptor } };
+  return { ok: true, state: { items, activeBattle: battle.state, battlefield:resolved.descriptor, ...tracking } };
 }
 
 function identity(context: RunSaveContext) {
@@ -77,7 +83,7 @@ function identity(context: RunSaveContext) {
 export function encodeRunSave(input: unknown, context: RunSaveContext): { readonly ok: true; readonly text: string } | SaveFailure {
   const read = readRunSnapshot(input, context);
   if (!read.ok) return read;
-  const format = read.state.activeBattle?.draughts ? DRAUGHT_RUN_SAVE_FORMAT : RUN_SAVE_FORMAT;
+  const format = read.state.stats ? STATS_RUN_SAVE_FORMAT : read.state.activeBattle?.draughts ? DRAUGHT_RUN_SAVE_FORMAT : RUN_SAVE_FORMAT;
   const body = { kind: RUN_SAVE_KIND, format, identity: identity(context), payload: read.state };
   const text = canonical({ ...body, digest: hashJson(body) });
   return text.length > RUN_SAVE_MAX_CODE_UNITS ? { ok: false, reason: 'tooLarge' } : { ok: true, text };
@@ -93,13 +99,14 @@ export function decodeRunSave(text: string, context: RunSaveContext): RunSnapsho
   const expected = identity(context);
   const previous = input.format === 7 && expected.items === itemCatalogIdentity(itemCatalog);
   if (previous) expected.items = previousItemCatalogIdentity;
-  if (input.kind !== RUN_SAVE_KIND || !(previous || input.format === RUN_SAVE_FORMAT || input.format === DRAUGHT_RUN_SAVE_FORMAT) || input.identity.content !== expected.content ||
+  if (input.kind !== RUN_SAVE_KIND || !(previous || input.format === RUN_SAVE_FORMAT || input.format === DRAUGHT_RUN_SAVE_FORMAT || input.format === STATS_RUN_SAVE_FORMAT) || input.identity.content !== expected.content ||
     input.identity.items !== expected.items || input.identity.encounters !== expected.encounters) return { ok: false, reason: 'incompatible' };
-  if(hasShape(input.payload,['items','activeBattle','battlefield']) &&
+  if((hasShape(input.payload,['items','activeBattle','battlefield']) || hasShape(input.payload,['items','activeBattle','battlefield','stats'])) &&
     hasShape(input.payload.battlefield,['encounterId','kind','mapId','mapHash','layoutSeed','biome','generatorVersion','profileVersion']) &&
     input.payload.battlefield.kind==='generated' && (input.payload.battlefield.biome!=='desert' || input.payload.battlefield.generatorVersion!==1 || input.payload.battlefield.profileVersion!=='desert-v1')) return {ok:false,reason:'incompatible'};
   const read = readRunSnapshot(input.payload, previous ? { ...context, items: previousItemCatalog } : context);
   if (!read.ok) return read;
+  if ((input.format === STATS_RUN_SAVE_FORMAT) !== (read.state.stats !== undefined)) return { ok: false, reason: 'invalidState' };
   if (previous && (read.state.items.offer?.version === 2 || read.state.activeBattle?.draughts)) return { ok: false, reason: 'incompatible' };
   if (input.format === DRAUGHT_RUN_SAVE_FORMAT && !read.state.activeBattle?.draughts) return { ok: false, reason: 'invalidState' };
   const body = { kind: RUN_SAVE_KIND, format: input.format, identity: expected, payload: read.state };

@@ -13,9 +13,10 @@ import { BASE_REPLAY_FORMAT_VERSION, DRAUGHT_REPLAY_FORMAT_VERSION, REPLAY_FORMA
 import { planEnemyTurn } from '../domain/ai';
 import { createBattle, dispatch, previewDraught } from '../domain/turns';
 import type { BattleEvent, BattleState, Command, Replay, ReplayCommand } from '../domain/types';
+import type { AcceptedBattle } from '../domain/runStats';
 
 export type SessionPhase = 'player' | 'enemy' | 'presenting' | 'ended' | 'error' | 'disposed';
-export type AcceptedState = (state: BattleState) => void;
+export type AcceptedState = (state: BattleState, accepted: AcceptedBattle) => void;
 export interface Presentation { readonly before: BattleState; readonly after: BattleState; readonly events: readonly BattleEvent[]; readonly token: number }
 export type ActionPreview = ReturnType<typeof previewMove> | ReturnType<typeof previewAbility> | ReturnType<typeof previewCommand> | ReturnType<typeof previewDraught>;
 function freeze<T>(value: T): T {
@@ -128,7 +129,7 @@ export class BattleSession {
     this.resolvedEvents.push(...events);
     this.phase = 'presenting';
     setTelemetryContext({phase:'presenting'});
-    try {this.accepted?.(this.current);} catch { /* Persistence reports its own nonfatal status. */ }
+    try {this.accepted?.(this.current, { before, after: this.current, events });} catch { /* Persistence reports its own nonfatal status. */ }
     return {before,after:this.current,events,token:++this.generation};
   }
   confirm(): Presentation | null {
@@ -161,7 +162,7 @@ export class BattleSession {
     this.phase = 'presenting';
     setTelemetryContext({ phase: 'presenting' });
     // Observers cannot undo an accepted command or prevent its presentation.
-    try { this.accepted?.(this.current); } catch { /* Persistence reports its own nonfatal status. */ }
+    try { this.accepted?.(this.current, { before, after: this.current, events }); } catch { /* Persistence reports its own nonfatal status. */ }
     return {before,after:this.current,events,token:++this.generation};
   }
   finishPresentation(token: number) {
