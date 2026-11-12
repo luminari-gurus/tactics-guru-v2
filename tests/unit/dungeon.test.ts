@@ -55,15 +55,41 @@ it('labels wall-aware saves and rejects signed payloads with the wrong sight for
     return canonical({ ...body, digest: hashJson(body) });
   };
   const wallAware = encodeDungeon(state); assert(wallAware.ok);
-  expect(JSON.parse(wallAware.text).format).toBe(12);
+  expect(JSON.parse(wallAware.text).format).toBe(14);
   expect(decodeDungeon(wallAware.text)).toEqual({ ok: true, state });
   expect(decodeDungeon(rewrap(wallAware.text, 10))).toEqual({ ok: false, reason: 'incompatible' });
-  expect(decodeDungeon(rewrap(wallAware.text, 13))).toEqual({ ok: false, reason: 'invalidState' });
+  expect(decodeDungeon(rewrap(wallAware.text, 12))).toEqual({ ok: true, state });
+  expect(decodeDungeon(rewrap(wallAware.text, 15))).toEqual({ ok: false, reason: 'invalidState' });
   const legacy = withLegacySight(state), old = encodeDungeon(legacy); assert(old.ok);
   expect(JSON.parse(old.text).format).toBe(10);
   expect(decodeDungeon(old.text)).toEqual({ ok: true, state: legacy });
-  expect(decodeDungeon(rewrap(old.text, 12))).toEqual({ ok: false, reason: 'incompatible' });
+  expect(decodeDungeon(rewrap(old.text, 14))).toEqual({ ok: false, reason: 'incompatible' });
 });
+it.each([false, true])('keeps a pre-fog backup after repeated writes (migrated: %s)', migrated => {
+  const initial = migrated ? withLegacySight(fresh()) : fresh();
+  const data = memory(), storage = createDungeonStorage(() => data);
+  expect(storage.save(initial).ok).toBe(true);
+  const original = storage.inspect().primary.text;
+  const step = (s: DungeonState) => {
+    const floor = s.floors[0], map = floorMap(floor.descriptor);
+    const destination = neighbors(floor.position, map.width, map.height).find(cell => map.cells[cell])!;
+    return good(stepDungeon(s, { id: s.id, depth: s.depth, revision: s.revision, destination }));
+  };
+  const first = step(initial);
+  expect(storage.save(first, original).ok).toBe(true);
+  if (migrated) expect(storage.inspect().backup.text).toBe(original);
+  const second = step(first);
+  expect(storage.save(second, storage.inspect().primary.text).ok).toBe(true);
+  const saved = storage.inspect();
+  assert(saved.primary.status === 'valid' && saved.backup.status === 'valid');
+  expect(JSON.parse(saved.primary.text).format).toBe(14);
+  expect(saved.primary.state).toEqual(second);
+  expect(JSON.parse(saved.backup.text).format).toBe(10);
+  expect(saved.backup.state).toMatchObject({ id: first.id, revision: first.revision, depth: first.depth, party: first.party });
+  expect(saved.backup.state.floors[0].exploration.sightVersion).toBeUndefined();
+  expect(saved.backup.state.floors[0].exploration.revealed).toEqual(expect.arrayContaining([...first.floors[0].exploration.revealed]));
+});
+
 function win(s: DungeonState) {
   s = good(startDungeonBattle(atEncounter(s)));
   const b = s.activeBattle!;
@@ -740,7 +766,7 @@ describe('unordered encounters and moving dungeon enemies', () => {
     expect(legacy.state.floors[0].exploration.version).toBe('exploration-v1');
     const upgraded=move(legacy.state);
     const next=encodeDungeon(upgraded);if(!next.ok)throw Error(next.reason);
-    expect(JSON.parse(next.text).format).toBe(12);
+    expect(JSON.parse(next.text).format).toBe(14);
     expect(decodeDungeon(next.text)).toEqual({ok:true,state:upgraded});
     for(const format of [7,8]){
       const old={...body,format};expect(decodeDungeon(canonical({...old,digest:hashJson(old)}))).toEqual({ok:false,reason:'incompatible'});
@@ -852,7 +878,7 @@ describe('versioned floor dimensions', () => {
     expect(storage.inspect().backup.text).toBe(raw);
     const saved = storage.inspect().primary; assert(saved.status === 'valid');
     expect(saved.state).toEqual(moved);
-    expect(JSON.parse(saved.text).format).toBe(12);
+    expect(JSON.parse(saved.text).format).toBe(14);
     expect(saved.state.floors[0].exploration.sightVersion).toBeUndefined();
     expect(saved.state.floors[1].exploration.sightVersion).toBe('wall-sight-v1');
     const ascended = good(stepDungeon(saved.state,{id:base.id,depth:2,revision:moved.revision,destination:floor.descriptor.upstairs}));

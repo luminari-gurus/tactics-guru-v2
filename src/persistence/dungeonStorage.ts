@@ -1,4 +1,4 @@
-import { decodeDungeon, encodeDungeon, encodeDungeonWithState } from '../domain/dungeonSaveEnvelope';
+import { decodeDungeon, encodeDungeonRollback, encodeDungeonWithState, hasWallSight } from '../domain/dungeonSaveEnvelope';
 import type { DungeonState } from '../domain/dungeon';
 import type { RunStorageProvider } from './runStorage';
 export const DUNGEON_KEYS = { primary: 'tactics-guru:phaser:dungeon:primary:v1', backup: 'tactics-guru:phaser:dungeon:backup:v1' } as const;
@@ -54,20 +54,36 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
       if (Object.values(old).some(s => s.status === 'invalid')) return { ok: false, reason: 'recoveryRequired' };
       if (expectedPrimary !== undefined && old.primary.text !== expectedPrimary) return { ok: false, reason: 'changed' };
       let backup = old.primary.status === 'valid' ? old.primary.text : old.backup.status === 'missing' ? encoded.text : null;
-      if (old.primary.status === 'valid' && old.primary.state.activeBattle?.draughts) backup = null;
+      let backupState: DungeonState | undefined = old.primary.status === 'valid' ? old.primary.state
+        : old.backup.status === 'valid' ? old.backup.state : encoded.state;
+      if (old.primary.status === 'valid' && old.primary.state.activeBattle?.draughts) {
+        backup = null;
+        backupState = old.backup.status === 'valid' ? old.backup.state : undefined;
+      }
       if (state.activeBattle?.draughts) {
-        const compatible = (slot: Slot) => slot.status === 'valid' && !slot.state.activeBattle?.draughts &&
+        const compatible = (slot: Slot): slot is Extract<Slot, { status: 'valid' }> => slot.status === 'valid' && !slot.state.activeBattle?.draughts &&
           slot.state.id === state.id && slot.state.depth === state.depth &&
           slot.state.floors[state.depth-1].completed === state.floors[state.depth-1].completed;
-        if (compatible(old.primary)) backup = old.primary.text;
-        else if (compatible(old.backup)) backup = null;
-        else {
+        if (compatible(old.primary)) {
+          backup = old.primary.text;
+          backupState = old.primary.state;
+        } else if (compatible(old.backup)) {
+          backup = null;
+          backupState = old.backup.state;
+        } else {
           const floors = state.floors.map((floor,index) => index === state.depth-1 && floor.exploration.version === 'exploration-v2'
             ? {...floor, exploration:{...floor.exploration,active:null}} : floor);
-          const checkpoint = encodeDungeon({...state,floors,phase:'ready',activeBattle:null,battlefield:null});
+          const checkpoint = encodeDungeonWithState({...state,floors,phase:'ready',activeBattle:null,battlefield:null});
           if (!checkpoint.ok) return checkpoint;
           backup = checkpoint.text;
+          backupState = checkpoint.state;
         }
+      }
+      if (backupState && hasWallSight(backupState)) {
+        const rollback = encodeDungeonRollback(backupState);
+        if (rollback.ok) backup = rollback.text;
+        else if (rollback.reason === 'tooLarge' && old.backup.status === 'valid' && !hasWallSight(old.backup.state)) backup = null;
+        else if (rollback.reason !== 'tooLarge') return rollback;
       }
       if (backup !== null) {
         storage.setItem(DUNGEON_KEYS.backup, backup);

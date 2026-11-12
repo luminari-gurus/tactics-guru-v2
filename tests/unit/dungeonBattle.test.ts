@@ -19,7 +19,7 @@ import { priorDungeonEnvelope } from '../helpers/dungeonFixtures';
 import { freshExploration } from '../../src/domain/exploration';
 import { createDungeonStorage } from '../../src/persistence/dungeonStorage';
 
-it.each([[10, 11], [12, 13]])('saves a draught in checkpoint/battle formats %i/%i and settles stock on either outcome', (checkpointFormat, battleFormat) => {
+it.each([[10, 11], [10, 15]])('saves a draught in checkpoint/battle formats %i/%i and settles stock on either outcome', (checkpointFormat, battleFormat) => {
   const base = freshDungeon('draught-test', 13);
   const ready = { ...base, party: base.party.map(hero => ({ ...hero, hp: 4 })),
     ownership: { ...base.ownership, consumables: [{ itemId: 'item:healing_draught' as const, quantity: 2 }] } };
