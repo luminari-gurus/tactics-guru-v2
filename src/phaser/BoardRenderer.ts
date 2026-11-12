@@ -18,6 +18,7 @@ const BOB_HEIGHT = 2;
 const BOB_CYCLE_MS = 1200;
 const cellKey = (cell: CellPosition): string => `${cell.x},${cell.y}`;
 const DEFAULT_COLUMN_COLORS = { left: 0x354538, right: 0x4c6050, top: 0x5b7157 } as const;
+const DESERT_LANDMARK_BOUNDS = { left: -27, top: -31, right: 27, bottom: 15 } as const;
 
 /** Optional presentation-only board look; battle rules never read it. */
 export interface BoardStyle {
@@ -41,6 +42,7 @@ export class BoardRenderer {
   private moving: { unitId: number; point: Point; depth: number } | null = null;
   private readonly rings = new Map<number, Phaser.GameObjects.Graphics>();
   private readonly canopies: { tile: Tile; graphics: Phaser.GameObjects.Graphics }[] = [];
+  private readonly landmarks: { tile: Tile & { depth: number }; image: Phaser.GameObjects.Image }[] = [];
   private readonly surfaces: { tile: Tile; image: Phaser.GameObjects.Image }[] = [];
   private view: View = { x: 0, y: 0, scale: 1 };
   // Layout constraints may temporarily clamp the camera; retain the last navigation intent.
@@ -169,9 +171,14 @@ export class BoardRenderer {
       this.highlights.set(cellKey(tile), highlight);
       this.root.add([column, surface, highlight]);
       if (tile.desertLandmark) {
-        const landmark = scene.add.graphics().setPosition(point.x, point.y).setDepth(tile.depth + 1.5);
-        drawDesertLandmark(landmark, tile.desertLandmark);
+        const { left, top, right, bottom } = DESERT_LANDMARK_BOUNDS;
+        const variant = tile.desertLandmark;
+        const key = this.shapeTexture(`landmark-${variant}`, DESERT_LANDMARK_BOUNDS,
+          graphics => drawDesertLandmark(graphics, variant));
+        const landmark = scene.add.image(point.x + left, point.y + top, key)
+          .setOrigin(0).setDisplaySize(right - left, bottom - top).setDepth(tile.depth + 1.5);
         this.root.add(landmark);
+        this.landmarks.push({ tile, image: landmark });
       }
       if (tile.terrain === 'forest') {
         const trunk = scene.add.graphics().setDepth(tile.depth + OCCUPANT_LAYER);
@@ -649,25 +656,37 @@ export class BoardRenderer {
     return count>1 ? `Overlap ${this.picking!.index+1}/${count}: tap/click again for next tile · ` : '';
   }
 
+  private hitsImage(point: Point, bounds: Bounds, image: Phaser.GameObjects.Image): boolean {
+    if (point.x < bounds.left || point.x >= bounds.right || point.y < bounds.top || point.y >= bounds.bottom) return false;
+    const x = Math.floor((point.x - bounds.left) * image.frame.realWidth / (bounds.right - bounds.left));
+    const y = Math.floor((point.y - bounds.top) * image.frame.realHeight / (bounds.bottom - bounds.top));
+    return Boolean(this.scene.textures.getPixelAlpha(x, y, image.texture.key, image.frame.name));
+  }
+
   private pickCandidates(point: Point): Tile[] {
     const local=screenToBoard(point,this.view);
     const candidates=pickTileCandidates(this.solidTiles,local);
-    const front=candidates[0];
-    // Only visible opaque living art can precede the solid terrain hit. Use the
-    // authoritative cell/anchor, independent of transient presentation offsets.
+    let artTile: Tile | undefined;
+    let depth = candidates.length ? candidates[0].depth + 1 : -Infinity;
+    for (const { tile, image } of this.landmarks) {
+      if (image.depth < depth) continue;
+      const bounds = { left: image.x, top: image.y, right: image.x + image.displayWidth, bottom: image.y + image.displayHeight };
+      if (!this.hitsImage(local, bounds, image)) continue;
+      artTile = tile;
+      depth = image.depth;
+    }
+    // Use the authoritative unit cell and anchor, independent of animation offsets.
     const units=(this.snapshot?.units ?? []).filter(unit=>unit.hp>0).map(unit=>({unit,tile:this.byCell.get(cellKey(unit.cell))!}))
       .sort((a,b)=>b.tile.depth-a.tile.depth);
     for(const {unit,tile} of units){
-      if(front && tile.depth+OCCUPANT_LAYER<front.depth+1)continue;
+      if(tile.depth+OCCUPANT_LAYER<depth)continue;
       const image=this.images.get(unit.id)!;
       const bounds=unitBounds(tile,{x:image.originX,y:image.originY});
-      if(local.x<bounds.left || local.x>=bounds.right || local.y<bounds.top || local.y>=bounds.bottom)continue;
-      const x=Math.floor((local.x-bounds.left)*image.frame.realWidth/UNIT_ART.width);
-      const y=Math.floor((local.y-bounds.top)*image.frame.realHeight/UNIT_ART.height);
-      if(!this.scene.textures.getPixelAlpha(x,y,image.texture.key,image.frame.name))continue;
-      return [tile,...candidates.filter(candidate=>cellKey(candidate)!==cellKey(tile))];
+      if(!this.hitsImage(local,bounds,image))continue;
+      artTile=tile;
+      break;
     }
-    return candidates;
+    return artTile ? [artTile,...candidates.filter(candidate=>cellKey(candidate)!==cellKey(artTile))] : candidates;
   }
 
   private publish(): void {

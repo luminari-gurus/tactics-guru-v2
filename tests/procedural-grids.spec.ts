@@ -5,7 +5,7 @@ import { preparedSnapshot, runContext } from './helpers/runItemFixtures';
 import { encodeRunSave, runBattleCatalog } from '../src/domain/runSaveEnvelope';
 import { RUN_STORAGE_KEYS } from '../src/persistence/runStorage';
 import { previewMovement } from '../src/domain/grid';
-import { readSession, playCommand, tapBoard } from './helpers/battlePolicy';
+import { readSession, playCommand } from './helpers/battlePolicy';
 import { pickTile } from '../src/geometry/picking';
 import { projectTile, type Tile } from '../src/geometry/iso';
 
@@ -62,10 +62,18 @@ standardTest('desert landmarks distinguish blocked ground in the battle view', a
   expect(new Set(landmarks.map(tile => tile.desertLandmark))).toEqual(new Set(['sandstone', 'cactus']));
   await page.locator('#battle-board-region').screenshot({ path: standardTest.info().outputPath('desert-landmarks.png') });
 
-  const exposed = landmarks.find(tile => pickTile(tiles, projectTile(tile)) === tile);
-  if (!exposed) throw new Error('Expected an exposed desert landmark');
-  expect(report.reachable).not.toContainEqual({ x: exposed.x, y: exposed.y });
-  await tapBoard(page, exposed);
+  const cactus = landmarks.find(tile => tile.x === 10 && tile.y === 4 && tile.desertLandmark === 'cactus');
+  if (!cactus) throw new Error('Expected a cactus at (10, 4) on the default run board');
+  const center = projectTile(cactus);
+  const tip = { x: center.x, y: center.y - 25 };
+  expect(pickTile(tiles, tip)).toMatchObject({ x: 9, y: 3, terrain: 'sand' });
+  expect(report.reachable).not.toContainEqual({ x: cactus.x, y: cactus.y });
+  const { x, y, scale } = report.transform;
+  const screen = { x: x + tip.x * scale, y: y + tip.y * scale };
+  if (standardTest.info().project.use.hasTouch) await page.touchscreen.tap(screen.x, screen.y);
+  else await page.mouse.click(screen.x, screen.y);
+  const selected = JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).selected;
+  expect(selected).toMatchObject({ x: cactus.x, y: cactus.y });
   await expect(page.locator('#battle-preview')).toBeVisible();
   await expect(page.locator('#battle-preview')).toHaveText('Rocky ground blocks movement and line of sight');
   expect((await readSession(page)).pending).toBeNull();
