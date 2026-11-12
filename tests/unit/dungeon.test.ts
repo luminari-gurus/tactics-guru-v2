@@ -1186,3 +1186,15 @@ it('flushes dungeon writes queued by an earlier checkpoint observer before revie
  pending.shift()!();await Promise.resolve();expect(done).toBe(false);expect(pending).toHaveLength(1);
  pending.shift()!();await flush;expect(done).toBe(true);expect(owner.hasUnsavedProgress).toBe(false);
 });
+
+it.each(['primary','backup'] as const)('does not publish an old queued autosave after continuing %s', async slot => {
+ const m=memory(),storage=createDungeonStorage(()=>m),pending:(()=>void)[]=[];
+ const initial=freshDungeon('queued-continue',13,undefined,true);assert(storage.save(initial).ok);
+ const primary={...initial,stats:{...initial.stats!,movesTaken:2}};assert(storage.save(primary).ok);
+ const owner=new DungeonSession(primary,storage,null,undefined,task=>pending.push(task));assert(owner.continue(owner.inspect()));
+ const save=owner.save(),review=owner.inspect();assert(owner.continue(review,slot));
+ const bytes=[m.getItem(DUNGEON_KEYS.primary),m.getItem(DUNGEON_KEYS.backup)],continued=owner.snapshot;
+ while(pending.length)pending.shift()!();await save;
+ expect([m.getItem(DUNGEON_KEYS.primary),m.getItem(DUNGEON_KEYS.backup)]).toEqual(bytes);
+ expect(owner.snapshot).toEqual(continued);expect(owner.hasUnsavedProgress).toBe(false);
+});
