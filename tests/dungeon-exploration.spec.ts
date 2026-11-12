@@ -331,9 +331,15 @@ test('compass keeps keyboard focus when movement disables the activated directio
 });
 
 fixedSeedTest('map shortcuts work on entry and outside the map without taking over other controls', async ({page}) => {
+ const expectSameProgress = async (expected: Awaited<ReturnType<typeof dungeonSnapshot>>) => {
+  const actual = await dungeonSnapshot(page);
+  expect({...actual,stats:actual.stats ? {...actual.stats,activeMs:expected.stats?.activeMs} : undefined}).toEqual(expected);
+  expect(actual.stats?.activeMs ?? 0).toBeGreaterThanOrEqual(expected.stats?.activeMs ?? 0);
+ };
  await page.goto('./?game=dungeon');
  await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();
  await page.locator('#dungeon-confirm-new').click();
+ await expect(page.locator('#dungeon-map')).toBeVisible();
  const initial = await dungeonSnapshot(page);
  const floor = initial.floors[0], terrain = floorMap(floor.descriptor);
  const direction = [
@@ -347,6 +353,7 @@ fixedSeedTest('map shortcuts work on entry and outside the map without taking ov
  const grid = page.locator('#dungeon-map');
  await expect(grid).not.toBeFocused();
  await page.keyboard.press(direction.arrow);
+ await expect.poll(async()=>(await dungeonSnapshot(page)).floors[0].position).toBe(floor.position+direction.offset);
  const moved = await dungeonSnapshot(page);
  expect(moved.floors[0].position).toBe(floor.position + direction.offset);
  expect(moved.revision).toBe(initial.revision + 1);
@@ -354,7 +361,7 @@ fixedSeedTest('map shortcuts work on entry and outside the map without taking ov
  const art = page.getByRole('combobox',{name:'Map art',exact:true});
  await art.focus();
  await page.keyboard.press(direction.reverse);
- expect(await dungeonSnapshot(page)).toEqual(moved);
+ await expectSameProgress(moved);
  await page.evaluate(() => {
   const input = document.createElement('input');
   input.id = 'shortcut-test-input';
@@ -363,15 +370,16 @@ fixedSeedTest('map shortcuts work on entry and outside the map without taking ov
  });
  await page.keyboard.press(direction.reverse);
  await expect(page.locator('#shortcut-test-input')).toHaveValue(direction.reverse);
- expect(await dungeonSnapshot(page)).toEqual(moved);
+ await expectSameProgress(moved);
  const restart = page.getByRole('button',{name:'Start new dungeon',exact:true});
  await restart.click();
  await page.keyboard.press(direction.reverse);
- expect(await dungeonSnapshot(page)).toEqual(moved);
+ await expectSameProgress(moved);
  await page.locator('#dungeon-cancel-new').click();
 
  await restart.focus();
  await page.keyboard.press(direction.reverse);
+ await expect.poll(async()=>(await dungeonSnapshot(page)).floors[0].position).toBe(floor.position);
  const returned = await dungeonSnapshot(page);
  expect(returned.floors[0].position).toBe(floor.position);
  expect(returned.revision).toBe(moved.revision + 1);
@@ -380,6 +388,7 @@ fixedSeedTest('map shortcuts work on entry and outside the map without taking ov
  const menu = page.getByRole('link',{name:'Main menu',exact:true});
  await menu.focus();
  await page.keyboard.press(direction.arrow);
+ await expect.poll(async()=>(await dungeonSnapshot(page)).floors[0].position).toBe(floor.position+direction.offset);
  const movedAgain = await dungeonSnapshot(page);
  expect(movedAgain.revision).toBe(returned.revision + 1);
  await expect(menu).toBeFocused();
@@ -390,10 +399,10 @@ fixedSeedTest('map shortcuts work on entry and outside the map without taking ov
  await expect(grid).toHaveAccessibleName(/Arrow keys move one cell/);
  await restart.focus();
  await page.keyboard.press(direction.reverse);
- expect(await dungeonSnapshot(page)).toEqual(movedAgain);
+ await expectSameProgress(movedAgain);
  await grid.focus();
  await page.keyboard.press(direction.reverse);
- expect(await dungeonSnapshot(page)).toEqual(movedAgain);
+ await expectSameProgress(movedAgain);
  await expect(grid).toBeFocused();
 
  await page.reload();
@@ -401,6 +410,7 @@ fixedSeedTest('map shortcuts work on entry and outside the map without taking ov
  await expect(wasd).not.toBeChecked();
  await restart.focus();
  await page.keyboard.press(direction.reverseArrow);
+ await expect.poll(async()=>(await dungeonSnapshot(page)).floors[0].position).toBe(floor.position);
  const arrowOnly = await dungeonSnapshot(page);
  expect(arrowOnly.floors[0].position).toBe(floor.position);
  expect(arrowOnly.revision).toBe(movedAgain.revision + 1);

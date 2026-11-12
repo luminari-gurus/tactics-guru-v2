@@ -14,11 +14,18 @@ it.each([-1, 0.1, Infinity, NaN, Number.MAX_SAFE_INTEGER + 1, '1'])('rejects inv
 it('validates exact versioned shapes and copies its bounded receipt', () => {
   const stats = { ...freshRunStats('since-upgrade'), boundary: { battle: 0, command: 2 } };
   expect(readRunStats(stats)).toEqual(stats); expect(readRunStats(stats)?.boundary).not.toBe(stats.boundary);
-  for (const patch of [{ version: 2 }, { coverage: 'unknown' }, { extra: 1 }, { boundary: { battle: -1, command: 0 } },
+  for (const patch of [{ version: 3 }, { coverage: 'unknown' }, { timeCoverage: 'unknown' }, { extra: 1 }, { boundary: { battle: -1, command: 0 } },
     { boundary: { battle: 24577, command: 1 } }, { boundary: { battle: 0, command: 1, extra: 0 } }]) {
     expect(readRunStats({ ...stats, ...patch })).toBeNull();
   }
   expect(readRunStats({ ...stats, activeMs: Number.MAX_SAFE_INTEGER })).not.toBeNull();
+});
+
+it('preserves whole counter-only facts while starting time coverage at the clock upgrade', () => {
+  const {timeCoverage:_,...counter}=freshRunStats();
+  expect(readRunStats({...counter,version:1,enemiesKilled:3,movesTaken:4})).toMatchObject({
+    version:2,coverage:'whole-run',timeCoverage:'since-upgrade',enemiesKilled:3,movesTaken:4,activeMs:0,
+  });
 });
 
 it('reduces legal multi-cell movement and undo once while leaving active time and RNG intact', () => {

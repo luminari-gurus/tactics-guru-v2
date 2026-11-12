@@ -97,6 +97,10 @@ personal bests. Corrupt or unsupported versions SHALL preserve original bytes.
 - **WHEN** a pre-statistics journey is explicitly continued and played further
 - **THEN** known progress remains exact, new partial counters are labelled since upgrade and no complete-history claim is made for them
 
+#### Scenario: Counter-only journey gains a clock
+- **WHEN** a journey saved by the counter-only increment is continued by the timed increment
+- **THEN** its whole-run kills and moves remain whole-run facts, reserved old zero time is marked since upgrade, and only that partial time is excluded from complete maxima
+
 #### Scenario: Legacy history and invalid future data
 - **WHEN** history contains old records or an unsupported/corrupt slot
 - **THEN** compatible facts can be viewed without rewriting storage and existing reviewed export, backup recovery and reset remain available

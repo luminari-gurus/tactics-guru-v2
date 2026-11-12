@@ -28,7 +28,7 @@ it('opens missing history read-only and stores/deduplicates immutable results wi
 });
 
 it('preserves corrupt, future-version and oversized bytes; explicit reviewed reset affects records only', async () => {
-  for (const bad of ['broken', JSON.stringify({ version: 2 }), 'x'.repeat(RECORDS_MAX_CODE_UNITS + 1)]) {
+  for (const bad of ['broken', JSON.stringify({ version: 3 }), 'x'.repeat(RECORDS_MAX_CODE_UNITS + 1)]) {
     const m = memory(); m.data.set(RUN_RECORD_KEYS.primary, bad); m.data.set('active-save', 'preserve');
     const store = createRunRecordsStorage(() => m, direct), review = store.inspect();
     expect(review.primary.status).toBe('invalid'); expect(m.writes).toEqual([]);
@@ -105,7 +105,8 @@ it('reads exact legacy pending bytes without writing and round-trips a paired in
   } };
   const legacy = canonical({ ...body, digest: hashJson(body) }); m.data.set(RUN_RECORD_KEYS.primary, legacy);
   const store = createRunRecordsStorage(() => m, direct);
-  expect(selectedRunRecords(store.inspect())).toEqual(body); expect(m.writes).toEqual([]);
+  expect(selectedRunRecords(store.inspect())).toEqual({ ...emptyRunRecords(), records: body.records, receipts: body.receipts, legacyBestCoverage: true });
+  expect(m.data.get(RUN_RECORD_KEYS.primary)).toBe(legacy); expect(m.writes).toEqual([]);
   assert((await store.mutate(history => ({ ...history, receipts: { ...history.receipts,
     run: { kind: 'pending', record: record(), other: record('unsaved'), newId: 'new-run',
       sealed: { kind: 'sealed', id: 'frozen', otherId: 'also-frozen' } },
@@ -120,11 +121,12 @@ it('keeps 100 widest summaries and both paired receipts inside the existing enve
   const wide = (mode: 'run' | 'dungeon', id: string): RunRecord => ({ mode, id: id.padEnd(64, 'x'),
     outcome: mode === 'run' ? 'victory' : 'abandoned', recordedAt: 8_640_000_000_000_000,
     battlesWon: mode === 'run' ? 3 : 8192 * 3, floorsCleared: mode === 'run' ? null : 8192,
-    deepestFloor: mode === 'run' ? null : 8192 });
+    deepestFloor: mode === 'run' ? null : 8192, stats: { version: 2, coverage: 'whole-run', timeCoverage: 'whole-run',
+      enemiesKilled: Number.MAX_SAFE_INTEGER, movesTaken: Number.MAX_SAFE_INTEGER, activeMs: Number.MAX_SAFE_INTEGER } });
   const pending = (mode: 'run' | 'dungeon') => ({ kind: 'pending' as const,
     record: wide(mode, 'saved'), other: wide(mode, 'live'), newId: 'new'.padEnd(64, 'x'),
     sealed: { kind: 'sealed' as const, id: 'frozen'.padEnd(64, 'x'), otherId: 'also-frozen'.padEnd(64, 'x') } });
-  const history: RunRecords = { version: 1, records: Array.from({ length: 100 }, (_, i) => wide('dungeon', `row-${i}`)),
+  const history: RunRecords = { ...emptyRunRecords(), records: Array.from({ length: 100 }, (_, i) => wide('dungeon', `row-${i}`)),
     receipts: { run: pending('run'), dungeon: pending('dungeon') } };
   const text = encodeRunRecords(history); assert(text); expect(text.length).toBeLessThan(RECORDS_MAX_CODE_UNITS);
   const m = memory(), store = createRunRecordsStorage(() => m, direct);

@@ -16,15 +16,24 @@ import { RunItemSession } from '../../src/app/RunItemSession';
 import { freshRunStats } from '../../src/domain/runStats';
 import { hashJson } from '../../src/domain/contentIdentity';
 
-it('roundtrips stats in format 10, preserving partial coverage, and refuses malformed or downgraded stats', () => {
+it('reads literal counter-only format 10 without inventing complete playtime, then writes timed format 11', () => {
+  const raw=readFileSync('tests/fixtures/saves/issue-270/counter-run-v1.json','utf8'),old=JSON.parse(raw);
+  expect(old).toMatchObject({format:10,payload:{stats:{version:1,coverage:'whole-run',activeMs:0}}});
+  const read=decodeRunSave(raw,runContext);assert(read.ok);
+  expect(read.state).toEqual({...old.payload,stats:{...old.payload.stats,version:2,timeCoverage:'since-upgrade'}});
+  const encoded=encodeRunSave(read.state,runContext);assert(encoded.ok);expect(JSON.parse(encoded.text).format).toBe(11);
+  expect(decodeRunSave(encoded.text,runContext)).toEqual(read);
+});
+
+it('roundtrips timed stats in format 11, preserving partial coverage, and refuses malformed or downgraded stats', () => {
   const snapshot = { ...activeSnapshot(), stats: { ...freshRunStats('since-upgrade'), enemiesKilled: 2, movesTaken: 4, activeMs: 12345 } };
   const encoded = encodeRunSave(snapshot, runContext); assert(encoded.ok);
-  expect(JSON.parse(encoded.text).format).toBe(10);
+  expect(JSON.parse(encoded.text).format).toBe(11);
   expect(decodeRunSave(encoded.text, runContext)).toEqual({ ok: true, state: snapshot });
   const envelope = JSON.parse(encoded.text);
-  for (const patch of [{ format: 8 }, { format: 9 }, { format: 11 },
+  for (const patch of [{ format: 8 }, { format: 9 }, { format: 10 }, { format: 12 },
     { payload: { ...snapshot, stats: { ...snapshot.stats, activeMs: -1 } } },
-    { payload: { ...snapshot, stats: { ...snapshot.stats, version: 2 } } },
+    { payload: { ...snapshot, stats: { ...snapshot.stats, version: 3 } } },
     { payload: activeSnapshot() }]) {
     const { digest: _, ...body } = { ...envelope, ...patch };
     expect(decodeRunSave(JSON.stringify({ ...body, digest: hashJson(body) }), runContext).ok).toBe(false);

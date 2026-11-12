@@ -4,6 +4,20 @@ import { createRunRecordsStorage, RUN_RECORD_KEYS, selectedRunRecords } from '..
 import { appendRunRecord, emptyRunRecords, type RunRecord } from '../../src/domain/runRecords';
 const old: RunRecord = { mode: 'run', id: 'old-run', outcome: 'abandoned', recordedAt: 100, battlesWon: 1, floorsCleared: null, deepestFloor: null };
 const live: RunRecord = { ...old, id: 'unsaved-run', battlesWon: 0 };
+
+it('freezes both paired statistics through interruption and updates maxima only on accepted recovery', async () => {
+  const f = fixture(), saved: RunRecord = { ...old, stats: { version: 2, coverage: 'whole-run', timeCoverage: 'whole-run', enemiesKilled: 10, movesTaken: 20, activeMs: 300 } },
+    unsaved: RunRecord = { ...live, stats: { version: 2, coverage: 'whole-run', timeCoverage: 'whole-run', enemiesKilled: 5, movesTaken: 40, activeMs: 100 } };
+  await expect(f.history.replace(saved, 'paired-new', async () => { throw Error('interrupted'); }, unsaved)).rejects.toThrow('interrupted');
+  expect(f.read()?.records).toEqual([]); expect(f.read()?.bests.run).toEqual({});
+  expect(f.read()?.receipts.run).toMatchObject({ record: saved, other: unsaved });
+  await f.history.resume('paired-new', null); await f.history.whenIdle();
+  expect(f.read()?.records).toEqual([saved, unsaved]);
+  expect(f.read()?.bests.run.enemiesKilled).toEqual(saved); expect(f.read()?.bests.run.movesTaken).toEqual(unsaved);
+  const recorded = [...f.data];
+  await f.history.record({ ...saved, stats: { ...saved.stats!, enemiesKilled: 999 } }); await f.history.whenIdle();
+  expect([...f.data]).toEqual(recorded);
+});
 function fixture() {
   const data = new Map<string, string>(), store = createRunRecordsStorage(() => ({ getItem: key => data.get(key) ?? null,
     setItem: (key, text) => { data.set(key, text); }, removeItem: key => { data.delete(key); } }), async action => action());

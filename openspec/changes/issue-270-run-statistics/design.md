@@ -118,6 +118,14 @@ its retained summary, even after recent-list eviction.
 
 ### 4. Explicit, lazy compatibility
 
+Independent increments require a time boundary distinct from the counter boundary.
+Counter-only stats v1 (run envelope 10 / dungeon 12) reserve `activeMs: 0` without
+measuring time. Timed stats v2 add `timeCoverage`, while `coverage` continues to
+describe kills/moves. New timed envelopes are run 11 / dungeon 13. Reading v1
+preserves known counter coverage and values but marks time since upgrade; only
+partial time is excluded from its maximum. Validate the old run digest against
+its raw v1 payload before normalization. Opening still does not write.
+
 Add new active-envelope formats without reusing historical format numbers.
 Keep all currently supported readers, digest/identity checks, byte limits,
 primary/backup review and recovery. Translate validated old data in memory;

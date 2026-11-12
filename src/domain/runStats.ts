@@ -1,14 +1,16 @@
 import type { BattleEvent, BattleState } from './types';
 import type { RunState } from './run';
 import type { DungeonState } from './dungeon';
-import { hasShape } from './validation';
+import { hasShape, isPlainRecord } from './validation';
 
 /** Store only facts that validated journey progress cannot reconstruct.
  * Future class/type damage totals belong in a new accepted-event reducer version,
  * with domain attribution, rather than UI observers or replaying old events. */
 export interface RunStats {
-  readonly version: 1;
+  readonly version: 2;
+  /** Kills/moves and playtime can begin in different application upgrades. */
   readonly coverage: 'whole-run' | 'since-upgrade';
+  readonly timeCoverage: 'whole-run' | 'since-upgrade';
   readonly enemiesKilled: number;
   readonly movesTaken: number;
   readonly activeMs: number;
@@ -19,16 +21,20 @@ export const statCount = (value: unknown): value is number =>
   typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
 export const boundedStat = (value: number) => Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, value));
 export const freshRunStats = (coverage: RunStats['coverage'] = 'whole-run'): RunStats =>
-  ({ version: 1, coverage, enemiesKilled: 0, movesTaken: 0, activeMs: 0, boundary: null });
+  ({ version: 2, coverage, timeCoverage: coverage, enemiesKilled: 0, movesTaken: 0, activeMs: 0, boundary: null });
 
 export function readRunStats(input: unknown): RunStats | null {
-  if (!hasShape(input, ['version', 'coverage', 'enemiesKilled', 'movesTaken', 'activeMs', 'boundary']) ||
-    input.version !== 1 || !['whole-run', 'since-upgrade'].includes(input.coverage as string) ||
+  if (!isPlainRecord(input)) return null;
+  const counterOnly = Object.getOwnPropertyDescriptor(input, 'version')?.value === 1;
+  if (!hasShape(input, ['version', 'coverage', 'enemiesKilled', 'movesTaken', 'activeMs', 'boundary', ...(counterOnly ? [] : ['timeCoverage'])]) ||
+    (!counterOnly && input.version !== 2) || !['whole-run', 'since-upgrade'].includes(input.coverage as string) ||
+    (!counterOnly && !['whole-run', 'since-upgrade'].includes(input.timeCoverage as string)) ||
     !statCount(input.enemiesKilled) || !statCount(input.movesTaken) || !statCount(input.activeMs)) return null;
   const boundary = input.boundary;
   if (boundary !== null && (!hasShape(boundary, ['battle', 'command']) ||
     !statCount(boundary.battle) || boundary.battle > 8192 * 3 || !statCount(boundary.command))) return null;
-  return { ...input, boundary: boundary === null ? null : { ...boundary } } as unknown as RunStats;
+  return { ...input, version: 2, timeCoverage: counterOnly ? 'since-upgrade' : input.timeCoverage,
+    boundary: boundary === null ? null : { ...boundary } } as unknown as RunStats;
 }
 
 export interface AcceptedBattle {

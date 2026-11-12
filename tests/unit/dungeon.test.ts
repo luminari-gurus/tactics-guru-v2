@@ -23,13 +23,65 @@ import { createRunRecordsStorage, RUN_RECORD_KEYS, selectedRunRecords } from '..
 import * as battlefields from '../../src/domain/battlefield';
 import { freshRunStats } from '../../src/domain/runStats';
 
-it('roundtrips versioned stats and rejects malformed, downgraded and future dungeon payloads', () => {
+it('reads literal counter-only format 12 while retaining whole kills/moves and partial time', () => {
+  const raw=readFileSync('tests/fixtures/saves/issue-270/counter-dungeon-v1.json','utf8'),old=JSON.parse(raw);
+  expect(old).toMatchObject({format:12,payload:{stats:{version:1,coverage:'whole-run',activeMs:0}}});
+  const read=decodeDungeon(raw);assert(read.ok);
+  expect(read.state).toEqual({...old.payload,stats:{...old.payload.stats,version:2,timeCoverage:'since-upgrade'}});
+  const encoded=encodeDungeon(read.state);assert(encoded.ok);expect(JSON.parse(encoded.text).format).toBe(13);
+  expect(decodeDungeon(encoded.text)).toEqual(read);
+});
+
+it('checkpoints eligible exploration time without counting paused or closed sessions', async () => {
+  const m = memory(), storage = createDungeonStorage(() => m); let now = 0;
+  const initial = freshDungeon('dungeon-clock', 13, undefined, true);
+  let owner = new DungeonSession(initial, storage, null, () => now);
+  owner.setPlaytimeActive(true); now = 500; (await owner.flushPlaytime());
+  expect(owner.snapshot.stats?.activeMs).toBe(0); // Startup is not admitted play.
+  owner.playUnsaved(); owner.setPlaytimeActive(true); now = 1000; (await owner.flushPlaytime());
+  expect(owner.snapshot.stats?.activeMs).toBe(500);
+  now = 5000; (await owner.flushPlaytime()); expect(owner.snapshot.stats?.activeMs).toBe(500);
+  const review = owner.inspect(); assert((await owner.retry(review))); owner.dispose();
+  now = 100000; owner = new DungeonSession(initial, storage, null, () => now);
+  assert(owner.continue(owner.inspect())); owner.setPlaytimeActive(true); now += 250;
+  (await owner.flushPlaytime()); expect(owner.snapshot.stats?.activeMs).toBe(750);
+});
+
+it('clears an unsaved status when a later clock checkpoint recovers storage', async () => {
+  const m=memory(),storage=createDungeonStorage(()=>m);let now=0;
+  const owner=new DungeonSession(freshDungeon('clock-recovery',13,undefined,true),storage,null,()=>now);
+  assert((await owner.save()));assert(owner.continue(owner.inspect()));owner.setPlaytimeActive(true);
+  const write=m.setItem;m.setItem=()=>{throw Error('denied');};now=500;owner.setPlaytimeActive(true);
+  expect(owner.hasUnsavedProgress).toBe(true);expect(owner.status).toContain('Progress unsaved');
+  m.setItem=write;now=1000;owner.setPlaytimeActive(true);
+  expect(owner.hasUnsavedProgress).toBe(false);expect(owner.status).toBe('Dungeon saved on this device');
+});
+
+it('checkpoints time with published steps and retains elapsed time without a ghost move on write refusal', async () => {
+  const m=memory(),storage=createDungeonStorage(()=>m);let now=0;
+  const initial=freshDungeon('step-clock',13,undefined,true),owner=new DungeonSession(initial,storage,null,()=>now);
+  assert((await owner.save()));assert(owner.continue(owner.inspect()));owner.setPlaytimeActive(true);
+  const floor=initial.floors[0],map=floorMap(floor.descriptor),destination=neighbors(floor.position,map.width,map.height)
+    .find(cell=>map.cells[cell]&&!floor.exploration.pois.some(poi=>poiCell(poi,map.width)===cell))!;
+  now=1000;assert((await owner.step({...owner.spatialBoundary,destination})));
+  expect(owner.snapshot.stats).toMatchObject({activeMs:1000,movesTaken:1});
+  const accepted=storage.inspect().primary;assert(accepted.status==='valid');expect(accepted.state.stats).toEqual(owner.snapshot.stats);
+  const write=m.setItem;m.setItem=()=>{throw Error('denied');};now=2000;
+  expect((await owner.step({...owner.spatialBoundary,destination:floor.position}))).toBe(false);
+  expect(owner.snapshot.stats).toMatchObject({activeMs:2000,movesTaken:1});expect(owner.hasUnsavedProgress).toBe(true);
+  expect(owner.snapshot.floors[0].position).toBe(destination);
+  m.setItem=write;assert((await owner.retry(owner.inspect())));now=2500;
+  assert((await owner.step({...owner.spatialBoundary,destination:floor.position})));
+  expect(owner.snapshot.stats).toMatchObject({activeMs:2500,movesTaken:2});
+});
+
+it('roundtrips versioned stats and rejects malformed, downgraded and future dungeon payloads', async () => {
   const tracked = { ...freshDungeon('stats-save', 13), stats: { ...freshRunStats('since-upgrade'), movesTaken: 5, activeMs: 1234 } };
   const encoded = encodeDungeon(tracked); assert(encoded.ok);
-  expect(JSON.parse(encoded.text).format).toBe(16); expect(decodeDungeon(encoded.text)).toEqual({ ok: true, state: tracked });
-  for (const patch of [{ format: 10 }, { format: 11 }, { format: 13 },
+  expect(JSON.parse(encoded.text).format).toBe(17); expect(decodeDungeon(encoded.text)).toEqual({ ok: true, state: tracked });
+  for (const patch of [{ format: 10 }, { format: 11 }, { format: 12 }, { format: 14 },
     { payload: { ...tracked, stats: { ...tracked.stats, movesTaken: -1 } } },
-    { payload: { ...tracked, stats: { ...tracked.stats, version: 2 } } },
+    { payload: { ...tracked, stats: { ...tracked.stats, version: 3 } } },
     { payload: freshDungeon('stats-save', 13) }]) {
     const { digest: _, ...body } = { ...JSON.parse(encoded.text), ...patch };
     expect(decodeDungeon(JSON.stringify({ ...body, digest: hashJson(body) })).ok).toBe(false);
@@ -245,7 +297,7 @@ describe('dungeon run history boundaries', () => {
       party: initial.party.map(hero => ({ ...hero, hp: hero.heroId === 'fighter' ? 1 : 0 })),
     });
     let denied=false;
-    const session = new DungeonSession(injured, f.storage, f.history, (task,unavailable)=>denied?unavailable():task());
+    const session = new DungeonSession(injured, f.storage, f.history, undefined, (task,unavailable)=>denied?unavailable():task());
     if (mode === 'unsaved') session.playUnsaved();
     const battle = (await session.startEncounter()); assert(battle);
     if (mode === 'lock-denied') denied=true;
@@ -1065,8 +1117,8 @@ describe('versioned floor dimensions', () => {
     const initial = freshDungeon('locked-tabs', 13, undefined, true), m = memory();
     const aStore = createDungeonStorage(() => m), bStore = createDungeonStorage(() => m);
     assert(aStore.save(initial).ok);
-    const a = new DungeonSession(initial, aStore, null, serializeBrowserDungeonWrite);
-    const b = new DungeonSession(initial, bStore, null, serializeBrowserDungeonWrite);
+    const a = new DungeonSession(initial, aStore, null, undefined, serializeBrowserDungeonWrite);
+    const b = new DungeonSession(initial, bStore, null, undefined, serializeBrowserDungeonWrite);
     assert(a.continue(a.inspect())); assert(b.continue(b.inspect()));
     const f = initial.floors[0], map = floorMap(f.descriptor);
     const destination = neighbors(f.position,map.width,map.height).find(n => map.cells[n] && !f.exploration.pois.some(p => poiCell(p,map.width) === n))!;
@@ -1087,7 +1139,7 @@ describe('versioned floor dimensions', () => {
  it('refuses dungeon mutations without an exclusive writer and retains exportable progress', async () => {
   const m = memory(), storage = createDungeonStorage(() => m), initial = fresh();
   assert(storage.save(initial).ok);
-  const owner = new DungeonSession(initial, storage, null, (_task,unavailable) => unavailable());
+  const owner = new DungeonSession(initial, storage, null, undefined, (_task,unavailable) => unavailable());
   assert(owner.continue(owner.inspect()));
   const before = [...m.values], state = owner.snapshot;
   expect(await owner.save()).toBe(false);
@@ -1099,11 +1151,47 @@ describe('versioned floor dimensions', () => {
   expect(owner.exports(owner.inspect()).length).toBeGreaterThan(0);
  });
 
+it('finishes the admitted dungeon clock checkpoint under its lock after disposal', async () => {
+ const m=memory(),storage=createDungeonStorage(()=>m),pending:(()=>void)[]=[];let now=0;
+ const initial=freshDungeon('closing-clock',13,undefined,true);assert(storage.save(initial).ok);
+ const owner=new DungeonSession(initial,storage,null,()=>now,task=>pending.push(task));
+ assert(owner.continue(owner.inspect()));owner.setPlaytimeActive(true);now=1234;
+ const flushed=owner.flushPlaytime();owner.dispose();
+ expect(storage.inspect().primary.status).toBe('valid');
+ while(pending.length)pending.shift()!();await flushed;
+ const durable=storage.inspect().primary;assert(durable.status==='valid');
+ expect(durable.state.stats?.activeMs).toBe(1234);
+});
+
+it('upgrades the rebased counter format 16 while preserving exact fog memory', () => {
+ const stats=JSON.parse(readFileSync('tests/fixtures/saves/issue-270/counter-dungeon-v1.json','utf8')).payload.stats;
+ const payload={...freshDungeon('fog-counter-upgrade',13),stats};
+ const current=encodeDungeon(payload);assert(current.ok);
+ const {digest,...body}=JSON.parse(current.text);body.format=16;body.payload=payload;
+ const read=decodeDungeon(canonical({...body,digest:hashJson(body)}));assert(read.ok);
+ expect(read.state.floors).toEqual(payload.floors);
+ expect(read.state.stats).toEqual({...stats,version:2,timeCoverage:'since-upgrade'});
+ const timed=encodeDungeon(read.state);assert(timed.ok);expect(JSON.parse(timed.text).format).toBe(17);
+ expect(decodeDungeon(timed.text)).toEqual(read);
+});
+
+it('flushes dungeon writes queued by an earlier checkpoint observer before reviewing bytes', async () => {
+ const m=memory(),storage=createDungeonStorage(()=>m),pending:(()=>void)[]=[];
+ const initial=freshDungeon('nested-checkpoints',13,undefined,true);assert(storage.save(initial).ok);
+ const owner=new DungeonSession(initial,storage,null,()=>0,task=>pending.push(task));assert(owner.continue(owner.inspect()));
+ let once=true;
+ // Save feedback is immediate; install the observer after queuing the first checkpoint.
+ owner.onChange=null;void owner.save();owner.onChange=()=>{if(once){once=false;void owner.save();}};
+ let done=false;const flush=owner.flushPlaytime().then(()=>{done=true;});
+ pending.shift()!();await Promise.resolve();expect(done).toBe(false);expect(pending).toHaveLength(1);
+ pending.shift()!();await flush;expect(done).toBe(true);expect(owner.hasUnsavedProgress).toBe(false);
+});
+
 it.each(['primary','backup'] as const)('does not publish an old queued autosave after continuing %s', async slot => {
  const m=memory(),storage=createDungeonStorage(()=>m),pending:(()=>void)[]=[];
  const initial=freshDungeon('queued-continue',13,undefined,true);assert(storage.save(initial).ok);
  const primary={...initial,stats:{...initial.stats!,movesTaken:2}};assert(storage.save(primary).ok);
- const owner=new DungeonSession(primary,storage,null,task=>pending.push(task));assert(owner.continue(owner.inspect()));
+ const owner=new DungeonSession(primary,storage,null,undefined,task=>pending.push(task));assert(owner.continue(owner.inspect()));
  const save=owner.save(),review=owner.inspect();assert(owner.continue(review,slot));
  const bytes=[m.getItem(DUNGEON_KEYS.primary),m.getItem(DUNGEON_KEYS.backup)],continued=owner.snapshot;
  while(pending.length)pending.shift()!();await save;
