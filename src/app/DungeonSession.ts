@@ -78,7 +78,7 @@ export class DungeonSession {
     this.pendingWrite = pending; return pending;
   }
   private recordEnding() { if (!this.disposed && this.history) void this.history.record(dungeonRunRecord(this.current, this.history.now())); }
-  save(quiet = false) { this.recordEnding(); this.progressSaved = false; if(!quiet)this.report('Saving dungeon…'); return this.mutate(() => this.saveNow(quiet), false, true, quiet); }
+  save(quiet = false) { const snapshot = this.current; this.recordEnding(); this.progressSaved = false; if(!quiet)this.report('Saving dungeon…'); return this.mutate(() => this.current === snapshot && this.saveNow(quiet), false, true, quiet); }
   private saveNow(quiet = false) {
     if (this.disposed && !quiet) return false;
     // Accepted endings survive an independent active-save opt-out or conflict.
