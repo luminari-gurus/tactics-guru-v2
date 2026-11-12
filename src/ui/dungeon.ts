@@ -8,8 +8,30 @@ import { ITEM_BOUNDS } from '../content/itemTypes';
 import type { HeroId } from '../content/types';
 import { preparationItemTarget, projectOwnedCatalog } from '../domain/items';
 import { BattleDialogs } from './dialogs';
+import { publicAssetUrl } from './publicAssetUrl';
+import fighterSheet from './dungeonPortraits/fighter.webp?url';
+import rangerSheet from './dungeonPortraits/ranger.webp?url';
+import mageSheet from './dungeonPortraits/mage.webp?url';
 import './dungeon.css';
 export const dungeonElement = <K extends keyof HTMLElementTagNameMap>(tag: K, text = '') => { const n = document.createElement(tag); n.textContent = text; return n; };
+
+const sheetPortraits: Record<HeroId, string> = { fighter: fighterSheet, ranger: rangerSheet, mage: mageSheet };
+
+function portrait(name: string, src: string | undefined, size: number) {
+  const frame = dungeonElement('span', name[0]);
+  frame.className = 'dungeon-portrait';
+  frame.setAttribute('aria-hidden', 'true');
+  if (src) {
+    const img = dungeonElement('img');
+    img.alt = '';
+    img.width = img.height = size;
+    img.addEventListener('error', () => img.remove(), { once: true });
+    img.src = src;
+    frame.append(img);
+  }
+  return frame;
+}
+
 export function renderDungeon(root: HTMLElement, s: DungeonState, session: DungeonSession, dialogs: BattleDialogs,
   actions: { start: () => void; recover?: () => void; restart: () => void }, cache: FloorCache, mapView: DungeonMap, tools: HTMLElement) {
   const active = root.contains(document.activeElement) ? document.activeElement : null;
@@ -27,7 +49,7 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
     play=el('div');play.className='dungeon-play';
     sidebar=el('div');sidebar.className='dungeon-sidebar';
     after=el('div');after.className='dungeon-secondary';
-    play.append(mapView.root,sidebar);
+    play.append(mapView.root,sidebar,mapView.controlsRoot);
     root.replaceChildren(header,play,after);
   }
   // Keep the map and host tools mounted to retain their state and focus.
@@ -71,9 +93,51 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
     el('p','Walk onto an uncleared enemy to start an encounter. Clear all three encounters and resolve pending rewards to unlock descent.'),
     el('p','Move onto an available stair to travel automatically. On arrival or after continuing a save, step off and back onto the stair to travel again. Upstairs is unavailable on floor 1.'),
   );
-  const party=el('section');party.setAttribute('aria-label','Party');party.append(el('h2','Party'));
-  const projected=projectOwnedCatalog(s.ownership,s.party,dungeonContent.catalog,dungeonContent.items);
-  for(const h of s.party){const stats=projected.heroes[h.heroId].stats;party.append(el('p',`${h.heroId}: ${s.activeBattle?s.activeBattle.units.find(u=>u.side==='player'&&u.defId===h.heroId)?.hp??0:h.hp}/${stats.maxHp} HP · ${progressionLabel(h)} · Accuracy ${stats.accuracy} · Armor class ${stats.armorClass}${h.hp===0?' · Defeated':''}`));}sidebar.append(party);
+  const party = el('section');
+  party.className = 'dungeon-party';
+  party.setAttribute('aria-label', 'Party');
+  const roster = el('div');
+  roster.className = 'dungeon-roster';
+  party.append(el('h2', 'Party'), roster);
+  const { catalog, items } = dungeonContent;
+  for (const hero of s.party) {
+    const { heroId, maxHp } = hero;
+    const name = heroId[0].toUpperCase() + heroId.slice(1);
+    const hp = s.activeBattle ? s.activeBattle.units.find(unit => unit.side === 'player' && unit.defId === heroId)?.hp ?? 0 : hero.hp;
+    const condition = hp === 0 ? 'Defeated' : hp < maxHp ? 'Injured' : '';
+    const hpLabel = `${hp}/${maxHp} HP`;
+    const id = `dungeon-hero-${heroId}`;
+    const card = el('div');
+    card.className = 'dungeon-hero';
+    const inspect = button(name, () => {
+      const stats = projectOwnedCatalog(s.ownership, s.party, catalog, items).heroes[heroId].stats;
+      const sheet = el('div');
+      sheet.className = 'dungeon-sheet';
+      const details = el('dl');
+      details.append(
+        el('dt', 'Health'), el('dd', condition ? `${hpLabel} · ${condition}` : hpLabel),
+        el('dt', 'Accuracy'), el('dd', String(stats.accuracy)),
+        el('dt', 'Armor class'), el('dd', String(stats.armorClass)),
+      );
+      sheet.append(portrait(name, sheetPortraits[heroId], 96), details, el('p', progressionLabel(hero)));
+      dialogs.showChoices(`${name} character sheet`, sheet, [
+        { id: 'dungeon-sheet-close', label: 'Close', run: () => {} },
+      ], () => {}, { focusTitle: true, returnFocus: () => root.querySelector<HTMLElement>(`#${id}`) });
+    }, false, id);
+    inspect.setAttribute('aria-haspopup', 'dialog');
+    const thumbnail = catalog.assets[catalog.heroes[heroId].portraitAssetId]?.runtimePath;
+    inspect.prepend(portrait(name, thumbnail ? publicAssetUrl(thumbnail) : undefined, 48));
+    const health = el('meter');
+    health.min = 0;
+    health.max = maxHp;
+    health.value = hp;
+    health.setAttribute('aria-label', `${name} health`);
+    health.setAttribute('aria-valuetext', `${hp} of ${maxHp} hit points${condition ? `, ${condition.toLowerCase()}` : ''}`);
+    card.append(inspect, health, el('span', hpLabel));
+    if (condition) card.append(el('span', condition));
+    roster.append(card);
+  }
+  sidebar.append(party);
   const inventory=disclosure('dungeon-inventory','Owned items');
   if(s.offer){const rewards=el('section');rewards.setAttribute('aria-label','Rewards');rewards.append(el('h2','Choose one reward'));
     for(const o of s.offer.options){const command:DungeonItemCommand={...dungeonBoundary(s),type:'claimReward',offerId:s.offer.id,itemId:o.itemId};rewards.append(button(`Claim ${dungeonContent.items[o.itemId].label}`,()=>review(`Claim ${dungeonContent.items[o.itemId].label} and prepare the next encounter?`,command)));}

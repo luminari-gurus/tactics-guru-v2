@@ -18,6 +18,7 @@ const WASD_PREFERENCE_KEY = 'tactics-guru:dungeon-wasd';
 /** View-local art state and bindings; no simulation timer or authoritative DOM state. */
 export class DungeonMap {
   readonly root = document.createElement('section');
+  readonly controlsRoot = document.createElement('div');
   private art: ArtStyle = 'simple';
   private live = true;
   private state: DungeonState | null = null;
@@ -78,7 +79,9 @@ export class DungeonMap {
       this.controls.push({button,dx,dy});directions.append(button);
     }
     const center=el('span');center.className='dungeon-compass-center';center.setAttribute('aria-hidden','true');directions.append(center);
-    this.root.append(this.heading,this.grid,this.markerDescription,directions,this.feedback,label,keyboardPreference);
+    this.root.append(this.heading,this.grid,this.markerDescription);
+    this.controlsRoot.className = 'dungeon-map-controls';
+    this.controlsRoot.append(directions,this.feedback,label,keyboardPreference);
     document.addEventListener('keydown',e => {
       if (this.state?.phase !== 'ready' || !this.root.isConnected || this.root.closest('[hidden]') ||
         this.locked() || document.hidden || e.defaultPrevented || e.isComposing ||
@@ -112,7 +115,8 @@ export class DungeonMap {
   }
   private draw() {
     if (!this.live || !this.state || !this.map) return;
-    const focused = this.root.contains(document.activeElement) ? document.activeElement as HTMLElement : null;
+    const active = document.activeElement;
+    const focused = active instanceof HTMLElement && (this.root.contains(active) || this.controlsRoot.contains(active)) ? active : null;
     const s = this.state, f = currentFloor(s), map = this.map, grid=this.grid;
     const biome = BIOMES.find(b => b.version === f.descriptor.biome)!;
     const heading=`Explore ${biome.label} · Floor ${s.depth}`;

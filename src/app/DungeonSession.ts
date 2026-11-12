@@ -78,15 +78,22 @@ export class DungeonSession {
     this.pendingWrite = pending; return pending;
   }
   private recordEnding() { if (!this.disposed && this.history) void this.history.record(dungeonRunRecord(this.current, this.history.now())); }
-  save(quiet = false) { const snapshot = this.current; this.recordEnding(); this.progressSaved = false; if(!quiet)this.report('Saving dungeon…'); return this.mutate(() => this.current === snapshot && this.saveNow(quiet), false, true, quiet); }
-  private saveNow(quiet = false) {
+  save(quiet = false, feedback = '') {
+    const snapshot = this.current;
+    this.recordEnding();
+    this.progressSaved = false;
+    if (!quiet) this.report(feedback ? `Saving dungeon… ${feedback}` : 'Saving dungeon…');
+    return this.mutate(() => this.current === snapshot && this.saveNow(quiet, feedback), false, true, quiet);
+  }
+  private saveNow(quiet = false, feedback = '') {
     if (this.disposed && !quiet) return false;
+    const report = (status: string) => this.report(feedback ? `${status.replace(/\.$/, '')}. ${feedback}` : status);
     // Accepted endings survive an independent active-save opt-out or conflict.
-    if (!this.storage) { this.report('Testing dungeon. Progress resets on reload.'); return false; }
-    if (this.unsaved) { this.report('Playing unsaved. Floor travel requires saving; open Save recovery.'); return false; }
+    if (!this.storage) { report('Testing dungeon. Progress resets on reload.'); return false; }
+    if (this.unsaved) { report('Playing unsaved. Floor travel requires saving; open Save recovery.'); return false; }
     const result = this.write(this.current);
     this.progressSaved = result.ok;
-    if (!quiet || !result.ok || this.message.startsWith('Progress unsaved')) this.report(result.ok ? 'Dungeon saved on this device' : `Progress unsaved: ${result.reason}. Open Save recovery to retry or export.`);
+    if (!quiet || !result.ok || this.message.startsWith('Progress unsaved')) report(result.ok ? 'Dungeon saved on this device' : `Progress unsaved: ${result.reason}. Open Save recovery to retry or export.`);
     return result.ok;
   }
   playUnsaved() { if (!this.storage) return; this.unsaved = true; this.started = true; this.report('Playing unsaved. Floor travel requires saving; open Save recovery.'); }
@@ -132,8 +139,7 @@ export class DungeonSession {
         this.current.stats ?? freshRunStats('since-upgrade'), dungeonProgressStats(this.current).battlesWon, batch) } : next.state;
       this.review = null;
       if (session.state.outcome !== 'ongoing') this.completedBattle = { entry, selection: source.selection, state: session.state, replay: session.replay, continuation: session.continuation, events: session.events };
-      this.save();
-      if (feedback) this.report(`${this.status}. ${feedback}`);
+      this.save(false, feedback);
     };
     // A persisted boundary resumes; fresh entry retains its canonical replay origin.
     session = new BattleSession(source.catalog, this.current.activeBattle, this.current.activeBattle.seed, accepted,

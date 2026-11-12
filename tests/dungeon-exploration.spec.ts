@@ -283,18 +283,25 @@ test('diamond compass directions, focus, touch targets and unavailable states',a
   expect(upright.label).toBe('matrix(0.707107, -0.707107, 0.707107, 0.707107, 0, 0)');
  }
  expect(boxes[0].y).toBeLessThan(boxes[1].y);expect(boxes[2].y).toBeGreaterThan(boxes[1].y);expect(boxes[3].x).toBeLessThan(boxes[0].x);expect(boxes[1].x).toBeGreaterThan(boxes[0].x);
- await page.locator('#dungeon-map').focus();await page.keyboard.press(browserName==='webkit'?'Alt+Tab':'Tab');
+ const tab = browserName === 'webkit' ? 'Alt+Tab' : 'Tab';
+ await page.locator('#dungeon-map').focus();
+ const party = page.getByRole('region', { name: 'Party', exact: true });
+ for (const hero of ['Fighter', 'Ranger', 'Mage']) {
+  await page.keyboard.press(tab);
+  await expect(party.getByRole('button', { name: hero, exact: true })).toBeFocused();
+ }
+ await page.keyboard.press(tab);
  await expect(compass.getByRole('button',{name:'North',exact:true})).toBeFocused();
  expect(await compass.getByRole('button',{name:'North',exact:true}).evaluate(node=>node.matches(':focus-visible')&&getComputedStyle(node).outlineStyle==='solid')).toBe(true);
  await page.screenshot({path:test.info().outputPath('compass-focus.png')});
  for(const [name,delta] of directions){
   const before=await dungeonSnapshot(page),button=compass.getByRole('button',{name,exact:true});
   if(isMobile)await button.tap();else {await button.focus();await page.keyboard.press(name==='North'?'Enter':'Space');}
-  expect((await dungeonSnapshot(page)).floors[0].position).toBe(center+delta);
+  await expect.poll(async () => (await dungeonSnapshot(page)).floors[0].position).toBe(center+delta);
   expect((await dungeonSnapshot(page)).revision).toBe(before.revision+1);
   const reverse=directions.find(([,offset])=>offset===-delta)![0];
   const back=compass.getByRole('button',{name:reverse,exact:true});if(isMobile)await back.tap();else await back.click();
-  expect((await dungeonSnapshot(page)).floors[0].position).toBe(center);
+  await expect.poll(async () => (await dungeonSnapshot(page)).floors[0].position).toBe(center);
  }
  if(!isMobile){
   const north=compass.getByRole('button',{name:'North',exact:true});await north.hover();await page.mouse.down();
@@ -327,13 +334,16 @@ test('compass keeps keyboard focus when movement disables the activated directio
   await page.reload();await continueSavedDungeon(page);
   const west=page.getByRole('button',{name:'West',exact:true}),map=page.locator('#dungeon-map');
   await expect(west).toBeEnabled();await west.focus();await page.keyboard.press(key);
-  const moved=await dungeonSnapshot(page);expect(moved.floors[0].position).toBe(26);expect(moved.revision).toBe(initial.revision+1);
+  await expect.poll(async () => (await dungeonSnapshot(page)).floors[0].position).toBe(26);
+  const moved=await dungeonSnapshot(page);expect(moved.revision).toBe(initial.revision+1);
   await expect(west).toBeDisabled();await expect(map).toBeFocused();
   expect(await map.evaluate(node=>node.matches(':focus-visible')&&getComputedStyle(node).outlineStyle==='solid')).toBe(true);
   await page.screenshot({path:test.info().outputPath(`compass-focus-fallback-${key}.png`)});
   await page.keyboard.press('ArrowLeft');expect(await dungeonSnapshot(page)).toEqual(moved);await expect(map).toBeFocused();
-  await page.keyboard.press('ArrowRight');const returned=await dungeonSnapshot(page);
-  expect(returned.floors[0].position).toBe(27);expect(returned.revision).toBe(initial.revision+2);await expect(map).toBeFocused();await expect(west).toBeEnabled();
+  await page.keyboard.press('ArrowRight');
+  await expect.poll(async () => (await dungeonSnapshot(page)).floors[0].position).toBe(27);
+  const returned=await dungeonSnapshot(page);
+  expect(returned.revision).toBe(initial.revision+2);await expect(map).toBeFocused();await expect(west).toBeEnabled();
  }
 });
 
@@ -552,17 +562,25 @@ for(const biome of ['forest','desert'] as const)test(`${biome} saved kinds, scal
 
  test('exploration keeps the map first on narrow screens and cells square across art styles',async({page})=>{
  await page.goto('./?game=dungeon');await page.getByRole('button',{name:'Play unsaved dungeon',exact:true}).click();
- for(const viewport of [{width:320,height:568},{width:393,height:852},{width:740,height:360},{width:915,height:412},{width:1280,height:800}]){
+ const map = page.locator('#dungeon-map');
+ const party = page.getByRole('region', { name: 'Party', exact: true });
+ for(const viewport of [{width:320,height:568},{width:393,height:852},{width:667,height:375},{width:740,height:360},{width:812,height:375},{width:915,height:412},{width:1280,height:800}]){
   await page.setViewportSize(viewport);
-  if (viewport.width < 760) {
+  await page.locator('#dungeon-screen').evaluate(screen => { screen.scrollTop = 0; });
+  await expect(map).toBeInViewport();
+  if (viewport.width < viewport.height) {
    const layout = await page.locator('#dungeon-screen').evaluate(screen => {
-    screen.scrollTop = 0;
     const map = screen.querySelector('#dungeon-map')!.getBoundingClientRect();
     const party = screen.querySelector('[aria-label="Party"]')!.getBoundingClientRect();
-    return { mapTop: map.top, partyTop: party.top, viewportBottom: screen.getBoundingClientRect().bottom };
+    return { mapTop: map.top, partyTop: party.top };
    });
    expect(layout.mapTop).toBeLessThan(layout.partyTop);
-   expect(layout.mapTop).toBeLessThan(layout.viewportBottom);
+  } else {
+   await expect(party).toBeInViewport({ ratio: 1 });
+   for (const hero of ['Fighter', 'Ranger', 'Mage']) {
+    await expect(party.locator(`meter[aria-label="${hero} health"]`)).toBeInViewport({ ratio: 1 });
+   }
+   expect(await page.locator('#dungeon-screen').evaluate(screen => screen.scrollWidth <= screen.clientWidth)).toBe(true);
   }
   for(const art of ['simple','legacy-8bit']){
    await page.locator('#dungeon-art').selectOption(art);
@@ -660,10 +678,10 @@ test('maximum-size saved floor renders and accepts a step after reload', async (
  const map=page.locator('#dungeon-map'); await expect(map.locator('[data-cell]')).toHaveCount(36*36);
  const assertLayout=async()=>{
   const geometry=await map.evaluate(grid=>{
-   const bounds=grid.getBoundingClientRect(), region=grid.parentElement!;
+   const bounds=grid.getBoundingClientRect();
    const cells=[...grid.querySelectorAll<HTMLElement>('[data-cell]')].map(cell=>cell.getBoundingClientRect());
-   const controls=[...region.querySelectorAll<HTMLElement>('.dungeon-directions button')];
    const screen=document.querySelector<HTMLElement>('#dungeon-screen')!;
+   const controls=[...screen.querySelectorAll<HTMLElement>('.dungeon-directions button')];
    return {
     count:cells.length,
     outside:cells.filter(cell=>cell.left<bounds.left-.1||cell.right>bounds.right+.1||cell.top<bounds.top-.1||cell.bottom>bounds.bottom+.1).length,
@@ -680,6 +698,8 @@ test('maximum-size saved floor renders and accepts a step after reload', async (
  };
  await assertLayout();
  const viewport=page.viewportSize()!;
+ await page.setViewportSize({width:740,height:360});
+ await assertLayout();
  for (const width of [760, 800, 840, 915]) {
   await page.setViewportSize({width,height:740});
   const overflow=await map.evaluate(grid=>grid.parentElement!.scrollWidth-grid.parentElement!.clientWidth);

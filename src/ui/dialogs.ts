@@ -3,7 +3,7 @@ export interface DialogChoice { id: string; label: string; run: () => void; keep
 export class BattleDialogs {
   readonly element=document.createElement('dialog');
   private readonly abort=new AbortController();
-  private prior:HTMLElement|null=null;
+  private returnFocus:(()=>HTMLElement|null)|null=null;
   private choices:readonly DialogChoice[]=[];
   private cancel:(()=>void)|null=null;
   constructor(private readonly transition:()=>void, private readonly restart:()=>void, private readonly fallbackFocus?:()=>void) {
@@ -41,15 +41,21 @@ export class BattleDialogs {
     choices.push({id:'dialog-restart',label:'Restart battle',run:this.restart});
     this.showChoices(title,message,choices,cancel??(()=>{}));
   }
-  showChoices(title:string,message:string,choices:readonly DialogChoice[],cancel:(()=>void)|null=null,options:{focusTitle?:boolean}={}) {
-    if(!this.open)this.prior=document.activeElement as HTMLElement;
+  showChoices(title:string,message:string|HTMLElement,choices:readonly DialogChoice[],cancel:(()=>void)|null=null,
+    options:{focusTitle?:boolean; returnFocus?:()=>HTMLElement|null}={}) {
+    if(!this.open){
+      const prior=document.activeElement as HTMLElement|null;
+      this.returnFocus=options.returnFocus??(()=>prior);
+    }
     this.choices=choices;this.cancel=cancel;
     const heading=this.element.querySelector<HTMLHeadingElement>('#battle-dialog-title')!;
     heading.textContent=title;
     heading.toggleAttribute('autofocus', options.focusTitle === true);
     if(options.focusTitle)heading.tabIndex=-1;
     else heading.removeAttribute('tabindex');
-    this.element.querySelector('#battle-dialog-message')!.textContent=message;
+    this.element.querySelector('#battle-dialog-message')!.replaceChildren(message);
+    if(typeof message==='string')this.element.setAttribute('aria-describedby','battle-dialog-message');
+    else this.element.removeAttribute('aria-describedby');
     this.element.querySelector('.fit-controls')!.replaceChildren(...choices.map(choice=>{
       const button=document.createElement('button');button.type='button';button.id=choice.id;button.textContent=choice.label;return button;
     }));
@@ -60,11 +66,13 @@ export class BattleDialogs {
   }
   dismiss(){if(this.cancel)this.close(this.cancel);}
   close(callback:(()=>void)|null=null){
-    const prior=this.prior;
+    const returnFocus=this.returnFocus;
+    this.returnFocus=null;
     this.choices=[];this.cancel=null;this.element.close();this.transition();
     callback?.();
     // The callback can disable the invoker or open a replacement modal.
     if(this.open)return;
+    const prior=returnFocus?.();
     if(prior?.isConnected && prior!==document.body && prior!==document.documentElement && !prior.closest('dialog') && !prior.matches(':disabled')) {
       prior.focus();
       if(document.activeElement===prior){
