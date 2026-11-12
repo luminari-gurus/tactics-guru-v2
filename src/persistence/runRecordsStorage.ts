@@ -22,7 +22,8 @@ function decode(text: string): RunRecords | null {
   if (text.length > RECORDS_MAX_CODE_UNITS) return null;
   try {
     const value: unknown = JSON.parse(text);
-    if (!hasShape(value, ['version', 'records', 'receipts', 'digest'])) return null;
+    if (!hasShape(value, ['version', 'records', 'receipts', 'digest']) &&
+      !hasShape(value, ['version', 'records', 'receipts', 'bests', 'legacyBestCoverage', 'digest'])) return null;
     const { digest, ...body } = value;
     if (digest !== hashJson(body)) return null;
     return readRunRecords(body);

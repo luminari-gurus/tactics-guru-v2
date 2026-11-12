@@ -1,0 +1,179 @@
+{
+  "date": "2026-11-12",
+  "pr": 369,
+  "qualifiedCodeSource": "7e98c698e65fa1eaa33adddcb03846505f736e10",
+  "qualificationSpecSource": "3114b3293677e214b26f463bdeab77d59027505d",
+  "outcome": "Five-stat recent/best records retain open disclosures and keyboard focus across real cross-tab storage updates. Sequential Tab/Enter and touch disclosure access, narrow widths, retained best summaries and reset pass across Chromium/WebKit. Both inherited data-loss fixes are included.",
+  "ownInputs": {
+    "src/ui/mainMenu.css": {
+      "sha256": "ecb5f8e29c0af25c53ab286993146147fbb5d5c0d606ff31f22b0796844940a2",
+      "gitBlob": "59d52c4da7fefcb04e43c31d9b3ddf29fc6ac188"
+    },
+    "src/ui/runRecords.ts": {
+      "sha256": "decae0e99d4d67568627f8a6695e021ceffa4d14b56d63b1d232b830d037e1f6",
+      "gitBlob": "013aa7010d52a2de567c2fddee0c0f3ed12606d0"
+    },
+    "tests/battle-persistence.spec.ts": {
+      "sha256": "1dad774beae3e6bf78c3ef0bfa679df2cc71d81da36f82da5a4dde85ab5ec31f",
+      "gitBlob": "46106dd2afaf7c7cc504d1702a010311cc1dad92"
+    },
+    "tests/main-menu.spec.ts": {
+      "sha256": "8eb4d7b926475c3e157fcc6bf2881df1c2d043f3ce05edeea0436ea045a08a93",
+      "gitBlob": "b839c955277d76e9bfb7db829a5ebf8e62ea60e6"
+    }
+  },
+  "commonInputs": "All other tracked application, domain, persistence, dependency, build and configuration blobs match parent #368. See review-368.json for its full input manifest, browser/environment identity, common case IDs, exact commands, route-isolation equivalence and preserved failures. Line-ending representation alone is not treated as a behavior change.",
+  "prVerification": {
+    "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-270-records-ui\\Tactics-Guru/verification-receipts/pr/1794501184479-141956/summary.json",
+    "sha256": "dd9bd136c7b3e0c173685bd0e2e3891c75a6f98bd467716c87a028dfca382cf9",
+    "source": "7e98c698e65fa1eaa33adddcb03846505f736e10",
+    "durationMs": 117187,
+    "units": {
+      "total": 1357,
+      "passed": 1357
+    },
+    "stages": [
+      {
+        "id": "tooling",
+        "status": "passed"
+      },
+      {
+        "id": "units",
+        "status": "passed"
+      },
+      {
+        "id": "typecheck",
+        "status": "passed"
+      },
+      {
+        "id": "build-integration",
+        "status": "passed"
+      },
+      {
+        "id": "bundle",
+        "status": "passed"
+      },
+      {
+        "id": "journeys",
+        "status": "passed"
+      }
+    ]
+  },
+  "uiBrowserRuns": [
+    {
+      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-270-records-ui\\Tactics-Guru/tmp/review-stack-final-chromium.json",
+      "sha256": "d205581b342f23b3368ae55dcb6f446db51a1d3b0fd192833f2e4adff5a01808",
+      "stats": {
+        "startTime": "2026-11-12T16:25:23.418Z",
+        "duration": 92277.034,
+        "expected": 48,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "project": "desktop",
+          "title": "main menu: five-stat records and retained personal bests stay keyboard and touch accessible",
+          "file": "main-menu.spec.ts",
+          "line": 987,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1024
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "main menu: five-stat records and retained personal bests stay keyboard and touch accessible",
+          "file": "main-menu.spec.ts",
+          "line": 987,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1190
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "main menu: five-stat records and retained personal bests stay keyboard and touch accessible",
+          "file": "main-menu.spec.ts",
+          "line": 987,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1686
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-270-records-ui\\Tactics-Guru/tmp/review-stack-webkit-complete-run-ui.json",
+      "sha256": "5f8616445143b34a72e783302a3ebdbb3d13c0df472637511bd79f9279f64489",
+      "stats": {
+        "startTime": "2026-11-12T16:35:02.166Z",
+        "duration": 66195.299,
+        "expected": 14,
+        "skipped": 0,
+        "unexpected": 6,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "main menu: five-stat records and retained personal bests stay keyboard and touch accessible",
+          "file": "main-menu.spec.ts",
+          "line": 987,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2615
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "main menu: five-stat records and retained personal bests stay keyboard and touch accessible",
+          "file": "main-menu.spec.ts",
+          "line": 987,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2593
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "inheritedQualification": "review-368.json: 48 qualified Chromium +20 run/UI WebKit +9 dungeon WebKit cases; explicit split-run repair accounting and earlier failures remain there. The five UI cases above passed on Chromium desktop/touch portrait/touch landscape and WebKit portrait/landscape, including sequential Tab/Enter and real cross-tab storage refresh.",
+  "equivalence": {
+    "lastSpecOnlyChange": "tests/run-progression.spec.ts now snapshots the owner after the recovery dialog appears, allows a pending enemy presentation to settle, asserts the original journey identity, and compares the entire exported payload exactly. Both type scopes and 30 changed Chromium/WebKit cases ran after that test repair. Application/build inputs and seven core case bodies match the final successful PR verification.",
+    "historyFollowup": "Final complete PR verification includes the independent ending-history repair (legal defeat with denied active-save lock). Earlier focused timer/review/spatial tests never reach that save-ending branch; their relevant behavior is unchanged.",
+    "parentReuse": "Inherited app/domain/persistence and menuReturn inputs are identical to #368; only records presentation/style and its browser proof differ.",
+    "routeIsolation": "Existing increment-3 route-isolation artifacts remain available. entry.ts/routes.ts and the storage-admission invariant are unchanged: testing entries pass null storage/history, create no playtime observer, strip statistics, and bypass browser locking in the mutation wrapper. No new key reader/writer exists outside the already-gated owners. Pure isolation units reran in final verification."
+  },
+  "lastSpecOnlyChange": "tests/run-progression.spec.ts now snapshots the owner after the recovery dialog appears, allows a pending enemy presentation to settle, asserts the original journey identity, and compares the entire exported payload exactly. Both type scopes and 30 changed Chromium/WebKit cases ran after that test repair. Application/build inputs and seven core case bodies match the final successful PR verification.",
+  "ablation": "References the parent receipt for shared evidence instead of duplicating its full manifest and case/error data. The UI change reuses the existing renderer, stable disclosure keys and dialog focus cycle.",
+  "limits": [
+    "Browser/device emulation; no physical-hardware claim.",
+    "Native focus/BFCache assertions are Chromium-specific; WebKit retains synthetic visibility/focus plus real navigation/resume.",
+    "Abrupt termination may lose the last bounded playtime checkpoint interval.",
+    "Old clients may reject upgraded saves/history. Preserve raw bytes and recover with a statistics-capable build; reverse old-client readability is not claimed.",
+    "Focused PR qualification, not a clean full-regression claim."
+  ],
+  "git": "One reviewed commit per PR, stacked 365 -> 368 -> 369 on main. Retain high/high/medium risk labels. No release tags or merges. If later squash-merging a parent, carry the dependent branch onto its resulting main commit before merging it."
+}

@@ -28,6 +28,20 @@
 .run-records-list h3 { margin:0 0 .35rem; font-size:1rem; }
 .run-records-list time { color:#c1c9b0; font-size:.85rem; }
 .run-records-list p { margin:.35rem 0; }
+.menu-dialog { --records-muted:#c1c9b0; --records-edge:#71806b; --records-accent:#f1ddb0; --records-gold:#b49a61; }
+.run-record-summary { min-width:0; overflow-wrap:anywhere; }
+.run-record-summary h4 { margin:.5rem 0 .25rem; font-size:1rem; }
+.run-record-summary time,.run-record-id { color:var(--records-muted); font-size:.8rem; }
+.run-record-id { font-family:ui-monospace,Consolas,monospace; }
+.run-statistics { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.5rem 1rem; margin:.75rem 0; }
+.run-statistics > div { min-width:0; }
+.run-statistics dt { color:var(--records-muted); font-size:.8rem; }
+.run-statistics dd { margin:0; font-weight:600; font-variant-numeric:tabular-nums; }
+.run-personal-bests { border-block:1px solid var(--records-edge); padding:.5rem 0; margin:.75rem 0; }
+.run-personal-bests summary { min-height:44px; padding:.35rem 0; box-sizing:border-box; color:var(--records-accent); cursor:pointer; overflow-wrap:anywhere; }
+.run-personal-bests h3 { margin:1.5rem 0 .5rem; font-size:1rem; }
+.run-personal-bests [data-best] .run-record-summary { border-inline-start:2px solid var(--records-gold); padding-inline-start:.75rem; margin:.25rem 0 .75rem; }
+@media(max-width:360px) { .run-statistics { grid-template-columns:1fr; } }
 .run-records-actions,[data-records-confirm] { display:flex; flex-wrap:wrap; gap:.65rem; margin-top:1rem; }
 [data-records-confirm] p { flex-basis:100%; }
 @media (max-height:550px) { .menu-content > nav[aria-label='Main menu'] { margin-top:1.5rem; } .menu-title { max-width:22rem; margin-top:0; } }

@@ -1,11 +1,78 @@
 import { assert, expect, it } from 'vitest';
-import { appendRunRecord, authoredRunRecord, dungeonRunRecord, emptyRunRecords, readRunRecord, readRunRecords, RECORD_LIMIT, type RunRecord } from '../../src/domain/runRecords';
+import { appendRunRecord, authoredRunRecord, dungeonRunRecord, emptyRunRecords, readRunRecord, readRunRecords, RECORD_LIMIT, BEST_STATS, type RunRecord } from '../../src/domain/runRecords';
 import { preparedSnapshot, rewardSnapshot, runContext } from '../helpers/runItemFixtures';
 import { createRun, runBoundaryId, transitionRun, type RunState } from '../../src/domain/run';
 import { freshDungeon, type DungeonState } from '../../src/domain/dungeon';
 
 export const recordFixture = (id = 'run-1', recordedAt = 100): RunRecord => ({ mode: 'run', id, outcome: 'defeat', recordedAt,
   battlesWon: 1, floorsCleared: null, deepestFloor: null });
+const trackedRecord = (id: string, at: number, value: number): RunRecord => ({ ...recordFixture(id, at),
+  stats: { version: 2, coverage: 'whole-run', timeCoverage: 'whole-run', enemiesKilled: value, movesTaken: value, activeMs: value } });
+
+it('ranks known counter-only kills/moves independently of partial playtime', () => {
+  const counter=readRunRecord({...recordFixture('counter',100),stats:{version:1,coverage:'whole-run',enemiesKilled:50,movesTaken:80,activeMs:0}})!;
+  let history=appendRunRecord(emptyRunRecords(),counter);
+  expect(history.bests.run.enemiesKilled?.id).toBe('counter');expect(history.bests.run.activeMs).toBeUndefined();
+  history=appendRunRecord(history,trackedRecord('timed',200,10));
+  expect(history.bests.run.enemiesKilled?.id).toBe('counter');expect(history.bests.run.movesTaken?.id).toBe('counter');
+  expect(history.bests.run.activeMs?.id).toBe('timed');
+});
+
+it('reads earlier nested v1 summaries without retaining an unproven complete-time maximum', () => {
+  const counter={...recordFixture('older-counter',100),stats:{version:1,coverage:'whole-run',enemiesKilled:50,movesTaken:80,activeMs:1000}};
+  const read=readRunRecords({...emptyRunRecords(),records:[counter],bests:{run:{activeMs:counter,enemiesKilled:counter},dungeon:{}}});assert(read);
+  expect(read.legacyBestCoverage).toBe(true);expect(read.bests.run.activeMs).toBeUndefined();
+  expect(read.bests.run.enemiesKilled?.stats).toMatchObject({version:2,coverage:'whole-run',timeCoverage:'since-upgrade',enemiesKilled:50});
+});
+
+it('retains attributed maxima after recent eviction, freezes their first result, and ranks duration by longest play', () => {
+  const winner = trackedRecord('old-winner', 1, 9999);
+  let history = appendRunRecord(emptyRunRecords(), winner);
+  for (let i = 0; i < 101; i++) history = appendRunRecord(history, trackedRecord(`new-${i}`, i + 2, i));
+  expect(history.records).toHaveLength(100); expect(history.records.some(row => row.id === winner.id)).toBe(false);
+  for (const stat of ['enemiesKilled', 'movesTaken', 'activeMs'] as const) expect(history.bests.run[stat]).toEqual(winner);
+  expect(appendRunRecord(history, trackedRecord(winner.id, 1000, 99999))).toBe(history);
+  expect(Object.values(history.bests.run).length).toBeLessThanOrEqual(5);
+  expect(readRunRecords(history)).toEqual(history);
+});
+
+it('selects newest tied maxima then stable identity, keeps modes separate and excludes partial totals', () => {
+  let history = appendRunRecord(emptyRunRecords(), trackedRecord('older', 1, 10));
+  history = appendRunRecord(history, trackedRecord('z-newer', 2, 10));
+  history = appendRunRecord(history, trackedRecord('a-newer', 2, 10));
+  expect(history.bests.run.activeMs?.id).toBe('a-newer');
+  const partial = { ...trackedRecord('partial', 3, 99999), stats: { ...trackedRecord('partial', 3, 99999).stats!, coverage: 'since-upgrade' as const, timeCoverage: 'since-upgrade' as const } };
+  history = appendRunRecord(history, partial);
+  expect(history.bests.run.enemiesKilled?.id).toBe('a-newer');
+  expect(history.bests.run.battlesWon?.id).toBe('partial');
+  const dungeon: RunRecord = { ...trackedRecord('dungeon', 4, 500), mode: 'dungeon', floorsCleared: 1, battlesWon: 3, deepestFloor: 1 };
+  history = appendRunRecord(history, dungeon);
+  expect(history.bests.dungeon.floorsCleared).toEqual(dungeon); expect(history.bests.run.floorsCleared).toBeUndefined();
+  for (const stat of BEST_STATS) if (stat !== 'floorsCleared') expect(history.bests.dungeon[stat]).toEqual(dungeon);
+  const stats = trackedRecord('mutable', 5, 50000), frozen = appendRunRecord(history, stats);
+  (stats.stats as { enemiesKilled: number }).enemiesKilled = 0;
+  expect(frozen.bests.run.enemiesKilled?.stats?.enemiesKilled).toBe(50000);
+});
+
+it('migrates only retained legacy facts and preserves honest historical best coverage', () => {
+  const old = { version: 1, records: [recordFixture()], receipts: { run: null, dungeon: null } };
+  const migrated = readRunRecords(old)!; expect(migrated.legacyBestCoverage).toBe(true);
+  expect(migrated.bests.run.battlesWon).toEqual(recordFixture());
+  expect(migrated.bests.run.movesTaken).toBeUndefined(); expect(migrated.records[0].stats).toBeUndefined();
+  expect(appendRunRecord(migrated, trackedRecord('new', 200, 1)).legacyBestCoverage).toBe(true);
+  expect(emptyRunRecords().legacyBestCoverage).toBe(false);
+});
+
+it('rejects unsupported stats, partial winners, inconsistent summaries and accessor best maps', () => {
+  const history = appendRunRecord(emptyRunRecords(), trackedRecord('winner', 10, 10));
+  for (const patch of [{ version: 3 }, { activeMs: -1 }, { boundary: null }])
+    expect(readRunRecord({ ...history.records[0], stats: { ...history.records[0].stats, ...patch } })).toBeNull();
+  expect(readRunRecords({ ...history, bests: { run: { fastest: history.records[0] }, dungeon: {} } })).toBeNull();
+  expect(readRunRecords({ ...history, bests: { run: { activeMs: { ...history.records[0], stats: { ...history.records[0].stats, timeCoverage: 'since-upgrade' } } }, dungeon: {} } })).toBeNull();
+  expect(readRunRecords({ ...history, bests: { run: { activeMs: trackedRecord('winner', 10, 999) }, dungeon: {} } })).toBeNull();
+  const getters = {}; Object.defineProperty(getters, 'activeMs', { enumerable: true, get() { throw Error('accessor'); } });
+  expect(readRunRecords({ ...history, bests: { run: getters, dungeon: {} } })).toBeNull();
+});
 
 it('projects every authored phase without ending an unfinished run or counting a pending reward twice', () => {
   const created = createRun('initial', 13, runContext.definition, runContext.catalog); assert(created.ok);
@@ -73,7 +140,7 @@ it('admits two bounded receipts and rejects duplicate keys, getters, sparse arra
   const history = appendRunRecord(emptyRunRecords(), recordFixture());
   const pending = { ...history, receipts: { run: { kind: 'pending', record: recordFixture(), newId: 'next' }, dungeon: null } };
   expect(readRunRecords(pending)).toEqual(pending);
-  for (const bad of [{ ...history, version: 2 }, { ...history, records: [recordFixture(), recordFixture()] },
+  for (const bad of [{ ...history, version: 3 }, { ...history, records: [recordFixture(), recordFixture()] },
     { ...history, records: new Array(1) }, { ...history, receipts: { ...history.receipts, extra: null } },
     { ...pending, receipts: { run: { ...pending.receipts.run, newId: 'run-1' }, dungeon: null } },
     { ...pending, receipts: { run: null, dungeon: pending.receipts.run } }]) expect(readRunRecords(bad)).toBeNull();

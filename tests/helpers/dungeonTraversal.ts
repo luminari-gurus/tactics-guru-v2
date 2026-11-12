@@ -51,7 +51,7 @@ export async function walkDungeon(page: Page, target?: number, mode: 'keyboard'|
     if(mode==='keyboard'){await page.locator('#dungeon-map').focus();await page.keyboard.press(delta===-width?'ArrowUp':delta===width?'ArrowDown':delta===1?'ArrowRight':'ArrowLeft');}
     else if(mode==='touch')await page.locator(`#dungeon-step-${name}`).tap();
     else await page.locator(`#dungeon-map [data-cell="${n}"]`).click();
-    const after=await dungeonSnapshot(page);expect(after.floors[s.depth-1].position).toBe(n);path.push(n);
+    await expect.poll(async () => (await dungeonSnapshot(page)).floors[s.depth-1].position).toBe(n);path.push(n);
   }
   throw Error('Could not reach moving encounter within 400 steps');
 }

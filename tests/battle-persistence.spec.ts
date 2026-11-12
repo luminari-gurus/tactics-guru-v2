@@ -107,9 +107,20 @@ for(const condition of ['missing','valid','corrupt','backup-only','unavailable']
       await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();
       await expect(page.locator('#dungeon-map')).toBeVisible();
       await page.locator('.dungeon-directions button:not(:disabled)').first().click();
-      await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();
+      // A legal exploration step can enter an encounter. Wait for its actual
+      // screen rather than clicking the loading screen's transient restart.
+      const stepped=JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);
+      if(stepped.phase==='battle'){
+        await expect(page.locator('#game')).toHaveAttribute('data-ready','true');
+        await page.locator('#fit-restart').click();
+      }else await page.locator('#dungeon-screen').getByRole('button',{name:'Start new dungeon',exact:true}).click();
+      await expect.poll(async()=>JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!).id).not.toBe(stepped.id);
       await expect(page.locator('#dungeon-map')).toBeVisible();
     }else if(mode==='proof')await page.locator('#fit-restart').click();
+    if(mode==='run'||mode==='dungeon') {
+      const snapshot=await page.locator('#game').getAttribute(`data-${mode}-snapshot`);
+      expect(JSON.parse(snapshot??'null')?.stats).toBeUndefined();
+    }
     await audit();
     await page.evaluate(()=>{document.dispatchEvent(new Event('visibilitychange'));window.dispatchEvent(new PageTransitionEvent('pagehide',{persisted:true}));});
     await audit();await page.reload();await ready();await audit();
@@ -448,6 +459,11 @@ test.describe('browser history with BFCache enabled',()=>{
     if(mode==='run'){await page.locator('#run-start').click();await page.locator('#run-confirm-new').click();}
     else {await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();}
     await expect(page.locator(mode==='run'?'#run-start-encounter':'#dungeon-map')).toBeVisible();
+    if(mode==='dungeon'){
+      // Capture reviewed bytes after the legitimate exploration-time checkpoint.
+      await page.getByRole('button',{name:'Save recovery',exact:true}).click();
+      await expect(page.getByRole('heading',{name:'Dungeon save recovery',exact:true})).toBeVisible();
+    }
     const saved=await page.evaluate(slots=>[localStorage.getItem(slots.primary),localStorage.getItem(slots.backup)],slots);
     const history=await page.evaluate(key=>localStorage.getItem(key),RUN_RECORD_KEYS.primary);
     expect(JSON.parse(history!).records).toMatchObject([{id:oldId,outcome:'abandoned'}]);
