@@ -1,5 +1,5 @@
 import { progressionLabel } from '../domain/progression';
-import { DungeonMap, dungeonBiomeLabel, dungeonEncounterLabel } from './dungeonMap';
+import { DungeonMap, dungeonBiomeLabel } from './dungeonMap';
 import { poiCell } from '../domain/exploration';
 import { dungeonContent } from '../content/dungeon';
 import { dungeonBoundary, currentFloor, clearedDungeonSlots, FloorCache, type DungeonItemCommand, type DungeonState } from '../domain/dungeon';
@@ -16,16 +16,32 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
   const el = dungeonElement, floor = currentFloor(s);
   const title = el('h1', s.phase === 'defeat' ? `Dungeon defeat · ${dungeonBiomeLabel(s)} · Floor ${s.depth}` : `Dungeon · Floor ${s.depth} · ${dungeonBiomeLabel(s)}`); title.tabIndex = -1;
   const status = el('p',session.status);status.className='dungeon-status';status.setAttribute('role','status');
-  let before=root.querySelector<HTMLElement>(':scope > [data-dungeon-part="before"]');
-  let after=root.querySelector<HTMLElement>(':scope > [data-dungeon-part="after"]');
-  if (!before || !after || mapView.root.parentElement !== root) {
-    before=el('div');before.dataset.dungeonPart='before';after=el('div');after.dataset.dungeonPart='after';
-    root.replaceChildren(before,mapView.root,after);
+  let header=root.querySelector<HTMLElement>(':scope > .dungeon-header');
+  let play=root.querySelector<HTMLElement>(':scope > .dungeon-play');
+  let sidebar=play?.querySelector<HTMLElement>('.dungeon-sidebar');
+  let after=root.querySelector<HTMLElement>(':scope > .dungeon-secondary');
+  const openPanels = new Set([...after?.querySelectorAll('details[open]') ?? []].map(panel => panel.id));
+  if (!header || !play || !sidebar || !after) {
+    header=el('header');header.className='dungeon-header';
+    play=el('div');play.className='dungeon-play';
+    sidebar=el('div');sidebar.className='dungeon-sidebar';
+    after=el('div');after.className='dungeon-secondary';
+    play.append(sidebar,mapView.root);
+    root.replaceChildren(header,play,after);
   }
-  // Rebuild the host-owned footer on every render while keeping the map mounted.
-  for (const child of [...root.children]) if (child !== before && child !== mapView.root && child !== after) child.remove();
-  before.replaceChildren(title,el('p',floor.completed === 3 ? 'All encounters cleared. Walk to the stairs to continue.' : 'Walk onto any uncleared enemy to start its encounter. Clear all three encounters to unlock the stairs.'),status);
+  // Keep the map mounted so it retains focus, scroll position, and art selection.
+  for (const child of [...root.children]) if (child !== header && child !== play && child !== after) child.remove();
+  header.replaceChildren(title,status);
+  sidebar.replaceChildren();
   after.replaceChildren();
+  const disclosure = (id: string, label: string) => {
+    const panel = el('details'), summary = el('summary', label);
+    panel.id = id;
+    panel.open = openPanels.has(id);
+    summary.id = `${id}-summary`;
+    panel.append(summary);
+    return panel;
+  };
   const button = (label: string, run: () => void, disabled = false, id?: string) => {
     const b=el('button',label);b.type='button';b.disabled=disabled;if(id)b.id=id;b.onclick=run;return b;
   };
@@ -36,19 +52,26 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
 
   mapView.render(s,cache.resolve(floor.descriptor.seed, floor.descriptor.generator, floor.descriptor.size ?? 20));
   const canEnter=s.phase==='ready'&&floor.completed<3&&floor.exploration.pois.some(p=>!clearedDungeonSlots(floor).includes(p.encounterSlot)&&floor.position===poiCell(p, floor.descriptor.size ?? 20));
-  if(canEnter)after.append(button('Enter encounter',actions.start,false,'dungeon-start-encounter'));
-  const travel=el('section');travel.setAttribute('aria-label','Stairs');
-  travel.append(el('h2','Stairs'),el('p','Move onto an available stair to travel automatically. On arrival or after continuing a save, move off and back onto the stair to travel again. Upstairs is unavailable on floor 1.'),el('p',floor.completed===3?'All encounters cleared. Descent is unlocked.':'Clear all three encounters and claim pending rewards to unlock descent.'));after.append(travel);
+  if(canEnter)sidebar.append(button('Enter encounter',actions.start,false,'dungeon-start-encounter'));
+  const travel=disclosure('dungeon-travel','Travel and map guide');
+  travel.append(
+    el('p','Tap an adjacent cell, use the compass, or press the arrow or WASD keys to move. Enemies move when you move.'),
+    el('p','● Player · M encounter or guardian · ✓ cleared · ↑ upstairs · ↓ downstairs. Hatching marks remembered terrain.'),
+    el('p','Walk onto an uncleared enemy to start an encounter. Clear all three encounters and resolve pending rewards to unlock descent.'),
+    el('p','Move onto an available stair to travel automatically. On arrival or after continuing a save, step off and back onto the stair to travel again. Upstairs is unavailable on floor 1.'),
+  );
   const party=el('section');party.setAttribute('aria-label','Party');party.append(el('h2','Party'));
   const projected=projectOwnedCatalog(s.ownership,s.party,dungeonContent.catalog,dungeonContent.items);
-  for(const h of s.party){const stats=projected.heroes[h.heroId].stats;party.append(el('p',`${h.heroId}: ${s.activeBattle?s.activeBattle.units.find(u=>u.side==='player'&&u.defId===h.heroId)?.hp??0:h.hp}/${stats.maxHp} HP · ${progressionLabel(h)} · Accuracy ${stats.accuracy} · Armor class ${stats.armorClass}${h.hp===0?' · Defeated':''}`));}after.append(party);
+  for(const h of s.party){const stats=projected.heroes[h.heroId].stats;party.append(el('p',`${h.heroId}: ${s.activeBattle?s.activeBattle.units.find(u=>u.side==='player'&&u.defId===h.heroId)?.hp??0:h.hp}/${stats.maxHp} HP · ${progressionLabel(h)} · Accuracy ${stats.accuracy} · Armor class ${stats.armorClass}${h.hp===0?' · Defeated':''}`));}sidebar.append(party);
   if(s.offer){const rewards=el('section');rewards.setAttribute('aria-label','Rewards');rewards.append(el('h2','Choose one reward'));
     for(const o of s.offer.options){const command:DungeonItemCommand={...dungeonBoundary(s),type:'claimReward',offerId:s.offer.id,itemId:o.itemId};rewards.append(button(`Claim ${dungeonContent.items[o.itemId].label}`,()=>review(`Claim ${dungeonContent.items[o.itemId].label} and prepare the next encounter?`,command)));}
     const decline:DungeonItemCommand={...dungeonBoundary(s),type:'declineReward',offerId:s.offer.id};
     rewards.append(button('Decline reward',()=>review('Continue without claiming either reward?',decline)));
-    after.append(rewards);
+    sidebar.append(rewards);
   }
-  const inventory=el('section');inventory.setAttribute('aria-label','Owned items');inventory.append(el('h2','Owned items'),el('p',`Charms ${s.ownership.equipment.length}/${ITEM_BOUNDS.equipmentInstances.max} · Discard a charm with confirmation to free space.`));
+  if(s.phase==='ready'&&floor.completed===3)sidebar.append(el('p','Descent unlocked. Walk onto the downstairs to continue.'));
+  const inventory=disclosure('dungeon-inventory','Owned items');
+  inventory.append(el('p',`Charms ${s.ownership.equipment.length}/${ITEM_BOUNDS.equipmentInstances.max} · Discard a charm with confirmation to free space.`));
   if(!s.ownership.consumables.length&&!s.ownership.equipment.length)inventory.append(el('p','No owned items yet.'));
   for(const entry of [...s.ownership.consumables,...s.ownership.equipment]){
     const def=dungeonContent.items[entry.itemId],row=el('div'),select=el('select');select.setAttribute('aria-label',`${def.label} target`);
@@ -81,9 +104,9 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
       ],focus),!['ready','reward'].includes(s.phase)));
     }
     inventory.append(row);
-  }after.append(inventory);
-  if(actions.recover)after.append(button('Save recovery',actions.recover));
-  after.append(button('Start new dungeon',actions.restart));
+  }after.append(inventory,travel);
+  if(actions.recover)after.append(button('Save recovery',actions.recover,false,'dungeon-save-recovery'));
+  after.append(button('Start new dungeon',actions.restart,false,'dungeon-restart'));
   const nav=el('nav');for(const [path,label] of [['run','Three-battle scenario'],['battle','Single battle'],['map','Map prototype']]){const a=el('a',label);a.href=`${import.meta.env.BASE_URL}${path}`;nav.append(a);}after.append(nav);
   if(focusId){
     const target=root.querySelector<HTMLElement>(`#${focusId}`);

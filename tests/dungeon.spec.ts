@@ -1,5 +1,5 @@
 import { dungeonContent } from '../src/content/dungeon';
-import { walkDungeon, reenterDungeonStair, continueSavedDungeon } from './helpers/dungeonTraversal';
+import { walkDungeon, reenterDungeonStair, continueSavedDungeon, openDungeonInventory } from './helpers/dungeonTraversal';
 import { atEncounter, atStairApproach, stagedMageAbility } from './helpers/dungeonFixtures';
 import { expect,railTest as test,type Page } from './helpers/dungeonEntropy';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -112,8 +112,8 @@ for(const saved of [false,true])(saved?test.extend({pinDungeonSeed:27}):fixedSee
   for(let i=0;i<20;i++){
    const s=await snapshot(page),command=journeyPreparation(s);if(!command)break;
    if(command.type==='claimReward')await page.getByRole('button',{name:`Claim ${dungeonContent.items[command.itemId].label}`,exact:true}).click();
-   else if(command.type==='useItem'){const label=dungeonContent.items[command.itemId].label;await page.getByRole('combobox',{name:`${label} target`,exact:true}).selectOption(command.heroId);await page.getByRole('button',{name:`Use ${label}`,exact:true}).click();}
-   else if(command.type==='equipItem'){const row=page.locator(`[data-instance-id="${command.instanceId}"]`);await row.locator('select').selectOption(command.heroId);const item=s.ownership.equipment.find(e=>e.instanceId===command.instanceId)!;await row.getByRole('button',{name:`Equip ${dungeonContent.items[item.itemId].label}`,exact:true}).click();}
+   else if(command.type==='useItem'){await openDungeonInventory(page);const label=dungeonContent.items[command.itemId].label;await page.getByRole('combobox',{name:`${label} target`,exact:true}).selectOption(command.heroId);await page.getByRole('button',{name:`Use ${label}`,exact:true}).click();}
+   else if(command.type==='equipItem'){await openDungeonInventory(page);const row=page.locator(`[data-instance-id="${command.instanceId}"]`);await row.locator('select').selectOption(command.heroId);const item=s.ownership.equipment.find(e=>e.instanceId===command.instanceId)!;await row.getByRole('button',{name:`Equip ${dungeonContent.items[item.itemId].label}`,exact:true}).click();}
    else throw Error('Unexpected preparation command');await page.locator('#dungeon-item-confirm').click();
   }
  }
@@ -470,7 +470,7 @@ test('declining a dungeon reward preserves inventory and allows the next encount
 });
 
 test('confirmed charm discard frees full capacity without cancelling or duplicating the pending reward',async({page,isMobile})=>{
- const initial=dungeonCapacityFixture();await seed(page,initial);
+ const initial=dungeonCapacityFixture();await seed(page,initial);await openDungeonInventory(page);
  const target=initial.ownership.equipment[0].instanceId;
  const discard=()=>page.locator(`[data-instance-id="${target}"]`).getByRole('button',{name:'Discard Warding Charm',exact:true});
  const saved=await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary);
@@ -488,6 +488,7 @@ test('confirmed charm discard frees full capacity without cancelling or duplicat
  const claimed=await snapshot(page);expect(claimed.ownership.equipment).toHaveLength(6);expect(claimed.ownership.equipment.some(e=>e.instanceId===target)).toBe(false);expect(claimed.phase).toBe('ready');expect(claimed.offer).toBeNull();
  await page.screenshot({path:test.info().outputPath('discard-capacity-recovered.png'),fullPage:true});
  await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(claimed);
+ await openDungeonInventory(page);
  await page.getByRole('button',{name:/^Discard /}).first().click();await page.locator('#dungeon-discard-confirm').click();
  const prepared=await snapshot(page);expect(prepared.phase).toBe('ready');expect(prepared.ownership.equipment).toHaveLength(5);
  await walkDungeon(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
@@ -503,6 +504,7 @@ test('a claimed Revive Kit restores a fallen dungeon hero across Continue and ne
  await seed(page,victory.state);
  const activate=async(name:string)=>{const button=page.getByRole('button',{name,exact:true});if(isMobile)await button.tap();else await button.click();};
  await activate('Claim Revive Kit');await activate('Confirm');
+ await openDungeonInventory(page);
  await expect(page.getByRole('combobox',{name:'Revive Kit target'})).toHaveValue('mage');
  await activate('Use Revive Kit');
  await expect(page.getByRole('dialog')).toContainText('mage will have 3/11 HP');

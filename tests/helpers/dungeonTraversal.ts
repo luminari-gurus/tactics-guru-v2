@@ -13,6 +13,11 @@ export async function continueSavedDungeon(page: Page) {
   await expect(resume).toBeEnabled();
   await resume.click();
 }
+export async function openDungeonInventory(page: Page) {
+  const summary = page.locator('#dungeon-inventory-summary');
+  await expect(summary).toBeVisible();
+  if (await page.locator('#dungeon-inventory').getAttribute('open') === null) await summary.click();
+}
 export async function walkDungeon(page: Page, target?: number, mode: 'keyboard'|'touch'|'pointer' = 'keyboard') {
   await expect(page.locator('#dungeon-screen')).toBeVisible();
   const initial=await dungeonSnapshot(page), floor=initial.floors[initial.depth-1];

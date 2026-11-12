@@ -62,8 +62,7 @@ export class DungeonMap {
       this.controls.push({button,dx,dy});directions.append(button);
     }
     const center=el('span');center.className='dungeon-compass-center';center.setAttribute('aria-hidden','true');directions.append(center);
-    const legend=el('p','● Player · M encounter (including guardian) · ✓ cleared · ↑ upstairs (floor 2+) · ↓ downstairs (all encounters cleared). Hatching marks remembered terrain. Enemies move when you move. Tap adjacent cells or use direction controls.');
-    this.root.append(this.heading,label,legend,this.grid,this.markerDescription,directions,this.feedback);
+    this.root.append(this.heading,this.grid,this.markerDescription,directions,this.feedback,label);
     document.addEventListener('keydown',e => {
       if (this.state?.phase !== 'ready' || !this.root.isConnected || this.root.closest('[hidden]') ||
         this.locked() || document.hidden || e.defaultPrevented || e.isComposing ||
