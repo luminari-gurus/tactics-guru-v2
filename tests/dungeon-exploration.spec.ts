@@ -337,8 +337,10 @@ fixedSeedTest('map shortcuts work on entry and outside the map without taking ov
  const initial = await dungeonSnapshot(page);
  const floor = initial.floors[0], terrain = floorMap(floor.descriptor);
  const direction = [
-  {offset:1, arrow:'ArrowRight', reverse:'a'}, {offset:-1, arrow:'ArrowLeft', reverse:'d'},
-  {offset:terrain.width, arrow:'ArrowDown', reverse:'w'}, {offset:-terrain.width, arrow:'ArrowUp', reverse:'s'},
+  {offset:1, arrow:'ArrowRight', reverseArrow:'ArrowLeft', reverse:'a'},
+  {offset:-1, arrow:'ArrowLeft', reverseArrow:'ArrowRight', reverse:'d'},
+  {offset:terrain.width, arrow:'ArrowDown', reverseArrow:'ArrowUp', reverse:'w'},
+  {offset:-terrain.width, arrow:'ArrowUp', reverseArrow:'ArrowDown', reverse:'s'},
  ].find(({offset}) => neighbors(floor.position,terrain.width,terrain.height).includes(floor.position+offset) &&
   terrain.cells[floor.position+offset] && floor.position+offset!==floor.descriptor.downstairs);
  if (!direction) throw Error('Expected a walkable cell next to the dungeon entrance');
@@ -373,10 +375,36 @@ fixedSeedTest('map shortcuts work on entry and outside the map without taking ov
  const returned = await dungeonSnapshot(page);
  expect(returned.floors[0].position).toBe(floor.position);
  expect(returned.revision).toBe(moved.revision + 1);
- await grid.focus();
+ await expect(restart).toBeFocused();
+
+ const menu = page.getByRole('link',{name:'Main menu',exact:true});
+ await menu.focus();
  await page.keyboard.press(direction.arrow);
- expect((await dungeonSnapshot(page)).revision).toBe(returned.revision + 1);
+ const movedAgain = await dungeonSnapshot(page);
+ expect(movedAgain.revision).toBe(returned.revision + 1);
+ await expect(menu).toBeFocused();
+
+ const wasd = page.getByRole('checkbox',{name:'Enable WASD movement'});
+ await expect(wasd).toBeChecked();
+ await wasd.uncheck();
+ await expect(grid).toHaveAccessibleName(/Arrow keys move one cell/);
+ await restart.focus();
+ await page.keyboard.press(direction.reverse);
+ expect(await dungeonSnapshot(page)).toEqual(movedAgain);
+ await grid.focus();
+ await page.keyboard.press(direction.reverse);
+ expect(await dungeonSnapshot(page)).toEqual(movedAgain);
  await expect(grid).toBeFocused();
+
+ await page.reload();
+ await continueSavedDungeon(page);
+ await expect(wasd).not.toBeChecked();
+ await restart.focus();
+ await page.keyboard.press(direction.reverseArrow);
+ const arrowOnly = await dungeonSnapshot(page);
+ expect(arrowOnly.floors[0].position).toBe(floor.position);
+ expect(arrowOnly.revision).toBe(movedAgain.revision + 1);
+ await expect(restart).toBeFocused();
 });
 
 fixedSeedTest('real traversal, art independence, keyboard locks, active battle and exact reload',async({page,isMobile})=>{

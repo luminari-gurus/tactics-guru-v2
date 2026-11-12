@@ -4,7 +4,7 @@ import { BATTLE_CUES } from '../../src/audio/battleCues';
 import { cueBytes, inventory } from '../../scripts/battle-audio-inventory';
 
 it('counts the actual cue files equally with Windows and POSIX inventory paths',async()=>{
-  const files=await inventory('public');
+  const files=await inventory('public', 'public/audio');
   const sizes=await Promise.all(Object.values(BATTLE_CUES).map(cue=>stat(`public${cue.url}`).then(file=>file.size)));
   const expected=sizes.reduce((a,b)=>a+b,0);
   expect(expected).toBe(11741);
