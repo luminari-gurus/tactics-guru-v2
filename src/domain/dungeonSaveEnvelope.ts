@@ -3,8 +3,8 @@ import { dungeonIdentity, previousDungeonIdentity } from '../content/dungeon';
 import { previousItemCatalog } from '../content/items';
 import { canonical, hashJson } from './contentIdentity';
 import { readDungeon, type DungeonResult, type DungeonState } from './dungeon';
-import { reveal } from './exploration';
-import { hasShape } from './validation';
+import { reveal, WALL_SIGHT_VERSION } from './exploration';
+import { hasShape, isDenseArray } from './validation';
 export const DUNGEON_SAVE_MAX_BYTES = 1024 * 1024;
 const DUNGEON_SAVE_FORMAT = 10;
 const DRAUGHT_DUNGEON_SAVE_FORMAT = 11;
@@ -35,17 +35,45 @@ export function encodeDungeon(input: unknown): { ok: true; text: string } | { ok
   const result = encodeDungeonWithState(input);
   return result.ok ? {ok:true,text:result.text} : result;
 }
-/** Keep the backup usable by a client that knows the original through-wall rule. */
-export function encodeDungeonRollback(state: DungeonState): ReturnType<typeof encodeDungeon> {
-  const floors = state.floors.map(floor => {
-    if (floor.exploration.sightVersion === undefined) return floor;
+/** Store just the changes needed to undo the legacy projection in a current client. */
+export function encodeDungeonRollback(state: DungeonState): { ok: true; text: string; checkpoint: string } | { ok: false; reason: string } {
+  const addedCells = state.floors.map(floor => floor.exploration.sightVersion === undefined ? null :
+    reveal(floor.position, floor.descriptor.size ?? 20).filter(cell => !floor.exploration.revealed.includes(cell)));
+  const floors = state.floors.map((floor, index) => {
+    const added = addedCells[index];
+    if (added === null) return floor;
     const { sightVersion, ...exploration } = floor.exploration;
-    const visible = reveal(floor.position, floor.descriptor.size ?? 20);
-    const revealed = [...new Set([...exploration.revealed, ...visible])].sort((a, b) => a - b);
+    const revealed = [...exploration.revealed, ...added].sort((a, b) => a - b);
     return { ...floor, exploration: { ...exploration, revealed } };
   });
-  return encodeDungeon({ ...state, floors });
+  const legacy = encodeDungeon({ ...state, floors });
+  if (!legacy.ok) return legacy;
+  const body = { backup: hashJson(legacy.text), addedCells };
+  return { ...legacy, checkpoint: canonical({ ...body, digest: hashJson(body) }) };
 }
+
+export function restoreDungeonRollback(text: string, legacy: DungeonState, checkpoint: string): DungeonState | null {
+  if (checkpoint.length > DUNGEON_SAVE_MAX_BYTES || hasWallSight(legacy)) return null;
+  try {
+    const value: unknown = JSON.parse(checkpoint);
+    if (!hasShape(value, ['backup','addedCells','digest']) || !isDenseArray(value.addedCells, legacy.floors.length) ||
+        value.addedCells.length !== legacy.floors.length || value.backup !== hashJson(text) ||
+        value.digest !== hashJson({ backup: value.backup, addedCells: value.addedCells })) return null;
+    const addedCells = value.addedCells;
+    const floors = legacy.floors.map((floor, index) => {
+      const added = addedCells[index];
+      if (added === null) return floor;
+      const visible = reveal(floor.position, floor.descriptor.size ?? 20);
+      if (!isDenseArray(added, visible.length) || !added.every(cell =>
+        typeof cell === 'number' && visible.includes(cell) && floor.exploration.revealed.includes(cell))) throw Error('Invalid rollback cells');
+      return { ...floor, exploration: { ...floor.exploration, sightVersion: WALL_SIGHT_VERSION,
+        revealed: floor.exploration.revealed.filter(cell => !added.includes(cell)) } };
+    });
+    const read = readDungeon({ ...legacy, floors });
+    return read.ok && hasWallSight(read.state) ? read.state : null;
+  } catch { return null; }
+}
+
 export function decodeDungeon(text: string): DungeonResult {
   if (typeof text !== 'string' || text.length > DUNGEON_SAVE_MAX_BYTES || utf8Bytes(text) > DUNGEON_SAVE_MAX_BYTES) return { ok: false, reason: 'tooLarge' };
   try {

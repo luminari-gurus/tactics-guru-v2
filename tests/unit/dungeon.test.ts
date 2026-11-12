@@ -8,9 +8,9 @@ import { assert, describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { dungeonCapacityFixture } from '../helpers/dungeonFixtures';
 import { clearedDungeonSlots, freshDungeon, newDungeonSeed, stepDungeon, dungeonBattle, dungeonOffer, floorDescriptor, floorMap, FloorCache, dungeonSeed, readDungeon, travelDungeon, startDungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
-import { encodeDungeon, decodeDungeon, utf8Bytes } from '../../src/domain/dungeonSaveEnvelope';
+import { encodeDungeon, decodeDungeon, encodeDungeonRollback, utf8Bytes } from '../../src/domain/dungeonSaveEnvelope';
 import { dungeonContent, dungeonIdentity, previousDungeonIdentity } from '../../src/content/dungeon';
-import { bothDungeonSlotsMissing, createDungeonStorage, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
+import { bothDungeonSlotsMissing, createDungeonStorage, DUNGEON_BACKUP_CHECKPOINT_KEY, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
 import { DungeonSession } from '../../src/app/DungeonSession';
 import { LEGACY_ENCOUNTER_POLICY, selectDungeonEncounter } from '../../src/domain/dungeonEncounters';
 import { priorDungeonEnvelope } from '../helpers/dungeonFixtures';
@@ -85,9 +85,51 @@ it.each([false, true])('keeps a pre-fog backup after repeated writes (migrated: 
   expect(JSON.parse(saved.primary.text).format).toBe(14);
   expect(saved.primary.state).toEqual(second);
   expect(JSON.parse(saved.backup.text).format).toBe(10);
-  expect(saved.backup.state).toMatchObject({ id: first.id, revision: first.revision, depth: first.depth, party: first.party });
-  expect(saved.backup.state.floors[0].exploration.sightVersion).toBeUndefined();
-  expect(saved.backup.state.floors[0].exploration.revealed).toEqual(expect.arrayContaining([...first.floors[0].exploration.revealed]));
+  const rollback = decodeDungeon(saved.backup.text); assert(rollback.ok);
+  expect(rollback.state.floors[0].exploration.sightVersion).toBeUndefined();
+  expect(rollback.state.floors[0].exploration.revealed).toEqual(expect.arrayContaining([...first.floors[0].exploration.revealed]));
+  expect(saved.backup.state).toEqual(first);
+  data.setItem(DUNGEON_KEYS.primary, '{broken');
+  const restartedStorage = createDungeonStorage(() => data);
+  const session = new DungeonSession(initial, restartedStorage), review = session.inspect();
+  const exports = session.exports(review);
+  expect(exports.find(entry => entry.label === 'pre-fog backup save')?.text).toBe(saved.backup.text);
+  expect(decodeDungeon(exports.find(entry => entry.label === 'backup save')!.text)).toEqual({ ok: true, state: first });
+  expect(session.continue(review)).toBe(true);
+  expect(session.snapshot).toEqual(first);
+
+  const reviewed = session.inspect();
+  const replacement = encodeDungeonRollback(second); assert(replacement.ok);
+  data.setItem(DUNGEON_KEYS.backup, replacement.text);
+  expect(session.continue(reviewed, 'backup')).toBe(false);
+  const changed = restartedStorage.inspect().backup; assert(changed.status === 'valid');
+  expect(changed.checkpoint).toBeUndefined();
+  expect(changed.state.floors[0].exploration.sightVersion).toBeUndefined();
+});
+
+it('keeps the previous exact checkpoint when a backup rotation is interrupted', () => {
+  const initial = fresh(), data = memory(), storage = createDungeonStorage(() => data);
+  expect(storage.save(initial).ok).toBe(true);
+  const floor = initial.floors[0], map = floorMap(floor.descriptor);
+  const next = good(stepDungeon(initial, { id: initial.id, depth: initial.depth, revision: initial.revision,
+    destination: neighbors(floor.position, map.width, map.height).find(cell => map.cells[cell])! }));
+  expect(storage.save(next).ok).toBe(true);
+  const write = data.setItem;
+  data.setItem = (key, value) => {
+    if (key === DUNGEON_KEYS.backup) throw Object.assign(Error('denied'), { name: 'SecurityError' });
+    write(key, value);
+  };
+  expect(storage.save(next)).toEqual({ ok: false, reason: 'security' });
+  const currentStorage = createDungeonStorage(() => data);
+  const backup = currentStorage.inspect().backup; assert(backup.status === 'valid');
+  expect(backup.state).toEqual(initial);
+  const session = new DungeonSession(next, currentStorage), reviewed = session.inspect();
+  write(DUNGEON_BACKUP_CHECKPOINT_KEY, 'corrupt');
+  expect(session.continue(reviewed, 'backup')).toBe(false);
+  const fallback = currentStorage.inspect().backup; assert(fallback.status === 'valid');
+  expect(fallback.state.floors[0].exploration.sightVersion).toBeUndefined();
+  expect(currentStorage.remove('backup', fallback.text, null).ok).toBe(true);
+  expect(data.getItem(DUNGEON_BACKUP_CHECKPOINT_KEY)).toBeNull();
 });
 
 function win(s: DungeonState) {

@@ -5,7 +5,7 @@ import { nextUint32, seedRng, isRngState, type RngState } from './rng';
 import { hasShape, isDenseArray } from './validation';
 
 export const EXPLORATION_VERSION = 'exploration-v1';
-const WALL_SIGHT_VERSION = 'wall-sight-v1';
+export const WALL_SIGHT_VERSION = 'wall-sight-v1';
 export interface EncounterPoi extends OverworldMarker { readonly encounterSlot: number }
 export interface Exploration {
   readonly version: typeof EXPLORATION_VERSION | 'exploration-v2';

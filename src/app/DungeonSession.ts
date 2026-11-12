@@ -120,14 +120,27 @@ export class DungeonSession {
     const values = [...this.retained];
     const current = encodeDungeon(this.current);
     if (current.ok) values.push({ label: 'current progress', text: current.text });
-    for (const slot of ['primary','backup'] as const) if (review[slot].text !== null) values.push({ label: `${slot} save`, text: review[slot].text! });
+    for (const slot of ['primary','backup'] as const) {
+      const reviewed = review[slot];
+      if (reviewed.text === null) continue;
+      if (reviewed.status === 'valid' && reviewed.checkpoint) {
+        const exact = encodeDungeon(reviewed.state);
+        if (exact.ok) {
+          values.push({ label: 'backup save', text: exact.text }, { label: 'pre-fog backup save', text: reviewed.text });
+          continue;
+        }
+      }
+      values.push({ label: `${slot} save`, text: reviewed.text });
+    }
     return values;
   }
   remove(slot: DungeonSlot, review: DungeonInspection) {
     if (!this.storage || this.disposed || review !== this.review) return false;
     this.retained = this.exports(review);
     this.progressSaved = false;
-    const result = this.storage.remove(slot, review[slot].text); this.review = null;
+    const reviewed = review[slot];
+    const result = this.storage.remove(slot, reviewed.text, reviewed.status === 'valid' ? reviewed.checkpoint ?? null : null);
+    this.review = null;
     this.report(result.ok ? 'Reviewed save removed. Retry saving to preserve current progress.' : `Removal refused: ${result.reason}`); return result.ok;
   }
   async replace(review: DungeonInspection, id: string, seed: number): Promise<boolean> {
@@ -151,8 +164,11 @@ export class DungeonSession {
     const next = freshDungeon(id, seed);
     this.retained = this.exports(review);
     this.progressSaved = false;
-    for (const slot of ['backup','primary'] as const) if (!this.storage.remove(slot, review[slot].text).ok) {
-      this.review = null; this.report('Reset incomplete. Current dungeon retained; export recovery copies and review again.'); return false;
+    for (const slot of ['backup','primary'] as const) {
+      const reviewed = review[slot];
+      if (!this.storage.remove(slot, reviewed.text, reviewed.status === 'valid' ? reviewed.checkpoint ?? null : null).ok) {
+        this.review = null; this.report('Reset incomplete. Current dungeon retained; export recovery copies and review again.'); return false;
+      }
     }
     const after = this.storage.inspect();
     if (Object.values(after).some(s => s.status !== 'missing') || !this.storage.acknowledge(after)) return false;
