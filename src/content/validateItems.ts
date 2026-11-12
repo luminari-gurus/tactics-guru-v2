@@ -1,5 +1,5 @@
 import { HERO_IDS } from './constants';
-import { ITEM_BOUNDS, type ItemCatalog, type ItemDef, type ItemId } from './itemTypes';
+import { ITEM_BOUNDS, isEquipmentSlot, type ItemCatalog, type ItemDef, type ItemId } from './itemTypes';
 import { isIntegerIn } from '../domain/rng';
 import { hasShape, isDenseArray, isPlainRecord } from '../domain/validation';
 
@@ -43,7 +43,7 @@ export function validateItems(input: unknown): ItemValidation {
       const revive = hasShape(effect, ['kind', 'percent']) && effect.kind === 'revive' && isIntegerIn(effect.percent, ITEM_BOUNDS.revivePercent);
       if (!restore && !revive) fail(`${path}.effect`, 'Expected restoreHp amount 1–18 or revive percent 1–100.');
     } else if (value.kind === 'equipment') {
-      if (value.slot !== 'charm') fail(`${path}.slot`, 'Expected charm slot.');
+      if (!isEquipmentSlot(value.slot)) fail(`${path}.slot`, 'Expected a supported equipment slot.');
       if (!hasShape(effect, ['kind', 'stat', 'amount']) || effect.kind !== 'statBonus' ||
         (effect.stat !== 'accuracy' && effect.stat !== 'armorClass') || !isIntegerIn(effect.amount, ITEM_BOUNDS.bonus))
         fail(`${path}.effect`, 'Expected accuracy/armorClass statBonus amount 1–2.');

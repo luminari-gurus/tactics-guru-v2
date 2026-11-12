@@ -55,6 +55,8 @@ body:has(#dungeon-screen:not([hidden])) #battle-heading { display: none; }
 .dungeon-sheet dt { font-weight: 600; }
 .dungeon-sheet dd { margin: 0; }
 .dungeon-sheet p { grid-column: 1 / -1; margin: 0; }
+.dungeon-sheet-equipment { grid-column: 1 / -1; border-top: 1px solid #657464; padding-top: 8px; }
+.dungeon-sheet-equipment h3 { font-size: 1rem; margin: 0 0 6px; }
 @media (max-width: 360px) {
   .dungeon-sheet dl { grid-template-columns: 1fr; gap: 2px; }
   .dungeon-sheet dd + dt { margin-top: 6px; }

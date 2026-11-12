@@ -7,7 +7,7 @@ import type { Locator } from '@playwright/test';
 import { dungeonCapacityFixture, dungeonVictoryBoundary } from './helpers/dungeonFixtures';
 import { dungeonBattle, startDungeonBattle, acceptDungeonBattle, freshDungeon, type DungeonState } from '../src/domain/dungeon';
 import { progressHero } from '../src/domain/progression';
-import { encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
+import { decodeDungeon, encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { RUN_RECORD_KEYS } from '../src/persistence/runRecordsStorage';
 import { COMBAT_CONTROLS_KEY } from '../src/ui/combatControls';
@@ -689,6 +689,44 @@ test('hero progression commits once, heals at a threshold and survives inspectio
  await expect(page.locator('.dungeon-status')).not.toContainText('reached level');
  const offer=saved.offer!;await page.getByRole('button',{name:`Claim ${dungeonContent.items[offer.options[0].itemId].label}`,exact:true}).click();await page.locator('#dungeon-item-confirm').click();
  expect((await snapshot(page)).party).toEqual(saved.party);
+});
+
+test('character sheets show equipped charms by hero through equip, resume, and unequip', async ({page,isMobile}) => {
+ const initial = dungeonCapacityFixture();
+ await seed(page, initial);
+ const inspect = async (hero: string, expected: string) => {
+  const portrait = page.getByRole('region',{name:'Party',exact:true}).getByRole('button',{name:hero,exact:true});
+  if (isMobile) await portrait.tap(); else await portrait.click();
+  const sheet = page.getByRole('dialog',{name:`${hero} character sheet`});
+  const equipment = sheet.getByRole('region',{name:'Equipment',exact:true});
+  await expect(equipment.locator('dt')).toHaveText('Charm');
+  await expect(equipment.locator('dd')).toHaveText(expected);
+  await sheet.getByRole('button',{name:'Close',exact:true}).click();
+ };
+ const charm = 'Warding Charm · +1 armor class';
+ await inspect('Fighter', charm);
+ await inspect('Ranger', 'Empty');
+ const unassigned = initial.ownership.equipment[1];
+ const row = page.locator(`[data-instance-id="${unassigned.instanceId}"]`);
+ await openDungeonInventory(page);
+ await row.getByRole('combobox').selectOption('ranger');
+ await row.getByRole('button',{name:'Equip Warding Charm',exact:true}).click();
+ await page.locator('#dungeon-item-confirm').click();
+ await inspect('Ranger', charm);
+ await inspect('Mage', 'Empty');
+ await expect.poll(async () => {
+  const text = await page.evaluate(key => localStorage.getItem(key), DUNGEON_KEYS.primary);
+  const saved = text === null ? null : decodeDungeon(text);
+  return saved?.ok ? saved.state.ownership.assignments : [];
+ }).toContainEqual({ heroId: 'ranger', slot: 'charm', instanceId: unassigned.instanceId });
+ await page.reload();
+ await continueSavedDungeon(page);
+ await inspect('Ranger', charm);
+ await openDungeonInventory(page);
+ await row.getByRole('button',{name:'Unequip Warding Charm',exact:true}).click();
+ await page.locator('#dungeon-item-confirm').click();
+ await inspect('Ranger', 'Empty');
+ await inspect('Fighter', charm);
 });
 
 test('dungeon recovery separates status and preserves exploration scroll', async ({page}) => {

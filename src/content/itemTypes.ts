@@ -1,7 +1,11 @@
 import type { HeroId } from './types';
 
 export type ItemId = `item:${string}`;
-export type EquipmentSlot = 'charm';
+export const EQUIPMENT_SLOTS = { charm: 'Charm' } as const;
+export type EquipmentSlot = keyof typeof EQUIPMENT_SLOTS;
+export function isEquipmentSlot(value: unknown): value is EquipmentSlot {
+  return typeof value === 'string' && Object.hasOwn(EQUIPMENT_SLOTS, value);
+}
 interface ItemBase {
   readonly id: ItemId;
   readonly label: string;
