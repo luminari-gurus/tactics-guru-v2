@@ -4,7 +4,7 @@ import { poiCell } from '../domain/exploration';
 import { dungeonContent } from '../content/dungeon';
 import { dungeonBoundary, currentFloor, clearedDungeonSlots, FloorCache, type DungeonItemCommand, type DungeonState } from '../domain/dungeon';
 import type { DungeonSession } from '../app/DungeonSession';
-import { ITEM_BOUNDS } from '../content/itemTypes';
+import { EQUIPMENT_SLOTS, ITEM_BOUNDS } from '../content/itemTypes';
 import type { HeroId } from '../content/types';
 import { preparationItemTarget, projectOwnedCatalog } from '../domain/items';
 import { BattleDialogs } from './dialogs';
@@ -109,6 +109,21 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
         el('dt', 'Armor class'), el('dd', String(stats.armorClass)),
       );
       sheet.append(portrait(name, sheetPortraits[heroId], 96), details, el('p', progressionLabel(hero)));
+      const equipment = el('section');
+      equipment.className = 'dungeon-sheet-equipment';
+      equipment.setAttribute('aria-label', 'Equipment');
+      const slots = el('dl');
+      for (const [slot, label] of Object.entries(EQUIPMENT_SLOTS)) {
+        const assignment = s.ownership.assignments.find(entry => entry.heroId === heroId && entry.slot === slot);
+        const instance = s.ownership.equipment.find(entry => entry.instanceId === assignment?.instanceId);
+        const item = instance && items[instance.itemId];
+        const value = item?.kind === 'equipment'
+          ? `${item.label} · +${item.effect.amount} ${item.effect.stat === 'armorClass' ? 'armor class' : 'accuracy'}`
+          : 'Empty';
+        slots.append(el('dt', label), el('dd', value));
+      }
+      equipment.append(el('h3', 'Equipment'), slots);
+      sheet.append(equipment);
       dialogs.showChoices(`${name} character sheet`, sheet, [
         { id: 'dungeon-sheet-close', label: 'Close', run: () => {} },
       ], () => {}, { focusTitle: true, returnFocus: () => root.querySelector<HTMLElement>(`#${id}`) });
@@ -156,8 +171,8 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
           {...dungeonBoundary(s),type:'useItem',itemId:def.id,heroId:hero.heroId});
       },!select.value||!['ready','reward'].includes(s.phase)));
     }
-    else{row.dataset.instanceId=entry.instanceId;const instanceId=entry.instanceId,assignment=s.ownership.assignments.find(a=>a.instanceId===instanceId);
-      row.append(button(assignment?`Unequip ${def.label}`:`Equip ${def.label}`,()=>review(`${assignment?'Unequip':'Equip'} ${def.label}?`,{...dungeonBoundary(s),type:assignment?'unequipItem':'equipItem',instanceId,heroId:assignment?.heroId??select.value as HeroId,slot:'charm'}),(!assignment&&!select.value)||!['ready','reward'].includes(s.phase)));}
+    else if(def.kind==='equipment'){row.dataset.instanceId=entry.instanceId;const instanceId=entry.instanceId,assignment=s.ownership.assignments.find(a=>a.instanceId===instanceId);
+      row.append(button(assignment?`Unequip ${def.label}`:`Equip ${def.label}`,()=>review(`${assignment?'Unequip':'Equip'} ${def.label}?`,{...dungeonBoundary(s),type:assignment?'unequipItem':'equipItem',instanceId,heroId:assignment?.heroId??select.value as HeroId,slot:def.slot}),(!assignment&&!select.value)||!['ready','reward'].includes(s.phase)));}
     if('instanceId'in entry){
       const command:DungeonItemCommand={...dungeonBoundary(s),type:'discardEquipment',instanceId:entry.instanceId};
       const assignment=s.ownership.assignments.find(a=>a.instanceId===entry.instanceId);

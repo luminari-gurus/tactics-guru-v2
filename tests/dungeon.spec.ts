@@ -628,6 +628,39 @@ test('hero progression commits once, heals at a threshold and survives inspectio
  expect((await snapshot(page)).party).toEqual(saved.party);
 });
 
+test('character sheets show equipped charms by hero through equip, resume, and unequip', async ({page,isMobile}) => {
+ const initial = dungeonCapacityFixture();
+ await seed(page, initial);
+ const inspect = async (hero: string, expected: string) => {
+  const portrait = page.getByRole('region',{name:'Party',exact:true}).getByRole('button',{name:hero,exact:true});
+  if (isMobile) await portrait.tap(); else await portrait.click();
+  const sheet = page.getByRole('dialog',{name:`${hero} character sheet`});
+  const equipment = sheet.getByRole('region',{name:'Equipment',exact:true});
+  await expect(equipment.locator('dt')).toHaveText('Charm');
+  await expect(equipment.locator('dd')).toHaveText(expected);
+  await sheet.getByRole('button',{name:'Close',exact:true}).click();
+ };
+ const charm = 'Warding Charm · +1 armor class';
+ await inspect('Fighter', charm);
+ await inspect('Ranger', 'Empty');
+ const unassigned = initial.ownership.equipment[1];
+ const row = page.locator(`[data-instance-id="${unassigned.instanceId}"]`);
+ await openDungeonInventory(page);
+ await row.getByRole('combobox').selectOption('ranger');
+ await row.getByRole('button',{name:'Equip Warding Charm',exact:true}).click();
+ await page.locator('#dungeon-item-confirm').click();
+ await inspect('Ranger', charm);
+ await inspect('Mage', 'Empty');
+ await page.reload();
+ await continueSavedDungeon(page);
+ await inspect('Ranger', charm);
+ await openDungeonInventory(page);
+ await row.getByRole('button',{name:'Unequip Warding Charm',exact:true}).click();
+ await page.locator('#dungeon-item-confirm').click();
+ await inspect('Ranger', 'Empty');
+ await inspect('Fighter', charm);
+});
+
 test('dungeon recovery separates status and preserves exploration scroll', async ({page}) => {
  await page.goto('./?game=dungeon');
  await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();

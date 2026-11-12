@@ -1,6 +1,6 @@
 import { projectProgression } from './progression';
 import { HERO_IDS } from '../content/constants';
-import { ITEM_BOUNDS, type ItemCatalog, type ItemId, type ItemOwnership, type EquipmentSlot, type ItemDef } from '../content/itemTypes';
+import { ITEM_BOUNDS, isEquipmentSlot, type ItemCatalog, type ItemId, type ItemOwnership, type EquipmentSlot, type ItemDef } from '../content/itemTypes';
 import type { ContentCatalog, HeroId } from '../content/types';
 import { isIntegerIn } from './rng';
 import { HEALING_DRAUGHT_ID } from '../content/items';
@@ -68,7 +68,7 @@ export function readItemOwnership(input: unknown, runId: string, catalog: ItemCa
     equipment.push({ instanceId: instance.instanceId, itemId: instance.itemId });
   }
   for (const assignment of input.assignments) {
-    if (!hasShape(assignment, ['heroId', 'slot', 'instanceId']) || !heroId(assignment.heroId) || assignment.slot !== 'charm' ||
+    if (!hasShape(assignment, ['heroId', 'slot', 'instanceId']) || !heroId(assignment.heroId) || !isEquipmentSlot(assignment.slot) ||
       typeof assignment.instanceId !== 'string' || assignments.some(a => a.heroId === assignment.heroId || a.instanceId === assignment.instanceId)) return invalid;
     const owned = equipment.find(e => e.instanceId === assignment.instanceId), def = owned && catalog[owned.itemId];
     if (!def || def.kind !== 'equipment' || def.slot !== assignment.slot || !def.eligibleHeroes.includes(assignment.heroId)) return invalid;
