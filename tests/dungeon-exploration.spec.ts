@@ -283,18 +283,25 @@ test('diamond compass directions, focus, touch targets and unavailable states',a
   expect(upright.label).toBe('matrix(0.707107, -0.707107, 0.707107, 0.707107, 0, 0)');
  }
  expect(boxes[0].y).toBeLessThan(boxes[1].y);expect(boxes[2].y).toBeGreaterThan(boxes[1].y);expect(boxes[3].x).toBeLessThan(boxes[0].x);expect(boxes[1].x).toBeGreaterThan(boxes[0].x);
- await page.locator('#dungeon-map').focus();await page.keyboard.press(browserName==='webkit'?'Alt+Tab':'Tab');
+ const tab = browserName === 'webkit' ? 'Alt+Tab' : 'Tab';
+ await page.locator('#dungeon-map').focus();
+ const party = page.getByRole('region', { name: 'Party', exact: true });
+ for (const hero of ['Fighter', 'Ranger', 'Mage']) {
+  await page.keyboard.press(tab);
+  await expect(party.getByRole('button', { name: hero, exact: true })).toBeFocused();
+ }
+ await page.keyboard.press(tab);
  await expect(compass.getByRole('button',{name:'North',exact:true})).toBeFocused();
  expect(await compass.getByRole('button',{name:'North',exact:true}).evaluate(node=>node.matches(':focus-visible')&&getComputedStyle(node).outlineStyle==='solid')).toBe(true);
  await page.screenshot({path:test.info().outputPath('compass-focus.png')});
  for(const [name,delta] of directions){
   const before=await dungeonSnapshot(page),button=compass.getByRole('button',{name,exact:true});
   if(isMobile)await button.tap();else {await button.focus();await page.keyboard.press(name==='North'?'Enter':'Space');}
-  expect((await dungeonSnapshot(page)).floors[0].position).toBe(center+delta);
+  await expect.poll(async () => (await dungeonSnapshot(page)).floors[0].position).toBe(center+delta);
   expect((await dungeonSnapshot(page)).revision).toBe(before.revision+1);
   const reverse=directions.find(([,offset])=>offset===-delta)![0];
   const back=compass.getByRole('button',{name:reverse,exact:true});if(isMobile)await back.tap();else await back.click();
-  expect((await dungeonSnapshot(page)).floors[0].position).toBe(center);
+  await expect.poll(async () => (await dungeonSnapshot(page)).floors[0].position).toBe(center);
  }
  if(!isMobile){
   const north=compass.getByRole('button',{name:'North',exact:true});await north.hover();await page.mouse.down();
@@ -327,13 +334,16 @@ test('compass keeps keyboard focus when movement disables the activated directio
   await page.reload();await continueSavedDungeon(page);
   const west=page.getByRole('button',{name:'West',exact:true}),map=page.locator('#dungeon-map');
   await expect(west).toBeEnabled();await west.focus();await page.keyboard.press(key);
-  const moved=await dungeonSnapshot(page);expect(moved.floors[0].position).toBe(26);expect(moved.revision).toBe(initial.revision+1);
+  await expect.poll(async () => (await dungeonSnapshot(page)).floors[0].position).toBe(26);
+  const moved=await dungeonSnapshot(page);expect(moved.revision).toBe(initial.revision+1);
   await expect(west).toBeDisabled();await expect(map).toBeFocused();
   expect(await map.evaluate(node=>node.matches(':focus-visible')&&getComputedStyle(node).outlineStyle==='solid')).toBe(true);
   await page.screenshot({path:test.info().outputPath(`compass-focus-fallback-${key}.png`)});
   await page.keyboard.press('ArrowLeft');expect(await dungeonSnapshot(page)).toEqual(moved);await expect(map).toBeFocused();
-  await page.keyboard.press('ArrowRight');const returned=await dungeonSnapshot(page);
-  expect(returned.floors[0].position).toBe(27);expect(returned.revision).toBe(initial.revision+2);await expect(map).toBeFocused();await expect(west).toBeEnabled();
+  await page.keyboard.press('ArrowRight');
+  await expect.poll(async () => (await dungeonSnapshot(page)).floors[0].position).toBe(27);
+  const returned=await dungeonSnapshot(page);
+  expect(returned.revision).toBe(initial.revision+2);await expect(map).toBeFocused();await expect(west).toBeEnabled();
  }
 });
 

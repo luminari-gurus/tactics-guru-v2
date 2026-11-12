@@ -695,10 +695,11 @@ test('dungeon recovery separates status and preserves exploration scroll', async
  await page.goto('./?game=dungeon');
  await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();
  await page.locator('#dungeon-confirm-new').click();
- await page.getByRole('button',{name:'Save recovery',exact:true}).focus();
+ await expect(page.locator('#dungeon-map')).toBeVisible();
+ await page.locator('#dungeon-recovery').focus();
  const before=await page.locator('#dungeon-screen').evaluate(node=>node.scrollTop);
  await page.keyboard.press('Enter');
- await expect(page.getByRole('dialog')).toBeVisible();
+ await expect(page.getByRole('dialog',{name:'Dungeon save recovery'})).toBeVisible();
  const message=await page.locator('#battle-dialog-message').boundingBox();
  const actions=await page.locator('#battle-dialog .fit-controls').boundingBox();
  expect(actions!.y-message!.y-message!.height).toBeGreaterThanOrEqual(15);
