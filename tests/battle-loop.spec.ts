@@ -193,8 +193,9 @@ test('default Move initializes once per usable player turn and preserves explici
   await expect(target).toHaveValue('');await expect(page.locator('#battle-review')).toBeDisabled();
   expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!).pending).toBeNull();
   await page.screenshot({path:test.info().outputPath('default-move.png')});
-  for(const action of ['basic','signature']){
-    await page.locator(`[data-action=${action}]`).click();await target.selectOption({index:1});
+  const selectedAbilityId=await page.locator('#battle-ability').inputValue();
+  for(const action of ['basic',selectedAbilityId]){
+    await page.locator(`[data-action="${action}"]`).click();await target.selectOption({index:1});
     const selected=await target.inputValue(),before=await page.locator('#game').getAttribute('data-session');
     const overlays=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).targets;
     await page.locator('#battle-party').click();await page.locator('#inspection-close').click();
@@ -203,7 +204,7 @@ test('default Move initializes once per usable player turn and preserves explici
     await page.mouse.move(box.x+box.width/2,box.y+box.height/2);
     const viewport=page.viewportSize()!;await page.setViewportSize({width:viewport.width-1,height:viewport.height});await page.setViewportSize(viewport);
     await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));Object.defineProperty(document,'hidden',{configurable:true,value:false});document.dispatchEvent(new Event('visibilitychange'));});
-    await expect(page.locator(`[data-action=${action}]`)).toHaveAttribute('aria-pressed','true');await expect(move).toHaveAttribute('aria-pressed','false');
+    await expect(page.locator(`[data-action="${action}"]`)).toHaveAttribute('aria-pressed','true');await expect(move).toHaveAttribute('aria-pressed','false');
     await expect(target).toHaveValue(selected);expect(await page.locator('#game').getAttribute('data-session')).toBe(before);
     expect(JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).targets).toEqual(overlays);
   }
@@ -630,7 +631,7 @@ test('keyboard-only movement, attack confirmation and Wait use the shared decisi
     const s=await session(page);
     if(command.type==='endTurn'){await page.locator('#battle-next').focus();await page.keyboard.press('Enter');return;}
     if(command.type==='drinkDraught')throw Error('Standalone battle does not supply draughts');
-    const action=command.type==='move'?'move':command.abilityId==='ability:basic_attack'?'basic':'signature';
+    const action=command.type==='move'?'move':command.abilityId==='ability:basic_attack'?'basic':command.abilityId;
     await page.locator(`[data-action="${action}"]`).focus();await page.keyboard.press('Enter');
     const cell=command.type==='move'?command.to:s.state.units.find(u=>u.id===('unitId' in command.target?command.target.unitId:'missileTargets' in command.target?command.target.missileTargets[0]:-1))!.cell;
     const actor=s.state.units.find(u=>u.id===s.state.initiative[s.state.activeIndex])!;
@@ -718,13 +719,13 @@ test('live actor, inspection and cancellation remain independent of pending inte
   for(let turn=0;turn<12 && seen.size<3;turn++){
     const current=await session(page),actor=current.state.units.find(u=>u.id===current.state.initiative[current.state.activeIndex])!;
     if(actor.side!=='player')throw Error('Expected player');
-    const def=catalog.heroes[actor.defId],signature=Object.values(catalog.abilities).find(a=>a.id!=='ability:basic_attack'&&a.owners.includes(actor.defId))!;
+    const def=catalog.heroes[actor.defId],abilities=Object.values(catalog.abilities).filter(a=>a.id!=='ability:basic_attack'&&a.owners.includes(actor.defId));
     seen.add(actor.defId);
     await page.locator('#battle-scroll').evaluate(e=>e.scrollTop=0);
     await page.screenshot({path:info.outputPath(`actor-${actor.defId}.png`)});
     await expect(page.locator('#battle-actor-name')).toHaveText(actor.defId[0].toUpperCase()+actor.defId.slice(1));
     await expect(page.locator('#battle-hp')).toHaveText(`HP ${actor.hp}/${def.stats.maxHp}`);
-    await expect(page.locator('[data-action="signature"] strong')).toHaveText(signature.id.slice(8).split('_').map(w=>w[0].toUpperCase()+w.slice(1)).join(' '));
+    for(const ability of abilities)await expect(page.locator(`[data-action="${ability.id}"] strong`)).toHaveText(displayName(ability.id));
     await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});
     const before=await page.locator('#game').getAttribute('data-session'),preview=await page.locator('#battle-preview').textContent();
     const actorText=await page.locator('#battle-actor').textContent();

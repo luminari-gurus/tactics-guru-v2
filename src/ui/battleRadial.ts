@@ -347,9 +347,13 @@ export class BattleRadial {
       if (!button) continue;
       button.disabled = view.disabled;
       button.setAttribute('aria-pressed', String(this.aimed === view.id || (this.aimed === 'hub' && view.isDefault)));
-      button.querySelector('strong')!.textContent = view.label;
+      // Focus can render between native pointer activation events. Retain unchanged pressed text nodes.
+      const title = button.querySelector('strong')!;
+      if (title.textContent !== view.label) title.textContent = view.label;
       const visible = view.disabled ? stripUnavailablePrefix(view.reason ?? view.detail) : (view.id === 'plan' ? view.detail : '');
-      button.querySelector('span')!.textContent = visible && visible.toLowerCase() !== view.label.toLowerCase() ? visible : '';
+      const detail = visible && visible.toLowerCase() !== view.label.toLowerCase() ? visible : '';
+      const subtitle = button.querySelector('span')!;
+      if (subtitle.textContent !== detail) subtitle.textContent = detail;
       const preview = view.disabled ? view.reason ?? view.detail : view.detail;
       button.setAttribute('aria-label', view.disabled ? `${view.label}, unavailable: ${preview}` : `${view.label}, ${preview}`);
       const key = view.id === 'move' ? BATTLE_KEYS.move : view.id === 'attack' ? BATTLE_KEYS.basic : view.id === 'special' ? BATTLE_KEYS.ability : null;

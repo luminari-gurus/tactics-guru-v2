@@ -52,7 +52,7 @@ async function load(page:Page,s:DungeonState){const saved=encodeDungeon(s);if(!s
 test('restart during accepted presentation discards old callbacks and history',async({page})=>{
  const f=dungeonVictoryBoundary(1,0);if(!f)throw Error('legal victory fixture changed');await load(page,f.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const cmd=f.command,state=(await readSession(page)).state;if(cmd.type!=='useAbility')throw Error('expected finishing attack');
- await page.locator(`[data-action="${cmd.abilityId==='ability:basic_attack'?'basic':'signature'}"]`).click();const target=state.units.find(u=>u.id===('unitId'in cmd.target?cmd.target.unitId:'missileTargets'in cmd.target?cmd.target.missileTargets[0]:-1))!;
+ await page.locator(`[data-action="${cmd.abilityId==='ability:basic_attack'?'basic':cmd.abilityId}"]`).click();const target=state.units.find(u=>u.id===('unitId'in cmd.target?cmd.target.unitId:'missileTargets'in cmd.target?cmd.target.missileTargets[0]:-1))!;
  await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
  await page.clock.install();await page.clock.pauseAt(new Date(Date.now()+1000));await page.locator('#battle-review').click({force:true});
  expect((await snapshot(page)).phase).toBe('reward');
@@ -82,7 +82,7 @@ test('run navigation reaches the base-aware dungeon entry and returns to existin
 test('visibility interruption finishes an accepted terminal presentation exactly once',async({page})=>{
  const f=dungeonVictoryBoundary(1,0);if(!f)throw Error('fixture changed');await load(page,f.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const cmd=f.command,state=(await readSession(page)).state;if(cmd.type!=='useAbility')throw Error('expected attack');
- await page.locator(`[data-action="${cmd.abilityId==='ability:basic_attack'?'basic':'signature'}"]`).click();const target=state.units.find(u=>u.id===('unitId'in cmd.target?cmd.target.unitId:'missileTargets'in cmd.target?cmd.target.missileTargets[0]:-1))!;
+ await page.locator(`[data-action="${cmd.abilityId==='ability:basic_attack'?'basic':cmd.abilityId}"]`).click();const target=state.units.find(u=>u.id===('unitId'in cmd.target?cmd.target.unitId:'missileTargets'in cmd.target?cmd.target.missileTargets[0]:-1))!;
  await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
  await page.clock.install();await page.clock.pauseAt(new Date(Date.now()+1000));await page.locator('#battle-review').click({force:true});const committed=await snapshot(page);expect(committed.phase).toBe('reward');
  await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));});

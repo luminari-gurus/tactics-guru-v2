@@ -60,7 +60,7 @@ async function confirmFrozen(page:Page) {
   await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
 }
 async function prepareCommand(page:Page,fixture:ReturnType<typeof damageBoundary>) {
-  await page.locator('[data-action="signature"]').click();
+  await page.locator(`[data-action="${fixture.command.abilityId}"]`).click();
   const target=fixture.command.target;
   const id='unitId' in target?target.unitId:'missileTargets' in target?target.missileTargets[0]:-1;
   const cell=fixture.before.units.find(u=>u.id===id)!.cell;
