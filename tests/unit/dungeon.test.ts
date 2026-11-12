@@ -1,4 +1,4 @@
-import { atEncounter, atDownstairs, atStairApproach, atCell, dungeonContactApproach } from '../helpers/dungeonFixtures';
+import { atEncounter, atDownstairs, atStairApproach, atCell, dungeonContactApproach, withLegacySight } from '../helpers/dungeonFixtures';
 import { freshExploration, movableExploration, neighbors, poiCell } from '../../src/domain/exploration';
 import { generateMap } from '../../src/map/generate';
 import { applyBiome } from '../../src/map/biomes';
@@ -8,9 +8,9 @@ import { assert, describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { dungeonCapacityFixture } from '../helpers/dungeonFixtures';
 import { clearedDungeonSlots, freshDungeon, newDungeonSeed, stepDungeon, dungeonBattle, dungeonOffer, floorDescriptor, floorMap, FloorCache, dungeonSeed, readDungeon, travelDungeon, startDungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
-import { encodeDungeon, decodeDungeon, utf8Bytes } from '../../src/domain/dungeonSaveEnvelope';
+import { encodeDungeon, decodeDungeon, encodeDungeonRollback, utf8Bytes } from '../../src/domain/dungeonSaveEnvelope';
 import { dungeonContent, dungeonIdentity, previousDungeonIdentity } from '../../src/content/dungeon';
-import { bothDungeonSlotsMissing, createDungeonStorage, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
+import { bothDungeonSlotsMissing, createDungeonStorage, DUNGEON_BACKUP_CHECKPOINT_KEY, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
 import { DungeonSession } from '../../src/app/DungeonSession';
 import { LEGACY_ENCOUNTER_POLICY, selectDungeonEncounter } from '../../src/domain/dungeonEncounters';
 import { priorDungeonEnvelope } from '../helpers/dungeonFixtures';
@@ -47,6 +47,125 @@ it.each(['active', 'reward'])('loads the exact pre-consumable dungeon %s save an
   }
   expect(decodeDungeon(JSON.stringify({ ...previous, digest: `sha256:${'0'.repeat(64)}` }))).toEqual({ ok: false, reason: 'digest' });
 });
+it('labels wall-aware saves and rejects signed payloads with the wrong sight format', () => {
+  const state = fresh();
+  const rewrap = (text: string, format: number) => {
+    const { kind, identity, payload } = JSON.parse(text);
+    const body = { kind, format, identity, payload };
+    return canonical({ ...body, digest: hashJson(body) });
+  };
+  const wallAware = encodeDungeon(state); assert(wallAware.ok);
+  expect(JSON.parse(wallAware.text).format).toBe(14);
+  expect(decodeDungeon(wallAware.text)).toEqual({ ok: true, state });
+  expect(decodeDungeon(rewrap(wallAware.text, 10))).toEqual({ ok: false, reason: 'incompatible' });
+  expect(decodeDungeon(rewrap(wallAware.text, 12))).toEqual({ ok: true, state });
+  expect(decodeDungeon(rewrap(wallAware.text, 15))).toEqual({ ok: false, reason: 'invalidState' });
+  const legacy = withLegacySight(state), old = encodeDungeon(legacy); assert(old.ok);
+  expect(JSON.parse(old.text).format).toBe(10);
+  expect(decodeDungeon(old.text)).toEqual({ ok: true, state: legacy });
+  expect(decodeDungeon(rewrap(old.text, 14))).toEqual({ ok: false, reason: 'incompatible' });
+});
+it.each([false, true])('keeps a pre-fog backup after repeated writes (migrated: %s)', migrated => {
+  const initial = migrated ? withLegacySight(fresh()) : fresh();
+  const data = memory(), storage = createDungeonStorage(() => data);
+  expect(storage.save(initial).ok).toBe(true);
+  const original = storage.inspect().primary.text;
+  const step = (s: DungeonState) => {
+    const floor = s.floors[0], map = floorMap(floor.descriptor);
+    const destination = neighbors(floor.position, map.width, map.height).find(cell => map.cells[cell])!;
+    return good(stepDungeon(s, { id: s.id, depth: s.depth, revision: s.revision, destination }));
+  };
+  const first = step(initial);
+  expect(storage.save(first, original).ok).toBe(true);
+  if (migrated) expect(storage.inspect().backup.text).toBe(original);
+  const second = step(first);
+  expect(storage.save(second, storage.inspect().primary.text).ok).toBe(true);
+  const saved = storage.inspect();
+  assert(saved.primary.status === 'valid' && saved.backup.status === 'valid');
+  expect(JSON.parse(saved.primary.text).format).toBe(14);
+  expect(saved.primary.state).toEqual(second);
+  expect(JSON.parse(saved.backup.text).format).toBe(10);
+  const rollback = decodeDungeon(saved.backup.text); assert(rollback.ok);
+  expect(rollback.state.floors[0].exploration.sightVersion).toBeUndefined();
+  expect(rollback.state.floors[0].exploration.revealed).toEqual(expect.arrayContaining([...first.floors[0].exploration.revealed]));
+  expect(saved.backup.state).toEqual(first);
+  data.setItem(DUNGEON_KEYS.primary, '{broken');
+  const restartedStorage = createDungeonStorage(() => data);
+  const session = new DungeonSession(initial, restartedStorage), review = session.inspect();
+  const exports = session.exports(review);
+  expect(exports.find(entry => entry.label === 'pre-fog backup save')?.text).toBe(saved.backup.text);
+  expect(decodeDungeon(exports.find(entry => entry.label === 'backup save')!.text)).toEqual({ ok: true, state: first });
+  expect(session.continue(review)).toBe(true);
+  expect(session.snapshot).toEqual(first);
+
+  const reviewed = session.inspect();
+  const replacement = encodeDungeonRollback(second); assert(replacement.ok);
+  data.setItem(DUNGEON_KEYS.backup, replacement.text);
+  expect(session.continue(reviewed, 'backup')).toBe(false);
+  const changed = restartedStorage.inspect().backup; assert(changed.status === 'valid');
+  expect(changed.checkpoint).toBeUndefined();
+  expect(changed.state.floors[0].exploration.sightVersion).toBeUndefined();
+});
+
+it('keeps the previous exact checkpoint when a backup rotation is interrupted', () => {
+  const initial = fresh(), data = memory(), storage = createDungeonStorage(() => data);
+  expect(storage.save(initial).ok).toBe(true);
+  const floor = initial.floors[0], map = floorMap(floor.descriptor);
+  const next = good(stepDungeon(initial, { id: initial.id, depth: initial.depth, revision: initial.revision,
+    destination: neighbors(floor.position, map.width, map.height).find(cell => map.cells[cell])! }));
+  expect(storage.save(next).ok).toBe(true);
+  const write = data.setItem;
+  data.setItem = (key, value) => {
+    if (key === DUNGEON_KEYS.backup) throw Object.assign(Error('denied'), { name: 'SecurityError' });
+    write(key, value);
+  };
+  expect(storage.save(next)).toEqual({ ok: false, reason: 'security' });
+  const currentStorage = createDungeonStorage(() => data);
+  const backup = currentStorage.inspect().backup; assert(backup.status === 'valid');
+  expect(backup.state).toEqual(initial);
+  const session = new DungeonSession(next, currentStorage), reviewed = session.inspect();
+  write(DUNGEON_BACKUP_CHECKPOINT_KEY, 'corrupt');
+  expect(session.continue(reviewed, 'backup')).toBe(false);
+  const fallback = currentStorage.inspect().backup; assert(fallback.status === 'valid');
+  expect(fallback.state.floors[0].exploration.sightVersion).toBeUndefined();
+  expect(currentStorage.remove('backup', fallback.text, null).ok).toBe(true);
+  expect(data.getItem(DUNGEON_BACKUP_CHECKPOINT_KEY)).toBeNull();
+});
+
+it.each(['backup', 'primary'] as const)('refuses to acknowledge a save if another tab removes its checkpoint during the %s write', writeSlot => {
+  const initial = fresh(), data = memory(), writer = createDungeonStorage(() => data);
+  const remover = createDungeonStorage(() => data);
+  expect(writer.save(initial).ok).toBe(true);
+  const floor = initial.floors[0], map = floorMap(floor.descriptor);
+  const next = good(stepDungeon(initial, { id: initial.id, depth: initial.depth, revision: initial.revision,
+    destination: neighbors(floor.position, map.width, map.height).find(cell => map.cells[cell])! }));
+  expect(writer.save(next).ok).toBe(true);
+  const reviewed = remover.inspect().backup, previousPrimary = writer.lastSavedText();
+  assert(reviewed.status === 'valid' && reviewed.checkpoint);
+  const write = data.setItem;
+  data.setItem = (key, value) => {
+    if (key === DUNGEON_KEYS[writeSlot]) {
+      const backup = writeSlot === 'backup' ? reviewed : remover.inspect().backup;
+      assert(backup.status === 'valid' && backup.checkpoint);
+      expect(remover.remove('backup', backup.text, backup.checkpoint)).toEqual({ ok: true });
+    }
+    write(key, value);
+  };
+  const candidate = { ...next, revision: next.revision + 1 };
+  expect(writer.save(candidate, previousPrimary)).toEqual({ ok: false, reason: 'uncertainWrite' });
+  expect(writer.lastSavedText()).toBe(previousPrimary);
+  expect(writer.save(candidate)).toEqual({ ok: false, reason: 'uncertainWrite' });
+  const primary = writer.inspect().primary; assert(primary.status === 'valid');
+  expect(primary.state).toEqual(writeSlot === 'backup' ? next : candidate);
+
+  data.setItem = write;
+  const recovery = writer.inspect();
+  expect(writer.acknowledge(recovery)).toBe(true);
+  expect(writer.save(candidate, recovery.primary.text)).toEqual({ ok: true });
+  const restored = writer.inspect().backup; assert(restored.status === 'valid');
+  expect(restored.state).toEqual(primary.state);
+});
+
 function win(s: DungeonState) {
   s = good(startDungeonBattle(atEncounter(s)));
   const b = s.activeBattle!;
@@ -694,7 +813,7 @@ describe('unordered encounters and moving dungeon enemies', () => {
   it('continues a current-format legacy-exploration active battle and upgrades movement after victory', () => {
     const initial=fresh(), started=good(startDungeonBattle(atEncounter(initial,0)));
     const oldExploration={...initial.floors[0].exploration,revealed:started.floors[0].exploration.revealed,visited:started.floors[0].exploration.visited};
-    const legacyState={...started,floors:[{...started.floors[0],exploration:oldExploration}]};
+    const legacyState=withLegacySight({...started,floors:[{...started.floors[0],exploration:oldExploration}]});
     const body={kind:'tactics-guru:dungeon',format:9,identity:hashJson({dungeonIdentity:previousDungeonIdentity,progression:HERO_PROGRESSION}),payload:legacyState};
     const legacy=decodeDungeon(canonical({...body,digest:hashJson(body)}));if(!legacy.ok)throw Error(legacy.reason);
     const battle=legacy.state.activeBattle!;
@@ -717,13 +836,13 @@ describe('unordered encounters and moving dungeon enemies', () => {
     expect(second.retry(second.inspect())).toBe(true); // Explicit recovery adopts the reviewed storage boundary.
   });
   it('reads current-format legacy exploration and upgrades its movement state only after a step', () => {
-    const s=fresh(), body={kind:'tactics-guru:dungeon',format:9,identity:hashJson({dungeonIdentity:previousDungeonIdentity,progression:HERO_PROGRESSION}),payload:s};
+    const s=withLegacySight(fresh()), body={kind:'tactics-guru:dungeon',format:9,identity:hashJson({dungeonIdentity:previousDungeonIdentity,progression:HERO_PROGRESSION}),payload:s};
     const legacy=decodeDungeon(canonical({...body,digest:hashJson(body)}));
     if(!legacy.ok)throw Error(legacy.reason);
     expect(legacy.state.floors[0].exploration.version).toBe('exploration-v1');
     const upgraded=move(legacy.state);
     const next=encodeDungeon(upgraded);if(!next.ok)throw Error(next.reason);
-    expect(JSON.parse(next.text).format).toBe(10);
+    expect(JSON.parse(next.text).format).toBe(14);
     expect(decodeDungeon(next.text)).toEqual({ok:true,state:upgraded});
     for(const format of [7,8]){
       const old={...body,format};expect(decodeDungeon(canonical({...old,digest:hashJson(old)}))).toEqual({ok:false,reason:'incompatible'});
@@ -815,7 +934,7 @@ describe('versioned floor dimensions', () => {
       return {descriptor, position:descriptor.upstairs, completed:3,
         exploration:freshExploration(descriptor.seed,descriptor.upstairs,map)};
     });
-    const original = {...base,depth:2,floors}, descriptors = floors.map(floor => floor.descriptor);
+    const original = withLegacySight({...base,depth:2,floors}), descriptors = floors.map(floor => floor.descriptor);
     const body = {kind:'tactics-guru:dungeon',format,
       identity:hashJson({dungeonIdentity:format === 9 ? previousDungeonIdentity : dungeonIdentity,progression:HERO_PROGRESSION}),payload:original};
     const raw = canonical({...body,digest:hashJson(body)}), m = memory();
@@ -835,6 +954,9 @@ describe('versioned floor dimensions', () => {
     expect(storage.inspect().backup.text).toBe(raw);
     const saved = storage.inspect().primary; assert(saved.status === 'valid');
     expect(saved.state).toEqual(moved);
+    expect(JSON.parse(saved.text).format).toBe(14);
+    expect(saved.state.floors[0].exploration.sightVersion).toBeUndefined();
+    expect(saved.state.floors[1].exploration.sightVersion).toBe('wall-sight-v1');
     const ascended = good(stepDungeon(saved.state,{id:base.id,depth:2,revision:moved.revision,destination:floor.descriptor.upstairs}));
     expect(ascended.depth).toBe(1);
     const revisited = good(travelDungeon(atDownstairs(ascended),'descend',ascended.revision));

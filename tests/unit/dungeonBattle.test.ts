@@ -1,6 +1,6 @@
 import { HERO_PROGRESSION } from '../../src/content/progression';
 import { progressHero } from '../../src/domain/progression';
-import { atEncounter } from '../helpers/dungeonFixtures';
+import { atEncounter, withLegacySight } from '../helpers/dungeonFixtures';
 import { freshDungeon, floorDescriptor, floorMap, startDungeonBattle, readDungeon } from '../../src/domain/dungeon';
 import { guardedBoundary } from '../helpers/guardedBoundary';
 import { combatStats } from '../../src/domain/effects';
@@ -17,13 +17,15 @@ import { dispatch, replayCommandSequence } from '../../src/domain/turns';
 import { LEGACY_ENCOUNTER_POLICY } from '../../src/domain/dungeonEncounters';
 import { priorDungeonEnvelope } from '../helpers/dungeonFixtures';
 import { freshExploration } from '../../src/domain/exploration';
-import { createDungeonStorage } from '../../src/persistence/dungeonStorage';
+import { createDungeonStorage, DUNGEON_BACKUP_CHECKPOINT_KEY, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
 
-it('saves a battle draught with its heal, replays it and settles stock on either outcome', () => {
+it.each([[10, 11], [10, 15]])('saves a draught in checkpoint/battle formats %i/%i and settles stock on either outcome', (checkpointFormat, battleFormat) => {
   const base = freshDungeon('draught-test', 13);
   const ready = { ...base, party: base.party.map(hero => ({ ...hero, hp: 4 })),
     ownership: { ...base.ownership, consumables: [{ itemId: 'item:healing_draught' as const, quantity: 2 }] } };
-  const started = startDungeonBattle(atEncounter(ready)); assert(started.ok && started.state.activeBattle);
+  const atContact = atEncounter(ready);
+  const started = startDungeonBattle(battleFormat === 11 ? withLegacySight(atContact) : atContact);
+  assert(started.ok && started.state.activeBattle);
   const built = dungeonBattle(started.state)!;
   const battle = new BattleSession(built.catalog, started.state.activeBattle, built.state.seed, undefined, true, built.battlefield);
   while (battle.phase === 'enemy') { const step = battle.nextEnemy(); assert(step); battle.finishPresentation(step.token); }
@@ -35,13 +37,44 @@ it('saves a battle draught with its heal, replays it and settles stock on either
   expect(dispatch(step.after, use, built.catalog)).toEqual({ ok: false, reason: 'alreadyActed' });
   const updated = acceptDungeonBattle(started.state, step.after); assert(updated.ok);
   const bytes = new Map<string,string>();
-  const storage = createDungeonStorage(()=>({getItem:key=>bytes.get(key)??null,setItem:(key,value)=>{bytes.set(key,value);},removeItem:key=>{bytes.delete(key);}}));
+  let duringPrimaryWrite: (() => void) | undefined;
+  const adapter = {
+    getItem: (key: string) => bytes.get(key) ?? null,
+    setItem: (key: string, value: string) => {
+      if (key === DUNGEON_KEYS.primary) duringPrimaryWrite?.();
+      bytes.set(key, value);
+    },
+    removeItem: (key: string) => { bytes.delete(key); },
+  };
+  const storage = createDungeonStorage(() => adapter);
   expect(storage.save(started.state).ok).toBe(true);
   const checkpoint = storage.inspect().backup.text!;
-  expect(JSON.parse(checkpoint)).toMatchObject({format:10,payload:{phase:'ready',activeBattle:null}});
+  expect(JSON.parse(checkpoint)).toMatchObject({format:checkpointFormat,payload:{phase:'ready',activeBattle:null}});
   expect(storage.save(updated.state).ok).toBe(true);
   expect(storage.inspect().backup.text).toBe(checkpoint);
-  expect(JSON.parse(storage.inspect().primary.text!).format).toBe(11);
+  expect(JSON.parse(storage.inspect().primary.text!).format).toBe(battleFormat);
+  const remover = createDungeonStorage(() => adapter);
+  const reviewed = remover.inspect().backup; assert(reviewed.status === 'valid');
+  const previousPrimary = storage.lastSavedText();
+  const retained = { ...updated.state, revision: updated.state.revision + 1 };
+  duringPrimaryWrite = () => {
+    expect(remover.remove('backup', reviewed.text, reviewed.checkpoint ?? null)).toEqual({ ok: true });
+  };
+  expect(storage.save(retained, previousPrimary)).toEqual({ ok: false, reason: 'uncertainWrite' });
+  expect(storage.lastSavedText()).toBe(previousPrimary);
+  expect(storage.save(retained)).toEqual({ ok: false, reason: 'uncertainWrite' });
+  const recovery = storage.inspect();
+  expect(recovery.backup.status).toBe('missing');
+  expect(storage.acknowledge(recovery)).toBe(true);
+  duringPrimaryWrite = undefined;
+  expect(storage.save(retained, recovery.primary.text)).toEqual({ ok: true });
+  if (battleFormat === 15) {
+    const replacement = storage.inspect();
+    assert(replacement.backup.status === 'valid' && replacement.backup.checkpoint);
+    duringPrimaryWrite = () => { bytes.delete(DUNGEON_BACKUP_CHECKPOINT_KEY); };
+    expect(storage.save(retained, replacement.primary.text)).toEqual({ ok: false, reason: 'uncertainWrite' });
+    expect(storage.inspect().backup.text).toBe(replacement.backup.text);
+  }
   expect(updated.state.ownership).toEqual(ready.ownership);
   const wire = encodeDungeon(updated.state); assert(wire.ok);
   const resumed = decodeDungeon(wire.text); assert(resumed.ok && resumed.state.activeBattle);

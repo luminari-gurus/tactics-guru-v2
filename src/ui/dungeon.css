@@ -44,6 +44,15 @@ body:has(#dungeon-screen:not([hidden])) #battle-heading { display: none; }
 #dungeon-map [data-terrain="desert-open"] { background-color: var(--desert-open); }
 #dungeon-map [data-terrain="desert-blocked"] { background-color: var(--desert-blocked); }
 #dungeon-map .explore-hidden { background-color: #111a24; }
+#dungeon-map .explore-remembered { position: relative; isolation: isolate; }
+#dungeon-map .explore-remembered::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: repeating-linear-gradient(135deg, transparent 0 3px, rgb(0 0 0 / 55%) 3px 4px);
+}
 #dungeon-map [data-player] { color: #8ce6ff; outline: 2px solid #8ce6ff; outline-offset: -2px; }
 #dungeon-map [data-poi] { font-weight: bold; }
 #dungeon-screen .dungeon-directions { display: grid; grid-template: repeat(3, 52px) / repeat(3, 52px); gap: 2px; width: max-content; padding: 16px; margin-block: 8px; }

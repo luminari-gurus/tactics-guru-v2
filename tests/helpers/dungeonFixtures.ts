@@ -1,4 +1,4 @@
-import { freshExploration, neighbors, poiCell, visit } from '../../src/domain/exploration';
+import { freshExploration, neighbors, poiCell, reveal, visit } from '../../src/domain/exploration';
 import { freshDungeon, floorDescriptor, floorMap, dungeonOffer, readDungeon, startDungeonBattle, dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, travelDungeon, stepDungeon, clearedDungeonSlots, type DungeonState, type DungeonResult, type DungeonItemCommand } from '../../src/domain/dungeon';
 import { generateMap } from '../../src/map/generate';
 import { BattleSession } from '../../src/app/BattleSession';
@@ -16,11 +16,21 @@ import { DUNGEON_ENCOUNTER_POLICY, LEGACY_ENCOUNTER_POLICY, type DungeonEncounte
 import { legacyDungeonIdentity, priorDungeonIdentity } from '../../src/content/dungeon';
 import { canonical, hashJson } from '../../src/domain/contentIdentity';
 import { dungeonContent } from '../../src/content/dungeon';
+/** Rebuild the terrain memory that the through-wall discovery rule would have saved. */
+export function withLegacySight(state: DungeonState): DungeonState {
+  const floors = state.floors.map(floor => {
+    const { sightVersion, ...exploration } = floor.exploration;
+    const { width, height } = floorMap(floor.descriptor);
+    const revealed = [...new Set(exploration.visited.flatMap(cell => reveal(cell, width, height)))].sort((a, b) => a - b);
+    return { ...floor, exploration: { ...exploration, revealed } };
+  });
+  return { ...state, floors };
+}
 /** Exact previous wire shapes, only from the fixed/unscaled policy they actually supported. */
 export function priorDungeonPayload(s: DungeonState, format: 1 | 2) {
   if (s.encounterPolicy !== LEGACY_ENCOUNTER_POLICY) throw Error('Prior fixtures must use legacy opponents');
-  const { encounterPolicy, ...state } = s;
-  return { ...state, party: s.party.map(({heroId,hp})=>({heroId,hp})), floors: s.floors.map(f => {
+  const { encounterPolicy, ...state } = format === 2 ? withLegacySight(s) : s;
+  return { ...state, party: s.party.map(({heroId,hp})=>({heroId,hp})), floors: state.floors.map(f => {
     const { encounters, ...descriptor } = f.descriptor;
     return format === 1 ? { descriptor, position: f.position === descriptor.downstairs ? f.position : descriptor.upstairs, completed: f.completed } : { ...f, descriptor };
   }) };
@@ -78,7 +88,7 @@ export function dungeonCapacityFixture(policy: DungeonEncounterPolicy = DUNGEON_
 /** Structural position fixture, not evidence of UI traversal. */
 export function atCell(s: DungeonState, position: number): DungeonState {
   const floors = [...s.floors], f = floors[s.depth-1];
-  floors[s.depth-1] = { ...f, position, exploration: visit(f.exploration,position,f.descriptor.size ?? 20) };
+  floors[s.depth-1] = { ...f, position, exploration: visit(f.exploration,position,floorMap(f.descriptor)) };
   return { ...s, floors };
 }
 export function atEncounter(s: DungeonState, slot = s.floors[s.depth-1].completed): DungeonState {
