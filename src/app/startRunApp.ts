@@ -20,7 +20,7 @@ import { mountBattleLayout } from '../ui/battleLayout';
 import { showGameError } from '../ui/gameError';
 
 const storage=appEntry.persistent?createRunStorage(context):null,initial=storage?.load();
-const controller = new RunItemSession(initial?.ok && initial.selected ? initial.selected.state : freshRunSnapshot(crypto.randomUUID(), 13, context), context,storage,serializeBrowserRunWrite,storage ? new RunHistory('run') : null);
+const controller = new RunItemSession(initial?.ok && initial.selected ? initial.selected.state : freshRunSnapshot(crypto.randomUUID(), 13, context, appEntry.persistent), context,storage,serializeBrowserRunWrite,storage ? new RunHistory('run') : null);
 const container = document.querySelector<HTMLElement>('#game')!;
 const panel = document.querySelector<HTMLElement>('#fit-panel')!;
 const status = document.querySelector<HTMLElement>('#fit-status')!;

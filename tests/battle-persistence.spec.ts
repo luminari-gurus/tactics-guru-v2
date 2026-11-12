@@ -110,6 +110,10 @@ for(const condition of ['missing','valid','corrupt','backup-only','unavailable']
       await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();
       await expect(page.locator('#dungeon-map')).toBeVisible();
     }else if(mode==='proof')await page.locator('#fit-restart').click();
+    if(mode==='run'||mode==='dungeon') {
+      const snapshot=await page.locator('#game').getAttribute(`data-${mode}-snapshot`);
+      expect(JSON.parse(snapshot??'null')?.stats).toBeUndefined();
+    }
     await audit();
     await page.evaluate(()=>{document.dispatchEvent(new Event('visibilitychange'));window.dispatchEvent(new PageTransitionEvent('pagehide',{persisted:true}));});
     await audit();await page.reload();await ready();await audit();

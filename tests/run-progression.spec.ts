@@ -64,15 +64,19 @@ async function prepare(page:Page){
 }
 test('run battle undo survives reload and a legal terminal journey',async({page,isMobile})=>{
  test.setTimeout(300000);await start(page);const entry=await snapshot(page);
+ expect(entry.stats).toMatchObject({coverage:'whole-run',movesTaken:0,enemiesKilled:0});
  await page.locator('canvas').focus();await page.keyboard.press('a');
  await expect(page.locator('[data-action=basic]')).toHaveAttribute('aria-pressed','true');
  await page.keyboard.press('m');await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');
  expect(await snapshot(page)).toEqual(entry);
  const catalog=runBattleCatalog(entry.items,runContext)!;const restored=await playUndo(page,catalog,isMobile);
+ const statsAfterUndo=(await snapshot(page)).stats;expect(statsAfterUndo?.movesTaken).toBe(0);
  await page.reload();await page.locator('#run-continue').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  expect((await readSession(page)).state).toEqual(restored);await expect(page.locator('#battle-undo')).toBeDisabled();
+ expect((await snapshot(page)).stats).toEqual(statsAfterUndo);
  await fight(page,true);await expect(page.getByRole('heading',{name:'Run defeat',exact:true})).toBeVisible();
  const ended=await snapshot(page);await page.keyboard.press('c');await page.keyboard.press('w');
+ expect(ended.stats).toMatchObject({movesTaken:0,enemiesKilled:0});
  await expect.poll(()=>historyRows(page)).toMatchObject([{id:ended.items.run.id,outcome:'defeat'}]);
  const recorded=await historyRows(page);
  expect(await snapshot(page)).toEqual(ended);

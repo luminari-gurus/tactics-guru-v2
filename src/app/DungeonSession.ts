@@ -5,6 +5,8 @@ import { encodeDungeon } from '../domain/dungeonSaveEnvelope';
 import { createDungeonStorage, type DungeonInspection, type DungeonSlot } from '../persistence/dungeonStorage';
 import { dungeonRunRecord } from '../domain/runRecords';
 import type { RunHistory } from './RunHistory';
+import { acceptBattleStats, dungeonProgressStats, freshRunStats, type AcceptedBattle } from '../domain/runStats';
+import type { BattleState } from '../domain/types';
 export class DungeonSession {
   private current: DungeonState;
   private battle: BattleSession | null = null;
@@ -20,8 +22,10 @@ export class DungeonSession {
   get status() { return this.history?.status ? `${this.message}. ${this.history.status}` : this.message; }
   onChange: (() => void) | null = null;
   completedBattle: unknown = null;
-  constructor(initial: unknown, readonly storage: ReturnType<typeof createDungeonStorage> | null = createDungeonStorage(), history: RunHistory | null = null) {
+  constructor(initial: unknown, readonly storage: ReturnType<typeof createDungeonStorage> | null = createDungeonStorage(), history: RunHistory | null = null,
+    private readonly serializeWrite?: (task: () => void, unavailable: () => void) => void) {
     const checked = readDungeon(initial); if (!checked.ok) throw Error('Invalid dungeon'); this.current = checked.state;
+    if (!storage) { const { stats: _, ...untracked } = this.current; this.current = untracked; }
     this.history = storage ? history : null;
     if (this.history) this.history.onChange = () => { if (!this.disposed) this.report(this.message); };
     if (!storage) this.message = 'Testing dungeon. Progress resets on reload.';
@@ -40,10 +44,18 @@ export class DungeonSession {
   }
   private report(text: string) { this.message = text; try { this.onChange?.(); } catch { /* Observers cannot undo state. */ } }
   dispose() { this.disposed = true; this.battle?.dispose(); this.battle = null; this.onChange = null; if (this.history) this.history.onChange = null; }
-  save() {
+  private mutate<T>(task: () => T, failure: T, writes = true): Promise<T> {
+    return new Promise(resolve => {
+      const unavailable = () => { this.report('Progress unsaved: exclusive save access unavailable. Open Save recovery to retry or export.'); resolve(failure); };
+      const run = () => { if (this.disposed) resolve(failure); else resolve(task()); };
+      if (writes && this.storage && this.serializeWrite) this.serializeWrite(run, unavailable); else run();
+    });
+  }
+  private recordEnding() { if (!this.disposed && this.history) void this.history.record(dungeonRunRecord(this.current, this.history.now())); }
+  save() { const snapshot = this.current; this.recordEnding(); this.progressSaved = false; this.report('Saving dungeon…'); return this.mutate(() => this.current === snapshot && this.saveNow(), false); }
+  private saveNow() {
     if (this.disposed) return false;
     // Accepted endings survive an independent active-save opt-out or conflict.
-    if (this.history) void this.history.record(dungeonRunRecord(this.current, this.history.now()));
     if (!this.storage) { this.report('Testing dungeon. Progress resets on reload.'); return false; }
     if (this.unsaved) { this.report('Playing unsaved. Floor travel requires saving; open Save recovery.'); return false; }
     const result = this.write(this.current);
@@ -65,11 +77,14 @@ export class DungeonSession {
     this.report(!this.storage ? 'Testing dungeon. Progress resets on reload.' : this.unsaved ? 'Playing unsaved. Floor travel requires saving; open Save recovery.' : traveling ? 'Travel saved on this device' : 'Exploration saved on this device');
     return true;
   }
-  step(command: ExplorationCommand) {
+  step(command: ExplorationCommand) { return this.mutate(() => this.stepNow(command), false, !this.unsaved); }
+  private stepNow(command: ExplorationCommand) {
     if (this.disposed || this.battle && !['ended','disposed'].includes(this.battle.phase)) return false;
-    return this.publishSpatial(stepDungeon(this.current, command));
+    const source = this.storage && !this.current.stats ? { ...this.current, stats: freshRunStats('since-upgrade') } : this.current;
+    return this.publishSpatial(stepDungeon(source, command));
   }
-  startEncounter() {
+  startEncounter() { return this.mutate(() => this.startEncounterNow(), null, !this.unsaved); }
+  private startEncounterNow(): BattleSession | null {
     if (this.disposed) return null;
     if (this.battle && !['ended','disposed'].includes(this.battle.phase)) return this.battle;
     if (this.current.phase === 'ready') {
@@ -78,12 +93,14 @@ export class DungeonSession {
     if (this.current.phase !== 'battle' || !this.current.activeBattle) return null;
     const entry = this.snapshot, source = dungeonBattle(entry); if (!source) return null;
     let session: BattleSession;
-    const accepted = () => {
+    const accepted = (_state?: BattleState, batch?: AcceptedBattle) => {
       if (this.disposed || this.battle !== session || this.current.phase !== 'battle') return;
       const next = acceptDungeonBattle(this.current, session.state);
       if (!next.ok) { this.report(`Dungeon boundary rejected: ${next.reason}`); return; }
       const feedback = levelUpFeedback(this.current.party, next.state.party);
-      this.current = next.state; this.review = null;
+      this.current = this.storage && batch ? { ...next.state, stats: acceptBattleStats(
+        this.current.stats ?? freshRunStats('since-upgrade'), dungeonProgressStats(this.current).battlesWon, batch) } : next.state;
+      this.review = null;
       if (session.state.outcome !== 'ongoing') this.completedBattle = { entry, selection: source.selection, state: session.state, replay: session.replay, continuation: session.continuation, events: session.events };
       this.save();
       if (feedback) this.report(`${this.status}. ${feedback}`);
@@ -111,9 +128,10 @@ export class DungeonSession {
     if (this.history) void this.history.resume(this.current.id, dungeonRunRecord(this.current, this.history.now()));
     return true;
   }
-  retry(review: DungeonInspection) {
+  retry(review: DungeonInspection) { this.recordEnding(); return this.mutate(() => this.retryNow(review), false); }
+  private retryNow(review: DungeonInspection) {
     if (!this.storage || this.disposed || review !== this.review || !this.storage.acknowledge(review)) return false;
-    this.expectedPrimary = review.primary.text; this.unsaved = false; this.review = null; return this.save();
+    this.expectedPrimary = review.primary.text; this.unsaved = false; this.review = null; return this.saveNow();
   }
   exports(review: DungeonInspection) {
     if (!this.storage) return [];
@@ -134,7 +152,8 @@ export class DungeonSession {
     }
     return values;
   }
-  remove(slot: DungeonSlot, review: DungeonInspection) {
+  remove(slot: DungeonSlot, review: DungeonInspection) { return this.mutate(() => this.removeNow(slot, review), false); }
+  private removeNow(slot: DungeonSlot, review: DungeonInspection) {
     if (!this.storage || this.disposed || review !== this.review) return false;
     this.retained = this.exports(review);
     this.progressSaved = false;
@@ -154,14 +173,14 @@ export class DungeonSession {
       ? dungeonRunRecord(this.current, recordedAt, true) : null;
     const perform = async () => {
       if (this.current !== expected) { this.report('Reset refused: the dungeon changed while confirming. Review again.'); return false; }
-      return this.replaceNow(review, id, seed);
+      return this.mutate(() => this.current === expected && this.replaceNow(review, id, seed), false);
     };
     return this.history ? this.history.replace(record, id, perform, other) : perform();
   }
   private replaceNow(review: DungeonInspection, id: string, seed: number) {
     if (!this.storage || this.disposed || review !== this.review || id === this.current.id || seed === this.current.seed) return false;
     if (!this.storage.acknowledge(review)) { this.review = null; this.report('Reset refused: saved dungeon data changed. Review again.'); return false; }
-    const next = freshDungeon(id, seed);
+    const next = freshDungeon(id, seed, undefined, true);
     this.retained = this.exports(review);
     this.progressSaved = false;
     for (const slot of ['backup','primary'] as const) {
@@ -182,6 +201,6 @@ export class DungeonSession {
   private reset(next: DungeonState) {
     this.battle?.dispose(); this.battle = null; this.current = next; this.expectedPrimary = null; this.completedBattle = null; this.review = null; this.unsaved = false;
     this.started = true;
-    this.save();
+    this.saveNow();
   }
 }

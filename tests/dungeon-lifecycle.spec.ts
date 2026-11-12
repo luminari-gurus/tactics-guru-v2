@@ -1,8 +1,9 @@
+import { neighbors, poiCell } from '../src/domain/exploration';
 import { atEncounter } from './helpers/dungeonFixtures';
 import {continueSavedDungeon} from './helpers/dungeonTraversal';
 import {expect,railTest as test,type Page} from './helpers/dungeonEntropy';
 import {dungeonVictoryBoundary} from './helpers/dungeonFixtures';
-import {freshDungeon,startDungeonBattle,dungeonBattle,type DungeonState} from '../src/domain/dungeon';
+import {freshDungeon,startDungeonBattle,dungeonBattle,floorMap,type DungeonState} from '../src/domain/dungeon';
 import {BattleSession} from '../src/app/BattleSession';
 import {encodeDungeon} from '../src/domain/dungeonSaveEnvelope';
 import {DUNGEON_KEYS} from '../src/persistence/dungeonStorage';
@@ -89,3 +90,29 @@ test('visibility interruption finishes an accepted terminal presentation exactly
  await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:false});document.dispatchEvent(new Event('visibilitychange'));});await page.clock.resume();
  await expect(page.locator('#dungeon-screen')).toBeVisible();expect(await snapshot(page)).toEqual(committed);await page.waitForTimeout(300);expect(await snapshot(page)).toEqual(committed);
 });
+
+ test('dungeon tabs serialize spatial publication and refuse the stale owner', async ({page,context}) => {
+  const initial = freshDungeon('exclusive-spatial-tabs',13,undefined,true);
+  await load(page,initial);
+  const other = await context.newPage(); await other.goto('./?game=dungeon'); await continueSavedDungeon(other);
+  const floor = initial.floors[0], map = floorMap(floor.descriptor);
+  const destination = neighbors(floor.position,map.width,map.height).find(n => map.cells[n] && !floor.exploration.pois.some(p => poiCell(p,map.width) === n))!;
+  const delta = destination-floor.position, direction = delta === -map.width ? 'north' : delta === map.width ? 'south' : delta === 1 ? 'east' : 'west';
+  // Hold the actual origin Web Lock; both rendered owners must wait without publishing.
+  await page.evaluate(key => {
+    const state = window as unknown as {releaseDungeonLock: () => void; dungeonLockHeld: boolean};
+    void navigator.locks.request(key,async () => {state.dungeonLockHeld=true;await new Promise<void>(resolve => {state.releaseDungeonLock=resolve;});});
+  },DUNGEON_KEYS.primary);
+  await expect.poll(() => page.evaluate(() => (window as unknown as {dungeonLockHeld:boolean}).dungeonLockHeld)).toBe(true);
+  await page.locator('#dungeon-step-'+direction).click();
+  await other.locator('#dungeon-step-'+direction).click();
+  expect(await snapshot(page)).toEqual(initial); expect(await snapshot(other)).toEqual(initial);
+  await page.evaluate(() => (window as unknown as {releaseDungeonLock:()=>void}).releaseDungeonLock());
+  await expect.poll(async () => (await snapshot(page)).stats?.movesTaken).toBe(1);
+  await expect(other.locator('.dungeon-status')).toContainText('changed');
+  expect(await snapshot(other)).toEqual(initial);
+  const durable = await page.evaluate(keys => ({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),DUNGEON_KEYS);
+  expect(JSON.parse(durable.primary!).payload).toEqual(await snapshot(page));
+  expect(JSON.parse(durable.backup!).payload.stats.movesTaken).toBe(0);
+  await other.close();
+ });

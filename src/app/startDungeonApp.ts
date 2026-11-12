@@ -8,7 +8,7 @@ import { mountTelemetryPreferences } from '../telemetry/preferences';
 import { DungeonSession } from './DungeonSession';
 import { RunHistory } from './RunHistory';
 import { freshDungeon, FloorCache, newDungeonSeed, type DungeonState } from '../domain/dungeon';
-import { bothDungeonSlotsMissing, createDungeonStorage } from '../persistence/dungeonStorage';
+import { bothDungeonSlotsMissing, createDungeonStorage, serializeBrowserDungeonWrite } from '../persistence/dungeonStorage';
 import { dungeonElement as el, renderDungeon } from '../ui/dungeon';
 import { BattleDialogs, type DialogChoice } from '../ui/dialogs';
 import type { RunBattleHost } from '../phaser/BattleScene';
@@ -17,7 +17,7 @@ import { diagnosticsSnapshot } from '../diagnostics/browser';
 function newSeed(previous?: number) {
  return newDungeonSeed(()=>crypto.getRandomValues(new Uint32Array(1))[0],previous);
 }
-const storage=appEntry.persistent?createDungeonStorage():null,session=new DungeonSession(freshDungeon(crypto.randomUUID(),newSeed()),storage,storage?new RunHistory('dungeon'):null),cache=new FloorCache();
+const storage=appEntry.persistent?createDungeonStorage():null,session=new DungeonSession(freshDungeon(crypto.randomUUID(),newSeed(),undefined,appEntry.persistent),storage,storage?new RunHistory('dungeon'):null,serializeBrowserDungeonWrite),cache=new FloorCache();
 const screen=el('main');screen.id='dungeon-screen';screen.dataset.boot='loading';document.body.append(screen);
 const shell=document.querySelector<HTMLElement>('#battle-shell')!,panel=document.querySelector<HTMLElement>('#fit-panel')!,container=document.querySelector<HTMLElement>('#game')!,status=document.querySelector<HTMLElement>('#fit-status')!,controls=document.querySelector<HTMLElement>('#battle-controls')!,restart=document.querySelector<HTMLButtonElement>('#fit-restart')!,persistence=document.querySelector<HTMLElement>('#battle-persistence')!;
 let live=true,playing=false,startup=true,loading=false,loadError=false,loadGeneration=0,host:RunBattleHost|null=null;
@@ -28,7 +28,7 @@ const sound={enabled:false};
 const dialogs=new BattleDialogs(()=>{host?.modalTransition();queueMicrotask(()=>deferredStart?.());},()=>requestNew(),()=>screen.querySelector<HTMLElement>('h1')?.focus());
 panel.setAttribute('aria-label','Dungeon battle controls');
 mountBattleLayout();window.fitDiagnostics=diagnosticsSnapshot;
-const mapView=new DungeonMap(destination=>{if(!live||playing||loading||loadError||replacing||dialogs.open)return;if(session.step({...session.spatialBoundary,destination})&&session.phase==='battle')start();},()=>!live||playing||loading||loadError||replacing||dialogs.open);
+const mapView=new DungeonMap(async destination=>{if(!live||playing||loading||loadError||replacing||dialogs.open)return;if(await session.step({...session.spatialBoundary,destination})&&session.phase==='battle')start();},()=>!live||playing||loading||loadError||replacing||dialogs.open);
 function button(label:string,run:()=>void){const n=el('button',label);n.type='button';n.onclick=run;return n;}
 function evidence(state:DungeonState=session.snapshot){container.dataset.dungeonSnapshot=JSON.stringify(state);container.dataset.dungeonBattleRecord=JSON.stringify(session.completedBattle);}
 function stop(){loadGeneration++;deferredStart=null;loading=false;loadError=false;playing=false;host=null;engine?.scene.stop('battle');controls.hidden=true;container.style.visibility='hidden';}
@@ -107,11 +107,11 @@ function recovery(){
  for(const slot of ['primary','backup'] as const){
   if(review[slot].status==='valid')choices.push({id:`dungeon-continue-${slot}`,label:`Continue ${slot} dungeon`,run:()=>{if(session.continue(review,slot)){startup=false;stop();render();if(session.snapshot.activeBattle)start();}else recovery();}});
   if(review[slot].text!==null)choices.push({id:`dungeon-remove-${slot}`,label:`Remove ${slot} save`,run:()=>dialogs.showChoices('Remove reviewed save?','Export first if needed. Only the reviewed dungeon slot will be removed.',[
-   {id:'dungeon-remove-confirm',label:'Remove reviewed save',run:()=>{session.remove(slot,review);recovery();}},
+   {id:'dungeon-remove-confirm',label:'Remove reviewed save',run:async()=>{await session.remove(slot,review);recovery();}},
    {id:'dungeon-remove-cancel',label:'Cancel',run:recovery},
   ])});
  }
- choices.push({id:'dungeon-retry-save',label:'Retry saving current progress',run:()=>{if(startup){close();return;}session.retry(review);close();}}, {id:'dungeon-close-recovery',label:'Close',run:close});
+ choices.push({id:'dungeon-retry-save',label:'Retry saving current progress',run:async()=>{if(startup){close();return;}await session.retry(review);close();}}, {id:'dungeon-close-recovery',label:'Close',run:close});
  dialogs.showChoices('Dungeon save recovery',`primary: ${review.primary.status}. backup: ${review.backup.status}. ${session.status}`,choices,close,{focusTitle:true});
  screen.scrollTop=scrollTop;
 }
@@ -132,7 +132,7 @@ async function start(){
  container.dataset.ready='false';delete container.dataset.phase;
  status.textContent='Loading encounter';status.removeAttribute('role');
  try {
-  const battle=session.startEncounter();if(!battle){loading=false;render();return;}
+  const battle=await session.startEncounter();if(!battle){loading=false;render();return;}
   render();
   const [runtime,{BattleScene}]=await Promise.all([import('../phaser/start'),import('../phaser/BattleScene')]);
   if(!live||generation!==loadGeneration)return;

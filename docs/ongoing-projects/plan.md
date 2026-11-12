@@ -1,355 +1,340 @@
-# Issue #176 — Device-local Hall of Records
+# Issue #270 — Recent and best runs with trustworthy statistics
 
 Date: 2026-11-10 (Asia/Jerusalem). Assigned to @moshehbenavraham.
-Issue: [#176](https://github.com/luminari-gurus/tactics-guru-v2/issues/176).
-Related follow-up: [#270](https://github.com/luminari-gurus/tactics-guru-v2/issues/270).
-Branch: [`branch/issue-176-local-records`](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-176-local-records).
-Authored branch: `branch/issue-176-authored-records` / PR #360, based on the
-review-ready first increment at `7d73d35`.
-Current implementation branch: `branch/issue-176-dungeon-records`, based on
-qualified PR #360 at `c79146e`; PR #361 targets that authored branch.
-The first two increments are ready for review; continue final acceptance here.
-Base: `origin/main`, `491f92a080d8577aca882c3e48ddaf910cf30369`.
-OpenSpec: [proposal](../../openspec/changes/issue-176-local-records/proposal.md),
-[design](../../openspec/changes/issue-176-local-records/design.md),
-[requirements](../../openspec/changes/issue-176-local-records/specs/run-records/spec.md),
-[tasks](../../openspec/changes/issue-176-local-records/tasks.md).
+Issue: [#270](https://github.com/luminari-gurus/tactics-guru-v2/issues/270).
+Branch: [`branch/issue-270-run-statistics`](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-270-run-statistics).
+Base: `origin/main`, `f0bdac46dbd018ba11300c800e3dfb0d986fd6a5`.
+Status: **increment 1 ready for review in [PR #365](https://github.com/luminari-gurus/tactics-guru-v2/pull/365); increment 2 in progress (2026-11-11)**.
+The user authorized implementation, verification and incremental PR publication.
 
-**Status:** implementation authorized on 2026-11-10. The caller requested autonomous
-implementation, verification, commits/pushes and focused labeled PRs as each chunk
-is ready, stacking dependent increments. Using OpenSpec change `issue-176-local-records`;
-9/9 implementation tasks complete and verified. Review-only delivery; no PR merge or deployment.
-The previous plan is preserved byte-for-byte in
-[the #316 handoff](issue-316-mage-acceptance-fixtures-plan.md).
+## Live handoff — 2026-11-11
 
-## Selection and backlog coverage
+- Clean starting branch at `c6b053d`; fetched origin/main is still the planned base.
+- OpenSpec `issue-270-run-statistics`, spec-driven schema, initially 0/9 tasks.
+  Run its CLI through WSL Ubuntu (installed Node v24.15.0); Windows PATH does not
+  contain npm or OpenSpec. WSL repository:
+  `/mnt/c/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru`.
+- Outcome: all AC1–AC8 through the three increments below. Non-goals remain
+  combat/balance changes, extra storage/event frameworks and new art.
+- Ablation: store only irrecoverable kills/net moves/active milliseconds and one
+  bounded receipt; derive exact wins/floors from validated progress. This removes
+  redundant persisted counters and their consistency machinery without losing a stat.
+- Current files: pure `src/domain/runStats.ts`, existing journey snapshots,
+  envelopes, accepted callbacks/owners and focused tests/docs. Proof: reducer and
+  compatibility units, legal resume/undo paths, affected persistence consumers and
+  `verify:pr` per increment. No implementation acceptance is claimed yet.
+- PR #365 is open and ready for review, with `enhancement` labeling. Its coverage
+  and remaining acceptance work are posted on #270, which remains open. OpenSpec
+  tasks 1.1–1.3 are complete (3/9). Next: qualify and stack active time/history,
+  then records presentation and the whole-issue audit. No merge or release occurred.
+- Increment 1 qualification is complete at `c4654c6`: final `verify:pr` passed
+  in 120.8 seconds (1,319 units, both type scopes/build integrations, bundle and
+  all seven core journeys). All 22 extended legal Chromium/WebKit cases and 15
+  direct/diagnostic/Qbert isolation cases passed, with one worker and no retries
+  or skips. The six selection/batch contract checks passed too. Evidence and
+  exact case IDs are in [increment-1.json](../qa/issue-270/increment-1.json);
+  raw reports remain under the referenced `verification-receipts/` paths.
+  Desktop and touch-portrait screenshots were inspected and retained alongside it.
+  This is affected-scope qualification, not a full-regression claim.
+- Implemented: optional version-one counters, authored format 10/dungeon format
+  12, exact accepted-event callbacks, owner integration, atomic published steps,
+  compatible legacy reading and explicit testing-entry gating. Stats-bearing
+  backups now rotate complete matching battle/counter snapshots; old draught
+  compatibility checkpoints still apply to untracked saves.
+- Verification so far: both type scopes and 139 focused tests passed before the
+  backup adjustment. First `verify:pr` receipt
+  `verification-receipts/pr/1794424875822-103876` failed its units stage (1316/1318):
+  the old draught test expected legacy format 9 after an accepted stats upgrade;
+  the new complete legal owner journey exceeded its default 5-second unit budget
+  under full-suite load. Updated the intended format/backup assertions and gave
+  that new legal storage journey 15 seconds (existing equivalent has 20 seconds).
+  A focused follow-up caught the old pre-battle checkpoint assertion too; updated
+  it to require the exact prior committed battle bytes. Original failures retained.
+- Browser environment qualified locally: Windows x64, Node v24.22.1,
+  Playwright 1.64.1, Chromium 156.0.8078.4 and WebKit 27.2; report
+  `verification-receipts/browser-environment/run-QC1faH/environment.json`.
+  WSL is used for OpenSpec only; runtime verification uses native Windows tools.
+- Frozen implementation commit: `e7b20c0bb7937d1e1520dd8b33ac898d60ff600a`.
+  `verify:pr` passed in 114.6 seconds, receipt
+  `verification-receipts/pr/1794425159287-117812`: 1,319/1,319 units,
+  both type scopes, both build integrations, root bundle and 7/7 core journeys.
+  OpenSpec tasks 1.1–1.2 are complete (2/9); task 1.3 awaits affected browser
+  qualification and PR publication. Documentation follow-ups reuse this receipt;
+  runtime/test/config/dependency inputs remain unchanged from that commit.
+- Running 12 Chromium cases (desktop/Pixel portrait/landscape): the existing
+  legal testing and saved-menu dungeon first-floor/descent/backtrack journeys,
+  authored undo/reload/defeat and complete authored reward/terminal/restart journey.
+  Command: `node node_modules/@playwright/test/cli.js test -c playwright.regression.config.ts tests/run-progression.spec.ts tests/dungeon.spec.ts -g 'run battle undo survives reload|legal run outcomes, earned rewards|saved menu dungeon keeps proof tools hidden|testing dungeon legally clears a floor' --reporter=line,json --output=verification-receipts/issue270/inc1-chromium/artifacts`.
+  `PLAYWRIGHT_JSON_OUTPUT_NAME=verification-receipts/issue270/inc1-chromium/report.json`;
+  raw log is adjacent `run.log`. Runtime input hashes: `verification-receipts/issue270/inc1-inputs.json`.
+  WebKit authored acceptance and dungeon exploration profiles follow serially.
+- The 12 Chromium cases passed in 10.0 minutes, and both WebKit authored legal
+  reward/terminal/restart journeys passed in 3.0 minutes. Discovery revealed the
+  WebKit allowlist omitted the existing undo journey. Added that exact title;
+  both portrait/landscape undo/reload/defeat cases then passed (43.2 seconds).
+  Reports: `verification-receipts/issue270/inc1-authored-webkit/` and
+  `verification-receipts/issue270/inc1-undo-webkit/`. The added selection changes
+  no gameplay/build inputs or existing selected cases. Extended direct-route
+  spies to assert that run/dungeon snapshots have no stats; qualification pending.
+- Parallel preparation (same agent, isolated inputs) lives in
+  `C:/Users/apexw/.codex/worktrees/issue-270-active-time-history/Tactics-Guru`,
+  branch `branch/issue-270-active-time-history`. Its plan records the active-clock
+  and v2 history/bests implementation; 152 focused clock/owner/history tests pass,
+  but its browser qualification and PR remain pending. Do not mix those files
+  into this counter PR. Merge this branch's final documentation/selector updates
+  into that stack before its publication.
+OpenSpec: [proposal](../../openspec/changes/issue-270-run-statistics/proposal.md),
+[design](../../openspec/changes/issue-270-run-statistics/design.md),
+[requirements](../../openspec/changes/issue-270-run-statistics/specs/run-statistics/spec.md),
+[tasks](../../openspec/changes/issue-270-run-statistics/tasks.md).
+The prior [#176 plan](issue-176-local-records-plan.md) is preserved byte-for-byte.
 
-Reviewed all **49 open issues**, including bodies, labels and assignees; relevant
-comments; both open PRs; published branch heads; main history; native dependency,
-parent/sub-issue and linked-branch relationships; and outstanding OpenSpec tasks.
-GitHub's issue connection reports `totalCount: 49`, `hasNextPage: false`.
-There are no attached repository Projects v2 or issue project items. No native
-blocking edges were present, so body prerequisites were checked separately.
+## Selection and availability
 
-Choose #176: it is unassigned, genuinely absent in current code, has concrete
-acceptance criteria, and establishes storage/terminal boundaries explicitly
-needed by #270. #157 (floors), #159 (encounters), #153 (menu) and #259 (route/save
-isolation) are closed/completed and their implementations are present on main.
-#174 is coordination for future currencies, not a prerequisite for recording
-existing progress. Neither a parent epic nor completion of every parity feature
-is an eligibility gate. Selection considered issues without `ready for work`.
+Reviewed all **48 open issues**, their bodies/labels/assignees, relevant comments,
+all three open PRs, published branches, merged prerequisite work, repository and
+organization projects, native blocking/parent/sub-issue/linked-branch relationships,
+and outstanding OpenSpec work. GitHub reports `totalCount: 48`,
+`hasNextPage: false`; every nested relationship page was complete. There are no
+attached repository Projects v2, organization projects or open-issue project items.
+No native blocking edges exist; body dependencies still matter.
 
-Complete disposition of the other 48 items:
+**Choose #270**, including it despite the absent `ready for work` label. Its
+explicit foundation #176 has just completed through merged #359/#360/#361/#363;
+the recording/recovery/replacement implementation is present on main. #153
+(menu), #157 (floors), #159 (encounters) and #259 (entry isolation) are closed
+and their owning paths are present. #174 is coordination for future reward
+counters, not a blocker for existing kills, moves, victories or floor clears.
+No published branch or PR claims #270. It adds visible player value to a newly
+delivered foundation without changing balance or needing external services.
+
+Complete disposition of the other 47 open issues:
 
 - **Assigned elsewhere:** #85, #128, #161, #162, #184, #200, #208, #219, #254,
-  #258, #306. Preserve ownership. Several are implemented investigations or
-  acceptance follow-ups, rather than fresh implementation work; #208 is blocked.
-- **Larger work requiring a bounded first slice:** #170 (biome packs), #199
-  (DevOps epic). #170 itself requires a separate bounded pack issue before coding.
-- **Mechanics, acquisition, or reward contracts to settle with actual consumers:**
-  #167, #168, #169, #171, #173, #174, #175. The partially delivered #161 is not
-  treated as a blanket blocker; the missing push/charge/damage/loot behavior is
-  the actual additional scope.
-- **Design, presentation, or rules choices remain:** #178, #180, #181, #182,
-  #185, #261, #262, #287. These can be planned, but offer a less direct bounded
-  implementation than #176; existing readiness labels do not resolve choices.
-- **Product/balance decisions:** #301, #313, #320, #323. These reports explicitly
-  leave intended behavior open; do not invent revival, healing or loot policy.
-- **Available smaller alternatives:** #179 (structured logs; explicitly low
-  priority), #311 (direct ability buttons; low-severity UX). Neither supplies
-  #270's documented storage dependency. #270 can follow this foundation; its
-  duration ranking and full accumulator remain its own scope.
-- **Existing merged changes cover the reported area:** #291/#330, #292/#333,
-  #296/#344, #298/#336, #302/#331, #304/#335, #307/#345, #312/#346. These need
-  acceptance reconciliation before another implementation is selected. #303
-  overlaps merged #314's encounter-contact work; verify any residual crossing
-  case before treating the original report as new work.
-- **Mixed polish lists:** #299, #308; separate remaining items from their merged
-  fixes and deliberate mechanics rather than claim the whole list as one patch.
-- **Unresolved reproduction/attribution:** #268, #318. #268 has a published
-  investigation branch. Current `combatStats` applies Weakened once and
-  `previewAttack` separately applies elevation; #318's double-penalty diagnosis
-  is not established by source inspection. No issue is closed or relabeled here.
+  #258, #306, #311. Preserve ownership. Several are delivered implementations or
+  investigations awaiting acceptance reconciliation. #311 is actively covered
+  by open PR #362; do not mix its ability-rail changes into this task.
+- **Epics needing bounded implementation slices:** #170 and #199. #170 explicitly
+  requires per-biome issues before coding; #199's remaining work has existing owners.
+- **Substantive mechanics/acquisition work:** #167, #168, #169, #171, #173, #174,
+  #175. #161 is partially delivered; its open state is not a blanket blocker, but
+  push/charge, typed damage, loot policy and their specific consumers remain real
+  additional scope. #175 also needs #174's reward/unlock contract.
+- **Design/presentation/rules choices:** #178, #180, #181, #182, #185, #261,
+  #262, #287. Potential planning candidates, with less direct implementation
+  readiness than the concrete follow-up to merged records storage.
+- **Explicit product/balance questions:** #301, #313, #320, #323. Do not invent
+  defeat/retry, revival, healing or final-floor loot rules while selecting work.
+- **Available smaller alternative:** #179, structured combat logs. It is explicitly
+  low priority and still needs history/storage scope choices. #270 uses stronger
+  existing boundaries and fulfills the planned next layer of records functionality.
+- **Merged work covers the reported area:** #291/#330, #292/#333, #296/#344,
+  #298/#336, #302/#331, #304/#335, #307/#345, #312/#346. Merge state was checked
+  live. #303 overlaps merged #314's contact repair. These need a current residual
+  reproduction/acceptance audit before another implementation; they are not
+  assumed closed or completely resolved by this planning pass.
+- **Mixed polish lists:** #299 and #308; separate remaining UI issues from merged
+  fixes and deliberate mechanics before claiming either entire list.
+- **Unresolved reproduction/attribution:** #268 and #318. #268 has an investigation
+  branch. #318's reported double-penalty diagnosis is not established; current
+  sources distinguish Weakened from elevation. Neither is treated as a ready fix.
 
-Open PRs #12 (restricted SSH deployment) and #237 (combat UI mockups) are drafts
-owned by @dubstylee and do not implement records. Stale OpenSpec acceptance tasks
-for #127/#153 are historical evidence to reconcile, not new unclaimed issues;
-this plan does not erase their recorded failures.
+Other open PRs #12 and #237 concern separately owned deployment tooling and UI
+mockups. OpenSpec #127/#153 has historical unfinished acceptance work; preserve
+its failures without treating it as newly unassigned implementation. No other
+issue is assigned, closed or relabeled by this selection.
 
-## Outcome
+## Outcome and definitions
 
-The existing Hall of Records menu shows the newest device-local summaries of
-saved authored runs and dungeons. Each admitted journey has at most one immutable
-record at real victory, defeat, or confirmed replacement of an unfinished run.
-Continued dungeon descent is still the same journey. History is bounded, versioned,
-recoverable, and independent of active-save storage.
+For each admitted menu-origin authored run or dungeon, save an exact, bounded
+five-stat summary: **enemies killed, battles won, moves taken, floors cleared and
+active playtime**. Show newest 100 journeys plus personal bests, attributed to
+their originating journeys, even when a best holder leaves the recent list.
 
-Initial counters are deliberately limited to exact facts already retained:
-`battlesWon` for both modes, and `floorsCleared`/`deepestFloor` for dungeons.
-Authored runs use null/not-applicable for floor fields. Compute authored wins from
-encounter index and phase; compute dungeon wins/cleared floors from distinct
-saved cleared slots and deepest floor from the visited floor descriptors, not
-current depth. Do not fabricate zero-valued currencies or unavailable counters.
+- A move is one accepted hero movement command, independent of path length, or
+  one published adjacent dungeon step. Enemy moves and floor travel itself do
+  not count. Accepted movement undo removes that move, retaining elapsed time.
+- Kills come from enemy `defeated` events, not damage numbers or sprite removal.
+  Wins and unique completed floors use validated progress. Authored floors are
+  N/A, since the three-encounter run has no dungeon floors.
+- Time counts visible, focused ongoing battle and ready dungeon exploration,
+  including battle animations/enemy turns. Loading, preparation, rewards,
+  terminal screens, menus, paused dialogs, hidden/unfocused pages and closed-app
+  intervals are excluded. No speculative inactivity timeout is added.
+- Bests are per mode and per applicable stat, using the **maximum**, including
+  **longest active playtime**. Include completed/abandoned outcomes. Ties select
+  newest recorded time then stable mode/ID order. Keep bounded winning summaries.
+- Old records retain known wins/floors. Missing historic kills/moves/time stay
+  unavailable; a continued old journey labels new counters as since upgrade.
+  Partial fields do not compete as whole-run maxima. Older evicted v1 history
+  cannot be reconstructed; show that historical best coverage limitation.
 
 ## Source findings and files
 
-- [mainMenu.ts](../../src/ui/mainMenu.ts) already owns the modal, focus return,
-  New Game review/handoff and records placeholder. Replace only that placeholder
-  and add a small `src/ui/runRecords.ts` renderer, reusing `mainMenu.css`.
-- [RunItemSession.ts](../../src/app/RunItemSession.ts) owns accepted battle
-  completion, terminal resume, serialized writes and reviewed replacement.
-  [startRunApp.ts](../../src/app/startRunApp.ts) owns entry and replacement UI.
-- [DungeonSession.ts](../../src/app/DungeonSession.ts) owns accepted outcomes,
-  validated continuation and two-slot replacement.
-  [startDungeonApp.ts](../../src/app/startDungeonApp.ts) consumes the menu handoff.
-  Main-menu confirmation alone is not a successful replacement.
-- [routes.ts](../../src/app/routes.ts) and [entry.ts](../../src/app/entry.ts)
-  already gate persistent menu-origin journeys. Testing entries pass null storage.
-  Gate history before constructing an adapter or touching storage too.
-- [run.ts](../../src/domain/run.ts), [dungeon.ts](../../src/domain/dungeon.ts)
-  and [exploration.ts](../../src/domain/exploration.ts) supply validated progress.
-  Add `src/domain/runRecords.ts` for bounded validation and pure projection only;
-  timestamps come from the application, not domain entropy.
-- Add `src/persistence/runRecordsStorage.ts`: one records-specific local-storage
-  adapter using the existing injected-provider/readback patterns and browser-lock
-  pattern from [runStorage.ts](../../src/persistence/runStorage.ts).
-  Existing active run/dungeon envelope readers and keys remain compatible.
-- Extend existing session, envelope, menu, run and dungeon tests. New record-model
-  and storage unit files are justified by the new behavior; reuse existing browser
-  files/helpers and configured matrices. Document the delivered contract in
-  `docs/run-records.md` and source-bound receipts in `docs/qa/issue-176/README.md`.
+- [BattleSession.ts](../../src/app/BattleSession.ts): accepted resolution and
+  undo already produce exact domain events before presentation. Extend its
+  state-only callback compatibly to expose the current accepted event batch.
+  Its standalone-battle consumers must retain identical rules/replay behavior.
+- Add `src/domain/runStats.ts` for the pure versioned accumulator, validation,
+  accepted-boundary deduplication and stat definitions. No DOM/time reads here.
+- [RunItemSession.ts](../../src/app/RunItemSession.ts),
+  [DungeonSession.ts](../../src/app/DungeonSession.ts),
+  [runBattle.ts](../../src/domain/runBattle.ts) and
+  [dungeon.ts](../../src/domain/dungeon.ts): publish stats with accepted state,
+  including the final kill before terminal battle removal and save-before-publish
+  exploration steps. Rejected spatial saves add no moves.
+- [runSaveEnvelope.ts](../../src/domain/runSaveEnvelope.ts) and
+  [dungeonSaveEnvelope.ts](../../src/domain/dungeonSaveEnvelope.ts): exact shapes
+  and currently supported formats need explicit compatible new versions, with
+  stats saved alongside active progress. Keep size/digest/recovery guarantees.
+- Add `src/app/ActivePlaytime.ts`, shared by both actual journey owners. Wire
+  eligibility/checkpoints in [startRunApp.ts](../../src/app/startRunApp.ts),
+  [startDungeonApp.ts](../../src/app/startDungeonApp.ts) and their existing
+  [dialogs.ts](../../src/ui/dialogs.ts)/[menuReturn.ts](../../src/ui/menuReturn.ts)
+  lifecycle boundaries. Flush before review/freeze/disposal; a timer must not
+  invalidate a reviewed replacement token. Use the existing save queues and locks.
+- [runRecords.ts](../../src/domain/runRecords.ts),
+  [RunHistory.ts](../../src/app/RunHistory.ts) and
+  [runRecordsStorage.ts](../../src/persistence/runRecordsStorage.ts): extend
+  frozen summaries, pending paired receipts and a bounded personal-best map in
+  the existing history store. Preserve first-result-wins and read-only opening.
+- [runRecords.ts](../../src/ui/runRecords.ts) and
+  [mainMenu.css](../../src/ui/mainMenu.css): extend the existing modal; retain
+  recovery actions, focus and responsive readability. Gate tracking with the
+  existing [entry.ts](../../src/app/entry.ts)/[routes.ts](../../src/app/routes.ts)
+  decision before constructing tracking or touching storage.
+- Extend relevant existing unit/browser files and helpers; add focused stats and
+  clock unit files. Update [run-records.md](../run-records.md), and retain
+  source-bound implementation receipts under `docs/qa/issue-270/`.
 
 ## Ablation and non-goals
 
-**Keep:** stable identity, immutable summaries, actual accepted boundaries,
-duplicate prevention, retention, recovery, route isolation and reachable UI proof.
-Removing any loses an explicit #176 gate. Keep a bounded pending/closed receipt
-for the current journey of each mode because two-slot replacement can partially
-fail and a terminal save can outlive retained history.
+**Keep:** accepted-event reduction, movement-undo handling, clock pause/flush,
+versioned active snapshots/history, legacy partial-data labels, exact terminal
+and paired replacement receipts, bounded best-holder summaries, route isolation
+and reachable UI verification. Each supplies an explicit #270 acceptance gate;
+dropping best-holder retention would incorrectly lose all-time bests at eviction.
 
-**Simplify:** derive existing counters from validated progress instead of adding
-an event accumulator or changing active-save formats. Use the existing menu modal,
-providers, validation and locking patterns. History has one implementation shared
-by the two real run consumers, with small mode-specific projections.
+**Simplify:** use existing event types and one compatible accepted notification,
+existing run/floor identities and command counters for deduplication, existing
+save/recovery/locking paths and records modal. Derive exact wins/floors from
+validated progress. One injected clock serves two consumers; completed intervals
+checkpoint on actions/lifecycle changes and one 5-second active interval.
 
-**Drop:** new packages/services, a generic analytics/event framework, active
-playtime, moves/kills/damage accounting, personal-best aggregation, music, economy,
-balance/defeat-policy changes, standalone-battle records, save import, and broad
-UI redesign. #270 still owns its full five statistics, recent/best presentation,
-undo semantics and extensible accumulated stats. No production operation is planned.
+**Drop:** a new event framework, per-event journal, separate stats storage,
+analytics transport, packages/services, historical event reconstruction,
+optional class damage totals, generic extension registry, fastest-clear scoring,
+new balance/economy behavior, standalone-battle scores and a broader UI redesign.
+Document the pure reducer's future granular-stat extension point without building
+that future feature. Implementation and incremental PR publication are now
+authorized; merge and production operations remain outside this task.
 
-## Delivery and acceptance mapping
+## Implementation increments and acceptance mapping
 
-1. **Record model, storage and menu (first PR; `Refs #176`).** Versioned immutable
-   records keyed by mode plus existing run ID, bounded inputs, newest-first order
-   with a stable tie-break, and retention of 100 summaries. Implement honest empty,
-   degraded and unavailable states in the existing menu. Preserve corrupt/unknown
-   bytes; explicit reviewed export/reset affects records only. This meets AC1,
-   AC3/AC4 and the storage/UI portion of AC5. End-to-end recording remains open.
-2. **Authored-run recording (second PR; `Refs #176`).** Record accepted victory,
-   defeat and confirmed replacement; repair a missed terminal write on explicit
-   Continue, idempotently. Snapshot the reviewed old journey before replacing it;
-   pending replacement is finalized only when the replacement is accepted.
-   Cancel, stale review, failed replacement, rendering, pagehide and menu return
-   never manufacture an abandonment. This covers authored-run AC2 and its AC5
-   repeated-callback/resume/failure proof. Dungeon acceptance remains open.
-3. **Dungeon recording and final qualification (third PR).** Integrate defeat and
-   confirmed replacement with the same store. A boss win, three cleared slots,
-   stairs, revisiting a floor or returning to the menu never completes the endless
-   run. Cover the root-menu New Game handoff as well as in-flow replacement.
-   This finishes dungeon AC2/AC5 and the complete AC1–AC5 audit. Use `Closes #176`
-   only if every gate is verified; otherwise use `Refs #176` and list what remains.
+1. **Persistent accepted counters** — first focused PR, `Refs #270`.
+   Add pure stats and compatible stats-bearing active snapshots; wire accepted
+   combat/undo/dungeon steps atomically, with tracking disabled on testing entries.
+   Land schema/counter tests, resume/undo browser proof and the delivered contract
+   documentation with this increment. Covers AC1, the counter portion of AC3,
+   active-save compatibility in AC6, AC7's extension note and affected AC8 paths.
+   Active time, record projection/bests and final UI remain open.
+2. **Active time and frozen history/bests** — depends on increment 1,
+   `Refs #270`. Add lifecycle eligibility/clock, compatible v2 history and
+   per-mode maxima, integrating terminal/abandoned/paired pending records.
+   Land fake-clock, storage/receipt and real reload/modal/replacement/lifecycle
+   proof with documentation. Covers AC2, AC4, remaining persistence/once-only
+   AC3/AC6 and the corresponding AC8 consumers. Recent/best presentation remains.
+3. **Records presentation and final qualification** — depends on 1–2.
+   Show all five stats, partial/legacy labels, recent list, best attribution and
+   retained winning summaries in the existing modal; land keyboard/touch tests
+   and screenshots. Audit every AC1–AC8, including full entry isolation and
+   complete legal terminal/replacement journeys. Use `Closes #270` only after all
+   eight criteria pass; otherwise `Refs #270` with an explicit remaining list.
 
-Keep #176 open between increments, with each PR's criteria, remaining scope and
-dependencies recorded on the issue. #270 remains unassigned and open throughout.
-The [design](../../openspec/changes/issue-176-local-records/design.md) specifies
-receipt ordering, recovery and retention details; all nine tasks are complete; retained source-bound proof and the final audit are linked below.
+Each increment includes its own affected tests/docs and can be reviewed and
+verified independently. Keep #270 open through partial delivery and record the
+criteria covered, dependencies and remaining work on each PR and the issue.
+The OpenSpec tasks contain the executable breakdown and current completion state.
 
 ## Proof
 
-Planning checks: strict OpenSpec validation, local link/path checks, command/config
-inspection, archived-plan blob equality, diff review and remote branch/issue
-readback. Documentation-only planning does not require application/browser reruns.
+For this documentation-only handoff: strict OpenSpec validation, local links and
+paths, command/config inspection, archived-plan byte equality, `git diff --check`,
+diff review, assignment/comment readback, native branch association and remote
+commit parity. No application or browser execution is needed for planning.
 
-During implementation, follow [verification-policy.md](../verification-policy.md):
+Planning validation passed: OpenSpec strict validation, all 30 local links in
+the six new/updated review documents, diff whitespace checks and prior-plan Git
+blob equality (`cf3d32dd1db967aa9204220068a047da997189f7`). The branch is created
+through GitHub's native linked-branch operation for #270; publication and final
+commit readback are checked before handoff.
 
-- Iterate with new model/storage units plus affected `RunItemSession.test.ts`,
-  `runBattle.test.ts`, `dungeon.test.ts`, `exploration.test.ts`, `menuSaves.test.ts`
-  and run/dungeon save-envelope coverage in `tests/unit`.
-  Cover immutable duplicate IDs, conflicting terminal candidates, all phases,
-  unique-floor counts, 100-entry eviction, bounded receipts, corrupt/future data,
-  failed read/write/readback, stale reviews and successful/failed/canceled replace.
-- Run `npm run verify:pr` for each increment's frozen relevant inputs: all fast
-  units, both type scopes, root/prefix build integrations, build and seven core
-  journeys. Add all affected storage/envelope/session units as the persistence
-  policy requires. Keep failure and reused-evidence identities explicit.
-- Discover focused selections before executing them:
-  `npm run test:regression -- --list`;
-  `npx --no-install playwright test -c playwright.device-acceptance.config.ts --list`;
-  `npx --no-install playwright test -c playwright.exploration.config.ts --list`.
-  Filters must actually select new records cases, not silently run zero.
-- Execute new records/menu and affected run/dungeon/replacement cases on desktop
-  Chromium and native-touch portrait/landscape, plus relevant WebKit menu/run and
-  dungeon cases. Retain complete legal authored-run and dungeon defeat witnesses,
-  exact terminal reload/Continue, repeated callbacks, partial replacement failures,
-  continued descent/backtracking and current primary/backup byte preservation.
-- Extend `testing routes:` witnesses to spy on records-key reads/writes as well as
-  active-save keys across every direct route and diagnostic entry. Menu-origin
-  games must record; direct `/run`, `/dungeon`, `/battle`, `/map`, `/qbert` and scene
-  diagnostics must not touch records. Standalone battles do not create run records.
-- On final inputs retain command/config/project IDs, source/build identity and
-  raw reports/screenshots. Preserve actual failures and incomplete runs. Use the
-  existing qualified self-hosted VM and per-runner concurrency group, workers 1,
-  retries 0; no automatic hosted fallback. Reuse unchanged engine/audio/telemetry
-  evidence only under the policy; run new broader checks only for demonstrated
-  affected behavior. A new bounded history write does not itself require full
-  performance recertification or the entire full-regression matrix.
+For implementation, follow [verification-policy.md](../verification-policy.md):
 
-Physical-device testing was not requested. Playwright device emulation is sufficient
-under AGENTS.md. Local `CAN_TEST_MOBILE=android` describes access only; no physical
-test was performed. Both registered self-hosted VMs were online/idle at planning;
-recheck capacity at execution. This is not a reservation or future-availability claim.
+- Iterate with the new pure stats/clock units and relevant existing
+  `battleSession`, `RunItemSession`, `RunHistory`, `runBattle`, `dungeonBattle`,
+  `dungeon`, `exploration`, `runSaveEnvelope`, `runStorage`, `runRecords`,
+  `runRecordsStorage` and `menuSaves` unit tests. Preserve domain-boundary checks.
+  Cover multi-hit kills, movement undo, duplicate/out-of-order boundary delivery,
+  final events, failed spatial writes, stale callbacks, max bounds and RNG parity.
+- For each increment's frozen inputs, run `npm run verify:pr` (all fast units,
+  both type scopes, root/prefix build integrations, build and seven core journeys).
+  Include the entire affected storage/envelope/session family because active
+  save admission changes. Keep all original failures and reused evidence explicit.
+- Extend existing `main-menu.spec.ts`, `run-progression.spec.ts`, `dungeon.spec.ts`,
+  `dungeon-exploration.spec.ts` and `dungeon-lifecycle.spec.ts` where their existing
+  helpers support the real path. Discover before running with
+  `npm run test:regression -- --list`,
+  `npx --no-install playwright test -c playwright.device-acceptance.config.ts --list`
+  and `npx --no-install playwright test -c playwright.exploration.config.ts --list`.
+  Match the actual added titles, update explicit acceptance grep only if needed,
+  and verify new cases enter the owning broad/special matrices and batch manifest.
+- Execute affected desktop Chromium and native-touch portrait/landscape cases,
+  plus both WebKit acceptance orientations and relevant dungeon WebKit profiles.
+  Retain a complete legal authored victory/defeat and dungeon terminal journey,
+  real undo/reload/Continue, final-kill counting, first-floor/descent/backtrack,
+  terminal Continue, admitted unsaved play and both paired replacement identities.
+- Use fake monotonic clocks and visibility/focus transitions for exact time
+  accounting; add actual normal navigation/reload, hidden-tab, paused-dialog,
+  disposal and Chromium BFCache witnesses. Never claim synthetic pagehide as
+  real BFCache or Chromium evidence as WebKit lifecycle proof.
+- Exercise legacy active formats/history, pending single/paired receipts, corrupt
+  and future bytes, backup recovery, read/write/readback denial, cross-tab conflicts,
+  history retention beyond 100, tied maxima and explicit history reset. Test clock
+  checkpoints racing review, delayed writes and terminal/replacement freeze.
+- Extend existing `testing routes:` storage spies across every direct route and
+  diagnostic entry, including `/run`, `/dungeon`, `/battle`, `/map` and `/qbert`.
+  Menu-origin journeys must track; these entries must not construct tracking or
+  read/write active saves/history. Stats must not alter gameplay/RNG/replay.
+- Retain exact source/build inputs, commands/config/project/test IDs, browser/OS,
+  workers 1, retries 0 and raw reports/screenshots. Use qualified self-hosted browser
+  capacity and existing per-runner concurrency groups; no automatic hosted fallback.
+  Reuse unchanged audio/telemetry/render evidence only with documented equivalence.
+  Widen verification only for actual affected consumers or failures, not merely
+  because this is a save-format change. Do not claim a full-regression run from
+  this affected-scope qualification.
 
-## Final handoff — 2026-11-10
+Playwright/device emulation is sufficient under AGENTS.md. Physical testing was
+not requested or performed. Local `CAN_TEST_MOBILE=android` declares access only;
+it does not certify a device or reserve self-hosted capacity.
 
-Issue #176 is fully implemented and verified as three focused stacked PRs:
+## Estimate, questions and risks
 
-1. [#359](https://github.com/luminari-gurus/tactics-guru-v2/pull/359): immutable model, bounded history storage/recovery and existing records menu.
-2. [#360](https://github.com/luminari-gurus/tactics-guru-v2/pull/360), based on #359: authored victory/defeat, terminal Continue and confirmed replacement.
-3. [#361](https://github.com/luminari-gurus/tactics-guru-v2/pull/361), based on #360: dungeon endings, root-menu handoff, continued descent, concurrent confirmation and complete acceptance.
+**My estimate: 6–9 hours of implementation, verification and PR preparation**
+for the complete issue, approximately 2–3 hours for the first increment. This
+excludes CI queue time, human review and unrelated environment failures. The
+main uncertainty is lifecycle/write ordering and compatibility fixtures, not
+the stat arithmetic. Re-estimate if the implementation exposes a wider real
+consumer than the inspected paths.
 
-All are review-only changes with enhancement/medium-risk classification. Keep
-#176 open until the reviewed stack merges. The final PR uses Closes #176 because
-every acceptance criterion is proven; earlier increments retain Refs #176.
-#270 remains separate for its five full statistics, active playtime and best-run
-aggregation. The initial implementation handoff excluded merge and production
-operations; the November 10 maintenance request separately authorizes review,
-fixes, verification, merge and safe cleanup.
+**No blocking unanswered question.** The plan explicitly proposes longest active
+duration, one move per hero command/exploration step, per-mode maxima, 100 recent
+entries and honest legacy partial-data coverage. These are reviewable defaults,
+not claims of previously approved product decisions. Requested revisions can be
+folded into this concrete plan before implementation.
 
-### Verification and retained limits
-
-- Qualified functional head: 003be9b; clean tested merge: 6dd0e291.
-- Standard verification 42845257864 passed 1,279 units, both TypeScript scopes,
-  both root/prefix build integrations, production build and seven core journeys.
-- Authored qualification 42833420673 passed 65 cases, including complete
-  three-encounter victories on all five selected Chromium/WebKit profiles,
-  separate legal defeat, immutable reload/Continue/restart and entry isolation.
-- Final 83-case acceptance is accounted across 62 retained passes from failed
-  capture 42840048098 and 21 fresh passes in 42845257735 attempt 2. It is not a
-  clean single 83-case run. The original three failures remain failures. Only one
-  assertion's position changed in the re-executed full-floor case; all production,
-  helper, config and other case bodies stayed unchanged. All fresh cases retain
-  original deadlines, workers 1 and test retries 0.
-- Full-health dungeon defeat and complete first-floor/guardian/descent/backtrack
-  witnesses passed on three Chromium and three WebKit profiles. Concurrent native
-  root-menu confirmations, actual Chromium BFCache, history export/recovery and
-  testing-route isolation passed. Browser device emulation is sufficient under
-  AGENTS.md; physical devices and WebKit BFCache are not claimed.
-- Real discovery/batch contracts preserve all profiles, nine file partitions and
-  the approved 24 equivalence mappings. Thirty checks passed on Windows; the
-  unchanged POSIX guard required sh and passed separately under WSL. Prior CPU
-  timeouts under overlapping host work are retained; controlled runs passed
-  without raising limits, not as a general claim of a repaired physical host.
-
-[QA and acceptance mapping](../qa/issue-176/README.md),
-[authored evidence](../qa/issue-176/increment-2.json), and
-[final evidence](../qa/issue-176/increment-3.json) retain exact source/build IDs,
-case identities, raw report hashes, environment, failed/incomplete runs and reuse
-comparisons. Raw artifacts remain under the caller checkout's ignored
-`tmp/issue-176/`; upstream CI artifact retention is 14 days. The 1.04 GB failed
-trace archive remains upstream; source/results/error contexts were selectively
-retained locally with per-file hashes.
-
-### Continuation
-
-OpenSpec issue-176-local-records has all nine tasks complete. Do not reselect
-another issue or repeat unchanged green suites. Review/merge is the next step;
-archive/sync OpenSpec only after acceptance and merge. All functional tests remain
-in their explicit matrices and documented CLI commands. The task-only workflow
-is retired after qualification; standing CI and the seven core selections remain.
-
-The final documentation/workflow-retirement commit preserves functional inputs,
-so the qualified evidence above remains valid under verification-policy.md.
-Use branch/issue-176-dungeon-records as the complete frontier. The caller's main
-checkout is handed back on that branch; the temporary dungeon worktree can remain
-detached at the same final commit for retained receipts. The original estimate
-was 4–6 hours including verification and preparing these PRs; the completed scope
-is unchanged. No new dependency or active-save migration was introduced.
-
-### November 10 independent merge review
-
-PR #359 merged as `39d461f` after fresh local units/types/builds and 20
-Chromium/WebKit menu checks. PR #360 incorporates that main merge, preserving
-stack ancestry. Its review reproduces and repairs encounter entry during the
-final replacement write, terminal-history loss during unsaved/lock-denied play,
-and preparatory feedback invalidating the startup review token. The latter
-minimal fix is carried forward from #361 so this increment stands alone.
-The existing session, history adapter and regression harnesses cover these
-repairs; no additional abstraction, save format or rule change is needed.
-Original failed review regressions remain under `tmp/issue-176-review/360/`;
-the QA document records final verification before merge. Dungeon review and
-full issue closure remain on #361 until its independent review is complete.
-
-### Final maintenance qualification
-
-Independent review fixed all eight substantive findings across #360/#361, including
-both automated inline findings: authored/dungeon replacement input races, terminal
-history lost during unsaved or failed active saving, preparatory token invalidation,
-unsaved dungeon admission, late discarded-engine mounting, and pre-existing WebKit
-failed-preload recovery. The existing sessions, deferred-start path and build
-exclusion supply the fixes. The shared prototype gate and HTTP fault fixture serve
-actual regression callers; no new production abstraction, dependency, save format
-or retry/fallback layer is needed.
-
-Final functional source is `4b88f7e`. Actual local `npm run verify:pr` passed in
-111.15 seconds: all 1,285 units, both types/build integrations, production bundle
-and seven core journeys. The final affected loader/HTTP consumers passed 47 cases.
-The [review QA](../qa/issue-176/README.md) and
-[portable receipt](../qa/issue-176/review-361.json) account for 122 unique browser
-cases (54 final-source and 68 retained with documented equivalence), all original
-failures, exact-base comparison and remaining limits. This is not one clean
-aggregate run; no acceptance criterion or original deadline is waived.
-
-#359 and #360 merged as `39d461f` and `c88de9f`. Consult #361's PR/issue timeline
-for the final merge SHA and completion state. The canonical continuation is `main`
-once the stack is merged. #176 closes with all five criteria satisfied; #270 stays
-separate. Cleanup is limited to verified-safe stack branches and owned temporary
-worktrees. Raw QA artifacts and unrelated worktrees/branches with unique commits
-or uncertain ownership are retained.
-
-### Reopened paired-replacement correction
-
-Post-merge review on #361 found that New Game can end two different identities:
-the reviewed save and the separately admitted unsaved/live journey. Both actual
-owners reproduce one result instead of two on `dafdeb3`; stale and partial reset
-still correctly produce neither. #176 AC2 is reopened for the focused follow-up
-on `branch/issue-176-paired-replacement`.
-
-Outcome: preserve both ended summaries exactly once, including interrupted intent
-recovery and frozen-result retention. Non-goals: active-save migrations, new game
-rules, a general journal or new dependencies. Files: the existing run/dungeon
-owners, RunHistory, runRecords validation, their unit/browser consumers and these
-contract/QA documents. A pending receipt can contain at most two summaries and
-retain at most two sealed IDs; existing v1 single-summary receipts stay readable.
-The extra bounded fields prevent either discarded journey or its prior result
-from being lost during replacement. No separate service or fallback is needed.
-
-Proof: RED owner regressions; accepted/refused/interrupted pair tests; legacy and
-malformed-envelope checks; retention plus racing-terminal regression; real
-keyboard/touch menu flows on Chromium/WebKit, including reload before final history
-commit; proportional persistence checks and local PR verification. Preserve the
-original review's evidence and all new failures. #362 is active ability-rail work
-owned by another contributor and is deliberately excluded.
-
-The correction is published in #363. Runtime source `96a10c6` passes actual local
-PR verification in 119.197 seconds (1,303 units, both types/build integrations,
-bundle, seven core journeys). Ninety-four qualified browser cases include all
-20 new finished/interrupted paired flows, records recovery, actual Chromium
-BFCache and legal terminal/restart journeys. One existing cancellation test's
-unsettled-save baseline was repaired on `d573ac7`; all five changed executions
-passed, while the failed capture remains retained. The
-[follow-up QA](../qa/issue-176/README.md) and
-[source-bound receipt](../qa/issue-176/review-363.json) record exact scope and limits.
-All ten implementation/verification tasks are complete; the maintenance goal
-separately requires the authorized follow-up merge, review resolution, issue
-reconciliation and safe branch cleanup.
+Known limits: abrupt browser/process termination or storage refusal can lose
+uncommitted progress; keep the existing unsaved/recovery behavior and never add
+closed time to hide it. Reverse compatibility with older application versions
+after writing newer saves is not promised. Pre-upgrade evicted records and past
+active time cannot be recovered from data that never stored them.

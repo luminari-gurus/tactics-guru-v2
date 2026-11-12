@@ -1,0 +1,750 @@
+{
+  "issue": 270,
+  "increment": "Persistent accepted counters",
+  "qualifiedCommit": "c4654c656039367cd071b7fd43827ff5301a3335",
+  "implementationCommit": "e7b20c0bb7937d1e1520dd8b33ac898d60ff600a",
+  "sourceInputHash": "c7378ad5cbd4d34a83dd21d3624f93cccd760841b01e28a9517e66f73ac85c8c",
+  "inputManifest": "verification-receipts/issue270/inc1-final-inputs.json",
+  "environment": {
+    "createdAt": "2026-11-11T19:19:04.316Z",
+    "commit": "c6b053dac15024bb974a9a31821faf367b07180d",
+    "node": "v24.22.1",
+    "playwright": "1.64.1",
+    "platform": "win32",
+    "release": "10.0.26300",
+    "arch": "x64",
+    "browsers": {
+      "chromium": {
+        "executable": "C:\\Users\\apexw\\AppData\\Local\\ms-playwright\\chromium-1248\\chrome-win64\\chrome.exe",
+        "override": false,
+        "channel": "chromium",
+        "version": "156.0.8078.4",
+        "passed": true
+      },
+      "webkit": {
+        "executable": "C:\\Users\\apexw\\AppData\\Local\\ms-playwright\\webkit-2370\\Playwright.exe",
+        "override": false,
+        "channel": null,
+        "version": "27.2",
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  "serverMode": "production root preview",
+  "baseURL": "http://127.0.0.1:4173/",
+  "workers": 1,
+  "retries": 0,
+  "physicalDevicesTested": false,
+  "lockfileSha256": "4d80074e809f307cab721dfbbcb4963e2a2ca6d617328aeea6450aed96d0d9d6",
+  "prVerification": {
+    "path": "verification-receipts/pr/1794427037689-102668/summary.json",
+    "sha256": "2ab0524f82beefc3ddb07f3ffd640f31117dae75948efcf749dc8378f7956f90",
+    "durationMs": 120779,
+    "stages": [
+      {
+        "id": "tooling",
+        "status": "passed",
+        "durationMs": 15591.648099999999,
+        "command": [
+          "npm",
+          "exec",
+          "--no",
+          "--",
+          "node",
+          "--test",
+          "tests/tooling/verify-pr.test.mjs",
+          "tests/tooling/verify-full.test.mjs"
+        ]
+      },
+      {
+        "id": "units",
+        "status": "passed",
+        "durationMs": 37432.6005,
+        "command": [
+          "npm",
+          "run",
+          "test:unit",
+          "--",
+          "--reporter=json",
+          "--outputFile=C:\\Users\\apexw\\OneDrive\\Desktop\\Projects\\Tactics-Guru\\verification-receipts\\pr\\1794427037689-102668\\units.json"
+        ]
+      },
+      {
+        "id": "typecheck",
+        "status": "passed",
+        "durationMs": 4885.6374,
+        "command": [
+          "npm",
+          "run",
+          "typecheck"
+        ]
+      },
+      {
+        "id": "build-integration",
+        "status": "passed",
+        "durationMs": 8040.360200000003,
+        "command": [
+          "npm",
+          "run",
+          "test:build",
+          "--",
+          "--reporter=json",
+          "--outputFile=C:\\Users\\apexw\\OneDrive\\Desktop\\Projects\\Tactics-Guru\\verification-receipts\\pr\\1794427037689-102668\\build-integration.json"
+        ]
+      },
+      {
+        "id": "bundle",
+        "status": "passed",
+        "durationMs": 5010.383600000001,
+        "command": [
+          "npm",
+          "run",
+          "build:bundle"
+        ]
+      },
+      {
+        "id": "journeys",
+        "status": "passed",
+        "durationMs": 49803.84850000001,
+        "command": [
+          "npm",
+          "test",
+          "--",
+          "--reporter=line,json",
+          "--output=C:\\Users\\apexw\\OneDrive\\Desktop\\Projects\\Tactics-Guru\\verification-receipts\\pr\\1794427037689-102668\\artifacts"
+        ]
+      }
+    ]
+  },
+  "browserRuns": [
+    {
+      "path": "verification-receipts/issue270/inc1-chromium/report.json",
+      "sha256": "612abcbc6047ed14460de02231c9dd40cd17ef31993aae3edebbc6cd2a28ac47",
+      "stats": {
+        "startTime": "2026-11-11T19:28:47.042Z",
+        "duration": 599394.34,
+        "expected": 12,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "id": "e0f8639c387951b6a797-293064b633046d6b18ea",
+          "file": "dungeon.spec.ts",
+          "title": "testing dungeon legally clears a floor, descends and backtracks without accessing saves",
+          "project": "desktop",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 62515
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-23630d4efbda6bcf21e1",
+          "file": "dungeon.spec.ts",
+          "title": "saved menu dungeon keeps proof tools hidden across legal encounters",
+          "project": "desktop",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 67214
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-dbe2f95f38122a611c82",
+          "file": "dungeon.spec.ts",
+          "title": "testing dungeon legally clears a floor, descends and backtracks without accessing saves",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 65775
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-c22d53481fae43b7fffc",
+          "file": "dungeon.spec.ts",
+          "title": "saved menu dungeon keeps proof tools hidden across legal encounters",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 68955
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-3f406e315128a5ef5507",
+          "file": "dungeon.spec.ts",
+          "title": "testing dungeon legally clears a floor, descends and backtracks without accessing saves",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 66077
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-56f89728611c6bc42a39",
+          "file": "dungeon.spec.ts",
+          "title": "saved menu dungeon keeps proof tools hidden across legal encounters",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 68950
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-83c4f7ba2ddd71073e4b",
+          "file": "run-progression.spec.ts",
+          "title": "run battle undo survives reload and a legal terminal journey",
+          "project": "desktop",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 11485
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-471d9897f80fdb516c2b",
+          "file": "run-progression.spec.ts",
+          "title": "legal run outcomes, earned rewards, terminal resume and fresh restart",
+          "project": "desktop",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 52115
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-09043f6df14c5ccf0fbd",
+          "file": "run-progression.spec.ts",
+          "title": "run battle undo survives reload and a legal terminal journey",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 12231
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-f975335c46ddd687e2ab",
+          "file": "run-progression.spec.ts",
+          "title": "legal run outcomes, earned rewards, terminal resume and fresh restart",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 52826
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-6e419ed9444ac52c2d32",
+          "file": "run-progression.spec.ts",
+          "title": "run battle undo survives reload and a legal terminal journey",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 11381
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-004e4d531227795b4a31",
+          "file": "run-progression.spec.ts",
+          "title": "legal run outcomes, earned rewards, terminal resume and fresh restart",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 52037
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "verification-receipts/issue270/inc1-authored-webkit/report.json",
+      "sha256": "38e357d37058867f43db335571ab121d86e427e4bca023e94e53410bae5db591",
+      "stats": {
+        "startTime": "2026-11-11T19:39:44.522Z",
+        "duration": 177868.36299999998,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "id": "56e8b196f7ac6aaa7059-3935c0ef26c0c083c117",
+          "file": "run-progression.spec.ts",
+          "title": "legal run outcomes, earned rewards, terminal resume and fresh restart",
+          "project": "acceptance-webkit-portrait",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 89386
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-207b4a40e36a3ffeb2cb",
+          "file": "run-progression.spec.ts",
+          "title": "legal run outcomes, earned rewards, terminal resume and fresh restart",
+          "project": "acceptance-webkit-landscape",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 84648
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "verification-receipts/issue270/inc1-undo-webkit/report.json",
+      "sha256": "0fe8e78050f67e0c37781eece709648978cfc32c7ad17ff9468bfd1a62a158c0",
+      "stats": {
+        "startTime": "2026-11-11T19:43:31.032Z",
+        "duration": 43182.597,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "id": "56e8b196f7ac6aaa7059-650ba64d89bdc73f9e02",
+          "file": "run-progression.spec.ts",
+          "title": "run battle undo survives reload and a legal terminal journey",
+          "project": "acceptance-webkit-portrait",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 19826
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-729bc3d299debb636401",
+          "file": "run-progression.spec.ts",
+          "title": "run battle undo survives reload and a legal terminal journey",
+          "project": "acceptance-webkit-landscape",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 19648
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "verification-receipts/issue270/inc1-dungeon-webkit/report.json",
+      "sha256": "e23ca054c6454006c813ba0e413a71c583b68526679c234e8a0136df99e93c55",
+      "stats": {
+        "startTime": "2026-11-11T19:45:28.47Z",
+        "duration": 675306.969,
+        "expected": 6,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "id": "e0f8639c387951b6a797-0e26bb3b2b9f6c922700",
+          "file": "dungeon.spec.ts",
+          "title": "testing dungeon legally clears a floor, descends and backtracks without accessing saves",
+          "project": "desktop-webkit",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 102521
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-1e11e9f7562322171c14",
+          "file": "dungeon.spec.ts",
+          "title": "saved menu dungeon keeps proof tools hidden across legal encounters",
+          "project": "desktop-webkit",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 121795
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-5a0549f23b4731d1d434",
+          "file": "dungeon.spec.ts",
+          "title": "testing dungeon legally clears a floor, descends and backtracks without accessing saves",
+          "project": "portrait-webkit",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 104443
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-fd4c06c9a9aade754d3c",
+          "file": "dungeon.spec.ts",
+          "title": "saved menu dungeon keeps proof tools hidden across legal encounters",
+          "project": "portrait-webkit",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 104693
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-cbda68b520c5cea355d8",
+          "file": "dungeon.spec.ts",
+          "title": "testing dungeon legally clears a floor, descends and backtracks without accessing saves",
+          "project": "landscape-webkit",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 116099
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-bb1f6485cdb0ec2a1634",
+          "file": "dungeon.spec.ts",
+          "title": "saved menu dungeon keeps proof tools hidden across legal encounters",
+          "project": "landscape-webkit",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 121088
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "verification-receipts/issue270/inc1-isolation-chromium/report.json",
+      "sha256": "0ddc5696c1d5857cb970defb02ee2c7f2e595a840ea0ef0c4d237e92cad01548",
+      "stats": {
+        "startTime": "2026-11-11T19:59:19.023Z",
+        "duration": 44494.69500000001,
+        "expected": 9,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "id": "8352ba8e75a15b46318d-5e85b1c0981a91fc8ac5",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses valid saved games",
+          "project": "desktop",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 5503
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-4cdb4db0d93af00a4b7d",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: diagnostic play never accesses valid saved games",
+          "project": "desktop",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 4476
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-770082e77c74d510d7fe",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: Qbert never accesses valid saved games",
+          "project": "desktop",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 3158
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-a1531df83cfede353c41",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses valid saved games",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 5456
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-ae93eecf62ad68b5ad1b",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: diagnostic play never accesses valid saved games",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 4408
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-39249e2c7cfeceade7e3",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: Qbert never accesses valid saved games",
+          "project": "mobile-portrait",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 3109
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-004d902ffad608bf779d",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses valid saved games",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 5315
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-6192b52af06a57b1a43d",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: diagnostic play never accesses valid saved games",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 4555
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-3ea65ba52ff61d57f3a6",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: Qbert never accesses valid saved games",
+          "project": "mobile-landscape",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 3153
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "verification-receipts/issue270/inc1-isolation-webkit/report.json",
+      "sha256": "3a3840e6aeb6518fa20012955317e34663aff2edf1f21c52ccf83271af8e756c",
+      "stats": {
+        "startTime": "2026-11-11T20:00:03.905Z",
+        "duration": 43384.191999999995,
+        "expected": 6,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "id": "8352ba8e75a15b46318d-29e02336ce6fcd53988c",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses valid saved games",
+          "project": "acceptance-webkit-portrait",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 8247
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-6c8ec5b702888c71ca53",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: diagnostic play never accesses valid saved games",
+          "project": "acceptance-webkit-portrait",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 7625
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-9c1f2e576c0f4be129af",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: Qbert never accesses valid saved games",
+          "project": "acceptance-webkit-portrait",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 4172
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-9772697b9dbcc13b23ec",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses valid saved games",
+          "project": "acceptance-webkit-landscape",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 8134
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-5fe39fb332096ccb33f3",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: diagnostic play never accesses valid saved games",
+          "project": "acceptance-webkit-landscape",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 7110
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-aadc2d472e2ecd66cde8",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: Qbert never accesses valid saved games",
+          "project": "acceptance-webkit-landscape",
+          "status": "expected",
+          "attempts": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 4227
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "selectionContract": {
+    "path": "verification-receipts/issue270/inc1-selection-contract.log",
+    "sha256": "aa2feca9e74cca501fd9dd83482264dc3193edac9e82c78713476f15527ae9d7",
+    "passed": 6
+  },
+  "reuse": "Extended journeys used the e7b20c0 production build. Relevant runtime, assets, helpers, tests and dependencies remain equivalent at c4654c6; later changes add the previously omitted WebKit undo selection and explicit no-stats assertions to a different isolation file. Final verify:pr and isolation runs used the c4654c6 build. Documentation and QA follow-ups do not change these inputs.",
+  "preservedFailures": [
+    {
+      "path": "verification-receipts/pr/1794424875822-103876/summary.json",
+      "passed": 1316,
+      "total": 1318,
+      "reasons": [
+        "Old draught test expected format 9 after accepted stats migration",
+        "New complete legal storage journey exceeded its initial 5-second unit timeout under full-suite load"
+      ]
+    },
+    {
+      "path": "docs/ongoing-projects/plan.md",
+      "reason": "Subsequent focused run exposed the old pre-battle backup expectation; changed it to require exact previously committed battle bytes and retained the failed run in chat/plan."
+    }
+  ],
+  "remaining": [
+    "Active clock measurement",
+    "Frozen completed/abandoned stats and bounded personal best history",
+    "Recent/best UI and final whole-issue AC1–AC8 qualification"
+  ]
+}

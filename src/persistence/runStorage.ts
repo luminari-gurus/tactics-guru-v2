@@ -105,10 +105,10 @@ export function createRunStorage(context: RunSaveContext, provider: RunStoragePr
     // First save seeds a recovery point before attempting primary publication.
     let backupText = inspection.primary.status === 'valid' ? inspection.primary.text
       : inspection.backup.status === 'missing' ? encoded.text : null;
-    if (inspection.primary.status === 'valid' && inspection.primary.state.activeBattle?.draughts) backupText = null;
     // encodeRunSave has already validated the snapshot and its ownership.
     const saved = state as RunSnapshot;
-    if (saved.activeBattle?.draughts) {
+    if (!saved.stats && inspection.primary.status === 'valid' && inspection.primary.state.activeBattle?.draughts) backupText = null;
+    if (!saved.stats && saved.activeBattle?.draughts) {
       const { items } = saved;
       const compatible = (slot: SlotInspection): slot is Extract<SlotInspection,{status:'valid'}> => slot.status === 'valid' &&
         !slot.state.activeBattle?.draughts && slot.state.items.run.id === items.run.id &&

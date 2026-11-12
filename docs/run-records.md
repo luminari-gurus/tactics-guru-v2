@@ -13,6 +13,35 @@ floors cleared and deepest visited floor. Authored runs have no floor counters.
 Only facts retained by validated authoritative progress are projected; detailed
 kills, moves, active playtime and best-run statistics belong to issue #270.
 
+## Active counters (issue #270, increment 1)
+
+Menu-origin authored runs and dungeons now save a version-one statistics value
+alongside active progress (authored envelope 10, dungeon envelope 12). All prior
+supported formats remain readable without rewriting them on inspection/Continue.
+Stats-bearing saves rotate complete matching battle/counter snapshots into backup.
+The prior draught reader's pre-battle compatibility checkpoint is retained for
+old untracked saves; newer statistics envelopes promise no older-app rollback.
+Kills count enemy `defeated` events in the current accepted command batch. Moves
+count one accepted hero movement command, regardless of path length, or one
+published adjacent exploration step. Undo removes its move; enemy movement,
+previews, rejected commands and floor travel alone add nothing. Wins and unique
+cleared floors derive from validated progress; authored floors are not applicable.
+
+Only irrecoverable kills, net moves and active milliseconds plus a bounded last
+battle/command receipt are stored. Repeated or older batches cannot increment them.
+Continued old journeys begin irrecoverable counters on their first accepted action
+with `since-upgrade` coverage; missing old totals are never whole-run zeroes.
+New menu journeys use `whole-run` coverage. Testing routes disable accumulation.
+The duration field is reserved here; active clock measurement, immutable summary
+projection, bests and their presentation are the next two increments, not yet
+delivered by this counter change.
+
+Future damage by class/type belongs in a new version of the pure `runStats.ts`
+accepted-event reducer. Its before/after battle context and exact event batch
+permit new counters without reading UI or replaying history. Damage attribution
+may require additional domain event fields; no breakdown or extension registry is
+implemented now.
+
 The first accepted result for a mode/ID wins. Repeated callbacks cannot rewrite its
 outcome or time. Two bounded current-journey receipts protect pending replacement
 and prevent a still-current terminal save from recreating an evicted old record.
@@ -54,8 +83,8 @@ New Game handoff. Both reviewed slots are rechecked, and a newly accepted
 exploration step is preserved if it races replacement preparation.
 Floor/guardian wins, stairs, backtracking, menu return and
 page closure do not end the endless dungeon. Dedicated testing routes and
-standalone battles do not create run records. See the active
-[implementation plan](ongoing-projects/plan.md) for acceptance and current progress.
+standalone battles do not create run records. See the
+[foundation plan](ongoing-projects/issue-176-local-records-plan.md) for acceptance and progress.
 
 Explicit unsaved dungeon play also admits a journey before its first move; accepted
 defeat or confirmed replacement can record it even if active saving is disabled or
@@ -71,3 +100,19 @@ them on Continue of an old identity. It also retains up to two frozen-result IDs
 so known results stay immutable through refusal, interruption and summary eviction.
 Legacy v1 single-summary receipts remain readable without an opening write. The
 extension uses the same bounded history namespace; active saves are unchanged.
+
+
+## Concurrent dungeon save safety
+
+All browser dungeon mutations share the origin Web Lock named by the primary
+save key. Spatial state publishes only after the locked expected-byte check and
+primary/backup/checkpoint transaction succeed. Battle saves, explicit retries,
+reviewed removal and replacement use the same lock. Missing exclusive access
+refuses the mutation and preserves recovery/export; testing routes remain untracked.
+
+Wall-aware counter saves use envelope 16; legacy-sight counter saves retain 12.
+Untracked fog saves retain 14/15, including their exact rollback checkpoint. Older
+fog-preview 12/13 payloads without statistics remain readable. Counter backups
+retain both statistics and exact fog memory. A client predating statistics cannot
+resume those new envelopes: recover/export with a statistics-capable build rather
+than reset or silently downgrade. Reverse readability by an old client is not claimed.
