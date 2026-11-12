@@ -32,9 +32,52 @@ battle/command receipt are stored. Repeated or older batches cannot increment th
 Continued old journeys begin irrecoverable counters on their first accepted action
 with `since-upgrade` coverage; missing old totals are never whole-run zeroes.
 New menu journeys use `whole-run` coverage. Testing routes disable accumulation.
-The duration field is reserved here; active clock measurement, immutable summary
-projection, bests and their presentation are the next two increments, not yet
-delivered by this counter change.
+The active clock and immutable summary/best projection are supplied by the next
+increment below. Recent/best presentation follows separately.
+
+## Active time and immutable personal bests (issue #270, increment 2)
+
+Timed stats use version two, in run envelope 11 and dungeon envelope 13 for legacy sight or 17 for wall-aware sight. The
+counter-only increment's v1 stats (run envelope 10, dungeon 12/16) reserved zero time without
+measuring it. Their known kill/move coverage and values remain intact; only time
+is marked since upgrade via `timeCoverage`. Partial time cannot set a complete
+duration maximum, while whole known kills/moves can still set their own bests.
+Legacy reading normalizes in memory and does not rewrite stored bytes.
+
+Active milliseconds accumulate only during admitted, visible, focused ongoing
+battle (including animations and enemy turns), or ready dungeon exploration.
+Startup/loading, preparation, rewards, terminal screens, menus and paused dialogs
+do not count. There is no arbitrary inactivity timeout. One monotonic clock per
+owner samples accepted actions, eligibility changes and a five-second checkpoint;
+only elapsed integer milliseconds are saved. New processes start paused, so closed
+time is never added. Undo removes movement, retaining elapsed time.
+
+Opening a save review pauses and flushes time before reading the reviewed bytes.
+The authored owner waits for its existing save queue in a cancelable pause dialog;
+Cancel resumes play even if another tab holds the write lock. Time checkpoints
+cannot change a paused review token. Normal same-origin links checkpoint before
+navigation. Confirmed replacement keeps its modal open through history staging;
+the old scene stops before that modal closes. Thus a pending enemy turn cannot
+change the frozen journey while the accepted replacement is being prepared.
+Hide/blur/pagehide close the active interval, and an already queued
+final write can finish after owner disposal. Browser/process termination or storage
+refusal can still lose uncommitted intervals; no second journal or closed-time
+compensation is used. Successful clock writes preserve current focus/scroll rather
+than rebuilding the game view.
+
+Version-two history retains the same primary/backup keys, newest 100 summaries and
+single/paired replacement receipts. Each new ending freezes its versioned stats
+with the original outcome. Only accepted recording boundaries update per-mode
+maxima; duration ranks by **longest active playtime**, across all outcomes. Equal
+maxima select newest recording time, then stable mode/ID order. At most five
+winning summaries per mode remain accessible even after recent-list eviction.
+Authored floors are not applicable. Partial since-upgrade kills/moves/time do not
+compete as whole-run maxima; exact known wins/floors remain eligible.
+
+Version-one history is read lazily without rewriting bytes, carrying retained
+known facts and a historical best-coverage limitation. Evicted old history cannot
+be reconstructed. Unknown/corrupt bytes retain explicit export/recovery. Reset
+clears recent history and personal bests together, preserving active saves.
 
 Future damage by class/type belongs in a new version of the pure `runStats.ts`
 accepted-event reducer. Its before/after battle context and exact event batch
@@ -102,17 +145,25 @@ Legacy v1 single-summary receipts remain readable without an opening write. The
 extension uses the same bounded history namespace; active saves are unchanged.
 
 
-## Concurrent dungeon save safety
+## Save review and departure safety
 
-All browser dungeon mutations share the origin Web Lock named by the primary
-save key. Spatial state publishes only after the locked expected-byte check and
-primary/backup/checkpoint transaction succeed. Battle saves, explicit retries,
-reviewed removal and replacement use the same lock. Missing exclusive access
-refuses the mutation and preserves recovery/export; testing routes remain untracked.
+Dungeon saves, spatial publication, retries, removal and replacement share the
+origin lock named by the dungeon primary key. Reviews await queued clock writes
+before inspecting bytes; a no-op flush is a queue fence and does not retry or
+recreate a deliberately removed save. Removal stays paused while its lock is pending.
+Fresh elapsed playtime and explicit Retry saving can still create a new checkpoint.
 
-Wall-aware counter saves use envelope 16; legacy-sight counter saves retain 12.
-Untracked fog saves retain 14/15, including their exact rollback checkpoint. Older
-fog-preview 12/13 payloads without statistics remain readable. Counter backups
-retain both statistics and exact fog memory. A client predating statistics cannot
-resume those new envelopes: recover/export with a statistics-capable build rather
-than reset or silently downgrade. Reverse readability by an old client is not claimed.
+Same-tab gameplay links flush before checking the existing unsaved-progress guard.
+Cancel keeps the owner available for recovery/export; explicit discard permits
+navigation. Opening recovery is independent of whether the flush actually saved.
+Dungeon flushes also await their mutation queue, including the final admitted clock
+checkpoint after disposal. Abrupt process termination can still lose the last bounded
+checkpoint interval; there is no synchronous unlocked unload write.
+
+New wall-aware timed saves use envelope 17 and read counter envelope 16 as partial
+time, retaining exact fog memory. Legacy-sight 12/13 and untracked fog 14/15 stay
+supported, as do older fog-preview 12/13 payloads without statistics. A client
+predating statistics cannot resume the new envelopes. Recover/export using a
+statistics-capable build; do not reset or silently downgrade for an old client.
+
+Pending failed checkpoints can retry; an explicit removal suppresses automatic retries until new accepted playtime/progress or an explicit Retry saving. Ending history is submitted independently of the active-save lock. Review preparation prevents status renders from restarting the clock before the modal is open, and disposal avoids an unnecessary no-op lock after a completed flush.

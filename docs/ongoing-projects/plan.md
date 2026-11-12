@@ -4,7 +4,7 @@ Date: 2026-11-10 (Asia/Jerusalem). Assigned to @moshehbenavraham.
 Issue: [#270](https://github.com/luminari-gurus/tactics-guru-v2/issues/270).
 Branch: [`branch/issue-270-run-statistics`](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-270-run-statistics).
 Base: `origin/main`, `f0bdac46dbd018ba11300c800e3dfb0d986fd6a5`.
-Status: **increment 1 ready for review in [PR #365](https://github.com/luminari-gurus/tactics-guru-v2/pull/365); increment 2 in progress (2026-11-11)**.
+Status: **increment 1 ready in [PR #365](https://github.com/luminari-gurus/tactics-guru-v2/pull/365); active time/history ready in [PR #368](https://github.com/luminari-gurus/tactics-guru-v2/pull/368); records UI final checks running (2026-11-12)**.
 The user authorized implementation, verification and incremental PR publication.
 
 ## Live handoff — 2026-11-11
@@ -338,3 +338,228 @@ uncommitted progress; keep the existing unsaved/recovery behavior and never add
 closed time to hide it. Reverse compatibility with older application versions
 after writing newer saves is not promised. Pre-upgrade evicted records and past
 active time cannot be recovered from data that never stored them.
+
+## Increment 2 workspace — 2026-11-11
+
+Branch `branch/issue-270-active-time-history`, based on counter branch `41bc3cd`,
+in `C:/Users/apexw/.codex/worktrees/issue-270-active-time-history/Tactics-Guru`.
+The original workspace continues increment-1 browser qualification unchanged.
+Outcome: eligible active time plus frozen records/bounded all-time maxima; existing
+clock/save/history owners remain the integration points. No new event journal,
+storage key, inactivity heuristic or gameplay policy. Files: `ActivePlaytime.ts`,
+both session/app owners, existing records model/storage and their focused tests.
+Proof: injected-clock tests, review/queued-save races, records compatibility,
+retention/replacement units, affected lifecycle/browser journeys and `verify:pr`.
+Current work: clock/history implementation is complete; browser qualification and
+the increment-2 PR remain pending. Counter PR #365 is its dependency.
+
+Implementation update: the injected clock, lifecycle/dialog/navigation eligibility,
+quiet 5-second checkpoints and final queued-save disposal are wired into both
+owners. Authored review waits for the existing save queue in a cancelable paused
+dialog, then reads exact bytes; Cancel resumes play without waiting for a held
+browser lock. Same-origin normal navigation flushes before leaving. No timestamp
+is persisted between processes. These paths still need real browser qualification.
+
+History v2 is implemented in the existing keys: frozen version-one summaries,
+bounded per-mode maxima and retained winner summaries, max duration, newest/stable
+ties, partial-field exclusion and lazy v1 reading with an explicit historical
+coverage flag. Existing receipt/replacement reconciliation carries the frozen
+summaries. Reads and old pending receipts remain read-only; Reset clears maxima.
+Iteration found two expected old-test mismatches (v2 was previously classified as
+future; legacy reads previously returned v1 instead of normalized v2) and a typed
+max-size fixture still constructing v1. Updated those expectations/fixture, keeping
+exact old bytes and no-opening-write assertions. The 34-test records/history
+follow-up and the 60-test combined records/owner follow-up passed; both type scopes
+pass. New eviction/tie/partial/getter/immutable/paired recovery tests are included.
+No increment-2 OpenSpec checkbox or PR readiness is claimed yet. Next: finish
+clock/lifecycle and terminal/replacement browser evidence, then `verify:pr`,
+document actual failures/results and publish the stacked increment promptly.
+
+Fresh increment-2 evidence: all 1,329 units passed at `7ab6000`, report
+`verification-receipts/issue270/inc2/units-first.json`; the ordinary production
+build and both type scopes passed (`inc2/build-first.log`). The two desktop
+clock browser cases passed in 7.6 seconds using that build, report
+`verification-receipts/issue270/inc2-clock-desktop/report.json`: exact 5-second
+active checkpoints, 60-second paused/hidden/blur exclusions, actual menu departure
+and Continue, and no menu-session time. Hidden/blur were synthetic lifecycle
+changes with a fake browser clock, not an actual background-tab claim.
+The parent counter branch through `49ad112` has been merged into this branch;
+the new authored clock case is included in both WebKit acceptance orientations.
+
+Clock qualification follow-up: first native-background Chromium attempt failed
+because Playwright 1.64.1 forces focus/visibility. Disabling only its Chromium
+focus emulation via CDP made both real tab-switch cases pass; the full three-profile
+Chromium clock matrix then passed 12/12 in 23.5 seconds. WebKit also forces
+`Emulation.setActiveAndFocused` internally and exposes no equivalent public CDP
+session. Its two owning configs explicitly exclude these **new** native-focus
+cases; they retain fake visibility/focus plus actual navigation/Continue, and no
+WebKit-native-tab claim is made. Existing cases remain selected; no runtime skip
+or assertion weakening is used.
+
+The first WebKit clock run additionally caught a real 26-ms review-handoff gap:
+closing the temporary save dialog resumed time in a microtask before the real
+review opened, allowing a queued write to drift its token. The authored app now
+keeps that paused modal open until the caller replaces it or navigates. Failed
+reports remain in `inc2-background-desktop/` and `inc2-clocks-authored-webkit/`;
+the source fix and all engine-specific clock checks are being requalified.
+
+Review/cache follow-up: the held-write Cancel and paused replacement token cases
+pass. The native BFCache record-history case needed its byte baseline taken after
+exploration time was flushed into a paused recovery review; cancel/restore still
+preserves that exact reviewed snapshot. The original history-return/replacement
+assertions are retained, and a separate normal-navigation case explicitly asserts
+native `pageshow.persisted`.
+
+A focused literal-parent comparison is retained under `cache-literal-base/` and
+`cache-current/`, with source `docs/qa/issue-270/cache-comparison-witness.ts`.
+Parent `49ad112`: typed and normal-link departures both used native BFCache (2/2).
+Current: normal-link departure used BFCache and preserved replacement bytes;
+unflushed programmatic/hard departure reloaded instead (1/2 for that exploratory
+native-cache assertion). The browser reports a masked non-restoration reason;
+queued final checkpoint locks are the likely cause, not a proven browser reason.
+Do not claim native caching for every hard departure: only the normal flushed
+navigation witness proves it. Both restore mechanisms preserve newer saved data.
+Keep this failed exploratory attempt and the normal-path proof explicit; no
+second lifecycle journal or unlocked write is added to force browser caching.
+The six required review/cache desktop cases now pass in 14.8 seconds, report
+`verification-receipts/issue270/inc2-review-cache-repair/report.json`.
+
+Latest clock boundary repairs: a focused failing unit reproduced save-status
+rendering re-entering eligibility and resuming an in-progress pause. The shared
+observer now guards synchronous publication; its negative run is retained as
+`inc2/reentrant-pause-failure.log`, with the repaired 153-test family run retained.
+Accepted exploration steps now checkpoint elapsed time in the saved candidate.
+If spatial saving fails, elapsed time stays in memory as unsaved, with no ghost
+move; the next accepted retry preserves the accumulated interval. A focused unit
+covers that save/refusal/retry sequence. Clock flush fences also skip a second
+identical write, preserving the preceding backup instead of rotating it twice.
+The final focused clock/session family passes 115 tests; both type scopes pass.
+
+All four desktop paired saved/unsaved replacement variants passed with explicit
+nonzero saved statistics and each live identity's own stats, including interrupted
+pending recovery (`inc2-paired-desktop/report.json`, 14.3 seconds). The original
+seed-13 authored witness is confirmed as three player victories; final tests now
+assert the earned victory, exact event-derived totals, frozen positive duration
+on both victory and defeat, and all five dungeon maxima after a legal clear,
+descent/backtrack and confirmed abandonment. Full affected engine qualification
+and final verify:pr follow on the frozen inputs before publishing this increment.
+
+Final durability feedback repair: a failing unit reproduced a coalesced clock
+write saving the current snapshot while leaving the older `Saving run…` message
+visible. Quiet writes now publish meaningful pending/error-to-saved transitions
+while keeping ordinary healthy checkpoints quiet. Dungeon clock recovery likewise
+clears stale unsaved feedback. Negative/positive runs are retained under
+`inc2/coalesced-status-failure.log` and `inc2/coalesced-status-repair.log`.
+
+Local command route for continuation: PowerShell tools use native Windows Node;
+prepend `C:/Users/apexw/.codex/tmp/issue270-node-tools` to PATH for npm/npx. Those
+local launchers invoke the installed WSL npm CLI using native Node, and the old
+node_modules/.bin Node shims were repaired to the current installed runtime.
+Use WSL Ubuntu for OpenSpec only. All test/build identities and browser versions
+remain recorded in the receipts; no unrelated .env values were read or copied.
+
+Frozen runtime `9e2d7cc` passed verify:pr in 120.7 seconds (1,333 units and all
+seven core journeys). The affected Chromium batch retained 72/78 passing cases in
+8.7 minutes, including legal authored victory/defeat with frozen exact totals,
+legal dungeon clear/descent/backtrack/abandonment with five maxima, paired stats,
+clock, recovery and native-cache cases. Six failures were two existing lifecycle
+tests across three profiles: reload legitimately saved ~335 ms of new exploration
+time, and a reset assertion read the old defeat before asynchronous replacement
+finished. The tests now checkpoint/pause before exact reload comparison (while
+requiring all non-time fields unchanged) and await the acknowledged new identity
+and map. No runtime change, retry, skip or timeout increase was needed. Retain the
+original `inc2-qualified-chromium/report.json`; fresh six-case repair plus WebKit
+qualification follows. Do not call that original batch a clean passing suite.
+
+2026-11-12 handoff repair: WebKit's held-checkpoint case caught a real confirmation
+race: closing the confirmation could resume a pending enemy turn during history
+preparation, so the current-snapshot guard correctly refused replacement. Both
+journey apps now reuse `DialogChoice.keepOpen` and keep a native progress modal
+open until the old scene stops and replacement finishes; no engine/input framework
+was added. The original failing WebKit report is retained. All 16 focused repair
+cases passed (9 Chromium, 4 authored-WebKit, 3 dungeon-WebKit), including a new
+staged valid player-to-enemy dungeon boundary held behind a native history lock.
+Clock task 2.1 was reopened for that integration repair and is complete again;
+OpenSpec is 5/9. History model task 2.2 remains complete; PR publication task 2.3
+awaits final affected qualification and source-bound receipt publication.
+
+Requalification is proportional: new confirmation/handoff, reset, cache and
+replacement consumers rerun on the final UI change. The previously passing earned
+counter/terminal portions of the long journeys remain reusable: no domain,
+accumulator, session, history, content, asset or dependency inputs changed; their
+frozen summaries were produced before the changed post-record confirmation UI.
+Fresh short terminal/live replacement journeys and core checks cover that changed
+UI boundary. The original 78-case run remains 72 passing / 6 failed, with a clean
+six-case test repair recorded separately; it is never relabeled fully green.
+
+Cleanup note: automatic approval review rejected removal of the clean temporary
+literal-base comparison worktree with `blocked by policy`; it remains intact at
+`C:/Users/apexw/.codex/worktrees/issue-270-cache-base/Tactics-Guru` (detached
+`49ad112`, no running service). Its temporary test file was already removed, and
+reports/witness source remain in this feature workspace. Do not retry cleanup via
+another shell or a recursive-delete workaround. This is retained diagnostic
+state, not a feature or PR-readiness blocker.
+
+2026-11-12 inter-increment migration audit (required before PR 2 publication):
+The counter-only #365 writer stores stats v1 with reserved `activeMs: 0` and whole
+kill/move coverage. Treating that same v1 as fully timed would fabricate complete
+historic zero playtime if #365 merges before the clock increment. Timed stats
+therefore need v2 with a separate `timeCoverage` flag: preserve known kill/move
+coverage, mark older time since upgrade, and exclude only partial time from its
+maximum. New active envelopes become run 11 / dungeon 13, retaining counter-only
+10 / 12 and all earlier readers. Validate the old run digest against its raw v1
+payload before in-memory normalization; opening remains read-only.
+
+Next: add literal #365 counter-only fixtures, implement stats-v2 compatibility,
+per-field best eligibility and UI labels; update both OpenSpec design and the
+compatibility scenario; then run affected units/core and focused migration/clock/
+records proof. Existing numeric/event/RNG/eligibility witnesses remain useful for
+unchanged obligations, with explicit input equivalence; do not call the current
+v1-clock implementation publication-ready until this migration is fixed. The UI
+worktree must merge this new version and update its typed fixtures/time-only
+partial presentation. No first-PR runtime change is needed.
+
+Migration implementation: timed stats v2 now separate counter coverage from
+`timeCoverage`, use run 11 / dungeon 13, and accept literal counter-only 10/12.
+Fixtures were generated by actual #365 commit `49ad112` with one legal battle:
+run 3 kills/4 moves and dungeon 3 kills/5 moves, both reserved zero time. Exact
+legacy digest/read/roundtrip tests, read-only Continue and per-field best tests
+pass in the 191-test focused family. Earlier nested v1 summaries remain readable
+without retaining unproven complete-time maxima. A new browser migration witness
+covers both modes: read-only admission, known counters, accepted mutation/reset,
+frozen partial time and exclusion only from duration bests. First run: 6/6
+Chromium, 3/4 WebKit; the last test polled an absent history slot before async
+replacement finished. It now waits for the new identity and safely polls pending
+history, retaining the original failed report. Fresh final migration reports are
+`inc2-counter-upgrade-chromium-final` and `inc2-counter-upgrade-webkit-final`.
+
+## Active time/history ready — 2026-11-12
+
+The migration audit above is resolved at `8fee762db48b469df763cdddbe9c180a99db9c4c`.
+Timed stats v2 separate counter coverage and time coverage; literal #365 saves
+keep complete known counters while elapsed time starts since upgrade. New envelopes
+are authored 11 / dungeon 13; older supported readers and read-only admission remain.
+OpenSpec tasks 2.1 and 2.2 are proven again (5/9); publication completes 2.3.
+
+Final `npm run verify:pr` passed in 127.5 seconds: 1,339 units, both type scopes,
+root/prefix build integrations, bundle and 7 core browser journeys. Receipt:
+`verification-receipts/pr/1794441623848-109888/summary.json`. Fresh timed-v2 coupled
+browser matrices passed 42 Chromium + 18 authored WebKit + 6 dungeon WebKit cases,
+with one worker, no retries or skips. Final literal-upgrade witnesses passed 6
+Chromium + 4 WebKit cases. Earlier 118 qualified handoff/lifecycle cases and 13
+passing earned-progression portions remain scoped to unchanged numeric/event/
+eligibility behavior. This does not relabel the earlier failed broad batches as
+clean runs or claim their v1 bytes were current timed-v2 proof.
+
+Source identities, commands, exact cases, compatibility boundaries, prior failures
+and limitations are retained in [increment-2.json](../qa/issue-270/increment-2.json).
+The final records UI is a dependent branch and still needs its current 15-case
+keyboard/touch/WebKit proof plus 75-case direct/diagnostic isolation audit. No
+merge, release, deployment or tag is needed for these review-ready increments.
+
+Publication: [PR #368](https://github.com/luminari-gurus/tactics-guru-v2/pull/368) is open, ready, labeled enhancement and stacked on #365. Issue #270 records coverage and remaining work. Six selection/batch contracts passed in 67.9 seconds. OpenSpec task 2.3 is complete (6/9). Next: finish UI/isolation proof and open the final dependent PR.
+
+
+## Review repairs — 2026-11-12
+
+The dungeon transaction race, failed-flush navigation and removed-save recreation are fixed. The stack is rebased onto main at 450dfeb, with wall-aware counter/timed envelopes 16/17 and existing fog recovery preserved. Local source-bound qualification and retained failures are in [review-368.json](../qa/issue-270/review-368.json). All session/storage inputs in the final UI qualification match this parent. Merge #365, then #368, then #369; keep #270 open until the reviewed stack merges. Original heads are preserved in local backup refs; each PR carries one focused commit. No release tag or deployment is part of this handoff.

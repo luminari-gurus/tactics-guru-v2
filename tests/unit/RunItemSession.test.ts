@@ -9,6 +9,59 @@ import { decodeRunSave, encodeRunSave } from '../../src/domain/runSaveEnvelope';
 import { runBoundaryId, transitionRun } from '../../src/domain/run';
 import { previewMovement } from '../../src/domain/grid';
 import { playerDecision } from '../helpers/playerPolicy';
+import { readFileSync } from 'node:fs';
+
+it('opens counter-only saves read-only and freezes known counters without ranking unknown past time', async () => {
+  const f=historyFixture(),raw=readFileSync('tests/fixtures/saves/issue-270/counter-run-v1.json','utf8'),old=JSON.parse(raw).payload;
+  f.data.set(RUN_STORAGE_KEYS.primary,raw);f.data.set(RUN_STORAGE_KEYS.backup,raw);
+  const owner=new RunItemSession(freshRunSnapshot('upgrade-placeholder',99,runContext,true),runContext,f.storage,undefined,f.history);
+  assert(owner.continue(owner.inspect()));await f.history.whenIdle();
+  expect([f.data.get(RUN_STORAGE_KEYS.primary),f.data.get(RUN_STORAGE_KEYS.backup)]).toEqual([raw,raw]);
+  expect(owner.snapshot.stats).toMatchObject({coverage:'whole-run',timeCoverage:'since-upgrade',enemiesKilled:old.stats.enemiesKilled,movesTaken:old.stats.movesTaken});
+  assert(await owner.replace(owner.inspect(),'timed-new-run',14));await f.history.whenIdle();
+  const history=selectedRunRecords(f.records.inspect())!;
+  expect(history.records[0].stats).toMatchObject({version:2,coverage:'whole-run',timeCoverage:'since-upgrade',activeMs:0});
+  expect(history.bests.run.enemiesKilled?.id).toBe(old.items.run.id);expect(history.bests.run.movesTaken?.id).toBe(old.items.run.id);
+  expect(history.bests.run.activeMs).toBeUndefined();
+});
+
+it('flushes active time before review and finishes its captured queued write after disposal', async () => {
+  const f = historyFixture(), pending: (() => void)[] = []; let now = 0;
+  const initial = freshRunSnapshot('clock-queued', 13, runContext, true);
+  const owner = new RunItemSession(initial, runContext, f.storage, task => pending.push(task), null, () => now);
+  owner.startNew(); owner.startEncounter(); while (pending.length) pending.shift()!();
+  owner.setPlaytimeActive(true); now = 1234;
+  const flushed = owner.flushPlaytime(); owner.dispose();
+  while (pending.length) pending.shift()!(); await flushed;
+  const saved = f.storage.load(); assert(saved.ok && saved.selected);
+  expect(saved.selected.state.stats?.activeMs).toBe(1234);
+  const backup=decodeRunSave(f.data.get(RUN_STORAGE_KEYS.backup)!,runContext);assert(backup.ok);
+  expect(backup.state.stats?.activeMs).toBe(0); // The flush fence must not rotate an identical checkpoint twice.
+  expect(owner.snapshot.stats?.activeMs).toBe(1234);
+});
+
+it('clears pending save feedback when a clock checkpoint coalesces the accepted snapshot', async () => {
+  const f=historyFixture(),pending:(()=>void)[]=[];let now=0;
+  const owner=new RunItemSession(freshRunSnapshot('coalesced-clock',13,runContext,true),runContext,f.storage,task=>pending.push(task),null,()=>now);
+  owner.startNew();owner.startEncounter();owner.setPlaytimeActive(true);now=1000;
+  const flushed=owner.flushPlaytime();while(pending.length)pending.shift()!();await flushed;
+  expect(owner.hasUnsavedProgress).toBe(false);expect(owner.status).toBe('Run saved on this device');
+});
+
+it('excludes preparation, paused dialogs and closed time across owner reconstruction', async () => {
+  const f = historyFixture(), initial = freshRunSnapshot('clock-resume', 13, runContext, true); let now = 0;
+  let owner = new RunItemSession(initial, runContext, f.storage, undefined, null, () => now);
+  owner.startNew(); owner.setPlaytimeActive(true); now = 1000;
+  await owner.flushPlaytime(); expect(owner.snapshot.stats?.activeMs).toBe(0);
+  owner.startEncounter(); owner.setPlaytimeActive(true); now = 1500;
+  await owner.flushPlaytime(); expect(owner.snapshot.stats?.activeMs).toBe(500);
+  const review = owner.inspect(), bytes = f.data.get(RUN_STORAGE_KEYS.primary);
+  now = 5000; owner.setPlaytimeActive(false); expect(f.data.get(RUN_STORAGE_KEYS.primary)).toBe(bytes);
+  expect(owner.continue(review)).toBe(true); owner.dispose(); now = 100000;
+  owner = new RunItemSession(initial, runContext, f.storage, undefined, null, () => now);
+  assert(owner.continue(owner.inspect())); owner.startEncounter(); owner.setPlaytimeActive(true);
+  now += 200; await owner.flushPlaytime(); expect(owner.snapshot.stats?.activeMs).toBe(700);
+});
 
 it('persists exact accepted move/undo and kills through real reload and a legal final battle event', () => {
   const f = historyFixture(), initial = freshRunSnapshot('tracked-run', 13, runContext, true);
@@ -283,4 +336,31 @@ it('keeps unsaved departure after a failed save then a rejected reward command',
   expect(s.status).toContain('Nothing changed');
   expect(/unsaved/i.test(s.status)).toBe(false);
   expect(s.hasUnsavedProgress).toBe(true);
+});
+
+it.each(['primary','backup'] as const)('does not recreate deliberately removed %s saves during no-op clock flushes', async slot => {
+ const f=historyFixture();let now=0;
+ const owner=new RunItemSession(freshRunSnapshot('remove-clock',13,runContext,true),runContext,f.storage,undefined,null,()=>now);
+ owner.startNew();owner.startEncounter();owner.setPlaytimeActive(true);now=1000;
+ await owner.flushPlaytime();
+ assert(owner.remove(slot,owner.inspect()));
+ const bytes=[f.data.get(RUN_STORAGE_KEYS.primary),f.data.get(RUN_STORAGE_KEYS.backup)];
+ expect(f.data.has(RUN_STORAGE_KEYS[slot])).toBe(false);
+ now+=10000;await owner.flushPlaytime();await owner.flushPlaytime();
+ expect([f.data.get(RUN_STORAGE_KEYS.primary),f.data.get(RUN_STORAGE_KEYS.backup)]).toEqual(bytes);
+ expect(owner.hasUnsavedProgress).toBe(true);
+ owner.requestSave();expect(f.data.has(RUN_STORAGE_KEYS[slot])).toBe(true);
+ expect(owner.hasUnsavedProgress).toBe(false);
+});
+
+it('a no-op flush waits for the queued clock checkpoint without rotating it twice', async () => {
+ const f=historyFixture(),pending:(()=>void)[]=[];let now=0;
+ const owner=new RunItemSession(freshRunSnapshot('flush-fence',13,runContext,true),runContext,f.storage,task=>pending.push(task),null,()=>now);
+ owner.startNew();owner.startEncounter();while(pending.length)pending.shift()!();
+ owner.setPlaytimeActive(true);now=1000;owner.setPlaytimeActive(false);
+ let finished=false;const fence=owner.flushPlaytime().then(()=>{finished=true;});
+ expect(pending).toHaveLength(2);pending.shift()!();await Promise.resolve();expect(finished).toBe(false);
+ const bytes=[f.data.get(RUN_STORAGE_KEYS.primary),f.data.get(RUN_STORAGE_KEYS.backup)];
+ pending.shift()!();await fence;expect(finished).toBe(true);
+ expect([f.data.get(RUN_STORAGE_KEYS.primary),f.data.get(RUN_STORAGE_KEYS.backup)]).toEqual(bytes);
 });

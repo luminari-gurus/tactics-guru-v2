@@ -8,8 +8,10 @@ import { hasShape, isDenseArray } from './validation';
 export const DUNGEON_SAVE_MAX_BYTES = 1024 * 1024;
 const DUNGEON_SAVE_FORMAT = 10;
 const DRAUGHT_DUNGEON_SAVE_FORMAT = 11;
-const STATS_DUNGEON_SAVE_FORMAT = 12;
-const WALL_SIGHT_STATS_SAVE_FORMAT = 16;
+const COUNTER_DUNGEON_SAVE_FORMAT = 12;
+const STATS_DUNGEON_SAVE_FORMAT = 13;
+const WALL_SIGHT_COUNTER_SAVE_FORMAT = 16;
+const WALL_SIGHT_STATS_SAVE_FORMAT = 17;
 const WALL_SIGHT_DUNGEON_SAVE_FORMAT = 14;
 const WALL_SIGHT_DRAUGHT_SAVE_FORMAT = 15;
 export const hasWallSight = (state: DungeonState) => state.floors.some(floor => floor.exploration.sightVersion !== undefined);
@@ -83,9 +85,12 @@ export function decodeDungeon(text: string): DungeonResult {
     const previous = input.format === 9 && input.identity === PREVIOUS_IDENTITY;
     // Earlier #370 previews wrote 12/13 with wall-sight floors and no stats.
     // Accept those payloads for recovery. New wall-sight writes use 14/15.
-    const stats = input.format === WALL_SIGHT_STATS_SAVE_FORMAT || (input.format === STATS_DUNGEON_SAVE_FORMAT && typeof input.payload === 'object' && input.payload !== null && 'stats' in input.payload);
-    const previewWallSight = !stats && (input.format === 12 || input.format === 13);
-    const wallSight = input.format === WALL_SIGHT_STATS_SAVE_FORMAT || previewWallSight || input.format === WALL_SIGHT_DUNGEON_SAVE_FORMAT || input.format === WALL_SIGHT_DRAUGHT_SAVE_FORMAT;
+    const payloadStats = typeof input.payload === 'object' && input.payload !== null && 'stats' in input.payload;
+    const counter = input.format === WALL_SIGHT_COUNTER_SAVE_FORMAT || payloadStats && input.format === COUNTER_DUNGEON_SAVE_FORMAT;
+    const timed = input.format === WALL_SIGHT_STATS_SAVE_FORMAT || payloadStats && input.format === STATS_DUNGEON_SAVE_FORMAT;
+    const stats = counter || timed;
+    const previewWallSight = !payloadStats && (input.format === 12 || input.format === 13);
+    const wallSight = input.format === WALL_SIGHT_COUNTER_SAVE_FORMAT || input.format === WALL_SIGHT_STATS_SAVE_FORMAT || previewWallSight || input.format === WALL_SIGHT_DUNGEON_SAVE_FORMAT || input.format === WALL_SIGHT_DRAUGHT_SAVE_FORMAT;
     const current = (input.format === DUNGEON_SAVE_FORMAT || input.format === DRAUGHT_DUNGEON_SAVE_FORMAT || stats || wallSight) &&
       input.identity === CURRENT_IDENTITY;
     if (input.kind !== 'tactics-guru:dungeon' || !(previous || current)) return { ok: false, reason: 'incompatible' };
@@ -95,6 +100,8 @@ export function decodeDungeon(text: string): DungeonResult {
     if (!read.ok) return read;
     if (previous && (read.state.offer?.version === 2 || read.state.activeBattle?.draughts)) return { ok: false, reason: 'incompatible' };
     if (stats !== (read.state.stats !== undefined)) return { ok: false, reason: 'invalidState' };
+    const statsVersion = (input.payload as { stats?: { version: unknown } }).stats?.version;
+    if (counter && statsVersion !== 1 || timed && statsVersion !== 2) return { ok: false, reason: 'invalidState' };
     if (wallSight !== hasWallSight(read.state)) return { ok: false, reason: 'incompatible' };
     const draughts = Boolean(read.state.activeBattle?.draughts);
     if ((input.format === DRAUGHT_DUNGEON_SAVE_FORMAT && !draughts) ||

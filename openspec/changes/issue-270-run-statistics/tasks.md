@@ -14,9 +14,9 @@ the plan records commands, failures, PR boundaries and remaining acceptance work
 
 ## 2. Active time and immutable history/bests — second PR
 
-- [ ] 2.1 Add one injected active-clock helper and wire both admitted owners to gameplay eligibility, visibility/focus/dialog/navigation/disposal plus bounded checkpoints; verify exact fake-clock accounting, repeated lifecycle events, no closed/paused time, no review-token drift and safe queued-write disposal; document eligibility and best-effort persistence limits.
-- [ ] 2.2 Extend existing history to compatible version 2 with frozen stats in terminal and single/paired pending records, plus bounded per-mode maxima and retained winner summaries; verify immutable repeat endings, interrupted/refused/paired replacement, eviction/ties/reset, legacy coverage and corrupt/future/readback/conflict recovery in existing record/storage/session units; document schema and compatibility.
-- [ ] 2.3 Exercise actual menu-origin terminal/unsaved/replacement and pause/reload/lifecycle paths on affected Chromium/WebKit profiles, retaining failed/incomplete attempts and source/build receipts; run required affected checks and verify:pr, then publish a focused Refs #270 PR dependent on increment 1 and update issue acceptance accounting.
+- [x] 2.1 Add one injected active-clock helper and wire both admitted owners to gameplay eligibility, visibility/focus/dialog/navigation/disposal plus bounded checkpoints; verify exact fake-clock accounting, repeated lifecycle events, no closed/paused time, no review-token drift and safe queued-write disposal; document eligibility and best-effort persistence limits.
+- [x] 2.2 Extend existing history to compatible version 2 with frozen stats in terminal and single/paired pending records, plus bounded per-mode maxima and retained winner summaries; verify immutable repeat endings, interrupted/refused/paired replacement, eviction/ties/reset, legacy coverage and corrupt/future/readback/conflict recovery in existing record/storage/session units; document schema and compatibility.
+- [x] 2.3 Exercise actual menu-origin terminal/unsaved/replacement and pause/reload/lifecycle paths on affected Chromium/WebKit profiles, retaining failed/incomplete attempts and source/build receipts; run required affected checks and verify:pr, then publish a focused Refs #270 PR dependent on increment 1 and update issue acceptance accounting.
 
 ## 3. Recent/best presentation and whole-issue qualification — third PR
 

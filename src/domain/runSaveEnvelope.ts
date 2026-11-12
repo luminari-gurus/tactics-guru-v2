@@ -20,7 +20,8 @@ import { readRunStats, type RunStats } from './runStats';
 export const RUN_SAVE_KIND = 'tactics-guru:run-snapshot';
 export const RUN_SAVE_FORMAT = 8;
 const DRAUGHT_RUN_SAVE_FORMAT = 9;
-const STATS_RUN_SAVE_FORMAT = 10;
+const COUNTER_RUN_SAVE_FORMAT = 10;
+const STATS_RUN_SAVE_FORMAT = 11;
 export const RUN_SAVE_MAX_CODE_UNITS = 32_768;
 /** Trusted validated definitions. Always pass the immutable BASE catalog. */
 export interface RunSaveContext {
@@ -99,16 +100,20 @@ export function decodeRunSave(text: string, context: RunSaveContext): RunSnapsho
   const expected = identity(context);
   const previous = input.format === 7 && expected.items === itemCatalogIdentity(itemCatalog);
   if (previous) expected.items = previousItemCatalogIdentity;
-  if (input.kind !== RUN_SAVE_KIND || !(previous || input.format === RUN_SAVE_FORMAT || input.format === DRAUGHT_RUN_SAVE_FORMAT || input.format === STATS_RUN_SAVE_FORMAT) || input.identity.content !== expected.content ||
+  if (input.kind !== RUN_SAVE_KIND || !(previous || input.format === RUN_SAVE_FORMAT || input.format === DRAUGHT_RUN_SAVE_FORMAT || input.format === COUNTER_RUN_SAVE_FORMAT || input.format === STATS_RUN_SAVE_FORMAT) || input.identity.content !== expected.content ||
     input.identity.items !== expected.items || input.identity.encounters !== expected.encounters) return { ok: false, reason: 'incompatible' };
   if((hasShape(input.payload,['items','activeBattle','battlefield']) || hasShape(input.payload,['items','activeBattle','battlefield','stats'])) &&
     hasShape(input.payload.battlefield,['encounterId','kind','mapId','mapHash','layoutSeed','biome','generatorVersion','profileVersion']) &&
     input.payload.battlefield.kind==='generated' && (input.payload.battlefield.biome!=='desert' || input.payload.battlefield.generatorVersion!==1 || input.payload.battlefield.profileVersion!=='desert-v1')) return {ok:false,reason:'incompatible'};
   const read = readRunSnapshot(input.payload, previous ? { ...context, items: previousItemCatalog } : context);
   if (!read.ok) return read;
-  if ((input.format === STATS_RUN_SAVE_FORMAT) !== (read.state.stats !== undefined)) return { ok: false, reason: 'invalidState' };
+  if ((input.format === COUNTER_RUN_SAVE_FORMAT || input.format === STATS_RUN_SAVE_FORMAT) !== (read.state.stats !== undefined)) return { ok: false, reason: 'invalidState' };
+  const statsVersion = (input.payload as { stats?: { version: unknown } }).stats?.version;
+  if (input.format === COUNTER_RUN_SAVE_FORMAT && statsVersion !== 1 || input.format === STATS_RUN_SAVE_FORMAT && statsVersion !== 2) return { ok: false, reason: 'invalidState' };
   if (previous && (read.state.items.offer?.version === 2 || read.state.activeBattle?.draughts)) return { ok: false, reason: 'incompatible' };
   if (input.format === DRAUGHT_RUN_SAVE_FORMAT && !read.state.activeBattle?.draughts) return { ok: false, reason: 'invalidState' };
-  const body = { kind: RUN_SAVE_KIND, format: input.format, identity: expected, payload: read.state };
+  // Counter-only v1 normalizes time coverage in memory; its digest covers the old bytes.
+  const body = { kind: RUN_SAVE_KIND, format: input.format, identity: expected,
+    payload: input.format === COUNTER_RUN_SAVE_FORMAT ? input.payload : read.state };
   return hashJson(body) === input.digest ? read : { ok: false, reason: 'corrupt' };
 }

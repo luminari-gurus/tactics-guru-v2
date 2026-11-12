@@ -452,6 +452,11 @@ test.describe('browser history with BFCache enabled',()=>{
     if(mode==='run'){await page.locator('#run-start').click();await page.locator('#run-confirm-new').click();}
     else {await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();}
     await expect(page.locator(mode==='run'?'#run-start-encounter':'#dungeon-map')).toBeVisible();
+    if(mode==='dungeon'){
+      // Capture reviewed bytes after the legitimate exploration-time checkpoint.
+      await page.getByRole('button',{name:'Save recovery',exact:true}).click();
+      await expect(page.getByRole('heading',{name:'Dungeon save recovery',exact:true})).toBeVisible();
+    }
     const saved=await page.evaluate(slots=>[localStorage.getItem(slots.primary),localStorage.getItem(slots.backup)],slots);
     const history=await page.evaluate(key=>localStorage.getItem(key),RUN_RECORD_KEYS.primary);
     expect(JSON.parse(history!).records).toMatchObject([{id:oldId,outcome:'abandoned'}]);

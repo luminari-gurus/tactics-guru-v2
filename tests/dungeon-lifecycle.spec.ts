@@ -17,6 +17,31 @@ import { encodeRunSave } from '../src/domain/runSaveEnvelope';
 import { freshRunSnapshot } from '../src/domain/runBattle';
 import { runContext } from './helpers/runItemFixtures';
 import { canonical, hashJson } from '../src/domain/contentIdentity';
+import { RUN_RECORD_KEYS } from '../src/persistence/runRecordsStorage';
+
+test('dungeon statistics: confirmed replacement pauses pending enemy turns through history',async({page},info)=>{
+ test.setTimeout(60000);
+ const made=startDungeonBattle(atEncounter(freshDungeon('enemy-replacement',1)));if(!made.ok)throw Error(made.reason);
+ const battle=made.state.activeBattle!,order=battle.initiative;
+ const activeIndex=order.findIndex((id,index)=>battle.units.find(unit=>unit.id===id)!.side==='player'&&battle.units.find(unit=>unit.id===order[(index+1)%order.length])!.side==='enemy');
+ if(activeIndex<0)throw Error('Missing player-to-enemy boundary');
+ await load(page,{...made.state,activeBattle:{...battle,activeIndex}});await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ await page.evaluate(key=>new Promise<void>(granted=>{void navigator.locks.request(key,()=>new Promise<void>(release=>{(window as any).releaseHistoryBoundary=release;granted();}));}),RUN_RECORD_KEYS.primary);
+ try {
+  const oldId=(await snapshot(page)).id;await page.getByRole('button',{name:'Wait / End turn',exact:true}).click();
+  await page.locator('#fit-restart').click();await page.locator('#dungeon-confirm-new').click();
+  await expect(page.getByRole('heading',{name:'Preparing new dungeon',exact:true})).toBeVisible();
+  const before=await page.evaluate(key=>localStorage.getItem(key)!,DUNGEON_KEYS.primary),frozen=JSON.parse(before).payload;
+  await page.clock.install();await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));await page.clock.fastForward(60000);
+  expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe(before);
+  await page.evaluate(()=>(window as any).releaseHistoryBoundary());await expect(page.locator('#dungeon-map')).toBeVisible();
+  expect((await snapshot(page)).id).not.toBe(oldId);
+  await expect.poll(()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)!).records,RUN_RECORD_KEYS.primary)).toMatchObject([{id:oldId,outcome:'abandoned'}]);
+  const record=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!).records[0],RUN_RECORD_KEYS.primary),{boundary:_,...stats}=frozen.stats;
+  expect(record.stats).toEqual(stats);
+  await info.attach('paused-replacement',{body:JSON.stringify({fixture:'staged valid player-to-enemy boundary',oldId,stats}),contentType:'application/json'});
+ }finally{await page.evaluate(()=>(window as any).releaseHistoryBoundary?.());await page.clock.resume();}
+});
 
 for(const route of ['battle','run','dungeon'] as const)test(`${route} previous-format recovery preserves and exports both original slots`,async({page})=>{
  const encoded=route==='battle'?encodeBattleSave(new BattleSession(standaloneCatalog,'map:forest_ruins',2).state,standaloneCatalog):
@@ -60,7 +85,13 @@ test('restart during accepted presentation discards old callbacks and history',a
  const accepted=await snapshot(page);
  await page.locator('#fit-restart').click({force:true});await page.locator('#dungeon-confirm-new').click({force:true});await page.clock.resume();
  await expect(page.locator('#dungeon-screen')).toBeVisible();const fresh=await snapshot(page);expect(fresh.id).not.toBe(accepted.id);expect(fresh.phase).toBe('ready');expect(fresh.ownership).toEqual({consumables:[],equipment:[],assignments:[]});
- await page.waitForTimeout(300);expect(await snapshot(page)).toEqual(fresh);await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(fresh);
+ await page.waitForTimeout(300);expect(await snapshot(page)).toEqual(fresh);
+ // Reload checkpoints the new journey's real exploration time, not old callbacks.
+ await page.getByRole('button',{name:'Save recovery',exact:true}).click();
+ const checkpoint=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!).payload,DUNGEON_KEYS.primary);
+ expect(checkpoint.stats.activeMs).toBeGreaterThanOrEqual(fresh.stats!.activeMs);
+ expect({...checkpoint,stats:{...checkpoint.stats,activeMs:fresh.stats!.activeMs}}).toEqual(fresh);
+ await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(checkpoint);
 });
 test('legal enemy defeat boundary resumes once and a confirmed new dungeon resets it',async({page})=>{
  const made=startDungeonBattle(atEncounter(freshDungeon('dungeon-defeat-fixture',1)));if(!made.ok)throw Error(made.reason);const entry=made.state,built=dungeonBattle(entry)!;
@@ -72,7 +103,9 @@ test('legal enemy defeat boundary resumes once and a confirmed new dungeon reset
  const defeat=await snapshot(page);await expect(page.locator('#dungeon-descend')).toHaveCount(0);await expect(page.locator('#dungeon-ascend')).toHaveCount(0);
  await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(defeat);
  await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-cancel-new').click();expect(await snapshot(page)).toEqual(defeat);
- await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();expect((await snapshot(page)).party.every(h=>h.hp>0)).toBe(true);expect((await snapshot(page)).floors).toHaveLength(1);
+ await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();
+ await expect.poll(async()=>(await snapshot(page)).id).not.toBe(defeat.id);await expect(page.locator('#dungeon-map')).toBeVisible();
+ expect((await snapshot(page)).party.every(h=>h.hp>0)).toBe(true);expect((await snapshot(page)).floors).toHaveLength(1);
 });
 test('run navigation reaches the base-aware dungeon entry and returns to existing modes',async({page,baseURL})=>{
  await page.goto('./?game=run');await page.getByRole('link',{name:'Dungeon floors',exact:true}).click();expect(page.url()).toBe(new URL('dungeon',baseURL).href);
@@ -92,9 +125,11 @@ test('visibility interruption finishes an accepted terminal presentation exactly
 });
 
  test('dungeon tabs serialize spatial publication and refuse the stale owner', async ({page,context}) => {
+  // Freeze only playtime; the origin Web Lock and both tabs are real.
+  await context.addInitScript(()=>Object.defineProperty(performance,'now',{value:()=>0}));
   const initial = freshDungeon('exclusive-spatial-tabs',13,undefined,true);
   await load(page,initial);
-  const other = await context.newPage(); await other.goto('./?game=dungeon'); await continueSavedDungeon(other);
+  const other = await context.newPage();await other.goto('./?game=dungeon'); await continueSavedDungeon(other);
   const floor = initial.floors[0], map = floorMap(floor.descriptor);
   const destination = neighbors(floor.position,map.width,map.height).find(n => map.cells[n] && !floor.exploration.pois.some(p => poiCell(p,map.width) === n))!;
   const delta = destination-floor.position, direction = delta === -map.width ? 'north' : delta === map.width ? 'south' : delta === 1 ? 'east' : 'west';

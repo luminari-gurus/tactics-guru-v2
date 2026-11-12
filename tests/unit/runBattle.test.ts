@@ -76,7 +76,7 @@ it('commits the last draught once, retries the exact failed write and continues 
  expect(run.save().ok).toBe(true);
  const checkpoint=data.get(RUN_STORAGE_KEYS.backup)!;
  expect(checkpoint).toBe(priorRaw); // Recovery keeps the complete previously committed battle.
- expect(JSON.parse(data.get(RUN_STORAGE_KEYS.primary)!).format).toBe(10);
+ expect(JSON.parse(data.get(RUN_STORAGE_KEYS.primary)!).format).toBe(11);
  expect(run.save().ok).toBe(true);
  expect(data.get(RUN_STORAGE_KEYS.backup)).toBe(data.get(RUN_STORAGE_KEYS.primary));
  expect(decodeRunSave(data.get(RUN_STORAGE_KEYS.primary)!,runContext)).toEqual({ok:true,state:run.snapshot});
@@ -90,7 +90,7 @@ it('commits the last draught once, retries the exact failed write and continues 
  expect(replayCommandSequence(continuation.snapshot,continuation.commands,restored.catalog)).toEqual({ok:true,state:restored.state,events:continuation.events});
  expect(restoredRun.snapshot.items.ownership.consumables).toEqual([]);
  expect(restoredRun.snapshot.items.run.phase).toBe('defeat');
- expect(JSON.parse(data.get(RUN_STORAGE_KEYS.primary)!).format).toBe(10);
+ expect(JSON.parse(data.get(RUN_STORAGE_KEYS.primary)!).format).toBe(11);
  const backup=decodeRunSave(data.get(RUN_STORAGE_KEYS.backup)!,runContext);assert(backup.ok);
  expect(backup.state.stats?.coverage).toBe('since-upgrade');
  expect(restoredRun.startEncounter()).toBeNull();

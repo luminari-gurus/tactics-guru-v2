@@ -11,7 +11,7 @@ import { encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { RUN_RECORD_KEYS } from '../src/persistence/runRecordsStorage';
 import { COMBAT_CONTROLS_KEY } from '../src/ui/combatControls';
-import { readSession,playCommand,playUndo } from './helpers/battlePolicy';
+import { readSession,playCommand,playUndo,checkActivePlaytime,checkBackgroundPlaytime } from './helpers/battlePolicy';
 import { playerDecision, fighterDecision } from './helpers/playerPolicy';
 import { journeyPreparation, healedFighterBoundary, shamanJourney } from './helpers/dungeonFixtures';
 import { dispatch, replayCommandSequence } from '../src/domain/turns';
@@ -21,6 +21,28 @@ import type { Command, BattleEvent } from '../src/domain/types';
 
 const fixedSeedTest = test.extend({ pinDungeonSeed: 28 });
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
+
+test('dungeon statistics: active exploration excludes recovery, visibility, blur and menu sessions',async({page},info)=>{
+ test.setTimeout(90000);await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();
+ await expect(page.locator('#dungeon-map')).toBeVisible();
+ await page.getByRole('button',{name:'Save recovery',exact:true}).click();
+ await expect(page.getByRole('heading',{name:'Dungeon save recovery',exact:true})).toBeVisible();
+ const clock=await checkActivePlaytime(page,DUNGEON_KEYS.primary,'#dungeon-close-recovery');
+ await page.getByRole('link',{name:'Main menu',exact:true}).last().click({force:true});
+ await expect(page.getByRole('button',{name:'Continue',exact:true})).toBeVisible();
+ const saved=await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary);
+ await page.clock.fastForward(60000);expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe(saved);
+ await page.clock.resume();await page.getByRole('button',{name:'Continue',exact:true}).click();
+ await expect(page.locator('#dungeon-map')).toBeVisible();expect((await snapshot(page)).stats?.activeMs).toBe(clock.activeMs);
+ await info.attach('active-playtime',{body:JSON.stringify({...clock,visibility:'synthetic hidden/blur; fake browser clock',navigation:'actual menu departure and Continue'}),contentType:'application/json'});
+});
+
+test('dungeon statistics: actual background tab pauses active exploration time',async({page},info)=>{
+ test.setTimeout(60000);await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();
+ await expect(page.locator('#dungeon-map')).toBeVisible();
+ const evidence=await checkBackgroundPlaytime(page,DUNGEON_KEYS.primary);
+ await info.attach('actual-background-playtime',{body:JSON.stringify(evidence),contentType:'application/json'});
+});
 async function historyRows(page:Page){return page.evaluate(keys=>{
  const text=localStorage.getItem(keys.primary);return text?JSON.parse(text).records:[];
 },RUN_RECORD_KEYS);}
@@ -133,6 +155,16 @@ for(const saved of [false,true])(saved?test.extend({pinDungeonSeed:27}):fixedSee
   await page.getByRole('link',{name:'Main menu',exact:true}).last().click();
   await page.getByRole('button',{name:'Hall of Records',exact:true}).click();
   await expect(page.getByRole('dialog').getByRole('status')).toHaveText('No finished journeys recorded yet.');
+  await page.getByRole('dialog').getByRole('button',{name:'Close',exact:true}).click();
+  await page.getByRole('button',{name:'New Game',exact:true}).click();
+  await page.getByRole('dialog').getByRole('button',{name:'Start new dungeon',exact:true}).click();
+  await expect(page.locator('#dungeon-map')).toBeVisible();
+  await expect.poll(()=>historyRows(page)).toMatchObject([{id:returned.id,outcome:'abandoned',battlesWon:3,floorsCleared:1,
+   stats:{coverage:'whole-run',enemiesKilled:returned.stats!.enemiesKilled,movesTaken:returned.stats!.movesTaken}}]);
+  const rows=await historyRows(page);expect(rows[0].stats.activeMs).toBeGreaterThanOrEqual(returned.stats!.activeMs);
+  const bests=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!).bests.dungeon,RUN_RECORD_KEYS.primary);
+  expect(Object.keys(bests)).toHaveLength(5);expect(rows[0].stats.activeMs).toBeGreaterThan(0);
+  expect(Object.values(bests).every((row:any)=>row.id===returned.id)).toBe(true);
  }
  expect(errors).toEqual([]);
 });
