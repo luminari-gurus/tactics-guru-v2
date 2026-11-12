@@ -349,7 +349,7 @@ export function stepDungeon(s: DungeonState, command: ExplorationCommand): Dunge
   const f = currentFloor(s), map = floorMap(f.descriptor);
   if (!neighbors(f.position, map.width, map.height).includes(command.destination) || !map.cells[command.destination]) return fail('blockedStep');
   const floors = [...s.floors];
-  floors[s.depth-1] = { ...f, position: command.destination, exploration: visit(f.exploration, command.destination, map.width, map.height) };
+  floors[s.depth-1] = { ...f, position: command.destination, exploration: visit(f.exploration, command.destination, map) };
   let candidate: DungeonState = { ...s, floors };
   if (f.exploration.pois.some(p => !clearedDungeonSlots(f).includes(p.encounterSlot) && command.destination === poiCell(p, f.descriptor.size ?? 20))) return startDungeonBattle(candidate);
   candidate = moveDungeonEnemies(candidate, f.position);

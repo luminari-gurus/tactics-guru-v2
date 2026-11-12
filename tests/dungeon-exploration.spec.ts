@@ -5,9 +5,9 @@ import type { Page } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { dungeonSnapshot, walkDungeon, continueSavedDungeon } from './helpers/dungeonTraversal';
-import { neighbors, poiCell } from '../src/domain/exploration';
+import { currentSight, neighbors, poiCell } from '../src/domain/exploration';
 import { generateMap } from '../src/map/generate';
-import { freshDungeon, floorDescriptor, floorMap, readDungeon, dungeonSeed, type DungeonState } from '../src/domain/dungeon';
+import { freshDungeon, floorDescriptor, floorMap, readDungeon, dungeonSeed, stepDungeon, type DungeonState } from '../src/domain/dungeon';
 import { legacyDungeonIdentity } from '../src/content/dungeon';
 import { canonical, hashJson } from '../src/domain/contentIdentity';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
@@ -38,15 +38,17 @@ test('map markers respect stair availability, discovery and saved floor state',a
  const revealed={...floor,exploration:{...floor.exploration,revealed:Array.from({length:400},(_,i)=>i)}};
  await load({...base,floors:[{...revealed,position:floor.position}]});
  await expect(page.locator('[aria-label="Discovered places"]')).toHaveCount(0);
- await expect(accessibleMap).toHaveAccessibleDescription(/Guardian · Goblins at row \d+, column \d+\. Available\./);
+ const firstMap = floorMap(floor.descriptor), sight = currentSight(floor.position, firstMap);
+ await expect(accessibleMap).not.toHaveAccessibleDescription(/Guardian · Goblins/);
+ await expect(cell(floor.descriptor.downstairs)).toHaveClass(/explore-remembered/);
+ await expect(cell(floor.position)).not.toHaveClass(/explore-remembered/);
  await expect(accessibleMap).not.toHaveAccessibleDescription(/Upstairs|Downstairs/);
  await expect(cell(floor.descriptor.downstairs)).toHaveText('');
- for(const poi of floor.exploration.pois)await expect(cell(poiCell(poi))).toHaveText('M');
+ for(const poi of floor.exploration.pois)await expect(cell(poiCell(poi))).toHaveText(sight.includes(poiCell(poi)) ? 'M' : '');
  await expect(page.locator('#dungeon-map')).not.toContainText(/[123]/);
  await expect(page.getByText('● Player · M encounter (including guardian)',{exact:false})).toBeVisible();
  await expect(page.locator('#dungeon-descend')).toHaveCount(0);
  await page.locator('#dungeon-map').screenshot({path:test.info().outputPath('markers-uncleared-map.png')});
- const firstMap=generateMap(floor.descriptor.seed,'rooms');
  const firstStep=neighbors(floor.position).find(n=>firstMap.cells[n]&&!floor.exploration.pois.some(p=>poiCell(p,firstMap.width)===n))!;
  await walkDungeon(page,firstStep,isMobile?'touch':'keyboard');
  await expect(cell(floor.descriptor.upstairs)).toHaveText('');
@@ -78,6 +80,71 @@ test('map markers respect stair availability, discovery and saved floor state',a
  await page.locator('#dungeon-map').screenshot({path:test.info().outputPath('markers-upper-floor-map.png')});
  if(isMobile){await page.setViewportSize({width:320,height:740});await page.locator('#dungeon-map').scrollIntoViewIfNeeded();}
  expect(await page.locator('#dungeon-screen').evaluate(n=>n.scrollWidth<=n.clientWidth)).toBe(true);
+});
+
+test('live markers follow current sight across movement, art changes and reload', async ({ page, isMobile }) => {
+ const base = freshDungeon('sight-movement', 1), map = floorMap(base.floors[0].descriptor);
+ const appeared = (before: DungeonState, after: DungeonState, slot: number) => {
+  const visible = (s: DungeonState) => {
+   const floor = s.floors[0];
+   return currentSight(floor.position, map).includes(poiCell(floor.exploration.pois[slot], map.width));
+  };
+  return !visible(before) && visible(after);
+ };
+ for (const entering of [true, false]) {
+  let witness: { before: DungeonState; after: DungeonState; slot: number } | undefined;
+  for (const [position, open] of map.cells.entries()) {
+   if (!open || base.floors[0].exploration.pois.some(poi => poiCell(poi, map.width) === position)) continue;
+   const before = atCell(base, position);
+   for (const destination of neighbors(position, map.width, map.height)) {
+    const result = stepDungeon(before, { id: before.id, depth: before.depth, revision: before.revision, destination });
+    if (!result.ok || result.state.phase !== 'ready') continue;
+    const slot = before.floors[0].exploration.pois.findIndex((_, i) =>
+     entering ? appeared(before, result.state, i) : appeared(result.state, before, i));
+    if (slot >= 0) {
+     witness = { before, after: result.state, slot };
+     break;
+    }
+   }
+   if (witness) break;
+  }
+  if (!witness) throw Error('Missing encounter sight transition');
+  const { before, after, slot } = witness, encoded = encodeDungeon(before);
+  if (!encoded.ok) throw Error(encoded.reason);
+  const marker = page.locator(`#dungeon-map [data-poi="enemy-${slot + 1}"]`);
+  const accessibleMap = page.getByRole('application', { name: /Floor 1 map/ });
+  const label = slot === 2 ? 'Guardian · Goblins' : `encounter ${slot + 1}`;
+  const check = async (visible: boolean) => {
+   await expect(marker).toHaveCount(visible ? 1 : 0);
+   if (visible) {
+    await expect(marker).toHaveText('M');
+    await expect(accessibleMap).toHaveAccessibleDescription(new RegExp(label));
+   } else {
+    await expect(accessibleMap).not.toHaveAccessibleDescription(new RegExp(label));
+   }
+  };
+  await page.goto('./?game=dungeon');
+  await page.evaluate(({ key, text }) => localStorage.setItem(key, text), { key: DUNGEON_KEYS.primary, text: encoded.text });
+  await page.reload();
+  await continueSavedDungeon(page);
+  await check(!entering);
+  await walkDungeon(page, after.floors[0].position, isMobile ? 'touch' : 'keyboard');
+  await check(entering);
+  const previousSight = currentSight(before.floors[0].position, map);
+  const nextSight = currentSight(after.floors[0].position, map);
+  const remembered = previousSight.find(cell => !nextSight.includes(cell));
+  if (remembered === undefined) throw Error('Missing remembered cell');
+  const rememberedCell = page.locator(`#dungeon-map [data-cell="${remembered}"]`);
+  await expect(rememberedCell).toHaveClass(/explore-remembered/);
+  await page.locator('#dungeon-art').selectOption('legacy-8bit');
+  await check(entering);
+  expect(await dungeonSnapshot(page)).toEqual(after);
+  await page.reload();
+  await continueSavedDungeon(page);
+  await check(entering);
+  await expect(rememberedCell).toHaveClass(/explore-remembered/);
+  expect(await dungeonSnapshot(page)).toEqual(after);
+ }
 });
 
 test('stairs remain visible under cleared saved markers and live markers stay visible',async({page})=>{
@@ -914,7 +981,10 @@ for(const depth of [1,5])test(`Guardian-first reward, map and encounter state su
  const checkMap=async()=>{
   await expect(page.locator('#dungeon-map [data-cell]')).toHaveCount(map.cells.length);
   await expect(page.locator('[aria-label="Discovered places"]')).toHaveCount(0);
-  for(const id of ['enemy-1','enemy-2'])await expect(page.locator(`#dungeon-map [data-poi="${id}"]`)).toHaveText('M');
+  const sight = currentSight(floor.position, map);
+  for (const poi of floor.exploration.pois.slice(0, 2)) {
+   await expect(page.locator(`#dungeon-map [data-poi="${poi.id}"]`)).toHaveCount(sight.includes(poiCell(poi, map.width)) ? 1 : 0);
+  }
  };
  await page.reload();await continueSavedDungeon(page);await checkMap();
  await expect(rewardPanel).toBeVisible();

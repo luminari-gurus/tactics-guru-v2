@@ -78,7 +78,7 @@ export function dungeonCapacityFixture(policy: DungeonEncounterPolicy = DUNGEON_
 /** Structural position fixture, not evidence of UI traversal. */
 export function atCell(s: DungeonState, position: number): DungeonState {
   const floors = [...s.floors], f = floors[s.depth-1];
-  floors[s.depth-1] = { ...f, position, exploration: visit(f.exploration,position,f.descriptor.size ?? 20) };
+  floors[s.depth-1] = { ...f, position, exploration: visit(f.exploration,position,floorMap(f.descriptor)) };
   return { ...s, floors };
 }
 export function atEncounter(s: DungeonState, slot = s.floors[s.depth-1].completed): DungeonState {

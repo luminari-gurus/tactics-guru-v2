@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { freshDungeon, stepDungeon, readDungeon, startDungeonBattle, acceptDungeonBattle, travelDungeon, currentFloor } from '../../src/domain/dungeon';
-import { encounterPois, freshExploration, neighbors, poiCell, readExploration, reveal } from '../../src/domain/exploration';
+import { freshDungeon, stepDungeon, readDungeon, startDungeonBattle, acceptDungeonBattle, travelDungeon, currentFloor, floorMap } from '../../src/domain/dungeon';
+import { currentSight, encounterPois, freshExploration, neighbors, poiCell, readExploration, reveal } from '../../src/domain/exploration';
 import { generateMap } from '../../src/map/generate';
 import { encodeDungeon, decodeDungeon } from '../../src/domain/dungeonSaveEnvelope';
 import { legacyDungeonIdentity } from '../../src/content/dungeon';
@@ -19,7 +19,36 @@ describe('exploration placement and validation',()=>{
   for(let seed=0;seed<100;seed++){const map=generateMap(seed,'rooms'),before=canonical(map),pois=encounterPois(seed,map);expect(pois).toEqual(encounterPois(seed));expect(new Set(pois.map(p => poiCell(p))).size).toBe(3);for(const p of pois){expect(map.cells[poiCell(p)]).toBe(1);expect([map.cells.indexOf(1),map.cells.lastIndexOf(1)]).not.toContain(poiCell(p));}expect(canonical(map)).toBe(before);}
   expect(()=>encounterPois(1,{...generateMap(1,'rooms'),cells:Array(400).fill(0)})).toThrow();
  });
- it('reveals exactly radius two through walls, with bounded sorted indices',()=>{expect(reveal(0)).toEqual([0,1,2,20,21,40]);expect(reveal(210)).toHaveLength(13);const s=fresh();expect(readDungeon(s)).toEqual({ok:true,state:s});});
+ it('retains the legacy radius-two save rule through walls, with bounded sorted indices',()=>{expect(reveal(0)).toEqual([0,1,2,20,21,40]);expect(reveal(210)).toHaveLength(13);const s=fresh();expect(readDungeon(s)).toEqual({ok:true,state:s});});
+ it('shows nearby wall faces, blocks straight sight behind them and closes double-wall corners', () => {
+  const map = { width: 5, height: 4, cells: Array<0 | 1>(20).fill(1) };
+  map.cells[6] = 0;
+  map.cells[12] = 0;
+  expect(currentSight(7, map)).toEqual([1, 2, 3, 6, 7, 8, 9, 12, 13]);
+  map.cells[12] = 1;
+  expect(currentSight(7, map)).toEqual([1, 2, 3, 6, 7, 8, 9, 11, 12, 13, 17]);
+  expect(currentSight(4, map)).toEqual([2, 3, 4, 8, 9, 14]);
+ });
+ it('retains a legacy save and all of its discoveries on the next accepted step', () => {
+  const freshState = fresh(), floor = currentFloor(freshState), map = floorMap(floor.descriptor);
+  const { sightVersion, ...exploration } = floor.exploration;
+  const remembered = reveal(floor.position, map.width, map.height);
+  const legacyState = { ...freshState, floors: [{ ...floor, exploration: { ...exploration, revealed: remembered } }] };
+  expect(remembered.some(cell => !currentSight(floor.position, map).includes(cell))).toBe(true);
+  const encoded = encodeDungeon(legacyState);
+  if (!encoded.ok) throw Error(encoded.reason);
+  expect(decodeDungeon(encoded.text)).toEqual({ ok: true, state: legacyState });
+  const target = neighbors(floor.position, map.width, map.height).find(cell => map.cells[cell])!;
+  expect(stepDungeon(legacyState, command(legacyState, -1)).ok).toBe(false);
+  const stepped = stepDungeon(legacyState, command(legacyState, target));
+  if (!stepped.ok) throw Error(stepped.reason);
+  const after = currentFloor(stepped.state).exploration;
+  expect(after.sightVersion).toBe(sightVersion);
+  expect(after.revealed).toEqual([...new Set([...remembered, ...currentSight(target, map)])].sort((a, b) => a - b));
+  const updated = encodeDungeon(stepped.state);
+  if (!updated.ok) throw Error(updated.reason);
+  expect(decodeDungeon(updated.text)).toEqual(stepped);
+ });
  it.each([20,24,28,32,36])('retains the reveal contract at every cell of a %i-column floor',size=>{
   const cells=Array.from({length:size*size},(_,i)=>i);
   for(const position of cells){

@@ -1,6 +1,6 @@
 import type { DungeonState } from '../domain/dungeon';
 import { currentFloor, clearedDungeonSlots } from '../domain/dungeon';
-import { neighbors, poiCell } from '../domain/exploration';
+import { currentSight, neighbors, poiCell } from '../domain/exploration';
 import type { GeneratedMap } from '../map/generate';
 import { createMapArt, ART_STYLES, type ArtStyle } from '../map/art';
 import { BIOMES, type Terrain } from '../map/biomes';
@@ -29,7 +29,7 @@ export class DungeonMap {
   private readonly cells: HTMLSpanElement[] = [];
   private readonly terrainCells = new Set<HTMLElement>();
   private readonly fallbackCells = new Set<HTMLElement>();
-  private visual: { map: GeneratedMap; biome: string; revealed: Set<number>; markers: number[] } | null = null;
+  private visual: { map: GeneratedMap; biome: string; revealed: Set<number>; sight: Set<number>; markers: number[] } | null = null;
   private readonly abort = new AbortController();
   private readonly treatment = createMapArt(() => { if (this.live) this.paintArt(); });
   constructor(private readonly move: (destination: number) => void, private readonly locked: () => boolean) {
@@ -62,7 +62,7 @@ export class DungeonMap {
       this.controls.push({button,dx,dy});directions.append(button);
     }
     const center=el('span');center.className='dungeon-compass-center';center.setAttribute('aria-hidden','true');directions.append(center);
-    const legend=el('p','● Player · M encounter (including guardian) · ✓ cleared · ↑ upstairs (floor 2+) · ↓ downstairs (all encounters cleared). Enemies move when you move. Tap adjacent cells or use direction controls.');
+    const legend=el('p','● Player · M encounter (including guardian) · ✓ cleared · ↑ upstairs (floor 2+) · ↓ downstairs (all encounters cleared). Hatching marks remembered terrain. Enemies move when you move. Tap adjacent cells or use direction controls.');
     this.root.append(this.heading,label,legend,this.grid,this.markerDescription,directions,this.feedback);
     this.root.addEventListener('keydown',e => {
       if (!(e.target instanceof HTMLElement) || e.target.id !== 'dungeon-map') return;
@@ -95,6 +95,7 @@ export class DungeonMap {
     if(grid.dataset.position!==String(f.position))grid.dataset.position=String(f.position);
     if(grid.dataset.biome!==biome.id)grid.dataset.biome=biome.id;
     const revealed = new Set(f.exploration.revealed);
+    const sight = new Set(currentSight(f.position, map));
     const showUpstairs = s.depth > 1 && revealed.has(f.descriptor.upstairs);
     const showDownstairs = f.completed === 3 && revealed.has(f.descriptor.downstairs);
     const cleared=clearedDungeonSlots(f);
@@ -103,9 +104,12 @@ export class DungeonMap {
     const markerDescriptions: string[] = [];
     const location = (cell: number) => `row ${Math.floor(cell / map.width) + 1}, column ${cell % map.width + 1}`;
     if (showUpstairs) markerDescriptions.push(`Upstairs at ${location(f.descriptor.upstairs)}.`);
-    for (const poi of f.exploration.pois) {
+    const shownPois = f.exploration.pois.filter(poi => {
       const cell = poiCell(poi, map.width);
-      if (!revealed.has(cell)) continue;
+      return cleared.includes(poi.encounterSlot) ? revealed.has(cell) : sight.has(cell);
+    });
+    for (const poi of shownPois) {
+      const cell = poiCell(poi, map.width);
       const slot = poi.encounterSlot;
       const status = slot === activeSlot && s.phase === 'reward' ? 'Reward pending'
         : cleared.includes(slot) ? 'Cleared'
@@ -114,9 +118,9 @@ export class DungeonMap {
       markerDescriptions.push(`${dungeonEncounterLabel(s, slot)} at ${location(cell)}. ${status}.`);
     }
     if (showDownstairs) markerDescriptions.push(`Downstairs at ${location(f.descriptor.downstairs)}.`);
-    const description = markerDescriptions.join(' ') || 'No encounters or stairs discovered.';
+    const description = markerDescriptions.join(' ') || 'No visible encounters or discovered stairs.';
     if (this.markerDescription.textContent !== description) this.markerDescription.textContent = description;
-    const pois=new Map([...f.exploration.pois].sort((a,b)=>Number(cleared.includes(b.encounterSlot))-Number(cleared.includes(a.encounterSlot))).map(p=>[poiCell(p,map.width),p]));
+    const pois=new Map([...shownPois].sort((a,b)=>Number(cleared.includes(b.encounterSlot))-Number(cleared.includes(a.encounterSlot))).map(p=>[poiCell(p,map.width),p]));
     const total=map.width*map.height;
     let rebuild=this.cells.length!==total||grid.children.length!==total;
     if (rebuild) {
@@ -126,7 +130,7 @@ export class DungeonMap {
     }
     const prior=this.visual;
     rebuild ||= !prior || prior.map!==map || prior.biome!==biome.id;
-    const markers=[f.position,f.descriptor.upstairs,f.descriptor.downstairs,...f.exploration.pois.map(p=>poiCell(p,map.width))];
+    const markers=[f.position,f.descriptor.upstairs,f.descriptor.downstairs,...pois.keys()];
     const dirty=new Set<number>(),artDirty=new Set<HTMLElement>();
     if(rebuild) {for(let i=0;i<total;i++)dirty.add(i);}
     else if(prior) {
@@ -134,14 +138,17 @@ export class DungeonMap {
       for(const index of prior.markers)dirty.add(index);
       for(const index of revealed)if(!prior.revealed.has(index))dirty.add(index);
       for(const index of prior.revealed)if(!revealed.has(index))dirty.add(index);
+      for(const index of sight)if(!prior.sight.has(index))dirty.add(index);
+      for(const index of prior.sight)if(!sight.has(index))dirty.add(index);
     }
     for(const i of dirty) {
       const cell=this.cells[i];
-      const visible=revealed.has(i), open=map.cells[i]===1;
-      const className=visible?open?'explore-open':'explore-wall':'explore-hidden';
+      const known = revealed.has(i), open = map.cells[i] === 1;
+      const terrainClass = open ? 'explore-open' : 'explore-wall';
+      const className = known ? terrainClass + (sight.has(i) ? '' : ' explore-remembered') : 'explore-hidden';
       if(cell.className!==className)cell.className=className;
       let text='', poi: string | undefined;
-      if(visible){
+      if(known){
         const terrain=`${biome.id}-${open?'open':'blocked'}`;
         if(cell.dataset.terrain!==terrain){cell.dataset.terrain=terrain;artDirty.add(cell);}
         this.terrainCells.add(cell);
@@ -156,14 +163,14 @@ export class DungeonMap {
       if(poi===undefined){if(cell.dataset.poi!==undefined)delete cell.dataset.poi;}else if(cell.dataset.poi!==poi)cell.dataset.poi=poi;
       if(i===f.position){if(cell.dataset.player!=='true')cell.dataset.player='true';}else if(cell.dataset.player!==undefined)delete cell.dataset.player;
     }
-    this.visual={map,biome:biome.id,revealed,markers};
+    this.visual={map,biome:biome.id,revealed,sight,markers};
     const adjacent=neighbors(f.position,map.width,map.height);
     for(const {button,dx,dy} of this.controls){
       const destination=f.position+dx+dy*map.width;
       const disabled=s.phase!=='ready'||!adjacent.includes(destination)||!map.cells[destination];
       if(button.disabled!==disabled)button.disabled=disabled;
     }
-    // Movement only treats newly changed terrain. Style changes and image completion repaint the visible set.
+    // Movement only treats newly changed terrain. Style changes and image completion repaint remembered and visible terrain.
     this.paintArt(artDirty);
     if(focused&&document.activeElement!==focused&&focused.isConnected)focused.focus({preventScroll:true});
   }
@@ -178,7 +185,7 @@ export class DungeonMap {
     }
     if(this.grid.dataset.art!==this.art)this.grid.dataset.art=this.art;
     const f = currentFloor(this.state);
-    const feedback=`Player cell ${f.position} · Revealed ${f.exploration.revealed.length}/${(this.map?.width??20)*(this.map?.height??20)} · Visited ${f.exploration.visited.length}. ${this.fallbackCells.size ? 'Artwork loading or unavailable; Simple fallback.' : ''}`;
+    const feedback=`Player cell ${f.position} · In sight ${this.visual?.sight.size ?? 0} · Discovered ${f.exploration.revealed.length}/${(this.map?.width??20)*(this.map?.height??20)} · Visited ${f.exploration.visited.length}. ${this.fallbackCells.size ? 'Artwork loading or unavailable; Simple fallback.' : ''}`;
     if(this.feedback.textContent!==feedback)this.feedback.textContent=feedback;
   }
 }
