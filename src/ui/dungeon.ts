@@ -27,12 +27,21 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
     play=el('div');play.className='dungeon-play';
     sidebar=el('div');sidebar.className='dungeon-sidebar';
     after=el('div');after.className='dungeon-secondary';
-    play.append(sidebar,mapView.root);
+    play.append(mapView.root,sidebar);
     root.replaceChildren(header,play,after);
   }
   // Keep the map and host tools mounted to retain their state and focus.
   for (const child of [...root.children]) if (child !== header && child !== play && child !== after && child !== tools) child.remove();
   header.replaceChildren(title,status);
+  if (s.phase === 'ready') {
+    if (s.depth > 1 && floor.position === floor.descriptor.upstairs) {
+      header.append(el('p', 'Step off the upstairs and back onto it to ascend.'));
+    } else if (floor.completed === 3 && floor.position === floor.descriptor.downstairs) {
+      header.append(el('p', 'Step off the downstairs and back onto it to descend.'));
+    } else if (floor.completed === 3) {
+      header.append(el('p', 'Descent unlocked. Walk onto the downstairs to continue.'));
+    }
+  }
   sidebar.replaceChildren();
   const itemTargets = new Map([...after.querySelectorAll('select')].map(select => [select.id, select.value]));
   after.replaceChildren();
@@ -71,7 +80,6 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
     rewards.append(button('Decline reward',()=>review('Continue without claiming either reward?',decline)));
     sidebar.append(rewards);
   }
-  if(s.phase==='ready'&&floor.completed===3)sidebar.append(el('p','Descent unlocked. Walk onto the downstairs to continue.'));
   const inventory=disclosure('dungeon-inventory','Owned items');
   inventory.append(el('p',`Charms ${s.ownership.equipment.length}/${ITEM_BOUNDS.equipmentInstances.max} · Discard a charm with confirmation to free space.`));
   if(!s.ownership.consumables.length&&!s.ownership.equipment.length)inventory.append(el('p','No owned items yet.'));

@@ -224,24 +224,31 @@ for(const control of ['arrows','wasd','compass','cell'] as const)test(`stairs tr
  };
  // Structural clear-floor input isolates traversal. The legal guardian journey separately proves unlock.
  const approach=atStairApproach(cleared);await load(approach);
+ const travelHint = page.locator('.dungeon-header');
+ await expect(travelHint).toContainText('Descent unlocked. Walk onto the downstairs to continue.');
  await move(approach.floors[0].descriptor.downstairs);
  const second=await dungeonSnapshot(page),upper=second.floors[1];expect(second.depth).toBe(2);expect(second.revision).toBe(approach.revision+1);
  expect(upper.position).toBe(upper.descriptor.upstairs);expect(second.party).toEqual(approach.party);expect(second.ownership).toEqual(approach.ownership);
  await expect(page.locator('#dungeon-map')).toHaveAttribute('data-position',String(upper.position));
  await expect(page.locator('#dungeon-ascend, #dungeon-descend')).toHaveCount(0);
+ await expect(travelHint).toContainText('Step off the upstairs and back onto it to ascend.');
  await reload();expect(await dungeonSnapshot(page)).toEqual(second);
+ await expect(travelHint).toContainText('Step off the upstairs and back onto it to ascend.');
  const off=atStairApproach(second,'ascend').floors[1].position;
  await move(off);expect((await dungeonSnapshot(page)).depth).toBe(2);
  await move(upper.descriptor.upstairs);
  const first=await dungeonSnapshot(page);expect(first.depth).toBe(1);expect(first.revision).toBe(second.revision+2);
  expect(first.floors[0].position).toBe(first.floors[0].descriptor.downstairs);
+ await expect(travelHint).toContainText('Step off the downstairs and back onto it to descend.');
  await reload();expect(await dungeonSnapshot(page)).toEqual(first);
+ await expect(travelHint).toContainText('Step off the downstairs and back onto it to descend.');
  await page.screenshot({path:test.info().outputPath(`stairs-${control}-arrival.png`),fullPage:true});
  // Floor-one upstairs and uncleared downstairs remain ordinary walkable cells.
  for(const direction of ['ascend','descend'] as const){
   const locked=atStairApproach(base,direction);await load(locked);
   const cell=direction==='ascend'?base.floors[0].descriptor.upstairs:base.floors[0].descriptor.downstairs;
   await move(cell);const after=await dungeonSnapshot(page);expect(after.depth).toBe(1);expect(after.floors[0].position).toBe(cell);
+  await expect(travelHint).not.toContainText('Step off');
   await reload();expect(await dungeonSnapshot(page)).toEqual(after);
  }
 });
@@ -533,10 +540,20 @@ for(const biome of ['forest','desert'] as const)test(`${biome} saved kinds, scal
  }
 });
 
- test('exploration cells stay square across viewport sizes and art styles',async({page})=>{
+ test('exploration keeps the map first on narrow screens and cells square across art styles',async({page})=>{
  await page.goto('./?game=dungeon');await page.getByRole('button',{name:'Play unsaved dungeon',exact:true}).click();
- for(const viewport of [{width:320,height:740},{width:393,height:852},{width:915,height:412},{width:1280,height:800}]){
+ for(const viewport of [{width:320,height:568},{width:393,height:852},{width:740,height:360},{width:915,height:412},{width:1280,height:800}]){
   await page.setViewportSize(viewport);
+  if (viewport.width < 760) {
+   const layout = await page.locator('#dungeon-screen').evaluate(screen => {
+    screen.scrollTop = 0;
+    const map = screen.querySelector('#dungeon-map')!.getBoundingClientRect();
+    const party = screen.querySelector('[aria-label="Party"]')!.getBoundingClientRect();
+    return { mapTop: map.top, partyTop: party.top, viewportBottom: screen.getBoundingClientRect().bottom };
+   });
+   expect(layout.mapTop).toBeLessThan(layout.partyTop);
+   expect(layout.mapTop).toBeLessThan(layout.viewportBottom);
+  }
   for(const art of ['simple','legacy-8bit']){
    await page.locator('#dungeon-art').selectOption(art);
    const sizes=await page.locator('#dungeon-map span').evaluateAll(cells=>cells.map(cell=>{const r=cell.getBoundingClientRect();return {width:r.width,height:r.height};}));
