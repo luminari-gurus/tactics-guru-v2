@@ -481,10 +481,23 @@ test('declining a dungeon reward preserves inventory and allows the next encount
 });
 
 test('confirmed charm discard frees full capacity without cancelling or duplicating the pending reward',async({page,isMobile})=>{
- const initial=dungeonCapacityFixture();await seed(page,initial);await openDungeonInventory(page);
+ const initial=dungeonCapacityFixture();await seed(page,initial);
+ const rewards=page.getByRole('region',{name:'Rewards',exact:true});
+ const manage=rewards.getByRole('button',{name:'Manage owned items',exact:true});
+ const inventory=page.locator('#dungeon-inventory');
+ const saved=await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary);
+ await expect(rewards).toContainText('Charm inventory is full');
+ await expect(inventory).toHaveJSProperty('open',false);
+ await rewards.getByRole('button',{name:/^Claim /}).first().click();
+ await page.locator('#dungeon-item-confirm').click();
+ await expect(page.locator('.dungeon-status')).toContainText('Choice refused: capacity');
+ expect(await snapshot(page)).toEqual(initial);
+ expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe(saved);
+ if(isMobile)await manage.tap();else await manage.press('Enter');
+ await expect(inventory).toHaveJSProperty('open',true);
+ await expect(inventory.locator('summary')).toBeFocused();
  const target=initial.ownership.equipment[0].instanceId;
  const discard=()=>page.locator(`[data-instance-id="${target}"]`).getByRole('button',{name:'Discard Warding Charm',exact:true});
- const saved=await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary);
  for(const cancellation of ['Cancel','Escape']){
   if(isMobile)await discard().tap();else await discard().click();
   await expect(page.getByRole('dialog')).toContainText('unequip it from fighter');await expect(page.locator('#dungeon-discard-cancel')).toBeFocused();
@@ -493,6 +506,7 @@ test('confirmed charm discard frees full capacity without cancelling or duplicat
  }
  await discard().click();await page.locator('#dungeon-discard-confirm').click();
  const disposed=await snapshot(page);expect(disposed.ownership.equipment).toHaveLength(5);expect(disposed.ownership.assignments).toEqual([]);expect(disposed.offer).toEqual(initial.offer);expect(disposed.party).toEqual(initial.party);expect(disposed.phase).toBe('reward');
+ await expect(manage).toHaveCount(0);
  await expect(page.locator('#dungeon-descend')).toHaveCount(0);
  await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(disposed);
  await page.getByRole('button',{name:/^Claim /}).first().click();await page.locator('#dungeon-item-confirm').click();

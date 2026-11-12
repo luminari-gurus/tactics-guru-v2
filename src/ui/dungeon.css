@@ -13,7 +13,7 @@
 #dungeon-screen ol { padding-left: 24px; }
 body:has(#dungeon-screen:not([hidden])) #battle-heading { display: none; }
 
-#dungeon-screen:has(.dungeon-play) { max-width: 1040px; }
+#dungeon-screen:has(.dungeon-play) { max-width: 1040px; container-type: inline-size; }
 .dungeon-header h1 { margin: 0; }
 .dungeon-header .dungeon-status { margin: 8px 0; }
 .dungeon-play { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
@@ -26,7 +26,8 @@ body:has(#dungeon-screen:not([hidden])) #battle-heading { display: none; }
 .dungeon-secondary details[open] { padding: 0 12px 12px; }
 .dungeon-secondary details[open] summary { margin-inline: -12px; }
 .dungeon-secondary details p { margin: 8px 0; }
-@media (min-width: 760px) {
+/* Leave 471px for a 36-column floor after the gap and the party column. */
+@container (min-width: 798px) {
   .dungeon-play { grid-template-columns: minmax(0, 1fr) minmax(280px, 0.65fr); gap: 20px; }
   .dungeon-sidebar { grid-column: 2; grid-row: 1; }
   .dungeon-play > section { grid-column: 1; grid-row: 1; }

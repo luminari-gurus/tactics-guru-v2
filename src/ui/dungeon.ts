@@ -74,13 +74,22 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
   const party=el('section');party.setAttribute('aria-label','Party');party.append(el('h2','Party'));
   const projected=projectOwnedCatalog(s.ownership,s.party,dungeonContent.catalog,dungeonContent.items);
   for(const h of s.party){const stats=projected.heroes[h.heroId].stats;party.append(el('p',`${h.heroId}: ${s.activeBattle?s.activeBattle.units.find(u=>u.side==='player'&&u.defId===h.heroId)?.hp??0:h.hp}/${stats.maxHp} HP · ${progressionLabel(h)} · Accuracy ${stats.accuracy} · Armor class ${stats.armorClass}${h.hp===0?' · Defeated':''}`));}sidebar.append(party);
+  const inventory=disclosure('dungeon-inventory','Owned items');
   if(s.offer){const rewards=el('section');rewards.setAttribute('aria-label','Rewards');rewards.append(el('h2','Choose one reward'));
     for(const o of s.offer.options){const command:DungeonItemCommand={...dungeonBoundary(s),type:'claimReward',offerId:s.offer.id,itemId:o.itemId};rewards.append(button(`Claim ${dungeonContent.items[o.itemId].label}`,()=>review(`Claim ${dungeonContent.items[o.itemId].label} and prepare the next encounter?`,command)));}
     const decline:DungeonItemCommand={...dungeonBoundary(s),type:'declineReward',offerId:s.offer.id};
     rewards.append(button('Decline reward',()=>review('Continue without claiming either reward?',decline)));
+    if (s.ownership.equipment.length === ITEM_BOUNDS.equipmentInstances.max &&
+        s.offer.options.some(option => dungeonContent.items[option.itemId].kind === 'equipment')) {
+      const manage = button('Manage owned items', () => {
+        inventory.open = true;
+        inventory.querySelector('summary')?.focus();
+      });
+      manage.setAttribute('aria-controls', inventory.id);
+      rewards.append(el('p', 'Charm inventory is full. Discard a charm to make room.'), manage);
+    }
     header.append(rewards);
   }
-  const inventory=disclosure('dungeon-inventory','Owned items');
   inventory.append(el('p',`Charms ${s.ownership.equipment.length}/${ITEM_BOUNDS.equipmentInstances.max} · Discard a charm with confirmation to free space.`));
   if(!s.ownership.consumables.length&&!s.ownership.equipment.length)inventory.append(el('p','No owned items yet.'));
   for(const entry of [...s.ownership.consumables,...s.ownership.equipment]){

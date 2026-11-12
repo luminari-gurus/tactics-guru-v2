@@ -670,6 +670,11 @@ test('maximum-size saved floor renders and accepts a step after reload', async (
  };
  await assertLayout();
  const viewport=page.viewportSize()!;
+ for (const width of [760, 800, 840, 915]) {
+  await page.setViewportSize({width,height:740});
+  const overflow=await map.evaluate(grid=>grid.parentElement!.scrollWidth-grid.parentElement!.clientWidth);
+  expect(overflow,`The largest floor should fit at ${width}px`).toBe(0);
+ }
  await page.setViewportSize({width:320,height:740});
  await assertLayout();
  const horizontal=await map.evaluate(grid=>{
