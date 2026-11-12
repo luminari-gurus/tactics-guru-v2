@@ -420,8 +420,11 @@ test('legal reward and guardian boundaries, travel reload, backtracking and isol
   const s=await snapshot(page),result=dispatch(f.snapshot.activeBattle!,f.command,dungeonBattle(f.snapshot)!.catalog);expect(result.ok).toBe(true);
   if(result.ok){const expected=acceptDungeonBattle(f.snapshot,result.state);expect(expected.ok).toBe(true);if(expected.ok)expect(s).toEqual(expected.state);}
   if(slot<2){
-   await expect(page.locator('#dungeon-descend')).toHaveCount(0);await expect(page.getByRole('heading',{name:'Choose one reward'})).toBeVisible();
+   await expect(page.locator('#dungeon-descend')).toHaveCount(0);
+   const rewards=page.getByRole('region',{name:'Rewards',exact:true});
+   await expect(rewards).toBeInViewport({ratio:1});
    await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(s);
+   await expect(rewards).toBeInViewport({ratio:1});
    const claim=page.getByRole('button',{name:/^Claim /}).first();
    const item=(await claim.textContent())!.replace(/^Claim /,'');
    await claim.click();await expect(page.locator('#battle-dialog-message')).toHaveText(`Claim ${item} and prepare the next encounter?`);
@@ -457,6 +460,13 @@ test('corrupt bytes stay exportable and uncertain travel requires explicit recov
 
 test('declining a dungeon reward preserves inventory and allows the next encounter',async({page,isMobile})=>{
  const initial=dungeonCapacityFixture();await seed(page,initial);
+ const viewport=page.viewportSize()!;
+ const rewards=page.getByRole('region',{name:'Rewards',exact:true});
+ for(const size of [{width:393,height:852},{width:740,height:360}]){
+  await page.setViewportSize(size);
+  await expect(rewards).toBeInViewport({ratio:1});
+ }
+ await page.setViewportSize(viewport);
  const decline=page.getByRole('button',{name:'Decline reward',exact:true});
  const activate=async()=>{if(isMobile)await decline.tap();else await decline.press('Enter');};
  await activate();await page.locator('#dungeon-item-cancel').click();
@@ -464,6 +474,7 @@ test('declining a dungeon reward preserves inventory and allows the next encount
  await activate();await page.locator('#dungeon-item-confirm').click();
  const next=await snapshot(page);
  expect(next).toMatchObject({phase:'ready',offer:null,ownership:initial.ownership});
+ await expect(rewards).toHaveCount(0);
  await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(next);
  await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');

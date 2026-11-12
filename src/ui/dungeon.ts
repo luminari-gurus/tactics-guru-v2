@@ -78,7 +78,7 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
     for(const o of s.offer.options){const command:DungeonItemCommand={...dungeonBoundary(s),type:'claimReward',offerId:s.offer.id,itemId:o.itemId};rewards.append(button(`Claim ${dungeonContent.items[o.itemId].label}`,()=>review(`Claim ${dungeonContent.items[o.itemId].label} and prepare the next encounter?`,command)));}
     const decline:DungeonItemCommand={...dungeonBoundary(s),type:'declineReward',offerId:s.offer.id};
     rewards.append(button('Decline reward',()=>review('Continue without claiming either reward?',decline)));
-    sidebar.append(rewards);
+    header.append(rewards);
   }
   const inventory=disclosure('dungeon-inventory','Owned items');
   inventory.append(el('p',`Charms ${s.ownership.equipment.length}/${ITEM_BOUNDS.equipmentInstances.max} · Discard a charm with confirmation to free space.`));
