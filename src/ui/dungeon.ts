@@ -49,7 +49,7 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
     play=el('div');play.className='dungeon-play';
     sidebar=el('div');sidebar.className='dungeon-sidebar';
     after=el('div');after.className='dungeon-secondary';
-    play.append(mapView.root,sidebar);
+    play.append(mapView.root,sidebar,mapView.controlsRoot);
     root.replaceChildren(header,play,after);
   }
   // Keep the map and host tools mounted to retain their state and focus.
