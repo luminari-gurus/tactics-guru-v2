@@ -78,11 +78,11 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
       let backup = old.primary.status === 'valid' ? old.primary.text : old.backup.status === 'missing' ? encoded.text : null;
       let backupState: DungeonState | undefined = old.primary.status === 'valid' ? old.primary.state
         : old.backup.status === 'valid' ? old.backup.state : encoded.state;
-      if (old.primary.status === 'valid' && old.primary.state.activeBattle?.draughts) {
+      if (!state.stats && old.primary.status === 'valid' && old.primary.state.activeBattle?.draughts) {
         backup = null;
         backupState = old.backup.status === 'valid' ? old.backup.state : undefined;
       }
-      if (state.activeBattle?.draughts) {
+      if (!state.stats && state.activeBattle?.draughts) {
         const compatible = (slot: Slot): slot is Extract<Slot, { status: 'valid' }> => slot.status === 'valid' && !slot.state.activeBattle?.draughts &&
           slot.state.id === state.id && slot.state.depth === state.depth &&
           slot.state.floors[state.depth-1].completed === state.floors[state.depth-1].completed;
@@ -104,7 +104,7 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
       let checkpoint: string | null = null;
       // Inspection caches the exact record that restored the reviewed backup.
       const retainedRecord = old.backup.status === 'valid' && old.backup.checkpoint ? restoredBackup?.record : undefined;
-      if (!(backup === null && retainedRecord !== undefined) && backupState && hasWallSight(backupState)) {
+      if (!(backup === null && retainedRecord !== undefined) && backupState && !backupState.stats && hasWallSight(backupState)) {
         const rollback = encodeDungeonRollback(backupState);
         if (rollback.ok) {
           backup = rollback.text;
@@ -176,4 +176,13 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
     return equal;
   }
   return { inspect, save, remove, acknowledge, lastSavedText: () => lastWritten };
+}
+
+/** All browser dungeon mutations, including multi-slot recovery, share this lock. */
+export function serializeBrowserDungeonWrite(task: () => void, unavailable: () => void) {
+  try {
+    const locks = navigator.locks;
+    if (!locks) { unavailable(); return; }
+    void locks.request(DUNGEON_KEYS.primary, task).catch(unavailable);
+  } catch { unavailable(); }
 }

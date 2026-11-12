@@ -224,24 +224,31 @@ for(const control of ['arrows','wasd','compass','cell'] as const)test(`stairs tr
  };
  // Structural clear-floor input isolates traversal. The legal guardian journey separately proves unlock.
  const approach=atStairApproach(cleared);await load(approach);
+ const travelHint = page.locator('.dungeon-header');
+ await expect(travelHint).toContainText('Descent unlocked. Walk onto the downstairs to continue.');
  await move(approach.floors[0].descriptor.downstairs);
  const second=await dungeonSnapshot(page),upper=second.floors[1];expect(second.depth).toBe(2);expect(second.revision).toBe(approach.revision+1);
  expect(upper.position).toBe(upper.descriptor.upstairs);expect(second.party).toEqual(approach.party);expect(second.ownership).toEqual(approach.ownership);
  await expect(page.locator('#dungeon-map')).toHaveAttribute('data-position',String(upper.position));
  await expect(page.locator('#dungeon-ascend, #dungeon-descend')).toHaveCount(0);
+ await expect(travelHint).toContainText('Step off the upstairs and back onto it to ascend.');
  await reload();expect(await dungeonSnapshot(page)).toEqual(second);
+ await expect(travelHint).toContainText('Step off the upstairs and back onto it to ascend.');
  const off=atStairApproach(second,'ascend').floors[1].position;
  await move(off);expect((await dungeonSnapshot(page)).depth).toBe(2);
  await move(upper.descriptor.upstairs);
  const first=await dungeonSnapshot(page);expect(first.depth).toBe(1);expect(first.revision).toBe(second.revision+2);
  expect(first.floors[0].position).toBe(first.floors[0].descriptor.downstairs);
+ await expect(travelHint).toContainText('Step off the downstairs and back onto it to descend.');
  await reload();expect(await dungeonSnapshot(page)).toEqual(first);
+ await expect(travelHint).toContainText('Step off the downstairs and back onto it to descend.');
  await page.screenshot({path:test.info().outputPath(`stairs-${control}-arrival.png`),fullPage:true});
  // Floor-one upstairs and uncleared downstairs remain ordinary walkable cells.
  for(const direction of ['ascend','descend'] as const){
   const locked=atStairApproach(base,direction);await load(locked);
   const cell=direction==='ascend'?base.floors[0].descriptor.upstairs:base.floors[0].descriptor.downstairs;
   await move(cell);const after=await dungeonSnapshot(page);expect(after.depth).toBe(1);expect(after.floors[0].position).toBe(cell);
+  await expect(travelHint).not.toContainText('Step off');
   await reload();expect(await dungeonSnapshot(page)).toEqual(after);
  }
 });
@@ -331,20 +338,29 @@ test('compass keeps keyboard focus when movement disables the activated directio
 });
 
 fixedSeedTest('map shortcuts work on entry and outside the map without taking over other controls', async ({page}) => {
+ const expectSameProgress = async (expected: Awaited<ReturnType<typeof dungeonSnapshot>>) => {
+  const actual = await dungeonSnapshot(page);
+  expect({...actual,stats:actual.stats ? {...actual.stats,activeMs:expected.stats?.activeMs} : undefined}).toEqual(expected);
+  expect(actual.stats?.activeMs ?? 0).toBeGreaterThanOrEqual(expected.stats?.activeMs ?? 0);
+ };
  await page.goto('./?game=dungeon');
  await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();
  await page.locator('#dungeon-confirm-new').click();
+ await expect(page.locator('#dungeon-map')).toBeVisible();
  const initial = await dungeonSnapshot(page);
  const floor = initial.floors[0], terrain = floorMap(floor.descriptor);
  const direction = [
-  {offset:1, arrow:'ArrowRight', reverse:'a'}, {offset:-1, arrow:'ArrowLeft', reverse:'d'},
-  {offset:terrain.width, arrow:'ArrowDown', reverse:'w'}, {offset:-terrain.width, arrow:'ArrowUp', reverse:'s'},
+  {offset:1, arrow:'ArrowRight', reverseArrow:'ArrowLeft', reverse:'a'},
+  {offset:-1, arrow:'ArrowLeft', reverseArrow:'ArrowRight', reverse:'d'},
+  {offset:terrain.width, arrow:'ArrowDown', reverseArrow:'ArrowUp', reverse:'w'},
+  {offset:-terrain.width, arrow:'ArrowUp', reverseArrow:'ArrowDown', reverse:'s'},
  ].find(({offset}) => neighbors(floor.position,terrain.width,terrain.height).includes(floor.position+offset) &&
   terrain.cells[floor.position+offset] && floor.position+offset!==floor.descriptor.downstairs);
  if (!direction) throw Error('Expected a walkable cell next to the dungeon entrance');
  const grid = page.locator('#dungeon-map');
  await expect(grid).not.toBeFocused();
  await page.keyboard.press(direction.arrow);
+ await expect.poll(async()=>(await dungeonSnapshot(page)).floors[0].position).toBe(floor.position+direction.offset);
  const moved = await dungeonSnapshot(page);
  expect(moved.floors[0].position).toBe(floor.position + direction.offset);
  expect(moved.revision).toBe(initial.revision + 1);
@@ -352,7 +368,7 @@ fixedSeedTest('map shortcuts work on entry and outside the map without taking ov
  const art = page.getByRole('combobox',{name:'Map art',exact:true});
  await art.focus();
  await page.keyboard.press(direction.reverse);
- expect(await dungeonSnapshot(page)).toEqual(moved);
+ await expectSameProgress(moved);
  await page.evaluate(() => {
   const input = document.createElement('input');
   input.id = 'shortcut-test-input';
@@ -361,22 +377,51 @@ fixedSeedTest('map shortcuts work on entry and outside the map without taking ov
  });
  await page.keyboard.press(direction.reverse);
  await expect(page.locator('#shortcut-test-input')).toHaveValue(direction.reverse);
- expect(await dungeonSnapshot(page)).toEqual(moved);
+ await expectSameProgress(moved);
  const restart = page.getByRole('button',{name:'Start new dungeon',exact:true});
  await restart.click();
  await page.keyboard.press(direction.reverse);
- expect(await dungeonSnapshot(page)).toEqual(moved);
+ await expectSameProgress(moved);
  await page.locator('#dungeon-cancel-new').click();
 
  await restart.focus();
  await page.keyboard.press(direction.reverse);
+ await expect.poll(async()=>(await dungeonSnapshot(page)).floors[0].position).toBe(floor.position);
  const returned = await dungeonSnapshot(page);
  expect(returned.floors[0].position).toBe(floor.position);
  expect(returned.revision).toBe(moved.revision + 1);
- await grid.focus();
+ await expect(restart).toBeFocused();
+
+ const menu = page.getByRole('link',{name:'Main menu',exact:true});
+ await menu.focus();
  await page.keyboard.press(direction.arrow);
- expect((await dungeonSnapshot(page)).revision).toBe(returned.revision + 1);
+ await expect.poll(async()=>(await dungeonSnapshot(page)).floors[0].position).toBe(floor.position+direction.offset);
+ const movedAgain = await dungeonSnapshot(page);
+ expect(movedAgain.revision).toBe(returned.revision + 1);
+ await expect(menu).toBeFocused();
+
+ const wasd = page.getByRole('checkbox',{name:'Enable WASD movement'});
+ await expect(wasd).toBeChecked();
+ await wasd.uncheck();
+ await expect(grid).toHaveAccessibleName(/Arrow keys move one cell/);
+ await restart.focus();
+ await page.keyboard.press(direction.reverse);
+ await expectSameProgress(movedAgain);
+ await grid.focus();
+ await page.keyboard.press(direction.reverse);
+ await expectSameProgress(movedAgain);
  await expect(grid).toBeFocused();
+
+ await page.reload();
+ await continueSavedDungeon(page);
+ await expect(wasd).not.toBeChecked();
+ await restart.focus();
+ await page.keyboard.press(direction.reverseArrow);
+ await expect.poll(async()=>(await dungeonSnapshot(page)).floors[0].position).toBe(floor.position);
+ const arrowOnly = await dungeonSnapshot(page);
+ expect(arrowOnly.floors[0].position).toBe(floor.position);
+ expect(arrowOnly.revision).toBe(movedAgain.revision + 1);
+ await expect(restart).toBeFocused();
 });
 
 fixedSeedTest('real traversal, art independence, keyboard locks, active battle and exact reload',async({page,isMobile})=>{
@@ -505,10 +550,20 @@ for(const biome of ['forest','desert'] as const)test(`${biome} saved kinds, scal
  }
 });
 
- test('exploration cells stay square across viewport sizes and art styles',async({page})=>{
+ test('exploration keeps the map first on narrow screens and cells square across art styles',async({page})=>{
  await page.goto('./?game=dungeon');await page.getByRole('button',{name:'Play unsaved dungeon',exact:true}).click();
- for(const viewport of [{width:320,height:740},{width:393,height:852},{width:915,height:412},{width:1280,height:800}]){
+ for(const viewport of [{width:320,height:568},{width:393,height:852},{width:740,height:360},{width:915,height:412},{width:1280,height:800}]){
   await page.setViewportSize(viewport);
+  if (viewport.width < 760) {
+   const layout = await page.locator('#dungeon-screen').evaluate(screen => {
+    screen.scrollTop = 0;
+    const map = screen.querySelector('#dungeon-map')!.getBoundingClientRect();
+    const party = screen.querySelector('[aria-label="Party"]')!.getBoundingClientRect();
+    return { mapTop: map.top, partyTop: party.top, viewportBottom: screen.getBoundingClientRect().bottom };
+   });
+   expect(layout.mapTop).toBeLessThan(layout.partyTop);
+   expect(layout.mapTop).toBeLessThan(layout.viewportBottom);
+  }
   for(const art of ['simple','legacy-8bit']){
    await page.locator('#dungeon-art').selectOption(art);
    const sizes=await page.locator('#dungeon-map span').evaluateAll(cells=>cells.map(cell=>{const r=cell.getBoundingClientRect();return {width:r.width,height:r.height};}));
@@ -625,6 +680,11 @@ test('maximum-size saved floor renders and accepts a step after reload', async (
  };
  await assertLayout();
  const viewport=page.viewportSize()!;
+ for (const width of [760, 800, 840, 915]) {
+  await page.setViewportSize({width,height:740});
+  const overflow=await map.evaluate(grid=>grid.parentElement!.scrollWidth-grid.parentElement!.clientWidth);
+  expect(overflow,`The largest floor should fit at ${width}px`).toBe(0);
+ }
  await page.setViewportSize({width:320,height:740});
  await assertLayout();
  const horizontal=await map.evaluate(grid=>{
