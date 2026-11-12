@@ -9,6 +9,7 @@ import { constrainView, DRAG_THRESHOLD, MAX_ZOOM, pickTileCandidates, screenToBo
 import { HEALTH_BAR, HEALTH_COLORS, healthArc, healthBarScale, healthColor, healthFraction } from './healthBar';
 import { abilityPresentation, type SignatureKind } from './abilityPresentation';
 import type { TargetOverlay, HoverPreview } from '../ui/targetPreview';
+import { drawDesertLandmark } from './desertLandmark';
 
 const REACHABLE_COLOR = 0x46d7c7;
 const ACTIVE_COLOR = 0xffd36a;
@@ -167,6 +168,11 @@ export class BoardRenderer {
         .setOrigin(0).setDisplaySize(88,48).setDepth(tile.depth + 2);
       this.highlights.set(cellKey(tile), highlight);
       this.root.add([column, surface, highlight]);
+      if (tile.desertLandmark) {
+        const landmark = scene.add.graphics().setPosition(point.x, point.y).setDepth(tile.depth + 1.5);
+        drawDesertLandmark(landmark, tile.desertLandmark);
+        this.root.add(landmark);
+      }
       if (tile.terrain === 'forest') {
         const trunk = scene.add.graphics().setDepth(tile.depth + OCCUPANT_LAYER);
         trunk.fillStyle(0x63452d).fillRect(point.x - 4, point.y - 40, 8, 40);

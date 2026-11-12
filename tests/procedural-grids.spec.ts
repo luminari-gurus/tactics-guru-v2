@@ -1,10 +1,13 @@
 import { writeFileSync } from 'node:fs';
 import { expect, test } from './helpers/forceRailControls';
+import { test as standardTest } from './helpers/coreGraphics';
 import { preparedSnapshot, runContext } from './helpers/runItemFixtures';
 import { encodeRunSave, runBattleCatalog } from '../src/domain/runSaveEnvelope';
 import { RUN_STORAGE_KEYS } from '../src/persistence/runStorage';
 import { previewMovement } from '../src/domain/grid';
-import { readSession, playCommand } from './helpers/battlePolicy';
+import { readSession, playCommand, tapBoard } from './helpers/battlePolicy';
+import { pickTile } from '../src/geometry/picking';
+import { projectTile, type Tile } from '../src/geometry/iso';
 
 test('generated production board picks, moves and resumes the same desert after camera changes',async({page})=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
@@ -46,6 +49,26 @@ test('generated production board picks, moves and resumes the same desert after 
  expect((await readSession(page)).state).toEqual(committed.activeBattle);
  expect(JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!).battlefield).toEqual(committed.battlefield);
  expect((await readSession(page)).events).toEqual([]);expect(errors).toEqual([]);
+});
+
+standardTest('desert landmarks distinguish blocked ground in the battle view', async ({ page }) => {
+  await page.goto('/?game=run');
+  await page.locator('#run-start').click();
+  await page.locator('#run-start-encounter').click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  const report = JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
+  const tiles: (Tile & { desertLandmark?: string })[] = report.tiles;
+  const landmarks = tiles.filter(tile => tile.desertLandmark);
+  expect(new Set(landmarks.map(tile => tile.desertLandmark))).toEqual(new Set(['sandstone', 'cactus']));
+  await page.locator('#battle-board-region').screenshot({ path: standardTest.info().outputPath('desert-landmarks.png') });
+
+  const exposed = landmarks.find(tile => pickTile(tiles, projectTile(tile)) === tile);
+  if (!exposed) throw new Error('Expected an exposed desert landmark');
+  expect(report.reachable).not.toContainEqual({ x: exposed.x, y: exposed.y });
+  await tapBoard(page, exposed);
+  await expect(page.locator('#battle-preview')).toBeVisible();
+  await expect(page.locator('#battle-preview')).toHaveText('Rocky ground blocks movement and line of sight');
+  expect((await readSession(page)).pending).toBeNull();
 });
 
 

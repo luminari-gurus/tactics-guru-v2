@@ -330,7 +330,10 @@ export class BattleHud {
     const target=occupants.find(u=>u.hp>0)??occupants[0];
     this.root.querySelector('#battle-target-info')!.textContent=target?`Target: ${unitLabel(s,target)}`:'';
     const inspect=this.root.querySelector<HTMLButtonElement>('#battle-inspect-target')!;inspect.hidden=this.skin==='radial'||!target;inspect.dataset.unitId=target?String(target.id):'';
-    this.root.querySelector('#battle-preview')!.textContent=s.error?`${s.phase==='error'?'Battle stopped':'Unavailable'}: ${s.error}`:message;
+    const selectedTile = selected && s.catalog.maps[s.state.mapId].cells.find(cell => cell.x === selected.x && cell.y === selected.y);
+    const terrainNote = selectedTile?.terrainId === 'rock' && (!action || action === 'move')
+      ? 'Rocky ground blocks movement and line of sight' : message;
+    this.root.querySelector('#battle-preview')!.textContent=s.error?`${s.phase==='error'?'Battle stopped':'Unavailable'}: ${s.error}`:terrainNote;
     const options: {cell:CellPosition;label:string}[]=[];
     if(enabled && action==='move') {if(movement?.ok) for(const c of movement.cells.filter(c=>c.cost>0)) options.push({cell:c.cell,label:`(${c.cell.x}, ${c.cell.y}) · cost ${c.cost}`});}
     else if(enabled && action) for(const u of actionTargets(s,action)) {

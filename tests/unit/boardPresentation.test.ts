@@ -1,5 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { assert, describe, expect, it } from 'vitest';
 import { battleCatalog } from '../../src/content/catalog';
+import { desertRunCatalog } from '../../src/content/desertCatalog';
+import { battlefieldEncounters } from '../../src/content/encounters';
+import { resolveBattlefield } from '../../src/domain/battlefield';
 import { buildBoardPresentation } from '../../src/geometry/boardPresentation';
 import { orderTiles, projectTile, tileDepth } from '../../src/geometry/iso';
 import { pickTile, screenToBoard } from '../../src/geometry/picking';
@@ -9,6 +12,7 @@ describe('authored board presentation', () => {
     const before = structuredClone(battleCatalog);
     const board = buildBoardPresentation(battleCatalog, 'map:forest_ruins');
     expect(board.tiles).toHaveLength(144);
+    expect(board.tiles.some(tile => tile.desertLandmark)).toBe(false);
     expect(board.occupants.map(unit => unit.unitId)).toEqual(['fighter', 'ranger', 'mage', 'goblin_grunt', 'goblin_archer', 'goblin_grunt']);
     for (const unit of board.occupants) {
       const asset = battleCatalog.assets[unit.assetId];
@@ -51,4 +55,21 @@ describe('authored board presentation', () => {
     }
     expect([...elevations].sort()).toEqual([0, 1, 2]);
   });
+});
+
+it('draws both desert landmarks on existing rock cells with stable, seed-dependent placement', () => {
+  const layouts = [123, 456, 123].map(seed => {
+    const result = resolveBattlefield(battlefieldEncounters[0], seed, desertRunCatalog);
+    assert(result.ok);
+    const { map } = result;
+    const catalog = { ...desertRunCatalog, maps: { ...desertRunCatalog.maps, [map.id]: map } };
+    const { tiles, occupants } = buildBoardPresentation(catalog, map.id);
+    const landmarks = tiles.filter(tile => tile.desertLandmark);
+    expect(landmarks).toEqual(tiles.filter(tile => tile.terrain === 'rock'));
+    expect(new Set(landmarks.map(tile => tile.desertLandmark))).toEqual(new Set(['sandstone', 'cactus']));
+    expect(occupants.every(unit => !unit.tile.desertLandmark)).toBe(true);
+    return landmarks;
+  });
+  expect(layouts[0]).toEqual(layouts[2]);
+  expect(layouts[0]).not.toEqual(layouts[1]);
 });
