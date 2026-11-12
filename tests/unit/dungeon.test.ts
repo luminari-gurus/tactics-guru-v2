@@ -832,7 +832,7 @@ describe('versioned floor dimensions', () => {
       return {descriptor, position:descriptor.upstairs, completed:3,
         exploration:freshExploration(descriptor.seed,descriptor.upstairs,map)};
     });
-    const original = {...base,depth:2,floors}, descriptors = floors.map(floor => floor.descriptor);
+    const original = withLegacySight({...base,depth:2,floors}), descriptors = floors.map(floor => floor.descriptor);
     const body = {kind:'tactics-guru:dungeon',format,
       identity:hashJson({dungeonIdentity:format === 9 ? previousDungeonIdentity : dungeonIdentity,progression:HERO_PROGRESSION}),payload:original};
     const raw = canonical({...body,digest:hashJson(body)}), m = memory();
@@ -852,6 +852,9 @@ describe('versioned floor dimensions', () => {
     expect(storage.inspect().backup.text).toBe(raw);
     const saved = storage.inspect().primary; assert(saved.status === 'valid');
     expect(saved.state).toEqual(moved);
+    expect(JSON.parse(saved.text).format).toBe(12);
+    expect(saved.state.floors[0].exploration.sightVersion).toBeUndefined();
+    expect(saved.state.floors[1].exploration.sightVersion).toBe('wall-sight-v1');
     const ascended = good(stepDungeon(saved.state,{id:base.id,depth:2,revision:moved.revision,destination:floor.descriptor.upstairs}));
     expect(ascended.depth).toBe(1);
     const revisited = good(travelDungeon(atDownstairs(ascended),'descend',ascended.revision));
