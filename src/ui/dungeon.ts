@@ -11,10 +11,11 @@ import { BattleDialogs } from './dialogs';
 import './dungeon.css';
 export const dungeonElement = <K extends keyof HTMLElementTagNameMap>(tag: K, text = '') => { const n = document.createElement(tag); n.textContent = text; return n; };
 export function renderDungeon(root: HTMLElement, s: DungeonState, session: DungeonSession, dialogs: BattleDialogs,
-  actions: { start: () => void; recover?: () => void; restart: () => void }, cache: FloorCache, mapView: DungeonMap) {
-  const focusId=(document.activeElement as HTMLElement|null)?.id;
+  actions: { start: () => void; recover?: () => void; restart: () => void }, cache: FloorCache, mapView: DungeonMap, tools: HTMLElement) {
+  const active = root.contains(document.activeElement) ? document.activeElement : null;
+  const focusId = active?.id;
   const el = dungeonElement, floor = currentFloor(s);
-  const title = el('h1', s.phase === 'defeat' ? `Dungeon defeat · ${dungeonBiomeLabel(s)} · Floor ${s.depth}` : `Dungeon · Floor ${s.depth} · ${dungeonBiomeLabel(s)}`); title.tabIndex = -1;
+  const title = el('h1', s.phase === 'defeat' ? `Dungeon defeat · ${dungeonBiomeLabel(s)} · Floor ${s.depth}` : `Dungeon · Floor ${s.depth} · ${dungeonBiomeLabel(s)}`); title.id = 'dungeon-title'; title.tabIndex = -1;
   const status = el('p',session.status);status.className='dungeon-status';status.setAttribute('role','status');
   let before=root.querySelector<HTMLElement>(':scope > [data-dungeon-part="before"]');
   let after=root.querySelector<HTMLElement>(':scope > [data-dungeon-part="after"]');
@@ -23,8 +24,9 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
     root.replaceChildren(before,mapView.root,after);
   }
   // Rebuild the host-owned footer on every render while keeping the map mounted.
-  for (const child of [...root.children]) if (child !== before && child !== mapView.root && child !== after) child.remove();
+  for (const child of [...root.children]) if (child !== before && child !== mapView.root && child !== after && child !== tools) child.remove();
   before.replaceChildren(title,el('p',floor.completed === 3 ? 'All encounters cleared. Walk to the stairs to continue.' : 'Walk onto any uncleared enemy to start its encounter. Clear all three encounters to unlock the stairs.'),status);
+  const itemTargets = new Map([...after.querySelectorAll('select')].map(select => [select.id, select.value]));
   after.replaceChildren();
   const button = (label: string, run: () => void, disabled = false, id?: string) => {
     const b=el('button',label);b.type='button';b.disabled=disabled;if(id)b.id=id;b.onclick=run;return b;
@@ -52,12 +54,15 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
   if(!s.ownership.consumables.length&&!s.ownership.equipment.length)inventory.append(el('p','No owned items yet.'));
   for(const entry of [...s.ownership.consumables,...s.ownership.equipment]){
     const def=dungeonContent.items[entry.itemId],row=el('div'),select=el('select');select.setAttribute('aria-label',`${def.label} target`);
+    const itemKey = 'quantity' in entry ? entry.itemId : entry.instanceId;
     for(const h of s.party){
       const preview=preparationItemTarget(def,h,s.party);
       const o=el('option',preview.ok?h.heroId:`${h.heroId} (${preview.reason})`);
       o.value=h.heroId;o.disabled=!preview.ok;select.append(o);
     }
-    select.value=[...select.options].find(o=>!o.disabled)?.value??'';
+    select.id = `dungeon-target-${itemKey}`;
+    const enabledOptions = [...select.options].filter(option => !option.disabled);
+    select.value = (enabledOptions.find(option => option.value === itemTargets.get(select.id)) ?? enabledOptions[0])?.value ?? '';
     row.append(el('p',`${def.label}${'quantity'in entry?` ×${entry.quantity}`:''}`),select);
     if('quantity'in entry){
       row.append(button(`Use ${def.label}`,()=>{
@@ -67,10 +72,10 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
         const result=preview.ok?`${hero.heroId} will have ${preview.hp}/${hero.maxHp} HP.`:`${hero.heroId} cannot use this item (${preview.reason}).`;
         review(`Use ${def.label} on ${hero.heroId}? ${result}`,
           {...dungeonBoundary(s),type:'useItem',itemId:def.id,heroId:hero.heroId});
-      },!select.value||!['ready','reward'].includes(s.phase)));
+      },!select.value||!['ready','reward'].includes(s.phase),`dungeon-use-${itemKey}`));
     }
     else{row.dataset.instanceId=entry.instanceId;const instanceId=entry.instanceId,assignment=s.ownership.assignments.find(a=>a.instanceId===instanceId);
-      row.append(button(assignment?`Unequip ${def.label}`:`Equip ${def.label}`,()=>review(`${assignment?'Unequip':'Equip'} ${def.label}?`,{...dungeonBoundary(s),type:assignment?'unequipItem':'equipItem',instanceId,heroId:assignment?.heroId??select.value as HeroId,slot:'charm'}),(!assignment&&!select.value)||!['ready','reward'].includes(s.phase)));}
+      row.append(button(assignment?`Unequip ${def.label}`:`Equip ${def.label}`,()=>review(`${assignment?'Unequip':'Equip'} ${def.label}?`,{...dungeonBoundary(s),type:assignment?'unequipItem':'equipItem',instanceId,heroId:assignment?.heroId??select.value as HeroId,slot:'charm'}),(!assignment&&!select.value)||!['ready','reward'].includes(s.phase),`dungeon-equip-${itemKey}`));}
     if('instanceId'in entry){
       const command:DungeonItemCommand={...dungeonBoundary(s),type:'discardEquipment',instanceId:entry.instanceId};
       const assignment=s.ownership.assignments.find(a=>a.instanceId===entry.instanceId);
@@ -78,16 +83,16 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
       row.append(button(`Discard ${def.label}`,()=>dialogs.showChoices('Discard charm?',`Permanently discard ${def.label}${assignment?` and unequip it from ${assignment.heroId}`:''}? No item or currency is received.`,[
         {id:'dungeon-discard-cancel',label:'Cancel',run:focus},
         {id:'dungeon-discard-confirm',label:'Discard charm',run:()=>{session.dispatch(command);focus();}},
-      ],focus),!['ready','reward'].includes(s.phase)));
+      ],focus),!['ready','reward'].includes(s.phase),`dungeon-discard-${itemKey}`));
     }
     inventory.append(row);
   }after.append(inventory);
-  if(actions.recover)after.append(button('Save recovery',actions.recover));
-  after.append(button('Start new dungeon',actions.restart));
-  const nav=el('nav');for(const [path,label] of [['run','Three-battle scenario'],['battle','Single battle'],['map','Map prototype']]){const a=el('a',label);a.href=`${import.meta.env.BASE_URL}${path}`;nav.append(a);}after.append(nav);
-  if(focusId){
-    const target=root.querySelector<HTMLElement>(`#${focusId}`);
-    const focusTarget=target?.matches('.dungeon-directions button:disabled')?root.querySelector<HTMLElement>('#dungeon-map'):target;
+  if(actions.recover)after.append(button('Save recovery',actions.recover,false,'dungeon-recovery'));
+  after.append(button('Start new dungeon',actions.restart,false,'dungeon-restart'));
+  const nav=el('nav');for(const [path,label] of [['run','Three-battle scenario'],['battle','Single battle'],['map','Map prototype']]){const a=el('a',label);a.href=`${import.meta.env.BASE_URL}${path}`;a.id=`dungeon-link-${path}`;nav.append(a);}after.append(nav);
+  if (active && focusId && (document.activeElement !== active || active.matches(':disabled'))) {
+    const target = root.querySelector<HTMLElement>(`#${CSS.escape(focusId)}`);
+    const focusTarget = target && !target.matches(':disabled') ? target : root.querySelector<HTMLElement>('#dungeon-map');
     focusTarget?.focus({preventScroll:true});
   }
 }

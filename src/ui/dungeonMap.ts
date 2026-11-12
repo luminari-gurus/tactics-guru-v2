@@ -13,6 +13,8 @@ export function dungeonEncounterLabel(s: DungeonState, slot: number): string {
   return kind === 'boss' ? 'Guardian · Goblins' : `${kind[0].toUpperCase()}${kind.slice(1)} encounter ${slot + 1}`;
 }
 
+const WASD_PREFERENCE_KEY = 'tactics-guru:dungeon-wasd';
+
 /** View-local art state and bindings; no simulation timer or authoritative DOM state. */
 export class DungeonMap {
   readonly root = document.createElement('section');
@@ -22,6 +24,7 @@ export class DungeonMap {
   private map: GeneratedMap | null = null;
   private readonly heading = document.createElement('h2');
   private readonly select = document.createElement('select');
+  private readonly wasd: HTMLInputElement;
   private readonly grid = document.createElement('div');
   private readonly markerDescription = document.createElement('p');
   private readonly feedback = document.createElement('p');
@@ -42,6 +45,19 @@ export class DungeonMap {
     this.select.value=this.art;
     this.select.addEventListener('change',()=>{this.art=this.select.value as ArtStyle;this.paintArt();},{signal});
     label.append(this.select);
+    const keyboardPreference = el('label');
+    const wasd = el('input');
+    wasd.type = 'checkbox';
+    wasd.checked = true;
+    try { wasd.checked = localStorage.getItem(WASD_PREFERENCE_KEY) !== 'off'; }
+    catch { /* Storage can be unavailable in a sandbox. */ }
+    wasd.addEventListener('change', () => {
+      try { localStorage.setItem(WASD_PREFERENCE_KEY, wasd.checked ? 'on' : 'off'); }
+      catch { /* The checkbox still applies for this visit. */ }
+      this.updateKeyboardLabel();
+    }, {signal});
+    this.wasd = wasd;
+    keyboardPreference.append(wasd, ' Enable WASD movement');
     this.grid.id='dungeon-map';this.grid.tabIndex=0;this.grid.setAttribute('role','application');
     this.markerDescription.id = 'dungeon-map-markers';
     this.markerDescription.hidden = true;
@@ -63,13 +79,21 @@ export class DungeonMap {
     }
     const center=el('span');center.className='dungeon-compass-center';center.setAttribute('aria-hidden','true');directions.append(center);
     const legend=el('p','● Player · M encounter (including guardian) · ✓ cleared · ↑ upstairs (floor 2+) · ↓ downstairs (all encounters cleared). Hatching marks remembered terrain. Enemies move when you move. Tap adjacent cells or use direction controls.');
-    this.root.append(this.heading,label,legend,this.grid,this.markerDescription,directions,this.feedback);
-    this.root.addEventListener('keydown',e => {
-      if (!(e.target instanceof HTMLElement) || e.target.id !== 'dungeon-map') return;
+    this.root.append(this.heading,label,keyboardPreference,legend,this.grid,this.markerDescription,directions,this.feedback);
+    document.addEventListener('keydown',e => {
+      if (this.state?.phase !== 'ready' || !this.root.isConnected || this.root.closest('[hidden]') ||
+        this.locked() || document.hidden || e.defaultPrevented || e.isComposing ||
+        e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      if (e.target instanceof HTMLElement && (e.target.isContentEditable ||
+        e.target.closest('input, textarea, select, dialog[open], [role="menu"], [role="listbox"], [role="combobox"]'))) return;
+      if (e.key.length === 1 && !wasd.checked) return;
       const width = this.map?.width ?? 20;
-      const offsets: Record<string,number> = { ArrowUp:-width,w:-width,ArrowRight:1,d:1,ArrowDown:width,s:width,ArrowLeft:-1,a:-1 };
-      const delta = offsets[e.key]; if (delta === undefined) return;
-      e.preventDefault(); if (!e.repeat) this.step(delta);
+      const offsets = new Map([['ArrowUp', -width], ['w', -width], ['ArrowRight', 1], ['d', 1],
+        ['ArrowDown', width], ['s', width], ['ArrowLeft', -1], ['a', -1]]);
+      const delta = offsets.get(e.key);
+      if (delta === undefined) return;
+      e.preventDefault();
+      if (!e.repeat) this.step(delta);
     },{signal});
   }
   dispose() { this.live = false; this.abort.abort(); }
@@ -80,6 +104,13 @@ export class DungeonMap {
     // Send an invalid sentinel at row wrap so authoritative rejection supplies feedback.
     this.move(neighbors(f.position, this.map?.width ?? 20, this.map?.height ?? 20).includes(destination) ? destination : -1);
   }
+  private updateKeyboardLabel() {
+    if (!this.state || !this.map) return;
+    const position = currentFloor(this.state).position, width = this.map.width;
+    const keys = this.wasd.checked ? 'Arrow or WASD keys' : 'Arrow keys';
+    const label = `Floor ${this.state.depth} map. Player row ${Math.floor(position / width) + 1}, column ${position % width + 1}. ${keys} move one cell.`;
+    if (this.grid.getAttribute('aria-label') !== label) this.grid.setAttribute('aria-label', label);
+  }
   private draw() {
     if (!this.live || !this.state || !this.map) return;
     const focused = this.root.contains(document.activeElement) ? document.activeElement as HTMLElement : null;
@@ -87,8 +118,7 @@ export class DungeonMap {
     const biome = BIOMES.find(b => b.version === f.descriptor.biome)!;
     const heading=`Explore ${biome.label} · Floor ${s.depth}`;
     if(this.heading.textContent!==heading)this.heading.textContent=heading;
-    const label=`Floor ${s.depth} map. Player row ${Math.floor(f.position/map.width)+1}, column ${f.position%map.width+1}. Arrow or WASD keys move one cell.`;
-    if(grid.getAttribute('aria-label')!==label)grid.setAttribute('aria-label',label);
+    this.updateKeyboardLabel();
     for (const [property, value] of [['--dungeon-map-columns', String(map.width)], ['--dungeon-map-rows', String(map.height)]]) {
       if (grid.style.getPropertyValue(property) !== value) grid.style.setProperty(property, value);
     }
