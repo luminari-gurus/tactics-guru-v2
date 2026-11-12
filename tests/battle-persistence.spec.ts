@@ -107,7 +107,14 @@ for(const condition of ['missing','valid','corrupt','backup-only','unavailable']
       await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();
       await expect(page.locator('#dungeon-map')).toBeVisible();
       await page.locator('.dungeon-directions button:not(:disabled)').first().click();
-      await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();
+      // A legal exploration step can enter an encounter. Wait for its actual
+      // screen rather than clicking the loading screen's transient restart.
+      const stepped=JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);
+      if(stepped.phase==='battle'){
+        await expect(page.locator('#game')).toHaveAttribute('data-ready','true');
+        await page.locator('#fit-restart').click();
+      }else await page.locator('#dungeon-screen').getByRole('button',{name:'Start new dungeon',exact:true}).click();
+      await expect.poll(async()=>JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!).id).not.toBe(stepped.id);
       await expect(page.locator('#dungeon-map')).toBeVisible();
     }else if(mode==='proof')await page.locator('#fit-restart').click();
     if(mode==='run'||mode==='dungeon') {

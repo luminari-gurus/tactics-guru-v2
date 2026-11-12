@@ -11,7 +11,7 @@ import { menuFixture, terminalMenuBattle, rewardRunFixture } from './helpers/men
 import { BATTLE_STORAGE_KEYS } from '../src/persistence/battleStorage';
 import { RUN_STORAGE_KEYS } from '../src/persistence/runStorage';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
-import { emptyRunRecords, type RunRecord } from '../src/domain/runRecords';
+import { appendRunRecord, emptyRunRecords, type RunRecord } from '../src/domain/runRecords';
 import { encodeRunRecords, RUN_RECORD_KEYS } from '../src/persistence/runRecordsStorage';
 import { readSession, reviewDraught, playerDecision } from './helpers/battlePolicy';
 import { BattleSession } from '../src/app/BattleSession';
@@ -65,7 +65,10 @@ test('main menu: records display and reviewed export restore reset preserve acti
   await expect(dialog.getByRole('status')).toContainText('History needs recovery');
   await expect(list.getByRole('listitem')).toHaveCount(2);
   await expect(list.getByRole('listitem').first()).toContainText('Dungeon · Abandoned');
-  await expect(list.getByRole('listitem').first()).toContainText('Battles won: 6 · Floors cleared: 2 · Deepest floor: 3');
+  const first=list.getByRole('listitem').first();
+  await expect(first.locator('[data-stat=battlesWon] dd')).toHaveText('6');
+  await expect(first.locator('[data-stat=floorsCleared] dd')).toHaveText('2');
+  await expect(first).toContainText('Deepest floor: 3');
   const stored = () => page.evaluate(({ records, run }) => ({ primary: localStorage.getItem(records.primary), backup: localStorage.getItem(records.backup),
     runPrimary: localStorage.getItem(run.primary), runBackup: localStorage.getItem(run.backup) }), { records: RUN_RECORD_KEYS, run: keys.run });
   const before = await stored(); expect(before).toEqual({ primary: 'preserved corrupt history', backup: encoded, runPrimary: saved, runBackup: saved });
@@ -979,4 +982,67 @@ for(const mode of ['run','dungeon'] as const)test(`main menu: counter-only ${mod
   const history=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!),RUN_RECORD_KEYS.primary);
   expect(history.bests[mode].enemiesKilled.id).toBe(oldId);expect(history.bests[mode].movesTaken.id).toBe(oldId);expect(history.bests[mode].activeMs).toBeUndefined();
   const next=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!),slots.primary);expect(next.format).toBe(mode==='run'?11:13);expect(next.payload.stats).toMatchObject({version:2,coverage:'whole-run',timeCoverage:'whole-run'});
+});
+
+test('main menu: five-stat records and retained personal bests stay keyboard and touch accessible', async ({page,isMobile,context},info)=>{
+  const at=Date.UTC(2026,10,11,12),oldId='old-best-'+ 'a'.repeat(55);
+  const old:RunRecord={mode:'run',id:oldId,outcome:'victory',recordedAt:at-86400000,battlesWon:3,floorsCleared:null,deepestFloor:null,
+    stats:{version:2,coverage:'whole-run',timeCoverage:'whole-run',enemiesKilled:900,movesTaken:800,activeMs:3661000}};
+  let history=appendRunRecord(emptyRunRecords(),old);
+  for(let i=0;i<101;i++)history=appendRunRecord(history,{...old,id:`recent-${i}`,outcome:'abandoned',recordedAt:at+i*1000,battlesWon:1,
+    stats:{version:2,coverage:'whole-run',timeCoverage:'whole-run',enemiesKilled:i,movesTaken:i,activeMs:i*1000}});
+  history=appendRunRecord(history,{mode:'dungeon',id:'dungeon-example',outcome:'abandoned',recordedAt:at+200000,battlesWon:6,floorsCleared:2,deepestFloor:3,
+    stats:{version:2,coverage:'whole-run',timeCoverage:'whole-run',enemiesKilled:55,movesTaken:80,activeMs:95000}});
+  history=appendRunRecord(history,{...old,id:'time-partial-example',outcome:'abandoned',battlesWon:1,recordedAt:at+250000,
+    stats:{version:2,coverage:'whole-run',timeCoverage:'since-upgrade',enemiesKilled:5,movesTaken:6,activeMs:99999999}});
+  history=appendRunRecord(history,{mode:'run',id:'legacy-example',outcome:'defeat',recordedAt:at+300000,battlesWon:1,floorsCleared:null,deepestFloor:null});
+  history=appendRunRecord(history,{...old,id:'partial-example',outcome:'abandoned',battlesWon:1,recordedAt:at+400000,
+    stats:{version:2,coverage:'since-upgrade',timeCoverage:'since-upgrade',enemiesKilled:99999,movesTaken:99999,activeMs:99999999}});
+  const encoded=encodeRunRecords({...history,legacyBestCoverage:true});if(!encoded)throw Error('Invalid stats fixture');
+  await page.addInitScript(({key,encoded})=>localStorage.setItem(key,encoded),{key:RUN_RECORD_KEYS.primary,encoded});
+  await page.goto('./');const invoker=page.getByRole('button',{name:'Hall of Records',exact:true});
+  if(!isMobile)await invoker.focus();if(isMobile)await invoker.tap();else await page.keyboard.press('Enter');
+  const dialog=page.getByRole('dialog'),recent=dialog.getByRole('list',{name:'Recent journeys'});
+  await expect(recent.getByRole('listitem')).toHaveCount(100);await expect(recent).not.toContainText(oldId);
+  const partial=recent.getByRole('listitem').first();await expect(partial).toContainText('tracked since upgrade');
+  await expect(partial.locator('[data-stat]')).toHaveCount(5);
+  await expect(partial.locator('[data-stat=floorsCleared] dd')).toHaveText('N/A — authored run');
+  const legacy=recent.getByRole('listitem').nth(1);await expect(legacy).toContainText('Older record');
+  await expect(legacy.locator('[data-stat=enemiesKilled] dd')).toHaveText('Unavailable');
+  await expect(legacy.locator('[data-stat=movesTaken] dd')).toHaveText('Unavailable');
+  await expect(legacy.locator('[data-stat=activeMs] dd')).toHaveText('Unavailable');
+  const timePartial=recent.getByRole('listitem').nth(2);await expect(timePartial).toContainText('Active playtime is tracked since upgrade.');
+  await expect(timePartial).not.toContainText('Kills and moves are tracked');await expect(timePartial.locator('[data-stat=enemiesKilled] dd')).toHaveText('5');
+  await expect(dialog).toContainText('Historical best coverage is limited');
+  await page.screenshot({path:info.outputPath('records-recent.png'),fullPage:true});
+  const bests=dialog.locator('.run-personal-bests > summary');
+  if(isMobile)await bests.tap();else{await dialog.getByRole('button',{name:'Close',exact:true}).focus();await page.keyboard.press('Tab');await expect(bests).toBeFocused();await page.keyboard.press('Enter');}
+  await expect(dialog.getByRole('heading',{name:'Three-encounter run',exact:true,level:3})).toBeVisible();
+  const winner=dialog.locator('[data-best=run-enemiesKilled]');await expect(winner.locator('summary')).toHaveText('Most enemies killed: 900');
+  if(isMobile)await winner.locator('summary').tap();else{await page.keyboard.press('Tab');await expect(winner.locator('summary')).toBeFocused();await page.keyboard.press('Enter');}
+  // A real storage event must preserve both disclosure state and the keyboard position.
+   const other=await context.newPage();await other.goto('./');
+   await other.evaluate(({key,text})=>localStorage.setItem(key,' '+text),{key:RUN_RECORD_KEYS.primary,text:encoded});
+   await expect.poll(()=>page.evaluate(key=>localStorage.getItem(key),RUN_RECORD_KEYS.primary)).toBe(' '+encoded);
+   await expect(dialog.locator('.run-personal-bests')).toHaveAttribute('open','');
+   await expect(winner).toHaveAttribute('open','');
+   if(!isMobile)await expect(winner.locator('summary')).toBeFocused();
+   await other.close();
+   await expect(winner).toContainText(oldId);await expect(winner.locator('[data-stat]')).toHaveCount(5);
+  await expect(winner.getByRole('heading',{name:'Three-encounter run · Victory',level:4})).toBeVisible();
+  await expect(winner.locator('[data-stat=activeMs] dd')).toHaveText('1h 1m 1s');
+  await expect(dialog.locator('[data-best=run-activeMs] > summary')).toHaveText('Longest active playtime: 1h 1m 1s');
+  const bounds=await dialog.evaluate(node=>({width:node.clientWidth,scroll:node.scrollWidth}));expect(bounds.scroll).toBeLessThanOrEqual(bounds.width+1);
+  await winner.locator('[data-stat=activeMs]').scrollIntoViewIfNeeded();
+  await expect(winner.locator('[data-stat=activeMs] dd')).toBeInViewport();
+  await page.screenshot({path:info.outputPath('records-retained-best.png'),fullPage:true});
+  expect(await page.evaluate(key=>localStorage.getItem(key),RUN_RECORD_KEYS.primary)).toBe(' '+encoded);
+  if(isMobile)await dialog.getByRole('button',{name:'Close',exact:true}).tap();else await page.keyboard.press('Escape');
+  if(!isMobile)await expect(invoker).toBeFocused();else await expect(invoker).toBeVisible();
+  if(isMobile)await invoker.tap();else await invoker.click();
+  await dialog.getByRole('button',{name:'Reset records',exact:true}).click();
+  await dialog.getByRole('button',{name:'Confirm reset records',exact:true}).click();
+  await expect(dialog.locator('.run-personal-bests')).toHaveCount(0);await expect(dialog.getByRole('status')).toContainText('No finished journeys recorded yet.');
+  const cleared=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!),RUN_RECORD_KEYS.primary);
+  expect(cleared.records).toEqual([]);expect(cleared.bests).toEqual({run:{},dungeon:{}});
 });

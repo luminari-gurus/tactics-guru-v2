@@ -20,11 +20,11 @@ the plan records commands, failures, PR boundaries and remaining acceptance work
 
 ## 3. Recent/best presentation and whole-issue qualification — third PR
 
-- [ ] 3.1 Extend the existing Hall of Records modal with five-stat recent rows, per-mode bests and accessible winning summaries, preserving partial/N/A labels and recovery/focus behavior; verify keyboard plus narrow portrait/landscape native touch and WebKit, retain reviewed screenshots, and update docs/run-records.md with delivered behavior.
-- [ ] 3.2 Extend existing route-isolation spies and real legal authored/dungeon journeys to verify full counters, time, final events, undo/reload, floor travel/backtracking, repeated terminal Continue and both replacement identities; verify all direct/diagnostic entries do not track or touch player storage, and discover the exact affected special/regression/batch selections without losing prior coverage.
-- [ ] 3.3 Freeze relevant final inputs, run required PR and affected persistence/lifecycle checks, strict OpenSpec validation, links and diff checks; retain exact source/build-bound evidence/reuse/failures, audit AC1–AC8, and publish the final focused PR using Closes #270 only when every gate is proven, otherwise Refs #270 with the remaining scope on the issue.
+- [x] 3.1 Extend the existing Hall of Records modal with five-stat recent rows, per-mode bests and accessible winning summaries, preserving partial/N/A labels and recovery/focus behavior; verify keyboard plus narrow portrait/landscape native touch and WebKit, retain reviewed screenshots, and update docs/run-records.md with delivered behavior.
+- [x] 3.2 Extend existing route-isolation spies and real legal authored/dungeon journeys to verify full counters, time, final events, undo/reload, floor travel/backtracking, repeated terminal Continue and both replacement identities; verify all direct/diagnostic entries do not track or touch player storage, and discover the exact affected special/regression/batch selections without losing prior coverage.
+- [x] 3.3 Freeze relevant final inputs, run required PR and affected persistence/lifecycle checks, strict OpenSpec validation, links and diff checks; retain exact source/build-bound evidence/reuse/failures, audit AC1–AC8, and publish the final focused PR using Closes #270 only when every gate is proven, otherwise Refs #270 with the remaining scope on the issue.
 
 ## Workflow follow-up
 
-- Review/merge and production operations require their applicable later instructions; this handoff only publishes the plan and linked branch.
+- Review/merge and production operations require their applicable later instructions; this handoff leaves all three implementation PRs ready for review.
 - Archive/sync this OpenSpec change after accepted implementation and merge, preserving the original qualification failures and partial-data limitations.
