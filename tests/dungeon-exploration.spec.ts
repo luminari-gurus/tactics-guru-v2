@@ -352,6 +352,7 @@ fixedSeedTest('map shortcuts work on entry and outside the map without taking ov
  const grid = page.locator('#dungeon-map');
  await expect(grid).not.toBeFocused();
  await page.keyboard.press(direction.arrow);
+ await expect.poll(async()=>(await dungeonSnapshot(page)).floors[0].position).toBe(floor.position+direction.offset);
  const moved = await dungeonSnapshot(page);
  expect(moved.floors[0].position).toBe(floor.position + direction.offset);
  expect(moved.revision).toBe(initial.revision + 1);
@@ -377,6 +378,7 @@ fixedSeedTest('map shortcuts work on entry and outside the map without taking ov
 
  await restart.focus();
  await page.keyboard.press(direction.reverse);
+ await expect.poll(async()=>(await dungeonSnapshot(page)).floors[0].position).toBe(floor.position);
  const returned = await dungeonSnapshot(page);
  expect(returned.floors[0].position).toBe(floor.position);
  expect(returned.revision).toBe(moved.revision + 1);
@@ -385,6 +387,7 @@ fixedSeedTest('map shortcuts work on entry and outside the map without taking ov
  const menu = page.getByRole('link',{name:'Main menu',exact:true});
  await menu.focus();
  await page.keyboard.press(direction.arrow);
+ await expect.poll(async()=>(await dungeonSnapshot(page)).floors[0].position).toBe(floor.position+direction.offset);
  const movedAgain = await dungeonSnapshot(page);
  expect(movedAgain.revision).toBe(returned.revision + 1);
  await expect(menu).toBeFocused();
@@ -406,6 +409,7 @@ fixedSeedTest('map shortcuts work on entry and outside the map without taking ov
  await expect(wasd).not.toBeChecked();
  await restart.focus();
  await page.keyboard.press(direction.reverseArrow);
+ await expect.poll(async()=>(await dungeonSnapshot(page)).floors[0].position).toBe(floor.position);
  const arrowOnly = await dungeonSnapshot(page);
  expect(arrowOnly.floors[0].position).toBe(floor.position);
  expect(arrowOnly.revision).toBe(movedAgain.revision + 1);
