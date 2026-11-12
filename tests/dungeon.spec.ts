@@ -502,6 +502,9 @@ test('a claimed Revive Kit restores a fallen dungeon hero across Continue and ne
  const victory=acceptDungeonBattle(entry,result.state);if(!victory.ok)throw Error(victory.reason);
  expect(victory.state.party[2].hp).toBe(0);
  await seed(page,victory.state);
+ const mageHealth = page.locator('meter[aria-label="Mage health"]');
+ await expect(mageHealth).toHaveAttribute('aria-valuetext','0 of 11 hit points, defeated');
+ await expect(page.locator('#dungeon-hero-mage')).toBeEnabled();
  const activate=async(name:string)=>{const button=page.getByRole('button',{name,exact:true});if(isMobile)await button.tap();else await button.click();};
  await activate('Claim Revive Kit');await activate('Confirm');
  await openDungeonInventory(page);
@@ -510,8 +513,10 @@ test('a claimed Revive Kit restores a fallen dungeon hero across Continue and ne
  await expect(page.getByRole('dialog')).toContainText('mage will have 3/11 HP');
  await activate('Confirm');
  expect((await snapshot(page)).ownership.consumables).toEqual([]);
+ await expect(mageHealth).toHaveAttribute('aria-valuetext','3 of 11 hit points, injured');
  await page.reload();await continueSavedDungeon(page);
  expect((await snapshot(page)).party[2].hp).toBe(3);
+ await expect(mageHealth).toHaveAttribute('aria-valuetext','3 of 11 hit points, injured');
  await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  expect((await readSession(page)).state.units.find(u=>u.defId==='mage')?.hp).toBe(3);
@@ -553,6 +558,46 @@ test('an earned Healing Draught survives dungeon Continue and settles once after
  expect(await snapshot(page)).toEqual(final);
 });
 
+test('fresh dungeon keeps the map and party in view and opens the selected character sheet', async ({page,isMobile}) => {
+ await page.route('**/battle/portraits/mage.png', route => route.abort());
+ await page.goto('./');
+ const newGame = page.getByRole('button',{name:'New Game',exact:true});
+ if (isMobile) await newGame.tap(); else await newGame.click();
+ const map = page.locator('#dungeon-map'), party = page.getByRole('region',{name:'Party',exact:true});
+ await expect(map).toBeInViewport();
+ await expect(party).toBeInViewport();
+ expect(await page.locator('#dungeon-screen').evaluate(node => node.scrollWidth <= node.clientWidth)).toBe(true);
+ const fighter = party.getByRole('button',{name:'Fighter',exact:true});
+ const mage = party.getByRole('button',{name:'Mage',exact:true});
+ await expect(fighter.locator('img')).toHaveJSProperty('naturalWidth',96);
+ await expect(mage.locator('img')).toHaveCount(0);
+ await expect(party.locator('meter[aria-label="Fighter health"]')).toHaveAttribute('aria-valuetext','18 of 18 hit points');
+ const before = await snapshot(page);
+ const direction = await page.locator('.dungeon-directions button:enabled').first().getAttribute('aria-label');
+ const arrow = {North:'ArrowUp',East:'ArrowRight',South:'ArrowDown',West:'ArrowLeft'}[direction as 'North'|'East'|'South'|'West'];
+ expect(arrow).toBeDefined();
+ if (isMobile) await fighter.tap();
+ else { await fighter.focus(); await page.keyboard.press('Enter'); }
+ const dialog = page.getByRole('dialog',{name:'Fighter character sheet'});
+ await expect(dialog.locator('img')).toHaveJSProperty('naturalWidth',192);
+ await expect(dialog).toContainText('18/18 HP');
+ await expect(dialog).toContainText('Level 1');
+ await expect(dialog).toContainText('Accuracy');
+ await expect(dialog).toContainText('Armor class');
+ await page.screenshot({path:test.info().outputPath('character-sheet.png')});
+ await page.keyboard.press(arrow);
+ expect(await snapshot(page)).toEqual(before);
+ await page.keyboard.press('Escape');
+ await expect(dialog).not.toBeVisible();
+ await expect(fighter).toBeFocused();
+ if (isMobile) await mage.tap(); else await mage.click();
+ const mageSheet = page.getByRole('dialog',{name:'Mage character sheet'});
+ await expect(mageSheet).toContainText('11/11 HP');
+ await mageSheet.getByRole('button',{name:'Close',exact:true}).click();
+ await expect(mage).toBeFocused();
+ expect(await snapshot(page)).toEqual(before);
+});
+
 test('hero progression commits once, heals at a threshold and survives inspection and reload',async({page})=>{
  test.setTimeout(90000);
  const f=fixture(1),built=dungeonBattle(f.snapshot)!;
@@ -565,8 +610,10 @@ test('hero progression commits once, heals at a threshold and survives inspectio
  await playCommand(page,f.command);
  await expect(page.locator('#dungeon-screen')).toBeVisible();
  expect((await snapshot(page)).party).toEqual(completed.state.party);
- await expect(page.locator('section[aria-label="Party"]')).toContainText('Level 2');
- await expect(page.locator('section[aria-label="Party"]')).toContainText('XP');
+ await page.locator(`#dungeon-hero-${leveled[0].heroId}`).click();
+ await expect(page.getByRole('dialog')).toContainText('Level 2');
+ await expect(page.getByRole('dialog')).toContainText('XP');
+ await page.locator('#dungeon-sheet-close').click();
  await expect(page.locator('.dungeon-status')).toContainText('reached level 2');
  await expect(page.locator('.dungeon-status')).toContainText('learned Second Wind');
  await expect(page.locator('.dungeon-status')).not.toContainText('ability:');
