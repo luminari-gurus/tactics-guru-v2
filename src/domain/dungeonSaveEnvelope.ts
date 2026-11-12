@@ -2,11 +2,14 @@ import { HERO_PROGRESSION } from '../content/progression';
 import { dungeonIdentity, previousDungeonIdentity } from '../content/dungeon';
 import { previousItemCatalog } from '../content/items';
 import { canonical, hashJson } from './contentIdentity';
-import { readDungeon, type DungeonResult } from './dungeon';
+import { readDungeon, type DungeonResult, type DungeonState } from './dungeon';
 import { hasShape } from './validation';
 export const DUNGEON_SAVE_MAX_BYTES = 1024 * 1024;
 const DUNGEON_SAVE_FORMAT = 10;
 const DRAUGHT_DUNGEON_SAVE_FORMAT = 11;
+const WALL_SIGHT_DUNGEON_SAVE_FORMAT = 12;
+const WALL_SIGHT_DRAUGHT_SAVE_FORMAT = 13;
+const hasWallSight = (state: DungeonState) => state.floors.some(floor => floor.exploration.sightVersion !== undefined);
 const CURRENT_IDENTITY = hashJson({ dungeonIdentity, progression: HERO_PROGRESSION });
 const PREVIOUS_IDENTITY = hashJson({ dungeonIdentity: previousDungeonIdentity, progression: HERO_PROGRESSION });
 /** No DOM dependency in the authoritative save reader. Lone surrogates count as replacement characters. */
@@ -15,10 +18,13 @@ export function utf8Bytes(text: string) {
   for (const char of text) { const c = char.codePointAt(0)!; n += c < 128 ? 1 : c < 2048 ? 2 : c < 65536 ? 3 : 4; }
   return n;
 }
-export function encodeDungeonWithState(input: unknown): { ok: true; text: string; state: import('./dungeon').DungeonState } | { ok: false; reason: string } {
+export function encodeDungeonWithState(input: unknown): { ok: true; text: string; state: DungeonState } | { ok: false; reason: string } {
   const checked = readDungeon(input);
   if (!checked.ok) return checked;
-  const format = checked.state.activeBattle?.draughts ? DRAUGHT_DUNGEON_SAVE_FORMAT : DUNGEON_SAVE_FORMAT;
+  const draughts = checked.state.activeBattle?.draughts;
+  const format = hasWallSight(checked.state)
+    ? draughts ? WALL_SIGHT_DRAUGHT_SAVE_FORMAT : WALL_SIGHT_DUNGEON_SAVE_FORMAT
+    : draughts ? DRAUGHT_DUNGEON_SAVE_FORMAT : DUNGEON_SAVE_FORMAT;
   const body = { kind: 'tactics-guru:dungeon', format, identity: CURRENT_IDENTITY, payload: checked.state };
   const text = canonical({ ...body, digest: hashJson(body) });
   return utf8Bytes(text) > DUNGEON_SAVE_MAX_BYTES ? { ok: false, reason: 'tooLarge' } : { ok: true, text, state: checked.state };
@@ -33,13 +39,19 @@ export function decodeDungeon(text: string): DungeonResult {
     const input: unknown = JSON.parse(text);
     if (!hasShape(input, ['kind','format','identity','payload','digest'])) return { ok: false, reason: 'invalidEnvelope' };
     const previous = input.format === 9 && input.identity === PREVIOUS_IDENTITY;
-    const current = (input.format === DUNGEON_SAVE_FORMAT || input.format === DRAUGHT_DUNGEON_SAVE_FORMAT) && input.identity === CURRENT_IDENTITY;
+    const wallSight = input.format === WALL_SIGHT_DUNGEON_SAVE_FORMAT || input.format === WALL_SIGHT_DRAUGHT_SAVE_FORMAT;
+    const current = (input.format === DUNGEON_SAVE_FORMAT || input.format === DRAUGHT_DUNGEON_SAVE_FORMAT || wallSight) &&
+      input.identity === CURRENT_IDENTITY;
     if (input.kind !== 'tactics-guru:dungeon' || !(previous || current)) return { ok: false, reason: 'incompatible' };
     const body = { kind: input.kind, format: input.format, identity: input.identity, payload: input.payload };
     if (input.digest !== hashJson(body)) return { ok: false, reason: 'digest' };
     const read = readDungeon(input.payload, previous ? previousItemCatalog : undefined);
-    if (previous && read.ok && (read.state.offer?.version === 2 || read.state.activeBattle?.draughts)) return { ok: false, reason: 'incompatible' };
-    if (input.format === DRAUGHT_DUNGEON_SAVE_FORMAT && read.ok && !read.state.activeBattle?.draughts) return { ok: false, reason: 'invalidState' };
+    if (!read.ok) return read;
+    if (previous && (read.state.offer?.version === 2 || read.state.activeBattle?.draughts)) return { ok: false, reason: 'incompatible' };
+    if (wallSight !== hasWallSight(read.state)) return { ok: false, reason: 'incompatible' };
+    const draughts = Boolean(read.state.activeBattle?.draughts);
+    if ((input.format === DRAUGHT_DUNGEON_SAVE_FORMAT && !draughts) ||
+        (wallSight && draughts !== (input.format === WALL_SIGHT_DRAUGHT_SAVE_FORMAT))) return { ok: false, reason: 'invalidState' };
     return read;
   } catch { return { ok: false, reason: 'invalidJson' }; }
 }

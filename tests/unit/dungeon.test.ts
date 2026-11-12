@@ -1,4 +1,4 @@
-import { atEncounter, atDownstairs, atStairApproach, atCell, dungeonContactApproach } from '../helpers/dungeonFixtures';
+import { atEncounter, atDownstairs, atStairApproach, atCell, dungeonContactApproach, withLegacySight } from '../helpers/dungeonFixtures';
 import { freshExploration, movableExploration, neighbors, poiCell } from '../../src/domain/exploration';
 import { generateMap } from '../../src/map/generate';
 import { applyBiome } from '../../src/map/biomes';
@@ -46,6 +46,23 @@ it.each(['active', 'reward'])('loads the exact pre-consumable dungeon %s save an
     expect(claimed.state.offer).toBeNull();
   }
   expect(decodeDungeon(JSON.stringify({ ...previous, digest: `sha256:${'0'.repeat(64)}` }))).toEqual({ ok: false, reason: 'digest' });
+});
+it('labels wall-aware saves and rejects signed payloads with the wrong sight format', () => {
+  const state = fresh();
+  const rewrap = (text: string, format: number) => {
+    const { kind, identity, payload } = JSON.parse(text);
+    const body = { kind, format, identity, payload };
+    return canonical({ ...body, digest: hashJson(body) });
+  };
+  const wallAware = encodeDungeon(state); assert(wallAware.ok);
+  expect(JSON.parse(wallAware.text).format).toBe(12);
+  expect(decodeDungeon(wallAware.text)).toEqual({ ok: true, state });
+  expect(decodeDungeon(rewrap(wallAware.text, 10))).toEqual({ ok: false, reason: 'incompatible' });
+  expect(decodeDungeon(rewrap(wallAware.text, 13))).toEqual({ ok: false, reason: 'invalidState' });
+  const legacy = withLegacySight(state), old = encodeDungeon(legacy); assert(old.ok);
+  expect(JSON.parse(old.text).format).toBe(10);
+  expect(decodeDungeon(old.text)).toEqual({ ok: true, state: legacy });
+  expect(decodeDungeon(rewrap(old.text, 12))).toEqual({ ok: false, reason: 'incompatible' });
 });
 function win(s: DungeonState) {
   s = good(startDungeonBattle(atEncounter(s)));
@@ -694,7 +711,7 @@ describe('unordered encounters and moving dungeon enemies', () => {
   it('continues a current-format legacy-exploration active battle and upgrades movement after victory', () => {
     const initial=fresh(), started=good(startDungeonBattle(atEncounter(initial,0)));
     const oldExploration={...initial.floors[0].exploration,revealed:started.floors[0].exploration.revealed,visited:started.floors[0].exploration.visited};
-    const legacyState={...started,floors:[{...started.floors[0],exploration:oldExploration}]};
+    const legacyState=withLegacySight({...started,floors:[{...started.floors[0],exploration:oldExploration}]});
     const body={kind:'tactics-guru:dungeon',format:9,identity:hashJson({dungeonIdentity:previousDungeonIdentity,progression:HERO_PROGRESSION}),payload:legacyState};
     const legacy=decodeDungeon(canonical({...body,digest:hashJson(body)}));if(!legacy.ok)throw Error(legacy.reason);
     const battle=legacy.state.activeBattle!;
@@ -717,13 +734,13 @@ describe('unordered encounters and moving dungeon enemies', () => {
     expect(second.retry(second.inspect())).toBe(true); // Explicit recovery adopts the reviewed storage boundary.
   });
   it('reads current-format legacy exploration and upgrades its movement state only after a step', () => {
-    const s=fresh(), body={kind:'tactics-guru:dungeon',format:9,identity:hashJson({dungeonIdentity:previousDungeonIdentity,progression:HERO_PROGRESSION}),payload:s};
+    const s=withLegacySight(fresh()), body={kind:'tactics-guru:dungeon',format:9,identity:hashJson({dungeonIdentity:previousDungeonIdentity,progression:HERO_PROGRESSION}),payload:s};
     const legacy=decodeDungeon(canonical({...body,digest:hashJson(body)}));
     if(!legacy.ok)throw Error(legacy.reason);
     expect(legacy.state.floors[0].exploration.version).toBe('exploration-v1');
     const upgraded=move(legacy.state);
     const next=encodeDungeon(upgraded);if(!next.ok)throw Error(next.reason);
-    expect(JSON.parse(next.text).format).toBe(10);
+    expect(JSON.parse(next.text).format).toBe(12);
     expect(decodeDungeon(next.text)).toEqual({ok:true,state:upgraded});
     for(const format of [7,8]){
       const old={...body,format};expect(decodeDungeon(canonical({...old,digest:hashJson(old)}))).toEqual({ok:false,reason:'incompatible'});

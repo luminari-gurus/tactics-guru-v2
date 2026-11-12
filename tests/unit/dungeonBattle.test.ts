@@ -1,6 +1,6 @@
 import { HERO_PROGRESSION } from '../../src/content/progression';
 import { progressHero } from '../../src/domain/progression';
-import { atEncounter } from '../helpers/dungeonFixtures';
+import { atEncounter, withLegacySight } from '../helpers/dungeonFixtures';
 import { freshDungeon, floorDescriptor, floorMap, startDungeonBattle, readDungeon } from '../../src/domain/dungeon';
 import { guardedBoundary } from '../helpers/guardedBoundary';
 import { combatStats } from '../../src/domain/effects';
@@ -19,11 +19,13 @@ import { priorDungeonEnvelope } from '../helpers/dungeonFixtures';
 import { freshExploration } from '../../src/domain/exploration';
 import { createDungeonStorage } from '../../src/persistence/dungeonStorage';
 
-it('saves a battle draught with its heal, replays it and settles stock on either outcome', () => {
+it.each([[10, 11], [12, 13]])('saves a draught in checkpoint/battle formats %i/%i and settles stock on either outcome', (checkpointFormat, battleFormat) => {
   const base = freshDungeon('draught-test', 13);
   const ready = { ...base, party: base.party.map(hero => ({ ...hero, hp: 4 })),
     ownership: { ...base.ownership, consumables: [{ itemId: 'item:healing_draught' as const, quantity: 2 }] } };
-  const started = startDungeonBattle(atEncounter(ready)); assert(started.ok && started.state.activeBattle);
+  const atContact = atEncounter(ready);
+  const started = startDungeonBattle(battleFormat === 11 ? withLegacySight(atContact) : atContact);
+  assert(started.ok && started.state.activeBattle);
   const built = dungeonBattle(started.state)!;
   const battle = new BattleSession(built.catalog, started.state.activeBattle, built.state.seed, undefined, true, built.battlefield);
   while (battle.phase === 'enemy') { const step = battle.nextEnemy(); assert(step); battle.finishPresentation(step.token); }
@@ -38,10 +40,10 @@ it('saves a battle draught with its heal, replays it and settles stock on either
   const storage = createDungeonStorage(()=>({getItem:key=>bytes.get(key)??null,setItem:(key,value)=>{bytes.set(key,value);},removeItem:key=>{bytes.delete(key);}}));
   expect(storage.save(started.state).ok).toBe(true);
   const checkpoint = storage.inspect().backup.text!;
-  expect(JSON.parse(checkpoint)).toMatchObject({format:10,payload:{phase:'ready',activeBattle:null}});
+  expect(JSON.parse(checkpoint)).toMatchObject({format:checkpointFormat,payload:{phase:'ready',activeBattle:null}});
   expect(storage.save(updated.state).ok).toBe(true);
   expect(storage.inspect().backup.text).toBe(checkpoint);
-  expect(JSON.parse(storage.inspect().primary.text!).format).toBe(11);
+  expect(JSON.parse(storage.inspect().primary.text!).format).toBe(battleFormat);
   expect(updated.state.ownership).toEqual(ready.ownership);
   const wire = encodeDungeon(updated.state); assert(wire.ok);
   const resumed = decodeDungeon(wire.text); assert(resumed.ok && resumed.state.activeBattle);

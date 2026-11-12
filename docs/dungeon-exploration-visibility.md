@@ -15,13 +15,15 @@ in memory, subject to the existing stair availability and marker priority rules.
 Live encounter markers and their accessible descriptions use current sight. The
 map does not keep last-seen enemy locations.
 
-Save envelopes retain their existing format and content identity. The floor's
+Saves with wall-aware floors use envelope format 12, or 13 during an active battle
+with a Healing Draught ledger. Saves containing only legacy floors still write
+format 10 or 11. The content identity remains the same. The floor's
 optional `sightVersion: "wall-sight-v1"` explicitly identifies the wall-aware discovery
 rule in both fixed and movable encounter records. Existing floor records without
 this field use the original admission checks and keep every revealed and visited
 cell. Their first accepted step adds the field and accumulates only the new
 position's sight. New floors start with the field and wall-aware memory. This is
-forward compatibility for existing saves. Older clients reject the new floor field.
+forward compatibility for existing saves. Older clients recognize formats 12 and 13 as unsupported.
 
 Current sight is derived on display and is never stored. Floor transitions and
 battle returns use the committed floor and position. Art loading and style changes

@@ -91,13 +91,7 @@ test('map markers respect stair availability, discovery and saved floor state',a
 
 test('live markers follow current sight across movement, art changes and reload', async ({ page, isMobile }) => {
  const base = freshDungeon('sight-movement', 1), map = floorMap(base.floors[0].descriptor);
- const appeared = (before: DungeonState, after: DungeonState, slot: number) => {
-  const visible = (s: DungeonState) => {
-   const floor = s.floors[0];
-   return currentSight(floor.position, map).includes(poiCell(floor.exploration.pois[slot], map.width));
-  };
-  return !visible(before) && visible(after);
- };
+ const encounterCell = (state: DungeonState, slot: number) => poiCell(state.floors[0].exploration.pois[slot], map.width);
  for (const entering of [true, false]) {
   let witness: { before: DungeonState; after: DungeonState; slot: number } | undefined;
   for (const [position, open] of map.cells.entries()) {
@@ -106,8 +100,12 @@ test('live markers follow current sight across movement, art changes and reload'
    for (const destination of neighbors(position, map.width, map.height)) {
     const result = stepDungeon(before, { id: before.id, depth: before.depth, revision: before.revision, destination });
     if (!result.ok || result.state.phase !== 'ready') continue;
-    const slot = before.floors[0].exploration.pois.findIndex((_, i) =>
-     entering ? appeared(before, result.state, i) : appeared(result.state, before, i));
+    const beforeSight = currentSight(position, map), afterSight = currentSight(destination, map);
+    const slot = before.floors[0].exploration.pois.findIndex((_, i) => {
+     const oldCell = encounterCell(before, i), newCell = encounterCell(result.state, i);
+     return beforeSight.includes(oldCell) === !entering &&
+      afterSight.includes(oldCell) === !entering && afterSight.includes(newCell) === entering;
+    });
     if (slot >= 0) {
      witness = { before, after: result.state, slot };
      break;
@@ -121,11 +119,14 @@ test('live markers follow current sight across movement, art changes and reload'
   const marker = page.locator(`#dungeon-map [data-poi="enemy-${slot + 1}"]`);
   const accessibleMap = page.getByRole('application', { name: /Floor 1 map/ });
   const label = slot === 2 ? 'Guardian · Goblins' : `encounter ${slot + 1}`;
-  const check = async (visible: boolean) => {
+  const check = async (state: DungeonState, visible: boolean) => {
    await expect(marker).toHaveCount(visible ? 1 : 0);
    if (visible) {
+    const index = encounterCell(state, slot);
     await expect(marker).toHaveText('M');
-    await expect(accessibleMap).toHaveAccessibleDescription(new RegExp(label));
+    await expect(marker).toHaveAttribute('data-cell', String(index));
+    await expect(accessibleMap).toHaveAccessibleDescription(new RegExp(
+     `${label} at row ${Math.floor(index / map.width) + 1}, column ${index % map.width + 1}\\.`));
    } else {
     await expect(accessibleMap).not.toHaveAccessibleDescription(new RegExp(label));
    }
@@ -134,9 +135,9 @@ test('live markers follow current sight across movement, art changes and reload'
   await page.evaluate(({ key, text }) => localStorage.setItem(key, text), { key: DUNGEON_KEYS.primary, text: encoded.text });
   await page.reload();
   await continueSavedDungeon(page);
-  await check(!entering);
+  await check(before, !entering);
   await walkDungeon(page, after.floors[0].position, isMobile ? 'touch' : 'keyboard');
-  await check(entering);
+  await check(after, entering);
   const previousSight = currentSight(before.floors[0].position, map);
   const nextSight = currentSight(after.floors[0].position, map);
   const remembered = previousSight.find(cell => !nextSight.includes(cell));
@@ -144,11 +145,11 @@ test('live markers follow current sight across movement, art changes and reload'
   const rememberedCell = page.locator(`#dungeon-map [data-cell="${remembered}"]`);
   await expect(rememberedCell).toHaveClass(/explore-remembered/);
   await page.locator('#dungeon-art').selectOption('legacy-8bit');
-  await check(entering);
+  await check(after, entering);
   expect(await dungeonSnapshot(page)).toEqual(after);
   await page.reload();
   await continueSavedDungeon(page);
-  await check(entering);
+  await check(after, entering);
   await expect(rememberedCell).toHaveClass(/explore-remembered/);
   expect(await dungeonSnapshot(page)).toEqual(after);
  }
