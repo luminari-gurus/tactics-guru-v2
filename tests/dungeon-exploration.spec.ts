@@ -39,12 +39,19 @@ test('map markers respect stair availability, discovery and saved floor state',a
  await load({...base,floors:[{...revealed,position:floor.position}]});
  await expect(page.locator('[aria-label="Discovered places"]')).toHaveCount(0);
  const firstMap = floorMap(floor.descriptor), sight = currentSight(floor.position, firstMap);
- await expect(accessibleMap).not.toHaveAccessibleDescription(/Guardian · Goblins/);
+ await expect(accessibleMap).toHaveAccessibleDescription(/Guardian · Goblins at row \d+, column \d+\. Available\./);
  await expect(cell(floor.descriptor.downstairs)).toHaveClass(/explore-remembered/);
  await expect(cell(floor.position)).not.toHaveClass(/explore-remembered/);
  await expect(accessibleMap).not.toHaveAccessibleDescription(/Upstairs|Downstairs/);
  await expect(cell(floor.descriptor.downstairs)).toHaveText('');
- for(const poi of floor.exploration.pois)await expect(cell(poiCell(poi))).toHaveText(sight.includes(poiCell(poi)) ? 'M' : '');
+ for (const poi of floor.exploration.pois) {
+  const index = poiCell(poi, firstMap.width), visible = sight.includes(index);
+  await expect(cell(index)).toHaveText(visible ? 'M' : '');
+  if (!visible) {
+   const location = `at row ${Math.floor(index / firstMap.width) + 1}, column ${index % firstMap.width + 1}.`;
+   await expect(accessibleMap).not.toHaveAccessibleDescription(new RegExp(location.replace('.', '\\.')));
+  }
+ }
  await expect(page.locator('#dungeon-map')).not.toContainText(/[123]/);
  await expect(page.getByText('● Player · M encounter (including guardian)',{exact:false})).toBeVisible();
  await expect(page.locator('#dungeon-descend')).toHaveCount(0);
