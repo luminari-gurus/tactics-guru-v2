@@ -13,6 +13,26 @@
 #dungeon-screen ol { padding-left: 24px; }
 body:has(#dungeon-screen:not([hidden])) #battle-heading { display: none; }
 
+#dungeon-screen:has(.dungeon-play) { max-width: 1040px; container-type: inline-size; }
+.dungeon-header h1 { margin: 0; }
+.dungeon-header .dungeon-status { margin: 8px 0; }
+.dungeon-play { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+#dungeon-screen .dungeon-play section { margin: 0; }
+.dungeon-play h2 { margin: 0 0 8px; }
+.dungeon-sidebar > section + section { padding-top: 12px; }
+.dungeon-secondary { margin-block: 16px; }
+.dungeon-secondary details { margin: 8px 0; border: 1px solid #657464; border-radius: 6px; background: #192622; }
+.dungeon-secondary summary { padding: 12px; cursor: pointer; font-weight: 600; }
+.dungeon-secondary details[open] { padding: 0 12px 12px; }
+.dungeon-secondary details[open] summary { margin-inline: -12px; }
+.dungeon-secondary details p { margin: 8px 0; }
+/* Leave 471px for a 36-column floor after the gap and the party column. */
+@container (min-width: 798px) {
+  .dungeon-play { grid-template-columns: minmax(0, 1fr) minmax(280px, 0.65fr); gap: 20px; }
+  .dungeon-sidebar { grid-column: 2; grid-row: 1; }
+  .dungeon-play > section { grid-column: 1; grid-row: 1; }
+}
+
 #dungeon-map {
   --dungeon-map-columns: 20;
   --dungeon-map-rows: 20;
