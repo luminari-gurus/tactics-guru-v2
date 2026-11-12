@@ -112,6 +112,10 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
         else if (rollback.reason !== 'tooLarge') return rollback;
       }
       let checkpointRecord: string | null = null;
+      const backupMatches = () => backup === null || (
+        storage.getItem(DUNGEON_KEYS.backup) === backup &&
+        (checkpointRecord === null || storage.getItem(DUNGEON_BACKUP_CHECKPOINT_KEY) === checkpointRecord)
+      );
       if (backup !== null) {
         if (checkpoint !== null) {
           // Keep the old checkpoint readable until the new rollback bytes land.
@@ -124,13 +128,14 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
           }
         }
         storage.setItem(DUNGEON_KEYS.backup, backup);
-        if (storage.getItem(DUNGEON_KEYS.backup) !== backup) { uncertain = true; return { ok: false, reason: 'uncertainWrite' }; }
+        if (!backupMatches()) { uncertain = true; return { ok: false, reason: 'uncertainWrite' }; }
         if (checkpoint === null && storage.getItem(DUNGEON_BACKUP_CHECKPOINT_KEY) !== null) storage.removeItem(DUNGEON_BACKUP_CHECKPOINT_KEY);
       }
       // Any exception after the write attempt can have an uncertain outcome.
       uncertain = true;
       storage.setItem(DUNGEON_KEYS.primary, encoded.text);
-      if (storage.getItem(DUNGEON_KEYS.primary) !== encoded.text) return { ok: false, reason: 'uncertainWrite' };
+      // A concurrent removal can invalidate the backup while the primary is being written.
+      if (storage.getItem(DUNGEON_KEYS.primary) !== encoded.text || !backupMatches()) return { ok: false, reason: 'uncertainWrite' };
       uncertain = false; lastWritten = encoded.text;
       try {
         decoded.clear();

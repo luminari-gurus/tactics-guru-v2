@@ -132,6 +132,40 @@ it('keeps the previous exact checkpoint when a backup rotation is interrupted', 
   expect(data.getItem(DUNGEON_BACKUP_CHECKPOINT_KEY)).toBeNull();
 });
 
+it.each(['backup', 'primary'] as const)('refuses to acknowledge a save if another tab removes its checkpoint during the %s write', writeSlot => {
+  const initial = fresh(), data = memory(), writer = createDungeonStorage(() => data);
+  const remover = createDungeonStorage(() => data);
+  expect(writer.save(initial).ok).toBe(true);
+  const floor = initial.floors[0], map = floorMap(floor.descriptor);
+  const next = good(stepDungeon(initial, { id: initial.id, depth: initial.depth, revision: initial.revision,
+    destination: neighbors(floor.position, map.width, map.height).find(cell => map.cells[cell])! }));
+  expect(writer.save(next).ok).toBe(true);
+  const reviewed = remover.inspect().backup, previousPrimary = writer.lastSavedText();
+  assert(reviewed.status === 'valid' && reviewed.checkpoint);
+  const write = data.setItem;
+  data.setItem = (key, value) => {
+    if (key === DUNGEON_KEYS[writeSlot]) {
+      const backup = writeSlot === 'backup' ? reviewed : remover.inspect().backup;
+      assert(backup.status === 'valid' && backup.checkpoint);
+      expect(remover.remove('backup', backup.text, backup.checkpoint)).toEqual({ ok: true });
+    }
+    write(key, value);
+  };
+  const candidate = { ...next, revision: next.revision + 1 };
+  expect(writer.save(candidate, previousPrimary)).toEqual({ ok: false, reason: 'uncertainWrite' });
+  expect(writer.lastSavedText()).toBe(previousPrimary);
+  expect(writer.save(candidate)).toEqual({ ok: false, reason: 'uncertainWrite' });
+  const primary = writer.inspect().primary; assert(primary.status === 'valid');
+  expect(primary.state).toEqual(writeSlot === 'backup' ? next : candidate);
+
+  data.setItem = write;
+  const recovery = writer.inspect();
+  expect(writer.acknowledge(recovery)).toBe(true);
+  expect(writer.save(candidate, recovery.primary.text)).toEqual({ ok: true });
+  const restored = writer.inspect().backup; assert(restored.status === 'valid');
+  expect(restored.state).toEqual(primary.state);
+});
+
 function win(s: DungeonState) {
   s = good(startDungeonBattle(atEncounter(s)));
   const b = s.activeBattle!;
