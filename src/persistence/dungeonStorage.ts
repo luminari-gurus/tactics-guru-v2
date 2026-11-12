@@ -102,8 +102,9 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
         }
       }
       let checkpoint: string | null = null;
-      const existingCheckpoint = backup === null && old.backup.status === 'valid' && old.backup.checkpoint;
-      if (!existingCheckpoint && backupState && hasWallSight(backupState)) {
+      // Inspection caches the exact record that restored the reviewed backup.
+      const retainedRecord = old.backup.status === 'valid' && old.backup.checkpoint ? restoredBackup?.record : undefined;
+      if (!(backup === null && retainedRecord !== undefined) && backupState && hasWallSight(backupState)) {
         const rollback = encodeDungeonRollback(backupState);
         if (rollback.ok) {
           backup = rollback.text;
@@ -112,10 +113,11 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
         else if (rollback.reason !== 'tooLarge') return rollback;
       }
       let checkpointRecord: string | null = null;
-      const backupMatches = () => backup === null || (
-        storage.getItem(DUNGEON_KEYS.backup) === backup &&
-        (checkpointRecord === null || storage.getItem(DUNGEON_BACKUP_CHECKPOINT_KEY) === checkpointRecord)
-      );
+      const backupMatches = () => {
+        const expectedRecord = backup === null ? retainedRecord : checkpointRecord;
+        return storage.getItem(DUNGEON_KEYS.backup) === (backup ?? old.backup.text) &&
+          (expectedRecord == null || storage.getItem(DUNGEON_BACKUP_CHECKPOINT_KEY) === expectedRecord);
+      };
       if (backup !== null) {
         if (checkpoint !== null) {
           // Keep the old checkpoint readable until the new rollback bytes land.
