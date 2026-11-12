@@ -43,6 +43,11 @@ const mapView=new DungeonMap(async destination=>{if(!live||playing||loading||loa
 function button(label:string,run:()=>void){const n=el('button',label);n.type='button';n.onclick=run;return n;}
 function evidence(state:DungeonState=session.snapshot){container.dataset.dungeonSnapshot=JSON.stringify(state);container.dataset.dungeonBattleRecord=JSON.stringify(session.completedBattle);}
 function stop(){loadGeneration++;deferredStart=null;loading=false;loadError=false;playing=false;host=null;engine?.scene.stop('battle');controls.hidden=true;container.style.visibility='hidden';playtime?.sync();}
+const explorationTools = el('div');
+const sandboxNotice = storage ? null : testingProgress('dungeon');
+if (sandboxNotice) explorationTools.append(sandboxNotice);
+explorationTools.append(returnLink());
+mountTelemetryPreferences(explorationTools);
 function render(){
  if(!live)return;const state=session.snapshot;evidence(state);
  if(playing){persistence.querySelector('span')!.textContent=session.status;playtime?.sync();return;}
@@ -68,19 +73,18 @@ function render(){
   }else screen.append(testingProgress('dungeon'),button('Start new dungeon',requestNew));
   const link=el('a','Three-battle scenario');link.href=`${import.meta.env.BASE_URL}run`;screen.append(link);
  }else {
-  renderDungeon(screen,state,session,dialogs,{start,recover:storage?recovery:undefined,restart:requestNew},cache,mapView);
+  renderDungeon(screen,state,session,dialogs,{start,recover:storage?recovery:undefined,restart:requestNew},cache,mapView,explorationTools);
   if(loadError){
    const error=el('p',storage?'Could not load the encounter. Reload the page to try again, or open Save recovery.':'Could not load the encounter. Reload the page to try again, or start a new dungeon.');
    error.id='dungeon-load-error';error.tabIndex=-1;error.setAttribute('role','alert');
    screen.prepend(error);
   }
  }
+ if(sandboxNotice)sandboxNotice.hidden=startup;
+ if(explorationTools.parentElement!==screen)screen.append(explorationTools);
  if(loading||loadError){
-  screen.append(el('p',storage&&!session.hasUnsavedProgress?'The encounter is saved on this device.':'Reloading will discard unsaved progress.'),button('Reload page',()=>location.reload()));
+  explorationTools.before(el('p',storage&&!session.hasUnsavedProgress?'The encounter is saved on this device.':'Reloading will discard unsaved progress.'),button('Reload page',()=>location.reload()));
  }
- if(!storage&&!startup)screen.append(testingProgress('dungeon'));
- screen.append(returnLink());
- mountTelemetryPreferences(screen);
  playtime?.sync();
 }
 async function requestNew(){
