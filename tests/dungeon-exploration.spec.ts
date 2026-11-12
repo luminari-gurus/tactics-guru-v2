@@ -339,6 +339,7 @@ fixedSeedTest('map shortcuts work on entry and outside the map without taking ov
  await page.goto('./?game=dungeon');
  await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();
  await page.locator('#dungeon-confirm-new').click();
+ await expect(page.locator('#dungeon-map')).toBeVisible();
  const initial = await dungeonSnapshot(page);
  const floor = initial.floors[0], terrain = floorMap(floor.descriptor);
  const direction = [
