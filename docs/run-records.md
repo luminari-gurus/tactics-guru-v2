@@ -5,13 +5,18 @@ and device; it is best-effort browser storage, separate from active game saves.
 Clearing site data also removes history. The view retains the newest 100 journeys,
 ordered by recording time with a stable journey-ID tie-break.
 
-## Initial record contract
+## Record contract
 
 Each immutable summary identifies an authored run or dungeon, its existing journey
-ID, outcome and recording time. Supported counters are battles won and, for dungeons,
-floors cleared and deepest visited floor. Authored runs have no floor counters.
-Only facts retained by validated authoritative progress are projected; detailed
-kills, moves, active playtime and best-run statistics belong to issue #270.
+ID, outcome and recording time. Recent summaries show enemies killed, battles won,
+moves taken, floors cleared and active playtime. Dungeons also retain deepest
+visited floor; authored floors are N/A. Missing historical totals display as
+unavailable, and continued older journeys label new counters as since upgrade.
+Playtime may be partial while kills/moves remain whole-run facts; labels and
+personal-best eligibility follow each field's actual coverage.
+Personal bests disclose per-mode maxima and open the originating frozen summary,
+including winners that have left the newest 100. Native disclosures work with
+keyboard and touch, within the existing focus-preserving recovery dialog.
 
 ## Active counters (issue #270, increment 1)
 
@@ -32,8 +37,9 @@ battle/command receipt are stored. Repeated or older batches cannot increment th
 Continued old journeys begin irrecoverable counters on their first accepted action
 with `since-upgrade` coverage; missing old totals are never whole-run zeroes.
 New menu journeys use `whole-run` coverage. Testing routes disable accumulation.
-The active clock and immutable summary/best projection are supplied by the next
-increment below. Recent/best presentation follows separately.
+The active clock and immutable summary/best projection are described below. The
+Hall of Records presents those frozen values without changing stored bytes merely
+by opening a record or a personal-best disclosure.
 
 ## Active time and immutable personal bests (issue #270, increment 2)
 
@@ -88,13 +94,15 @@ implemented now.
 The first accepted result for a mode/ID wins. Repeated callbacks cannot rewrite its
 outcome or time. Two bounded current-journey receipts protect pending replacement
 and prevent a still-current terminal save from recreating an evicted old record.
-The model and adapter are shared; no combat event accumulator is introduced.
+The model and adapter are shared; counters come from the pure accepted-event
+accumulator, never rendered text or sprite state.
 
 ## Storage and recovery
 
-Version-one history uses `tactics-guru:records:primary:v1` and
+History uses `tactics-guru:records:primary:v1` and
 `tactics-guru:records:backup:v1`. The bounded envelope includes a digest and is
-validated before use. Writes are serialized using a records-specific browser lock
+validated before use. These keys retain their original namespace; payload version
+two reads version-one history compatibly. Writes use a records-specific browser lock
 and verified by readback. Missing lock/storage access or write failure is reported;
 it never changes combat or prevents playing.
 
@@ -166,4 +174,6 @@ supported, as do older fog-preview 12/13 payloads without statistics. A client
 predating statistics cannot resume the new envelopes. Recover/export using a
 statistics-capable build; do not reset or silently downgrade for an old client.
 
-Pending failed checkpoints can retry; an explicit removal suppresses automatic retries until new accepted playtime/progress or an explicit Retry saving. Ending history is submitted independently of the active-save lock. Review preparation prevents status renders from restarting the clock before the modal is open, and disposal avoids an unnecessary no-op lock after a completed flush.
+Records updates from another tab preserve open personal-best disclosures and restore the matching focused summary or action. If that control disappears, focus moves to the current status inside the dialog.
+
+Pending failed checkpoints remain distinct from deliberately removed slots; fresh accepted playtime/progress or explicit Retry saving can save again. Ending history is submitted independently of active-save locks. Review preparation blocks reentrant eligibility until its modal opens, and completed unload flushes avoid new no-op locks.

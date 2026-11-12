@@ -4,8 +4,41 @@ Date: 2026-11-10 (Asia/Jerusalem). Assigned to @moshehbenavraham.
 Issue: [#270](https://github.com/luminari-gurus/tactics-guru-v2/issues/270).
 Branch: [`branch/issue-270-run-statistics`](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-270-run-statistics).
 Base: `origin/main`, `f0bdac46dbd018ba11300c800e3dfb0d986fd6a5`.
-Status: **increment 1 ready in [PR #365](https://github.com/luminari-gurus/tactics-guru-v2/pull/365); active time/history ready in [PR #368](https://github.com/luminari-gurus/tactics-guru-v2/pull/368); records UI final checks running (2026-11-12)**.
+Status: **all AC1–AC8 qualified; [PR #369](https://github.com/luminari-gurus/tactics-guru-v2/pull/369) ready on #368 on #365 (2026-11-12)**.
 The user authorized implementation, verification and incremental PR publication.
+
+## Current continuation point — 2026-11-12
+
+This section supersedes the historical work log below. PR #365 (counters) and
+PR #368 (active time/history) are open, ready and labeled enhancement. The final
+UI branch is `branch/issue-270-records-ui`, worktree
+`C:/Users/apexw/.codex/worktrees/issue-270-records-ui/Tactics-Guru`, stacked on
+`branch/issue-270-active-time-history` at `1d9eeb8`. All implementation and
+AC1–AC8 gates are qualified; OpenSpec is 9/9 complete.
+
+Latest UI runtime input commit: `46e8f34`; `76c00bd` adds the focused isolation
+test readiness repair. Its full PR suite passed in 136.7 seconds (1,339 units,
+both type scopes, root/prefix build integrations, bundle, seven core journeys).
+All 15 records/recovery cases passed across desktop/Pixel/iPhone WebKit profiles.
+All 75 unique isolation permutations are qualified: 30 unchanged passing Chromium
+diagnostic/Qbert cases, 15 repaired Chromium fresh-route cases, and 30 WebKit
+cases. The original 45-case batch remains 44 passed/1 failed; the repaired 15-case
+batch passed separately. No assertions, timeouts or retries were relaxed.
+Five fresh final UI witnesses passed, and retained desktop, portrait/landscape
+and WebKit screenshots were visually reviewed. Six discovery/batch checks passed.
+
+The source-bound [final AC audit](../qa/issue-270/increment-3.json) links inherited
+counter/time/history/legal evidence and preserves original failures. Review/merge
+#365 then #368 then [PR #369](https://github.com/luminari-gurus/tactics-guru-v2/pull/369). Keep #270 open until the stack merges; sync
+and archive OpenSpec afterward. No remaining implementation or acceptance work.
+
+Runtime tools: prepend `C:/Users/apexw/.codex/tmp/issue270-node-tools` to Windows
+PATH for npm/npx; use native Node for tests. Run OpenSpec through WSL Ubuntu in
+the corresponding `/mnt/c/Users/apexw/.codex/worktrees/.../Tactics-Guru` directory.
+Do not use WSL git to inspect this Windows-CRLF worktree. No secrets are needed.
+No merge/release/deployment/tag is part of this review-ready handoff.
+The temporary detached comparison worktree remains because automatic approval
+review rejected its cleanup with “blocked by policy”; do not retry via a workaround.
 
 ## Live handoff — 2026-11-11
 
@@ -533,6 +566,21 @@ replacement finished. It now waits for the new identity and safely polls pending
 history, retaining the original failed report. Fresh final migration reports are
 `inc2-counter-upgrade-chromium-final` and `inc2-counter-upgrade-webkit-final`.
 
+## Records presentation workspace — 2026-11-11
+
+Branch `branch/issue-270-records-ui`, worktree
+`C:/Users/apexw/.codex/worktrees/issue-270-records-ui/Tactics-Guru`, based on the
+active-time/history branch at `0f1dbf3`. Outcome: five-stat recent summaries,
+honest unavailable/since-upgrade/N/A labels, and attributed personal bests that
+open their retained summaries. Non-goals: gameplay/HUD redesign, new art or UI
+frameworks. Files: existing `src/ui/runRecords.ts`, `src/ui/mainMenu.css`, menu
+browser tests and delivered contract docs. Proof: keyboard focus/disclosures,
+portrait/landscape native touch and WebKit, recovery/reset and best eviction
+fixtures, reviewed screenshots, `verify:pr` and final AC1–AC8 audit.
+Ablation: native details/summary elements use the existing modal focus trap;
+reuse one summary renderer for recent rows and retained best winners. Keep the
+existing forest-green/gold palette and serif headings, with tabular stat numerals.
+No presentation acceptance is claimed yet. Parent qualification is in progress.
 ## Active time/history ready — 2026-11-12
 
 The migration audit above is resolved at `8fee762db48b469df763cdddbe9c180a99db9c4c`.
@@ -559,7 +607,23 @@ merge, release, deployment or tag is needed for these review-ready increments.
 
 Publication: [PR #368](https://github.com/luminari-gurus/tactics-guru-v2/pull/368) is open, ready, labeled enhancement and stacked on #365. Issue #270 records coverage and remaining work. Six selection/batch contracts passed in 67.9 seconds. OpenSpec task 2.3 is complete (6/9). Next: finish UI/isolation proof and open the final dependent PR.
 
+Isolation qualification update: the first 45-case Chromium run retained 44 passes
+and one failure in fresh/unavailable Pixel landscape. A legal random dungeon step
+entered a battle while the test attempted the loading screen's transient restart
+button; the trace waited on a hidden control. The same assumption exists at the
+literal #365 base. No storage access violation was observed and no app defect is
+established. The test now waits for the accepted phase's actual ready screen,
+clicks its restart control normally, and also requires a new identity. Retain
+that failed report/error context; rerun all 15 affected fresh-route permutations,
+then the 30 WebKit isolation cases. Do not relabel the old full batch green.
 
-## Review repairs — 2026-11-12
+## Final qualification — 2026-11-12
 
-The dungeon transaction race, failed-flush navigation and removed-save recreation are fixed. The stack is rebased onto main at 450dfeb, with wall-aware counter/timed envelopes 16/17 and existing fog recovery preserved. Local source-bound qualification and retained failures are in [review-368.json](../qa/issue-270/review-368.json). All session/storage inputs in the final UI qualification match this parent. Merge #365, then #368, then #369; keep #270 open until the reviewed stack merges. Original heads are preserved in local backup refs; each PR carries one focused commit. No release tag or deployment is part of this handoff.
+AC1–AC8 are all qualified by [increment-3.json](../qa/issue-270/increment-3.json), including explicit inherited evidence from increments 1/2. Screenshot review found readable five-stat summaries, wrapped IDs/N/A and no horizontal overflow. The fresh route repair passed 15/15, WebKit isolation 30/30, final captures 5/5. Earlier Chromium diagnostic/Qbert 30-case passes are reused with unchanged inputs; the original full batch remains failed. Both type scopes, strict OpenSpec, local links and diff checks pass. Final publication/task 3.3 is complete in PR #369.
+
+Publication complete: [PR #369](https://github.com/luminari-gurus/tactics-guru-v2/pull/369) is open, ready and labeled enhancement, based on #368 (which is based on #365). All nine OpenSpec tasks are complete. Issue #270 has the final AC1–AC8 accounting and remains open pending merge. Later commits change only handoff/QA/task tracking; runtime inputs remain those qualified above. Current self-hosted CI for new heads may be queued; local affected-scope qualification is complete. Review/merge and later OpenSpec sync/archive are the only follow-up.
+
+
+## Review repairs and final qualification — 2026-11-12
+
+All reported review findings are fixed in their owning increments and inherited here. The UI preserves disclosure state and focus on cross-tab history refresh, with sequential Tab/Enter and touch evidence. [review-365.json](../qa/issue-270/review-365.json), [review-368.json](../qa/issue-270/review-368.json) and [review-369.json](../qa/issue-270/review-369.json) retain final inputs, exact commands/cases, failed attempts and reuse limits. Local PR verification passed 1,357 units and all seven core journeys. The focused matrix qualifies 48 Chromium, 20 run/UI WebKit and nine dungeon WebKit cases with the explicit split-run accounting in the receipt. Merge #365 -> #368 -> #369; issue #270 remains open until that stack merges. Each PR has one focused commit; original heads remain in local backup refs. No release tag, merge or deployment was performed.
