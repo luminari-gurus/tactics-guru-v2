@@ -64,12 +64,19 @@ export class DungeonMap {
     const center=el('span');center.className='dungeon-compass-center';center.setAttribute('aria-hidden','true');directions.append(center);
     const legend=el('p','● Player · M encounter (including guardian) · ✓ cleared · ↑ upstairs (floor 2+) · ↓ downstairs (all encounters cleared). Hatching marks remembered terrain. Enemies move when you move. Tap adjacent cells or use direction controls.');
     this.root.append(this.heading,label,legend,this.grid,this.markerDescription,directions,this.feedback);
-    this.root.addEventListener('keydown',e => {
-      if (!(e.target instanceof HTMLElement) || e.target.id !== 'dungeon-map') return;
+    document.addEventListener('keydown',e => {
+      if (this.state?.phase !== 'ready' || !this.root.isConnected || this.root.closest('[hidden]') ||
+        this.locked() || document.hidden || e.defaultPrevented || e.isComposing ||
+        e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      if (e.target instanceof HTMLElement && (e.target.isContentEditable ||
+        e.target.closest('input, textarea, select, dialog[open], [role="menu"], [role="listbox"], [role="combobox"]'))) return;
       const width = this.map?.width ?? 20;
-      const offsets: Record<string,number> = { ArrowUp:-width,w:-width,ArrowRight:1,d:1,ArrowDown:width,s:width,ArrowLeft:-1,a:-1 };
-      const delta = offsets[e.key]; if (delta === undefined) return;
-      e.preventDefault(); if (!e.repeat) this.step(delta);
+      const offsets = new Map([['ArrowUp', -width], ['w', -width], ['ArrowRight', 1], ['d', 1],
+        ['ArrowDown', width], ['s', width], ['ArrowLeft', -1], ['a', -1]]);
+      const delta = offsets.get(e.key);
+      if (delta === undefined) return;
+      e.preventDefault();
+      if (!e.repeat) this.step(delta);
     },{signal});
   }
   dispose() { this.live = false; this.abort.abort(); }

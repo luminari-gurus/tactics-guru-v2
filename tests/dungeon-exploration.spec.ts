@@ -330,6 +330,55 @@ test('compass keeps keyboard focus when movement disables the activated directio
  }
 });
 
+fixedSeedTest('map shortcuts work on entry and outside the map without taking over other controls', async ({page}) => {
+ await page.goto('./?game=dungeon');
+ await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();
+ await page.locator('#dungeon-confirm-new').click();
+ const initial = await dungeonSnapshot(page);
+ const floor = initial.floors[0], terrain = floorMap(floor.descriptor);
+ const direction = [
+  {offset:1, arrow:'ArrowRight', reverse:'a'}, {offset:-1, arrow:'ArrowLeft', reverse:'d'},
+  {offset:terrain.width, arrow:'ArrowDown', reverse:'w'}, {offset:-terrain.width, arrow:'ArrowUp', reverse:'s'},
+ ].find(({offset}) => neighbors(floor.position,terrain.width,terrain.height).includes(floor.position+offset) &&
+  terrain.cells[floor.position+offset] && floor.position+offset!==floor.descriptor.downstairs);
+ if (!direction) throw Error('Expected a walkable cell next to the dungeon entrance');
+ const grid = page.locator('#dungeon-map');
+ await expect(grid).not.toBeFocused();
+ await page.keyboard.press(direction.arrow);
+ const moved = await dungeonSnapshot(page);
+ expect(moved.floors[0].position).toBe(floor.position + direction.offset);
+ expect(moved.revision).toBe(initial.revision + 1);
+
+ const art = page.getByRole('combobox',{name:'Map art',exact:true});
+ await art.focus();
+ await page.keyboard.press(direction.reverse);
+ expect(await dungeonSnapshot(page)).toEqual(moved);
+ await page.evaluate(() => {
+  const input = document.createElement('input');
+  input.id = 'shortcut-test-input';
+  document.querySelector('#dungeon-screen')!.append(input);
+  input.focus();
+ });
+ await page.keyboard.press(direction.reverse);
+ await expect(page.locator('#shortcut-test-input')).toHaveValue(direction.reverse);
+ expect(await dungeonSnapshot(page)).toEqual(moved);
+ const restart = page.getByRole('button',{name:'Start new dungeon',exact:true});
+ await restart.click();
+ await page.keyboard.press(direction.reverse);
+ expect(await dungeonSnapshot(page)).toEqual(moved);
+ await page.locator('#dungeon-cancel-new').click();
+
+ await restart.focus();
+ await page.keyboard.press(direction.reverse);
+ const returned = await dungeonSnapshot(page);
+ expect(returned.floors[0].position).toBe(floor.position);
+ expect(returned.revision).toBe(moved.revision + 1);
+ await grid.focus();
+ await page.keyboard.press(direction.arrow);
+ expect((await dungeonSnapshot(page)).revision).toBe(returned.revision + 1);
+ await expect(grid).toBeFocused();
+});
+
 fixedSeedTest('real traversal, art independence, keyboard locks, active battle and exact reload',async({page,isMobile})=>{
  test.setTimeout(120000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  // Qualify input/art/reload on a traversable witness, independently of fresh entropy.
