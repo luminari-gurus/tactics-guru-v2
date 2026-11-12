@@ -52,7 +52,7 @@ export class DungeonSession {
     });
   }
   private recordEnding() { if (!this.disposed && this.history) void this.history.record(dungeonRunRecord(this.current, this.history.now())); }
-  save() { this.recordEnding(); this.progressSaved = false; this.report('Saving dungeon…'); return this.mutate(() => this.saveNow(), false); }
+  save() { const snapshot = this.current; this.recordEnding(); this.progressSaved = false; this.report('Saving dungeon…'); return this.mutate(() => this.current === snapshot && this.saveNow(), false); }
   private saveNow() {
     if (this.disposed) return false;
     // Accepted endings survive an independent active-save opt-out or conflict.

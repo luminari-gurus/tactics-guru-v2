@@ -1098,3 +1098,15 @@ describe('versioned floor dimensions', () => {
   expect([...m.values]).toEqual(before); expect(owner.snapshot).toEqual(state);
   expect(owner.exports(owner.inspect()).length).toBeGreaterThan(0);
  });
+
+it.each(['primary','backup'] as const)('does not publish an old queued autosave after continuing %s', async slot => {
+ const m=memory(),storage=createDungeonStorage(()=>m),pending:(()=>void)[]=[];
+ const initial=freshDungeon('queued-continue',13,undefined,true);assert(storage.save(initial).ok);
+ const primary={...initial,stats:{...initial.stats!,movesTaken:2}};assert(storage.save(primary).ok);
+ const owner=new DungeonSession(primary,storage,null,task=>pending.push(task));assert(owner.continue(owner.inspect()));
+ const save=owner.save(),review=owner.inspect();assert(owner.continue(review,slot));
+ const bytes=[m.getItem(DUNGEON_KEYS.primary),m.getItem(DUNGEON_KEYS.backup)],continued=owner.snapshot;
+ while(pending.length)pending.shift()!();await save;
+ expect([m.getItem(DUNGEON_KEYS.primary),m.getItem(DUNGEON_KEYS.backup)]).toEqual(bytes);
+ expect(owner.snapshot).toEqual(continued);expect(owner.hasUnsavedProgress).toBe(false);
+});
