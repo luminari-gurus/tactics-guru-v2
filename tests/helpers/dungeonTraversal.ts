@@ -19,7 +19,8 @@ export async function openDungeonInventory(page: Page) {
   if (await page.locator('#dungeon-inventory').getAttribute('open') === null) await summary.click();
 }
 export async function walkDungeon(page: Page, target?: number, mode: 'keyboard'|'touch'|'pointer' = 'keyboard') {
-  await expect(page.locator('#dungeon-screen')).toBeVisible();
+  // The screen is also visible while New Dungeon still owns the dormant snapshot.
+  await expect(page.locator('#dungeon-map')).toBeVisible();
   const initial=await dungeonSnapshot(page), floor=initial.floors[initial.depth-1];
   const targetPoi=target===undefined ? undefined : floor.exploration.pois.find(p=>poiCell(p,floor.descriptor.size ?? 20)===target&&!clearedDungeonSlots(floor).includes(p.encounterSlot));
   const path:number[]=[];

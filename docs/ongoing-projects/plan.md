@@ -267,3 +267,38 @@ lockfile change was required.
   screenshots inspected: count/labels readable, reward choices unobstructed,
   map and party retained. Focused final selection is still **39 cases per engine**
   across desktop, touch portrait and touch landscape. No physical devices claimed.
+- Ordinary feature PR verification passed at `f09eb0ac` in **232.9s**:
+  **1,364 units**, both type scopes, **2** build integrations, bundle and **7/7**
+  core journeys. Receipt: `verification-receipts/pr/1794594728814-1799351/`.
+- First affected Chromium run: **36 passed / 3 failed**, no skips/retries.
+  The defeat journey fails on all profiles before combat in `walkDungeon`:
+  expected cell 108, accepted cell 53. Its helper waits only for the persistent
+  screen while asynchronous New Dungeon replacement still exposes the dormant
+  snapshot. Literal-base reproduction and a readiness repair are in progress in
+  the prerequisite worktree. Do not call this run green. Outputs remain at
+  `verification-receipts/issue376/final/chromium.{log,json}`; reruns will use
+  different receipt paths. Earlier progress commentary overstated profile passes.
+- The literal-base defeat comparison **passed 1/1**. Do not attribute this new
+  timing-sensitive failure to a reproduced base failure. The HUD change exposes
+  the existing helper's insufficient readiness condition: the persistent screen
+  is visible before New Dungeon's asynchronous replacement publishes its map.
+  The application already gates movement during replacement; no app workaround
+  is needed. This feature's test adaptation now waits for the actual map before
+  reading a snapshot, in `tests/helpers/dungeonTraversal.ts` (one condition).
+  PR #395 stays the independent legend-only repair.
+- Shared-helper consumers are dungeon exploration, dungeon journeys (including
+  extended journeys), public-asset dungeon audio and radial persistence tests.
+  Re-run the 39-case affected matrices after this helper edit, core journeys,
+  and bounded desktop public-asset audio/radial testing witnesses. No traversal,
+  save, route/base, audio or extended multi-floor simulation algorithm changed;
+  no broad regression or repeated full extended journeys are justified.
+- The fixed helper's **three Chromium defeat profiles passed**. Reuse those
+  results alongside a new 36-case Chromium run excluding only that already-passed
+  title, plus all 39 WebKit cases. This is 39 covered Chromium cases across two
+  successful runs; it is not a claim that the original failed run became green.
+  The helper patch is retained in `readiness-fix/helper.patch`; no assertion or
+  timeout changed. Build inputs remain identical to tested `f09eb0ac`; subsequent
+  edits affect only this helper and documentation. Re-run the two affected ordinary
+  core dungeon journeys; reuse the five unchanged core journeys, units, type/build
+  integration and bundle with their original source identity. Fresh typecheck is
+  cheap and will also be run. No production rebuild is necessary for the helper edit.

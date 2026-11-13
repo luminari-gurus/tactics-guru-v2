@@ -26,6 +26,8 @@ changes or general progress framework.
   overlapping standalone travel paragraph. Keep save status and rewards intact.
 - Extend current unit and browser journeys. Preserve legal victory/defeat witnesses,
   Chromium/WebKit desktop and touch orientations, focus and narrow screenshots.
+  The traversal helper waits for the actionable map before reading state, avoiding
+  a dormant snapshot during asynchronous New Dungeon replacement.
 
 ## Risks / Trade-offs
 
