@@ -207,17 +207,14 @@ feature series is unnecessary for this bounded change. The planning commit uses
 integration problem needs another increment, record its remaining criteria and
 dependencies on the issue and use `Refs #389` for the partial PR.
 
-Estimate for me after implementation is authorized: **2–3 hours** of active agent
+Original planning estimate: **2–3 hours** of active agent
 work: about 30–45 minutes rendering/integration, 60–90 minutes browser witnesses and
 verification, and 20–30 minutes evidence/PR preparation. CI queue, review, and
 unexpected runner failures are additional elapsed time. This is an estimate, not
 a test result or delivery guarantee.
 
-No blocking unanswered product questions. The concrete visual choice is the
-snowflake at the existing Guarded anchor; responsive validation may adjust its
-strokes within that treatment. The remaining technical uncertainty is whether
-extreme zoom/short viewports require a small local anchor adjustment; existing
-badge geometry tests and screenshots will decide it during implementation.
+No blocking unanswered product questions. The snowflake uses the existing Guarded
+anchor; camera and narrow/short viewport tests passed without an anchor adjustment.
 
 ## Implementation handoff — 2026-11-13
 
@@ -227,7 +224,8 @@ badge geometry tests and screenshots will decide it during implementation.
   dependencies changed. OpenSpec: `issue-389-snared-indicator` (spec-driven).
 - Added bounded dungeon witnesses (15 selected cases per Chromium/WebKit config).
   XP, positions and defeat-fixture HP are staged; cast, intervening commands and
-  defeats are legal. No earned-progression claim. Still to execute and inspect.
+  defeats are legal. No earned-progression claim. All 30 final badge cases now
+  pass across Chromium/WebKit desktop, portrait and landscape; see receipts below.
 - Runtime: WSL Ubuntu, Node 24.15.0, lockfile Playwright 1.64.1. Initial Windows
   launcher/native-binding mismatch repaired by `npm ci` from the unchanged lockfile
   (49 packages audited, zero advisories). Optional PostHog CLI postinstall remained
@@ -251,10 +249,13 @@ badge geometry tests and screenshots will decide it during implementation.
   dirty listing includes platform line-ending noise; aligning repository-local
   `core.autocrlf=true` with Windows Git removes that noise without source changes.
   New dungeon test-only edits after its unit stage do not affect those covered
-  core journeys or production build; their own focused execution is still pending.
-- Next: execute the focused dungeon + Guarded and WebKit selections, inspect screenshots, run complete
-  authored battle/run witnesses, audit final source/build identity, then publish
-  the focused labeled PR. Browser execution stays serial, one worker, zero retries.
+  core journeys or production build; their focused execution subsequently passed.
+- Browser execution stayed serial, one worker, zero retries. All 36 shared
+  regressions passed in `run-nnox2B` (15.1 minutes): 27 Guarded cases, six complete
+  battle cases (win/loss on each profile), and three complete authored runs with
+  rewards, terminal resume and fresh restart. No failures or skips in this run.
+  All 129 served-build files and all ten recorded relevant
+  source/test/config/dependency inputs still match their retained manifests.
 - Desktop Snared iteration `run-xYWEjD`: cast/resume/unrelated-turn/expiry and
   camera/narrow-layout/restart cases passed, with narrow screenshot reviewed.
   Three new test cases failed: defeat tests sampled before the lazy engine
@@ -266,6 +267,60 @@ badge geometry tests and screenshots will decide it during implementation.
   cases in `run-xYWEjD`, three repaired desktop cases in `run-C1swy9`, and all ten
   portrait/landscape cases in `run-0BPxOH`. Zero retries or skips. Both type scopes
   passed again after the last test edit. Desktop, 320×568, 568×320, Pixel portrait,
-  resumed and source-defeat screenshots were visually inspected. WebKit's 15
-  cases are running in `run-nC2bny`; shared Guarded and complete legal authored
-  battle/run regressions remain to execute.
+  resumed and source-defeat screenshots were visually inspected. All 15 WebKit
+  cases passed in `run-nC2bny` (92.0 seconds); WebKit landscape screenshot reviewed.
+- Implementation `8777fd2fd2eed4d6cc065f75b6d0bc8db096a5eb` is committed and pushed.
+  Runtime/test inputs remain unchanged after those passes. Further commits are
+  evidence/hand-off documentation only unless a new failure requires code changes.
+
+## Source and served-build identity
+
+The production preview remains the root build from the passing PR lane, built on
+`3c3f443cd6dcb74b5d720cdd27df39c7665131ee` plus the implementation diff, then committed
+as `8777fd2f`. Final test-only repairs were checked with fresh type checks and their
+own browser cases. Evidence reuse is limited to unchanged relevant inputs; no old
+run is described as having executed a later commit. There were no dependency,
+asset, build/config, domain or persistence edits.
+
+Raw SHA-256 identities (files retain their working-copy line endings):
+
+- `src/phaser/BoardRenderer.ts`: `1b35e23c8115e1bd83858e9ae3e5475ec5a4efe4f7a97e3506bb26ff60116d65`
+- `tests/dungeon.spec.ts`: `42620526c1b9eb67d97be8ad2dd198c50f7fcadf2127a30dfa43083b8388d168`
+- `tests/helpers/dungeonFixtures.ts`: `15d0fe18210e282942976a5802037fd426926e57767db2817ea2e76666fb7392`
+- `tests/ability-picker.spec.ts`: `d652abe8c2795e00c67c0e616e1d218365b5338c43b53ccdacf56f96fb3fa9c0`
+- `package-lock.json`: `4d80074e809f307cab721dfbbcb4963e2a2ca6d617328aeea6450aed96d0d9d6`
+- Full served `dist/` inventory: ignored `tmp/issue-389-build.json`, SHA-256
+  `55cb98cad8fdccf50f494646c0a66615a967a157ef98c085e32a6476a97d3d03`.
+  The source/config input manifest is `tmp/issue-389-inputs.json`.
+
+Engine/runtime qualification is functional, not a performance measurement:
+Linux 6.6.114.1 WSL2 x86_64, Node 24.15.0, Playwright 1.64.1, Chromium 156.0.8078.4
+and WebKit 27.2, default executables from `run-10Qjmh`, root production preview at
+`http://127.0.0.1:4173`, dev mode only for the picker fixture. Browser plugin is not
+available; regular repository Playwright is used. Existing caches were retained;
+no cold-cache or physical-device claim. No full-regression or deployment claim.
+
+Representative screenshots are retained in each receipt's `artifacts/` and copied
+outside disposable browser output to
+`C:/Users/apexw/.codex/visualizations/2026/11/13/01a1d5e9-3b5d-7b72-acc8-84ea6faf5830/`
+as `snared-desktop.png`, `snared-pixel-portrait.png` and
+`snared-webkit-landscape.png`. No active test-created probe remains in tracked code.
+
+## Acceptance audit and delivery
+
+- AC1 passed: real HUD cast and picker witnesses identify only the affected
+  target, retain the badge after presentation and preserve accessible inspection.
+- AC2 passed: desktop, native emulated touch portrait/landscape, 320×568 and
+  568×320 geometry, minimum size, HP separation, depth, pan/zoom, noninteractive
+  badge input and scene replacement. Guarded's 27 existing regressions passed.
+- AC3 passed: exact accepted state/RNG/save slots on active resume, no replayed
+  activation, unrelated turns and attack, target-turn expiry, legal source/target
+  defeat (including replay of the staged legal command sequence), Pin exclusion,
+  cancelled/rejected casts and fresh scenes without stale graphics.
+- AC4 passed: 15 Chromium + 15 WebKit Snared cases across all three profiles,
+  plus the real keyboard/touch picker checks. Reviewed representative screenshots.
+
+All local completion gates passed. Earlier failures and repaired test mistakes
+remain recorded above; no test assertions, timeouts, retries or budgets were
+relaxed. Strict OpenSpec validation, all ten plan links and whitespace checks pass.
+The only remaining task is PR publication/labels and recording its URL/head parity.
