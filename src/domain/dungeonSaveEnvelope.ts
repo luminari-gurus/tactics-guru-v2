@@ -17,6 +17,12 @@ const WALL_SIGHT_DRAUGHT_SAVE_FORMAT = 15;
 export const hasWallSight = (state: DungeonState) => state.floors.some(floor => floor.exploration.sightVersion !== undefined);
 const CURRENT_IDENTITY = hashJson({ dungeonIdentity, progression: HERO_PROGRESSION });
 const PREVIOUS_IDENTITY = hashJson({ dungeonIdentity: previousDungeonIdentity, progression: HERO_PROGRESSION });
+const FINAL_REWARD_IDENTITY = hashJson({ dungeonIdentity, progression: HERO_PROGRESSION, rewardsPerFloor: 3 });
+
+export function requiresFinalRewardSupport(state: DungeonState): boolean {
+  return (state.phase === 'reward' && state.floors[state.depth - 1].completed === 3) ||
+    state.ownership.equipment.some(({ instanceId }) => /:reward:2:option:[01]$/.test(instanceId));
+}
 /** No DOM dependency in the authoritative save reader. Lone surrogates count as replacement characters. */
 export function utf8Bytes(text: string) {
   let n = 0;
@@ -30,7 +36,8 @@ export function encodeDungeonWithState(input: unknown): { ok: true; text: string
   const format = checked.state.stats ? hasWallSight(checked.state) ? WALL_SIGHT_STATS_SAVE_FORMAT : STATS_DUNGEON_SAVE_FORMAT : hasWallSight(checked.state)
     ? draughts ? WALL_SIGHT_DRAUGHT_SAVE_FORMAT : WALL_SIGHT_DUNGEON_SAVE_FORMAT
     : draughts ? DRAUGHT_DUNGEON_SAVE_FORMAT : DUNGEON_SAVE_FORMAT;
-  const body = { kind: 'tactics-guru:dungeon', format, identity: CURRENT_IDENTITY, payload: checked.state };
+  const identity = requiresFinalRewardSupport(checked.state) ? FINAL_REWARD_IDENTITY : CURRENT_IDENTITY;
+  const body = { kind: 'tactics-guru:dungeon', format, identity, payload: checked.state };
   const text = canonical({ ...body, digest: hashJson(body) });
   return utf8Bytes(text) > DUNGEON_SAVE_MAX_BYTES ? { ok: false, reason: 'tooLarge' } : { ok: true, text, state: checked.state };
 }
@@ -91,14 +98,17 @@ export function decodeDungeon(text: string): DungeonResult {
     const stats = counter || timed;
     const previewWallSight = !payloadStats && (input.format === 12 || input.format === 13);
     const wallSight = input.format === WALL_SIGHT_COUNTER_SAVE_FORMAT || input.format === WALL_SIGHT_STATS_SAVE_FORMAT || previewWallSight || input.format === WALL_SIGHT_DUNGEON_SAVE_FORMAT || input.format === WALL_SIGHT_DRAUGHT_SAVE_FORMAT;
+    const finalReward = input.identity === FINAL_REWARD_IDENTITY;
     const current = (input.format === DUNGEON_SAVE_FORMAT || input.format === DRAUGHT_DUNGEON_SAVE_FORMAT || stats || wallSight) &&
-      input.identity === CURRENT_IDENTITY;
+      (input.identity === CURRENT_IDENTITY || finalReward);
     if (input.kind !== 'tactics-guru:dungeon' || !(previous || current)) return { ok: false, reason: 'incompatible' };
     const body = { kind: input.kind, format: input.format, identity: input.identity, payload: input.payload };
     if (input.digest !== hashJson(body)) return { ok: false, reason: 'digest' };
     const read = readDungeon(input.payload, previous ? previousItemCatalog : undefined);
     if (!read.ok) return read;
-    if (previous && (read.state.offer?.version === 2 || read.state.activeBattle?.draughts)) return { ok: false, reason: 'incompatible' };
+    const needsFinalReward = requiresFinalRewardSupport(read.state);
+    if (finalReward && !needsFinalReward ||
+        previous && (needsFinalReward || read.state.offer?.version === 2 || read.state.activeBattle?.draughts)) return { ok: false, reason: 'incompatible' };
     if (stats !== (read.state.stats !== undefined)) return { ok: false, reason: 'invalidState' };
     const statsVersion = (input.payload as { stats?: { version: unknown } }).stats?.version;
     if (counter && statsVersion !== 1 || timed && statsVersion !== 2) return { ok: false, reason: 'invalidState' };

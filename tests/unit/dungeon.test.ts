@@ -6,7 +6,7 @@ import { DEFAULT_BEHAVIORS, stepMovement } from '../../src/map/movement';
 import { HERO_PROGRESSION } from '../../src/content/progression';
 import { assert, describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { dungeonCapacityFixture } from '../helpers/dungeonFixtures';
+import { dungeonCapacityFixture, dungeonVictoryBoundary } from '../helpers/dungeonFixtures';
 import { clearedDungeonSlots, freshDungeon, newDungeonSeed, stepDungeon, dungeonBattle, dungeonOffer, floorDescriptor, floorMap, FloorCache, dungeonSeed, readDungeon, travelDungeon, startDungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
 import { encodeDungeon, decodeDungeon, encodeDungeonRollback, utf8Bytes } from '../../src/domain/dungeonSaveEnvelope';
 import { dungeonContent, dungeonIdentity, previousDungeonIdentity } from '../../src/content/dungeon';
@@ -256,6 +256,54 @@ function win(s: DungeonState) {
   const b = s.activeBattle!;
   return good(acceptDungeonBattle(s, { ...b, outcome: 'playerWin', units: b.units.map(u => u.side === 'enemy' ? { ...u, hp: 0 } : u) }));
 }
+
+it.each([false, true])('versions final reward saves and keeps a rollback checkpoint (tracked: %s)', tracked => {
+  const fixture = dungeonVictoryBoundary(5, 2); assert(fixture);
+  const entry = tracked ? { ...fixture.snapshot, stats: freshRunStats() } : fixture.snapshot;
+  const resolved = dispatch(entry.activeBattle!, fixture.command, dungeonBattle(entry)!.catalog);
+  assert(resolved.ok);
+  const pending = good(acceptDungeonBattle(entry, resolved.state));
+  const offer = pending.offer; assert(offer);
+  const charm = offer.options.find(({ itemId }) => dungeonContent.items[itemId].kind === 'equipment'); assert(charm);
+  const claimed = good(dungeonItem(pending, {
+    ...dungeonBoundary(pending), type: 'claimReward', offerId: offer.id, itemId: charm.itemId,
+  }));
+  const declined = good(dungeonItem(pending, {
+    ...dungeonBoundary(pending), type: 'declineReward', offerId: offer.id,
+  }));
+
+  const original = encodeDungeon(entry); assert(original.ok);
+  const { format, identity } = JSON.parse(original.text);
+  expect(format).toBe(tracked ? 17 : 15);
+  expect(decodeDungeon(original.text)).toEqual({ ok: true, state: entry });
+  for (const state of [pending, claimed]) {
+    const saved = encodeDungeon(state); assert(saved.ok);
+    const envelope = JSON.parse(saved.text);
+    expect(envelope.format).toBe(tracked ? 17 : 14);
+    expect(envelope.identity).not.toBe(identity);
+    expect(decodeDungeon(saved.text)).toEqual({ ok: true, state });
+    // The first PR preview used the old identity. Continue can still read those saves.
+    const preview = { kind: envelope.kind, format: envelope.format, identity, payload: state };
+    expect(decodeDungeon(canonical({ ...preview, digest: hashJson(preview) }))).toEqual({ ok: true, state });
+  }
+  const resolvedWithoutCharm = encodeDungeon(declined); assert(resolvedWithoutCharm.ok);
+  expect(JSON.parse(resolvedWithoutCharm.text).identity).toBe(identity);
+  expect(decodeDungeon(resolvedWithoutCharm.text)).toEqual({ ok: true, state: declined });
+
+  const data = memory(), storage = createDungeonStorage(() => data);
+  assert(storage.save(entry).ok);
+  assert(storage.save(pending).ok);
+  const checkpoint = storage.inspect().backup; assert(checkpoint.status === 'valid');
+  expect(JSON.parse(checkpoint.text).identity).toBe(identity);
+  expect(checkpoint.state.floors[0].completed).toBe(2);
+  assert(storage.save(claimed).ok);
+  const descended = good(travelDungeon(atDownstairs(claimed), 'descend', claimed.revision));
+  assert(storage.save(descended).ok);
+  const reopened = createDungeonStorage(() => data).inspect();
+  expect(reopened.primary).toMatchObject({ status: 'valid', state: descended });
+  expect(reopened.backup).toEqual(checkpoint);
+});
+
 export function clearFloor(s: DungeonState) {
   for (let i = 0; i < 3; i++) {
     s = win(s);
