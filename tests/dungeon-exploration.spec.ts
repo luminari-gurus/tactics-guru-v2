@@ -53,7 +53,9 @@ test('map markers respect stair availability, discovery and saved floor state',a
   }
  }
  await expect(page.locator('#dungeon-map')).not.toContainText(/[123]/);
- await expect(page.getByText('● Player · M encounter (including guardian)',{exact:false})).toBeVisible();
+ await page.locator('#dungeon-travel-summary').click();
+ await expect(page.getByText('● Player · M encounter or guardian',{exact:false})).toBeVisible();
+ await page.locator('#dungeon-travel-summary').click();
  await expect(page.locator('#dungeon-descend')).toHaveCount(0);
  await page.locator('#dungeon-map').screenshot({path:test.info().outputPath('markers-uncleared-map.png')});
  const firstStep=neighbors(floor.position).find(n=>firstMap.cells[n]&&!floor.exploration.pois.some(p=>poiCell(p,firstMap.width)===n))!;
