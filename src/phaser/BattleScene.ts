@@ -285,11 +285,12 @@ export class BattleScene extends Phaser.Scene {
     };
     const cancel=()=>{if(dialogs.open || session.phase!=='player')return;clear();refresh();hud.focusAction();};
     const applySkin=()=>{skin=resolveCombatControlsSkin();hud.applySkin(skin);if(skin!=='radial')radial.hide();refresh();};
-    const inspect=(id:number=session.active.id)=>{
-      const unit=session.state.units.find(u=>u.id===id);if(!unit)return;
+    const inspect=(id?:number)=>{
+      const inspectedId=id ?? presentationStart?.initiative[presentationStart.activeIndex] ?? session.active.id;
+      const unit=session.state.units.find(u=>u.id===inspectedId);if(!unit)return;
       const {def,name,armorClass,accuracy,status,support}=unitFeedback(session,unit);
       dialogs.showChoices(`Inspection only — ${name} #${unit.id}`,
-        `HP ${unit.hp}/${def.stats.maxHp} · ${status}${session.progression.find(h => h.heroId === unit.defId) ? ` · ${progressionLabel(session.progression.find(h => h.heroId === unit.defId)!)}` : ''}\nAC ${armorClass} · Accuracy ${accuracy>=0?'+':''}${accuracy} · Power ${def.stats.power}\nMovement allowance ${def.stats.move} · Jump ${def.stats.jump} · Dexterity ${def.stats.dexterity} · Will ${def.stats.will}${support?`\n${support}`:''}\nActing unit remains ${unitFeedback(session,session.active).name}. Inspection never changes the turn.`,[
+        `HP ${unit.hp}/${def.stats.maxHp} · ${status}${session.progression.find(h => h.heroId === unit.defId) ? ` · ${progressionLabel(session.progression.find(h => h.heroId === unit.defId)!)}` : ''}\nAC ${armorClass} · Accuracy ${accuracy>=0?'+':''}${accuracy} · Power ${def.stats.power}\nMovement allowance ${def.stats.move} · Jump ${def.stats.jump} · Dexterity ${def.stats.dexterity} · Will ${def.stats.will}${support?`\n${support}`:''}\nInspection never changes the turn.`,[
           ...session.state.units.map(u=>({id:`inspect-unit-${u.id}`,label:`Inspect ${unitFeedback(session,u).name} #${u.id}`,run:()=>inspect(u.id),keepOpen:true})),
           {id:'inspection-close',label:'Close inspection',run:()=>{}},
         ],()=>{});

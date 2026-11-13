@@ -95,11 +95,13 @@ export class BattleHud {
   private abilityKey="";
   private readonly abilityButtons=new Map<AbilityId, HTMLButtonElement>();
   private lastRender: readonly unknown[] = [];
+  private openingEnemyTurn: boolean;
   private skin: CombatSkin = 'rail';
   private readonly actorRoot=document.querySelector<HTMLElement>('#battle-actor')!;
   private readonly abort=new AbortController();
   private readonly log:string[]=[];
   constructor(private readonly session:BattleSession, private readonly callbacks:{action:(a:Action)=>void;target:(c:CellPosition|null)=>void;confirm:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void;inspect:()=>void;inspectTarget:(id:number)=>void;danger:()=>void;plan:()=>void;undo:()=>void;draught:()=>void;log:(lines:readonly string[])=>void}) {
+    this.openingEnemyTurn = !session.resumed && session.phase === 'enemy';
     this.actorRoot.hidden=false;
     this.actorRoot.innerHTML=`<p id="battle-active" aria-live="polite"></p><div class="battle-identity"><div id="battle-portraits"></div><div><h2 id="battle-actor-name" aria-live="polite"></h2><p id="battle-hp"></p><div class="battle-health" aria-hidden="true"><span></span></div><p id="battle-stats"></p><p id="battle-status"></p></div></div><p id="battle-budgets"></p>`;
     for(const unit of session.state.units.filter((u,i,all)=>all.findIndex(v=>v.defId===u.defId)===i)) {
@@ -261,9 +263,12 @@ export class BattleHud {
       : actor;
     const displayInfo = displayActor===actor ? info : unitFeedback(s,displayActor);
     const outcome = s.state.outcome==='ongoing'?'':s.state.outcome==='playerWin'?'Victory · ':'Defeat · ';
+    if (enabled || s.state.outcome !== 'ongoing') this.openingEnemyTurn = false;
+    const opening = this.openingEnemyTurn && displayActor.side === 'enemy';
+    const turn = opening ? 'Enemy opening turn (initiative)' : actor.side === 'player' ? 'Your turn' : 'Enemy turn';
     this.actorRoot.querySelector('#battle-active')!.textContent=presenting
-      ? `Round ${presentationStart?.round ?? s.state.round} · Resolving action (Animating)`
-      : `${outcome}Round ${s.state.round} · ${actor.side==='player'?'Your turn':'Enemy turn'}${s.phase==='error'?' · Battle stopped':''}`;
+      ? `Round ${presentationStart?.round ?? s.state.round} · ${opening ? turn + ' · ' : ''}Resolving action (Animating)`
+      : `${outcome}Round ${s.state.round} · ${turn}${s.phase==='error'?' · Battle stopped':''}`;
     this.actorRoot.querySelector('#battle-actor-name')!.textContent=displayInfo.name;
     this.actorRoot.querySelector('#battle-hp')!.textContent=`HP ${displayActor.hp}/${displayInfo.def.stats.maxHp}`;
     this.actorRoot.querySelectorAll<HTMLImageElement>('.battle-portrait').forEach(img=>{img.hidden=img.dataset.unitType!==displayActor.defId;});
@@ -274,7 +279,7 @@ export class BattleHud {
       ? 'Move locked / Action locked'
       : `Move ${actor.hasMoved?'spent':'ready'} / Action ${actor.hasActed?'spent':'ready'}`;
     const locked=presenting?'Resolving action. Gameplay is locked until presentation finishes.':s.phase==='enemy'?'Enemy turn. Hero actions are unavailable.':s.phase==='ended'?'Battle complete. Gameplay is unavailable.':s.phase==='error'?'Battle stopped. Use recovery or restart.':'';
-    const abilities=ownedAbilities(s),key=abilities.map(a=>a.id).join('|');
+    const abilities=ownedAbilities(s,displayActor.defId),key=abilities.map(a=>a.id).join('|');
     if(key!==this.abilityKey){
       this.abilityKey=key;this.ability.replaceChildren(...abilities.map(a=>new Option(displayName(a.id),a.id)));
       // Reconcile only when the learned set changes, preserving focus and scroll
@@ -306,16 +311,16 @@ export class BattleHud {
       else {button.removeAttribute('aria-keyshortcuts');button.removeAttribute('title');}
     }
     this.root.querySelector('#battle-ability-info')!.textContent=chosen
-      ? `${!enabled?locked+' ':actor.hasActed?'Action spent. ':''}Range ${chosen.rangeMin}–${chosen.rangeMax} · ${chosen.kind==='weakeningHex'?`Hostile target · Will save vs DC ${10+info.def.stats.power} · −2 accuracy on failure until target turn end or source/target defeat`:chosen.kind==='healGoblin'?'Living injured goblin ally · heal up to 4 HP · no self heal or revival · no roll':chosen.kind==='secondWind'?`Self only · heal up to ${chosen.healBase+info.def.stats.power} HP · ${actor.secondWindUsed?'0':'1'}/1 use this battle · no roll`:chosen.kind==='taunt'?'Hostile target · forced target until its next turn ends · no roll':chosen.kind==='markTarget'?'Hostile target · +2 on next player attack roll, consumed even on miss · no damage or roll':chosen.kind==='pinningShot'||chosen.kind==='frostSnare'?'Hostile target · blocks movement until its next turn ends or source/target defeat · no damage or roll':chosen.kind==='magicMissile'?'Living target, including allies · automatic force damage':chosen.kind==='guardedAttack'?'Hostile target · −2 attack / +2 AC until next turn':'Hostile target · attack roll'}${chosen.requiredLevel?` · unlock level ${chosen.requiredLevel}`:''} · uses action`
+      ? `${!enabled?locked+' ':displayActor.hasActed?'Action spent. ':''}Range ${chosen.rangeMin}–${chosen.rangeMax} · ${chosen.kind==='weakeningHex'?`Hostile target · Will save vs DC ${10+displayInfo.def.stats.power} · −2 accuracy on failure until target turn end or source/target defeat`:chosen.kind==='healGoblin'?'Living injured goblin ally · heal up to 4 HP · no self heal or revival · no roll':chosen.kind==='secondWind'?`Self only · heal up to ${chosen.healBase+displayInfo.def.stats.power} HP · ${displayActor.secondWindUsed?'0':'1'}/1 use this battle · no roll`:chosen.kind==='taunt'?'Hostile target · forced target until its next turn ends · no roll':chosen.kind==='markTarget'?'Hostile target · +2 on next player attack roll, consumed even on miss · no damage or roll':chosen.kind==='pinningShot'||chosen.kind==='frostSnare'?'Hostile target · blocks movement until its next turn ends or source/target defeat · no damage or roll':chosen.kind==='magicMissile'?'Living target, including allies · automatic force damage':chosen.kind==='guardedAttack'?'Hostile target · −2 attack / +2 AC until next turn':'Hostile target · attack roll'}${chosen.requiredLevel?` · unlock level ${chosen.requiredLevel}`:''} · uses action`
       : 'No owned abilities';
-    if(actor.defId==='fighter')this.root.querySelector('#battle-ability-info')!.textContent+=' · Second Wind unlocks at level 2; Taunt at level 3';
-    if(actor.defId==='ranger')this.root.querySelector('#battle-ability-info')!.textContent+=' · Mark Target unlocks at level 2; Pinning Shot at level 3';
-    if(actor.defId==='mage')this.root.querySelector('#battle-ability-info')!.textContent+=' · Arc Bolt consolidated into Magic Missile (level 1); Frost Snare unlocks at level 3';
-    if(chosen?.kind==='secondWind')this.root.querySelector('#battle-ability-info')!.textContent+=actor.secondWindUsed?' · Use exhausted':actor.hp===info.def.stats.maxHp?' · Full health':'';
+    if(displayActor.defId==='fighter')this.root.querySelector('#battle-ability-info')!.textContent+=' · Second Wind unlocks at level 2; Taunt at level 3';
+    if(displayActor.defId==='ranger')this.root.querySelector('#battle-ability-info')!.textContent+=' · Mark Target unlocks at level 2; Pinning Shot at level 3';
+    if(displayActor.defId==='mage')this.root.querySelector('#battle-ability-info')!.textContent+=' · Arc Bolt consolidated into Magic Missile (level 1); Frost Snare unlocks at level 3';
+    if(chosen?.kind==='secondWind')this.root.querySelector('#battle-ability-info')!.textContent+=displayActor.secondWindUsed?' · Use exhausted':displayActor.hp===displayInfo.def.stats.maxHp?' · Full health':'';
     this.root.querySelectorAll<HTMLButtonElement>('[data-action]').forEach(b=>{
       const spent=b.dataset.action==='move'?actor.hasMoved:actor.hasActed;
       const ability=b.dataset.action?.startsWith('ability:')?s.catalog.abilities[b.dataset.action as AbilityId]:null;
-      const healReason=ability?.kind==='secondWind'?(actor.secondWindUsed?'Use exhausted':actor.hp===info.def.stats.maxHp?'Full health':''):'';
+      const healReason=ability?.kind==='secondWind'?(displayActor.secondWindUsed?'Use exhausted':displayActor.hp===displayInfo.def.stats.maxHp?'Full health':''):'';
       const reason=!enabled?'Unavailable':spent?'Spent':healReason || (b.dataset.action==='move' && !movement?.ok?'Unavailable':'');
       b.disabled=!!reason;
       b.setAttribute('aria-pressed',String(b.dataset.action===action));
