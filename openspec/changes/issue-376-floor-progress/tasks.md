@@ -6,7 +6,7 @@
 
 ## 2. Floor HUD
 
-- [ ] 2.1 Add compact encounter/stair text with contextual re-entry guidance and wrapping; extend existing browser assertions for legal victories, claim/decline, travel/backtrack/Continue, hidden stairs, defeat and focus/layout; pass typecheck and focused desktop iteration, and update plan.md.
+- [x] 2.1 Add compact encounter/stair text with contextual re-entry guidance and wrapping; extend existing browser assertions for legal victories, claim/decline, travel/backtrack/Continue, hidden stairs, defeat and focus/layout; pass typecheck and focused desktop iteration, and update plan.md.
 
 ## 3. Integration and delivery
 

@@ -5,8 +5,9 @@ Issue: [#376](https://github.com/luminari-gurus/tactics-guru-v2/issues/376).
 Owner: [@moshehbenavraham](https://github.com/moshehbenavraham).
 Branch: [`branch/issue-376-floor-progress`](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-376-floor-progress).
 Base: `origin/main`, `973b792f3e26b178b71dfa07d5654019cb34e24e`.
-Status: implementation in progress under OpenSpec `issue-376-floor-progress`;
-runtime acceptance and PR publication remain outstanding. Working tree started clean.
+Status: implementation and focused desktop iteration complete under OpenSpec
+`issue-376-floor-progress`; full affected acceptance and PR publication remain
+outstanding. Working tree started clean.
 The previous plan is preserved unchanged as
 [issue-389-snared-indicator-plan.md](issue-389-snared-indicator-plan.md).
 
@@ -246,7 +247,7 @@ lockfile change was required.
   now assert progress around legal battle victories, reward claim/decline,
   floor changes, Continue, defeat and hidden stair discovery. No new test files
   or browser selection/configuration changes.
-- Next: finish focused desktop iteration, verify both engine/device matrices,
+- Next: verify both engine/device matrices,
   inspect screenshots, run ordinary PR verification and publish the focused PR.
 - Desktop iteration: legal reward/guardian, decline and fresh-layout journeys
   **3 passed**; map-marker journey **1 failed** on an obsolete legend selector.
@@ -259,3 +260,10 @@ lockfile change was required.
   `verification-receipts/issue376/iteration/`. Its initial base build failed on a
   Windows worktree path in WSL; the retry used explicit GIT_DIR/GIT_WORK_TREE.
   No failed assertion, timeout or skip was suppressed.
+- Repair commit `1a634f59` is merged into this feature branch without rewriting
+  history. Its fixed marker journey passed **3 Chromium + 3 WebKit profiles**
+  (50.3s / 26.0s). Repair ordinary PR verification is in progress separately.
+- Feature typecheck and production bundle passed. Desktop fresh and final-reward
+  screenshots inspected: count/labels readable, reward choices unobstructed,
+  map and party retained. Focused final selection is still **39 cases per engine**
+  across desktop, touch portrait and touch landscape. No physical devices claimed.
