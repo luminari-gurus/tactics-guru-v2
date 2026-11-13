@@ -691,29 +691,69 @@ test('hero progression commits once, heals at a threshold and survives inspectio
  expect((await snapshot(page)).party).toEqual(saved.party);
 });
 
-test('character sheets show equipped charms by hero through equip, resume, and unequip', async ({page,isMobile}) => {
+test('character sheets switch heroes and show equipped charms through equip, resume, and unequip', async ({page,isMobile}) => {
  const initial = dungeonCapacityFixture();
  await seed(page, initial);
- const inspect = async (hero: string, expected: string) => {
-  const portrait = page.getByRole('region',{name:'Party',exact:true}).getByRole('button',{name:hero,exact:true});
-  if (isMobile) await portrait.tap(); else await portrait.click();
-  const sheet = page.getByRole('dialog',{name:`${hero} character sheet`});
-  const equipment = sheet.getByRole('region',{name:'Equipment',exact:true});
+ const party = page.getByRole('region',{name:'Party',exact:true});
+ const fighter = party.getByRole('button',{name:'Fighter',exact:true});
+ const ranger = party.getByRole('button',{name:'Ranger',exact:true});
+ const dialog = page.getByRole('dialog');
+ const close = dialog.getByRole('button',{name:'Close',exact:true});
+ const open = async (portrait: Locator) => {
+  if (isMobile) await portrait.tap();
+  else { await portrait.focus(); await page.keyboard.press('Enter'); }
+ };
+ const activate = async (control: Locator) => {
+  if (isMobile) await control.tap();
+  else { await expect(control).toBeFocused(); await page.keyboard.press('Enter'); }
+ };
+ const expectSheet = async (hero: string, stats: string[], expected: string) => {
+  await expect(dialog).toHaveAccessibleName(`${hero} character sheet`);
+  await expect(dialog.locator('.dungeon-sheet > dl dd')).toHaveText(stats);
+  const image = dialog.locator('img');
+  await expect(image).toHaveAttribute('src', new RegExp(`/${hero.toLowerCase()}[.-]`));
+  await expect(image).toHaveJSProperty('naturalWidth',192);
+  const equipment = dialog.getByRole('region',{name:'Equipment',exact:true});
   await expect(equipment.locator('dt')).toHaveText('Charm');
   await expect(equipment.locator('dd')).toHaveText(expected);
-  await sheet.getByRole('button',{name:'Close',exact:true}).click();
  };
+ const previous = dialog.getByRole('button',{name:'Previous hero',exact:true});
+ const next = dialog.getByRole('button',{name:'Next hero',exact:true});
  const charm = 'Warding Charm · +1 armor class';
- await inspect('Fighter', charm);
- await inspect('Ranger', 'Empty');
+ await open(fighter);
+ await expectSheet('Fighter', ['18/18 HP','4','15'], charm);
+ await dialog.evaluate(element => {
+  element.addEventListener('close', () => element.setAttribute('data-closed-during-switch', 'true'), { once: true });
+ });
+ if (!isMobile) await page.keyboard.press('Tab');
+ await activate(previous);
+ await expectSheet('Mage', ['11/11 HP','3','11'], 'Empty');
+ if (!isMobile) { await page.keyboard.press('Tab'); await page.keyboard.press('Tab'); }
+ await activate(next);
+ await expectSheet('Fighter', ['18/18 HP','4','15'], charm);
+ if (!isMobile) { await page.keyboard.press('Tab'); await page.keyboard.press('Tab'); }
+ await activate(next);
+ await expectSheet('Ranger', ['12/12 HP','5','12'], 'Empty');
+ await expect(dialog).toBeVisible();
+ await expect(dialog).not.toHaveAttribute('data-closed-during-switch', 'true');
+ await page.keyboard.press('Escape');
+ await expect(dialog).not.toBeVisible();
+ await expect(fighter).toBeFocused();
  const unassigned = initial.ownership.equipment[1];
  const row = page.locator(`[data-instance-id="${unassigned.instanceId}"]`);
  await openDungeonInventory(page);
  await row.getByRole('combobox').selectOption('ranger');
  await row.getByRole('button',{name:'Equip Warding Charm',exact:true}).click();
  await page.locator('#dungeon-item-confirm').click();
- await inspect('Ranger', charm);
- await inspect('Mage', 'Empty');
+ await open(ranger);
+ await expectSheet('Ranger', ['12/12 HP','5','13'], charm);
+ if (!isMobile) { await page.keyboard.press('Tab'); await page.keyboard.press('Tab'); }
+ await activate(next);
+ await expectSheet('Mage', ['11/11 HP','3','11'], 'Empty');
+ if (isMobile) await close.tap();
+ else { await page.keyboard.press('Shift+Tab'); await activate(close); }
+ await expect(dialog).not.toBeVisible();
+ await expect(ranger).toBeFocused();
  await expect.poll(async () => {
   const text = await page.evaluate(key => localStorage.getItem(key), DUNGEON_KEYS.primary);
   const saved = text === null ? null : decodeDungeon(text);
@@ -721,12 +761,15 @@ test('character sheets show equipped charms by hero through equip, resume, and u
  }).toContainEqual({ heroId: 'ranger', slot: 'charm', instanceId: unassigned.instanceId });
  await page.reload();
  await continueSavedDungeon(page);
- await inspect('Ranger', charm);
+ await open(ranger);
+ await expectSheet('Ranger', ['12/12 HP','5','13'], charm);
+ await close.click();
  await openDungeonInventory(page);
  await row.getByRole('button',{name:'Unequip Warding Charm',exact:true}).click();
  await page.locator('#dungeon-item-confirm').click();
- await inspect('Ranger', 'Empty');
- await inspect('Fighter', charm);
+ await open(ranger);
+ await expectSheet('Ranger', ['12/12 HP','5','12'], 'Empty');
+ await close.click();
 });
 
 test('dungeon recovery separates status and preserves exploration scroll', async ({page}) => {
