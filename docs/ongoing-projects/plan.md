@@ -7,8 +7,10 @@ Branch: [`branch/issue-376-floor-progress`](https://github.com/luminari-gurus/ta
 Implementation base: `973b792f3e26b178b71dfa07d5654019cb34e24e`.
 Review base: `origin/main`, `4290b700` (merged prerequisite PR #395).
 Status: implementation and acceptance complete under OpenSpec
-`issue-376-floor-progress` (3/4 tasks); HUD PR publication remains outstanding.
-Working tree started clean. Current evidence and review handoff are below.
+`issue-376-floor-progress` (**4/4 tasks**). Published ready for review as
+[PR #396](https://github.com/luminari-gurus/tactics-guru-v2/pull/396), labeled
+`enhancement`, targeting `main`. Prerequisite PR #395 is merged. Working tree
+started clean; current evidence and review handoff are below.
 The previous plan is preserved unchanged as
 [issue-389-snared-indicator-plan.md](issue-389-snared-indicator-plan.md).
 
@@ -372,11 +374,17 @@ Representative final screenshots were inspected and committed for review:
 The changes retain the existing visual theme and use one pure domain projection;
 no new controller, saved fields, migration, timer, assets or dependencies were needed.
 
-Publication: PR #395 has merged. The feature branch incorporated updated main;
+Publication: [PR #396](https://github.com/luminari-gurus/tactics-guru-v2/pull/396)
+is open and ready for review, labeled `enhancement`, targeting `main` and closing
+issue #376 when merged. PR #395 was delivered separately with `bug` and merged.
+The feature branch incorporated updated main;
 its complete Git tree was identical before and after that ancestry-only merge.
 Main added only the already-inherited legend test repair, so no evidence was
-invalidated. Open the HUD PR against `main`, add `enhancement`, record its URL and
-finish OpenSpec task 3.2. Keep issue #376 open until the completing PR merges.
+invalidated. OpenSpec is 4/4 complete and intentionally remains unarchived for
+review. No required implementation or acceptance work remains. Review/merge and
+the current-head remote CI result are the remaining repository workflow; keep
+issue #376 open until PR #396 merges. Final handoff commits change documentation
+only and reuse the explicitly recorded runtime evidence above.
 
 An unused npm helper folder at `C:/Users/apexw/.codex/tmp/issue-376-tools` remains
 outside the repository: automatic approval rejected its optional deletion as
