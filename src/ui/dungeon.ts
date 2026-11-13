@@ -100,45 +100,56 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
   roster.className = 'dungeon-roster';
   party.append(el('h2', 'Party'), roster);
   const { catalog, items } = dungeonContent;
-  for (const hero of s.party) {
+  const rosterMembers = s.party.map(hero => {
     const { heroId, maxHp } = hero;
     const name = heroId[0].toUpperCase() + heroId.slice(1);
     const hp = s.activeBattle ? s.activeBattle.units.find(unit => unit.side === 'player' && unit.defId === heroId)?.hp ?? 0 : hero.hp;
     const condition = hp === 0 ? 'Defeated' : hp < maxHp ? 'Injured' : '';
-    const hpLabel = `${hp}/${maxHp} HP`;
+    return { hero, name, hp, condition, hpLabel: `${hp}/${maxHp} HP` };
+  });
+  const showHeroSheet = (index: number, invokerId: string) => {
+    const { hero, name, condition, hpLabel } = rosterMembers[index];
+    const { heroId } = hero;
+    const stats = projectOwnedCatalog(s.ownership, s.party, catalog, items).heroes[heroId].stats;
+    const sheet = el('div');
+    sheet.className = 'dungeon-sheet';
+    const details = el('dl');
+    details.append(
+      el('dt', 'Health'), el('dd', condition ? `${hpLabel} · ${condition}` : hpLabel),
+      el('dt', 'Accuracy'), el('dd', String(stats.accuracy)),
+      el('dt', 'Armor class'), el('dd', String(stats.armorClass)),
+    );
+    sheet.append(portrait(name, sheetPortraits[heroId], 96), details, el('p', progressionLabel(hero)));
+    const equipment = el('section');
+    equipment.className = 'dungeon-sheet-equipment';
+    equipment.setAttribute('aria-label', 'Equipment');
+    const slots = el('dl');
+    for (const [slot, label] of Object.entries(EQUIPMENT_SLOTS)) {
+      const assignment = s.ownership.assignments.find(entry => entry.heroId === heroId && entry.slot === slot);
+      const instance = s.ownership.equipment.find(entry => entry.instanceId === assignment?.instanceId);
+      const item = instance && items[instance.itemId];
+      const value = item?.kind === 'equipment'
+        ? `${item.label} · +${item.effect.amount} ${item.effect.stat === 'armorClass' ? 'armor class' : 'accuracy'}`
+        : 'Empty';
+      slots.append(el('dt', label), el('dd', value));
+    }
+    equipment.append(el('h3', 'Equipment'), slots);
+    sheet.append(equipment);
+    const count = rosterMembers.length;
+    dialogs.showChoices(`${name} character sheet`, sheet, [
+      { id: 'dungeon-sheet-previous', label: 'Previous hero', keepOpen: true,
+        run: () => showHeroSheet((index + count - 1) % count, invokerId) },
+      { id: 'dungeon-sheet-next', label: 'Next hero', keepOpen: true,
+        run: () => showHeroSheet((index + 1) % count, invokerId) },
+      { id: 'dungeon-sheet-close', label: 'Close', run: () => {} },
+    ], () => {}, { focusTitle: true, returnFocus: () => root.querySelector<HTMLElement>(`#${invokerId}`) });
+  };
+  for (const [index, { hero, name, hp, condition, hpLabel }] of rosterMembers.entries()) {
+    const { heroId, maxHp } = hero;
     const id = `dungeon-hero-${heroId}`;
     const card = el('div');
     card.className = 'dungeon-hero';
-    const inspect = button(name, () => {
-      const stats = projectOwnedCatalog(s.ownership, s.party, catalog, items).heroes[heroId].stats;
-      const sheet = el('div');
-      sheet.className = 'dungeon-sheet';
-      const details = el('dl');
-      details.append(
-        el('dt', 'Health'), el('dd', condition ? `${hpLabel} · ${condition}` : hpLabel),
-        el('dt', 'Accuracy'), el('dd', String(stats.accuracy)),
-        el('dt', 'Armor class'), el('dd', String(stats.armorClass)),
-      );
-      sheet.append(portrait(name, sheetPortraits[heroId], 96), details, el('p', progressionLabel(hero)));
-      const equipment = el('section');
-      equipment.className = 'dungeon-sheet-equipment';
-      equipment.setAttribute('aria-label', 'Equipment');
-      const slots = el('dl');
-      for (const [slot, label] of Object.entries(EQUIPMENT_SLOTS)) {
-        const assignment = s.ownership.assignments.find(entry => entry.heroId === heroId && entry.slot === slot);
-        const instance = s.ownership.equipment.find(entry => entry.instanceId === assignment?.instanceId);
-        const item = instance && items[instance.itemId];
-        const value = item?.kind === 'equipment'
-          ? `${item.label} · +${item.effect.amount} ${item.effect.stat === 'armorClass' ? 'armor class' : 'accuracy'}`
-          : 'Empty';
-        slots.append(el('dt', label), el('dd', value));
-      }
-      equipment.append(el('h3', 'Equipment'), slots);
-      sheet.append(equipment);
-      dialogs.showChoices(`${name} character sheet`, sheet, [
-        { id: 'dungeon-sheet-close', label: 'Close', run: () => {} },
-      ], () => {}, { focusTitle: true, returnFocus: () => root.querySelector<HTMLElement>(`#${id}`) });
-    }, false, id);
+    const inspect = button(name, () => showHeroSheet(index, id), false, id);
     inspect.setAttribute('aria-haspopup', 'dialog');
     const thumbnail = catalog.assets[catalog.heroes[heroId].portraitAssetId]?.runtimePath;
     inspect.prepend(portrait(name, thumbnail ? publicAssetUrl(thumbnail) : undefined, 48));
