@@ -221,6 +221,7 @@ for(const control of ['arrows','wasd','compass','cell'] as const)test(`stairs tr
    const target=control==='compass'?page.locator(`#dungeon-step-${direction}`):page.locator(`#dungeon-map [data-cell="${destination}"]`);
    if(isMobile)await target.tap();else await target.click();
   }
+  await expect.poll(async()=> (await dungeonSnapshot(page)).revision).toBe(before.revision+1);
  };
  // Structural clear-floor input isolates traversal. The legal guardian journey separately proves unlock.
  const approach=atStairApproach(cleared);await load(approach);

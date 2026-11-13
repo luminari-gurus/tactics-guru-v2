@@ -223,7 +223,7 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
     party.push(checked);
   }
   const owned = readItemOwnership(input.ownership, input.id, items, id => {
-    const m = new RegExp(`^${input.id}:floor:([1-9][0-9]*):reward:([01]):option:[01]$`).exec(id);
+    const m = new RegExp(`^${input.id}:floor:([1-9][0-9]*):reward:([0-2]):option:[01]$`).exec(id);
     if (!m || !safeCount(Number(m[1]), 1) || Number(m[1]) > floors.length) return false;
     const floor = floors[Number(m[1]) - 1];
     return floor.completed > Number(m[2]) && !(input.depth === Number(m[1]) && input.phase === 'reward' && floor.completed === Number(m[2]) + 1);
@@ -235,7 +235,7 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
   if (canonical(geometry) !== canonical(floorGeometry(state.seed, state.depth, currentFloor(state).descriptor.biome, undefined, currentFloor(state).descriptor.generator))) return fail('invalidFloor');
   const slot = dungeonSlot(state), alive = party.some(h => h.hp > 0);
   if ((state.phase === 'defeat') === alive || state.phase === 'battle' && slot === 3 ||
-    state.phase === 'reward' && (slot < 1 || slot > 2) || state.phase !== 'reward' && state.offer !== null) return fail('invalidPhase');
+    state.phase === 'reward' && slot < 1 || state.phase !== 'reward' && state.offer !== null) return fail('invalidPhase');
   const offer = state.phase === 'reward' ? readRewardOffer(state.offer, dungeonRewardBoundary(state), items) : null;
   if (offer && !offer.ok) return fail('invalidPhase');
   const exp = currentFloor(state).exploration;
@@ -305,10 +305,10 @@ export function acceptDungeonBattle(s: DungeonState, battle: BattleState): Dunge
     return advance(s, { floors, party, ownership, phase: 'defeat', activeBattle: null, battlefield: null });
   }
   floors[s.depth - 1] = { ...f, completed: f.completed + 1,
-    exploration:{...exploration,cleared:[...exploration.cleared!,selected].sort((a,b)=>a-b),active:f.completed === 2 ? null : selected} };
+    exploration:{...exploration,cleared:[...exploration.cleared!,selected].sort((a,b)=>a-b),active:selected} };
   const next = { ...s, floors };
   const awarded = party.map(h => awardHero(h, HERO_PROGRESSION.awards[f.descriptor.encounters[selected].selection.kind], dungeonContent.catalog));
-  return advance(s, { floors, party: awarded, ownership, phase: f.completed === 2 ? 'ready' : 'reward', offer: f.completed === 2 ? null : dungeonOffer(next), activeBattle: null, battlefield: null });
+  return advance(s, { floors, party: awarded, ownership, phase: 'reward', offer: dungeonOffer(next), activeBattle: null, battlefield: null });
 }
 export type DungeonItemCommand = ItemCommand | (ReturnType<typeof dungeonBoundary> & (
   { readonly type: 'discardEquipment'; readonly instanceId: string } |

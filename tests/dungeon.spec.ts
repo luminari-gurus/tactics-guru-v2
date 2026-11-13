@@ -1,11 +1,11 @@
 import { dungeonContent } from '../src/content/dungeon';
 import { walkDungeon, reenterDungeonStair, continueSavedDungeon, openDungeonInventory } from './helpers/dungeonTraversal';
-import { atEncounter, atStairApproach, stagedMageAbility } from './helpers/dungeonFixtures';
+import { atEncounter, atStairApproach, checkedDungeon, stagedMageAbility } from './helpers/dungeonFixtures';
 import { expect,railTest as test,type Page } from './helpers/dungeonEntropy';
 import { readFileSync, writeFileSync } from 'node:fs';
 import type { Locator } from '@playwright/test';
 import { dungeonCapacityFixture, dungeonVictoryBoundary } from './helpers/dungeonFixtures';
-import { dungeonBattle, startDungeonBattle, acceptDungeonBattle, freshDungeon, type DungeonState } from '../src/domain/dungeon';
+import { dungeonBattle, startDungeonBattle, acceptDungeonBattle, dungeonBoundary, dungeonItem, freshDungeon, type DungeonState } from '../src/domain/dungeon';
 import { progressHero } from '../src/domain/progression';
 import { decodeDungeon, encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
@@ -392,7 +392,7 @@ test('automatic stairs preserve healed Fighter carry and fresh battle resources'
  // Generate the legal boundary under current rules; the historical #163 receipt remains immutable.
  const record=healedFighterBoundary();expect(record.state.units.find(u=>u.defId==='fighter')!.secondWindUsed).toBe(true);
  const completed=acceptDungeonBattle(record.entry,record.state);if(!completed.ok)throw Error(completed.reason);
- const approach=atStairApproach(completed.state),party=approach.party,ownership=approach.ownership;
+ const approach=atStairApproach(declineReward(completed.state)),party=approach.party,ownership=approach.ownership;
  expect(party.find(h=>h.heroId==='fighter')!.hp).toBeGreaterThan(0);expect(party.find(h=>h.heroId==='fighter')!.learned).toContain('ability:second_wind');
  await seed(page,approach);await walkDungeon(page,approach.floors[0].descriptor.downstairs,isMobile?'touch':'keyboard');
  const arrived=await snapshot(page);expect(arrived.depth).toBe(2);expect(arrived.revision).toBe(approach.revision+1);expect(arrived.party).toEqual(party);expect(arrived.ownership).toEqual(ownership);
@@ -407,6 +407,9 @@ test('automatic stairs preserve healed Fighter carry and fresh battle resources'
 });
 async function seed(page:Page,s:DungeonState){const encoded=encodeDungeon(s);if(!encoded.ok)throw Error(encoded.reason);await page.goto('./?game=dungeon');await page.evaluate(({key,text})=>{localStorage.setItem(key,text);}, {key:DUNGEON_KEYS.primary,text:encoded.text});await page.reload();await continueSavedDungeon(page);}
 function fixture(slot:number){for(let seed=1;seed<=50;seed++){const f=dungeonVictoryBoundary(seed,slot);if(f)return f;}throw Error('No legal fixture');}
+function declineReward(state: DungeonState) {
+ return checkedDungeon(dungeonItem(state, { ...dungeonBoundary(state), type: 'declineReward', offerId: state.offer!.id }));
+}
 fixedSeedTest('dungeon battle undo survives reload and a legal defeat journey',async({page,isMobile})=>{
  test.setTimeout(300000);
  // This case qualifies undo/reload/defeat; random-layout identity has its own case.
@@ -461,7 +464,7 @@ fixedSeedTest('read-only entry, keyboard new dungeon, real action and active res
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect((await readSession(page)).state).toEqual(saved.activeBattle);expect((await readSession(page)).events).toEqual([]);
  await page.screenshot({path:test.info().outputPath('battle-resumed.png')});expect(errors).toEqual([]);
 });
-test('legal reward and guardian boundaries, travel reload, backtracking and isolated saves',async({page})=>{
+test('legal reward and guardian boundaries, travel reload, backtracking and isolated saves',async({page,isMobile})=>{
  test.setTimeout(180000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  for(const slot of [0,1,2]){
   const f=fixture(slot);writeFileSync(test.info().outputPath(`legal-boundary-${slot}.json`),JSON.stringify(f));
@@ -469,20 +472,35 @@ test('legal reward and guardian boundaries, travel reload, backtracking and isol
   await playCommand(page,f.command);await expect(page.locator('#dungeon-screen')).toBeVisible();
   const s=await snapshot(page),result=dispatch(f.snapshot.activeBattle!,f.command,dungeonBattle(f.snapshot)!.catalog);expect(result.ok).toBe(true);
   if(result.ok){const expected=acceptDungeonBattle(f.snapshot,result.state);expect(expected.ok).toBe(true);if(expected.ok){expect(s).toEqual({...expected.state,stats:expect.objectContaining({coverage:'since-upgrade',enemiesKilled:1,movesTaken:0})});expect(s.stats?.boundary).toEqual({battle:slot,command:result.state.commandCount});}}
-  if(slot<2){
-   await expect(page.locator('#dungeon-descend')).toHaveCount(0);
-   const rewards=page.getByRole('region',{name:'Rewards',exact:true});
-   await expect(rewards).toBeInViewport({ratio:1});
-   await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(s);
-   await expect(rewards).toBeInViewport({ratio:1});
-   const claim=page.getByRole('button',{name:/^Claim /}).first();
-   const item=(await claim.textContent())!.replace(/^Claim /,'');
-   await claim.click();await expect(page.locator('#battle-dialog-message')).toHaveText(`Claim ${item} and prepare the next encounter?`);
-   await page.locator('#dungeon-item-cancel').click();expect(await snapshot(page)).toEqual(s);
-   await page.getByRole('button',{name:/^Claim /}).first().click();await page.locator('#dungeon-item-confirm').click();expect((await snapshot(page)).phase).toBe('ready');
-  }else{
+  const rewards=page.getByRole('region',{name:'Rewards',exact:true});
+  const descentHint=page.getByText('Descent unlocked. Walk onto the downstairs to continue.',{exact:true});
+  const status=page.locator('.dungeon-status');
+  await expect(descentHint).toHaveCount(0);
+  await expect(rewards).toBeInViewport({ratio:1});
+  await expect(status).toContainText('Dungeon saved on this device');
+  await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(s);
+  await expect(rewards).toBeInViewport({ratio:1});
+  if(slot===2){
+   await expect(page.locator('#dungeon-map').getByText('↓',{exact:true})).toHaveCount(0);
+   for(const direction of ['north','east','south','west'])await expect(page.locator(`#dungeon-step-${direction}`)).toBeDisabled();
+  }
+  const claim=rewards.getByRole('button',{name:/^Claim /}).first();
+  const item=(await claim.textContent())!.replace(/^Claim /,'');
+  const nextStep=slot===2?'unlock descent':'prepare the next encounter';
+  const choose=async()=>{if(isMobile)await claim.tap();else await claim.click();};
+  await choose();await expect(page.locator('#battle-dialog-message')).toHaveText(`Claim ${item} and ${nextStep}?`);
+  await page.locator('#dungeon-item-cancel').click();expect(await snapshot(page)).toEqual(s);
+  await choose();await page.locator('#dungeon-item-confirm').click();
+  await expect(status).toContainText('Dungeon saved on this device');
+  const claimed=await snapshot(page);
+  expect(claimed).toMatchObject({phase:'ready',offer:null});
+  expect(claimed.ownership).not.toEqual(s.ownership);
+  if(slot===2){
+   await expect(descentHint).toBeVisible();
+   await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(claimed);
+   await expect(rewards).toHaveCount(0);
    await page.evaluate(()=>localStorage.setItem('tactics-guru:phaser:run:primary:v1','preserved-short-run'));
-   await walkDungeon(page,s.floors[s.depth-1].descriptor.downstairs);expect((await snapshot(page)).depth).toBe(2);const second=await snapshot(page);
+   await walkDungeon(page,s.floors[s.depth-1].descriptor.downstairs,isMobile?'touch':'keyboard');expect((await snapshot(page)).depth).toBe(2);const second=await snapshot(page);
    await page.screenshot({path:test.info().outputPath('automatic-descent.png'),fullPage:true});
    await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(second);
    await reenterDungeonStair(page,'ascend');const returned=await snapshot(page);expect(returned.depth).toBe(1);expect(returned.floors[0].completed).toBe(3);expect(returned.ownership).toEqual(second.ownership);expect(returned.floors[0].position).toBe(returned.floors[0].descriptor.downstairs);
@@ -499,8 +517,11 @@ test('corrupt bytes stay exportable and uncertain travel requires explicit recov
  await page.addInitScript(()=>{document.hasFocus=()=>false;});
  test.setTimeout(90000);const f=fixture(2),result=dispatch(f.snapshot.activeBattle!,f.command,dungeonBattle(f.snapshot)!.catalog);if(!result.ok)throw Error('fixture failed');
  const cleared=acceptDungeonBattle(f.snapshot,result.state);if(!cleared.ok)throw Error(cleared.reason);
- const approach=atStairApproach(cleared.state);await seed(page,approach);await page.evaluate(()=>{const original=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){original.call(this,k,v);if(k==='tactics-guru:phaser:dungeon:primary:v1')throw Error('uncertain primary write');};});
- await page.locator(`#dungeon-map [data-cell="${approach.floors[0].descriptor.downstairs}"]`).click();expect(await snapshot(page)).toEqual(approach);await expect(page.locator('.dungeon-status')).toContainText('Travel not published');
+ const approach=atStairApproach(declineReward(cleared.state));await seed(page,approach);
+ await page.evaluate(key=>{const original=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){original.call(this,k,v);if(k===key&&JSON.parse(v).payload.depth===2)throw Error('uncertain travel write');};},DUNGEON_KEYS.primary);
+ await page.locator(`#dungeon-map [data-cell="${approach.floors[0].descriptor.downstairs}"]`).click();
+ await expect(page.locator('.dungeon-status')).toContainText('Travel not published');
+ expect(await snapshot(page)).toMatchObject({depth:approach.depth,revision:approach.revision,floors:approach.floors});
  await page.getByRole('button',{name:'Save recovery',exact:true}).click();await page.locator('#dungeon-continue-primary').click();expect((await snapshot(page)).depth).toBe(2);
  await page.evaluate(key=>localStorage.setItem(key,'broken save bytes'),DUNGEON_KEYS.primary).catch(()=>{});await page.reload();
  await page.getByRole('button',{name:'Save recovery',exact:true}).click();
@@ -527,6 +548,7 @@ test('declining a dungeon reward preserves inventory and allows the next encount
  const next=await snapshot(page);
  expect(next).toMatchObject({phase:'ready',offer:null,ownership:initial.ownership});
  await expect(rewards).toHaveCount(0);
+ await expect(page.locator('.dungeon-status')).toContainText('Dungeon saved on this device');
  await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(next);
  await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');

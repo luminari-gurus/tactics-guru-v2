@@ -166,7 +166,8 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
   sidebar.append(party);
   const inventory=disclosure('dungeon-inventory','Owned items');
   if(s.offer){const rewards=el('section');rewards.setAttribute('aria-label','Rewards');rewards.append(el('h2','Choose one reward'));
-    for(const o of s.offer.options){const command:DungeonItemCommand={...dungeonBoundary(s),type:'claimReward',offerId:s.offer.id,itemId:o.itemId};rewards.append(button(`Claim ${dungeonContent.items[o.itemId].label}`,()=>review(`Claim ${dungeonContent.items[o.itemId].label} and prepare the next encounter?`,command)));}
+    const nextStep = floor.completed === 3 ? 'unlock descent' : 'prepare the next encounter';
+    for(const o of s.offer.options){const command:DungeonItemCommand={...dungeonBoundary(s),type:'claimReward',offerId:s.offer.id,itemId:o.itemId};rewards.append(button(`Claim ${dungeonContent.items[o.itemId].label}`,()=>review(`Claim ${dungeonContent.items[o.itemId].label} and ${nextStep}?`,command)));}
     const decline:DungeonItemCommand={...dungeonBoundary(s),type:'declineReward',offerId:s.offer.id};
     rewards.append(button('Decline reward',()=>review('Continue without claiming either reward?',decline)));
     if (s.ownership.equipment.length === ITEM_BOUNDS.equipmentInstances.max &&
