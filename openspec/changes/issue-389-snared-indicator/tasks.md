@@ -8,7 +8,7 @@
 ## 2. Integration and delivery
 
 - [x] 2.1 Run the standard PR lane and complete legal authored battle/run checks; audit all acceptance criteria and retain source/build/environment/results and all failed or incomplete attempts in plan.md. PR verification passed (1,363 units, both types, two build integrations, bundle and seven core journeys); run-nnox2B passed 36/36 shared Guarded and complete battle/run cases without retries or skips. All acceptance criteria, source/build identities, screenshots and prior failures are retained in plan.md.
-- [ ] 2.2 Review the final diff, strictly validate OpenSpec, commit and push, open a focused labeled review-ready PR completing #389, and verify remote head parity; update plan.md with the handoff.
+- [x] 2.2 Review the final diff, strictly validate OpenSpec, commit and push, open a focused labeled review-ready PR completing #389, and verify remote head parity; update plan.md with the handoff. PR #394 is open, non-draft and mergeable, labeled enhancement/risk:pending; pushed-head parity verified. Local acceptance is complete, with CI and maintainer review tracked on the PR. No merge or production deployment was performed.
 
 ## Workflow follow-up
 

@@ -5,8 +5,10 @@ Issue: [#389](https://github.com/luminari-gurus/tactics-guru-v2/issues/389).
 Owner: [@moshehbenavraham](https://github.com/moshehbenavraham).
 Branch: [`branch/issue-389-snared-indicator`](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-389-snared-indicator).
 Base: `origin/main`, `6a03f37cf51d1e46a72fc6c49ca2421a0836c2e6`.
-Status: implementation authorized and in progress; OpenSpec change
-`issue-389-snared-indicator` tracks implementation and verification.
+Status: implementation and local acceptance complete;
+[PR #394](https://github.com/luminari-gurus/tactics-guru-v2/pull/394) is open for review
+(non-draft, mergeable; labels `enhancement`, `risk:pending`). CI is running.
+OpenSpec change `issue-389-snared-indicator`: all four tracked tasks complete.
 
 The caller authorized implementation, autonomous repairs, verification, commits,
 pushes and a focused labeled review-ready PR on this branch.
@@ -323,4 +325,18 @@ as `snared-desktop.png`, `snared-pixel-portrait.png` and
 All local completion gates passed. Earlier failures and repaired test mistakes
 remain recorded above; no test assertions, timeouts, retries or budgets were
 relaxed. Strict OpenSpec validation, all ten plan links and whitespace checks pass.
-The only remaining task is PR publication/labels and recording its URL/head parity.
+PR [#394](https://github.com/luminari-gurus/tactics-guru-v2/pull/394) targets `main`,
+is non-draft and mergeable, and uses `Closes #389` after all four criteria passed.
+Labels: `enhancement`, `risk:pending` (maintainer risk review remains on the PR).
+Implementation commit: `8777fd2fd2eed4d6cc065f75b6d0bc8db096a5eb`;
+verification handoff commit: `be83346bfc96d9fddc20c6747df43f2980808057`.
+Local/remote/PR head parity was verified at publication. Subsequent documentation
+closeout changes only this plan and OpenSpec checkboxes; all recorded runtime,
+test, configuration, lockfile and served-build hashes remain unchanged.
+
+CI `PR verification` and the automatic Cloudflare Pages preview were running at
+publication; the auto-merge workflow check succeeded. Follow their current status
+on the PR. Issue #389 remains open until merge. No further implementation work,
+stacked PR, release tag or production deployment is required for this increment.
+Review/merge and later OpenSpec archive/sync are follow-ups, not unfinished local
+implementation. Do not rerun app/browser suites for documentation-only closeout.
