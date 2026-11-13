@@ -586,6 +586,41 @@ describe('dungeon persistence', () => {
 });
 
 describe('dungeon recovery limits', () => {
+  it('keeps a removed backup exportable through repeated partial resets and a successful retry', async () => {
+    const data = memory(), storage = createDungeonStorage(() => data);
+    const initial = freshDungeon('recovery-copies', 13, undefined, true);
+    const session = new DungeonSession(initial, storage);
+    assert(await session.save());
+    assert(session.continue(session.inspect()));
+    const before = session.inspect();
+    assert(before.primary.status === 'valid' && before.backup.status === 'valid');
+
+    const remove = data.removeItem;
+    data.removeItem = key => {
+      if (key === DUNGEON_KEYS.primary) throw Error('denied');
+      remove(key);
+    };
+
+    expect(await session.replace(before, 'replacement-dungeon', 14)).toBe(false);
+    expect(await session.replace(session.inspect(), 'replacement-dungeon', 14)).toBe(false);
+    const after = session.inspect();
+    expect(after.backup.status).toBe('missing');
+    expect(session.exports(after)).toEqual([
+      { label: 'current progress', text: before.primary.text },
+      { label: 'primary save', text: before.primary.text },
+      { label: 'retained backup save (copy 1)', text: before.backup.text },
+    ]);
+
+    data.removeItem = remove;
+    expect(await session.replace(session.inspect(), 'replacement-dungeon', 14)).toBe(true);
+    const replaced = session.inspect();
+    assert(replaced.primary.status === 'valid' && replaced.backup.status === 'valid');
+    expect(replaced.primary.state.id).toBe('replacement-dungeon');
+    expect(replaced.backup.text).not.toBe(before.backup.text);
+    const exports = session.exports(replaced);
+    expect(exports.filter(copy => copy.label === 'backup save').map(copy => copy.text)).toEqual([replaced.backup.text]);
+    expect(exports.filter(copy => copy.label.startsWith('retained backup save')).map(copy => copy.text)).toEqual([before.backup.text]);
+  });
   it('keeps primary recoverable on backup-write/security failures and changed reset slots',async()=>{
     const m=memory(),store=createDungeonStorage(()=>m),s=clearFloor(fresh());store.save(s);const original=m.getItem(DUNGEON_KEYS.primary);
     const write=m.setItem;m.setItem=(k,v)=>{if(k===DUNGEON_KEYS.backup)throw Object.assign(Error('denied'),{name:'SecurityError'});write(k,v);};
