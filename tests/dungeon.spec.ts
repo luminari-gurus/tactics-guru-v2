@@ -769,6 +769,9 @@ test('character sheets switch heroes and show equipped charms through equip, res
  await page.locator('#dungeon-item-confirm').click();
  await open(ranger);
  await expectSheet('Ranger', ['12/12 HP','5','12'], 'Empty');
+ if (!isMobile) await page.keyboard.press('Tab');
+ await activate(previous);
+ await expectSheet('Fighter', ['18/18 HP','4','15'], charm);
  await close.click();
 });
 
