@@ -172,6 +172,9 @@ for(const saved of [false,true])(saved?test.extend({pinDungeonSeed:27}):fixedSee
 // Use the same legal New Game seed as the complete saved first-floor journey above.
 test.extend({pinDungeonSeed:27})('saved dungeon downloads only after explicit recovery export',async({page,isMobile})=>{
  test.setTimeout(120000);
+ // Playtime checkpoints write saves when recovery opens or the page reloads.
+ // Disable time accrual here so exact byte checks isolate export behavior.
+ await page.addInitScript(()=>{document.hasFocus=()=>false;});
  const downloads:string[]=[];
  page.on('download',download=>downloads.push(download.suggestedFilename()));
  const activate=async(control:Locator)=>{if(isMobile)await control.tap();else await control.click();};
@@ -219,6 +222,15 @@ test.extend({pinDungeonSeed:27})('saved dungeon downloads only after explicit re
   expect(await snapshot(page)).toEqual(boundary);
   expect((await readSession(page)).state).toEqual(battle);
  };
+ await test.step('recovery lists each live export once before reloading',async()=>{
+  await activate(recovery);await expect(dialog).toHaveAccessibleName('Dungeon save recovery');
+  for(const label of ['Export current progress','Export primary save','Export backup save']){
+   await expect(dialog.getByRole('button',{name:label,exact:true})).toHaveCount(1);
+  }
+  await activate(page.locator('#dungeon-close-recovery'));await expect(dialog).not.toBeVisible();
+  await unchanged();expect(downloads).toEqual([]);
+ });
+
  await test.step('reload and Continue preserve the accepted boundary without downloading',async()=>{
   await page.reload();await continueSavedDungeon(page);
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
@@ -483,6 +495,8 @@ test('legal reward and guardian boundaries, travel reload, backtracking and isol
  expect(errors).toEqual([]);
 });
 test('corrupt bytes stay exportable and uncertain travel requires explicit recovery',async({page})=>{
+ // Keep elapsed playtime from changing the fixture during refused travel.
+ await page.addInitScript(()=>{document.hasFocus=()=>false;});
  test.setTimeout(90000);const f=fixture(2),result=dispatch(f.snapshot.activeBattle!,f.command,dungeonBattle(f.snapshot)!.catalog);if(!result.ok)throw Error('fixture failed');
  const cleared=acceptDungeonBattle(f.snapshot,result.state);if(!cleared.ok)throw Error(cleared.reason);
  const approach=atStairApproach(cleared.state);await seed(page,approach);await page.evaluate(()=>{const original=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){original.call(this,k,v);if(k==='tactics-guru:phaser:dungeon:primary:v1')throw Error('uncertain primary write');};});

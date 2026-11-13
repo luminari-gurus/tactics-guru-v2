@@ -632,7 +632,7 @@ test('main menu: failed new-game write retains exportable recovery copies',async
  },{key:keys.dungeon.primary,text});
  await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();await page.getByRole('dialog').getByRole('button',{name:'Start new dungeon',exact:true}).click();
  await expect(page.getByRole('dialog')).toContainText('Dungeon save recovery');
- const download=page.waitForEvent('download');await page.getByRole('button',{name:/Export primary/}).click();
+ const download=page.waitForEvent('download');await page.getByRole('button',{name:/^Export retained primary save/}).click();
  const file=await (await download).path();expect(readFileSync(file!,'utf8')).toBe(text);
  await expect(page.locator('#dungeon-screen')).toContainText('Progress unsaved');
 });
@@ -680,6 +680,8 @@ test('main menu: unsaved return cancellation opens recovery and accepted leave r
 });
 
 for(const path of ['unsaved play','failed replacement'] as const)test(`main menu: dungeon departure after rejected movement retains ${path} warning`,async({page})=>{
+ // Departure flushes playtime independently of rejected movement and export.
+ await page.addInitScript(()=>{document.hasFocus=()=>false;});
  if(path==='failed replacement')await page.addInitScript(()=>{const set=Storage.prototype.setItem;Storage.prototype.setItem=function(key,value){if(key.includes(':dungeon:'))throw new DOMException('full','QuotaExceededError');set.call(this,key,value);};});
  // This checks departure after a rejected exploration command, not encounter
  // placement. An arbitrary first compass step can enter a battle and hide the map.
@@ -713,7 +715,7 @@ for(const path of ['unsaved play','failed replacement'] as const)test(`main menu
  await (await cancel).dismiss();await departure;
  await expect(page.getByRole('dialog')).toContainText('Dungeon save recovery');
  expect(await page.locator('#game').getAttribute('data-dungeon-snapshot')).toBe(before);
- const download=page.waitForEvent('download');await page.getByRole('button',{name:'Export current progress',exact:true}).last().click();
+ const download=page.waitForEvent('download');await page.getByRole('button',{name:'Export current progress',exact:true}).click();
  const file=await (await download).path();expect(JSON.parse(readFileSync(file!,'utf8')).payload).toEqual(JSON.parse(before!));
  const accept=page.waitForEvent('dialog');const leave=page.getByRole('link',{name:'Main menu',exact:true}).click();
  await (await accept).accept();await leave;await expect(page.locator('#main-menu')).toBeVisible();

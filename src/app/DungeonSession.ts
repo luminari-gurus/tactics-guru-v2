@@ -169,9 +169,8 @@ export class DungeonSession {
     if (!this.storage || this.disposed || review !== this.review || !this.storage.acknowledge(review)) return false;
     this.expectedPrimary = review.primary.text; this.unsaved = false; this.review = null; return this.saveNow();
   }
-  exports(review: DungeonInspection) {
-    if (!this.storage) return [];
-    const values = [...this.retained];
+  private liveExports(review: DungeonInspection) {
+    const values: { label: string; text: string }[] = [];
     const current = encodeDungeon(this.current);
     if (current.ok) values.push({ label: 'current progress', text: current.text });
     for (const slot of ['primary','backup'] as const) {
@@ -188,10 +187,23 @@ export class DungeonSession {
     }
     return values;
   }
+  exports(review: DungeonInspection) {
+    if (!this.storage) return [];
+    const live = this.liveExports(review);
+    const retained = this.retained.filter(copy => !live.some(value => value.label === copy.label && value.text === copy.text));
+    return [...live, ...retained.map(({ label, text }, index) => ({
+      label: `retained ${label} (copy ${index + 1})`, text,
+    }))];
+  }
+  private retainExports(review: DungeonInspection) {
+    for (const value of this.liveExports(review)) {
+      if (!this.retained.some(copy => copy.label === value.label && copy.text === value.text)) this.retained.push(value);
+    }
+  }
   remove(slot: DungeonSlot, review: DungeonInspection) { return this.mutate(() => this.removeNow(slot, review), false); }
   private removeNow(slot: DungeonSlot, review: DungeonInspection) {
     if (!this.storage || this.disposed || review !== this.review) return false;
-    this.retained = this.exports(review);
+    this.retainExports(review);
     this.progressSaved = false;
     const reviewed = review[slot];
     const result = this.storage.remove(slot, reviewed.text, reviewed.status === 'valid' ? reviewed.checkpoint ?? null : null);
@@ -217,7 +229,7 @@ export class DungeonSession {
     if (!this.storage || this.disposed || review !== this.review || id === this.current.id || seed === this.current.seed) return false;
     if (!this.storage.acknowledge(review)) { this.review = null; this.report('Reset refused: saved dungeon data changed. Review again.'); return false; }
     const next = freshDungeon(id, seed, undefined, true);
-    this.retained = this.exports(review);
+    this.retainExports(review);
     this.progressSaved = false;
     for (const slot of ['backup','primary'] as const) {
       const reviewed = review[slot];
@@ -237,6 +249,6 @@ export class DungeonSession {
   private reset(next: DungeonState) {
     this.battle?.dispose(); this.battle = null; this.current = next; this.expectedPrimary = null; this.completedBattle = null; this.review = null; this.unsaved = false;
     this.started = true;
-    this.saveNow();
+    if (this.saveNow()) this.retained = [];
   }
 }
