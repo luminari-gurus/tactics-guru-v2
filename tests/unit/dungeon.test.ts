@@ -729,7 +729,7 @@ describe('durable encounter policies', () => {
     expect(revisit.floors).toEqual(next.floors); expect(revisit.ownership).toEqual(next.ownership);
   });
 
-  it('requires the entire guardian roster, then completes exactly once', () => {
+  it('requires the entire guardian roster, then saves one final reward before descent', () => {
     let state = fresh();
     for (let slot = 0; slot < 2; slot++) { state = win(state); state = good(dungeonItem(state, { ...dungeonBoundary(state), type: 'claimReward', offerId: state.offer!.id, itemId: state.offer!.options[0].itemId })); }
     state = good(startDungeonBattle(atEncounter(state)));
@@ -737,8 +737,22 @@ describe('durable encounter policies', () => {
     const partial = good(acceptDungeonBattle(state, { ...battle, units: battle.units.map(u => u.id === firstEnemy.id ? { ...u, hp: 0 } : u) }));
     expect(partial.floors[0].completed).toBe(2); expect(travelDungeon(partial, 'descend', partial.revision).ok).toBe(false);
     const victory = good(acceptDungeonBattle(partial, { ...partial.activeBattle!, outcome: 'playerWin', units: partial.activeBattle!.units.map(u => u.side === 'enemy' ? { ...u, hp: 0 } : u) }));
-    expect(victory.floors[0].completed).toBe(3); expect(victory.offer).toBeNull();
+    expect(victory.floors[0].completed).toBe(3);
+    expect(victory.floors[0].exploration.active).toBe(2);
+    expect(victory.offer?.id).toBe(`${victory.id}:floor:1:reward:2`);
     expect(acceptDungeonBattle(victory, battle)).toEqual({ ok: false, reason: 'staleBoundary' });
+    expect(travelDungeon(victory, 'descend', victory.revision)).toEqual({ ok: false, reason: 'lockedStairs' });
+    const encoded = encodeDungeon(victory); assert(encoded.ok);
+    const restored = good(decodeDungeon(encoded.text));
+    expect(restored).toEqual(victory);
+
+    const boundary = { ...dungeonBoundary(restored), offerId: restored.offer!.id };
+    const decline = { ...boundary, type: 'declineReward' as const };
+    const declined = good(dungeonItem(restored, decline));
+    expect(declined).toMatchObject({ phase: 'ready', offer: null, ownership: restored.ownership });
+    expect(declined.floors[0].exploration.active).toBeNull();
+    expect(dungeonItem(declined, decline)).toEqual({ ok: false, reason: 'staleBoundary' });
+    expect(good(travelDungeon(atDownstairs(declined), 'descend', declined.revision)).depth).toBe(2);
   });
 });
 

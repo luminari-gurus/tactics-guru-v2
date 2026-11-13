@@ -268,7 +268,7 @@ it('legally reaches guardian victory with next-command/RNG equivalence after sav
   const catalog=dungeonBattle(fixture.snapshot)!.catalog;
   const a=dispatch(fixture.snapshot.activeBattle!,fixture.command,catalog),b=dispatch(decoded.state.activeBattle!,fixture.command,catalog);
   expect(a).toEqual(b);expect(a.ok).toBe(true);
-  if(a.ok){expect(a.state.outcome).toBe('playerWin');const result=acceptDungeonBattle(decoded.state,a.state);expect(result.ok).toBe(true);if(result.ok){expect(result.state.phase).toBe('ready');expect(result.state.floors[0].completed).toBe(3);}}
+  if(a.ok){expect(a.state.outcome).toBe('playerWin');const result=acceptDungeonBattle(decoded.state,a.state);expect(result.ok).toBe(true);if(result.ok){expect(result.state.phase).toBe('reward');expect(result.state.floors[0].completed).toBe(3);}}
 },120000);
 
 it('retains the accepted-command history through every legal encounter',()=>{
