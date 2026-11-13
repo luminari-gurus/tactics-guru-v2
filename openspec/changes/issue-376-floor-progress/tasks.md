@@ -10,7 +10,7 @@
 
 ## 3. Integration and delivery
 
-- [ ] 3.1 Pass affected Chromium and WebKit desktop/portrait/landscape journeys and ordinary verify:pr; inspect representative screenshots and record source/build identity, commands, results and limitations in plan.md.
+- [x] 3.1 Pass affected Chromium and WebKit desktop/portrait/landscape journeys and ordinary verify:pr; inspect representative screenshots and record source/build identity, commands, results and limitations in plan.md.
 - [ ] 3.2 Review the focused diff, validate OpenSpec and whitespace, commit and push, and publish a labeled ready-for-review PR covering #376; record handoff in plan.md.
 
 ## Workflow follow-up

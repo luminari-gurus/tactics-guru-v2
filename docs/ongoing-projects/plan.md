@@ -5,9 +5,9 @@ Issue: [#376](https://github.com/luminari-gurus/tactics-guru-v2/issues/376).
 Owner: [@moshehbenavraham](https://github.com/moshehbenavraham).
 Branch: [`branch/issue-376-floor-progress`](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-376-floor-progress).
 Base: `origin/main`, `973b792f3e26b178b71dfa07d5654019cb34e24e`.
-Status: implementation and focused desktop iteration complete under OpenSpec
-`issue-376-floor-progress`; full affected acceptance and PR publication remain
-outstanding. Working tree started clean.
+Status: implementation and acceptance complete under OpenSpec
+`issue-376-floor-progress` (3/4 tasks); HUD PR publication remains outstanding.
+Working tree started clean. Current evidence and review handoff are below.
 The previous plan is preserved unchanged as
 [issue-389-snared-indicator-plan.md](issue-389-snared-indicator-plan.md).
 
@@ -247,8 +247,7 @@ lockfile change was required.
   now assert progress around legal battle victories, reward claim/decline,
   floor changes, Continue, defeat and hidden stair discovery. No new test files
   or browser selection/configuration changes.
-- Next: verify both engine/device matrices,
-  inspect screenshots, run ordinary PR verification and publish the focused PR.
+- Final acceptance evidence and current publication status are summarized below.
 - Desktop iteration: legal reward/guardian, decline and fresh-layout journeys
   **3 passed**; map-marker journey **1 failed** on an obsolete legend selector.
   The same assertion failed on literal base `973b792f` with matching WSL/browser
@@ -262,7 +261,8 @@ lockfile change was required.
   No failed assertion, timeout or skip was suppressed.
 - Repair commit `1a634f59` is merged into this feature branch without rewriting
   history. Its fixed marker journey passed **3 Chromium + 3 WebKit profiles**
-  (50.3s / 26.0s). Repair ordinary PR verification is in progress separately.
+  (50.3s / 26.0s). Repair ordinary PR verification passed in 209.6s, and PR #395
+  is ready for review with the `bug` label; its remote PR verification also passed.
 - Feature typecheck and production bundle passed. Desktop fresh and final-reward
   screenshots inspected: count/labels readable, reward choices unobstructed,
   map and party retained. Focused final selection is still **39 cases per engine**
@@ -302,3 +302,79 @@ lockfile change was required.
   core dungeon journeys; reuse the five unchanged core journeys, units, type/build
   integration and bundle with their original source identity. Fresh typecheck is
   cheap and will also be run. No production rebuild is necessary for the helper edit.
+- Repaired Chromium acceptance is complete: **3/3** defeat cases (102.8s) plus
+  **36/36** other cases (184.8s), all profiles, no failures/skips/retries. Fresh
+  typecheck passed. Current source checkpoint is `bd719298`; production build
+  remains the unchanged `f09eb0ac` build. Input/blob identities are recorded in
+  `verification-receipts/issue376/repaired/source-identity.json`, and build hashes
+  in `verification-receipts/issue376/final/build-hashes.json`.
+- WebKit's full **39/39** selection passed (216.5s), followed by **2/2** affected
+  ordinary core dungeon cases (43.7s) and **3/3** desktop transitive consumer cases
+  (29.7s: Web Audio dungeon, HTML5 dungeon, radial testing routes). All have zero
+  failures, skips or retries. Outputs: `verification-receipts/issue376/repaired/`.
+
+## Verified result and review handoff
+
+- [x] Criterion 1: counts update at all three legal victory/reward boundaries,
+  after claim/decline, on descent/backtracking and after Continue.
+- [x] Criterion 2: remaining encounters, pending rewards including 3/3, floor-one
+  ascent, ready/deeper stairs, defeat and arrival/re-entry are labeled in visible
+  text. Discovery remains independent; hidden stairs stay hidden. Native touch,
+  keyboard/focus, narrow layout, map/party/reward usability and overflow checks pass.
+
+Final browser acceptance covers **78 cases**: Chromium **3 + 36** and WebKit **39**,
+with no skips/retries. `repaired/coverage-summary.json` proves that the two repaired
+Chromium runs cover exactly the original 39 selected cases, without omissions or
+duplicates, and preserves the original failed-run statistics separately.
+
+The final production bundle was built from clean `f09eb0ac36d6fff7cb88b78a69fe74d1e2ae11cf`.
+The later code checkpoint `bd719298127c6507358fee1bf71f8c0ab6f94455` changes only
+the test helper and documentation. Relevant app/public/config/lockfile/unit/build
+inputs are unchanged. The helper blob is `17c3ae161ed1f2392dbcddd2d07472c01e824d69`.
+Subsequent handoff edits are documentation and QA images only. Reuse the earlier
+1,364 unit tests, two build integrations, ordinary bundle and five unaffected core
+journeys from `verification-receipts/pr/1794594728814-1799351/`; the two affected
+core journeys were rerun after the helper edit. Both type scopes passed again.
+This does not claim the aggregate command ran a later documentation commit.
+
+Built dungeon files: `startDungeonApp-C9dhlmkO.js` and
+`startDungeonApp-DqpiXCti.css`. Recorded SHA-256 hashes for them, the entry HTML
+and load manifest were rechecked unchanged after browser acceptance. See
+`final/build-hashes.json`, `repaired/source-identity.json` and
+`repaired/coverage-summary.json` under the issue's local receipts.
+
+Exact additional commands after the helper repair (same WSL environment above):
+
+```sh
+# Three repaired defeat profiles; use the full planned Chromium filter above
+# with this title excluded for the other 36 already-accounted-for cases.
+npm run test:regression -- tests/dungeon.spec.ts -g 'dungeon battle undo survives reload'
+# The other 36: planned two-file/filter command plus:
+# --grep-invert 'dungeon battle undo survives reload'
+# WebKit: the full planned 39-case command above, with no exclusions.
+npm run test:pr -- tests/dungeon.spec.ts
+npm run test:regression -- tests/public-asset-base.spec.ts tests/battle-persistence.spec.ts --project=desktop -g '(Web Audio|HTML5) dungeon audio loads at the base|radial testing routes preserve saved games'
+npm run typecheck
+```
+
+All executions used line/JSON reporters and distinct output directories recorded
+in the receipts. No assertion, timeout, retry or persistent matrix configuration
+was relaxed. The initial missing-legend failure, identical literal-base legend
+failure, 36/3 Chromium failure and passing literal-base defeat comparison remain
+preserved. There are no unresolved product or acceptance failures. Physical
+hardware was not tested; Playwright device emulation satisfies this task.
+
+Representative final screenshots were inspected and committed for review:
+[320px floor progress](../qa/issue-376/narrow-floor-progress.png) and
+[WebKit landscape final reward](../qa/issue-376/final-reward-webkit-landscape.png).
+The changes retain the existing visual theme and use one pure domain projection;
+no new controller, saved fields, migration, timer, assets or dependencies were needed.
+
+Publication: push the QA/documentation checkpoint, open the HUD PR against
+`branch/issue-376-marker-guide-test`, add `enhancement`, then record its URL and
+finish OpenSpec task 3.2. PR #395 must merge first; retarget the HUD PR to `main`
+before merging it. Keep issue #376 open until the completing PR merges.
+
+An unused npm helper folder at `C:/Users/apexw/.codex/tmp/issue-376-tools` remains
+outside the repository: automatic approval rejected its optional deletion as
+`blocked by policy`. It has no effect on the source, evidence or PR readiness.
