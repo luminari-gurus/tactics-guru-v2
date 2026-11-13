@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { freshDungeon, stepDungeon, readDungeon, startDungeonBattle, acceptDungeonBattle, travelDungeon, currentFloor, floorMap } from '../../src/domain/dungeon';
+import { dungeonStairStatus, freshDungeon, stepDungeon, readDungeon, startDungeonBattle, acceptDungeonBattle, travelDungeon, currentFloor, floorMap } from '../../src/domain/dungeon';
 import { currentSight, encounterPois, freshExploration, neighbors, poiCell, readExploration, reveal } from '../../src/domain/exploration';
 import { generateMap } from '../../src/map/generate';
 import { encodeDungeon, decodeDungeon } from '../../src/domain/dungeonSaveEnvelope';
@@ -134,6 +134,8 @@ describe('movement onto stairs', () => {
   const before=atStairApproach(cleared()),original=canonical(before);
   const down=command(before,currentFloor(before).descriptor.downstairs),second=good(stepDungeon(before,down));
   expect(second.depth).toBe(2);expect(second.revision).toBe(before.revision+1);
+  expect(dungeonStairStatus(second,'descend')).toBe('encounters');
+  expect(dungeonStairStatus(second,'ascend')).toBe('available');
   expect(currentFloor(second).position).toBe(currentFloor(second).descriptor.upstairs);
   expect(second.party).toEqual(before.party);expect(second.ownership).toEqual(before.ownership);
   expect(stepDungeon(second,down)).toEqual({ok:false,reason:'staleBoundary'});
@@ -145,6 +147,8 @@ describe('movement onto stairs', () => {
   expect(off.depth).toBe(2);
   const first=good(stepDungeon(off,command(off,currentFloor(off).descriptor.upstairs)));
   expect(first.depth).toBe(1);expect(first.revision).toBe(second.revision+2);
+  expect(dungeonStairStatus(first,'descend')).toBe('available');
+  expect(dungeonStairStatus(first,'ascend')).toBe('floorOne');
   expect(currentFloor(first).position).toBe(currentFloor(first).descriptor.downstairs);
   expect(first.party).toEqual(before.party);expect(first.ownership).toEqual(before.ownership);
   const away=atStairApproach(first),reentered=good(stepDungeon(first,command(first,currentFloor(away).position)));

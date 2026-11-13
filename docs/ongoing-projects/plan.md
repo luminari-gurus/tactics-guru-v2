@@ -5,7 +5,8 @@ Issue: [#376](https://github.com/luminari-gurus/tactics-guru-v2/issues/376).
 Owner: [@moshehbenavraham](https://github.com/moshehbenavraham).
 Branch: [`branch/issue-376-floor-progress`](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-376-floor-progress).
 Base: `origin/main`, `973b792f3e26b178b71dfa07d5654019cb34e24e`.
-Status: planning only; implementation and acceptance checks remain outstanding.
+Status: implementation in progress under OpenSpec `issue-376-floor-progress`;
+runtime acceptance and PR publication remain outstanding. Working tree started clean.
 The previous plan is preserved unchanged as
 [issue-389-snared-indicator-plan.md](issue-389-snared-indicator-plan.md).
 
@@ -114,7 +115,8 @@ the existing state and render path supply the whole outcome. Keep the small
 shared projection because three real consumers otherwise repeat progression
 conditions and can disagree about pending rewards. Extend current tests instead
 of adding fixtures, a browser matrix or a new workflow. This bounded change needs
-only this requested plan; additional OpenSpec artifacts would duplicate it.
+only a small OpenSpec contract/tasks alongside this continuation plan, as requested
+in the implementation instruction. No extra implementation machinery is needed.
 
 ## Non-goals
 
@@ -219,5 +221,41 @@ Local `CAN_TEST_MOBILE` declares Android access only, not completed testing;
 physical hardware is not required here. Playwright/device emulation is sufficient
 under AGENTS.md, and no physical testing is claimed.
 
-Planning and publication are the current authorized deliverable. All
-implementation steps and runtime acceptance remain pending for the next stage.
+Implementation, verification, commits, pushes and a ready-for-review PR are now
+authorized. OpenSpec change: `openspec/changes/issue-376-floor-progress/`.
+The Windows shell supplies Node v24.22.1 but no npm/OpenSpec command on PATH.
+Use cached OpenSpec via
+`node C:/Users/apexw/AppData/Local/npm-cache/_npx/c37562604d2d088d/node_modules/@fission-ai/openspec/bin/openspec.js`.
+Installed project dependencies are Linux binaries. Execute app checks via
+`wsl.exe --exec bash --noprofile --norc -c 'export PATH=/home/aiwithapex/.nvm/versions/node/v26.11.1/bin:$PATH; <command>'`
+from this workspace (Node v26.11.1 / npm 11.20.0). A Windows npm shim downloaded
+outside the repo was unnecessary: its first unit attempt failed before execution
+because installed `.bin` entries are Linux scripts. No project dependency or
+lockfile change was required.
+
+## Implementation log
+
+- Shared direction-based stair status now feeds travel validation, automatic
+  travel admission and downstairs map eligibility. Discovery, upstairs markers,
+  remote/stale rejection order and enemy movement are preserved.
+- First focused WSL unit run: **179/179 passed** across dungeon, exploration,
+  dungeonBattle and dungeonProgressionBoundary (35.87s). Subsequent additions to
+  existing travel assertions will be checked again with final verification.
+- HUD now reads the existing current-floor count/descriptor and shows short
+  stair labels with contextual lock/re-entry reasons. Existing browser journeys
+  now assert progress around legal battle victories, reward claim/decline,
+  floor changes, Continue, defeat and hidden stair discovery. No new test files
+  or browser selection/configuration changes.
+- Next: finish focused desktop iteration, verify both engine/device matrices,
+  inspect screenshots, run ordinary PR verification and publish the focused PR.
+- Desktop iteration: legal reward/guardian, decline and fresh-layout journeys
+  **3 passed**; map-marker journey **1 failed** on an obsolete legend selector.
+  The same assertion failed on literal base `973b792f` with matching WSL/browser
+  conditions. Source now puts the renamed legend inside the collapsed guide.
+  A separate prerequisite branch `branch/issue-376-marker-guide-test` repairs the
+  test by opening the guide, asserting its visible legend, then closing it.
+  Base comparison lives in that worktree under
+  `verification-receipts/issue376/base/`; feature iteration remains preserved at
+  `verification-receipts/issue376/iteration/`. Its initial base build failed on a
+  Windows worktree path in WSL; the retry used explicit GIT_DIR/GIT_WORK_TREE.
+  No failed assertion, timeout or skip was suppressed.
