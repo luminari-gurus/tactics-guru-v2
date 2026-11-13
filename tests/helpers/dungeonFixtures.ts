@@ -320,6 +320,30 @@ export function stagedMageAbility(abilityId:'ability:frost_snare'|'ability:magic
   throw Error(`No legal staged Mage target for ${abilityId}`);
 }
 
+/** Stage level/HP/positions before casting; every effect and defeat transition is legal. */
+export function snaredDefeatBoundary(kind:'source'|'target') {
+  const fixture=stagedMageAbility('ability:frost_snare'),catalog=dungeonBattle(fixture.state)!.catalog;
+  const initial={...fixture.state.activeBattle!,units:fixture.state.activeBattle!.units.map(u=>({...u,
+    ...(kind==='target'&&u.id===1?{cell:{x:7,y:4}}:{}),
+    hp:u.id===(kind==='source'?fixture.command.unitId:fixture.command.target.unitId)?1:u.hp}))};
+  const cast=dispatch(initial,fixture.command,catalog);if(!cast.ok)throw Error(cast.reason);
+  const session=new BattleSession(catalog,cast.state,cast.state.seed);
+  const defeatedId=kind==='source'?fixture.command.unitId:fixture.command.target.unitId;
+  for(let i=0;i<20&&session.state.outcome==='ongoing';i++) {
+    const before=session.state;
+    const player=session.phase==='player',command:Command=kind==='target'&&session.active.id===1&&!session.active.hasActed
+      ? {type:'useAbility',unitId:1,abilityId:'ability:basic_attack',target:fixture.command.target}
+      : {type:'endTurn',unitId:session.active.id};
+    if(session.phase==='player')session.prepare(command);
+    const step=session.phase==='enemy'?session.nextEnemy():session.confirm();if(!step)throw Error('Snared defeat stalled');
+    if(step.events.some(e=>e.type==='defeated'&&e.unitId===defeatedId))return {
+      state:checkedDungeon(readDungeon({...fixture.state,activeBattle:before})),command:player?command:null,
+      initial,commands:[fixture.command,...session.continuation!.commands],expected:step.after,events:step.events,targetId:fixture.command.target.unitId,defeatedId};
+    session.finishPresentation(step.token);
+  }
+  throw Error(`No legal Snared ${kind} defeat`);
+}
+
 /** Legal first-floor Fighter witness supplies the healed carry fixture in the current wire format. */
 export function healedFighterBoundary() {
   let state=freshDungeon('fighter-production-journey',190);

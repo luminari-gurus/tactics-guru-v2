@@ -5,10 +5,11 @@ Issue: [#389](https://github.com/luminari-gurus/tactics-guru-v2/issues/389).
 Owner: [@moshehbenavraham](https://github.com/moshehbenavraham).
 Branch: [`branch/issue-389-snared-indicator`](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-389-snared-indicator).
 Base: `origin/main`, `6a03f37cf51d1e46a72fc6c49ca2421a0836c2e6`.
-Status: planning only; implementation has not started.
+Status: implementation authorized and in progress; OpenSpec change
+`issue-389-snared-indicator` tracks implementation and verification.
 
-The caller requested backlog selection, assignment/comment, this plan, and a
-published branch containing the plan. Implementation is a subsequent step.
+The caller authorized implementation, autonomous repairs, verification, commits,
+pushes and a focused labeled review-ready PR on this branch.
 The previous `plan.md` is preserved as
 [issue-270-run-statistics-plan.md](issue-270-run-statistics-plan.md).
 
@@ -103,8 +104,9 @@ Apply [ablation](../../.agents/skills/ablation/SKILL.md):
 
 Non-goals: other status badges, Pinning Shot presentation, balance changes, new
 abilities, general UI cleanup, analytics, deployment and issue #161 completion.
-This is a localized presentation change; extra OpenSpec artifacts would not
-resolve an outstanding design question, so this requested plan is sufficient.
+This is a localized presentation change. The caller subsequently requested
+OpenSpec implementation; the change artifacts mirror this scope and acceptance
+mapping without introducing new architecture.
 
 ## Files and implementation steps
 
@@ -216,3 +218,54 @@ snowflake at the existing Guarded anchor; responsive validation may adjust its
 strokes within that treatment. The remaining technical uncertainty is whether
 extreme zoom/short viewports require a small local anchor adjustment; existing
 badge geometry tests and screenshots will decide it during implementation.
+
+## Implementation handoff — 2026-11-13
+
+- Production renderer and picker assertions implemented. Local Guarded placement
+  and diagnostics are shared by two graphics maps; visibility uses the presented
+  Frost Snare state and existing living-source helper. No rules, saves, assets or
+  dependencies changed. OpenSpec: `issue-389-snared-indicator` (spec-driven).
+- Added bounded dungeon witnesses (15 selected cases per Chromium/WebKit config).
+  XP, positions and defeat-fixture HP are staged; cast, intervening commands and
+  defeats are legal. No earned-progression claim. Still to execute and inspect.
+- Runtime: WSL Ubuntu, Node 24.15.0, lockfile Playwright 1.64.1. Initial Windows
+  launcher/native-binding mismatch repaired by `npm ci` from the unchanged lockfile
+  (49 packages audited, zero advisories). Optional PostHog CLI postinstall remained
+  blocked by npm policy; telemetry CLI is outside this change's verification.
+- Installed missing matching Chromium 1248 with the local Playwright CLI.
+  `npm run check:browsers` now passes Chromium 156.0.8078.4 and WebKit 27.2:
+  `verification-receipts/browser-environment/run-10Qjmh/environment.json`.
+  Initial missing-Chromium setup failure is retained as `run-QGrfJ5`.
+- `npm run test:unit -- tests/unit/abilities.test.ts tests/unit/boardPresentation.test.ts`:
+  54 passed. Both type scopes passed. Strict OpenSpec validation passed.
+- Picker command: `npm run test:browser -- -c playwright.fixtures.config.ts
+  tests/ability-picker.spec.ts -g 'Mage real Frost Snare'`. Receipt `run-KPUQ62`
+  retained desktop boot-readiness and portrait audio-readiness failures, with
+  landscape passing. Focused diagnostic rerun `run-mbUJ5N` passed desktop and
+  portrait, preserving all assertions (2/2); it does not erase the first failures.
+- Standard `npm run verify:pr` passed in 253.4 seconds: tooling, 1,363 units,
+  both type scopes, two root/prefix build integration tests, production bundle,
+  and all seven core browser journeys (no failures, retries or skips).
+  Receipt: `verification-receipts/pr/1794590838870-1702551/summary.json`.
+  This ran on planning HEAD `3c3f443c` plus the implementation diff. Its initial
+  dirty listing includes platform line-ending noise; aligning repository-local
+  `core.autocrlf=true` with Windows Git removes that noise without source changes.
+  New dungeon test-only edits after its unit stage do not affect those covered
+  core journeys or production build; their own focused execution is still pending.
+- Next: execute the focused dungeon + Guarded and WebKit selections, inspect screenshots, run complete
+  authored battle/run witnesses, audit final source/build identity, then publish
+  the focused labeled PR. Browser execution stays serial, one worker, zero retries.
+- Desktop Snared iteration `run-xYWEjD`: cast/resume/unrelated-turn/expiry and
+  camera/narrow-layout/restart cases passed, with narrow screenshot reviewed.
+  Three new test cases failed: defeat tests sampled before the lazy engine
+  finished loading, and Pin exclusion lacked a `readDungeon` import. Repaired
+  those test paths (wait for the real scene with bounded RAF advancement; import
+  the existing admission helper). Production source/build unchanged. Focused
+  diagnostic rerun `run-C1swy9` passed all three cases; original failures retained.
+- Final Chromium Snared coverage is complete: the two unchanged passing desktop
+  cases in `run-xYWEjD`, three repaired desktop cases in `run-C1swy9`, and all ten
+  portrait/landscape cases in `run-0BPxOH`. Zero retries or skips. Both type scopes
+  passed again after the last test edit. Desktop, 320×568, 568×320, Pixel portrait,
+  resumed and source-defeat screenshots were visually inspected. WebKit's 15
+  cases are running in `run-nC2bny`; shared Guarded and complete legal authored
+  battle/run regressions remain to execute.

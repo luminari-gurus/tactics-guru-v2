@@ -28,7 +28,11 @@ Unrelated turns, round wrap and later range/LOS changes do not expire it. Mark
 remains independent; new encounters reset all battle-local blocks.
 
 The existing picker, pure preview, inspection, log and floating feedback distinguish
-Snared by Mage from Pinned by Ranger. Effect-only casts emit no attack cue or
+Snared by Mage from Pinned by Ranger. Active Frost Snare also shows a persistent,
+noninteractive snowflake beside the affected enemy, using Guarded's placement,
+contrast and minimum readable size. It follows the presented effect state through
+unrelated turns, expiry, source/target defeat and saved-battle resume; Pinning Shot
+does not show this badge. Effect-only casts emit no attack cue or
 signature animation. No new assets, resistance system, Ember Burst or reward
 upgrade is included.
 
