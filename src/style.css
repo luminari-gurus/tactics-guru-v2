@@ -77,7 +77,8 @@ dialog button { touch-action: manipulation; }
 .battle-mode #battle-availability { font-size:.8rem; color:var(--muted); margin:10px 0 15px; }
 .battle-mode .battle-decision { border-top:1px solid #66768d; padding-top:13px; }
 .battle-mode .battle-decision label { display:block; font-size:.75rem; color:var(--muted); margin-bottom:6px; }
-.battle-mode #battle-target { width:100%; min-width:0; font-size:.85rem; }
+/* WebKit needs an explicit height for this native select. */
+.battle-mode #battle-target { width:100%; min-width:0; height:44px; font-size:.85rem; }
 .battle-mode #battle-selection, .battle-mode #battle-target-info { font-size:.8rem; margin:6px 0; }
 .battle-mode #battle-preview { font-size:.85rem; margin:12px 0; overflow-wrap:anywhere; }
 .battle-mode .battle-commit { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; }
