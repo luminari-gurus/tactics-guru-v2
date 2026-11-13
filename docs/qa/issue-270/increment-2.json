@@ -1,0 +1,3986 @@
+{
+  "issue": 270,
+  "increment": "Active playtime, immutable history and bounded personal bests",
+  "qualifiedCommit": "8fee762db48b469df763cdddbe9c180a99db9c4c",
+  "sourceInputHash": "a4f722a6c13f75100cb50669da8788b39e5451232cba53223c1968eb256d64d5",
+  "inputManifest": "verification-receipts/issue270/inc2/final-inputs.json",
+  "lockfileSha256": "4d80074e809f307cab721dfbbcb4963e2a2ca6d617328aeea6450aed96d0d9d6",
+  "environment": {
+    "node": "v24.22.1",
+    "platform": "win32",
+    "arch": "x64",
+    "playwright": "1.64.1",
+    "chromium": "156.0.8078.4",
+    "webkit": "27.2"
+  },
+  "serverMode": "production root preview",
+  "baseURL": "http://127.0.0.1:4173/",
+  "workers": 1,
+  "retries": 0,
+  "physicalDevicesTested": false,
+  "fullRegressionClaim": false,
+  "prVerification": {
+    "path": "verification-receipts/pr/1794441623848-109888/summary.json",
+    "sha256": "c356f8065b61a3d44c6d4eec0ac167f37ee58a0d5a468a59154211d16c238f5e",
+    "source": "8fee762db48b469df763cdddbe9c180a99db9c4c",
+    "stages": [
+      {
+        "id": "tooling",
+        "status": "passed",
+        "durationMs": 16501.7436,
+        "command": [
+          "npm",
+          "exec",
+          "--no",
+          "--",
+          "node",
+          "--test",
+          "tests/tooling/verify-pr.test.mjs",
+          "tests/tooling/verify-full.test.mjs"
+        ]
+      },
+      {
+        "id": "units",
+        "status": "passed",
+        "durationMs": 39745.179899999996,
+        "command": [
+          "npm",
+          "run",
+          "test:unit",
+          "--",
+          "--reporter=json",
+          "--outputFile=C:\\Users\\apexw\\.codex\\worktrees\\issue-270-active-time-history\\Tactics-Guru\\verification-receipts\\pr\\1794441623848-109888\\units.json"
+        ]
+      },
+      {
+        "id": "typecheck",
+        "status": "passed",
+        "durationMs": 5350.614199999996,
+        "command": [
+          "npm",
+          "run",
+          "typecheck"
+        ]
+      },
+      {
+        "id": "build-integration",
+        "status": "passed",
+        "durationMs": 9681.412100000001,
+        "command": [
+          "npm",
+          "run",
+          "test:build",
+          "--",
+          "--reporter=json",
+          "--outputFile=C:\\Users\\apexw\\.codex\\worktrees\\issue-270-active-time-history\\Tactics-Guru\\verification-receipts\\pr\\1794441623848-109888\\build-integration.json"
+        ]
+      },
+      {
+        "id": "bundle",
+        "status": "passed",
+        "durationMs": 4946.030700000003,
+        "command": [
+          "npm",
+          "run",
+          "build:bundle"
+        ]
+      },
+      {
+        "id": "journeys",
+        "status": "passed",
+        "durationMs": 51299.33290000001,
+        "command": [
+          "npm",
+          "test",
+          "--",
+          "--reporter=line,json",
+          "--output=C:\\Users\\apexw\\.codex\\worktrees\\issue-270-active-time-history\\Tactics-Guru\\verification-receipts\\pr\\1794441623848-109888\\artifacts"
+        ]
+      }
+    ],
+    "units": {
+      "total": 1339,
+      "passed": 1339,
+      "failed": 0
+    },
+    "coreJourneys": 7
+  },
+  "currentBrowserEvidence": [
+    {
+      "path": "verification-receipts/issue270/inc2-timed-v2-chromium/report.json",
+      "sha256": "84af88e865450936b7f0c7d42f2607d821291eb4b813be5e25eb0d2b21755a08",
+      "source": "8fee762db48b469df763cdddbe9c180a99db9c4c",
+      "obligations": "Current timed-v2 schema, per-field compatibility, replacement and active clock coupling",
+      "kind": "playwright",
+      "counts": {
+        "total": 42,
+        "expected": 42,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "runnerDurationMs": 68192.354,
+      "configuredWorkers": 1,
+      "firstTestDelayMs": 2744,
+      "testExecutionSpanMs": 64489,
+      "actualWorkers": 1,
+      "projects": [
+        {
+          "name": "desktop",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-active-time-history/Tactics-Guru/tests"
+        },
+        {
+          "name": "mobile-portrait",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-active-time-history/Tactics-Guru/tests"
+        },
+        {
+          "name": "mobile-landscape",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-active-time-history/Tactics-Guru/tests"
+        }
+      ],
+      "globalErrors": [],
+      "tests": [
+        {
+          "id": "dc51ed921d1e48686c08-90df26bbf73c9b2141b6",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "dungeon statistics: confirmed replacement pauses pending enemy turns through history",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1216,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1216,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:02:34.718Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-8b3a6b3a6c447f877eba",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "dungeon statistics: confirmed replacement pauses pending enemy turns through history",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1092,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1092,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:02:54.473Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-a82c85feefdd003fe004",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "dungeon statistics: confirmed replacement pauses pending enemy turns through history",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1114,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1114,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-11-12T00:03:17.105Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-8881baf4cb08032a19ce",
+          "file": "dungeon.spec.ts",
+          "title": "dungeon statistics: active exploration excludes recovery, visibility, blur and menu sessions",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 762,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 762,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:02:36.146Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-2d3cf756f8a642877be1",
+          "file": "dungeon.spec.ts",
+          "title": "dungeon statistics: actual background tab pauses active exploration time",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 598,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 598,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:02:36.913Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-bab0f17a3ec6fff91d8d",
+          "file": "dungeon.spec.ts",
+          "title": "dungeon statistics: active exploration excludes recovery, visibility, blur and menu sessions",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 753,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 753,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:02:55.804Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-6f68d05711614de8605c",
+          "file": "dungeon.spec.ts",
+          "title": "dungeon statistics: actual background tab pauses active exploration time",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 540,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 540,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:02:56.563Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-39f05ef6145ee3408272",
+          "file": "dungeon.spec.ts",
+          "title": "dungeon statistics: active exploration excludes recovery, visibility, blur and menu sessions",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 748,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 748,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-11-12T00:03:18.438Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-81c3019d46662534a6f1",
+          "file": "dungeon.spec.ts",
+          "title": "dungeon statistics: actual background tab pauses active exploration time",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 504,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 504,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-11-12T00:03:19.192Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-fe9b317b89bcfdd57ab1",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records dungeon replacement withholds exploration until final history finishes",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 623,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 623,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:02:37.589Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-03afaff586f99239b798",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved run preserves both after finished history",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1789,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1789,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:02:38.220Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-e46bc3cb7a0843f1abe5",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved run preserves both after interrupted history",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1884,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1884,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:02:40.026Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-bc83c995de05e8af928d",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved dungeon preserves both after finished history",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1052,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1052,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:02:41.920Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-bed7bb4b9d10e5dd15a5",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved dungeon preserves both after interrupted history",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1093,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1093,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:02:42.980Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-ebc3bf3f505ac291c78a",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: counter-only run upgrades known counters without inventing complete playtime",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1209,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1209,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:02:44.082Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-316933f207443d3f9e81",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: counter-only dungeon upgrades known counters without inventing complete playtime",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 460,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 460,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:02:45.298Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-57687142e3a62c384dcb",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records dungeon replacement withholds exploration until final history finishes",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 541,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 541,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:02:57.166Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-93dd92a01d7a5607c81b",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved run preserves both after finished history",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2349,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2349,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:02:57.714Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-fb738d553f4693300f07",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved run preserves both after interrupted history",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2575,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2575,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:03:00.072Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-8af3ee80b204100faa3f",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved dungeon preserves both after finished history",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1096,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1096,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:03:02.656Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-78f1bbe926fedfd0b819",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved dungeon preserves both after interrupted history",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1197,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1197,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:03:03.759Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-169d75010e6a707461ec",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: counter-only run upgrades known counters without inventing complete playtime",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1625,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1625,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:03:04.962Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-5a96a2d70ac14fe23874",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: counter-only dungeon upgrades known counters without inventing complete playtime",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 437,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 437,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:03:06.594Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-7bba00f3e872f0a34fec",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records dungeon replacement withholds exploration until final history finishes",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 574,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 574,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-11-12T00:03:19.770Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-d470a100e3210b81fb20",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved run preserves both after finished history",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2316,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2316,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-11-12T00:03:20.350Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-5929e55f819979f203eb",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved run preserves both after interrupted history",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2454,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2454,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-11-12T00:03:22.674Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-9832abe12d180c630609",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved dungeon preserves both after finished history",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1104,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1104,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-11-12T00:03:25.136Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-f62f8723d0db2709ca8c",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved dungeon preserves both after interrupted history",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1318,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1318,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-11-12T00:03:26.248Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-2930aa6bd3605720572a",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: counter-only run upgrades known counters without inventing complete playtime",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1600,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1600,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-11-12T00:03:27.574Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-e670ab58f9f667d40a7e",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: counter-only dungeon upgrades known counters without inventing complete playtime",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 435,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 435,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-11-12T00:03:29.182Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-8de4a6e6a855299874d1",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: active time excludes recovery, visibility, blur and menu sessions",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1889,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1889,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:02:46.429Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-6c1bc2f8c622bd648157",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: actual background tab pauses active time",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1172,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1172,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:02:48.554Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-330aa86d5b14ab1796a1",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: cancel a held checkpoint and keep reviewed replacement bytes stable",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1380,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1380,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:02:49.736Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-ca4276f5975300a15016",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: Chromium BFCache survives normal navigation",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2693,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2693,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:02:51.126Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-1103117dc629f7f9b94b",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: active time excludes recovery, visibility, blur and menu sessions",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2261,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2261,
+              "retry": 0,
+              "workerIndex": 3,
+              "startTime": "2026-11-12T00:03:07.637Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-db8027efc6bbd820b0ff",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: actual background tab pauses active time",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1553,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1553,
+              "retry": 0,
+              "workerIndex": 3,
+              "startTime": "2026-11-12T00:03:10.125Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-cf35360205a1d2acae19",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: cancel a held checkpoint and keep reviewed replacement bytes stable",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1762,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1762,
+              "retry": 0,
+              "workerIndex": 3,
+              "startTime": "2026-11-12T00:03:11.687Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-f500083fc750c08954c5",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: Chromium BFCache survives normal navigation",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3025,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3025,
+              "retry": 0,
+              "workerIndex": 3,
+              "startTime": "2026-11-12T00:03:13.457Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-442e282657a99b0930ae",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: active time excludes recovery, visibility, blur and menu sessions",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2366,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2366,
+              "retry": 0,
+              "workerIndex": 5,
+              "startTime": "2026-11-12T00:03:30.220Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-5c5a313ccb96a0495633",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: actual background tab pauses active time",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1579,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1579,
+              "retry": 0,
+              "workerIndex": 5,
+              "startTime": "2026-11-12T00:03:32.782Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-f06cfc959ff1416ce463",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: cancel a held checkpoint and keep reviewed replacement bytes stable",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1787,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1787,
+              "retry": 0,
+              "workerIndex": 5,
+              "startTime": "2026-11-12T00:03:34.370Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-4c57dbccc1f115a11288",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: Chromium BFCache survives normal navigation",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3043,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3043,
+              "retry": 0,
+              "workerIndex": 5,
+              "startTime": "2026-11-12T00:03:36.164Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "verification-receipts/issue270/inc2-timed-v2-authored-webkit/report.json",
+      "sha256": "e9306e47873d90cd1215eef6d09a46ec8eeb655e185c306373bee6845739cf67",
+      "source": "8fee762db48b469df763cdddbe9c180a99db9c4c",
+      "obligations": "Current timed-v2 schema, per-field compatibility, replacement and active clock coupling",
+      "kind": "playwright",
+      "counts": {
+        "total": 18,
+        "expected": 18,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "runnerDurationMs": 57719.386,
+      "configuredWorkers": 1,
+      "firstTestDelayMs": 2725,
+      "testExecutionSpanMs": 54341,
+      "actualWorkers": 1,
+      "projects": [
+        {
+          "name": "acceptance-webkit-portrait",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-active-time-history/Tactics-Guru/tests"
+        },
+        {
+          "name": "acceptance-webkit-landscape",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-active-time-history/Tactics-Guru/tests"
+        }
+      ],
+      "globalErrors": [],
+      "tests": [
+        {
+          "id": "6584249e185c6ba36dd3-0923652166d447bd39dd",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records dungeon replacement withholds exploration until final history finishes",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1231,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1231,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:03:43.354Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-11aca912bcd11d5c6df3",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved run preserves both after finished history",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4549,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4549,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:03:44.652Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-ff353685b5fc427e049a",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved run preserves both after interrupted history",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4747,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4747,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:03:49.208Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-976243206f39f70d481c",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved dungeon preserves both after finished history",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2307,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2307,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:03:53.962Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-cc8739244edf08230745",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved dungeon preserves both after interrupted history",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2661,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2661,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:03:56.276Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-fff87d89441f37e13e0e",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: counter-only run upgrades known counters without inventing complete playtime",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2820,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2820,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:03:58.944Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-769ce3a2c72383bf5f4c",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: counter-only dungeon upgrades known counters without inventing complete playtime",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 810,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 810,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:04:01.772Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-a51fa2dbb845b4ca4ab3",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records dungeon replacement withholds exploration until final history finishes",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1256,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1256,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:04:10.584Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-d360f3fa33c4a91a44dc",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved run preserves both after finished history",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4256,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4256,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:04:11.899Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-6487c89f4f99a2e58c8e",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved run preserves both after interrupted history",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4563,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4563,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:04:16.163Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-4c2baa4c1a2b13f44b12",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved dungeon preserves both after finished history",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2330,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2330,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:04:20.735Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-6e47ef8723bb6b9d4186",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved dungeon preserves both after interrupted history",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2749,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2749,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:04:23.074Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-cf34b3ce10e26da64701",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: counter-only run upgrades known counters without inventing complete playtime",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3001,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3001,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:04:25.831Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-edaa82800b535b967efb",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: counter-only dungeon upgrades known counters without inventing complete playtime",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 978,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 978,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:04:28.841Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-ab379d15cd4c9ad3bbc2",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: active time excludes recovery, visibility, blur and menu sessions",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3601,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3601,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:04:03.083Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-ee7c2a4b847fb30b658d",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: cancel a held checkpoint and keep reviewed replacement bytes stable",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3297,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3297,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:04:06.745Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-f313321957b13a367487",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: active time excludes recovery, visibility, blur and menu sessions",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3970,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3970,
+              "retry": 0,
+              "workerIndex": 3,
+              "startTime": "2026-11-12T00:04:30.373Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-9bc60fd70f7d30e1b608",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: cancel a held checkpoint and keep reviewed replacement bytes stable",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3291,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3291,
+              "retry": 0,
+              "workerIndex": 3,
+              "startTime": "2026-11-12T00:04:34.404Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "verification-receipts/issue270/inc2-timed-v2-dungeon-webkit/report.json",
+      "sha256": "d35e422fac755a5d5c9bae64ff333e7ad17582a2c114f08f9e132653914aa132",
+      "source": "8fee762db48b469df763cdddbe9c180a99db9c4c",
+      "obligations": "Current timed-v2 schema, per-field compatibility, replacement and active clock coupling",
+      "kind": "playwright",
+      "counts": {
+        "total": 6,
+        "expected": 6,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "runnerDurationMs": 16608.528,
+      "configuredWorkers": 1,
+      "firstTestDelayMs": 2685,
+      "testExecutionSpanMs": 13059,
+      "actualWorkers": 1,
+      "projects": [
+        {
+          "name": "desktop-webkit",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-active-time-history/Tactics-Guru/tests"
+        },
+        {
+          "name": "portrait-webkit",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-active-time-history/Tactics-Guru/tests"
+        },
+        {
+          "name": "landscape-webkit",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-active-time-history/Tactics-Guru/tests"
+        }
+      ],
+      "globalErrors": [],
+      "tests": [
+        {
+          "id": "dc51ed921d1e48686c08-1d30f64e05047c0b5836",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "dungeon statistics: confirmed replacement pauses pending enemy turns through history",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2562,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2562,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:04:41.452Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-69175347719b34a9b973",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "dungeon statistics: confirmed replacement pauses pending enemy turns through history",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2138,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2138,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:04:46.208Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-6976ade0013ee8fa8ccc",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "dungeon statistics: confirmed replacement pauses pending enemy turns through history",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2357,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2357,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:04:50.523Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-0428f793ff73fd0056ea",
+          "file": "dungeon.spec.ts",
+          "title": "dungeon statistics: active exploration excludes recovery, visibility, blur and menu sessions",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1557,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1557,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:04:44.113Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-977dbb8a813a51bac05f",
+          "file": "dungeon.spec.ts",
+          "title": "dungeon statistics: active exploration excludes recovery, visibility, blur and menu sessions",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1557,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1557,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:04:48.425Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-342202bc86a4c45a5cb5",
+          "file": "dungeon.spec.ts",
+          "title": "dungeon statistics: active exploration excludes recovery, visibility, blur and menu sessions",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1551,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1551,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:04:52.960Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "verification-receipts/issue270/inc2-counter-upgrade-chromium-final/report.json",
+      "sha256": "81164c7650eed42db84598f7e3ef1f6a73f12b64edffcd7c2e5e8eeb27171651",
+      "source": "8fee762db48b469df763cdddbe9c180a99db9c4c",
+      "obligations": "Current timed-v2 schema, per-field compatibility, replacement and active clock coupling",
+      "kind": "playwright",
+      "counts": {
+        "total": 6,
+        "expected": 6,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "runnerDurationMs": 11325.235999999999,
+      "configuredWorkers": 1,
+      "firstTestDelayMs": 2682,
+      "testExecutionSpanMs": 7735,
+      "actualWorkers": 1,
+      "projects": [
+        {
+          "name": "desktop",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-active-time-history/Tactics-Guru/tests"
+        },
+        {
+          "name": "mobile-portrait",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-active-time-history/Tactics-Guru/tests"
+        },
+        {
+          "name": "mobile-landscape",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-active-time-history/Tactics-Guru/tests"
+        }
+      ],
+      "globalErrors": [],
+      "tests": [
+        {
+          "id": "6584249e185c6ba36dd3-ebc3bf3f505ac291c78a",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: counter-only run upgrades known counters without inventing complete playtime",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1290,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1290,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-11T23:55:40.485Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-316933f207443d3f9e81",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: counter-only dungeon upgrades known counters without inventing complete playtime",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 415,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 415,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-11T23:55:41.971Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-169d75010e6a707461ec",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: counter-only run upgrades known counters without inventing complete playtime",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1730,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1730,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T23:55:43.007Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-5a96a2d70ac14fe23874",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: counter-only dungeon upgrades known counters without inventing complete playtime",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 360,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 360,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T23:55:44.918Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-2930aa6bd3605720572a",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: counter-only run upgrades known counters without inventing complete playtime",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1722,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1722,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-11T23:55:45.846Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-e670ab58f9f667d40a7e",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: counter-only dungeon upgrades known counters without inventing complete playtime",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 472,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 472,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-11T23:55:47.748Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "verification-receipts/issue270/inc2-counter-upgrade-webkit-final/report.json",
+      "sha256": "f888977aafa7cefe6b7986686cfad93475bed9df7aa3545ad3024a1cd4940de0",
+      "source": "8fee762db48b469df763cdddbe9c180a99db9c4c",
+      "obligations": "Current timed-v2 schema, per-field compatibility, replacement and active clock coupling",
+      "kind": "playwright",
+      "counts": {
+        "total": 4,
+        "expected": 4,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "runnerDurationMs": 11703.591,
+      "configuredWorkers": 1,
+      "firstTestDelayMs": 2659,
+      "testExecutionSpanMs": 8270,
+      "actualWorkers": 1,
+      "projects": [
+        {
+          "name": "acceptance-webkit-portrait",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-active-time-history/Tactics-Guru/tests"
+        },
+        {
+          "name": "acceptance-webkit-landscape",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-active-time-history/Tactics-Guru/tests"
+        }
+      ],
+      "globalErrors": [],
+      "tests": [
+        {
+          "id": "6584249e185c6ba36dd3-fff87d89441f37e13e0e",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: counter-only run upgrades known counters without inventing complete playtime",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3015,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3015,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-11T23:55:52.220Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-769ce3a2c72383bf5f4c",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: counter-only dungeon upgrades known counters without inventing complete playtime",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 861,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 861,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-11T23:55:55.301Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-cf34b3ce10e26da64701",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: counter-only run upgrades known counters without inventing complete playtime",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2910,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2910,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T23:55:56.671Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-edaa82800b535b967efb",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: counter-only dungeon upgrades known counters without inventing complete playtime",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 852,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 852,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T23:55:59.638Z"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "earlierQualifiedEvidence": [
+    {
+      "path": "verification-receipts/issue270/inc2-final-handoffs-chromium/report.json",
+      "sha256": "5bcb109e24c3286c6ddbd19811b3cac27ebbe4860853c16883596b75e3821171",
+      "source": "c6f5e08fd7dc9be9f6a419fd0ba8a8c188481a05",
+      "obligations": "Unchanged numeric/event/clock eligibility and legal lifecycle obligations only; fresh current-schema tests qualify schema/coverage and replacement integration",
+      "kind": "playwright",
+      "counts": {
+        "total": 72,
+        "expected": 72,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "runnerDurationMs": 115861.11,
+      "configuredWorkers": 1,
+      "firstTestDelayMs": 2612,
+      "testExecutionSpanMs": 112514,
+      "actualWorkers": 1,
+      "projects": [
+        {
+          "name": "desktop",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-active-time-history/Tactics-Guru/tests"
+        },
+        {
+          "name": "mobile-portrait",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-active-time-history/Tactics-Guru/tests"
+        },
+        {
+          "name": "mobile-landscape",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-active-time-history/Tactics-Guru/tests"
+        }
+      ],
+      "globalErrors": [],
+      "tests": [
+        {
+          "id": "8352ba8e75a15b46318d-0e9d47a364a27a96b3b7",
+          "file": "battle-persistence.spec.ts",
+          "title": "cached run record history preserves the replacement and one old result",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 992,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 992,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-11T22:58:23.177Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-d3ed8a57383a5e1cd9c9",
+          "file": "battle-persistence.spec.ts",
+          "title": "cached dungeon record history preserves the replacement and one old result",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 848,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 848,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-11T22:58:24.375Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-44fccd49c56caef2ee66",
+          "file": "battle-persistence.spec.ts",
+          "title": "cached run record history preserves the replacement and one old result",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 980,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 980,
+              "retry": 0,
+              "workerIndex": 3,
+              "startTime": "2026-11-11T22:58:59.596Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-aeffae6226b8d7615293",
+          "file": "battle-persistence.spec.ts",
+          "title": "cached dungeon record history preserves the replacement and one old result",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 833,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 833,
+              "retry": 0,
+              "workerIndex": 3,
+              "startTime": "2026-11-11T22:59:00.783Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-1fa05fe10625373f0fa8",
+          "file": "battle-persistence.spec.ts",
+          "title": "cached run record history preserves the replacement and one old result",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1024,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1024,
+              "retry": 0,
+              "workerIndex": 6,
+              "startTime": "2026-11-11T22:59:37.541Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-c8636a4032126fc1d84c",
+          "file": "battle-persistence.spec.ts",
+          "title": "cached dungeon record history preserves the replacement and one old result",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 821,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 821,
+              "retry": 0,
+              "workerIndex": 6,
+              "startTime": "2026-11-11T22:59:38.761Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-90df26bbf73c9b2141b6",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "dungeon statistics: confirmed replacement pauses pending enemy turns through history",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1160,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1160,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T22:58:25.889Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-0d040e273c757c00bb4a",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "run previous-format recovery preserves and exports both original slots",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 739,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 739,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T22:58:27.269Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-8976eac76a1e6c99f82c",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "dungeon previous-format recovery preserves and exports both original slots",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 573,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 573,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T22:58:28.015Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-c54412077c6fed182277",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "restart during accepted presentation discards old callbacks and history",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1708,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1708,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T22:58:28.593Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-02db78f88a13d90da9d4",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "legal enemy defeat boundary resumes once and a confirmed new dungeon resets it",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1911,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1911,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T22:58:30.308Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-f20d5db5b7f79c7ba9c8",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "visibility interruption finishes an accepted terminal presentation exactly once",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1444,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1444,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T22:58:32.225Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-8b3a6b3a6c447f877eba",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "dungeon statistics: confirmed replacement pauses pending enemy turns through history",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1027,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1027,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-11-11T22:59:02.223Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-012aa9e99aa8c4d62ec3",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "run previous-format recovery preserves and exports both original slots",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 718,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 718,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-11-11T22:59:03.449Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-a556c600b1959daa545b",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "dungeon previous-format recovery preserves and exports both original slots",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 573,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 573,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-11-11T22:59:04.173Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-d47311d85069ad676a40",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "restart during accepted presentation discards old callbacks and history",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1805,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1805,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-11-11T22:59:04.751Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-0fbc14f83b036a3e0363",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "legal enemy defeat boundary resumes once and a confirmed new dungeon resets it",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1933,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1933,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-11-11T22:59:06.563Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-dabc8bd6d377cf241eb1",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "visibility interruption finishes an accepted terminal presentation exactly once",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1512,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1512,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-11-11T22:59:08.503Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-a82c85feefdd003fe004",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "dungeon statistics: confirmed replacement pauses pending enemy turns through history",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 947,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 947,
+              "retry": 0,
+              "workerIndex": 7,
+              "startTime": "2026-11-11T22:59:40.159Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-d5dd2f5928997f6768c9",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "run previous-format recovery preserves and exports both original slots",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 652,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 652,
+              "retry": 0,
+              "workerIndex": 7,
+              "startTime": "2026-11-11T22:59:41.294Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-222e3e8a27d61328c8b7",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "dungeon previous-format recovery preserves and exports both original slots",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 540,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 540,
+              "retry": 0,
+              "workerIndex": 7,
+              "startTime": "2026-11-11T22:59:41.952Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-b3a744b335ed673c7fdd",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "restart during accepted presentation discards old callbacks and history",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1608,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1608,
+              "retry": 0,
+              "workerIndex": 7,
+              "startTime": "2026-11-11T22:59:42.498Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-7428f0a8276fb9b3a2fe",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "legal enemy defeat boundary resumes once and a confirmed new dungeon resets it",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1870,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1870,
+              "retry": 0,
+              "workerIndex": 7,
+              "startTime": "2026-11-11T22:59:44.113Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-530af5340be5704ebc81",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "visibility interruption finishes an accepted terminal presentation exactly once",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1412,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1412,
+              "retry": 0,
+              "workerIndex": 7,
+              "startTime": "2026-11-11T22:59:45.989Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-8881baf4cb08032a19ce",
+          "file": "dungeon.spec.ts",
+          "title": "dungeon statistics: active exploration excludes recovery, visibility, blur and menu sessions",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 648,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 648,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T22:58:33.699Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-2d3cf756f8a642877be1",
+          "file": "dungeon.spec.ts",
+          "title": "dungeon statistics: actual background tab pauses active exploration time",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 496,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 496,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T22:58:34.353Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-bab0f17a3ec6fff91d8d",
+          "file": "dungeon.spec.ts",
+          "title": "dungeon statistics: active exploration excludes recovery, visibility, blur and menu sessions",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 659,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 659,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-11-11T22:59:10.046Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-6f68d05711614de8605c",
+          "file": "dungeon.spec.ts",
+          "title": "dungeon statistics: actual background tab pauses active exploration time",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 489,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 489,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-11-11T22:59:10.711Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-39f05ef6145ee3408272",
+          "file": "dungeon.spec.ts",
+          "title": "dungeon statistics: active exploration excludes recovery, visibility, blur and menu sessions",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 632,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 632,
+              "retry": 0,
+              "workerIndex": 7,
+              "startTime": "2026-11-11T22:59:47.429Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-81c3019d46662534a6f1",
+          "file": "dungeon.spec.ts",
+          "title": "dungeon statistics: actual background tab pauses active exploration time",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 519,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 519,
+              "retry": 0,
+              "workerIndex": 7,
+              "startTime": "2026-11-11T22:59:48.068Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-ec4ee4a6e9bc29a7e12d",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records authored replacement waits for confirmation and freezes the old journey",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1266,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1266,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T22:58:34.895Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-74d9dedaacc4d9a8cffb",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacement guards encounter entry while final history waits from preparation",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1612,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1612,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T22:58:36.168Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-638ae11381f01aec8f8e",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacement guards encounter entry while final history waits from terminal",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1022,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1022,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T22:58:37.788Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-fe9b317b89bcfdd57ab1",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records dungeon replacement withholds exploration until final history finishes",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 523,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 523,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T22:58:38.816Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-03afaff586f99239b798",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved run preserves both after finished history",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2037,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2037,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T22:58:39.347Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-e46bc3cb7a0843f1abe5",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved run preserves both after interrupted history",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2105,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2105,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T22:58:41.391Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-bc83c995de05e8af928d",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved dungeon preserves both after finished history",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 878,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 878,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T22:58:43.503Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-bed7bb4b9d10e5dd15a5",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved dungeon preserves both after interrupted history",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1011,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1011,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T22:58:44.388Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-f737f0e419e055518736",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records concurrent confirmed dungeon replacements retain one immutable old result",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2765,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2765,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T22:58:45.406Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-81a253168d6eb464b6ec",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records authored replacement waits for confirmation and freezes the old journey",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1205,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1205,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-11-11T22:59:11.243Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-cb15fa87c3b6879b99a7",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacement guards encounter entry while final history waits from preparation",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1530,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1530,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-11-11T22:59:12.454Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-58b23f21d8b1b898cddc",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacement guards encounter entry while final history waits from terminal",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1471,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1471,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-11-11T22:59:13.992Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-57687142e3a62c384dcb",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records dungeon replacement withholds exploration until final history finishes",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 523,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 523,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-11-11T22:59:15.469Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-93dd92a01d7a5607c81b",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved run preserves both after finished history",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2231,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2231,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-11-11T22:59:15.998Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-fb738d553f4693300f07",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved run preserves both after interrupted history",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2364,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2364,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-11-11T22:59:18.235Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-8af3ee80b204100faa3f",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved dungeon preserves both after finished history",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 963,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 963,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-11-11T22:59:20.607Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-78f1bbe926fedfd0b819",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved dungeon preserves both after interrupted history",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1098,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1098,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-11-11T22:59:21.577Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-8c479cc11ef5a11f90c3",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records concurrent confirmed dungeon replacements retain one immutable old result",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2741,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2741,
+              "retry": 0,
+              "workerIndex": 4,
+              "startTime": "2026-11-11T22:59:22.682Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-d789ae642d82c3606296",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records authored replacement waits for confirmation and freezes the old journey",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1244,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1244,
+              "retry": 0,
+              "workerIndex": 7,
+              "startTime": "2026-11-11T22:59:48.628Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-3e7d7d30966d42b70e0d",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacement guards encounter entry while final history waits from preparation",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1521,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1521,
+              "retry": 0,
+              "workerIndex": 7,
+              "startTime": "2026-11-11T22:59:49.880Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-f2571429a09b2fe05d04",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacement guards encounter entry while final history waits from terminal",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1455,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1455,
+              "retry": 0,
+              "workerIndex": 7,
+              "startTime": "2026-11-11T22:59:51.407Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-7bba00f3e872f0a34fec",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records dungeon replacement withholds exploration until final history finishes",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 540,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 540,
+              "retry": 0,
+              "workerIndex": 7,
+              "startTime": "2026-11-11T22:59:52.869Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-d470a100e3210b81fb20",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved run preserves both after finished history",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2225,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2225,
+              "retry": 0,
+              "workerIndex": 7,
+              "startTime": "2026-11-11T22:59:53.416Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-5929e55f819979f203eb",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved run preserves both after interrupted history",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2385,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2385,
+              "retry": 0,
+              "workerIndex": 7,
+              "startTime": "2026-11-11T22:59:55.648Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-9832abe12d180c630609",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved dungeon preserves both after finished history",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1093,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1093,
+              "retry": 0,
+              "workerIndex": 7,
+              "startTime": "2026-11-11T22:59:58.039Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-f62f8723d0db2709ca8c",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved dungeon preserves both after interrupted history",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1175,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1175,
+              "retry": 0,
+              "workerIndex": 7,
+              "startTime": "2026-11-11T22:59:59.139Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-489cee2d93f6c5fa0fdb",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records concurrent confirmed dungeon replacements retain one immutable old result",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3789,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3789,
+              "retry": 0,
+              "workerIndex": 7,
+              "startTime": "2026-11-11T23:00:00.322Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-8de4a6e6a855299874d1",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: active time excludes recovery, visibility, blur and menu sessions",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1763,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1763,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-11T22:58:48.795Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-6c1bc2f8c622bd648157",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: actual background tab pauses active time",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1059,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1059,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-11T22:58:50.747Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-330aa86d5b14ab1796a1",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: cancel a held checkpoint and keep reviewed replacement bytes stable",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1745,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1745,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-11T22:58:51.816Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-e30fd4031da28f42a065",
+          "file": "run-progression.spec.ts",
+          "title": "cached run return cannot overwrite either slot of a newer replacement",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1559,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1559,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-11T22:58:53.569Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-ca4276f5975300a15016",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: Chromium BFCache survives normal navigation",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2589,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2589,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-11T22:58:55.139Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-1103117dc629f7f9b94b",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: active time excludes recovery, visibility, blur and menu sessions",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2222,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2222,
+              "retry": 0,
+              "workerIndex": 5,
+              "startTime": "2026-11-11T22:59:26.021Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-db8027efc6bbd820b0ff",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: actual background tab pauses active time",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1605,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1605,
+              "retry": 0,
+              "workerIndex": 5,
+              "startTime": "2026-11-11T22:59:28.436Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-cf35360205a1d2acae19",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: cancel a held checkpoint and keep reviewed replacement bytes stable",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1773,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1773,
+              "retry": 0,
+              "workerIndex": 5,
+              "startTime": "2026-11-11T22:59:30.051Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-9609366939035932f595",
+          "file": "run-progression.spec.ts",
+          "title": "cached run return cannot overwrite either slot of a newer replacement",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2104,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2104,
+              "retry": 0,
+              "workerIndex": 5,
+              "startTime": "2026-11-11T22:59:31.831Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-f500083fc750c08954c5",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: Chromium BFCache survives normal navigation",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2992,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2992,
+              "retry": 0,
+              "workerIndex": 5,
+              "startTime": "2026-11-11T22:59:33.948Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-442e282657a99b0930ae",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: active time excludes recovery, visibility, blur and menu sessions",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2256,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2256,
+              "retry": 0,
+              "workerIndex": 8,
+              "startTime": "2026-11-11T23:00:04.675Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-5c5a313ccb96a0495633",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: actual background tab pauses active time",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1607,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1607,
+              "retry": 0,
+              "workerIndex": 8,
+              "startTime": "2026-11-11T23:00:07.104Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-f06cfc959ff1416ce463",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: cancel a held checkpoint and keep reviewed replacement bytes stable",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1730,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1730,
+              "retry": 0,
+              "workerIndex": 8,
+              "startTime": "2026-11-11T23:00:08.720Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-d88f255c5e2f97f01190",
+          "file": "run-progression.spec.ts",
+          "title": "cached run return cannot overwrite either slot of a newer replacement",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2186,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2186,
+              "retry": 0,
+              "workerIndex": 8,
+              "startTime": "2026-11-11T23:00:10.459Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-4c57dbccc1f115a11288",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: Chromium BFCache survives normal navigation",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3034,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3034,
+              "retry": 0,
+              "workerIndex": 8,
+              "startTime": "2026-11-11T23:00:12.657Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "verification-receipts/issue270/inc2-final-handoffs-authored-webkit/report.json",
+      "sha256": "9b7b69f042c1e1e273179bcad57c83e81ad89281655bcdf6bc74714ed54e2c7e",
+      "source": "c6f5e08fd7dc9be9f6a419fd0ba8a8c188481a05",
+      "obligations": "Unchanged numeric/event/clock eligibility and legal lifecycle obligations only; fresh current-schema tests qualify schema/coverage and replacement integration",
+      "kind": "playwright",
+      "counts": {
+        "total": 22,
+        "expected": 22,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "runnerDurationMs": 66938.887,
+      "configuredWorkers": 1,
+      "firstTestDelayMs": 2595,
+      "testExecutionSpanMs": 63712,
+      "actualWorkers": 1,
+      "projects": [
+        {
+          "name": "acceptance-webkit-portrait",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-active-time-history/Tactics-Guru/tests"
+        },
+        {
+          "name": "acceptance-webkit-landscape",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-active-time-history/Tactics-Guru/tests"
+        }
+      ],
+      "globalErrors": [],
+      "tests": [
+        {
+          "id": "6584249e185c6ba36dd3-bceb9c7df7a091df9e9f",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records authored replacement waits for confirmation and freezes the old journey",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3235,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3235,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-11T23:00:19.416Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-feb76c67dc6ff621c529",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacement guards encounter entry while final history waits from preparation",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2190,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2190,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-11T23:00:22.726Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-5d8f344aca394a3e64f1",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacement guards encounter entry while final history waits from terminal",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2165,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2165,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-11T23:00:24.928Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-0923652166d447bd39dd",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records dungeon replacement withholds exploration until final history finishes",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1317,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1317,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-11T23:00:27.102Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-11aca912bcd11d5c6df3",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved run preserves both after finished history",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4181,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4181,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-11T23:00:28.429Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-ff353685b5fc427e049a",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved run preserves both after interrupted history",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4269,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4269,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-11T23:00:32.618Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-976243206f39f70d481c",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved dungeon preserves both after finished history",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2355,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2355,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-11T23:00:36.893Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-cc8739244edf08230745",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved dungeon preserves both after interrupted history",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2664,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2664,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-11T23:00:39.255Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-7b671a3414aa47271dea",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records concurrent confirmed dungeon replacements retain one immutable old result",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1717,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1717,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-11T23:00:41.925Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-e652d496d761cf6003c9",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records authored replacement waits for confirmation and freezes the old journey",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2747,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2747,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-11T23:00:51.845Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-53e7fb6ed4fbdd9493bb",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacement guards encounter entry while final history waits from preparation",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2079,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2079,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-11T23:00:54.648Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-55bda39fb19e38a29591",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacement guards encounter entry while final history waits from terminal",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2072,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2072,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-11T23:00:56.739Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-a51fa2dbb845b4ca4ab3",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records dungeon replacement withholds exploration until final history finishes",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1224,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1224,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-11T23:00:58.818Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-d360f3fa33c4a91a44dc",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved run preserves both after finished history",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4271,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4271,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-11T23:01:00.049Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-6487c89f4f99a2e58c8e",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved run preserves both after interrupted history",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4726,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4726,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-11T23:01:04.327Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-4c2baa4c1a2b13f44b12",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved dungeon preserves both after finished history",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2336,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2336,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-11T23:01:09.059Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-6e47ef8723bb6b9d4186",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records replacing distinct saved and unsaved dungeon preserves both after interrupted history",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2565,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2565,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-11T23:01:11.401Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-92cb15b4eae60a56dee6",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records concurrent confirmed dungeon replacements retain one immutable old result",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1744,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1744,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-11T23:01:13.973Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-ab379d15cd4c9ad3bbc2",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: active time excludes recovery, visibility, blur and menu sessions",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3648,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3648,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T23:00:44.163Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-ee7c2a4b847fb30b658d",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: cancel a held checkpoint and keep reviewed replacement bytes stable",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3100,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3100,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T23:00:47.869Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-f313321957b13a367487",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: active time excludes recovery, visibility, blur and menu sessions",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3532,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3532,
+              "retry": 0,
+              "workerIndex": 3,
+              "startTime": "2026-11-11T23:01:16.219Z"
+            }
+          ]
+        },
+        {
+          "id": "56e8b196f7ac6aaa7059-9bc60fd70f7d30e1b608",
+          "file": "run-progression.spec.ts",
+          "title": "run statistics: cancel a held checkpoint and keep reviewed replacement bytes stable",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3319,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3319,
+              "retry": 0,
+              "workerIndex": 3,
+              "startTime": "2026-11-11T23:01:19.809Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "verification-receipts/issue270/inc2-qualified-dungeon-webkit/report.json",
+      "sha256": "a16a54de208406d6e6184e0c58085149c1c4708097862efe7e01146e86eccdff",
+      "source": "c6f5e08fd7dc9be9f6a419fd0ba8a8c188481a05",
+      "obligations": "Unchanged numeric/event/clock eligibility and legal lifecycle obligations only; fresh current-schema tests qualify schema/coverage and replacement integration",
+      "kind": "playwright",
+      "counts": {
+        "total": 24,
+        "expected": 24,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "runnerDurationMs": 397083.13300000003,
+      "configuredWorkers": 1,
+      "firstTestDelayMs": 2579,
+      "testExecutionSpanMs": 393612,
+      "actualWorkers": 1,
+      "projects": [
+        {
+          "name": "desktop-webkit",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-active-time-history/Tactics-Guru/tests"
+        },
+        {
+          "name": "portrait-webkit",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-active-time-history/Tactics-Guru/tests"
+        },
+        {
+          "name": "landscape-webkit",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-active-time-history/Tactics-Guru/tests"
+        }
+      ],
+      "globalErrors": [],
+      "tests": [
+        {
+          "id": "dc51ed921d1e48686c08-1d30f64e05047c0b5836",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "dungeon statistics: confirmed replacement pauses pending enemy turns through history",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2105,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2105,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-11T23:01:26.722Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-d68fd8321f79ee6273c2",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "run previous-format recovery preserves and exports both original slots",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1209,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1209,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-11T23:01:28.887Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-5bfb63ba6bbe16ce527d",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "dungeon previous-format recovery preserves and exports both original slots",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1034,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1034,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-11T23:01:30.107Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-1b423d12d787c46ec923",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "restart during accepted presentation discards old callbacks and history",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2839,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2839,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-11T23:01:31.153Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-0f85422b99ba5f6aa530",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "legal enemy defeat boundary resumes once and a confirmed new dungeon resets it",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3105,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3105,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-11T23:01:33.999Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-b0402643173154b738b1",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "visibility interruption finishes an accepted terminal presentation exactly once",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2140,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2140,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-11T23:01:37.112Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-69175347719b34a9b973",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "dungeon statistics: confirmed replacement pauses pending enemy turns through history",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1915,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1915,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T23:03:42.426Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-f068b8b10c76d3d1b457",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "run previous-format recovery preserves and exports both original slots",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1201,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1201,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T23:03:44.414Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-2768ee00f51abf961ad5",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "dungeon previous-format recovery preserves and exports both original slots",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1087,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1087,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T23:03:45.624Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-ae826d8ee87c238ed5a3",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "restart during accepted presentation discards old callbacks and history",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2601,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2601,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T23:03:46.725Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-4939693a3b634a4ea87c",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "legal enemy defeat boundary resumes once and a confirmed new dungeon resets it",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2906,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2906,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T23:03:49.332Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-2a962233fcb4d7cbb9c2",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "visibility interruption finishes an accepted terminal presentation exactly once",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1892,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1892,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T23:03:52.245Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-6976ade0013ee8fa8ccc",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "dungeon statistics: confirmed replacement pauses pending enemy turns through history",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2114,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2114,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-11T23:05:47.965Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-d6bca5327f28cae251bf",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "run previous-format recovery preserves and exports both original slots",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1237,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1237,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-11T23:05:50.155Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-7e6d5e0ba1a42d5be1e3",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "dungeon previous-format recovery preserves and exports both original slots",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1108,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1108,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-11T23:05:51.399Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-909bb2080f9ee77199c8",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "restart during accepted presentation discards old callbacks and history",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2784,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2784,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-11T23:05:52.514Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-9568daca899b9f8cf86d",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "legal enemy defeat boundary resumes once and a confirmed new dungeon resets it",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2923,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2923,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-11T23:05:55.304Z"
+            }
+          ]
+        },
+        {
+          "id": "dc51ed921d1e48686c08-f57dd11f651b1ff3e148",
+          "file": "dungeon-lifecycle.spec.ts",
+          "title": "visibility interruption finishes an accepted terminal presentation exactly once",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2065,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2065,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-11T23:05:58.233Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-0428f793ff73fd0056ea",
+          "file": "dungeon.spec.ts",
+          "title": "dungeon statistics: active exploration excludes recovery, visibility, blur and menu sessions",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1534,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1534,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-11T23:01:39.277Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-1e11e9f7562322171c14",
+          "file": "dungeon.spec.ts",
+          "title": "saved menu dungeon keeps proof tools hidden across legal encounters",
+          "project": "desktop-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 121101,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 121101,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-11T23:01:40.817Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-977dbb8a813a51bac05f",
+          "file": "dungeon.spec.ts",
+          "title": "dungeon statistics: active exploration excludes recovery, visibility, blur and menu sessions",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1706,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1706,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T23:03:54.167Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-fd4c06c9a9aade754d3c",
+          "file": "dungeon.spec.ts",
+          "title": "saved menu dungeon keeps proof tools hidden across legal encounters",
+          "project": "portrait-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 111408,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 111408,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-11T23:03:55.878Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-342202bc86a4c45a5cb5",
+          "file": "dungeon.spec.ts",
+          "title": "dungeon statistics: active exploration excludes recovery, visibility, blur and menu sessions",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1613,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1613,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-11T23:06:00.339Z"
+            }
+          ]
+        },
+        {
+          "id": "e0f8639c387951b6a797-bb1f6485cdb0ec2a1634",
+          "file": "dungeon.spec.ts",
+          "title": "saved menu dungeon keeps proof tools hidden across legal encounters",
+          "project": "landscape-webkit",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 118372,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 118372,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-11T23:06:01.962Z"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "reuseBoundary": {
+    "previousSchema": "Counter/time coverage formerly shared v1; no old v1 duration completeness is assumed.",
+    "equivalence": "Since c6f5e08 only stats schema/coverage compatibility and its tests/docs changed: numeric accepted-event arithmetic, clock eligibility/accounting, engine, command/RNG/content/assets/dependencies and lifecycle lock protocol are unchanged. Fresh 1339-unit verification, core journeys and 66 coupled browser cases validate current representations and current replacement paths. Earlier legal earned counter/terminal evidence is used for those unchanged obligations, never to claim current v2 bytes were tested earlier.",
+    "earnedPortions": [
+      {
+        "path": "verification-receipts/issue270/inc2-qualified-chromium/report.json",
+        "source": "9e2d7cc",
+        "titles": [
+          "run battle undo survives reload",
+          "legal run outcomes, earned rewards",
+          "saved menu dungeon keeps proof tools hidden"
+        ],
+        "profiles": 3,
+        "passingCases": 9
+      },
+      {
+        "path": "verification-receipts/issue270/inc2-qualified-authored-webkit/report.json",
+        "source": "9e2d7cc",
+        "titles": [
+          "run battle undo survives reload",
+          "legal run outcomes, earned rewards"
+        ],
+        "profiles": 2,
+        "passingCases": 4
+      }
+    ]
+  },
+  "selection": {
+    "path": "verification-receipts/issue270/inc2/selection-final.log",
+    "expectedChecks": 6,
+    "nativeFocus": "Chromium public CDP disables forced focus emulation for actual background tabs. WebKit driver forces active/focus; its matrices explicitly exclude only new native-tab/BFCache cases and retain visibility accounting/navigation/Continue. Prior selections retained by contract."
+  },
+  "retainedFailures": [
+    {
+      "path": "verification-receipts/issue270/inc2/reentrant-pause-failure.log",
+      "resolution": "Guard synchronous status publication against reentrant clock eligibility changes."
+    },
+    {
+      "path": "verification-receipts/issue270/inc2/coalesced-status-failure.log",
+      "resolution": "Publish meaningful saved-status transitions while keeping routine clock checkpoints quiet."
+    },
+    {
+      "path": "verification-receipts/issue270/inc2-background-desktop/report.json",
+      "resolution": "Disable Chromium forced-focus emulation; actual tab switching now passes, no synthetic blur claimed."
+    },
+    {
+      "path": "verification-receipts/issue270/inc2-clocks-authored-webkit/report.json",
+      "resolution": "Retain review pause continuously between saving and confirmation; WebKit native focus unsupported by public driver."
+    },
+    {
+      "path": "verification-receipts/issue270/inc2-qualified-chromium/report.json",
+      "counts": "72 passed / 6 failed",
+      "resolution": "Exact lifecycle byte assertion now checkpoints legitimate elapsed time; asynchronous reset waits for new identity. Focused 6-case repair and fresh handoffs passed. Original batch remains failed."
+    },
+    {
+      "path": "verification-receipts/issue270/inc2-qualified-authored-webkit/report.json",
+      "counts": "24 passed / 2 failed",
+      "resolution": "Confirmed replacement retains existing modal pause until old scene stops; fresh held-enemy proof passed."
+    },
+    {
+      "path": "verification-receipts/issue270/inc2-counter-upgrade-webkit/report.json",
+      "counts": "3 passed / 1 failed",
+      "resolution": "New witness waits for acknowledged new identity before polling history; final 4/4 passed."
+    },
+    {
+      "path": "verification-receipts/issue270/cache-current/report.json",
+      "counts": "1 passed / 1 exploratory assertion failed",
+      "resolution": "Normal flushed navigation gets real native BFCache; unflushed programmatic hard departure may reload instead. Saved replacement bytes survive. No guarantee of BFCache on every departure."
+    }
+  ],
+  "limitations": [
+    "Closed/hidden/blurred/paused time is excluded; abrupt termination can lose the final bounded checkpoint interval.",
+    "Counter-only v1 saves preserve known kills/moves while timeCoverage is since-upgrade; legacy stats and earlier unproven duration bests cannot be reconstructed.",
+    "Native browser BFCache admission is best effort; normal-link cached restoration and safe reload fallback are separately witnessed.",
+    "Automatic approval review rejected cleanup of the temporary detached comparison worktree; it remains intact."
+  ],
+  "remaining": "Five-stat recent/best UI and final whole-issue/route-isolation audit in the dependent presentation PR."
+}

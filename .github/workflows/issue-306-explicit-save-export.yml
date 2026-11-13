@@ -1,0 +1,61 @@
+name: Issue 306 focused explicit save export
+on:
+  push:
+    branches: [work/issue-306-explicit-save-export]
+    paths: ['src/**', 'tests/**', 'scripts/**', '*config*', 'package*.json', '.github/workflows/issue-306-explicit-save-export.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: tactics-browser-tactics-browser-02
+  queue: max
+  cancel-in-progress: false
+jobs:
+  exports:
+    if: github.repository == 'luminari-gurus/tactics-guru-v2' && github.ref == 'refs/heads/work/issue-306-explicit-save-export'
+    runs-on: [self-hosted, tactics-browser, tactics-browser-02]
+    timeout-minutes: 20
+    steps:
+      - name: Check host disposition
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run setup:browsers && npm run check:browsers
+      - name: Record source identity
+        run: |
+          mkdir -p verification-receipts/issue-306
+          node --input-type=module <<'JS'
+          import { writeFileSync } from 'node:fs';
+          import { sourceIdentity } from './scripts/verification-report.mjs';
+          writeFileSync('verification-receipts/issue-306/source.json', JSON.stringify({
+            source: sourceIdentity(process.cwd()), node: process.version, runner: process.env.RUNNER_NAME,
+            conditions: 'Qualified persistent runner; shared host load and caches not independently controlled'
+          }, null, 2));
+          JS
+      - name: Build the application
+        id: build
+        run: npm run build
+      - name: Verify explicit export boundaries on Chromium
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.regression.config.ts tests/dungeon.spec.ts -g 'saved dungeon downloads only after explicit recovery export|corrupt bytes stay exportable and uncertain travel requires explicit recovery' --diagnostics
+      - name: Verify explicit export boundaries on WebKit
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon.spec.ts -g 'saved dungeon downloads only after explicit recovery export|corrupt bytes stay exportable and uncertain travel requires explicit recovery' --diagnostics
+      - name: Preserve previous-format primary and backup export coverage
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-lifecycle.spec.ts -g 'dungeon previous-format recovery preserves and exports both original slots' --diagnostics
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-306-exports-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/
+          retention-days: 14
+          if-no-files-found: warn

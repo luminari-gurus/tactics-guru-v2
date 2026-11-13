@@ -1,6 +1,6 @@
 import { awardHero, progressHero, readProgressHero } from './progression';
 import { HERO_PROGRESSION } from '../content/progression';
-import { freshExploration, readExploration, movableExploration, visit, poiCell, neighbors, type Exploration } from './exploration';
+import { freshArrivalExploration, freshExploration, readExploration, movableExploration, visit, poiCell, neighbors, type Exploration } from './exploration';
 import { HERO_IDS } from '../content/constants';
 import { dungeonContent, DUNGEON_TEMPLATE } from '../content/dungeon';
 import type { ItemCatalog, ItemOwnership } from '../content/itemTypes';
@@ -22,6 +22,7 @@ import { readBattlefieldDescriptor } from './battlefield';
 import { encounterHpLimit } from './effects';
 import { draughtHealing, enterWithDraughts, matchesDraughtStock } from './draughts';
 import { dungeonBattleCatalog } from '../content/dungeonEncounters';
+import { boundedStat, freshRunStats, readRunStats, type RunStats } from './runStats';
 
 export interface FloorDescriptor {
   readonly depth: number; readonly seed: number; readonly template: typeof DUNGEON_TEMPLATE;
@@ -31,6 +32,7 @@ export interface FloorDescriptor {
 }
 export interface DungeonFloor { readonly descriptor: FloorDescriptor; readonly position: number; readonly completed: number; readonly exploration: Exploration }
 export interface DungeonState {
+  readonly stats?: RunStats;
   readonly encounterPolicy: DungeonEncounterPolicy;
   readonly id: string; readonly seed: number; readonly revision: number; readonly depth: number;
   readonly floors: readonly DungeonFloor[]; readonly party: readonly RunHero[]; readonly ownership: ItemOwnership;
@@ -114,13 +116,14 @@ export function newDungeonSeed(draw: () => number, previous?: number): number {
   const seed = draw() >>> 0;
   return seed === previous ? (seed + 1) >>> 0 : seed;
 }
-export function freshDungeon(id: string, seed: number, encounterPolicy: DungeonEncounterPolicy = DUNGEON_ENCOUNTER_POLICY): DungeonState {
+export function freshDungeon(id: string, seed: number, encounterPolicy: DungeonEncounterPolicy = DUNGEON_ENCOUNTER_POLICY, tracking = false): DungeonState {
   if (!/^[A-Za-z0-9-]{1,64}$/.test(id) || !seedOk(seed)) throw new RangeError('Invalid dungeon identity');
   if (encounterPolicy !== DUNGEON_ENCOUNTER_POLICY && encounterPolicy !== LEGACY_ENCOUNTER_POLICY) throw new RangeError('Invalid encounter policy');
   const descriptor = floorDescriptor(seed, 1, undefined, encounterPolicy);
   return { id, seed, encounterPolicy, revision: 0, depth: 1, floors: [{ descriptor, position: descriptor.upstairs, completed: 0, exploration: freshExploration(descriptor.seed, descriptor.upstairs, floorMap(descriptor)) }],
     party: HERO_IDS.map(heroId => progressHero(heroId, 0, dungeonContent.catalog.heroes[heroId].stats.maxHp, dungeonContent.catalog)),
-    ownership: emptyItemOwnership(), phase: 'ready', offer: null, activeBattle: null, battlefield: null };
+    ownership: emptyItemOwnership(), phase: 'ready', offer: null, activeBattle: null, battlefield: null,
+    ...(tracking ? { stats: freshRunStats() } : {}) };
 }
 export function dungeonBoundary(s: DungeonState) {
   const slot = dungeonSlot(s), encounterId = `${s.id}:floor:${s.depth}:encounter:${slot}`;
@@ -155,9 +158,12 @@ export function readDungeon(input: unknown, items: ItemCatalog = dungeonContent.
   try { return readDungeonValue(input, items); } catch { return fail("invalidState"); }
 }
 function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
-  if (!hasShape(input, ['id','seed','revision','depth','floors','party','ownership','phase','offer','activeBattle','battlefield', 'encounterPolicy']) ||
+  const tracked = typeof input === 'object' && input !== null && Object.hasOwn(input, 'stats');
+  if (!hasShape(input, ['id','seed','revision','depth','floors','party','ownership','phase','offer','activeBattle','battlefield', 'encounterPolicy', ...(tracked ? ['stats'] : [])]) ||
     typeof input.id !== 'string' || !/^[A-Za-z0-9-]{1,64}$/.test(input.id) || !seedOk(input.seed) || !safeCount(input.revision) || !safeCount(input.depth, 1) ||
     !isDenseArray(input.floors, MAX_DUNGEON_FLOORS) || !input.floors.length || input.depth > input.floors.length || !isDenseArray(input.party, 3) || input.party.length !== 3) return fail('invalidState');
+  const stats = tracked ? readRunStats(input.stats) : null;
+  if (tracked && !stats) return fail('invalidState');
   const policy = input.encounterPolicy;
   if (policy !== LEGACY_ENCOUNTER_POLICY && policy !== DUNGEON_ENCOUNTER_POLICY) return fail('invalidPolicy');
   const floors: DungeonFloor[] = [];
@@ -224,7 +230,7 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
   });
   if (!owned.ok) return owned;
   if (!['ready','battle','reward','defeat'].includes(input.phase as string)) return fail('invalidPhase');
-  const state = { ...input, encounterPolicy: policy, floors, party, ownership: owned.ownership } as unknown as DungeonState;
+  const state = { ...input, ...(stats ? { stats } : {}), encounterPolicy: policy, floors, party, ownership: owned.ownership } as unknown as DungeonState;
   const { encounters, ...geometry } = currentFloor(state).descriptor;
   if (canonical(geometry) !== canonical(floorGeometry(state.seed, state.depth, currentFloor(state).descriptor.biome, undefined, currentFloor(state).descriptor.generator))) return fail('invalidFloor');
   const slot = dungeonSlot(state), alive = party.some(h => h.hp > 0);
@@ -267,7 +273,7 @@ export function travelDungeon(s: DungeonState, direction: 'ascend' | 'descend', 
   floors[s.depth - 1] = { ...current, position: direction === 'descend' ? current.descriptor.downstairs : current.descriptor.upstairs };
   if (depth > floors.length) {
     const descriptor = floorDescriptor(s.seed, depth, undefined, s.encounterPolicy);
-    floors = [...floors, { descriptor, position: descriptor.upstairs, completed: 0, exploration: freshExploration(descriptor.seed, descriptor.upstairs, floorMap(descriptor)) }];
+    floors = [...floors, { descriptor, position: descriptor.upstairs, completed: 0, exploration: freshArrivalExploration(descriptor.seed, descriptor.upstairs, floorMap(descriptor)) }];
   }
   return advance(s, { depth, floors });
 }
@@ -349,8 +355,9 @@ export function stepDungeon(s: DungeonState, command: ExplorationCommand): Dunge
   const f = currentFloor(s), map = floorMap(f.descriptor);
   if (!neighbors(f.position, map.width, map.height).includes(command.destination) || !map.cells[command.destination]) return fail('blockedStep');
   const floors = [...s.floors];
-  floors[s.depth-1] = { ...f, position: command.destination, exploration: visit(f.exploration, command.destination, map.width, map.height) };
-  let candidate: DungeonState = { ...s, floors };
+  floors[s.depth-1] = { ...f, position: command.destination, exploration: visit(f.exploration, command.destination, map) };
+  let candidate: DungeonState = { ...s, floors,
+    ...(s.stats ? { stats: { ...s.stats, movesTaken: boundedStat(s.stats.movesTaken + 1) } } : {}) };
   if (f.exploration.pois.some(p => !clearedDungeonSlots(f).includes(p.encounterSlot) && command.destination === poiCell(p, f.descriptor.size ?? 20))) return startDungeonBattle(candidate);
   candidate = moveDungeonEnemies(candidate, f.position);
   // Only accepted movement enters stairs; arrival, rendering and restore never travel.

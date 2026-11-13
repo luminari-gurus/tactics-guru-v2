@@ -1,0 +1,2140 @@
+{
+  "date": "2026-11-12",
+  "pr": 368,
+  "qualifiedCodeSource": "7e98c698e65fa1eaa33adddcb03846505f736e10",
+  "qualificationSpecSource": "e5f2c42132d29acedeabc588d6cefb50f548d5c2",
+  "runtimeInputs": {
+    "package-lock.json": "4d80074e809f307cab721dfbbcb4963e2a2ca6d617328aeea6450aed96d0d9d6",
+    "package.json": "0d41768a8f8862c8a3fd6ec7aa9b9b2485f3944ec5eb8ef8d0f40e7437721cc9",
+    "playwright.abilities.config.ts": "d20e741b0fec5c063ddc6012a19b704ffd124eb7162797becdf1ddb372634d6a",
+    "playwright.config.ts": "49da2e9599f9b6bacc19c7d7f79be4d82323ceaebf2a4d7ee9a8c47cb9c0bd8f",
+    "playwright.device-acceptance.config.ts": "147e98b381baf1b5bf4338253b135d8a8c05dbab85587f033aa83ea7413832da",
+    "playwright.encounters.config.ts": "3fa7a752987e693247f52f5cca08b37da2a3b94e2b7a7ef4bdd5c492401dd437",
+    "playwright.exploration.config.ts": "cc02e4dfad2a1659383521841de9285ae93e961c02ad716e9f523ee162b475fe",
+    "playwright.extended-webkit.config.ts": "bc1d9010ef4378bb3b758d0b023c31ce6a88a79c718d2e8a297eccd3223de317",
+    "playwright.extended.config.ts": "3c7e4b2e9bbdad513356c2edc3f05b7b73c1e57cef994f719923459fc704e9f8",
+    "playwright.fixtures.config.ts": "420abf0e08e395a3ac89d72db84a94fe4d73acb67682bc861b0d6f47fbcd64c6",
+    "playwright.health-bars.config.ts": "596f762a12bd320ef1bcaefcae8661bb64ed6a9a114dce791863e88fa30f5ed1",
+    "playwright.pr.config.ts": "ab9d0e2c47869d1d09425414352692ac5811e107292ba7a3572df46a89db4e8f",
+    "playwright.prefix-assets.config.ts": "d6b9e6b81ffac0baf2ad64c7613d9923a9901778a2817946dc7517fee39d7bb1",
+    "playwright.regression.config.ts": "b2eccd0d4465a40a6b0204759f36db4e3c7dd4d866e3dea88417fdfde6bdff03",
+    "playwright.run-items.config.ts": "6e264c956b4e741f266fddfe5b81c957aa77781129f62064e5052d0a9034c326",
+    "playwright.setup-smoke.config.ts": "82aa94e19c46bada8050821a26fa8628d344a893fd368622c31c28deee67896e",
+    "playwright.telemetry.config.ts": "46b7fdc96544d56a398e5cdaaf5e018629c96c97fefb178d5173917a825765a2",
+    "public/audio/battle/critical.mp3": "f419892404a9224fd4bf984892eb69f33a2c0704d8776873ee21bc58bd5901f8",
+    "public/audio/battle/hit.mp3": "607244384c2d238211fa46631325a07232728d15fbfca68bcaaa87a5b65bee41",
+    "public/audio/battle/loss.mp3": "cee68cbe441f8622a7b559414305e3bcc459fb48f46115951f9f5097291ca6a5",
+    "public/audio/battle/magic.mp3": "ddab11c45966c473523560aed11b3722cca9e8108b4eb49f1e46387dcc2a6a65",
+    "public/audio/battle/miss.mp3": "46c4680c22025042552972330e4237ce23c5480eac6db0e08a65e2ca0e8381e6",
+    "public/audio/battle/move.mp3": "987ac8ce55959343212675696e3201821717fca9718ad7e5b26bd420f45e5d34",
+    "public/audio/battle/unit-defeat.mp3": "a9a5264dacbfacba180c562dbfe4f4aeed8848f73171c3413009a8e2a2396df4",
+    "public/audio/battle/victory.mp3": "1d6e4fd2177d1013b4cce4c9ee480ba67cf107a81e6ae1033b561f6619790758",
+    "public/battle/portraits/fighter.png": "f0c4ab9c2859f59e74198b3759597f78b246c1474b732c6a40433e57f035a0b3",
+    "public/battle/portraits/goblin_archer.png": "70f30350ea20aac9eca93bb607779fff70e8d155b11cc5887429d369053a8b9b",
+    "public/battle/portraits/goblin_grunt.png": "cc6494048e8cd6a8ca7cc358d4bbc45e5cbe031d57ca6acf72c47b03ee8a1ac7",
+    "public/battle/portraits/goblin_shaman.png": "c81d18f2d869258283e8c2d969a9c179fe6aaa9d14f4408b1af61f3486e4b5e0",
+    "public/battle/portraits/mage.png": "da44b5706aaadefbcc7b636d70195af40a9cc44d6524a154cd3cde28e0014b95",
+    "public/battle/portraits/ranger.png": "72b7f789a242de129f861fe5b5eb6e87cf08b58ffb607322eac625301081e3b7",
+    "public/battle/source/goblin_archer_portrait.png": "a4ee1b8eb0ab4ed959a6cb160f9b8db330c2e4125b99122c17e175cd2becde4e",
+    "public/battle/source/goblin_archer_sprite.png": "070fb462027ed7a5b530a5fdf343aaac95b54c5dc9b8e16e7e071664d129c39e",
+    "public/battle/source/goblin_grunt_portrait.png": "73248f68e4ada0036bb8cf379352631acec98b058ef63cc35ee17bc97f0b8992",
+    "public/battle/source/goblin_grunt_sprite.png": "57972fe37b1c0579eb2edc744965e7efda1d89334548279e33ebb7c42783cc97",
+    "public/battle/source/goblin_shaman_portrait.png": "55cc13df61bab3b51581a5be52c42c21a7c5b376607ef92dbd6b3f8901efbbe2",
+    "public/battle/source/goblin_shaman_sprite.png": "43d287a0d5e801bb4fdcfe007e94aae424472ccdb01619eb02d35906753a9d3f",
+    "public/battle/source/mage_portrait.png": "f40dcba51ab801afbbcb6588579e18229cb74360497972991bfa50e679610c5c",
+    "public/battle/source/mage_sprite.png": "37fcb2969f129de5c29445cb8eabaa4589953b02879054e5d070adfd99a65e0b",
+    "public/battle/source/ranger_portrait.png": "bd8c8786e1006f85df5db3dc423d3535ee7664dee4b32b1a679041b59cc1cb8a",
+    "public/battle/source/ranger_sprite.png": "7203e2b3a992c9c88baa79f2cbddf89046613eb99440c413eda2e3bc45387332",
+    "public/battle/terrain/forest.png": "9f88a273b676fa0e9a89d1737ddf3875e8efd1b6db3b1f54d78c8843aa301b26",
+    "public/battle/terrain/grass.png": "58625a5a9febe5148cc2f3dd34cbc94a3ea0d729e9486de28823a466a27690f8",
+    "public/battle/terrain/grass_path.png": "be249ec3f8849929efed099d5615ab2ae4b5e8a9e4d613d73826b3412b95fbf9",
+    "public/battle/terrain/rock.png": "74e8838120256800c12ecc33f1df934e947f25ae7f4657b566fb4b71b97b89d5",
+    "public/battle/terrain/sand.png": "0bf5465d7ad8396a327690f573377b58b140fd257ac9258b7c796a93baa00810",
+    "public/battle/terrain/stone.png": "f8322179450af9157fb2bc82ae65405ca9350ae74289e4264efff6eb9bc25a7a",
+    "public/battle/terrain/water.png": "b47c382b0be6e6fe2b0f51feaa9c8348120df761a7d083b4e26943a70ec96622",
+    "public/map-art/legacy-8bit/00_terrain_grass_plains.png": "33be39d3c06656543121c0b7a0632c065fa383b327ab3fab91777364599f4f5f",
+    "public/map-art/legacy-8bit/01_terrain_forest.png": "2d4674b4c7d4489893e687823614356c46e1440786fabe43cfbf1c01b0bbc013",
+    "public/map-art/legacy-8bit/04_terrain_mountain_blocked.png": "b2d83e7bacccd0b2ca8b58d86e51eef4096689b3824a1f1731ec5185961f408e",
+    "public/menu/dawn.webp": "5520cba31b303811e6e6bb39a92fa480ee850e426dcbe38d06e835ef1e0900f0",
+    "public/menu/midnight.webp": "fb56f92e25f9e92c7075068f5aaaa6155bb168dc8deb14ebe4d653a76700207d",
+    "public/menu/title.webp": "7933dfbe3e9607226a94eeee73677454212ce32387500aa0102a16f2d42080ec",
+    "public/proof/fighter-portrait-96.webp": "e6ee42fa2e65ccb09ad80c1353505f5e6accb5ae1bb2b77da9a78eb99994bbb8",
+    "public/proof/fighter-portrait.png": "712956d5e94716d240a0cce5fbcf37d3d82c3c4a68dd29de940d23b99f00e190",
+    "public/proof/fighter.png": "b5b947941d91b9729fd953e903a932eef161c27de133bc5c5294d24fa0830981",
+    "public/proof/grass-material-v1-348.png": "002fe98dc7d904b4813205b076e90bf605b594e8a51767e1e6abadbb7605920d",
+    "public/proof/grass-material-v1.png": "570aef06876d43488db7181dc97e3cf8fcb39dd7b4b515772629d86998d369a2",
+    "public/proof/tree-grass-v1-480.webp": "d835dd041e2bb867798933b166c699ac56b73d1ffcd4774c5cddb9ea2f1acc32",
+    "public/proof/tree-grass-v1.png": "850cb7e6868bc800c4ab108877b19d3f6077ab10ef74092f019c2a819679eba5",
+    "public/proof/unlock-tone.mp3": "0af0c3a2d1ef4eb91cce55ab6b4a9668b74274741e5c20cbd2e24b4d096d31ec",
+    "public/proof/unlock-tone.ogg": "e57491c81c51e2a1f81fad699be7cbcc5916866cf48a1b1075aebe9a6956668d",
+    "public/textures/terrain/ash-top-down-v1.png": "35aadd201ef9dd77993e4144514791770f1a1cfa751d72773dbc67894721620b",
+    "public/textures/terrain/cliff-top-down-v1.png": "c842591e27c7f256de587da600b5ee58d11cb07fcea5633d1ed7fd2454745c06",
+    "public/textures/terrain/forest-top-down-v1.png": "2b2b170c8b81aa7105f8386e1ab365fa712408eb8c6ae2ca5d9a1ddc08d1664b",
+    "public/textures/terrain/grass-top-down-v1.png": "af080d957977f5fe845ad10f28319ebcd38fdb0cbdd5c390811b4a0f9891c3c8",
+    "public/textures/terrain/grass_path-top-down-v1.png": "3d89a0f75140b46908cea19a686c3d727828d3dd696ce300017724d4cbb7f154",
+    "public/textures/terrain/lava-top-down-v1.png": "c245b7b9b5c3b724322398e603164cfdabdf7b85f134eed9eec41993d30561ea",
+    "public/textures/terrain/mud-top-down-v1.png": "ea341bef832f0e5160779b70a4d0044758e16f355495f84dd0605a1024683cd8",
+    "public/textures/terrain/runtime/ash-top-down-v1.png": "94fde9fb46251d02f529c722719ed8a3355796fff2f6c12bb4fda663ea5e2d74",
+    "public/textures/terrain/runtime/cliff-top-down-v1.png": "bf320cb0c8bec60fe1bb10e9aa11c0a887e66a775dcb4be1aabd8c130c84a295",
+    "public/textures/terrain/runtime/forest-top-down-v1.png": "aba9379dbeff3acafd98f0365f224687db166e896885ee683376fd3d4276e1a7",
+    "public/textures/terrain/runtime/grass-top-down-v1.png": "47e5e26a77fa7ce32d0d0338916b91236c98dd39f248f0187996883e6385df93",
+    "public/textures/terrain/runtime/grass_path-top-down-v1.png": "9d6da7d3a4790bbe162e8ca1adc8cf3186f3917d4aae65b890899358e707be61",
+    "public/textures/terrain/runtime/lava-top-down-v1.png": "3f1963785b7f6514ea56c1e2ec59acf7cb141db24a05451f26f24e832ee13c86",
+    "public/textures/terrain/runtime/mud-top-down-v1.png": "4d1ced1a21fac2e4a87bcac4292c8375b9e9f4ce950e7081b3592714ebb38c5f",
+    "public/textures/terrain/runtime/sand-top-down-v1.png": "6d5b1817c7fafd8c4d6a6b9ef6f9c652101a8ed8bdcdf51d9ae0c455e787689d",
+    "public/textures/terrain/runtime/stone-top-down-v1.png": "f7e257c6ff1f13e144c09f5dc3dd300314a226d9ba374475020e172eb17c6442",
+    "public/textures/terrain/runtime/water-top-down-v1.png": "566c466eb7c1e9befc03afd3ba33f618ef76a4d9e46315a9d37960ff09d41dc1",
+    "public/textures/terrain/sand-top-down-v1.png": "b399da9ad2f3c040ef4cd2477bac7d0eb60ea046ffc7d2b6cec8bd4d4edf53db",
+    "public/textures/terrain/stone-top-down-v1.png": "eb6067450fd694c4b8c66a9d7208a40a13bf2f7f4c098334a0df87d9d38613f7",
+    "public/textures/terrain/water-top-down-v1.png": "d4bdea611cf31b3b8208603f1d709726da94567ea84c5a1405f9d3064a8c998e",
+    "src/app/ActivePlaytime.ts": "b9a992679ccce0ad51e630d9ad7b6a4c307eed23773d6cb47081f265f128b5ed",
+    "src/app/BattlePersistence.ts": "9534277ce1e58ac1464e9664778ee47b26fb94588f03d81cb4b7c8b51522b6ed",
+    "src/app/BattleSession.ts": "95653922031921208d5fc23527061578c5cd118214950400341997bff6b7b60e",
+    "src/app/DungeonSession.ts": "74c2ef6ca35799d734ce65a3f56df4de5b5afbdbeb587676e945ff4f46b54d7e",
+    "src/app/RunHistory.ts": "d2b108f93e8d3420486c351fc9f0d66917e4a8c6bae01f192ed101626261e4bf",
+    "src/app/RunItemSession.ts": "03066cfead0105143f95fc2991b9f7c957eb0d9274ac13e4d812ad6c232537ac",
+    "src/app/entry.ts": "2c6608eb768f070fa70b05a20ed09a76efbaa3c210fc7fcc49ae1321aa01dd22",
+    "src/app/menuSaves.ts": "ea74b43095b7f001630a925ecce952c93c445b9659f840454347057bda18c353",
+    "src/app/routes.ts": "bef78cc4a0f974ff85d3a1ecbbbdb185a3b280cb06f7025d3c9eb17ad6d58457",
+    "src/app/runContext.ts": "3a98214a7f10d05c22181a11cd420c5232f6f6f29fa16aad87af0c4668841e4c",
+    "src/app/startBattleApp.ts": "9d4342044650f897524db2e5ab3c68a4c76068fd95f6d70ccf8b1a374e738c12",
+    "src/app/startDungeonApp.ts": "7f1ce7dc676d6974c9ff344d82821cbd3b2277d030984b37a769171a26ec2625",
+    "src/app/startRunApp.ts": "750e711dc56d4b1596664433cb79e406779da5fef5dd8002eb245ec025afd015",
+    "src/audio/battleCues.ts": "5c8d0a1d8f50cb218ac427d6a2c2aa864d8c637b4ecbdc5bcbce8c6776c0cf91",
+    "src/content/abilities.ts": "47546f3f3bc2687f711ddff1976b8a1104a5c2670f808bfd65aec5265b77bdf6",
+    "src/content/assets.ts": "f3652e154f0d1b900c6dd659bcd45efcb00ede304987a1d7720bbd9792421e3b",
+    "src/content/battlefieldTypes.ts": "1d5f9e0f1c8ecfb1061a5c3862e681dc6b8a4429f4c6bd4d0f10ff1b22c65178",
+    "src/content/catalog.ts": "3b7d95539ad57abb28fa768687d72762568976e6201894f2d9c56bff78f1bebc",
+    "src/content/constants.ts": "275444628c6a13d14830e21ad54672f08356d3b2b2f759ad2b8a8bf87d71f3fd",
+    "src/content/desertAssets.ts": "9fc6df3271d650cc528a029e2eb8b492d545322a0d044258c376c02ae28e8748",
+    "src/content/desertCatalog.ts": "dda70c31ae3a622c2626e19e6d5a9e5536498d7315dd72b960153dadc7aca08b",
+    "src/content/dungeon.ts": "b61586cffe14837b7a9a02967be6e8b600b006250ad0c876bf705ecf6e0d305c",
+    "src/content/dungeonEncounters.ts": "95e425db7ce5ded5e35e399a33123ff3cbe0b1379876c360dafe62fc06b4ca8b",
+    "src/content/encounters.ts": "bc72024007ab383a0eddcf988817ccf9d7cb70f4a8c7ca8b283b96dc878bea63",
+    "src/content/forestRuins.ts": "f95e996a3c8abb73c699fc72435f5f45547352bdc6d4d113f52a97a620a47ecf",
+    "src/content/itemTypes.ts": "8ea3d6cd80f6a39dd8a9dac05029d404b767ff2e5d322a8bd233e42786931545",
+    "src/content/items.ts": "d4471a5e08151a07334eb2deb27fbc4ccc8013ed1bd767cee053fade167ef6bf",
+    "src/content/progression.ts": "43f2eaeb720cfffe77c9e79c28f415ed79e80ce24ce0421902dd7a9978221369",
+    "src/content/qbertPyramid.ts": "3336b39c49c3e158798b479bd2ab188880f869a0384354c2115e22b7bf7bc696",
+    "src/content/ruinedApproach.ts": "61d6f931af9ee40b466acdcddec151b0d060107808df5a9828614393e41966de",
+    "src/content/standaloneCatalog.ts": "89657f168120eee4178607a15bab0339ca2a9eccb34515c959dfc0ccd9722ecb",
+    "src/content/types.ts": "976fb39e6e28c17fcaecfcfe11fb485b6a718845771ef804b0f07fe502b40f9b",
+    "src/content/validate.ts": "2cc2e544086a2d7c6e1a70bc429046b65675ddc6542322a5943ec00b8e1d231f",
+    "src/content/validateItems.ts": "a07dd1e5bed7dc5dbc652dbc2ea1a1e17dd69ff845b04deddfd69c70c614eb9b",
+    "src/content/woodlandCrossing.ts": "e33568d149f8fea4061232d72b38d2c9d9d68596c659a40a65d98730faeef660",
+    "src/diagnostics/applicationLoadFailure.ts": "e5e4fac59855241e71177135428fd63171451818b3375c2cfa2d67aba337eac0",
+    "src/diagnostics/audioState.ts": "cb32bf78bd7142ba437697078c71f50a4cd887d3d03bdb5b98f7eaa61796391f",
+    "src/diagnostics/boardFixture.ts": "c5cf2e0ae533ff0ea83252c2a3a873fd1fe131d0a1101f40022221f0be079bcb",
+    "src/diagnostics/browser.ts": "78a5a1b8b8219514de355a9334a72131cd86523d8e7e4780761bfe3713b96bca",
+    "src/diagnostics/measurements.ts": "5ed799458ef37993b9e09c51da4321a35506b702df921840591bbef01a426bc7",
+    "src/diagnostics/proofAssets.ts": "b308d53fb427085c3fc15454e233f85298e86bed72387ba26d15e138cba516df",
+    "src/diagnostics/scriptedMove.ts": "0d733335c9a2f9f39997265c3027c43821c1dd26ae4b832f05cff799d50615a6",
+    "src/domain/ai.ts": "a4fd5d77bb79555f099a9866c410aef5fa6a9ed847ecd1143c9c663c12c54e4d",
+    "src/domain/battle.ts": "9daa58854f0c4b23593604baa767c7325277f517840bc80ca6380713903cc83e",
+    "src/domain/battlefield.ts": "873a591eada40a37a81f5c59c3157cfa34a4a08cc97850d26aa2e61129bc1185",
+    "src/domain/battlefieldValidation.ts": "2b955ff31f61f192068b0e9fdb46a59a3fb7217e5fe8a4e3c892311595942de4",
+    "src/domain/combat.ts": "86af36a384d2b94b9508d6adb7afe7bb3b6d17662aca85fb7e12b24631c767d6",
+    "src/domain/constants.ts": "1e44185636d6aa0a88298f2e394f862913f2e49acc13f3aaae8486a89cf43320",
+    "src/domain/contentIdentity.ts": "8debe271ea4755b8063fa985e24b96009c285e0c6c0b4d78d64a10aea8d01002",
+    "src/domain/draughts.ts": "f628ac8cded291c1f9873b7d4270e8199b1f2aa5582144e6635072dd8eeb807b",
+    "src/domain/dungeon.ts": "2ebd87a4a2bf6ca3849de9d9ae14386a2bd2f24eee81b8c4ab8410427b0b3ae6",
+    "src/domain/dungeonEncounters.ts": "9706afbec3b71c07c79826923ff1bd3a01e98ebc9025428775b1385b949c7a34",
+    "src/domain/dungeonSaveEnvelope.ts": "dbec96c7d97e496c4c566296faf6a084f4ef12769afa5733b8155df4164c1563",
+    "src/domain/effects.ts": "37bbecedc272d98737c369d474f11fc08873b5080e9d7815301d71c6a56cc4b4",
+    "src/domain/exploration.ts": "a28c963082dd66dcc6efef21ef0b85c6ae7cadc0634645b64b6bb7ac353c3794",
+    "src/domain/grid.ts": "9964d2f4f582bafb6b0b54a8ea47668b70c6956274d58183d3f71a2081c7169f",
+    "src/domain/items.ts": "10fe277950fbbe94afa53a63d6c53cd022f02b1ba1e47f7b9b31fb35c4c25ead",
+    "src/domain/movementEdge.ts": "167538673dfcc4822fa52ba0cfe8d30c8c0d2200f1c4c13001d48bba49c3da31",
+    "src/domain/movementUndo.ts": "684463de1d8c000c046ed8ca67f1670c59c041e0af195b3d84ee87a1ee4a96cb",
+    "src/domain/progression.ts": "ef6706c49c53eb5e9824ce3724b1b30cb361ef06b9f617d2862f2955b51cbe01",
+    "src/domain/rewards.ts": "ccb3993012df4fb7575b04c399447a962f879984958f96b5d99d3f40131bc249",
+    "src/domain/rng.ts": "d962b6aadf7f89d6ffcb0e506eaf7ba7778e0d90f27960b9b046f917c156af44",
+    "src/domain/routes.ts": "e141580ded38bc4a0f07b6338c21e2d6239d2b980c58a7f76fabb802ddd17c7b",
+    "src/domain/run.ts": "f4ef1e950aa15f0d4abad60cf054b64a29b0e4c3d043fcc532ba51bd527c516c",
+    "src/domain/runBattle.ts": "d04647fc88ce2603afe72655db85e90a15a77bfdb96b77d30fdde63f3f35df1b",
+    "src/domain/runRecords.ts": "659164918686a4f91b572843aa894b108546737196c392ea1656c7173f734f25",
+    "src/domain/runSaveEnvelope.ts": "fe377127a26ab5e4163d6f57186dc6098ca517af04144b1b65acb211328a99e6",
+    "src/domain/runStats.ts": "2953437ced99ac8e9e046a90132c009e8379099ab84ff0016f4f65d33a44bd39",
+    "src/domain/saveEnvelope.ts": "f2ef271fb66982b8bb957b8a5d661a797551dadb3525e7dcb2289eb3160815bd",
+    "src/domain/tacticalPlan.ts": "f92b14a66e1c74993a3d960f0fa64be345388e03dd24f5824e43e452aa78e85f",
+    "src/domain/targeting.ts": "e6fd495d0fc0bbb241ca51d349f924cfd9f9b2fbb1fc9852004110dfbd0301d5",
+    "src/domain/threat.ts": "5243be5652e18b54bd35466dd4fcf3e75376a0056213c12db1455123f1e51336",
+    "src/domain/turns.ts": "9b5b459bd70a61e1d2677e9afc0b1abf7aff35090fc5e1d85332a7fe28646ce6",
+    "src/domain/types.ts": "5597573620c339302cab152f0c851505d3607421ac11de03da85f8281d648b25",
+    "src/domain/validation.ts": "db2c07d783b2a382794ce5be0413b74fef59b7bafb3804c563843b20d5fe7327",
+    "src/geometry/boardPresentation.ts": "2a5526862b8eba5dd5f8a610f52b903ef2b9fce53e6d988ab582b2635eb897d5",
+    "src/geometry/canopy.ts": "b69b41888f6cab81891536428d812dc3e88ccfecd80ca7ba3eb09cfaf3ad2b23",
+    "src/geometry/iso.ts": "94f33e4819a53e695e087acdde96a08b436b696a90167fecf0015cee3c2007f5",
+    "src/geometry/picking.ts": "45008cf3754c3b6056850ece8def78fdbe2964e1daa57d79f8896d4fc0fc7537",
+    "src/main.ts": "fad86f3475181c173fcfb3f88b87f3f1eb4daccc9408f270daa9ed5d5d68c9be",
+    "src/map/art.ts": "18f1b5f275245e0771d224ac6dbaac3dc9b862a32bc6152e202abb7499f67c67",
+    "src/map/biomes.ts": "29fa28b68a0fe6ab91843b028fcec4a7ef538be8250903fc3fcd883d7abdbdd1",
+    "src/map/generate.ts": "5bb3ebf81d7ea01f8ffcd12de0d95a03f07d6cfd21857d9b34c032af5c284fad",
+    "src/map/movement.ts": "31d152ea26a9c80ce58b73039213bda61506181b95c38c93b75a2182e3f37a3c",
+    "src/map/state.ts": "da6f8583bb6b3399e5107f04056f5ee6434b08a21a4d55284e42d1b536910352",
+    "src/map/style.css": "36c813ac96901151b805bf446453acaa18f6ab3514e1c3ce6e92438a73d104df",
+    "src/map/view.ts": "c45b3510a4d43ee1a7db7e131e6a94d11e3c4af561fdd797da2aa5978945b2db",
+    "src/persistence/battleStorage.ts": "8f59ab814c8d48342a5354a1e28ad170794e15f5440947d63ed943569d0249fd",
+    "src/persistence/dungeonStorage.ts": "6c52799f5f90fbefebb35170746ddbac4fa9e4651179a4f5c49668ffaa4f228f",
+    "src/persistence/runRecordsStorage.ts": "37a7a583070c45e36cd66bef5be841f712b176cd6f2a242ce633bbb0bc3c348c",
+    "src/persistence/runStorage.ts": "dc6e3faa30d2afb6af78c967d2c2d91b3643da270f14e80e754f6dedc1741107",
+    "src/phaser/BattleAudio.ts": "39e97d6bf85ecc339534c1863e3565929aa4be89d4e8b946dca1c476878aff2e",
+    "src/phaser/BattleScene.ts": "c4c912ca6476b9c7267e2404db102d38304f776b300049bd73bb7f5dfa4291bc",
+    "src/phaser/BoardInput.ts": "c584dd838993cc407b02f029613f8c5bf2a626732338b2ebf36e7007f8794460",
+    "src/phaser/BoardRenderer.ts": "3e5be64445369a467cc737bd3bad313240260deecd58f9220707d4bdb7b7b196",
+    "src/phaser/ContentSmokeScene.ts": "7577e5364502eca5236a32ac22adfa45d0623ad9fa925846a6445242d9859e51",
+    "src/phaser/FitScene.ts": "c7172abe67bf8ceb8fe77d924dadcd6f4102de6bad959db4ca0221eb24744859",
+    "src/phaser/ProofAudio.ts": "c0ee62ce825ac2374b275a2645c2b67125d92813b04497a67332995679c9ca70",
+    "src/phaser/ProofBoardRenderer.ts": "c035ec117ec9f923261fe7bf6f4f274b2960506d308c5a44f7e5b0daf523920d",
+    "src/phaser/abilityPresentation.ts": "677be1bdff6b68de1cf60c16b82f6c1bc88cbb678651272c7bccc933999eeb22",
+    "src/phaser/contentLoading.ts": "f5a56fe3ea40c47b2a2b4beccab48367d3d3bec108b98463d26820a7a87cbbc4",
+    "src/phaser/healthBar.ts": "00aa78fbc2fd0b94e3af7ad2aaf0f8f8a7f70f84196ef816b79db31c7f453921",
+    "src/phaser/start.ts": "5c6811015a4bfcdc0aae0c155483284cfee9e8f5c303b645e52d20a4fff077cf",
+    "src/style.css": "c386eed4372aa37178e817a3cc72771045a1b1d9cb1a30ddee340862c2e8505e",
+    "src/telemetry/browser.ts": "2cc77a7d29f7869af3fe55f22e975b4a95cf5744aa75b934534e22dfaadaa44f",
+    "src/telemetry/preferences.css": "ef8b9c2a9ea4bf53e49411c01bdc63f0b0a0c38f0040c96c56d084a728cac459",
+    "src/telemetry/preferences.ts": "6736e35dd28b0100228a8716b48330460630232d6db5dcd8e786dabb5b6442c6",
+    "src/telemetry/privacy.ts": "580b7762947011f226d1091f17d005951f7112a1b66e08efdee1f4224895cf58",
+    "src/telemetry/telemetry.ts": "097a62ec9673742a0d365bcfea9923d6f8678b2aa89578d42f747dd995543c0b",
+    "src/telemetry/transport.ts": "e7b814e0c54323344efb69caa95e572290a36da64fd87c493a06d9ec6d0dfc8d",
+    "src/terrain/materials.ts": "141f0f45e30294dc32ed0afdf036bc65c7d5d0f78718841def6d6a32a7d670fb",
+    "src/ui/battleActions.ts": "02574a345383e27b198cab9c975c3cf2298f8cfef4487e6efe9740cdd0fee616",
+    "src/ui/battleLayout.ts": "3b494452f84f80cf91eec4cb4f73bf55db51753b8e9509b2e5f24b5059552a34",
+    "src/ui/battleRadial.ts": "cd8ec6fee34064e313d140df85b7df1d911f404ceb97bdb30a4b1c693379a977",
+    "src/ui/battleSelection.ts": "114df6b285248255d6bfb62f3f4b53f1a44c40df0f8592d7548ad13e902256ab",
+    "src/ui/combatControls.ts": "18726661dc7e9df6da74695a42730656b538c88b1ccfd58a7ac82b47621330de",
+    "src/ui/dialogs.ts": "0862dfc1052996f4c0430de088df187e26664d8a5bd3545aa781002253e59c51",
+    "src/ui/dungeon.css": "eb98a0e5a5a40d41ec304b5a0235d6ba75943942f0bb401de7d27a4f233e7404",
+    "src/ui/dungeon.ts": "64e3c073d0d148a488457b2c11ec8919db32c8d0b3e00c76c62dda8eb042d2ba",
+    "src/ui/dungeonMap.ts": "5911a6e747195d6fa778ffbf99c0d5a331b05d712f42fa952e224beec367711d",
+    "src/ui/gameError.ts": "40da4f5ee92222c40f82b63c073356dc5d9dd62082425f902798c3451be638ca",
+    "src/ui/hud.ts": "e857404a1316a922d713bb57d821a1f0551addbe0856886c54e45069f7810366",
+    "src/ui/mainMenu.css": "1a66864152266480e10e25912741a9ca5400b4dd6971985cf79a689d3be76613",
+    "src/ui/mainMenu.ts": "a9af36e2f3734c55b9ce2cf4af258724fcb585c485795685256df13dd1430756",
+    "src/ui/menuReturn.ts": "532a31f732c0eddecf3ade9f150569d7c0cd73a8573993780a613c3adca1884d",
+    "src/ui/persistence.ts": "ab8722d3e2259ec387c56e1c633f18b6e5a3f8ec7e3bfd0cf1669fda8e08de77",
+    "src/ui/publicAssetUrl.ts": "abdc0cfa8971cc00d77fcf11d72616bcf9d05fa6cb5fe890e6d2f11353068128",
+    "src/ui/radialGesture.ts": "c08592bde824feb81406329a64fffc92e57eec6c0484cddab007ba6fcabbe06b",
+    "src/ui/radialLabels.ts": "84278f4424e7b0879233f3b4c12024dbc8a684aad657dc46905637e726347200",
+    "src/ui/runFlow.css": "c3221a04e9138212ec5889dee3090d93352cf5d2754debadcfcb800039bdf671",
+    "src/ui/runItems.css": "d5209511bd1f7455df1d2672fcf0832af5d00c3479f9e19a3a4743e42021f800",
+    "src/ui/runItems.ts": "e45605531c795ebdfba2992945348c5d8f2b2d1ba40243ccaaec2399ce8702f4",
+    "src/ui/runRecords.ts": "55f176db9f9eb7691696c8b03ea1cdea7272340beb8fa443af66102ebe155dbf",
+    "src/ui/targetPreview.ts": "33a14fbb81cec4a34850ebac9e26710ba69ba30759db694dbf5a480b73117306",
+    "src/ui/testingProgress.ts": "f007495a75ae5f76afc9320993382bf08ea44280091d1b89fb3c9d9a030bec1b",
+    "tests/ability-picker.spec.ts": "87ed13c47f22000b18847773dec617941d61b4eacb856a208f6a219bbb55c1aa",
+    "tests/assets.spec.ts": "2ad260b5e4db19bd30a3442b811ef360fd780a96366a1a9dc44dd6b822da8a1c",
+    "tests/audio.spec.ts": "e5346ef007c76f6d252f43aa7560f1ad59c5e267cd1373f27a54992fbd561fcc",
+    "tests/authored-encounters.spec.ts": "b1375d0fc9906b7cbb4fafe462218d786c8ae2969fd5fb3d8db69380ca356e7a",
+    "tests/battle-animations.spec.ts": "abee12c9c1d9de33afde0fb50b62a336d90d0ebf4144c9e49b9d4d07367e3805",
+    "tests/battle-audio.spec.ts": "97b1be8c5eae97012d51ea2ed542f0924994bd9a12b4ce2467aa3c7b29cb5b4c",
+    "tests/battle-board.spec.ts": "69fc66d27734c90ffc20d7b8039a0ac4869c17057d9df6f3677f9a943ece0dbc",
+    "tests/battle-loop.spec.ts": "3ab3070f554937b2fd8427fa8e6d11fdfef2e91e9f23b6871b0a4b3723f54db3",
+    "tests/battle-persistence.spec.ts": "530901dda49a167804ea95e90b4fb1fcd23429fc9ab646b3828693c02b386f97",
+    "tests/battle-radial.spec.ts": "87e0cf6baf240d8bdddfdf25110cb7c54af40956a037010f5facbb55b37e429d",
+    "tests/board.spec.ts": "9f23281436ef5d16f675c69ebeb5a3063fe49ddcea57d079bbdc86b28f211d84",
+    "tests/boot.spec.ts": "31f45d3215aaa721af7aa3d095153f43c0c613e5ad3527da1beb4ef4de2e631c",
+    "tests/content-loading.spec.ts": "d4470b2e7cdecc7bdea9c0496f35109aab93a7d9da6751f175d6d76474d5b33e",
+    "tests/dungeon-exploration.spec.ts": "69f0f581b4b17a27ab96cc93935ca70012c3f58866a3a6480c44ec8ec7a80951",
+    "tests/dungeon-extended.spec.ts": "4fbb26f7d077d44bb26f337372b0d77a94df7627ce82673d5f262de8e4148149",
+    "tests/dungeon-lifecycle.spec.ts": "bce838c3c8164b1705c61fb178ccb79afb7559d1c6e1e0c18d64333e67272126",
+    "tests/dungeon.spec.ts": "6520d3b718db0522818eb409806696b9ae599039470493ead17befe608b980a8",
+    "tests/engine-fit.spec.ts": "1db99383067327d262244c18c00b44fd18f1fe2aae293eee70bcf1497e7d822c",
+    "tests/fixtures/abilities/index.html": "cc410e9780bcd8f7c6e2134aac2a3352a388d7893aefd5fa428646b04bbd91f9",
+    "tests/fixtures/abilities/main.ts": "f3d46bee404028ef3eb6ed22bca078ded1deea8ae2ba1cfb4cf51fda77b1b8a6",
+    "tests/fixtures/encounters/index.html": "1aeef75ad341d9f313c44caeb37d1747465bad89ebbbcfcfee0e930bffbaa050",
+    "tests/fixtures/encounters/main.ts": "66b88fcbc55b5c06eda1a34a2a92252255d320075b1da4ccd45063f1ccc0844d",
+    "tests/fixtures/run-items/index.html": "c37ddb14040d6fbcffe2c4ca2237cc7d00c3ecb29e8b48dbba4fdd19d36124dd",
+    "tests/fixtures/run-items/main.ts": "bb058887a6fcddcf75453446f1f62062a384a9ed2b66ea4f589b3413c2d50c15",
+    "tests/fixtures/saves/issue-165/README.md": "94714e4837402f9f9240be86d01e52a01f93503262494afce4daebf4d306c6f3",
+    "tests/fixtures/saves/issue-165/battle.json": "b66ae5cce1e3eb1312653f7ee2980c5995b2f7ccdc76fd5754e53c34285c8143",
+    "tests/fixtures/saves/issue-165/dungeon.json": "3bafd83794f77099623f85f74fb9dab8962976578c44adcd15baa873a33d5842",
+    "tests/fixtures/saves/issue-165/run.json": "f77a10f0f770e5bd5a533d69eb0e234b337eb8f8f1ded681faa3dc4f463e52e1",
+    "tests/fixtures/saves/issue-166/README.md": "de8b49eaf441ba004bfe5444931e4d9fdfe50136dedb51035103a5144ad237b7",
+    "tests/fixtures/saves/issue-166/battle.json": "8ba7beac57461794a1d9e4d863eaee4f527138e2cac3affabc24f7834710aefe",
+    "tests/fixtures/saves/issue-166/dungeon-main8.json": "457ce164f860fbc9ad5e83b64e8f8ee447819ba4ffe9d1a4745d7022f5dfec93",
+    "tests/fixtures/saves/issue-166/dungeon.json": "f4699c6f8ccdfc281332a9f3642c08e6fc713f4a895296759c4fcb9ae9a47aca",
+    "tests/fixtures/saves/issue-166/run.json": "e934b96cd1df2bcc18279d2db676799600785de12e16a0969609e18f7cbbe731",
+    "tests/fixtures/saves/issue-172/dungeon-active.json": "199c33ab63da21afbf6eb91761c57ce6166486386a30bc3fbaf8b7436cf5bade",
+    "tests/fixtures/saves/issue-172/dungeon-reward.json": "b5a8b524e355bd8c72efc40fc408feee850280753823127d80cfc5d80e81a188",
+    "tests/fixtures/saves/issue-172/run-active.json": "5145ceb15779c3283c47fec51ab2d2b72448210a77ae972a9e5de35364f17599",
+    "tests/fixtures/saves/issue-172/run-reward.json": "226bbadc37e2286f8d56538275acb2608e0abe3b7a878a6dd633ff8bda092c0c",
+    "tests/fixtures/saves/issue-270/README.md": "4a9402b23cd29800270019e0ce885720b4ecb451027223b302b40c2837bcb11f",
+    "tests/fixtures/saves/issue-270/counter-dungeon-v1.json": "3e40d0c837ac847043526aa972a7691968242cbd1906d2ac3e71a670a6d0e799",
+    "tests/fixtures/saves/issue-270/counter-run-v1.json": "3c0119490214fc5c75e681ce99389eba14cc629bddb36a83a8e4b12c386a9b3a",
+    "tests/grass-surface.spec.ts": "7ebba6c2fc1deebddc583b74fac02c1ae8ffcda353fb9f144150836f1ca51236",
+    "tests/guarded-effects.spec.ts": "cd3a68a2050031cb61bad43e01f00a4dfd2da3a9ea803333d76ff7f668983b07",
+    "tests/helpers/abilityCatalog.ts": "b2b3a304c87a6c5db87c56211a0d4cd1624ce26d15e596b33cab660889841120",
+    "tests/helpers/applicationLoadDiagnostics.ts": "aa2fb07a2864c8f56f246af96a6740043c541c9b44c619ceda433ed3f28bd884",
+    "tests/helpers/battleModuleFaultServer.ts": "f95eec69c82b8522ca38f754b02766e075d22686fceb0e2e05acfdc1a8af7ab3",
+    "tests/helpers/battlePolicy.ts": "64daba7815e547ced87020ba4caa3b483ada8d5b9eddf47e66b62bf5a01aede0",
+    "tests/helpers/coreGraphics.ts": "bebafdf48aaa9b1f6e1b40187ee917e42e15c5ef9ca89de4a050a3e14c17d5ea",
+    "tests/helpers/dungeonEntropy.ts": "0e38a0cb2be813ee07aeb5acadbb713f684d292bc78472be56f71b0eaaa99866",
+    "tests/helpers/dungeonFixtures.ts": "1ce4ee9d5795545021c538b8330656843d70e9df1c1c7204816983dc690f7b7f",
+    "tests/helpers/dungeonTraversal.ts": "94def073a82233b19a3f9f1d79a008932274cef2d3325aac3b10ae9c8adba66d",
+    "tests/helpers/forceRailControls.ts": "995363d2a5aad6a25e4fb36715bd234eff29e1bb185e65797b83461895e379c5",
+    "tests/helpers/guardedBoundary.ts": "43bf3b7d4583f80442f43153a7117c6cef9bacafbfcb36d7a2adf034d4af7848",
+    "tests/helpers/menuFixtures.ts": "8efb65602711e3d5a59209b3c7991cd8729ded3d91498c75f55bb753742bef2d",
+    "tests/helpers/playerPolicy.ts": "d95cc04792adbf39b9206575bc4158fe2ed412bf2929a0a72fd300fde5cc3dcf",
+    "tests/helpers/recordsWriteGate.ts": "9fb162956a279d4f7f8953aba0b209b79225826e7aad604baf5941cf1f91b75f",
+    "tests/helpers/runItemFixtures.ts": "6ef75f29e7f4054ef51bd6dea7c64fd10dc8b956ecc74f148f0c0844a5dc9370",
+    "tests/helpers/runRecoveryFixtures.ts": "918e0a293d343d0b4f2bc226e5cdac96ecc255cc8e5c10fadf6cd8325838074f",
+    "tests/helpers/saveFixtures.ts": "2e48c8dcd988650743d6f83cb43b94198aa515834e5ec10c206fb460206de7bb",
+    "tests/helpers/startupDiagnostics.ts": "040f02e8737151d8d240fe83e394771c87918f48e16f8fb4b0b6072ed144b856",
+    "tests/helpers/startupObserver.ts": "956a54a1a5d9ad328ee0f309ef526a3bcc8ed2bdfae1826b5569c92480b4b547",
+    "tests/input.spec.ts": "1b66ad4d7c0b41b738f2fa6de7c616a2543326d410e7c928cb092c49dbf371a1",
+    "tests/integration/buildHeaders.test.ts": "a726870f48a35ef7c0df7670d8ca2501b90498b57eedb385fddddb1144feb6de",
+    "tests/layout.spec.ts": "e442f14bf8e1a3045562f465d8c19662465d89ebb87c59417480edf3c7f9937b",
+    "tests/lifecycle.spec.ts": "d3abf093b3bbed800d9b03dc71f833a0a717aeaa4f3768274a121795ebd2da55",
+    "tests/main-menu.spec.ts": "507b1dcf44afb4936366e98461efb455e320b42a76af8338e8311d80cd3d1617",
+    "tests/move.spec.ts": "88cfc8c343f3eb4a218f93cad18bffcd5a2d56d889132455ccce5604819f4596",
+    "tests/opacity.spec.ts": "2ada0960fb7d48a678347f64ed41328a5ded267cabb60dec29fe57094e8b75c2",
+    "tests/overworld-map.spec.ts": "08ecf913118fab7e25c08268da40669a4337d948e2e7b8c60ac4339721f9935d",
+    "tests/procedural-grids.spec.ts": "b3fb46796feedb2ce58c886e3600bff81fd5e9ae0d8998b3ee1f2758324e2cf0",
+    "tests/public-asset-base.spec.ts": "10d0006bfae7319e8a9f4f58926c4387a8e8eb477e5f542cd1c46c727105a68f",
+    "tests/qbert.spec.ts": "b31754f635c0f17eafe9037a7e162a142913c35cff9cf59ecaa5f183ffc9f9f2",
+    "tests/run-items.spec.ts": "f60e2ef2bd215f92586bc0728bbe0d21329c86063637cb5c52a2e342c23bb4c0",
+    "tests/run-progression.spec.ts": "942c89871c160c2d44d8b34a2174791d454ba7b164752655dcc234d30b2ec995",
+    "tests/telemetry.spec.ts": "a57e5d7b8c2977a506b29641ef7b6761a801d3ef15a5dc1f8ad0b8e3d84ea804",
+    "tests/terrain-materials.spec.ts": "5e4fbcabad76c50b1fac9f19b90f638dbd0d4dbfd7ed29c7e142de5c0f8d52dc",
+    "tests/tooling/browser-diagnostics.test.mjs": "de97fdc3af1c4138d33427f7998f07519a9748bd67fc98ac0892a58c349b5cf2",
+    "tests/tooling/risk-gate.test.mjs": "a04711fb2683e8a8610163364554f74993fb2cb9b1d17b29158b1a7b78dfd138",
+    "tests/tooling/verification-batches.test.mjs": "c75fe51676cfd3e0fc62c02b9ea7dd6480655c60f5d0c1c0cb1a7086ee17d1c3",
+    "tests/tooling/verification-browser.test.mjs": "095f9099592e1c548061b05177e42317964222780155a6ead30d2d60c30bde0b",
+    "tests/tooling/verification-processes.test.mjs": "2dc6abfa1af65d9f24946dc68f2f924b340a777fca857a65b8f2cc45ffcfe163",
+    "tests/tooling/verification-reporters.test.mjs": "54c58ca10a8fd5597b3e1eaeaa16dd4b535c3e21b1a9c56981e9a75d5592caf3",
+    "tests/tooling/verification-selection.test.mjs": "209c8f93a5a86dca257bfbd473cc7b3f5990c90c827456eba7d1ed710c28c652",
+    "tests/tooling/verification-timings.test.mjs": "7de982a4325907afe4e3c8ebeadc34eea46c840a371a0af9fcb2a19cdd60d703",
+    "tests/tooling/verify-full.test.mjs": "7021ebf41b7c55cd12921877a1c2a11b8ef8b019bdb05d25a5c4123995ff7792",
+    "tests/tooling/verify-pr.test.mjs": "566c9bb506a3197b3e0d025b5868448cc934d0685006481302871859eda64022",
+    "tests/unit-health-bars.spec.ts": "e7011da0bcca3539f9d82f2584b09e3fc8f39c3da8a89e05885477bd0d60f040",
+    "tests/unit/ActivePlaytime.test.ts": "38c9e8f51511fbd6edaba149be331ac50590af4e50bfd89efdfc32c0b4ca3cf3",
+    "tests/unit/RunHistory.test.ts": "31ed086ce6fc3b260750a3c9620c37176a5e4301929468542f62c2acc2a551f3",
+    "tests/unit/RunItemSession.test.ts": "380fcf3117d966f70dd810b0c3b076940e66123cf96b6bfbd070f45141d7986e",
+    "tests/unit/__snapshots__/authoredEncounters.test.ts.snap": "d2d92689447dfb3674035aa6e4bd3b4d76b6a148a58491bece687ff2fc829bac",
+    "tests/unit/__snapshots__/battlefield.test.ts.snap": "f8fac2780d3dfd375b87f1c63b3418ae66d84e9c6b722c56e085e3f01a66efea",
+    "tests/unit/__snapshots__/dungeonEncounters.test.ts.snap": "e7ab004e01809e92d59b33c44ebbaed64a6d2868c81939cdc29a8583a017dcee",
+    "tests/unit/abilities.test.ts": "beb73e0754218fd721ca98bd451dfea81e89cd335da07d2c07500f9f1dd0f0f5",
+    "tests/unit/abilityFixtureProgression.test.ts": "39658688de58658b5d63c89e478142112181e1285c5294953f17d6871d140320",
+    "tests/unit/abilityValidation.test.ts": "cfabab7fe91c8a7518044c9d1bb809b8ea30fad6f5b230991105770e64ce81ed",
+    "tests/unit/ai.test.ts": "9751098dd4a295fe08d7bc90f44e9cb83dbc42835c70231ed3a12ad1b6c76157",
+    "tests/unit/applicationLoadDiagnostics.test.ts": "791d59208315e86ce0ae64e667f64798f0daf5b5c091c19c5cfba49647caf608",
+    "tests/unit/applicationLoadFailure.test.ts": "0e26c879bbc73d3f8711a1467792ab5b583414bdd76d863d5e184c3e5bf2b816",
+    "tests/unit/audioState.test.ts": "dc210650d635cc2fc34174041701df2d97a39db4737aff58f421f77fc0bde955",
+    "tests/unit/authoredContent.test.ts": "930aeba905adac10963a64fd288d6bae699fecc811e504468cc08aa94b25511e",
+    "tests/unit/authoredEncounters.test.ts": "bf3db8a5c43e8cc9d80d9f62db5883211cacb3917affb9b52e44d0d8ec50ac39",
+    "tests/unit/battleActions.test.ts": "c2405080727f3e628438721ad260ab532257921467ffeaef3b80d99e11585d33",
+    "tests/unit/battleAudio.test.ts": "970ff1016dfaac611a2b88b58897ed85b7eaed4759d75a7471e848683e54925c",
+    "tests/unit/battleAudioInventory.test.ts": "9a4035c2acb1f2a1508ff602a49ba29b62ac814452bd0f91caee6fd1e1826cf3",
+    "tests/unit/battleCues.test.ts": "62d1bf30ac222c1990cfdef3b341ef4c4ac9c906af1f4cf81db89b282f90508f",
+    "tests/unit/battlePersistence.test.ts": "25521da1c0a730473798c7db1b2a185c5c6c7b58f9075566003f89b88d7e5210",
+    "tests/unit/battleSelection.test.ts": "0d74f4a7342afac90071c2a46f2741e44de9911ae90d54f36ab412d582e93d34",
+    "tests/unit/battleSession.test.ts": "1714b523f991165d939ec3225024028feb83511df3b2f5d0ceec79dfad8a0d03",
+    "tests/unit/battleStorage.test.ts": "b633076338bc23b6ad826e1f7921a0bb72b49f9f2e1c3d61c7b562786743a508",
+    "tests/unit/battlefield.test.ts": "b28d07341bd8e8b82a861cd6dbc2d85dd69bf0b21896e43c79bf2be3d86cc730",
+    "tests/unit/battlefieldContinuation.test.ts": "39efe0958435827f88287ea27d5df95e89cacd787ca0ff8d25a4348499dc22c6",
+    "tests/unit/battlefieldCorpus.test.ts": "811a767bfbc4790fc9e1c9e1dc961944cc0cd45ce2954ef0b7789ca49800b550",
+    "tests/unit/battlefieldSimulation.test.ts": "24cf7ec1177bfbfef8842bf4df8a7e236b05af8939ffb36d728e2bcb6f3fc84f",
+    "tests/unit/battlefieldSources.test.ts": "a0835e8c2219f10641c217e659e268cb9992d81e81d622d4da353547a5f774f8",
+    "tests/unit/boardCamera.test.ts": "b582e5bb195fe3ff4908de71a1ec610ad8e8d330d9875b0738eb08173ab90003",
+    "tests/unit/boardPresentation.test.ts": "67527eeea0ca23c6896eb75a26c4d09d329ab6bf8ff81d1ff5f61c17ab0cb6b9",
+    "tests/unit/canopy.test.ts": "6ecb01218476074627924a4ae9b56a24b98d6f875b6f472ca9d606e3922f09ad",
+    "tests/unit/combat.test.ts": "b9f156daeb8a93b3cc98bdaff3621f12b96fa334763e0dec0d2416d3958512dc",
+    "tests/unit/combatControls.test.ts": "65f0ef679640ea59b6f1dc0aabfa9b56431ed9250dde06b22314ac57f69a4216",
+    "tests/unit/content.test.ts": "99388720895544e1577749639250fe3e23fde17ea6ba1b764053d1163364ab24",
+    "tests/unit/contentContract.test.ts": "9f5a3a8db40531cb79ce1ccde449effcb854bc5d250d93a0f748c2a94dbad2d5",
+    "tests/unit/domainBoundary.test.ts": "f3d770ba058f4099f60d09b7b75a57ac75c0d4e73fa937661ec9f6dc094fba73",
+    "tests/unit/dungeon.test.ts": "b27cf8ace37bb6de11dc166735047564e972f6ef93d483986b16a110967bc3be",
+    "tests/unit/dungeonBattle.test.ts": "56ea4a532adfe8e3d06cb03ab93daccec1908055cacbc9190f93ddf00ac7fca3",
+    "tests/unit/dungeonEncounters.test.ts": "2a4299c8bd94610553b546945e5960b789a66d80565d82e7cc673cb59159a6ef",
+    "tests/unit/dungeonEntropy.test.ts": "8aac466583bfd2bfedbbdecb45fd766bb593f42541a228ff5071c446b7e9939f",
+    "tests/unit/dungeonProgressionBoundary.test.ts": "de01dc60c135b7a7ebcf7412bdf528f7b85384fced7422089cc98e8d86957a1d",
+    "tests/unit/exploration.test.ts": "0eadc71972388a8d87c8b9a785972d1f54e4755f2ba2f3e12097f925dcada49e",
+    "tests/unit/fixtures/contentContract.ts": "77758f6036eea5617c54dc75df955764adcfdc13b6c0c5df7cb499f1e5163204",
+    "tests/unit/grid.test.ts": "cf91ad4924937595571fe48be9b308d019308c20b35a0b81bd997da621bc3880",
+    "tests/unit/healthBar.test.ts": "ea8283ca82826f222a9f20d77c60feb041c086bd2bbb3da6d798b95e59d7653a",
+    "tests/unit/input.test.ts": "10b5b9663c25a76b6c488103a01c3df1551fbc64e2c2a4b9697dd7e5adb507c5",
+    "tests/unit/iso.test.ts": "897db5fd29e821293c344f7064d47c52175a7e2a7efe288fd6e03e376a6696a8",
+    "tests/unit/itemCommands.test.ts": "825d614ff57ca4bd5c082c4590f2ad9a6b4be772c72bd130ccf925901b5dfe34",
+    "tests/unit/items.test.ts": "77320e7191bd66ced08ad0bd9f9bfb12ec29108f4640f19933d257d127831faa",
+    "tests/unit/measureFitOptions.test.ts": "af066456ccf1a9efc146e779283ad5668c30e0d5ab8a9d7082b40b929e55ef8b",
+    "tests/unit/measureFitPreview.test.ts": "0fec44abe1423317997fca99a13d7e3adf4178eaf3e003ad68ea36d2614a246b",
+    "tests/unit/measurements.test.ts": "2cab42f9e963dc7d472b3d6b8829126f2b010a7869183f173bc4a3f6d6f32458",
+    "tests/unit/menuSaves.test.ts": "64d5a9fa0ba95b6853b841414f486af8d78cc8e2d7499293b9da3af5a3de5c2a",
+    "tests/unit/move.test.ts": "3ae9bd9de4453424ea0f88eda98f32082e3e1a941e97af1c629606cc48617766",
+    "tests/unit/movementUndo.test.ts": "bab4664f00beac1932ea7311b53acffb6ff2bda9f2080ac25cb1c1764295191d",
+    "tests/unit/overworldMap.test.ts": "aa02594011aa5747dae2d029a834656c4563aef72fa8f1e88447b19fddddba6b",
+    "tests/unit/picking.test.ts": "6c09d5d3ef1038c19cfa91194bee97ed6dd9cb0784abfa513dc017d77c27403c",
+    "tests/unit/progression.test.ts": "e619219ef1db743a627db8a0a871359b54e749f367ee19fd75321cbbc5488eae",
+    "tests/unit/proofAssetExports.test.ts": "ff3333d95a0b5c110c3c0ac98a574425951529e6d0445b4067d5ddf59727cccb",
+    "tests/unit/qbertPyramid.test.ts": "214d663d2434d9b6eee8773315ac23baad2bd0821ec47bc2218135da3d6bca58",
+    "tests/unit/radialGesture.test.ts": "b89ab210b78864e7e1090ce5b709006361692b8d8ff4c994d9068104910ce742",
+    "tests/unit/radialLabels.test.ts": "9cc017fb3bc0f01e4b5c027c3ab15881117d19fe54811a396217e93f7d277416",
+    "tests/unit/rewards.test.ts": "2d2a25e9f7dd74ee8d25fc8516185a5fdc0e8c036e466d8b724ae1a78dd17997",
+    "tests/unit/rng.test.ts": "b3a1974c1ba01183498b8e8f0dc1020a4c72527502b8c220d73099897a20706f",
+    "tests/unit/routes.test.ts": "e908ffd439a11fd4adf88e2422e023cc4530afd02e7918584ac07c107af993a5",
+    "tests/unit/run.test.ts": "e79e788d0285a4de6a42da0d7989e22d07c08e8a429e3564fa88060c08d3e97c",
+    "tests/unit/runBattle.test.ts": "c1dfa43e7eb4bdbc44691eee6d4aaf233f68480c02e365ce0056867322c3ab35",
+    "tests/unit/runRecords.test.ts": "90baed26010822006b9b70a09c17a413b84e34c788f2d04b8360bf919446d760",
+    "tests/unit/runRecordsStorage.test.ts": "4195254acb4fc86b7013700480bfc55f67424af4d343d9b9929459ee74840444",
+    "tests/unit/runRecoveryFixtures.test.ts": "4c416c60ee2815a6d83b4dcc61678f255a213673dbc12fd989ba579766ac73d3",
+    "tests/unit/runSaveEnvelope.test.ts": "3504570f9507c58bc1c822af6546007294d9760b6bf3021659acc88b28aca71b",
+    "tests/unit/runStats.test.ts": "a2e6a7bd533a893d63ee17d0f7f3051c627410949b3f3216a0435727a2280c1f",
+    "tests/unit/runStorage.test.ts": "0320dfc7f3e1714dcf14747ea1e290d9210fd06281fd978d6d5043dcc82fb44e",
+    "tests/unit/saveEnvelope.test.ts": "09fbf77483b4850640b870b233003db2bcd42663796756773e68e1f735f184e0",
+    "tests/unit/state.test.ts": "b7bedc83462e39e4af6ee9b8b841017bb08d8022d7cd9b15ea34070bdf7e83b2",
+    "tests/unit/tacticalPlan.test.ts": "8ea1c0f4ded154ea8138160e7b0c9f911d850548029e91088d54645b2c2a08e5",
+    "tests/unit/targeting.test.ts": "2171bbeb823c6cfb3acd00765a2081e6b5fb13b5862b0a1653c8bec520654d00",
+    "tests/unit/telemetry.test.ts": "009c5b8d32893c69155154db9bdca422dbc191cadd050c83d2b0323ae134069a",
+    "tests/unit/threat.test.ts": "227af50a50a45410bcea5d624cbe0f7dbb7873633010ad96eb03c32276021fe8",
+    "tests/unit/turns.test.ts": "368c29ae4b9ed13ab8c7adf9415f6bacecdd795c2ce33dfb8bfbc86d30f33187",
+    "tsconfig.domain.json": "94b255ca7ab890df804d9e4b06d9ed62b5f0e01a9f77ace3ac9798d47572591e",
+    "tsconfig.json": "0dd83947555cc594acbd955a45ef4789e9387a99cff759b460fd988a6e5c97da",
+    "vite.config.ts": "966b33c9cd5f3f9d386819c975731d33f0b59cace81c3c2c4a6c4f6d3cdb2996",
+    "vitest.all.config.ts": "46e39525da304339468cb43d31cd4500212f81ad71e35158b51cb90023bbef71",
+    "vitest.build.config.ts": "58f3bccff5edbe319cd611271e23c88dcef213109057c41c26e0619f2235d84e",
+    "vitest.config.ts": "8b967780731d5b199a8eff59c600789b2ccc84584d523c07796b8c896e09c2cf"
+  },
+  "environment": {
+    "createdAt": "2026-11-12T16:40:27.062Z",
+    "commit": "3114b3293677e214b26f463bdeab77d59027505d",
+    "node": "v24.22.1",
+    "playwright": "1.64.1",
+    "platform": "win32",
+    "release": "10.0.26300",
+    "arch": "x64",
+    "browsers": {
+      "chromium": {
+        "executable": "C:\\Users\\apexw\\AppData\\Local\\ms-playwright\\chromium-1248\\chrome-win64\\chrome.exe",
+        "override": false,
+        "channel": "chromium",
+        "version": "156.0.8078.4",
+        "passed": true
+      },
+      "webkit": {
+        "executable": "C:\\Users\\apexw\\AppData\\Local\\ms-playwright\\webkit-2370\\Playwright.exe",
+        "override": false,
+        "channel": null,
+        "version": "27.2",
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  "serverMode": "ordinary root production preview at http://127.0.0.1:4173/",
+  "workers": 1,
+  "retries": 0,
+  "physicalDevicesTested": false,
+  "prVerification": {
+    "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-270-records-ui\\Tactics-Guru/verification-receipts/pr/1794501184479-141956/summary.json",
+    "sha256": "dd9bd136c7b3e0c173685bd0e2e3891c75a6f98bd467716c87a028dfca382cf9",
+    "source": "7e98c698e65fa1eaa33adddcb03846505f736e10",
+    "durationMs": 117187,
+    "units": {
+      "total": 1357,
+      "passed": 1357
+    },
+    "stages": [
+      {
+        "id": "tooling",
+        "status": "passed"
+      },
+      {
+        "id": "units",
+        "status": "passed"
+      },
+      {
+        "id": "typecheck",
+        "status": "passed"
+      },
+      {
+        "id": "build-integration",
+        "status": "passed"
+      },
+      {
+        "id": "bundle",
+        "status": "passed"
+      },
+      {
+        "id": "journeys",
+        "status": "passed"
+      }
+    ]
+  },
+  "commands": [
+    "npm run verify:pr",
+    "npm run test:regression -- tests/run-progression.spec.ts tests/dungeon.spec.ts tests/dungeon-lifecycle.spec.ts tests/main-menu.spec.ts --grep 'review repair:.*(departure|clock flushes)|run statistics:|dungeon statistics:|five-stat records|serialize spatial|normal.*navigation|actual BFCache|native BFCache' --reporter=line,json",
+    "node node_modules/@playwright/test/cli.js test -c playwright.exploration.config.ts tests/dungeon-lifecycle.spec.ts tests/dungeon.spec.ts --grep 'confirmed replacement pauses|serialize spatial|dungeon statistics: active' --reporter=line,json",
+    "node node_modules/@playwright/test/cli.js test -c playwright.device-acceptance.config.ts tests/run-progression.spec.ts tests/main-menu.spec.ts --grep 'review repair:.*(departure|clock flushes)|run statistics:|five-stat records' --reporter=line,json",
+    "node node_modules/@playwright/test/cli.js test -c playwright.device-acceptance.config.ts tests/run-progression.spec.ts --grep 'confirms unsaved departure' --reporter=line,json",
+    "npm run test:regression -- tests/run-progression.spec.ts --grep 'confirms unsaved departure' --reporter=line,json",
+    "node --test tests/tooling/verification-selection.test.mjs tests/tooling/risk-gate.test.mjs",
+    "node scripts/browser-check.mjs"
+  ],
+  "browserRuns": [
+    {
+      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-270-records-ui\\Tactics-Guru/tmp/review-stack-final-chromium.json",
+      "sha256": "d205581b342f23b3368ae55dcb6f446db51a1d3b0fd192833f2e4adff5a01808",
+      "stats": {
+        "startTime": "2026-11-12T16:25:23.418Z",
+        "duration": 92277.034,
+        "expected": 48,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "project": "desktop",
+          "title": "dungeon statistics: confirmed replacement pauses pending enemy turns through history",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 22,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1151
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "title": "dungeon tabs serialize spatial publication and refuse the stale owner",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 127,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 682
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "dungeon statistics: confirmed replacement pauses pending enemy turns through history",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 22,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1119
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "dungeon tabs serialize spatial publication and refuse the stale owner",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 127,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 768
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "dungeon statistics: confirmed replacement pauses pending enemy turns through history",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 22,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1437
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "dungeon tabs serialize spatial publication and refuse the stale owner",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 127,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 963
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "title": "dungeon statistics: active exploration excludes recovery, visibility, blur and menu sessions",
+          "file": "dungeon.spec.ts",
+          "line": 25,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 766
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "title": "dungeon statistics: actual background tab pauses active exploration time",
+          "file": "dungeon.spec.ts",
+          "line": 40,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 587
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "dungeon statistics: active exploration excludes recovery, visibility, blur and menu sessions",
+          "file": "dungeon.spec.ts",
+          "line": 25,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 805
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "dungeon statistics: actual background tab pauses active exploration time",
+          "file": "dungeon.spec.ts",
+          "line": 40,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 528
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "dungeon statistics: active exploration excludes recovery, visibility, blur and menu sessions",
+          "file": "dungeon.spec.ts",
+          "line": 25,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 963
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "dungeon statistics: actual background tab pauses active exploration time",
+          "file": "dungeon.spec.ts",
+          "line": 40,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 754
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "title": "main menu: five-stat records and retained personal bests stay keyboard and touch accessible",
+          "file": "main-menu.spec.ts",
+          "line": 987,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1024
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "main menu: five-stat records and retained personal bests stay keyboard and touch accessible",
+          "file": "main-menu.spec.ts",
+          "line": 987,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1190
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "main menu: five-stat records and retained personal bests stay keyboard and touch accessible",
+          "file": "main-menu.spec.ts",
+          "line": 987,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1686
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "title": "run statistics: active time excludes recovery, visibility, blur and menu sessions",
+          "file": "run-progression.spec.ts",
+          "line": 19,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1967
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "title": "run statistics: actual background tab pauses active time",
+          "file": "run-progression.spec.ts",
+          "line": 34,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1136
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "title": "run statistics: cancel a held checkpoint and keep reviewed replacement bytes stable",
+          "file": "run-progression.spec.ts",
+          "line": 40,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1319
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "title": "run statistics: Chromium BFCache survives normal navigation",
+          "file": "run-progression.spec.ts",
+          "line": 302,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 3204
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "title": "review repair: Single battle confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1656
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "title": "review repair: Single battle confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1553
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "title": "review repair: Dungeon floors confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1609
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "title": "review repair: Dungeon floors confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2115
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "title": "review repair: Main menu confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1547
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "title": "review repair: Main menu confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1703
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "title": "review repair: recovery removal stays deleted through repeated authored clock flushes",
+          "file": "run-progression.spec.ts",
+          "line": 484,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1207
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "run statistics: active time excludes recovery, visibility, blur and menu sessions",
+          "file": "run-progression.spec.ts",
+          "line": 19,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2332
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "run statistics: actual background tab pauses active time",
+          "file": "run-progression.spec.ts",
+          "line": 34,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1567
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "run statistics: cancel a held checkpoint and keep reviewed replacement bytes stable",
+          "file": "run-progression.spec.ts",
+          "line": 40,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1854
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "run statistics: Chromium BFCache survives normal navigation",
+          "file": "run-progression.spec.ts",
+          "line": 302,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 3110
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "review repair: Single battle confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2176
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "review repair: Single battle confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2052
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "review repair: Dungeon floors confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2047
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "review repair: Dungeon floors confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2041
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "review repair: Main menu confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2173
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "review repair: Main menu confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2177
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "review repair: recovery removal stays deleted through repeated authored clock flushes",
+          "file": "run-progression.spec.ts",
+          "line": 484,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1839
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "run statistics: active time excludes recovery, visibility, blur and menu sessions",
+          "file": "run-progression.spec.ts",
+          "line": 19,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2780
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "run statistics: actual background tab pauses active time",
+          "file": "run-progression.spec.ts",
+          "line": 34,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1917
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "run statistics: cancel a held checkpoint and keep reviewed replacement bytes stable",
+          "file": "run-progression.spec.ts",
+          "line": 40,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2666
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "run statistics: Chromium BFCache survives normal navigation",
+          "file": "run-progression.spec.ts",
+          "line": 302,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 3351
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "review repair: Single battle confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2229
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "review repair: Single battle confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2384
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "review repair: Dungeon floors confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2193
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "review repair: Dungeon floors confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2227
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "review repair: Main menu confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2111
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "review repair: Main menu confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2298
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "review repair: recovery removal stays deleted through repeated authored clock flushes",
+          "file": "run-progression.spec.ts",
+          "line": 484,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2095
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-270-records-ui\\Tactics-Guru/tmp/review-stack-final-webkit-dungeon.json",
+      "sha256": "b0c248a2faa41cc6652803a08f0c4ce3392704c0f75fca727851983178e9d95e",
+      "stats": {
+        "startTime": "2026-11-12T16:27:28.596Z",
+        "duration": 22157.976000000002,
+        "expected": 9,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "project": "desktop-webkit",
+          "title": "dungeon statistics: confirmed replacement pauses pending enemy turns through history",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 22,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2489
+            }
+          ]
+        },
+        {
+          "project": "desktop-webkit",
+          "title": "dungeon tabs serialize spatial publication and refuse the stale owner",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 127,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1627
+            }
+          ]
+        },
+        {
+          "project": "portrait-webkit",
+          "title": "dungeon statistics: confirmed replacement pauses pending enemy turns through history",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 22,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2295
+            }
+          ]
+        },
+        {
+          "project": "portrait-webkit",
+          "title": "dungeon tabs serialize spatial publication and refuse the stale owner",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 127,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1543
+            }
+          ]
+        },
+        {
+          "project": "landscape-webkit",
+          "title": "dungeon statistics: confirmed replacement pauses pending enemy turns through history",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 22,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2426
+            }
+          ]
+        },
+        {
+          "project": "landscape-webkit",
+          "title": "dungeon tabs serialize spatial publication and refuse the stale owner",
+          "file": "dungeon-lifecycle.spec.ts",
+          "line": 127,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1625
+            }
+          ]
+        },
+        {
+          "project": "desktop-webkit",
+          "title": "dungeon statistics: active exploration excludes recovery, visibility, blur and menu sessions",
+          "file": "dungeon.spec.ts",
+          "line": 25,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1812
+            }
+          ]
+        },
+        {
+          "project": "portrait-webkit",
+          "title": "dungeon statistics: active exploration excludes recovery, visibility, blur and menu sessions",
+          "file": "dungeon.spec.ts",
+          "line": 25,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2175
+            }
+          ]
+        },
+        {
+          "project": "landscape-webkit",
+          "title": "dungeon statistics: active exploration excludes recovery, visibility, blur and menu sessions",
+          "file": "dungeon.spec.ts",
+          "line": 25,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2065
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-270-records-ui\\Tactics-Guru/tmp/review-stack-webkit-complete-run-ui.json",
+      "sha256": "5f8616445143b34a72e783302a3ebdbb3d13c0df472637511bd79f9279f64489",
+      "stats": {
+        "startTime": "2026-11-12T16:35:02.166Z",
+        "duration": 66195.299,
+        "expected": 14,
+        "skipped": 0,
+        "unexpected": 6,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "main menu: five-stat records and retained personal bests stay keyboard and touch accessible",
+          "file": "main-menu.spec.ts",
+          "line": 987,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2615
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "main menu: five-stat records and retained personal bests stay keyboard and touch accessible",
+          "file": "main-menu.spec.ts",
+          "line": 987,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2593
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "run statistics: active time excludes recovery, visibility, blur and menu sessions",
+          "file": "run-progression.spec.ts",
+          "line": 19,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 3412
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "run statistics: cancel a held checkpoint and keep reviewed replacement bytes stable",
+          "file": "run-progression.spec.ts",
+          "line": 40,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 3033
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "review repair: Single battle confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "unexpected",
+          "results": [
+            {
+              "status": "failed",
+              "retry": 0,
+              "duration": 2514,
+              "error": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m3\u001b[39m\nReceived: \u001b[31m4\u001b[39m"
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "review repair: Single battle confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2921
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "review repair: Dungeon floors confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 3123
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "review repair: Dungeon floors confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "unexpected",
+          "results": [
+            {
+              "status": "failed",
+              "retry": 0,
+              "duration": 2563,
+              "error": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m3\u001b[39m\nReceived: \u001b[31m4\u001b[39m"
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "review repair: Main menu confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 3056
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "review repair: Main menu confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 3025
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "review repair: recovery removal stays deleted through repeated authored clock flushes",
+          "file": "run-progression.spec.ts",
+          "line": 484,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 3302
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "run statistics: active time excludes recovery, visibility, blur and menu sessions",
+          "file": "run-progression.spec.ts",
+          "line": 19,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 3726
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "run statistics: cancel a held checkpoint and keep reviewed replacement bytes stable",
+          "file": "run-progression.spec.ts",
+          "line": 40,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 3206
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "review repair: Single battle confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "unexpected",
+          "results": [
+            {
+              "status": "failed",
+              "retry": 0,
+              "duration": 2694,
+              "error": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m3\u001b[39m\nReceived: \u001b[31m4\u001b[39m"
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "review repair: Single battle confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "unexpected",
+          "results": [
+            {
+              "status": "failed",
+              "retry": 0,
+              "duration": 2666,
+              "error": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m3\u001b[39m\nReceived: \u001b[31m4\u001b[39m"
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "review repair: Dungeon floors confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2792
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "review repair: Dungeon floors confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "unexpected",
+          "results": [
+            {
+              "status": "failed",
+              "retry": 0,
+              "duration": 2463,
+              "error": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m3\u001b[39m\nReceived: \u001b[31m4\u001b[39m"
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "review repair: Main menu confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 3024
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "review repair: Main menu confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "unexpected",
+          "results": [
+            {
+              "status": "failed",
+              "retry": 0,
+              "duration": 2553,
+              "error": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m3\u001b[39m\nReceived: \u001b[31m4\u001b[39m"
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "review repair: recovery removal stays deleted through repeated authored clock flushes",
+          "file": "run-progression.spec.ts",
+          "line": 484,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 3260
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-270-records-ui\\Tactics-Guru/tmp/review-stack-settled-webkit-departures.json",
+      "sha256": "a6188bfd3c0ac8cb4fd600050dfae2241ea3b444815c904427e32a274c992d3d",
+      "stats": {
+        "startTime": "2026-11-12T16:37:06.660Z",
+        "duration": 56050.881,
+        "expected": 12,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "review repair: Single battle confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 5084
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "review repair: Single battle confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 3949
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "review repair: Dungeon floors confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 3849
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "review repair: Dungeon floors confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 4764
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "review repair: Main menu confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 4205
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-portrait",
+          "title": "review repair: Main menu confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 4240
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "review repair: Single battle confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 4065
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "review repair: Single battle confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 3624
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "review repair: Dungeon floors confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 4143
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "review repair: Dungeon floors confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 3976
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "review repair: Main menu confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 4441
+            }
+          ]
+        },
+        {
+          "project": "acceptance-webkit-landscape",
+          "title": "review repair: Main menu confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 4113
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-270-records-ui\\Tactics-Guru/tmp/review-stack-settled-chromium-departures.json",
+      "sha256": "752beda67d1505c372734aeed79910180c5632679729125f4ec0a6ab80c1f530",
+      "stats": {
+        "startTime": "2026-11-12T16:38:03.859Z",
+        "duration": 52126.715000000004,
+        "expected": 18,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "cases": [
+        {
+          "project": "desktop",
+          "title": "review repair: Single battle confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 3015
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "title": "review repair: Single battle confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2450
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "title": "review repair: Dungeon floors confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2264
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "title": "review repair: Dungeon floors confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1937
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "title": "review repair: Main menu confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 1827
+            }
+          ]
+        },
+        {
+          "project": "desktop",
+          "title": "review repair: Main menu confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2167
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "review repair: Single battle confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2716
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "review repair: Single battle confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2254
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "review repair: Dungeon floors confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2188
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "review repair: Dungeon floors confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2343
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "review repair: Main menu confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2514
+            }
+          ]
+        },
+        {
+          "project": "mobile-portrait",
+          "title": "review repair: Main menu confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2685
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "review repair: Single battle confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 3287
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "review repair: Single battle confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2600
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "review repair: Dungeon floors confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2501
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "review repair: Dungeon floors confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2427
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "review repair: Main menu confirms unsaved departure after quota",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2395
+            }
+          ]
+        },
+        {
+          "project": "mobile-landscape",
+          "title": "review repair: Main menu confirms unsaved departure after stale",
+          "file": "run-progression.spec.ts",
+          "line": 456,
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "duration": 2445
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "qualifiedBrowserCases": {
+    "chromium": 48,
+    "webkitRunAndUI": 20,
+    "webkitDungeon": 9,
+    "accounting": "Chromium 48 passed; its 18 departure cases were strengthened and passed again after pending presentation settled. Expanded WebKit run/UI attempt had 14 passes and 6 timing-assertion failures. All 12 departure cases passed after moving the equality check to the paused recovery snapshot and comparing the whole exported payload; the other 8 case bodies/inputs are unchanged. This qualifies 20 unique run/UI cases across both orientations, not a claimed clean single 20-case run. WebKit dungeon 9 passed on desktop/portrait/landscape."
+  },
+  "selection": {
+    "before": 288,
+    "after": 302,
+    "added": [
+      "  [acceptance-webkit-portrait] › run-progression.spec.ts:456:1 › review repair: Single battle confirms unsaved departure after quota",
+      "  [acceptance-webkit-portrait] › run-progression.spec.ts:456:1 › review repair: Single battle confirms unsaved departure after stale",
+      "  [acceptance-webkit-portrait] › run-progression.spec.ts:456:1 › review repair: Dungeon floors confirms unsaved departure after quota",
+      "  [acceptance-webkit-portrait] › run-progression.spec.ts:456:1 › review repair: Dungeon floors confirms unsaved departure after stale",
+      "  [acceptance-webkit-portrait] › run-progression.spec.ts:456:1 › review repair: Main menu confirms unsaved departure after quota",
+      "  [acceptance-webkit-portrait] › run-progression.spec.ts:456:1 › review repair: Main menu confirms unsaved departure after stale",
+      "  [acceptance-webkit-portrait] › run-progression.spec.ts:484:1 › review repair: recovery removal stays deleted through repeated authored clock flushes",
+      "  [acceptance-webkit-landscape] › run-progression.spec.ts:456:1 › review repair: Single battle confirms unsaved departure after quota",
+      "  [acceptance-webkit-landscape] › run-progression.spec.ts:456:1 › review repair: Single battle confirms unsaved departure after stale",
+      "  [acceptance-webkit-landscape] › run-progression.spec.ts:456:1 › review repair: Dungeon floors confirms unsaved departure after quota",
+      "  [acceptance-webkit-landscape] › run-progression.spec.ts:456:1 › review repair: Dungeon floors confirms unsaved departure after stale",
+      "  [acceptance-webkit-landscape] › run-progression.spec.ts:456:1 › review repair: Main menu confirms unsaved departure after quota",
+      "  [acceptance-webkit-landscape] › run-progression.spec.ts:456:1 › review repair: Main menu confirms unsaved departure after stale",
+      "  [acceptance-webkit-landscape] › run-progression.spec.ts:484:1 › review repair: recovery removal stays deleted through repeated authored clock flushes"
+    ],
+    "removed": [],
+    "contract": "99 selection/risk-gate tests passed; 14 WebKit cases added, none removed. Default seven core journeys remain unchanged."
+  },
+  "preservedFailures": [
+    {
+      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-270-records-ui\\Tactics-Guru/tmp/review-stack-chromium.json",
+      "sha256": "233ae3dcade055b7c5f9962deea1e566ad07141ea522e620e5dce78b7a82635e",
+      "stats": {
+        "startTime": "2026-11-12T16:12:51.464Z",
+        "duration": 137625.967,
+        "expected": 41,
+        "skipped": 0,
+        "unexpected": 7,
+        "flaky": 0
+      }
+    },
+    {
+      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-270-records-ui\\Tactics-Guru/tmp/review-stack-lifecycle-repaired.json",
+      "sha256": "860971d1d6747192c98899aac86c6beea31d61ce8171c65b5bae8a46db580820",
+      "stats": {
+        "startTime": "2026-11-12T16:18:25.243Z",
+        "duration": 58035.314,
+        "expected": 5,
+        "skipped": 0,
+        "unexpected": 4,
+        "flaky": 0
+      }
+    },
+    {
+      "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-270-records-ui\\Tactics-Guru/tmp/review-stack-lifecycle-drained.json",
+      "sha256": "d9490c0ef7f1ffdbe0e14afe5b072b211bb56bcbe1267b0564d94f04dfd21521",
+      "stats": {
+        "startTime": "2026-11-12T16:21:00.597Z",
+        "duration": 10561.713,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      }
+    }
+  ],
+  "earlierSetupFailure": {
+    "path": "C:\\Users\\apexw\\.codex\\worktrees\\issue-270-records-ui\\Tactics-Guru/verification-receipts/pr/1794499445206-16652/summary.json",
+    "result": "Units/types/builds passed; browser stage was blocked by our already-owned port 4173. Subsequent isolated PR verification passed; the setup failure remains retained."
+  },
+  "negativeProof": {
+    "path": "C:/Users/apexw/.codex/worktrees/issue-270-active-time-history/Tactics-Guru/tmp/review-368-removal-before.log",
+    "result": "Both removed-slot cases fail with the original blanket flush retry and pass with explicit removal state."
+  },
+  "equivalence": {
+    "lastSpecOnlyChange": "tests/run-progression.spec.ts now snapshots the owner after the recovery dialog appears, allows a pending enemy presentation to settle, asserts the original journey identity, and compares the entire exported payload exactly. Both type scopes and 30 changed Chromium/WebKit cases ran after that test repair. Application/build inputs and seven core case bodies match the final successful PR verification.",
+    "historyFollowup": "Final complete PR verification includes the independent ending-history repair (legal defeat with denied active-save lock). Earlier focused timer/review/spatial tests never reach that save-ending branch; their relevant behavior is unchanged.",
+    "parentReuse": "Final stack and this parent have identical app/domain/persistence/menuReturn/dependency/config inputs (git diff is empty for those paths). UI-only records presentation is independently tested on #369.",
+    "routeIsolation": "Existing increment-3 route-isolation artifacts remain available. entry.ts/routes.ts and the storage-admission invariant are unchanged: testing entries pass null storage/history, create no playtime observer, strip statistics, and bypass browser locking in the mutation wrapper. No new key reader/writer exists outside the already-gated owners. Pure isolation units reran in final verification."
+  },
+  "outcome": "All same-tab departures await checkpoints then use the shared unsaved-progress guard. Cancel preserves recovery/export; explicit discard navigates. Removed saves are distinct from pending progress, reviews drain queued/observer-created checkpoints, removal stays paused, and already-flushed disposal avoids new Web Locks so native Chromium BFCache survives. All dungeon checkpoints share #365 locking.",
+  "ablation": "Reuses existing mutation queues, dialog owner, departure confirmation, records store and typed storage primitives. One explicit removal flag distinguishes deleted bytes from pending progress; review barriers solve demonstrated asynchronous handoff failures. No dependency, new storage journal, service or broad redesign.",
+  "limits": [
+    "Browser/device emulation; no physical-hardware claim.",
+    "Native focus/BFCache assertions are Chromium-specific; WebKit retains synthetic visibility/focus plus real navigation/resume.",
+    "Abrupt termination may lose the last bounded playtime checkpoint interval.",
+    "Old clients may reject upgraded saves/history. Preserve raw bytes and recover with a statistics-capable build; reverse old-client readability is not claimed.",
+    "Focused PR qualification, not a clean full-regression claim."
+  ],
+  "git": "One reviewed commit per PR, stacked 365 -> 368 -> 369 on main. Retain high/high/medium risk labels. No release tags or merges. If later squash-merging a parent, carry the dependent branch onto its resulting main commit before merging it."
+}

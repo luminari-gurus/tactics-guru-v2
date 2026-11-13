@@ -1,16 +1,279 @@
 import { generateMap } from '../src/map/generate';
 import { readFileSync } from 'node:fs';
-import { type Page } from '@playwright/test';
-import { test, expect } from './helpers/dungeonEntropy';
+import { type Page, type Response } from '@playwright/test';
+import { test as base, expect } from './helpers/dungeonEntropy';
 import { preparedSnapshot, rewardSnapshot, runContext } from './helpers/runItemFixtures';
 import { encodeRunSave, type RunSnapshot } from '../src/domain/runSaveEnvelope';
+import { encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
+import { freshRunStats } from '../src/domain/runStats';
 import { readFile } from 'node:fs/promises';
 import { menuFixture, terminalMenuBattle, rewardRunFixture } from './helpers/menuFixtures';
 import { BATTLE_STORAGE_KEYS } from '../src/persistence/battleStorage';
 import { RUN_STORAGE_KEYS } from '../src/persistence/runStorage';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
-import { readSession, reviewDraught } from './helpers/battlePolicy';
+import { appendRunRecord, emptyRunRecords, type RunRecord } from '../src/domain/runRecords';
+import { encodeRunRecords, RUN_RECORD_KEYS } from '../src/persistence/runRecordsStorage';
+import { readSession, reviewDraught, playerDecision } from './helpers/battlePolicy';
+import { BattleSession } from '../src/app/BattleSession';
+import { encodeBattleSave } from '../src/domain/saveEnvelope';
+import { standaloneCatalog as battleCatalog } from './helpers/playerPolicy';
+import { startApplicationLoadDiagnostics, type ApplicationLoadDiagnostics } from './helpers/applicationLoadDiagnostics';
+import { startBattleModuleFaultServer } from './helpers/battleModuleFaultServer';
+import { holdFinalRecordsWrite } from './helpers/recordsWriteGate';
+
+const test = base.extend<{ applicationLoadDiagnostics: ApplicationLoadDiagnostics }>({
+ applicationLoadDiagnostics: [async ({page},use,info) => {
+  const diagnostics = await startApplicationLoadDiagnostics(page,info);
+  try { await use(diagnostics); } finally { await diagnostics.finalize(); }
+ }, {auto:true}],
+});
 const keys={battle:BATTLE_STORAGE_KEYS,run:RUN_STORAGE_KEYS,dungeon:DUNGEON_KEYS};
+
+test('main menu: records empty state is read-only and keyboard focus returns to the invoker', async ({ page }) => {
+  await page.goto('./');
+  const invoker = page.getByRole('button', { name: 'Hall of Records', exact: true });
+  await invoker.focus(); await page.keyboard.press('Enter');
+  const dialog = page.getByRole('dialog', { name: 'Hall of Records', exact: true });
+  await expect(dialog.getByRole('status')).toHaveText('No finished journeys recorded yet.');
+  await expect(dialog).toContainText('Records stay on this device and browser');
+  expect(await page.evaluate(slots => [localStorage.getItem(slots.primary), localStorage.getItem(slots.backup)], RUN_RECORD_KEYS)).toEqual([null, null]);
+  await dialog.getByRole('button', { name: 'Close', exact: true }).focus(); await page.keyboard.press('Enter');
+  await expect(invoker).toBeFocused(); await expect(dialog).not.toBeVisible();
+});
+
+test('main menu: records display and reviewed export restore reset preserve active saves', async ({ page, isMobile }, info) => {
+  const rows: RunRecord[] = [
+    { mode: 'run', id: 'authored-example', outcome: 'defeat', recordedAt: Date.UTC(2026, 10, 10, 12), battlesWon: 1, floorsCleared: null, deepestFloor: null },
+    { mode: 'dungeon', id: 'dungeon-example', outcome: 'abandoned', recordedAt: Date.UTC(2026, 10, 10, 13), battlesWon: 6, floorsCleared: 2, deepestFloor: 3 },
+  ];
+  const encoded = encodeRunRecords({ ...emptyRunRecords(), records: rows })!;
+  const saved = menuFixture('run');
+  await page.addInitScript(({ records, encoded, run, saved }) => {
+    if (sessionStorage.getItem('test:records-seeded')) return;
+    localStorage.setItem(records.primary, 'preserved corrupt history'); localStorage.setItem(records.backup, encoded);
+    localStorage.setItem(run.primary, saved); localStorage.setItem(run.backup, saved);
+    sessionStorage.setItem('test:records-seeded', 'yes');
+  }, { records: RUN_RECORD_KEYS, encoded, run: keys.run, saved });
+  await page.goto('./');
+  const activate = async (label: string) => {
+    const target = page.getByRole('button', { name: label, exact: true });
+    if (isMobile) await target.tap(); else await target.click();
+  };
+  await activate('Hall of Records');
+  const dialog = page.getByRole('dialog', { name: 'Hall of Records', exact: true });
+  const list = dialog.getByRole('list', { name: 'Recent journeys' });
+  await expect(dialog.getByRole('status')).toContainText('History needs recovery');
+  await expect(list.getByRole('listitem')).toHaveCount(2);
+  await expect(list.getByRole('listitem').first()).toContainText('Dungeon · Abandoned');
+  const first=list.getByRole('listitem').first();
+  await expect(first.locator('[data-stat=battlesWon] dd')).toHaveText('6');
+  await expect(first.locator('[data-stat=floorsCleared] dd')).toHaveText('2');
+  await expect(first).toContainText('Deepest floor: 3');
+  const stored = () => page.evaluate(({ records, run }) => ({ primary: localStorage.getItem(records.primary), backup: localStorage.getItem(records.backup),
+    runPrimary: localStorage.getItem(run.primary), runBackup: localStorage.getItem(run.backup) }), { records: RUN_RECORD_KEYS, run: keys.run });
+  const before = await stored(); expect(before).toEqual({ primary: 'preserved corrupt history', backup: encoded, runPrimary: saved, runBackup: saved });
+  await page.screenshot({ path: info.outputPath('records-recovery.png'), fullPage: true });
+  expect(await dialog.evaluate(node => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
+  const download = page.waitForEvent('download'); await activate('Export primary history');
+  const exported = await download; expect(exported.suggestedFilename()).toBe('tactics-guru-records-primary.json');
+  expect(await readFile((await exported.path())!, 'utf8')).toBe('preserved corrupt history');
+  expect(await stored()).toEqual(before);
+  await activate('Reset records'); await activate('Cancel'); expect(await stored()).toEqual(before);
+  await activate('Restore reviewed history'); await expect(dialog.getByRole('status')).toContainText('Run history updated');
+  expect(await stored()).toEqual({ primary: encoded, backup: encoded, runPrimary: saved, runBackup: saved });
+  await activate('Reset records'); await activate('Confirm reset records');
+  await expect(dialog.getByRole('status')).toContainText('No finished journeys recorded yet.');
+  const cleared = await stored(); expect(cleared.primary).toBe(encodeRunRecords(emptyRunRecords())); expect(cleared.backup).toBe(cleared.primary);
+  expect(cleared.runPrimary).toBe(saved); expect(cleared.runBackup).toBe(saved);
+  await activate('Close'); await expect(page.getByRole('button', { name: 'Hall of Records', exact: true })).toBeFocused();
+});
+
+test('main menu: records unavailable storage is honest and leaves gameplay navigation usable', async ({ page, isMobile }) => {
+  await page.addInitScript(slots => {
+    const original = Storage.prototype.getItem;
+    Storage.prototype.getItem = function(key) {
+      if (key === slots.primary || key === slots.backup) throw new DOMException('Blocked', 'SecurityError');
+      return original.call(this, key);
+    };
+  }, RUN_RECORD_KEYS);
+  await page.goto('./');
+  const invoker = page.getByRole('button', { name: 'Hall of Records', exact: true });
+  if (isMobile) await invoker.tap(); else await invoker.click();
+  const dialog = page.getByRole('dialog', { name: 'Hall of Records', exact: true });
+  await expect(dialog.getByRole('status')).toHaveText('Run history storage is unavailable. You can still play.');
+  await expect(dialog.getByRole('button', { name: 'Reset records', exact: true })).toHaveCount(0);
+  if (isMobile) await dialog.getByRole('button', { name: 'Close', exact: true }).tap(); else await dialog.getByRole('button', { name: 'Close', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'New Game', exact: true })).toBeEnabled();
+  const newGame=async()=>{const target=page.getByRole('button',{name:'New Game',exact:true});if(isMobile)await target.tap();else await target.click();};
+  await newGame();await expect(page.locator('#dungeon-map')).toBeVisible();
+  const previous=JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!).id;
+  await page.getByRole('link',{name:'Main menu',exact:true}).last().click();await newGame();
+  const confirm=page.getByRole('dialog').getByRole('button',{name:'Start new dungeon',exact:true});
+  if(isMobile)await confirm.tap();else await confirm.click();
+  await expect(page.locator('#dungeon-map')).toBeVisible();
+  const current=JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);
+  expect(current.id).not.toBe(previous);
+  expect(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!).payload.id,DUNGEON_KEYS.primary)).toBe(current.id);
+  await expect(page.locator('#dungeon-screen')).toContainText('Run history could not be confirmed');
+});
+
+test('main menu: records authored replacement waits for confirmation and freezes the old journey', async ({ page, isMobile }) => {
+  const saved = preparedSnapshot(), text = encodeRunSave(saved, runContext); if (!text.ok) throw Error('Invalid run fixture');
+  const battle = menuFixture('battle');
+  await page.addInitScript(({ run, battleKeys, text, battle }) => {
+    if (sessionStorage.getItem('test:replacement-seeded')) return;
+    localStorage.setItem(run.primary, text); localStorage.setItem(run.backup, text);
+    localStorage.setItem(battleKeys.primary, battle); sessionStorage.setItem('test:replacement-seeded', 'yes');
+  }, { run: keys.run, battleKeys: keys.battle, text: text.text, battle });
+  await page.goto('./?game=run'); await page.locator('#run-continue').click(); await page.locator('#run-start-encounter').click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  await expect(page.locator('#battle-persistence')).toContainText('Run saved on this device');
+  const history = () => page.evaluate(slots => {
+    const value = localStorage.getItem(slots.primary); return value ? JSON.parse(value).records : [];
+  }, RUN_RECORD_KEYS);
+  const activate = async (selector: string) => { const target = page.locator(selector); if (isMobile) await target.tap(); else await target.click(); };
+  await activate('#fit-restart');
+  // Active time flushes before review; cancellation preserves those reviewed bytes.
+  await expect(page.getByRole('heading',{name:'Start new run?',exact:true})).toBeVisible();
+  const before = await page.evaluate(slots => [localStorage.getItem(slots.primary), localStorage.getItem(slots.backup)], keys.run);
+  await activate('#run-cancel-new'); expect(await history()).toEqual([]);
+  expect(await page.evaluate(slots => [localStorage.getItem(slots.primary), localStorage.getItem(slots.backup)], keys.run)).toEqual(before);
+  await activate('#fit-restart'); await activate('#run-confirm-new');
+  await expect(page.locator('#run-start-encounter')).toBeVisible();
+  expect(await history()).toMatchObject([{ id: saved.items.run.id, outcome: 'abandoned', battlesWon: 1 }]);
+  const recorded = await history();
+  await page.reload(); await page.locator('#run-continue').click(); expect(await history()).toEqual(recorded);
+  expect(await page.evaluate(key => localStorage.getItem(key), keys.battle.primary)).toBe(battle);
+  await page.getByRole('link', { name: 'Main menu', exact: true }).last().click();
+  await page.getByRole('button', { name: 'Hall of Records', exact: true }).click();
+  await expect(page.getByRole('dialog').getByRole('listitem')).toHaveCount(1);
+  await expect(page.getByRole('dialog')).toContainText('Three-encounter run · Abandoned');
+});
+
+for (const phase of ['preparation', 'terminal'] as const) test(`main menu: records replacement guards encounter entry while final history waits from ${phase}`, async ({ page }) => {
+  const prepared = preparedSnapshot(), saved: RunSnapshot = phase === 'preparation' ? prepared : {
+    ...prepared, items: { ...prepared.items, run: { ...prepared.items.run, phase: 'defeat', pendingReward: null,
+      revision: prepared.items.run.revision + 1, party: prepared.items.run.party.map(hero => ({ ...hero, hp: 0 })) } },
+  };
+  const encoded = encodeRunSave(saved, runContext); if (!encoded.ok) throw Error('Invalid replacement fixture');
+  await page.goto('./?game=run');
+  await page.evaluate(({ key, text }) => localStorage.setItem(key, text), { key: keys.run.primary, text: encoded.text });
+  await page.reload(); await page.locator('#run-continue').click();
+  // Finish the explicit Continue's history mutation before arming the two replacement writes.
+  await page.evaluate(key => navigator.locks.request(key, () => {}), RUN_RECORD_KEYS.primary);
+  const releaseHistory = await holdFinalRecordsWrite(page);
+  if (phase === 'terminal') await page.locator('#run-new').click();
+  else {
+    await page.locator('#fit-restart').dispatchEvent('click');
+    await page.locator('#run-confirm-new').click();
+  }
+  await expect(page.locator('html')).toHaveAttribute('data-records-held', 'yes');
+  const enter = page.locator('#run-start-encounter'); await expect(enter).toBeDisabled();
+  await enter.dispatchEvent('click');
+  expect(JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!).activeBattle).toBeNull();
+  await releaseHistory();
+  await expect(enter).toBeEnabled(); await enter.click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  await expect(page.locator('#battle-actor')).toBeVisible();
+});
+
+test('main menu: records dungeon replacement withholds exploration until final history finishes', async ({ page }) => {
+  await page.goto('./'); await page.getByRole('button', { name: 'New Game', exact: true }).click();
+  await expect(page.locator('#dungeon-map')).toBeVisible();
+  const map = await page.locator('#dungeon-map').elementHandle(); if (!map) throw Error('Missing exploration map');
+  await page.evaluate(key => navigator.locks.request(key, () => {}), RUN_RECORD_KEYS.primary);
+  const releaseHistory = await holdFinalRecordsWrite(page);
+  await page.getByRole('button', { name: 'Start new dungeon', exact: true }).click();
+  await page.locator('#dungeon-confirm-new').click();
+  await expect(page.locator('html')).toHaveAttribute('data-records-held', 'yes');
+  const before = await page.locator('#game').getAttribute('data-dungeon-snapshot');
+  // A queued event from the detached old map must not move the newly installed journey.
+  await map.evaluate(node => { for (const key of ['ArrowUp', 'ArrowRight', 'ArrowDown', 'ArrowLeft']) {
+    node.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+  } });
+  expect(await page.locator('#game').getAttribute('data-dungeon-snapshot')).toBe(before);
+  await expect(page.getByRole('heading', { name: 'Starting new dungeon', exact: true })).toBeVisible();
+  await expect(page.locator('#dungeon-map')).not.toBeVisible();
+  await releaseHistory();
+  await expect(page.locator('#dungeon-map')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Starting new dungeon', exact: true })).toHaveCount(0);
+  await expect(page.locator('.dungeon-directions button:enabled').first()).toBeEnabled();
+  await page.locator('.dungeon-directions button:enabled').first().click();
+  expect(await page.locator('#game').getAttribute('data-dungeon-snapshot')).not.toBe(before);
+});
+
+for (const mode of ['run', 'dungeon'] as const) for (const completion of ['finished', 'interrupted'] as const)
+test(`main menu: records replacing distinct saved and unsaved ${mode} preserves both after ${completion} history`, async ({ page, isMobile }, info) => {
+  const slots = keys[mode], savedPayload = {...JSON.parse(menuFixture(mode)).payload,
+    stats:{...freshRunStats(),enemiesKilled:mode==='run'?3:0,movesTaken:mode==='run'?7:6,activeMs:5000}};
+  const encoded=mode==='run'?encodeRunSave(savedPayload,runContext):encodeDungeon(savedPayload);
+  if(!encoded.ok)throw Error('Invalid paired statistics fixture');const saved=encoded.text;
+  const savedId = mode === 'run' ? savedPayload.items.run.id : savedPayload.id, battle = menuFixture('battle');
+  await page.goto('./');
+  await page.evaluate(({ slots, saved, battleKeys, battle }) => {
+    localStorage.setItem(slots.primary, saved); localStorage.setItem(slots.backup, saved);
+    localStorage.setItem(battleKeys.primary, battle);
+  }, { slots, saved, battleKeys: keys.battle, battle });
+  await page.addInitScript(({ slots, mode }) => {
+    const get = Storage.prototype.getItem, flag = 'test:paired-storage-ready';
+    let ready = mode === 'dungeon' || sessionStorage.getItem(flag) === 'yes';
+    (window as any).restorePairedStorage = () => { ready = true; sessionStorage.setItem(flag, 'yes'); };
+    Storage.prototype.getItem = function(key) {
+      if (!ready && (key === slots.primary || key === slots.backup)) throw new DOMException('Denied', 'SecurityError');
+      return get.call(this, key);
+    };
+  }, { slots, mode });
+  await page.goto(`./?game=${mode}`);
+  const activate = async (target: ReturnType<Page['locator']>) => { if (isMobile) await target.tap(); else await target.click(); };
+  await activate(page.getByRole('button', { name: `Play unsaved ${mode}`, exact: true }));
+  if (mode === 'run') {
+    await activate(page.locator('#run-start-encounter')); await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  } else await expect(page.locator('#dungeon-map')).toBeVisible();
+  const snapshot = () => page.locator('#game').getAttribute(mode === 'run' ? 'data-run-snapshot' : 'data-dungeon-snapshot');
+  const live = JSON.parse((await snapshot())!), liveId = mode === 'run' ? live.items.run.id : live.id;
+  expect(liveId).not.toBe(savedId); await page.evaluate(() => (window as any).restorePairedStorage());
+  const history = () => page.evaluate(key => JSON.parse(localStorage.getItem(key) ?? '{"records":[]}'), RUN_RECORD_KEYS.primary);
+  const activeSlots = () => page.evaluate(slots => [localStorage.getItem(slots.primary), localStorage.getItem(slots.backup)], slots);
+  const before = await activeSlots(); expect(before).toEqual([saved, saved]);
+  const request = () => activate(mode === 'run' ? page.locator('#fit-restart') : page.getByRole('button', { name: 'Start new dungeon', exact: true }));
+  await request(); await activate(page.locator(mode === 'run' ? '#run-cancel-new' : '#dungeon-cancel-new'));
+  expect((await history()).records).toEqual([]); expect(await activeSlots()).toEqual(before);
+  const releaseHistory = await holdFinalRecordsWrite(page);
+  await request(); await activate(page.locator(mode === 'run' ? '#run-confirm-new' : '#dungeon-confirm-new'));
+  await expect(page.locator('html')).toHaveAttribute('data-records-held', 'yes');
+  const pending = (await history()).receipts[mode];
+  expect(pending).toMatchObject({ kind: 'pending', record: { id: savedId }, other: { id: liveId } });
+  const {boundary:_,...savedStats}=savedPayload.stats;
+  expect(pending.record.stats).toEqual(savedStats);
+  expect(pending.other.stats).toMatchObject({coverage:'whole-run',enemiesKilled:live.stats.enemiesKilled,movesTaken:live.stats.movesTaken});
+  expect(pending.other.stats.activeMs).toBeGreaterThanOrEqual(live.stats.activeMs);
+  expect((await history()).records).toEqual([]);
+  const nextPayload = JSON.parse((await activeSlots())[0]!).payload;
+  const nextId = mode === 'run' ? nextPayload.items.run.id : nextPayload.id;
+  expect([savedId, liveId]).not.toContain(nextId);
+  const continueCurrent = async () => {
+    await activate(page.getByRole('button', { name: `Continue saved ${mode}`, exact: true }));
+    await expect(page.locator(mode === 'run' ? '#run-start-encounter' : '#dungeon-map')).toBeVisible();
+  };
+  if (completion === 'interrupted') {
+    await page.reload(); expect((await history()).records).toEqual([]); await continueCurrent();
+  } else {
+    await releaseHistory(); await expect(page.locator(mode === 'run' ? '#run-start-encounter' : '#dungeon-map')).toBeVisible();
+  }
+  await expect.poll(async () => (await history()).records).toHaveLength(2);
+  const recorded = (await history()).records;
+  expect(recorded.map((row: RunRecord) => row.id).sort()).toEqual([savedId, liveId].sort());
+  expect(recorded.every((row: RunRecord) => row.mode === mode && row.outcome === 'abandoned')).toBe(true);
+  expect(recorded.find((row:RunRecord)=>row.id===savedId).stats).toEqual(savedStats);
+  expect(recorded.find((row:RunRecord)=>row.id===liveId).stats).toEqual(pending.other.stats);
+  expect((await history()).bests[mode].movesTaken.id).toBe(savedId);
+  await page.reload(); await continueCurrent(); expect((await history()).records).toEqual(recorded);
+  expect(await page.evaluate(key => localStorage.getItem(key), keys.battle.primary)).toBe(battle);
+  await page.getByRole('link', { name: 'Main menu', exact: true }).last().click();
+  await activate(page.getByRole('button', { name: 'Hall of Records', exact: true }));
+  await expect(page.getByRole('dialog').getByRole('listitem')).toHaveCount(2);
+  await page.screenshot({ path: info.outputPath('paired-records.png'), fullPage: true });
+});
 
 test('main menu: startup hides proof tools before application modules run',async({page})=>{
  let release!:()=>void;
@@ -53,6 +316,84 @@ test('main menu: failed gameplay imports retain visible recovery without proof t
   await expect(page.getByRole('complementary',{name:'Proof scene diagnostics'})).toHaveCount(0);
  }
  expect(errors).toEqual([]);
+});
+
+test('main menu: application import failure preserves battle saves and reload resumes without historical effects',async({page,browserName,applicationLoadDiagnostics},info)=>{
+ test.skip(process.env.PLAYWRIGHT_SERVER_MODE==='dev','Requires emitted production chunks and the build manifest.');
+ // Reach a real accepted High Shot boundary, retaining different valid primary
+ // and backup bytes so a reload cannot silently replace either saved slot.
+ const session=new BattleSession(battleCatalog,'map:forest_ruins',2);
+ let saved:{primary:string;backup:string;state:typeof session.state}|undefined;
+ try {
+  for(let i=0;i<200 && session.state.outcome==='ongoing';i++){
+   const command=session.phase==='player'?playerDecision(session.state):null;
+   if(command && !session.prepare(command).ok)throw Error('Recovery fixture policy rejected');
+   const step=command?session.confirm():session.nextEnemy();
+   if(!step)throw Error('Recovery fixture did not advance');
+   session.finishPresentation(step.token);
+   if(command?.type==='useAbility' && command.abilityId==='ability:high_shot'){
+    const primary=encodeBattleSave(step.after,battleCatalog),backup=encodeBattleSave(step.before,battleCatalog);
+    if(!primary.ok || !backup.ok)throw Error('Recovery fixture could not be encoded');
+    saved={primary:primary.text,backup:backup.text,state:step.after};break;
+   }
+  }
+ } finally { session.dispose(); }
+ if(!saved)throw Error('No legal saved High Shot boundary');
+ expect(saved.primary).not.toBe(saved.backup);
+ const bytes={primary:saved.primary,backup:saved.backup};
+ const stored=()=>page.evaluate(slots=>({primary:localStorage.getItem(slots.primary),backup:localStorage.getItem(slots.backup)}),keys.battle);
+ await page.addInitScript(({slots,bytes})=>{
+  if(!sessionStorage.getItem('test:application-load-seeded')){
+   localStorage.setItem(slots.primary,bytes.primary);localStorage.setItem(slots.backup,bytes.backup);
+   sessionStorage.setItem('test:application-load-seeded','yes');
+  }
+ },{slots:keys.battle,bytes});
+ const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+ await page.clock.install();
+ const faultServer=await startBattleModuleFaultServer();
+ let failedResponses=0,recoveryVerified=false;
+ const observeEntryResponse=(response:Response)=>{if(faultServer.isModuleURL(response.url()) && response.status()===503)failedResponses++;};
+ page.on('response',observeEntryResponse);
+ // The first document receives a real server HTTP 503 with the legal save seeded.
+ // The origin stays fixed; recovery serves the unchanged build through Vite.
+ try {
+  await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
+  await page.goto(faultServer.battleURL);
+  await expect.poll(()=>faultServer.receipt().blocked).toBeGreaterThan(0);
+  await expect.poll(()=>failedResponses).toBeGreaterThan(0);
+  await expect(page.getByRole('alert')).toHaveText('Error: Could not load the application. Reload the page to retry.');
+  await expect(page.getByRole('alert')).toBeVisible();await expect(page.locator('#save-continue')).toHaveCount(0);
+  expect(await stored()).toEqual(bytes);
+  await expect.poll(()=>applicationLoadDiagnostics.failures().length).toBe(1);
+  const [failure]=applicationLoadDiagnostics.failures();
+  expect(failure).toMatchObject({route:'battle',name:'TypeError',category:'module-fetch'});
+  // Chromium includes the failed module URL in the caught error. Check that
+  // both the browser and host allowlists retain the real emitted filename.
+  if(browserName==='chromium'){
+   expect(failure.frames).toEqual(expect.arrayContaining([{file:faultServer.receipt().assets[0].file}]));
+  }
+  // The error path stays inert. Recovery remains the user's explicit reload and
+  // Continue, with the paused-clock interaction from the original failing test.
+  const allowedBeforeRecovery=faultServer.receipt().allowed;faultServer.allowImport();
+  await page.reload();await page.clock.resume();await expect(page.locator('#save-continue')).toBeVisible();
+  expect(faultServer.receipt().allowed).toBeGreaterThan(allowedBeforeRecovery);
+  await expect.poll(()=>faultServer.receipt().assets.reduce((sum,asset)=>sum+asset.responses['200']+asset.responses['304'],0)).toBeGreaterThan(0);
+  expect(await stored()).toEqual(bytes);await page.locator('#save-continue').click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const resumed=await readSession(page);
+  expect(resumed.state).toEqual(saved.state);expect(resumed.events).toEqual([]);
+  expect(resumed.continuation).toEqual({snapshot:saved.state,commands:[],events:[]});expect(resumed.pending).toBeNull();
+  expect(JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).effect).toBeNull();
+  expect(await stored()).toEqual(bytes);expect(errors).toEqual([]);
+  await expect(page.locator('link[rel="modulepreload"][href*="/assets/startBattleApp-"]')).toHaveCount(0);
+  recoveryVerified=true;
+ } finally {
+  page.off('response',observeEntryResponse);
+  try {
+   await info.attach('application-load-recovery',{body:JSON.stringify({...faultServer.receipt(),recoveryVerified,
+    injectedResponse:{status:503,cacheControl:'no-store',observed:failedResponses},failures:applicationLoadDiagnostics.failures()},null,2),contentType:'application/json'});
+  } finally { await faultServer.close(); }
+ }
 });
 
 for(const mode of ['run','dungeon'] as const)test(`main menu: post-mount ${mode} failure remains visible and preserves saves`,async({page},info)=>{
@@ -116,7 +457,7 @@ test('main menu: read-only root, separate artwork and isolated loading',async({p
  await expect(page.getByRole('link',{name:'Three-encounter run',exact:true})).toHaveAttribute('href',/\?game=run$/);
  await expect(page.getByRole('link',{name:'Map inspection',exact:true})).toHaveAttribute('href',/\/map$/);
  expect(requests.some(url=>/\/start-[^/]+\.js|\.mp3|\.ogg|\/battle\/audio/.test(url))).toBe(false);
- await page.getByRole('button',{name:'Hall of Records'}).click();await expect(page.getByRole('dialog')).toContainText('Records are not collected yet');
+ await page.getByRole('button',{name:'Hall of Records'}).click();await expect(page.getByRole('dialog')).toContainText('No finished journeys recorded yet');
  await page.keyboard.press('Escape');await expect(page.getByRole('button',{name:'Hall of Records'})).toBeFocused();
  await page.getByRole('button',{name:'Settings',exact:true}).click();await expect(page.getByRole('dialog')).toContainText('Sound controls');
  await expect(page.getByRole('dialog')).toContainText('Combat controls');
@@ -165,9 +506,37 @@ test('main menu: New Game confirms over the menu and preserves other save famili
  await expect(page.locator('#main-menu')).toBeVisible();await expect(page.getByRole('dialog')).toContainText('Start new dungeon?');
  await page.getByRole('button',{name:'Close',exact:true}).click();await expect(page.getByRole('button',{name:'New Game',exact:true})).toBeFocused();
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.dungeon.primary)).toBe(text);
+ expect(await page.evaluate(key=>localStorage.getItem(key),RUN_RECORD_KEYS.primary)).toBeNull();
  await page.getByRole('button',{name:'New Game',exact:true}).click();await page.getByRole('dialog').getByRole('button',{name:'Start new dungeon',exact:true}).click();
  await expect(page.locator('#dungeon-screen')).toContainText('Floor 1');await expect(page.locator('dialog')).not.toBeVisible();
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.battle.primary)).toBe('battle sentinel');
+ await expect.poll(()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)??'{"records":[]}').records,RUN_RECORD_KEYS.primary))
+  .toMatchObject([{id:JSON.parse(text).payload.id,mode:'dungeon',outcome:'abandoned'}]);
+});
+
+test('main menu: records concurrent confirmed dungeon replacements retain one immutable old result',async({page,context,isMobile})=>{
+ const saved=menuFixture('dungeon'),id=JSON.parse(saved).payload.id;
+ await page.goto('./');await page.evaluate(({keys,saved})=>{
+  localStorage.setItem(keys.primary,saved);localStorage.setItem(keys.backup,saved);
+ },{keys:DUNGEON_KEYS,saved});
+ const other=await context.newPage(),errors:string[]=[];
+ for(const tab of [page,other])tab.on('pageerror',error=>errors.push(error.message));
+ const activate=async(tab:Page,label:string)=>{const target=tab.getByRole('button',{name:label,exact:true});if(isMobile)await target.tap();else await target.click();};
+ try{
+  await Promise.all([page.reload(),other.goto('./')]);
+  await Promise.all([activate(page,'New Game'),activate(other,'New Game')]);
+  for(const tab of [page,other])await expect(tab.getByRole('dialog')).toContainText('Start new dungeon?');
+  await Promise.all([page.waitForURL(/\?game=dungeon/,{waitUntil:'domcontentloaded'}),other.waitForURL(/\?game=dungeon/,{waitUntil:'domcontentloaded'}),
+    activate(page,'Start new dungeon'),activate(other,'Start new dungeon')]);
+  for(const tab of [page,other])await expect(tab.locator('#dungeon-screen')).toHaveAttribute('data-boot','ready');
+  const history=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)??'{"records":[]}').records,RUN_RECORD_KEYS.primary);
+  await expect.poll(history).toMatchObject([{id,mode:'dungeon',outcome:'abandoned'}]);
+  const currentId=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)??'{"payload":{}}').payload.id,DUNGEON_KEYS.primary);
+  await expect.poll(currentId).toMatch(/^[A-Za-z0-9-]{1,64}$/);expect(await currentId()).not.toBe(id);
+  await page.goto('./');await activate(page,'Hall of Records');
+  await expect(page.getByRole('dialog').getByRole('listitem')).toHaveCount(1);
+  expect(await history()).toHaveLength(1);expect(errors).toEqual([]);
+ }finally{await other.close();}
 });
 test('main menu: New Game starts immediately when no dungeon save exists',async({page})=>{
  await page.addInitScript(({keys})=>{localStorage.setItem(keys.battle.primary,'battle sentinel');localStorage.setItem(keys.run.primary,'run sentinel');},{keys});
@@ -588,4 +957,92 @@ for (const route of ['nonexistent', '?game=zzz', '?game=run&game=battle']) test(
  await expect(page).toHaveURL(new URL('./', test.info().project.use.baseURL!).href);
  await expect(page.locator('[data-menu-action]')).toHaveCount(4);
  await expect(page.locator('canvas')).toHaveCount(0);
+});
+
+for(const mode of ['run','dungeon'] as const)test(`main menu: counter-only ${mode} upgrades known counters without inventing complete playtime`,async({page})=>{
+  const raw=readFileSync(`tests/fixtures/saves/issue-270/counter-${mode}-v1.json`,'utf8'),old=JSON.parse(raw).payload,slots=keys[mode],oldId=mode==='run'?old.items.run.id:old.id;
+  await page.addInitScript(({slots,raw,mode})=>{const flag=`test:counter-upgrade:${mode}`;if(sessionStorage.getItem(flag))return;localStorage.setItem(slots.primary,raw);localStorage.setItem(slots.backup,raw);sessionStorage.setItem(flag,'yes');},{slots,raw,mode});
+  await page.goto(`./?game=${mode}`);await page.getByRole('button',{name:`Continue saved ${mode}`,exact:true}).click();
+  const attribute=mode==='run'?'data-run-snapshot':'data-dungeon-snapshot';
+  const snapshot=()=>page.locator('#game').getAttribute(attribute).then(text=>JSON.parse(text!));
+  await expect.poll(async()=>(await snapshot()).stats?.version).toBe(2);
+  expect((await snapshot()).stats).toMatchObject({coverage:'whole-run',timeCoverage:'since-upgrade',enemiesKilled:old.stats.enemiesKilled,movesTaken:old.stats.movesTaken});
+  expect(await page.evaluate(slots=>[localStorage.getItem(slots.primary),localStorage.getItem(slots.backup)],slots)).toEqual([raw,raw]);
+  if(mode==='run'){
+    const current=await snapshot(),offer=current.items.offer,choice=offer.options[0];
+    await page.getByRole('button',{name:`Claim ${runContext.items[choice.itemId as keyof typeof runContext.items].label}`,exact:true}).click();await page.locator('#item-confirm').click();
+    await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    await page.locator('#fit-restart').click();await page.locator('#run-confirm-new').click();
+    await expect(page.locator('#run-start-encounter')).toBeVisible();
+  }else{
+    await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();await expect(page.locator('#dungeon-map')).toBeVisible();
+  }
+  await expect.poll(async()=>mode==='run'?(await snapshot()).items.run.id:(await snapshot()).id).not.toBe(oldId);
+  await expect.poll(()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)??'{"records":[]}').records,RUN_RECORD_KEYS.primary)).toMatchObject([{id:oldId,stats:{version:2,coverage:'whole-run',timeCoverage:'since-upgrade',enemiesKilled:old.stats.enemiesKilled,movesTaken:old.stats.movesTaken}}]);
+  const history=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!),RUN_RECORD_KEYS.primary);
+  expect(history.bests[mode].enemiesKilled.id).toBe(oldId);expect(history.bests[mode].movesTaken.id).toBe(oldId);expect(history.bests[mode].activeMs).toBeUndefined();
+  const next=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!),slots.primary);expect(next.format).toBe(mode==='run'?11:13);expect(next.payload.stats).toMatchObject({version:2,coverage:'whole-run',timeCoverage:'whole-run'});
+});
+
+test('main menu: five-stat records and retained personal bests stay keyboard and touch accessible', async ({page,isMobile,context},info)=>{
+  const at=Date.UTC(2026,10,11,12),oldId='old-best-'+ 'a'.repeat(55);
+  const old:RunRecord={mode:'run',id:oldId,outcome:'victory',recordedAt:at-86400000,battlesWon:3,floorsCleared:null,deepestFloor:null,
+    stats:{version:2,coverage:'whole-run',timeCoverage:'whole-run',enemiesKilled:900,movesTaken:800,activeMs:3661000}};
+  let history=appendRunRecord(emptyRunRecords(),old);
+  for(let i=0;i<101;i++)history=appendRunRecord(history,{...old,id:`recent-${i}`,outcome:'abandoned',recordedAt:at+i*1000,battlesWon:1,
+    stats:{version:2,coverage:'whole-run',timeCoverage:'whole-run',enemiesKilled:i,movesTaken:i,activeMs:i*1000}});
+  history=appendRunRecord(history,{mode:'dungeon',id:'dungeon-example',outcome:'abandoned',recordedAt:at+200000,battlesWon:6,floorsCleared:2,deepestFloor:3,
+    stats:{version:2,coverage:'whole-run',timeCoverage:'whole-run',enemiesKilled:55,movesTaken:80,activeMs:95000}});
+  history=appendRunRecord(history,{...old,id:'time-partial-example',outcome:'abandoned',battlesWon:1,recordedAt:at+250000,
+    stats:{version:2,coverage:'whole-run',timeCoverage:'since-upgrade',enemiesKilled:5,movesTaken:6,activeMs:99999999}});
+  history=appendRunRecord(history,{mode:'run',id:'legacy-example',outcome:'defeat',recordedAt:at+300000,battlesWon:1,floorsCleared:null,deepestFloor:null});
+  history=appendRunRecord(history,{...old,id:'partial-example',outcome:'abandoned',battlesWon:1,recordedAt:at+400000,
+    stats:{version:2,coverage:'since-upgrade',timeCoverage:'since-upgrade',enemiesKilled:99999,movesTaken:99999,activeMs:99999999}});
+  const encoded=encodeRunRecords({...history,legacyBestCoverage:true});if(!encoded)throw Error('Invalid stats fixture');
+  await page.addInitScript(({key,encoded})=>localStorage.setItem(key,encoded),{key:RUN_RECORD_KEYS.primary,encoded});
+  await page.goto('./');const invoker=page.getByRole('button',{name:'Hall of Records',exact:true});
+  if(!isMobile)await invoker.focus();if(isMobile)await invoker.tap();else await page.keyboard.press('Enter');
+  const dialog=page.getByRole('dialog'),recent=dialog.getByRole('list',{name:'Recent journeys'});
+  await expect(recent.getByRole('listitem')).toHaveCount(100);await expect(recent).not.toContainText(oldId);
+  const partial=recent.getByRole('listitem').first();await expect(partial).toContainText('tracked since upgrade');
+  await expect(partial.locator('[data-stat]')).toHaveCount(5);
+  await expect(partial.locator('[data-stat=floorsCleared] dd')).toHaveText('N/A — authored run');
+  const legacy=recent.getByRole('listitem').nth(1);await expect(legacy).toContainText('Older record');
+  await expect(legacy.locator('[data-stat=enemiesKilled] dd')).toHaveText('Unavailable');
+  await expect(legacy.locator('[data-stat=movesTaken] dd')).toHaveText('Unavailable');
+  await expect(legacy.locator('[data-stat=activeMs] dd')).toHaveText('Unavailable');
+  const timePartial=recent.getByRole('listitem').nth(2);await expect(timePartial).toContainText('Active playtime is tracked since upgrade.');
+  await expect(timePartial).not.toContainText('Kills and moves are tracked');await expect(timePartial.locator('[data-stat=enemiesKilled] dd')).toHaveText('5');
+  await expect(dialog).toContainText('Historical best coverage is limited');
+  await page.screenshot({path:info.outputPath('records-recent.png'),fullPage:true});
+  const bests=dialog.locator('.run-personal-bests > summary');
+  if(isMobile)await bests.tap();else{await dialog.getByRole('button',{name:'Close',exact:true}).focus();await page.keyboard.press('Tab');await expect(bests).toBeFocused();await page.keyboard.press('Enter');}
+  await expect(dialog.getByRole('heading',{name:'Three-encounter run',exact:true,level:3})).toBeVisible();
+  const winner=dialog.locator('[data-best=run-enemiesKilled]');await expect(winner.locator('summary')).toHaveText('Most enemies killed: 900');
+  if(isMobile)await winner.locator('summary').tap();else{await page.keyboard.press('Tab');await expect(winner.locator('summary')).toBeFocused();await page.keyboard.press('Enter');}
+  // A real storage event must preserve both disclosure state and the keyboard position.
+   const other=await context.newPage();await other.goto('./');
+   await other.evaluate(({key,text})=>localStorage.setItem(key,' '+text),{key:RUN_RECORD_KEYS.primary,text:encoded});
+   await expect.poll(()=>page.evaluate(key=>localStorage.getItem(key),RUN_RECORD_KEYS.primary)).toBe(' '+encoded);
+   await expect(dialog.locator('.run-personal-bests')).toHaveAttribute('open','');
+   await expect(winner).toHaveAttribute('open','');
+   if(!isMobile)await expect(winner.locator('summary')).toBeFocused();
+   await other.close();
+   await expect(winner).toContainText(oldId);await expect(winner.locator('[data-stat]')).toHaveCount(5);
+  await expect(winner.getByRole('heading',{name:'Three-encounter run · Victory',level:4})).toBeVisible();
+  await expect(winner.locator('[data-stat=activeMs] dd')).toHaveText('1h 1m 1s');
+  await expect(dialog.locator('[data-best=run-activeMs] > summary')).toHaveText('Longest active playtime: 1h 1m 1s');
+  const bounds=await dialog.evaluate(node=>({width:node.clientWidth,scroll:node.scrollWidth}));expect(bounds.scroll).toBeLessThanOrEqual(bounds.width+1);
+  await winner.locator('[data-stat=activeMs]').scrollIntoViewIfNeeded();
+  await expect(winner.locator('[data-stat=activeMs] dd')).toBeInViewport();
+  await page.screenshot({path:info.outputPath('records-retained-best.png'),fullPage:true});
+  expect(await page.evaluate(key=>localStorage.getItem(key),RUN_RECORD_KEYS.primary)).toBe(' '+encoded);
+  if(isMobile)await dialog.getByRole('button',{name:'Close',exact:true}).tap();else await page.keyboard.press('Escape');
+  if(!isMobile)await expect(invoker).toBeFocused();else await expect(invoker).toBeVisible();
+  if(isMobile)await invoker.tap();else await invoker.click();
+  await dialog.getByRole('button',{name:'Reset records',exact:true}).click();
+  await dialog.getByRole('button',{name:'Confirm reset records',exact:true}).click();
+  await expect(dialog.locator('.run-personal-bests')).toHaveCount(0);await expect(dialog.getByRole('status')).toContainText('No finished journeys recorded yet.');
+  const cleared=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!),RUN_RECORD_KEYS.primary);
+  expect(cleared.records).toEqual([]);expect(cleared.bests).toEqual({run:{},dungeon:{}});
 });

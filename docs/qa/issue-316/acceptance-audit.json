@@ -1,0 +1,73 @@
+{
+  "issue": 316,
+  "codeSource": "debe0effe319e859ef79b66334a5e181bf7d0991",
+  "acceptedBrowserCases": 36,
+  "compositeEvidence": [
+    {
+      "run": 42675462523,
+      "source": "bcc523cc2dc0d9f1e8660be880ac156964ddd90e",
+      "cases": 30,
+      "scope": "unchanged focused production and picker checks"
+    },
+    {
+      "run": 42687875604,
+      "source": "debe0effe319e859ef79b66334a5e181bf7d0991",
+      "cases": 6,
+      "scope": "requalified complete legal progression, all six profiles"
+    }
+  ],
+  "requirements": [
+    {
+      "gate": "Independent focused ability/replay/resume checks",
+      "proof": "24 production checks (12 per engine), including the two staged ability cases, plus 6 existing picker checks; source/runtime/input equivalence in evidence-reuse.json",
+      "status": "proven"
+    },
+    {
+      "gate": "Complete legal earned level three and both abilities",
+      "proof": "All six current-source journey receipts start at XP 0/level 1, enact five legal battles, reach Mage level 3, use Frost Snare and multiple missiles, and end at the legal terminal boundary",
+      "status": "proven"
+    },
+    {
+      "gate": "Bounded deterministic shared seed selection",
+      "proof": "Current-source unit bounds/exclusion/exhaustion/unexpected-error/replay-divergence cases pass; range 64–79, first qualifying seed 68, complete interval measurement retained",
+      "status": "proven"
+    },
+    {
+      "gate": "Exact replay, active reload, rejection/expiry, multiple missiles and cleanup",
+      "proof": "Retained original unit/earned-browser assertions and all staged UI/storage checks pass; each current full receipt has blocked/expired and both ability flags",
+      "status": "proven"
+    },
+    {
+      "gate": "Existing ten-minute case budget without weakened controls",
+      "proof": "All six current cases are below 600000 ms with diagnostics retained; max 507168 ms; one worker, zero skipped/flaky/retried cases. Original 639262 ms failure remains preserved",
+      "status": "proven"
+    }
+  ],
+  "standard": {
+    "run": 42687175365,
+    "units": 1245,
+    "buildIntegrations": 2,
+    "coreJourneys": 7,
+    "durationMs": 199342,
+    "actualSource": "b17443a1096c70ee8b54a95196a30e017bfae453",
+    "equalImplementationTree": "4a3dfda631c1db37530fc35e2300e4227fb769d7"
+  },
+  "limitations": "Affected-scope acceptance, not an executed full regression or physical-device claim. Original failed matrices remain preserved. Final tracking/evidence commits change documentation only, preserving qualified inputs.",
+  "reviewHandoff": {
+    "evidenceCommit": "8d6487ffd2e80b0a634769f78b2ebf88b8eba1a1",
+    "pr357": {
+      "state": "open",
+      "draft": false,
+      "base": "branch/fix-radial-selection-contract",
+      "issueReference": "Closes #316"
+    },
+    "pr358": {
+      "state": "open",
+      "draft": false,
+      "base": "main"
+    },
+    "openspecTasks": "6/6 complete; strict validation passes",
+    "remainingImplementation": 0,
+    "workflowFollowup": "Review #358 before #357; keep issue open until merge; archive after merge, not during this task."
+  }
+}

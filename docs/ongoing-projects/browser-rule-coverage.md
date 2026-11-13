@@ -62,11 +62,9 @@ original and nine retained cases, with no failures/skips/flakes; the measured
 browser process wall decreased from 124.734s to 93.500s (25.0% for this subset).
 The QA record retains exact inputs, report hashes and measurement limits.
 
-## Remaining measurement work
+## Setup measurements
 
-The successful PR observations are on persistent runner caches. A reproducible
-cold dependency/browser setup observation and a separate warm observation,
-including upload and queue time, remain open. Do not delete shared runner caches
-to manufacture a cold run; use isolated cache/install directories on qualified
-capacity and record their scope. This work is separate from product cold-start
-qualification, whose original startup failure remains retained.
+The [main and cold setup qualification](build-times.md#main-and-cold-setup-qualification)
+records matched cold/warm runs, including upload and queue time. The cold run
+used empty job-local directories, preserving shared caches. This is separate
+from product cold-start qualification, whose original failure remains retained.

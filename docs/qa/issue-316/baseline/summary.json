@@ -1,0 +1,71 @@
+{
+  "run": 42670137498,
+  "attempt": 1,
+  "source": {
+    "source": {
+      "commit": "1a02557e76041e307ddf172d39ddc3e477ac967d",
+      "dirty": false,
+      "inputHash": "a6858c051fb015cbdb8cf75ee716c9bf08a19b7c4a14e1e2c9191d2a7961abef",
+      "hashes": "See full-summary.json.gz"
+    },
+    "node": "v24.22.2",
+    "runner": "unraid-tactics-02",
+    "conditions": "Persistent qualified runner; shared storage/network load and caches not independently controlled"
+  },
+  "results": [
+    {
+      "file": "browser-runs\\run-ntadkA\\results.json",
+      "stats": {
+        "startTime": "2026-11-09T18:08:49.194Z",
+        "duration": 212861.047,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "workers": 1,
+      "tests": [
+        {
+          "title": "Mage legal progression journey earns level three uses Frost Snare and multiple missiles and resumes",
+          "project": "desktop-webkit",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 211504,
+              "startTime": "2026-11-09T18:08:50.200Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "browser-runs\\run-V25OBZ\\results.json",
+      "stats": {
+        "startTime": "2026-11-09T18:01:27.650Z",
+        "duration": 440735.63800000004,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "workers": 1,
+      "tests": [
+        {
+          "title": "Mage legal progression journey earns level three uses Frost Snare and multiple missiles and resumes",
+          "project": "desktop",
+          "status": "expected",
+          "results": [
+            {
+              "status": "passed",
+              "retry": 0,
+              "durationMs": 438973,
+              "startTime": "2026-11-09T18:01:28.888Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

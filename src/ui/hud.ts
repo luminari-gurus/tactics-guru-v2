@@ -1,20 +1,25 @@
 import type { Threat } from '../domain/threat';
 import { combatStats, guardedEffect, markSource, movementBlockSource, tauntSource, weakenedSource, weakenedImmune } from '../domain/effects';
 import { saveFaceCounts } from '../domain/combat';
-import type { CellPosition } from '../content/types';
-import type { BattleEvent, UnitState, Command } from '../domain/types';
+import type { AbilityId, CellPosition } from '../content/types';
+import type { BattleEvent, BattleState, UnitState, Command } from '../domain/types';
 import { previewTacticalPlan } from '../domain/tacticalPlan';
 import { previewMovement } from '../domain/grid';
 import { D20_SIDES, NATURAL_AUTO_MISS, NATURAL_CRITICAL } from '../domain/constants';
-import type { BattleSession, ActionPreview, Presentation } from '../app/BattleSession';
+import type { BattleSession, ActionPreview } from '../app/BattleSession';
 import type { BattleAudioSnapshot } from '../phaser/BattleAudio';
 import { publicAssetUrl } from './publicAssetUrl';
 import { GUARDED_STRIKE_TRADEOFF } from '../content/constants';
 
-import { ownedAbilities, actionCommand, actionTargets, type Action } from './battleActions';
+import { BATTLE_KEYS, ownedAbilities, actionCommand, actionTargets, type Action } from './battleActions';
 import { mountCombatControlsPreference, type CombatSkin } from './combatControls';
 import { draughtsSpent } from '../domain/draughts';
 export const displayName = (id: string) => id.replace(/^ability:/,'').replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase());
+export function shortcutHint(control: HTMLElement, key: string, label: string) {
+  const hint=key==='Escape'?key:key.toUpperCase();
+  control.setAttribute('aria-keyshortcuts',hint);
+  control.title=`${label} (${hint})`;
+}
 export function previewText(preview: ActionPreview): string {
   if (!preview.ok) return `Unavailable: ${displayName(preview.reason.replace(/([A-Z])/g,' $1'))}`;
   if ('path' in preview) return `Move ${preview.path.length-1} steps · cost ${preview.cost} · uses movement`;
@@ -88,13 +93,14 @@ export class BattleHud {
   readonly target: HTMLSelectElement;
   readonly ability: HTMLSelectElement;
   private abilityKey="";
+  private readonly abilityButtons=new Map<AbilityId, HTMLButtonElement>();
   private lastRender: readonly unknown[] = [];
-  private skin: CombatSkin = 'rail';
   private openingEnemyTurn: boolean;
+  private skin: CombatSkin = 'rail';
   private readonly actorRoot=document.querySelector<HTMLElement>('#battle-actor')!;
   private readonly abort=new AbortController();
   private readonly log:string[]=[];
-  constructor(private readonly session:BattleSession, callbacks:{action:(a:Action)=>void;target:(c:CellPosition|null)=>void;confirm:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void;inspect:()=>void;inspectTarget:(id:number)=>void;danger:()=>void;plan:()=>void;undo:()=>void;draught:()=>void;log:(lines:readonly string[])=>void}) {
+  constructor(private readonly session:BattleSession, private readonly callbacks:{action:(a:Action)=>void;target:(c:CellPosition|null)=>void;confirm:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void;inspect:()=>void;inspectTarget:(id:number)=>void;danger:()=>void;plan:()=>void;undo:()=>void;draught:()=>void;log:(lines:readonly string[])=>void}) {
     this.openingEnemyTurn = !session.resumed && session.phase === 'enemy';
     this.actorRoot.hidden=false;
     this.actorRoot.innerHTML=`<p id="battle-active" aria-live="polite"></p><div class="battle-identity"><div id="battle-portraits"></div><div><h2 id="battle-actor-name" aria-live="polite"></h2><p id="battle-hp"></p><div class="battle-health" aria-hidden="true"><span></span></div><p id="battle-stats"></p><p id="battle-status"></p></div></div><p id="battle-budgets"></p>`;
@@ -107,11 +113,18 @@ export class BattleHud {
     this.root.innerHTML=`<p class="battle-section-label">Choose your action</p><div class="battle-actions" aria-label="Acting unit actions">
       <button id="battle-move" data-action="move" aria-label="Move" aria-describedby="battle-availability"><strong>Move</strong><span>Uses movement</span></button>
       <button data-action="basic" aria-label="Basic attack" aria-describedby="battle-availability"><strong>Basic attack</strong><span>Uses action</span></button>
-      <button data-action="signature" aria-describedby="battle-availability"><strong>Signature</strong><span>Uses action</span></button>
       <button id="battle-next" aria-label="Wait / End turn" aria-describedby="battle-availability"><strong>Wait / End turn</strong><span>Ends turn immediately</span></button><button id="battle-plan-cancel" hidden>Cancel plan</button></div>
       <label for="battle-ability">Ability</label><select id="battle-ability" aria-describedby="battle-ability-info battle-availability"></select><p id="battle-ability-info"></p><p id="battle-availability"></p><section class="battle-decision" aria-label="Target and action preview"><label for="battle-target">Target / destination</label><select id="battle-target"><option value="">Choose target</option></select><p id="battle-selection">Select a tile</p><p id="battle-target-info"></p><button id="battle-inspect-target" hidden>Inspect target</button><p id="battle-preview" aria-live="polite">Choose an action and target</p><div class="battle-commit"><button id="battle-review" disabled>Confirm action</button><button id="battle-cancel" disabled>Cancel action</button></div></section>
       <nav class="battle-tools" aria-label="Secondary battle tools"><button id="battle-plan">Plan move + ability</button><button id="battle-undo">Undo move</button><button id="battle-party">Inspect party</button><button id="battle-danger" aria-pressed="false" aria-describedby="battle-danger-info">Show enemy danger</button><button id="battle-log-open">Battle log</button><button id="battle-sound" aria-pressed="false" aria-describedby="battle-sound-status">Enable sound</button><button id="battle-sound-retry" hidden>Retry sound</button><details id="battle-overflow"><summary>More</summary></details></nav><p id="battle-danger-info">Danger shows living heroes reachable by an enemy attack or Weakening Hex on its next turn, assuming current positions and statuses; it does not predict enemy choice.</p><p id="battle-danger-results" aria-live="polite" aria-atomic="true"></p><p id="battle-sound-status" aria-live="polite">Sound off</p>`;
     const signal=this.abort.signal;
+    const help=document.createElement('details');help.id='battle-shortcuts';
+    help.innerHTML=`<summary>Keyboard shortcuts</summary><p>${BATTLE_KEYS.move.toUpperCase()}: Move · ${BATTLE_KEYS.basic.toUpperCase()}: Basic attack · ${BATTLE_KEYS.ability.toUpperCase()}: selected ability (rail) or offered Special (radial) · 1–9: learned abilities · ${BATTLE_KEYS.wait.toUpperCase()}: Wait / End turn immediately · ${BATTLE_KEYS.confirm.toUpperCase()}: confirm · ${BATTLE_KEYS.cancel}: cancel.</p><p>Rail: choose an action, then a target. Radial: choose a target with the board cursor first, then aim an action; confirm with C or activate its focused button. Arrow keys navigate the board; Enter/Space select a cell or activate a focused control. Tab moves focus. Shortcuts pause while editing, in dialogs, or while holding modifiers. Held keys never repeat actions.</p><ol aria-label="Learned ability shortcuts"></ol>`;
+    this.root.querySelector('.battle-tools')!.append(help);
+    for(const [selector,key,label] of [
+      ['#battle-move',BATTLE_KEYS.move,'Move'],['[data-action="basic"]',BATTLE_KEYS.basic,'Basic attack'],
+      ['#battle-next',BATTLE_KEYS.wait,'End turn immediately'],['#battle-review',BATTLE_KEYS.confirm,'Confirm action'],
+      ['#battle-cancel',BATTLE_KEYS.cancel,'Cancel action'],
+    ])shortcutHint(this.root.querySelector<HTMLElement>(selector)!,key,label);
     const draught = document.createElement('button');
     draught.id = 'battle-draught'; draught.type = 'button'; draught.hidden = true;
     draught.addEventListener('click', callbacks.draught, { signal });
@@ -126,10 +139,10 @@ export class BattleHud {
     this.root.querySelector('#battle-log-open')!.addEventListener('click',()=>callbacks.log(this.log),{signal});
     this.ability=this.root.querySelector('#battle-ability')!;
     this.ability.addEventListener('change',()=>{if(this.ability.value)callbacks.action(this.ability.value as Action);},{signal});
-    this.root.querySelectorAll<HTMLButtonElement>('[data-action]').forEach(b=>b.addEventListener('click',()=>{
-      const action=b.dataset.action==='signature'?this.ability.value:b.dataset.action;
-      if(action)callbacks.action(action as Action);
-    },{signal}));
+    this.root.querySelector('.battle-actions')!.addEventListener('click',event=>{
+      const button=event.target instanceof Element?event.target.closest<HTMLButtonElement>('button[data-action]'):null;
+      if(button && !button.disabled)callbacks.action(button.dataset.action as Action);
+    },{signal});
     this.target=this.root.querySelector('#battle-target')!;
     this.target.addEventListener('change',()=>{if(this.target.value){const [x,y]=this.target.value.split(',').map(Number);callbacks.target({x,y});}else callbacks.target(null);},{signal});
     this.root.querySelector('#battle-review')!.addEventListener('click',callbacks.confirm,{signal});
@@ -137,6 +150,24 @@ export class BattleHud {
     this.root.querySelector('#battle-plan-cancel')!.addEventListener('click',callbacks.cancel,{signal});
     this.root.querySelector('#battle-next')!.addEventListener('click',callbacks.wait,{signal});
     mountCombatControlsPreference(this.root.querySelector('#battle-overflow')!);
+  }
+  shortcut(key:string):boolean {
+    if(/^[1-9]$/.test(key)) {
+      const option=this.ability.options[Number(key)-1];
+      if(this.ability.disabled || !option || option.disabled)return false;
+      this.ability.value=option.value;
+      this.callbacks.action(option.value as Action);
+      return true;
+    }
+    const selector:Record<string,string>={
+      [BATTLE_KEYS.move]:'#battle-move',[BATTLE_KEYS.basic]:'[data-action="basic"]',
+      [BATTLE_KEYS.wait]:'#battle-next',
+      [BATTLE_KEYS.confirm]:'#battle-review',
+    };
+    const button=key===BATTLE_KEYS.ability?this.abilityButtons.get(this.ability.value as AbilityId)
+      :selector[key]?this.root.querySelector<HTMLButtonElement>(selector[key]):null;
+    if(!button || button.disabled || button.closest('[hidden]'))return false;
+    button.click();return true;
   }
   applySkin(skin: CombatSkin) {
     this.lastRender = [];
@@ -193,18 +224,15 @@ export class BattleHud {
     const labels={muted:'Sound off',loading:'Loading sound',unavailable:'Sound unavailable',hidden:'Sound paused while hidden',unlocking:'Unlocking sound',blocked:'Sound blocked',ready:'Sound on'};
     this.root.querySelector('#battle-sound-status')!.textContent=labels[snapshot.status]+(snapshot.error?`: ${snapshot.error}`:'');
   }
-  render(action:Action|null, selected:CellPosition|null, message:string, danger=false, threats:readonly Threat[] | null=null, planWaiting=false, planMove:Extract<Command,{type:'move'}>|null=null, presentation:Presentation|null=null) {
+  render(action:Action|null, selected:CellPosition|null, message:string, danger=false, threats:readonly Threat[] | null=null, planWaiting=false, planMove:Extract<Command,{type:'move'}>|null=null, presentationStart:BattleState|null=null) {
     // Hover refreshes only change the board. Rebuilding the live controls during
     // a pointer gesture can disturb native select interaction and scroll anchoring.
-    const inputs = [this.session.state, this.session.phase, this.session.pending, this.session.pendingPlan,
-      this.session.error, action, selected?.x, selected?.y, message, danger, threats, planWaiting, planMove?.to.x, planMove?.to.y, this.skin, presentation];
+    const inputs = [this.session.state, this.session.phase, presentationStart, this.session.pending, this.session.pendingPlan,
+      this.session.error, action, selected?.x, selected?.y, message, danger, threats, planWaiting, planMove?.to.x, planMove?.to.y, this.skin];
     if (inputs.every((value, i) => Object.is(value, this.lastRender[i]))) return;
     this.lastRender = inputs;
-    const s=this.session, enabled=s.phase==='player';
-    // Resolution already advanced initiative, but the board is still animating
-    // the command's actor. Keep the entire card on that actor until completion.
-    const actor=presentation?.after.units.find(unit=>unit.id===presentation.before.initiative[presentation.before.activeIndex]) ?? s.active;
-    const round=presentation?.before.round ?? s.state.round;
+    const s=this.session, enabled=s.phase==='player', actor=s.active;
+    const presenting=s.phase==='presenting';
     const showPlanCancel=this.skin==='radial' && planWaiting && enabled;
     this.root.dataset.planWaiting=String(showPlanCancel);
     this.root.querySelector<HTMLButtonElement>('#battle-plan-cancel')!.hidden=!showPlanCancel;
@@ -229,36 +257,74 @@ export class BattleHud {
       draught.disabled = !!reason;
       draught.textContent = `Healing Draught ×${remaining}${reason ? ` · ${reason}` : ''}`;
     }
-    if (s.phase === 'player' || s.state.outcome !== 'ongoing') this.openingEnemyTurn = false;
-    this.actorRoot.querySelector('#battle-active')!.textContent=`${s.state.outcome==='ongoing'?'':s.state.outcome==='playerWin'?'Victory · ':'Defeat · '}Round ${round} · ${actor.side==='player'?'Your turn':this.openingEnemyTurn?'Enemy opening turn (initiative)':'Enemy turn'}${s.phase==='presenting'?' · Resolving action (Animating)':s.phase==='error'?' · Battle stopped':''}`;
-    this.actorRoot.querySelector('#battle-actor-name')!.textContent=info.name;
-    this.actorRoot.querySelector('#battle-hp')!.textContent=`HP ${actor.hp}/${info.def.stats.maxHp}`;
-    this.actorRoot.querySelectorAll<HTMLImageElement>('.battle-portrait').forEach(img=>{img.hidden=img.dataset.unitType!==actor.defId;});
-    (this.actorRoot.querySelector('.battle-health span') as HTMLElement).style.width=`${100*actor.hp/info.def.stats.maxHp}%`;
-    this.actorRoot.querySelector('#battle-stats')!.textContent=`AC ${info.armorClass} · Accuracy ${info.accuracy>=0?'+':''}${info.accuracy}`;
-    this.actorRoot.querySelector('#battle-status')!.textContent=info.status;
-    this.actorRoot.querySelector('#battle-budgets')!.textContent=s.phase==='presenting'?'Resolving action · Controls locked':`Move ${actor.hasMoved?'spent':'ready'} / Action ${actor.hasActed?'spent':'ready'}`;
-    const locked=s.phase==='presenting'?'Resolving action. Gameplay is locked until presentation finishes.':s.phase==='enemy'?'Enemy turn. Hero actions are unavailable.':s.phase==='ended'?'Battle complete. Gameplay is unavailable.':s.phase==='error'?'Battle stopped. Use recovery or restart.':'';
-    const abilities=ownedAbilities(s,actor.defId),key=abilities.map(a=>a.id).join('|');
-    if(key!==this.abilityKey){this.abilityKey=key;this.ability.replaceChildren(...abilities.map(a=>new Option(displayName(a.id),a.id)));}
+    // End Turn commits the next actor and round before the board finishes the handoff.
+    const displayActor = presentationStart
+      ? s.state.units.find(unit=>unit.id===presentationStart.initiative[presentationStart.activeIndex])!
+      : actor;
+    const displayInfo = displayActor===actor ? info : unitFeedback(s,displayActor);
+    const outcome = s.state.outcome==='ongoing'?'':s.state.outcome==='playerWin'?'Victory · ':'Defeat · ';
+    if (enabled || s.state.outcome !== 'ongoing') this.openingEnemyTurn = false;
+    const opening = this.openingEnemyTurn && displayActor.side === 'enemy';
+    const turn = opening ? 'Enemy opening turn (initiative)' : actor.side === 'player' ? 'Your turn' : 'Enemy turn';
+    this.actorRoot.querySelector('#battle-active')!.textContent=presenting
+      ? `Round ${presentationStart?.round ?? s.state.round} · ${opening ? turn + ' · ' : ''}Resolving action (Animating)`
+      : `${outcome}Round ${s.state.round} · ${turn}${s.phase==='error'?' · Battle stopped':''}`;
+    this.actorRoot.querySelector('#battle-actor-name')!.textContent=displayInfo.name;
+    this.actorRoot.querySelector('#battle-hp')!.textContent=`HP ${displayActor.hp}/${displayInfo.def.stats.maxHp}`;
+    this.actorRoot.querySelectorAll<HTMLImageElement>('.battle-portrait').forEach(img=>{img.hidden=img.dataset.unitType!==displayActor.defId;});
+    (this.actorRoot.querySelector('.battle-health span') as HTMLElement).style.width=`${100*displayActor.hp/displayInfo.def.stats.maxHp}%`;
+    this.actorRoot.querySelector('#battle-stats')!.textContent=`AC ${displayInfo.armorClass} · Accuracy ${displayInfo.accuracy>=0?'+':''}${displayInfo.accuracy}`;
+    this.actorRoot.querySelector('#battle-status')!.textContent=displayInfo.status;
+    this.actorRoot.querySelector('#battle-budgets')!.textContent=presenting
+      ? 'Move locked / Action locked'
+      : `Move ${actor.hasMoved?'spent':'ready'} / Action ${actor.hasActed?'spent':'ready'}`;
+    const locked=presenting?'Resolving action. Gameplay is locked until presentation finishes.':s.phase==='enemy'?'Enemy turn. Hero actions are unavailable.':s.phase==='ended'?'Battle complete. Gameplay is unavailable.':s.phase==='error'?'Battle stopped. Use recovery or restart.':'';
+    const abilities=ownedAbilities(s,displayActor.defId),key=abilities.map(a=>a.id).join('|');
+    if(key!==this.abilityKey){
+      this.abilityKey=key;this.ability.replaceChildren(...abilities.map(a=>new Option(displayName(a.id),a.id)));
+      // Reconcile only when the learned set changes, preserving focus and scroll
+      // while selection, previews and pointer hover refresh the HUD.
+      for(const button of this.abilityButtons.values())button.remove();
+      this.abilityButtons.clear();
+      const next=this.root.querySelector('#battle-next')!;
+      for(const [index,ability] of abilities.entries()){
+        const button=document.createElement('button'),label=document.createElement('strong'),hint=document.createElement('span');
+        button.type='button';button.dataset.action=ability.id;button.hidden=this.skin==='radial';
+        label.textContent=displayName(ability.id);hint.id=`battle-ability-state-${index}`;
+        button.setAttribute('aria-label',label.textContent);
+        button.setAttribute('aria-describedby',`${hint.id} battle-availability`);
+        button.append(label,hint);next.before(button);this.abilityButtons.set(ability.id,button);
+      }
+      this.root.querySelector('#battle-shortcuts ol')!.replaceChildren(...abilities.map((a,index)=>{
+        const item=document.createElement('li');item.textContent=`${index<9?index+1:'Picker'}: ${displayName(a.id)}`;return item;
+      }));
+      this.ability.setAttribute('aria-keyshortcuts',abilities.slice(0,9).map((_,index)=>index+1).join(' '));
+      this.ability.title='1–9: select a learned ability (outside editable controls)';
+    }
     if(action?.startsWith('ability:'))this.ability.value=action;
     this.ability.disabled=!enabled || actor.hasActed || !abilities.length;
-    const chosen=s.catalog.abilities[this.ability.value as import('../content/types').AbilityId];
+    const chosen=s.catalog.abilities[this.ability.value as AbilityId];
+    for(const [index,ability] of abilities.entries()){
+      const button=this.abilityButtons.get(ability.id)!;
+      const keys=[...(index<9?[String(index+1)]:[]),...(ability.id===chosen?.id?[BATTLE_KEYS.ability]:[])];
+      if(keys.length)shortcutHint(button,keys.join(' '),displayName(ability.id));
+      else {button.removeAttribute('aria-keyshortcuts');button.removeAttribute('title');}
+    }
     this.root.querySelector('#battle-ability-info')!.textContent=chosen
-      ? `${!enabled?locked+' ':actor.hasActed?'Action spent. ':''}Range ${chosen.rangeMin}–${chosen.rangeMax} · ${chosen.kind==='weakeningHex'?`Hostile target · Will save vs DC ${10+info.def.stats.power} · −2 accuracy on failure until target turn end or source/target defeat`:chosen.kind==='healGoblin'?'Living injured goblin ally · heal up to 4 HP · no self heal or revival · no roll':chosen.kind==='secondWind'?`Self only · heal up to ${chosen.healBase+info.def.stats.power} HP · ${actor.secondWindUsed?'0':'1'}/1 use this battle · no roll`:chosen.kind==='taunt'?'Hostile target · forced target until its next turn ends · no roll':chosen.kind==='markTarget'?'Hostile target · +2 on next player attack roll, consumed even on miss · no damage or roll':chosen.kind==='pinningShot'||chosen.kind==='frostSnare'?'Hostile target · blocks movement until its next turn ends or source/target defeat · no damage or roll':chosen.kind==='magicMissile'?'Living target, including allies · automatic force damage':chosen.kind==='guardedAttack'?'Hostile target · −2 attack / +2 AC until next turn':'Hostile target · attack roll'}${chosen.requiredLevel?` · unlock level ${chosen.requiredLevel}`:''} · uses action`
+      ? `${!enabled?locked+' ':displayActor.hasActed?'Action spent. ':''}Range ${chosen.rangeMin}–${chosen.rangeMax} · ${chosen.kind==='weakeningHex'?`Hostile target · Will save vs DC ${10+displayInfo.def.stats.power} · −2 accuracy on failure until target turn end or source/target defeat`:chosen.kind==='healGoblin'?'Living injured goblin ally · heal up to 4 HP · no self heal or revival · no roll':chosen.kind==='secondWind'?`Self only · heal up to ${chosen.healBase+displayInfo.def.stats.power} HP · ${displayActor.secondWindUsed?'0':'1'}/1 use this battle · no roll`:chosen.kind==='taunt'?'Hostile target · forced target until its next turn ends · no roll':chosen.kind==='markTarget'?'Hostile target · +2 on next player attack roll, consumed even on miss · no damage or roll':chosen.kind==='pinningShot'||chosen.kind==='frostSnare'?'Hostile target · blocks movement until its next turn ends or source/target defeat · no damage or roll':chosen.kind==='magicMissile'?'Living target, including allies · automatic force damage':chosen.kind==='guardedAttack'?'Hostile target · −2 attack / +2 AC until next turn':'Hostile target · attack roll'}${chosen.requiredLevel?` · unlock level ${chosen.requiredLevel}`:''} · uses action`
       : 'No owned abilities';
-    if(actor.defId==='fighter')this.root.querySelector('#battle-ability-info')!.textContent+=' · Second Wind unlocks at level 2; Taunt at level 3';
-    if(actor.defId==='ranger')this.root.querySelector('#battle-ability-info')!.textContent+=' · Mark Target unlocks at level 2; Pinning Shot at level 3';
-    if(actor.defId==='mage')this.root.querySelector('#battle-ability-info')!.textContent+=' · Arc Bolt consolidated into Magic Missile (level 1); Frost Snare unlocks at level 3';
-    if(chosen?.kind==='secondWind')this.root.querySelector('#battle-ability-info')!.textContent+=actor.secondWindUsed?' · Use exhausted':actor.hp===info.def.stats.maxHp?' · Full health':'';
+    if(displayActor.defId==='fighter')this.root.querySelector('#battle-ability-info')!.textContent+=' · Second Wind unlocks at level 2; Taunt at level 3';
+    if(displayActor.defId==='ranger')this.root.querySelector('#battle-ability-info')!.textContent+=' · Mark Target unlocks at level 2; Pinning Shot at level 3';
+    if(displayActor.defId==='mage')this.root.querySelector('#battle-ability-info')!.textContent+=' · Arc Bolt consolidated into Magic Missile (level 1); Frost Snare unlocks at level 3';
+    if(chosen?.kind==='secondWind')this.root.querySelector('#battle-ability-info')!.textContent+=displayActor.secondWindUsed?' · Use exhausted':displayActor.hp===displayInfo.def.stats.maxHp?' · Full health':'';
     this.root.querySelectorAll<HTMLButtonElement>('[data-action]').forEach(b=>{
       const spent=b.dataset.action==='move'?actor.hasMoved:actor.hasActed;
-      const signature=b.dataset.action==='signature'?chosen:null;
-      const unavailableHeal=signature?.kind==='secondWind' && (actor.secondWindUsed || actor.hp===info.def.stats.maxHp);
-      b.disabled=!enabled || spent || (b.dataset.action==='move' && !movement?.ok) || (b.dataset.action==='signature' && !signature) || Boolean(unavailableHeal);
-      b.setAttribute('aria-pressed',String(b.dataset.action==='signature'?action===chosen?.id:b.dataset.action===action));
-      b.querySelector('span')!.textContent=!enabled?'Unavailable':spent?'Spent':b.disabled?'Unavailable':b.dataset.action==='move'?'Uses movement':'Uses action';
-      if(b.dataset.action==='signature'){const label=signature?displayName(signature.id):'No signature';b.querySelector('strong')!.textContent=label;b.setAttribute('aria-label',label);}
+      const ability=b.dataset.action?.startsWith('ability:')?s.catalog.abilities[b.dataset.action as AbilityId]:null;
+      const healReason=ability?.kind==='secondWind'?(displayActor.secondWindUsed?'Use exhausted':displayActor.hp===displayInfo.def.stats.maxHp?'Full health':''):'';
+      const reason=!enabled?'Unavailable':spent?'Spent':healReason || (b.dataset.action==='move' && !movement?.ok?'Unavailable':'');
+      b.disabled=!!reason;
+      b.setAttribute('aria-pressed',String(b.dataset.action===action));
+      b.querySelector('span')!.textContent=reason || (b.dataset.action==='move'?'Uses movement':'Uses action');
     });
     this.root.querySelector('#battle-availability')!.textContent=locked || `${actor.hasMoved?'Movement spent. ':''}${actor.hasActed?'Action spent. ':''}Choose an action, then a target. Wait ends the turn immediately.`;
     (this.root.querySelector('#battle-next') as HTMLButtonElement).disabled=!enabled;
@@ -269,7 +335,10 @@ export class BattleHud {
     const target=occupants.find(u=>u.hp>0)??occupants[0];
     this.root.querySelector('#battle-target-info')!.textContent=target?`Target: ${unitLabel(s,target)}`:'';
     const inspect=this.root.querySelector<HTMLButtonElement>('#battle-inspect-target')!;inspect.hidden=this.skin==='radial'||!target;inspect.dataset.unitId=target?String(target.id):'';
-    this.root.querySelector('#battle-preview')!.textContent=s.error?`${s.phase==='error'?'Battle stopped':'Unavailable'}: ${s.error}`:message;
+    const selectedTile = selected && s.catalog.maps[s.state.mapId].cells.find(cell => cell.x === selected.x && cell.y === selected.y);
+    const terrainNote = selectedTile?.terrainId === 'rock' && (!action || action === 'move')
+      ? 'Rocky ground blocks movement and line of sight' : message;
+    this.root.querySelector('#battle-preview')!.textContent=s.error?`${s.phase==='error'?'Battle stopped':'Unavailable'}: ${s.error}`:terrainNote;
     const options: {cell:CellPosition;label:string}[]=[];
     if(enabled && action==='move') {if(movement?.ok) for(const c of movement.cells.filter(c=>c.cost>0)) options.push({cell:c.cell,label:`(${c.cell.x}, ${c.cell.y}) · cost ${c.cost}`});}
     else if(enabled && action) for(const u of actionTargets(s,action)) {

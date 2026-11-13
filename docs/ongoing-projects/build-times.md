@@ -129,6 +129,25 @@ and 9/9 retained cases passed. Browser process wall decreased from 124.734s to
 background workload). The same job passed 1,185 units, both type scopes, two
 build integrations and seven core journeys; ordinary verification took 192.734s.
 
-Cold dependency/browser setup measurement remains open; existing successful
-under-ten-minute observations use persistent caches. See the inventory for the
-bounded follow-up and its acceptance evidence.
+## Main and cold setup qualification
+
+On 2026-11-07, the ordinary verification workflow passed on clean main
+`2b72fd322ece27acfd6aed152efa442e384b37e4`. PR #347 then measured cold
+dependency/browser setup against the ordinary warm path on the same VM
+(`unraid-tactics-01`, Node 24.22.1). The cold head `4fc406d` and warm
+tested merge `97efb0a` have identical trees.
+
+| Run | Active job, including setup/upload | Queue | Total |
+| --- | ---: | ---: | ---: |
+| [Main](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42365975210) | 3m49s | 3s | 3m52s |
+| [Cold](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42366126057) | 4m31s | 1m35s | 6m06s |
+| [Warm PR](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42366156594) | 3m53s | 5m40s | 9m33s |
+
+All three passed 1,235 units, both build integrations and type scopes,
+the bundle, and the same seven journeys with zero skips, flakes or failures.
+Cold `npm ci` took 7 seconds and browser installation took 46 seconds;
+warm installation took 6 seconds and reused the browser binaries. The cold
+job used empty npm and Playwright directories under job temp, bypassed npm
+cache restore, and downloaded the lockfile browsers. These are observed times
+on the qualified VM, with Node and OS libraries already installed. They do
+not guarantee queue time or certify cold GPU startup or the full matrix.

@@ -1,0 +1,56 @@
+{
+  "base": "1a02557e76041e307ddf172d39ddc3e477ac967d",
+  "comparedHead": "9826fc48f9c2e8a7397c5cd848d080adc6cee4f0",
+  "helper": "tests/helpers/dungeonFixtures.ts",
+  "functions": [
+    {
+      "name": "dungeonJourney",
+      "unchanged": true,
+      "sha256": "8c315c1a8f5158ad3143a4cc194bf182a3684cf23e1869679232e54b2ad5fe9b"
+    },
+    {
+      "name": "journeyPreparation",
+      "unchanged": true,
+      "sha256": "8f0f3b701fc6fb3ccf5c774836a03d0f93a65c19a3a414bddc8d38a006573cae"
+    },
+    {
+      "name": "fighterJourney",
+      "unchanged": true,
+      "sha256": "b189c087b0659bf803d232926ab92556d661683b00d3e881dc3af71108d32640"
+    },
+    {
+      "name": "walkWitness",
+      "unchanged": true,
+      "sha256": "d2304e234e3184b6a293b4b0527b727ffc06e99be418c1d0038ee229904342d2"
+    },
+    {
+      "name": "rangerJourney",
+      "unchanged": true,
+      "sha256": "96cd54b2e4f7c63c9c43e86ab74b1f548316a56b4623b2483b0b470049fcde81"
+    },
+    {
+      "name": "healedFighterBoundary",
+      "unchanged": true,
+      "sha256": "2d88b2accf28898ed1927008acb0a58422e8589964786800d8c9baafb76588e9"
+    },
+    {
+      "name": "shamanJourney",
+      "unchanged": true,
+      "sha256": "cb2e6ac04c9379895d8a69274b099ce176b3f0799411236c7b100a199de03513"
+    }
+  ],
+  "unitSource": "a0a0964e8fb936f8718f2f83a39740417e794154",
+  "units": [
+    {
+      "title": "retains a legal six-battle Fighter level-three witness with healing, Taunt and exact terminal replay",
+      "status": "passed",
+      "durationMs": 4556.597743
+    },
+    {
+      "title": "finds a legal earned Ranger level-three witness using both controls and retains replayable histories",
+      "status": "passed",
+      "durationMs": 5855.9441730000035
+    }
+  ],
+  "scope": "No new full Fighter/Ranger browser certification is claimed. Their complete function bodies, shared traversal/preparation and runtime inputs are unchanged; affected units and extended discovery remain verified."
+}

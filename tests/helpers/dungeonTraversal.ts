@@ -13,6 +13,11 @@ export async function continueSavedDungeon(page: Page) {
   await expect(resume).toBeEnabled();
   await resume.click();
 }
+export async function openDungeonInventory(page: Page) {
+  const summary = page.locator('#dungeon-inventory-summary');
+  await expect(summary).toBeVisible();
+  if (await page.locator('#dungeon-inventory').getAttribute('open') === null) await summary.click();
+}
 export async function walkDungeon(page: Page, target?: number, mode: 'keyboard'|'touch'|'pointer' = 'keyboard') {
   await expect(page.locator('#dungeon-screen')).toBeVisible();
   const initial=await dungeonSnapshot(page), floor=initial.floors[initial.depth-1];
@@ -46,7 +51,7 @@ export async function walkDungeon(page: Page, target?: number, mode: 'keyboard'|
     if(mode==='keyboard'){await page.locator('#dungeon-map').focus();await page.keyboard.press(delta===-width?'ArrowUp':delta===width?'ArrowDown':delta===1?'ArrowRight':'ArrowLeft');}
     else if(mode==='touch')await page.locator(`#dungeon-step-${name}`).tap();
     else await page.locator(`#dungeon-map [data-cell="${n}"]`).click();
-    const after=await dungeonSnapshot(page);expect(after.floors[s.depth-1].position).toBe(n);path.push(n);
+    await expect.poll(async () => (await dungeonSnapshot(page)).floors[s.depth-1].position).toBe(n);path.push(n);
   }
   throw Error('Could not reach moving encounter within 400 steps');
 }

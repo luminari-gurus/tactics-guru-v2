@@ -193,8 +193,9 @@ test('default Move initializes once per usable player turn and preserves explici
   await expect(target).toHaveValue('');await expect(page.locator('#battle-review')).toBeDisabled();
   expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!).pending).toBeNull();
   await page.screenshot({path:test.info().outputPath('default-move.png')});
-  for(const action of ['basic','signature']){
-    await page.locator(`[data-action=${action}]`).click();await target.selectOption({index:1});
+  const selectedAbilityId=await page.locator('#battle-ability').inputValue();
+  for(const action of ['basic',selectedAbilityId]){
+    await page.locator(`[data-action="${action}"]`).click();await target.selectOption({index:1});
     const selected=await target.inputValue(),before=await page.locator('#game').getAttribute('data-session');
     const overlays=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).targets;
     await page.locator('#battle-party').click();await page.locator('#inspection-close').click();
@@ -203,7 +204,7 @@ test('default Move initializes once per usable player turn and preserves explici
     await page.mouse.move(box.x+box.width/2,box.y+box.height/2);
     const viewport=page.viewportSize()!;await page.setViewportSize({width:viewport.width-1,height:viewport.height});await page.setViewportSize(viewport);
     await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));Object.defineProperty(document,'hidden',{configurable:true,value:false});document.dispatchEvent(new Event('visibilitychange'));});
-    await expect(page.locator(`[data-action=${action}]`)).toHaveAttribute('aria-pressed','true');await expect(move).toHaveAttribute('aria-pressed','false');
+    await expect(page.locator(`[data-action="${action}"]`)).toHaveAttribute('aria-pressed','true');await expect(move).toHaveAttribute('aria-pressed','false');
     await expect(target).toHaveValue(selected);expect(await page.locator('#game').getAttribute('data-session')).toBe(before);
     expect(JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).targets).toEqual(overlays);
   }
@@ -505,6 +506,121 @@ test('real touch previews a board move, modal backdrop captures it, and suspend 
   expect((await session(page)).state).toEqual(after.state);
 });
 
+test('keyboard-only shortcuts select preview confirm and wait once without replacing native keys',async({page})=>{
+  await page.goto('./?game=battle');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const canvas=page.locator('canvas'),before=await session(page);
+  const saves=await page.evaluate(()=>JSON.stringify(localStorage));
+  await canvas.focus();await page.keyboard.press('a');
+  await expect(page.locator('[data-action="basic"]')).toHaveAttribute('aria-pressed','true');
+  await page.keyboard.press('m');
+  await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');
+  expect((await session(page)).state).toEqual(before.state);
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saves);
+  await expect(page.locator('#battle-move')).toHaveAttribute('aria-keyshortcuts','M');
+  const help=page.locator('#battle-shortcuts summary');
+  await help.focus();await page.keyboard.press('Enter');
+  await expect(page.locator('#battle-shortcuts')).toContainText('C');
+  await expect(page.locator('#battle-shortcuts')).toContainText('Enter');
+  await page.screenshot({path:test.info().outputPath('keyboard-shortcuts-help.png')});
+  await help.press('Enter');
+  const actor=before.state.units.find(u=>u.id===before.state.initiative[before.state.activeIndex])!;
+  const reach=previewMovement(before.state,actor.id,catalog);if(!reach.ok)throw Error(reach.reason);
+  const cell=reach.cells.find(c=>c.cost>0)!.cell;
+  await page.locator('#battle-target').selectOption(`${cell.x},${cell.y}`);
+  expect((await session(page)).state).toEqual(before.state);
+  await canvas.focus();await page.keyboard.press('c');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const moved=await session(page);
+  expect(moved.state.commandCount).toBe(before.state.commandCount+1);
+  expect(moved.state.units.find(u=>u.id===actor.id)!.cell).toEqual(cell);
+  await expect(page.locator('#battle-move')).toBeDisabled();
+  await page.keyboard.press('m');await page.keyboard.press('c');
+  expect((await session(page)).state).toEqual(moved.state);
+  await page.keyboard.down('w');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const waited=await session(page);
+  expect(waited.replay.commands.slice(moved.replay.commands.length).filter(c=>c.type==='endTurn'&&c.unitId===actor.id)).toHaveLength(1);
+  await page.keyboard.down('w');await page.keyboard.down('c');await page.keyboard.down('c');
+  await page.keyboard.up('c');await page.keyboard.up('w');
+  expect((await session(page)).state).toEqual(waited.state);
+});
+
+test('keyboard-only shortcuts yield to editing modifiers composition handled events and dialogs',async({page})=>{
+  await page.goto('./?game=battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const before=await session(page),canvas=page.locator('canvas');
+  await page.evaluate(()=>{
+    const fields=document.createElement('div');fields.id='shortcut-editors';
+    fields.innerHTML='<input aria-label="Shortcut input"><textarea aria-label="Shortcut text"></textarea><div contenteditable="true" role="textbox"><span tabindex="0">Editable child</span></div><div role="textbox" tabindex="0">Custom textbox</div>';
+    document.querySelector('#battle-controls')!.append(fields);
+  });
+  for(const selector of ['input','textarea','[contenteditable] span','[role="textbox"]:not([contenteditable])']){
+    await page.locator(`#shortcut-editors ${selector}`).focus();
+    for(const key of ['a','m','w','c','1'])await page.keyboard.press(key);
+    await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');
+    expect((await session(page)).state).toEqual(before.state);
+  }
+  await page.locator('#battle-ability').focus();await page.keyboard.press('w');await page.keyboard.press('c');
+  expect((await session(page)).state).toEqual(before.state);
+  await canvas.focus();
+  for(const key of ['Control+m','Alt+m','Meta+m','Shift+a'])await page.keyboard.press(key);
+  await canvas.dispatchEvent('keydown',{key:'a',isComposing:true,bubbles:true});
+  await canvas.dispatchEvent('keydown',{key:'a',repeat:true,bubbles:true});
+  await page.evaluate(()=>document.querySelector('canvas')!.addEventListener('keydown',event=>event.preventDefault(),{once:true}));
+  await page.keyboard.press('a');
+  await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');
+  for(const selector of ['#battle-party','#battle-log-open']){
+    await page.locator(selector).click();await expect(page.locator('#battle-dialog')).toBeVisible();
+    for(const key of ['m','a','s','1','w','c'])await page.keyboard.press(key);
+    expect((await session(page)).state).toEqual(before.state);
+    await page.keyboard.press('Escape');await expect(page.locator('#battle-dialog')).not.toBeVisible();
+  }
+  await page.evaluate(()=>{const dialog=document.createElement('dialog');dialog.id='unrelated-shortcut-dialog';dialog.innerHTML='<button>Unrelated dialog</button>';document.body.append(dialog);dialog.showModal();});
+  await page.keyboard.press('w');await page.keyboard.press('c');
+  expect((await session(page)).state).toEqual(before.state);
+  await page.evaluate(()=>{document.querySelector('#unrelated-shortcut-dialog')!.remove();document.querySelector('#shortcut-editors')!.remove();});
+  await canvas.focus();await page.keyboard.press('a');
+  await expect(page.locator('[data-action="basic"]')).toHaveAttribute('aria-pressed','true');
+  await page.keyboard.press('Escape');expect((await session(page)).pending).toBeNull();
+});
+
+test('keyboard-only shortcuts respect presentation visibility and repeated scene replacement',async({page})=>{
+  await page.clock.install();
+  await page.goto('./?game=battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const before=await session(page),actor=before.state.units.find(u=>u.id===before.state.initiative[before.state.activeIndex])!;
+  const reach=previewMovement(before.state,actor.id,catalog);if(!reach.ok)throw Error(reach.reason);
+  const cell=reach.cells.find(c=>c.cost>0)!.cell;
+  await page.locator('#battle-target').selectOption(`${cell.x},${cell.y}`);await page.locator('canvas').focus();
+  await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
+  await page.keyboard.press('c');await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
+  const accepted=await session(page);
+  for(const key of ['m','a','s','1','w','c'])await page.keyboard.press(key);
+  expect((await session(page)).state).toEqual(accepted.state);
+  await page.clock.resume();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));});
+  const hidden=await session(page);
+  await page.keyboard.press('a');await page.keyboard.press('w');
+  expect((await session(page)).state).toEqual(hidden.state);
+  await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:false});document.dispatchEvent(new Event('visibilitychange'));});
+  for(let i=0;i<2;i++){
+    await page.locator('#fit-restart').click();await expect(page.locator('#battle-dialog')).toBeVisible();
+    const modal=await session(page);await page.keyboard.press('w');await page.keyboard.press('c');
+    expect((await session(page)).state).toEqual(modal.state);
+    await confirmRestart(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  }
+  const current=await session(page),active=current.state.units.find(u=>u.id===current.state.initiative[current.state.activeIndex])!;
+  const moves=previewMovement(current.state,active.id,catalog);if(!moves.ok)throw Error(moves.reason);
+  const destination=moves.cells.find(c=>c.cost>0)!.cell;
+  await page.locator('#battle-target').selectOption(`${destination.x},${destination.y}`);await page.locator('canvas').focus();await page.keyboard.press('c');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  expect((await session(page)).state.commandCount).toBe(current.state.commandCount+1);
+  await page.reload();await page.locator('#save-continue').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const resumed=await readSession(page);await page.locator('canvas').focus();await page.keyboard.press('w');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const after=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
+  expect(after.state.commandCount).toBeGreaterThan(resumed.state.commandCount);
+});
+
 test('keyboard-only movement, attack confirmation and Wait use the shared decision flow',async({page})=>{
   await page.goto('./?game=battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   await page.locator('#fit-restart').focus();await page.keyboard.press('Enter');
@@ -515,7 +631,7 @@ test('keyboard-only movement, attack confirmation and Wait use the shared decisi
     const s=await session(page);
     if(command.type==='endTurn'){await page.locator('#battle-next').focus();await page.keyboard.press('Enter');return;}
     if(command.type==='drinkDraught')throw Error('Standalone battle does not supply draughts');
-    const action=command.type==='move'?'move':command.abilityId==='ability:basic_attack'?'basic':'signature';
+    const action=command.type==='move'?'move':command.abilityId==='ability:basic_attack'?'basic':command.abilityId;
     await page.locator(`[data-action="${action}"]`).focus();await page.keyboard.press('Enter');
     const cell=command.type==='move'?command.to:s.state.units.find(u=>u.id===('unitId' in command.target?command.target.unitId:'missileTargets' in command.target?command.target.missileTargets[0]:-1))!.cell;
     const actor=s.state.units.find(u=>u.id===s.state.initiative[s.state.activeIndex])!;
@@ -603,13 +719,13 @@ test('live actor, inspection and cancellation remain independent of pending inte
   for(let turn=0;turn<12 && seen.size<3;turn++){
     const current=await session(page),actor=current.state.units.find(u=>u.id===current.state.initiative[current.state.activeIndex])!;
     if(actor.side!=='player')throw Error('Expected player');
-    const def=catalog.heroes[actor.defId],signature=Object.values(catalog.abilities).find(a=>a.id!=='ability:basic_attack'&&a.owners.includes(actor.defId))!;
+    const def=catalog.heroes[actor.defId],abilities=Object.values(catalog.abilities).filter(a=>a.id!=='ability:basic_attack'&&a.owners.includes(actor.defId));
     seen.add(actor.defId);
     await page.locator('#battle-scroll').evaluate(e=>e.scrollTop=0);
     await page.screenshot({path:info.outputPath(`actor-${actor.defId}.png`)});
     await expect(page.locator('#battle-actor-name')).toHaveText(actor.defId[0].toUpperCase()+actor.defId.slice(1));
     await expect(page.locator('#battle-hp')).toHaveText(`HP ${actor.hp}/${def.stats.maxHp}`);
-    await expect(page.locator('[data-action="signature"] strong')).toHaveText(signature.id.slice(8).split('_').map(w=>w[0].toUpperCase()+w.slice(1)).join(' '));
+    for(const ability of abilities)await expect(page.locator(`[data-action="${ability.id}"] strong`)).toHaveText(displayName(ability.id));
     await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});
     const before=await page.locator('#game').getAttribute('data-session'),preview=await page.locator('#battle-preview').textContent();
     const actorText=await page.locator('#battle-actor').textContent();
@@ -733,4 +849,34 @@ test('opening enemy initiative is explicit before the first playable hero turn',
   expect(opening.filter(turn => !turn.label.includes('Enemy opening turn (initiative)'))).toEqual([]);
   await expect(page.locator('#battle-active')).toContainText('Your turn');
   expect((await session(page)).replay.initial.initiative).toEqual(new BattleSession(catalog, 'map:forest_ruins', 1).state.initiative);
+});
+
+test('narrow landscape battle stacks controls below a usable board', async ({ page }) => {
+ for (const viewport of [{width:320,height:200},{width:400,height:300},{width:480,height:320}]) {
+  await page.setViewportSize(viewport);
+  await page.goto('./battle');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const board=await page.locator('#battle-board-region').boundingBox();
+  const panel=await page.locator('#fit-panel').boundingBox();
+  expect(board!.width).toBeGreaterThan(viewport.width*.85);
+  expect(board!.height).toBeGreaterThan(30);
+  expect(panel!.y).toBeGreaterThanOrEqual(board!.y+board!.height);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  await page.screenshot({path:test.info().outputPath(`narrow-${viewport.width}.png`)});
+  // Use the same inset hooks as the portrait/rail stress case above.
+  await page.evaluate(()=>{
+   for(const [side,size] of Object.entries({top:24,right:24,bottom:34,left:24}))document.body.style.setProperty('--safe-'+side,size+'px');
+  });
+  await expect.poll(async()=> (await page.locator('#battlefield').boundingBox())!.y).toBeGreaterThanOrEqual(24);
+  const insetBoard=await page.locator('#battle-board-region').boundingBox();
+  const insetPanel=await page.locator('#fit-panel').boundingBox();
+  expect(insetBoard!.height).toBeGreaterThan(30);
+  expect(insetBoard!.x).toBeGreaterThanOrEqual(24);
+  expect(insetBoard!.x+insetBoard!.width).toBeLessThanOrEqual(viewport.width-24);
+  expect(insetPanel!.y).toBeGreaterThanOrEqual(insetBoard!.y+insetBoard!.height);
+  expect(insetPanel!.x).toBeGreaterThanOrEqual(24);
+  expect(insetPanel!.x+insetPanel!.width).toBeLessThanOrEqual(viewport.width-24);
+  expect(insetPanel!.y+insetPanel!.height).toBeLessThanOrEqual(viewport.height-34);
+  await page.screenshot({path:test.info().outputPath(`narrow-${viewport.width}-safe-area.png`)});
+ }
 });

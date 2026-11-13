@@ -114,7 +114,7 @@ portrait and native touch landscape. Only reviewed metadata narrows selection:
 Metadata is in Playwright test details, preserving titles and retained test IDs.
 Neither tag is a runtime skip, a replacement for touch or WebKit, nor permission
 to classify additional cases without reviewing their assertions. Current approved
-scope is nine canonical startup/asset cases and five explicit-viewport layout
+scope is nine canonical startup/asset cases and six explicit-viewport layout
 cases. Other routine interactions retain their matrix. The three extended progression journeys retain their matrix in the explicit extended commands.
 
 Full regression also applies reviewed stage filters beyond those tags: configured
@@ -216,7 +216,7 @@ PR readiness selects the applicable rows under the change matrix.
 | Ability-picker fixtures | `npm run test:fixtures -- ability-picker.spec.ts` | `ability-picker.spec.ts`, dev server, all three Chromium profiles. |
 | Run-item fixtures | `npm run test:fixtures -- run-items.spec.ts` | `run-items.spec.ts`, dev server, all three Chromium profiles. |
 | Placement failure/retry | `PLAYWRIGHT_SERVER_MODE=dev npx --no-install playwright test -c playwright.regression.config.ts tests/overworld-map.spec.ts -g 'controlled placement failure preserves complete state and supports retry'` | Three Chromium profiles; preview skips are not coverage. |
-| WebKit battle/run acceptance | `npx --no-install playwright test -c playwright.device-acceptance.config.ts` | Config's selected battle-loop, persistence, run-progression, audio and radial hold/tap/cancel/End turn cases, iPhone portrait/landscape. |
+| WebKit battle/run acceptance | `npx --no-install playwright test -c playwright.device-acceptance.config.ts` | Config's selected battle-loop, persistence, run-progression, audio, radial hold/tap/cancel/End turn and camera HUD-reflow/viewport-refit cases, iPhone portrait/landscape. Camera zoom setup uses synthetic wheel events on mobile WebKit; post-reflow picking uses native taps (no native-pinch claim). |
 | WebKit dungeon/exploration | `npx --no-install playwright test -c playwright.exploration.config.ts` | Dungeon, exploration, lifecycle files; desktop and two mobile orientations. |
 | Health-bar device matrix | `npx --no-install playwright test -c playwright.health-bars.config.ts` | Health-bar file, iPhone portrait and landscape WebKit. Chromium desktop and Pixel coverage stays in the broad regression suite; do not reintroduce those duplicate projects. |
 | Configured production telemetry | `npm run test:telemetry` | `telemetry.spec.ts`; dedicated instrumented build in `tmp/issue128-dist`. Full regression selects desktop Chromium only. Focused runs without `--project` still discover all three profiles. |
@@ -249,8 +249,10 @@ WebKit acceptance/exploration configs retain their matching profiles. Dev item
 and ability fixtures reset on reload, with learned-ability persistence retained
 in the menu dungeon corpus and extended journeys. Collector cold/warm coverage
 preserves game slots instead of clearing them. Issue #259's source-bound coverage
-[mapping](qa/issue-259/coverage-map.json) records moved/renamed/added IDs; the existing 23 approved device-matrix
-reductions remain unchanged. The additional full-regression desktop-only telemetry/root-dev
+[mapping](qa/issue-259/coverage-map.json) records moved/renamed/added IDs. The original 23 approved device-matrix
+reductions are preserved; the explicit 1280×720 radial-dock witness adds one
+checked Pixel landscape-to-portrait equivalence, for 24 current reductions.
+See [the repair evidence](qa/radial-selection-contract.md). The additional full-regression desktop-only telemetry/root-dev
 filters, prefix `@touch-audio` Pixel portrait retention, and health-bar Chromium overlap
 removal are enforced by the live selection contract.
 Honor meaningful engine/mode skips (for example Chromium CDP-only input checks

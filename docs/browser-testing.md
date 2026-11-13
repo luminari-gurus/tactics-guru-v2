@@ -108,6 +108,14 @@ CLI for other custom reporting workflows. `npm test` selects only the seven core
 
 ## CI and resuming #200
 
+For a cold setup measurement, dispatch **PR verification** with `cold_setup`
+enabled. The job starts with empty npm and Playwright directories under the
+runner's job temp directory and skips the Actions npm cache restore. It uses
+the same ten-minute budget and checks as an ordinary PR run. Compare it with a
+dispatch on the same source with `cold_setup` disabled. Record queue time
+separately from active job time. This measures package and browser downloads
+on the qualified runner; Node, OS libraries and GPU state are outside its scope.
+
 Brian provisions the self-hosted runner. Register it with the default `self-hosted`
 label and the custom `tactics-browser` label. OS/architecture are intentionally
 not fixed until the host is selected; use a Playwright-supported platform.

@@ -1,0 +1,102 @@
+{
+  "source": "cb5927663f66ec5dd1f70aca9edfd3dec5e32c09",
+  "dirty": "",
+  "node": "v24.22.1",
+  "startedAt": "2026-11-09T18:14:18.951Z",
+  "durationMs": 204929,
+  "budgetMs": 480000,
+  "results": [
+    {
+      "id": "tooling",
+      "status": "passed",
+      "command": [
+        "npm",
+        "exec",
+        "--no",
+        "--",
+        "node",
+        "--test",
+        "tests/tooling/verify-pr.test.mjs",
+        "tests/tooling/verify-full.test.mjs"
+      ],
+      "durationMs": 8658.900077,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false
+    },
+    {
+      "id": "units",
+      "status": "passed",
+      "command": [
+        "npm",
+        "run",
+        "test:unit",
+        "--",
+        "--reporter=json",
+        "--outputFile=/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/pr/1794248058921-1188165/units.json"
+      ],
+      "durationMs": 59784.094961999996,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false
+    },
+    {
+      "id": "typecheck",
+      "status": "passed",
+      "command": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "durationMs": 1347.076270000005,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false
+    },
+    {
+      "id": "build-integration",
+      "status": "passed",
+      "command": [
+        "npm",
+        "run",
+        "test:build",
+        "--",
+        "--reporter=json",
+        "--outputFile=/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/pr/1794248058921-1188165/build-integration.json"
+      ],
+      "durationMs": 7194.076983999999,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false
+    },
+    {
+      "id": "bundle",
+      "status": "passed",
+      "command": [
+        "npm",
+        "run",
+        "build:bundle"
+      ],
+      "durationMs": 942.7083129999955,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false
+    },
+    {
+      "id": "journeys",
+      "status": "passed",
+      "command": [
+        "npm",
+        "test",
+        "--",
+        "--reporter=line,json",
+        "--output=/home/actions/actions-runner/_work/tactics-guru-v2/tactics-guru-v2/verification-receipts/pr/1794248058921-1188165/artifacts"
+      ],
+      "durationMs": 126985.308079,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false
+    }
+  ],
+  "fullReceipt": "pr-5e3df8b-full-summary.json.gz"
+}

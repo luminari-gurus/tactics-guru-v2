@@ -1,0 +1,266 @@
+{
+  "status": "83-case acceptance accounted across retained passes and fresh remainder; not a clean single 83-case run",
+  "reused": {
+    "head": "a2c62287b5825432ee368b66e49a4afae11e70c3",
+    "testedMerge": "e3a888e1c22e3a01b0da1aaa107c2786ce38cfc7",
+    "dirty": false,
+    "inputHash": "90714a4b0f59ed9b9bf186504cdc2ef8369a834c8759789dffc703efe830b33d",
+    "node": "v24.22.2",
+    "runner": "unraid-tactics-02",
+    "run": 42840048098,
+    "runStatus": "failed; retain original failures",
+    "passedCases": 62,
+    "failedCases": [
+      {
+        "id": "e0f8639c387951b6a797-23630d4efbda6bcf21e1",
+        "file": "dungeon.spec.ts",
+        "title": "saved menu dungeon keeps proof tools hidden across legal encounters",
+        "project": "desktop",
+        "outcome": "unexpected",
+        "evidenceRun": 42840048098,
+        "attempts": [
+          {
+            "status": "failed",
+            "retry": 0,
+            "duration": 320628
+          }
+        ]
+      },
+      {
+        "id": "e0f8639c387951b6a797-c22d53481fae43b7fffc",
+        "file": "dungeon.spec.ts",
+        "title": "saved menu dungeon keeps proof tools hidden across legal encounters",
+        "project": "mobile-portrait",
+        "outcome": "unexpected",
+        "evidenceRun": 42840048098,
+        "attempts": [
+          {
+            "status": "failed",
+            "retry": 0,
+            "duration": 191870
+          }
+        ]
+      },
+      {
+        "id": "e0f8639c387951b6a797-56f89728611c6bc42a39",
+        "file": "dungeon.spec.ts",
+        "title": "saved menu dungeon keeps proof tools hidden across legal encounters",
+        "project": "mobile-landscape",
+        "outcome": "unexpected",
+        "evidenceRun": 42840048098,
+        "attempts": [
+          {
+            "status": "failed",
+            "retry": 0,
+            "duration": 206760
+          }
+        ]
+      }
+    ],
+    "stats": [
+      {
+        "path": "browser-runs\\run-7Czld6\\results.json",
+        "stats": {
+          "startTime": "2026-11-10T15:03:32.074Z",
+          "duration": 1085960.119,
+          "expected": 27,
+          "skipped": 0,
+          "unexpected": 3,
+          "flaky": 0
+        }
+      },
+      {
+        "path": "browser-runs\\run-OHgOgJ\\results.json",
+        "stats": {
+          "startTime": "2026-11-10T15:02:05.659Z",
+          "duration": 43365.33,
+          "expected": 21,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      {
+        "path": "browser-runs\\run-XZ2gRg\\results.json",
+        "stats": {
+          "startTime": "2026-11-10T15:02:51.485Z",
+          "duration": 38366.334,
+          "expected": 14,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      }
+    ],
+    "comparison": "Production, helpers, configs and other test bodies unchanged. Only the saved full-floor assertion order changed; those cases are re-executed.",
+    "artifact": {
+      "id": 13777315995,
+      "bytes": 1042292280,
+      "digest": "sha256:eaf24322e581acff354ca10fd2e7426ad2b57d9cc8196ba9b37fce2165ac714f",
+      "localSelection": "selected source/results/error contexts, 1,369,569 bytes; full traces retained by original CI artifact"
+    },
+    "rawSha256": {
+      "issue-176\\source.json": "23f70ddd993a30e6637c08c37fe392b012a4683ff74ad02089c7f03cfa520bca",
+      "browser-runs\\run-7Czld6\\results.json": "523a59935d0cd8196e6e1139b1355dcb9236934e0566c891d15f25f96d0150c1",
+      "browser-runs\\run-OHgOgJ\\results.json": "11a39d94e83f6b1f514c0ec84d0704637d4942a16d2fc7d3743a582d219fb016",
+      "browser-runs\\run-XZ2gRg\\results.json": "07794ec328a4b38478a955abb24c029526d7b601b4625ee89a4ff16eaf6355f1"
+    }
+  },
+  "standard": {
+    "run": 42845257864,
+    "source": "6dd0e291661a7527745e3626fcff9b9ad7625ea7",
+    "dirty": "",
+    "node": "v24.22.1",
+    "stages": [
+      {
+        "id": "tooling",
+        "status": "passed",
+        "durationMs": 7281.964964999999
+      },
+      {
+        "id": "units",
+        "status": "passed",
+        "durationMs": 60275.105488999994
+      },
+      {
+        "id": "typecheck",
+        "status": "passed",
+        "durationMs": 1403.2019230000005
+      },
+      {
+        "id": "build-integration",
+        "status": "passed",
+        "durationMs": 7175.181400999994
+      },
+      {
+        "id": "bundle",
+        "status": "passed",
+        "durationMs": 920.5193880000006
+      },
+      {
+        "id": "journeys",
+        "status": "passed",
+        "durationMs": 124010.42999100001
+      }
+    ],
+    "units": {
+      "total": 1279,
+      "passed": 1279,
+      "failed": 0,
+      "pending": 0
+    },
+    "core": {
+      "startTime": "2026-11-10T15:33:15.966Z",
+      "duration": 123323.001,
+      "expected": 7,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "rawSha256": {
+      "1794324718226-1476377\\build-integration.json": "6862576a1ec2d37e88eed9dc2c8f86595264919f4fa0bef83c0330a1658b4b32",
+      "1794324718226-1476377\\journeys.json": "23e7079dda8db62b0ac60850049db7a8393b436f345069387bcc8c237c7e83bd",
+      "1794324718226-1476377\\summary.json": "ab8d1519a9272a06703f0b789a2dd12b7c732dd87fe7fdbac59fe5eda09617f2",
+      "1794324718226-1476377\\units.json": "833c874bcb7c710042fbff437baa2f0e27c05da282e90815f41cb984d438d7c6"
+    },
+    "buildIntegrations": {
+      "total": 2,
+      "passed": 2,
+      "failed": 0
+    }
+  },
+  "remaining": {
+    "run": 42845257735,
+    "attempt": 2,
+    "head": "003be9bad3afc25a264f05ce3b95bd5e8e441b0e",
+    "source": "6dd0e291661a7527745e3626fcff9b9ad7625ea7",
+    "dirty": false,
+    "inputHash": "f4914a8ea61efe004781e4e2b6e6670bf2dca4cc3d8c28e7629b3bb733fbcf3c",
+    "node": "v24.22.2",
+    "runner": "unraid-tactics-02",
+    "passedCases": 21,
+    "stats": [
+      {
+        "path": "browser-runs\\run-d836So\\results.json",
+        "stats": {
+          "startTime": "2026-11-10T15:47:57.261Z",
+          "duration": 495339.49,
+          "expected": 6,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      {
+        "path": "browser-runs\\run-gBZvEq\\results.json",
+        "stats": {
+          "startTime": "2026-11-10T15:56:13.355Z",
+          "duration": 92819.318,
+          "expected": 12,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      {
+        "path": "browser-runs\\run-olBGfK\\results.json",
+        "stats": {
+          "startTime": "2026-11-10T15:37:20.019Z",
+          "duration": 635455.968,
+          "expected": 3,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      }
+    ],
+    "conditions": "VM-01 idle; only qualified VM-02 executing browser acceptance; physical-host unrelated processes not independently controlled",
+    "rawSha256": {
+      "issue-176\\source.json": "ef2eb8eec16d648df8c3e5f128826957baf12645bc0b9612edb00fae016ca65e",
+      "browser-runs\\run-d836So\\results.json": "9bd631466b9230becfe0096c02a37db1a054a00ba3300d68e53302b6a31cdd68",
+      "browser-runs\\run-gBZvEq\\results.json": "c788a16b02bedad86fcd869fbef430c4716bcbb66f308162d66346b173a9d0d6",
+      "browser-runs\\run-olBGfK\\results.json": "13137570b868127d116731a166fdaf812b90ce97297fd230defb21557f75d336"
+    }
+  },
+  "caseFile": "increment-3-cases.jsonl",
+  "totalQualifiedCases": 83,
+  "uniqueCaseKeys": 83,
+  "tooling": {
+    "windows": {
+      "command": "node --test tests/tooling/verification-batches.test.mjs tests/tooling/verification-selection.test.mjs",
+      "passed": 30,
+      "failed": 1,
+      "reason": "Existing POSIX guard test could not spawn sh in Windows runtime"
+    },
+    "posixGuard": {
+      "command": "node --test --test-name-pattern=\"workflow stays manual\" tests/tooling/verification-batches.test.mjs",
+      "host": "WSL Node 24.15.0",
+      "passed": 1,
+      "failed": 0
+    },
+    "contract": "Real selection retains all existing profiles, nine whole-file batches partition full discovery, approved 24 equivalence mappings preserved; no source changes for the shell limitation"
+  },
+  "environment": {
+    "platform": "linux",
+    "node": "v24.22.2",
+    "playwright": "1.64.1",
+    "browsers": {
+      "chromium": {
+        "executable": "/home/actions/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome",
+        "override": false,
+        "channel": "chromium",
+        "version": "156.0.8078.4",
+        "passed": true
+      },
+      "webkit": {
+        "executable": "/home/actions/.cache/ms-playwright/webkit-2370/pw_run.sh",
+        "override": false,
+        "channel": null,
+        "version": "27.2",
+        "passed": true
+      }
+    }
+  },
+  "qualifiedHead": "003be9bad3afc25a264f05ce3b95bd5e8e441b0e",
+  "visualReview": "Records menu desktop/Pixel portrait/landscape and complete-journey desktop/iPhone WebKit board snapshots inspected; existing layout retained; keyboard/touch recovery and legal controls executed."
+}

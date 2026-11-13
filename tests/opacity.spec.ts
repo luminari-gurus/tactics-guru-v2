@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, plainTest as test } from './helpers/startupDiagnostics';
 
 test('opacity slider previews 0–100, preserves its choice across fixtures and restart', async ({ page }) => {
   await page.goto('/?scene=proof');

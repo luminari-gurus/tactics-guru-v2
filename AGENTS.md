@@ -60,6 +60,10 @@ self-hosted runner with no automatic GitHub-hosted fallback.
 
 Eligible `risk:low` PRs auto-merge after `PR verification` passes for their current commit; [the workflow](.github/workflows/auto-merge-low-risk.yml) defines maintainer and safety checks.
 
+## Issue tracking
+
+Do not use Beads (`bd`) for this project. Use GitHub Issues to track work.
+
 ## `/work-work-work`
 
 When the user submits `/work-work-work`, read and follow

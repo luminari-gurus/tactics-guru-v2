@@ -1,0 +1,2970 @@
+{
+  "issue": 270,
+  "increment": "Five-stat recent journeys and retained personal best presentation",
+  "qualifiedCommit": "76c00bdbad31446f036042e1439d2e72e5fb6866",
+  "runtimeInputCommit": "46e8f3400dbd8afcbe45e473442cd39db5f359f0",
+  "sourceInputHash": "77536f6e36039e81d6030da8d8445fa039c0d4d2fad24818e0b30edb418bc5a1",
+  "inputManifest": "verification-receipts/issue270/inc3-final-inputs.json",
+  "lockfileSha256": "4d80074e809f307cab721dfbbcb4963e2a2ca6d617328aeea6450aed96d0d9d6",
+  "build": {
+    "indexSha256": "c48440b1dc67c7bb9274c508024156970f5ebd3d114de5f79ed244a44fe95ea0",
+    "mode": "production root preview",
+    "baseURL": "http://127.0.0.1:4173/"
+  },
+  "environment": {
+    "node": "v24.22.1",
+    "platform": "win32",
+    "arch": "x64",
+    "playwright": "1.64.1",
+    "chromium": "156.0.8078.4",
+    "webkit": "27.2"
+  },
+  "workers": 1,
+  "retries": 0,
+  "physicalDevicesTested": false,
+  "fullRegressionClaim": false,
+  "prVerification": {
+    "path": "verification-receipts/pr/1794442030634-127952/summary.json",
+    "sha256": "374115b441db3910e85c79926b23977aae69f01f6a804419ece520313bdff260",
+    "source": "46e8f3400dbd8afcbe45e473442cd39db5f359f0",
+    "durationMs": 136679,
+    "stages": [
+      {
+        "id": "tooling",
+        "status": "passed",
+        "durationMs": 20141.6061,
+        "command": [
+          "npm",
+          "exec",
+          "--no",
+          "--",
+          "node",
+          "--test",
+          "tests/tooling/verify-pr.test.mjs",
+          "tests/tooling/verify-full.test.mjs"
+        ]
+      },
+      {
+        "id": "units",
+        "status": "passed",
+        "durationMs": 45437.19640000001,
+        "command": [
+          "npm",
+          "run",
+          "test:unit",
+          "--",
+          "--reporter=json",
+          "--outputFile=C:\\Users\\apexw\\.codex\\worktrees\\issue-270-records-ui\\Tactics-Guru\\verification-receipts\\pr\\1794442030634-127952\\units.json"
+        ]
+      },
+      {
+        "id": "typecheck",
+        "status": "passed",
+        "durationMs": 5280.761400000003,
+        "command": [
+          "npm",
+          "run",
+          "typecheck"
+        ]
+      },
+      {
+        "id": "build-integration",
+        "status": "passed",
+        "durationMs": 9502.284799999994,
+        "command": [
+          "npm",
+          "run",
+          "test:build",
+          "--",
+          "--reporter=json",
+          "--outputFile=C:\\Users\\apexw\\.codex\\worktrees\\issue-270-records-ui\\Tactics-Guru\\verification-receipts\\pr\\1794442030634-127952\\build-integration.json"
+        ]
+      },
+      {
+        "id": "bundle",
+        "status": "passed",
+        "durationMs": 5353.541599999997,
+        "command": [
+          "npm",
+          "run",
+          "build:bundle"
+        ]
+      },
+      {
+        "id": "journeys",
+        "status": "passed",
+        "durationMs": 50947.74459999999,
+        "command": [
+          "npm",
+          "test",
+          "--",
+          "--reporter=line,json",
+          "--output=C:\\Users\\apexw\\.codex\\worktrees\\issue-270-records-ui\\Tactics-Guru\\verification-receipts\\pr\\1794442030634-127952\\artifacts"
+        ]
+      }
+    ],
+    "units": {
+      "total": 1339,
+      "passed": 1339,
+      "failed": 0
+    },
+    "coreJourneys": 7
+  },
+  "browserEvidence": [
+    {
+      "path": "verification-receipts/issue270/inc3-final-ui-chromium/report.json",
+      "sha256": "e437102b68759cd2f9288058602b74f002d3d3afb168c77fbfa2401d2c7fad24",
+      "scope": "All 9 records UI/recovery cases",
+      "kind": "playwright",
+      "counts": {
+        "total": 9,
+        "expected": 9,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "runnerDurationMs": 12134.101999999999,
+      "configuredWorkers": 1,
+      "firstTestDelayMs": 2608,
+      "testExecutionSpanMs": 8571,
+      "actualWorkers": 1,
+      "projects": [
+        {
+          "name": "desktop",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-records-ui/Tactics-Guru/tests"
+        },
+        {
+          "name": "mobile-portrait",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-records-ui/Tactics-Guru/tests"
+        },
+        {
+          "name": "mobile-landscape",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-records-ui/Tactics-Guru/tests"
+        }
+      ],
+      "globalErrors": [],
+      "tests": [
+        {
+          "id": "6584249e185c6ba36dd3-ae79674f970c42beac1e",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records empty state is read-only and keyboard focus returns to the invoker",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 314,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 314,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:09:30.536Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-905ae8e4ce7eeefb284d",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records display and reviewed export restore reset preserve active saves",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 896,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 896,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:09:31.074Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-786b4ff40e5c757ec84a",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: five-stat records and retained personal bests stay keyboard and touch accessible",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 687,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 687,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:09:31.977Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-68fd05b6127280468d31",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records empty state is read-only and keyboard focus returns to the invoker",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 358,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 358,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:09:33.325Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-c064462333227b5567c0",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records display and reviewed export restore reset preserve active saves",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 913,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 913,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:09:33.870Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-f998704fac9636cf3ec4",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: five-stat records and retained personal bests stay keyboard and touch accessible",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 968,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 968,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:09:34.792Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-7c53421120dc9c61a5f9",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records empty state is read-only and keyboard focus returns to the invoker",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 389,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 389,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:09:36.409Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-81754c3ac1ca4f07ed34",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records display and reviewed export restore reset preserve active saves",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 943,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 943,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:09:37.011Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-eade645413e2278ecd87",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: five-stat records and retained personal bests stay keyboard and touch accessible",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1146,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1146,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:09:37.961Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "verification-receipts/issue270/inc3-final-ui-webkit/report.json",
+      "sha256": "b7e8462d2ea1f0a81199a1d731c31c9828dec4941f7a6d3e47268418825b8b01",
+      "scope": "All 6 records UI/recovery cases",
+      "kind": "playwright",
+      "counts": {
+        "total": 6,
+        "expected": 6,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "runnerDurationMs": 14435.414999999999,
+      "configuredWorkers": 1,
+      "firstTestDelayMs": 2860,
+      "testExecutionSpanMs": 10875,
+      "actualWorkers": 1,
+      "projects": [
+        {
+          "name": "acceptance-webkit-portrait",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-records-ui/Tactics-Guru/tests"
+        },
+        {
+          "name": "acceptance-webkit-landscape",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-records-ui/Tactics-Guru/tests"
+        }
+      ],
+      "globalErrors": [],
+      "tests": [
+        {
+          "id": "6584249e185c6ba36dd3-5891ae6e542c15fdb806",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records empty state is read-only and keyboard focus returns to the invoker",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 490,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 490,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:09:43.429Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-696779a756e853e7baee",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records display and reviewed export restore reset preserve active saves",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2252,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2252,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:09:43.985Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-05e2dd31fc5702a40fbf",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: five-stat records and retained personal bests stay keyboard and touch accessible",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2571,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2571,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:09:46.245Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-6833e4133f04933d345a",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records empty state is read-only and keyboard focus returns to the invoker",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 392,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 392,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:09:49.404Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-8d857a31e5e967b37001",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: records display and reviewed export restore reset preserve active saves",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1994,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1994,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:09:49.865Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-c6da3a97347ae76ad79d",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: five-stat records and retained personal bests stay keyboard and touch accessible",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2436,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2436,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:09:51.868Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "verification-receipts/issue270/inc3-final-isolation-fresh-repair/report.json",
+      "sha256": "be865753dee03852d5a273e554d7f287808f49d9efed0593e5d9911ba41af692",
+      "scope": "All 15 fresh-route permutations after readiness repair",
+      "kind": "playwright",
+      "counts": {
+        "total": 15,
+        "expected": 15,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "runnerDurationMs": 94731.747,
+      "configuredWorkers": 1,
+      "firstTestDelayMs": 3313,
+      "testExecutionSpanMs": 90476,
+      "actualWorkers": 1,
+      "projects": [
+        {
+          "name": "desktop",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-records-ui/Tactics-Guru/tests"
+        },
+        {
+          "name": "mobile-portrait",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-records-ui/Tactics-Guru/tests"
+        },
+        {
+          "name": "mobile-landscape",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-records-ui/Tactics-Guru/tests"
+        }
+      ],
+      "globalErrors": [],
+      "tests": [
+        {
+          "id": "8352ba8e75a15b46318d-4f498f00598fe7a62a3f",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses missing saved games",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 5989,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 5989,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:15:24.209Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-5e85b1c0981a91fc8ac5",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses valid saved games",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6221,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6221,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:15:30.507Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-b416ddbdd91ab5907829",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses corrupt saved games",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6066,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6066,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:15:36.738Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-18cd41a77fbb0b43db24",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses backup-only saved games",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6065,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6065,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:15:42.816Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-89e4f21bc61dec33eace",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses unavailable saved games",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 5870,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 5870,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:15:48.890Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-616f8f13ed45e7ee21d8",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses missing saved games",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 5881,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 5881,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:15:55.531Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-a1531df83cfede353c41",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses valid saved games",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 5900,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 5900,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:16:01.662Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-ce792c43a9226680ea1f",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses corrupt saved games",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 5591,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 5591,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:16:07.573Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-dd4a8b9c53a78e673501",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses backup-only saved games",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 5863,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 5863,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:16:13.176Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-e5a0e12b97db9e6d5699",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses unavailable saved games",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 5606,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 5606,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:16:19.046Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-ce2128f4b8eb661f80f1",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses missing saved games",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 5988,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 5988,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:16:25.528Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-004d902ffad608bf779d",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses valid saved games",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 5932,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 5932,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:16:31.736Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-942d41633f66678cc74a",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses corrupt saved games",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 5510,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 5510,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:16:37.678Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-f2aac0a1b2f5156ee688",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses backup-only saved games",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 5827,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 5827,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:16:43.200Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-12565df00087e1f9d9b7",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses unavailable saved games",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 5651,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 5651,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:16:49.034Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "verification-receipts/issue270/inc3-final-isolation-webkit/report.json",
+      "sha256": "888c452523bed4d7f9fcf60a02923577d5969bdecbbc346a364992b9989748f0",
+      "scope": "All 30 WebKit isolation permutations",
+      "kind": "playwright",
+      "counts": {
+        "total": 30,
+        "expected": 30,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "runnerDurationMs": 204200.169,
+      "configuredWorkers": 1,
+      "firstTestDelayMs": 3751,
+      "testExecutionSpanMs": 199569,
+      "actualWorkers": 1,
+      "projects": [
+        {
+          "name": "acceptance-webkit-portrait",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-records-ui/Tactics-Guru/tests"
+        },
+        {
+          "name": "acceptance-webkit-landscape",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-records-ui/Tactics-Guru/tests"
+        }
+      ],
+      "globalErrors": [],
+      "tests": [
+        {
+          "id": "8352ba8e75a15b46318d-c36978f47754645e4baa",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses missing saved games",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 8426,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 8426,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:16:59.815Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-29e02336ce6fcd53988c",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses valid saved games",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 9661,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 9661,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:17:08.319Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-574a0d5d23ac73bfe661",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses corrupt saved games",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 8876,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 8876,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:17:17.989Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-536b80aa955d95ae67f9",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses backup-only saved games",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 11010,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 11010,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:17:26.874Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-c261f8c7f2279a93cf91",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses unavailable saved games",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 8828,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 8828,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:17:37.894Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-776256eabc7eea3d66b4",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: diagnostic play never accesses missing saved games",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6758,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6758,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:17:46.732Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-6c8ec5b702888c71ca53",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: diagnostic play never accesses valid saved games",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 8070,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 8070,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:17:53.497Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-97abb8d72ed24d5b29df",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: diagnostic play never accesses corrupt saved games",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6925,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6925,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:18:01.573Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-3a6777670c68b01a1f4c",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: diagnostic play never accesses backup-only saved games",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 8013,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 8013,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:18:08.503Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-9ac9552d35134138f903",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: diagnostic play never accesses unavailable saved games",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6741,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6741,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:18:16.523Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-6891f67932526fb3c52f",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: Qbert never accesses missing saved games",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3587,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3587,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:18:23.270Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-9c1f2e576c0f4be129af",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: Qbert never accesses valid saved games",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4589,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4589,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:18:26.865Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-ba09a43a093c67015a66",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: Qbert never accesses corrupt saved games",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4325,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4325,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:18:31.462Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-3aa91509ea7d06c67cc8",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: Qbert never accesses backup-only saved games",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4197,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4197,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:18:35.794Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-2341236992c8ec9271ce",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: Qbert never accesses unavailable saved games",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3645,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3645,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:18:39.995Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-339f37b3f8546d9281a3",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses missing saved games",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 7738,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 7738,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:18:44.359Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-9772697b9dbcc13b23ec",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses valid saved games",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 8481,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 8481,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:18:52.176Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-6afa3babbe4125bbb6ab",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses corrupt saved games",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 7743,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 7743,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:19:00.663Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-38d0c8822a68708b43f3",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses backup-only saved games",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 8568,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 8568,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:19:08.411Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-2e93b02f40ddb18d936a",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: fresh play never accesses unavailable saved games",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 7845,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 7845,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:19:16.984Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-3f8fda5cfb88d2608ca2",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: diagnostic play never accesses missing saved games",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6558,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6558,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:19:24.834Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-5fe39fb332096ccb33f3",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: diagnostic play never accesses valid saved games",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 7535,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 7535,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:19:31.397Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-11b859ec45849775b866",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: diagnostic play never accesses corrupt saved games",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6720,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6720,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:19:38.939Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-8891b9fde4f2e87b95f4",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: diagnostic play never accesses backup-only saved games",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 7205,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 7205,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:19:45.666Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-0f13b74ea7ffa2eb6950",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: diagnostic play never accesses unavailable saved games",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 6520,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 6520,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:19:52.877Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-32a3c6d23ad9d4ce046a",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: Qbert never accesses missing saved games",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3563,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3563,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:19:59.407Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-aadc2d472e2ecd66cde8",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: Qbert never accesses valid saved games",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4479,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4479,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:20:02.975Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-3c08c26edf584ccfd813",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: Qbert never accesses corrupt saved games",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3706,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3706,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:20:07.460Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-c54148388417b2821bf3",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: Qbert never accesses backup-only saved games",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 4504,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 4504,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:20:11.172Z"
+            }
+          ]
+        },
+        {
+          "id": "8352ba8e75a15b46318d-3be3293324cc62be7020",
+          "file": "battle-persistence.spec.ts",
+          "title": "testing routes: Qbert never accesses unavailable saved games",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 3701,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 3701,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:20:15.683Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "verification-receipts/issue270/inc3-final-captures-chromium/report.json",
+      "sha256": "84293bafa1c7353b9ecccd1283ee5a54b0a2cc4df17700cd053ba22697d56dbf",
+      "scope": "3 fresh current UI witnesses and retained screenshots",
+      "kind": "playwright",
+      "counts": {
+        "total": 3,
+        "expected": 3,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "runnerDurationMs": 9990.041000000001,
+      "configuredWorkers": 1,
+      "firstTestDelayMs": 3939,
+      "testExecutionSpanMs": 4975,
+      "actualWorkers": 1,
+      "projects": [
+        {
+          "name": "desktop",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-records-ui/Tactics-Guru/tests"
+        },
+        {
+          "name": "mobile-portrait",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-records-ui/Tactics-Guru/tests"
+        },
+        {
+          "name": "mobile-landscape",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-records-ui/Tactics-Guru/tests"
+        }
+      ],
+      "globalErrors": [],
+      "tests": [
+        {
+          "id": "6584249e185c6ba36dd3-786b4ff40e5c757ec84a",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: five-stat records and retained personal bests stay keyboard and touch accessible",
+          "project": "desktop",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 936,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 936,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:20:24.615Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-f998704fac9636cf3ec4",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: five-stat records and retained personal bests stay keyboard and touch accessible",
+          "project": "mobile-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1055,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1055,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:20:26.486Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-eade645413e2278ecd87",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: five-stat records and retained personal bests stay keyboard and touch accessible",
+          "project": "mobile-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 1199,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 1199,
+              "retry": 0,
+              "workerIndex": 2,
+              "startTime": "2026-11-12T00:20:28.391Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "verification-receipts/issue270/inc3-final-captures-webkit/report.json",
+      "sha256": "32ad2a02dfe2a4fba1861baa8af2175305fbf3214ba2e57daadcdf2b5f569053",
+      "scope": "2 fresh current UI witnesses and retained screenshots",
+      "kind": "playwright",
+      "counts": {
+        "total": 2,
+        "expected": 2,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "retryAttempts": 0
+      },
+      "runnerDurationMs": 8923.046,
+      "configuredWorkers": 1,
+      "firstTestDelayMs": 2699,
+      "testExecutionSpanMs": 5418,
+      "actualWorkers": 1,
+      "projects": [
+        {
+          "name": "acceptance-webkit-portrait",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-records-ui/Tactics-Guru/tests"
+        },
+        {
+          "name": "acceptance-webkit-landscape",
+          "retries": 0,
+          "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-records-ui/Tactics-Guru/tests"
+        }
+      ],
+      "globalErrors": [],
+      "tests": [
+        {
+          "id": "6584249e185c6ba36dd3-05e2dd31fc5702a40fbf",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: five-stat records and retained personal bests stay keyboard and touch accessible",
+          "project": "acceptance-webkit-portrait",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2430,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2430,
+              "retry": 0,
+              "workerIndex": 0,
+              "startTime": "2026-11-12T00:20:33.806Z"
+            }
+          ]
+        },
+        {
+          "id": "6584249e185c6ba36dd3-c6da3a97347ae76ad79d",
+          "file": "main-menu.spec.ts",
+          "title": "main menu: five-stat records and retained personal bests stay keyboard and touch accessible",
+          "project": "acceptance-webkit-landscape",
+          "outcome": "expected",
+          "expectedStatus": "passed",
+          "durationMs": 2351,
+          "attempts": [
+            {
+              "status": "passed",
+              "durationMs": 2351,
+              "retry": 0,
+              "workerIndex": 1,
+              "startTime": "2026-11-12T00:20:36.873Z"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "originalFailedIsolation": {
+    "path": "verification-receipts/issue270/inc3-final-isolation-chromium/report.json",
+    "sha256": "f1e9bb0485cb6cd0ac0c54ef7fda139e51889918156347ced11a8c3465d17504",
+    "scope": "Original full batch: 44 passed / 1 failed; only 30 passing diagnostic/Qbert cases reused unchanged. All 15 fresh-route cases rerun separately after repair.",
+    "kind": "playwright",
+    "counts": {
+      "total": 45,
+      "expected": 44,
+      "unexpected": 1,
+      "flaky": 0,
+      "skipped": 0,
+      "retryAttempts": 0
+    },
+    "runnerDurationMs": 230569.383,
+    "configuredWorkers": 1,
+    "firstTestDelayMs": 2688,
+    "testExecutionSpanMs": 227140,
+    "actualWorkers": 1,
+    "projects": [
+      {
+        "name": "desktop",
+        "retries": 0,
+        "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-records-ui/Tactics-Guru/tests"
+      },
+      {
+        "name": "mobile-portrait",
+        "retries": 0,
+        "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-records-ui/Tactics-Guru/tests"
+      },
+      {
+        "name": "mobile-landscape",
+        "retries": 0,
+        "testDir": "C:/Users/apexw/.codex/worktrees/issue-270-records-ui/Tactics-Guru/tests"
+      }
+    ],
+    "globalErrors": [],
+    "tests": [
+      {
+        "id": "8352ba8e75a15b46318d-4f498f00598fe7a62a3f",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: fresh play never accesses missing saved games",
+        "project": "desktop",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 5238,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 5238,
+            "retry": 0,
+            "workerIndex": 0,
+            "startTime": "2026-11-12T00:09:58.079Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-5e85b1c0981a91fc8ac5",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: fresh play never accesses valid saved games",
+        "project": "desktop",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 6110,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 6110,
+            "retry": 0,
+            "workerIndex": 0,
+            "startTime": "2026-11-12T00:10:03.517Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-b416ddbdd91ab5907829",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: fresh play never accesses corrupt saved games",
+        "project": "desktop",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 5541,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 5541,
+            "retry": 0,
+            "workerIndex": 0,
+            "startTime": "2026-11-12T00:10:09.634Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-18cd41a77fbb0b43db24",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: fresh play never accesses backup-only saved games",
+        "project": "desktop",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 5739,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 5739,
+            "retry": 0,
+            "workerIndex": 0,
+            "startTime": "2026-11-12T00:10:15.182Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-89e4f21bc61dec33eace",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: fresh play never accesses unavailable saved games",
+        "project": "desktop",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 5560,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 5560,
+            "retry": 0,
+            "workerIndex": 0,
+            "startTime": "2026-11-12T00:10:20.928Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-7dfe9619d127dc4198be",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: diagnostic play never accesses missing saved games",
+        "project": "desktop",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 4476,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 4476,
+            "retry": 0,
+            "workerIndex": 0,
+            "startTime": "2026-11-12T00:10:26.495Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-4cdb4db0d93af00a4b7d",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: diagnostic play never accesses valid saved games",
+        "project": "desktop",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 4732,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 4732,
+            "retry": 0,
+            "workerIndex": 0,
+            "startTime": "2026-11-12T00:10:30.979Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-238f2d6a23557e04905a",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: diagnostic play never accesses corrupt saved games",
+        "project": "desktop",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 4455,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 4455,
+            "retry": 0,
+            "workerIndex": 0,
+            "startTime": "2026-11-12T00:10:35.719Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-fef03ba6f761d11e7197",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: diagnostic play never accesses backup-only saved games",
+        "project": "desktop",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 4633,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 4633,
+            "retry": 0,
+            "workerIndex": 0,
+            "startTime": "2026-11-12T00:10:40.180Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-9f12cf0424639429659b",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: diagnostic play never accesses unavailable saved games",
+        "project": "desktop",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 4291,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 4291,
+            "retry": 0,
+            "workerIndex": 0,
+            "startTime": "2026-11-12T00:10:44.820Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-d109a31b1d29065c2148",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: Qbert never accesses missing saved games",
+        "project": "desktop",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 3056,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 3056,
+            "retry": 0,
+            "workerIndex": 0,
+            "startTime": "2026-11-12T00:10:49.118Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-770082e77c74d510d7fe",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: Qbert never accesses valid saved games",
+        "project": "desktop",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 3298,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 3298,
+            "retry": 0,
+            "workerIndex": 0,
+            "startTime": "2026-11-12T00:10:52.180Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-33d7eb5ca067393ec642",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: Qbert never accesses corrupt saved games",
+        "project": "desktop",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 3072,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 3072,
+            "retry": 0,
+            "workerIndex": 0,
+            "startTime": "2026-11-12T00:10:55.486Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-d563cc74393c5f2b8505",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: Qbert never accesses backup-only saved games",
+        "project": "desktop",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 3301,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 3301,
+            "retry": 0,
+            "workerIndex": 0,
+            "startTime": "2026-11-12T00:10:58.564Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-b351faec71e77f6c1397",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: Qbert never accesses unavailable saved games",
+        "project": "desktop",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 3161,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 3161,
+            "retry": 0,
+            "workerIndex": 0,
+            "startTime": "2026-11-12T00:11:01.872Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-616f8f13ed45e7ee21d8",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: fresh play never accesses missing saved games",
+        "project": "mobile-portrait",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 5521,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 5521,
+            "retry": 0,
+            "workerIndex": 1,
+            "startTime": "2026-11-12T00:11:05.731Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-a1531df83cfede353c41",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: fresh play never accesses valid saved games",
+        "project": "mobile-portrait",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 5745,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 5745,
+            "retry": 0,
+            "workerIndex": 1,
+            "startTime": "2026-11-12T00:11:11.467Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-ce792c43a9226680ea1f",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: fresh play never accesses corrupt saved games",
+        "project": "mobile-portrait",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 5500,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 5500,
+            "retry": 0,
+            "workerIndex": 1,
+            "startTime": "2026-11-12T00:11:17.220Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-dd4a8b9c53a78e673501",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: fresh play never accesses backup-only saved games",
+        "project": "mobile-portrait",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 5561,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 5561,
+            "retry": 0,
+            "workerIndex": 1,
+            "startTime": "2026-11-12T00:11:22.728Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-e5a0e12b97db9e6d5699",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: fresh play never accesses unavailable saved games",
+        "project": "mobile-portrait",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 5484,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 5484,
+            "retry": 0,
+            "workerIndex": 1,
+            "startTime": "2026-11-12T00:11:28.297Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-93109cee059d3d6d0431",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: diagnostic play never accesses missing saved games",
+        "project": "mobile-portrait",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 4346,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 4346,
+            "retry": 0,
+            "workerIndex": 1,
+            "startTime": "2026-11-12T00:11:33.788Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-ae93eecf62ad68b5ad1b",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: diagnostic play never accesses valid saved games",
+        "project": "mobile-portrait",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 4614,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 4614,
+            "retry": 0,
+            "workerIndex": 1,
+            "startTime": "2026-11-12T00:11:38.141Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-24d459c8314265a7d775",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: diagnostic play never accesses corrupt saved games",
+        "project": "mobile-portrait",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 4381,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 4381,
+            "retry": 0,
+            "workerIndex": 1,
+            "startTime": "2026-11-12T00:11:42.762Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-23fb74c07f60aa88e095",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: diagnostic play never accesses backup-only saved games",
+        "project": "mobile-portrait",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 4781,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 4781,
+            "retry": 0,
+            "workerIndex": 1,
+            "startTime": "2026-11-12T00:11:47.150Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-b9b47dc432048cda493a",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: diagnostic play never accesses unavailable saved games",
+        "project": "mobile-portrait",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 4515,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 4515,
+            "retry": 0,
+            "workerIndex": 1,
+            "startTime": "2026-11-12T00:11:51.937Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-87d7b13e5fb296d6b656",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: Qbert never accesses missing saved games",
+        "project": "mobile-portrait",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 3053,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 3053,
+            "retry": 0,
+            "workerIndex": 1,
+            "startTime": "2026-11-12T00:11:56.459Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-39249e2c7cfeceade7e3",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: Qbert never accesses valid saved games",
+        "project": "mobile-portrait",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 3322,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 3322,
+            "retry": 0,
+            "workerIndex": 1,
+            "startTime": "2026-11-12T00:11:59.519Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-799f6d01cbae9a080c34",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: Qbert never accesses corrupt saved games",
+        "project": "mobile-portrait",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 3099,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 3099,
+            "retry": 0,
+            "workerIndex": 1,
+            "startTime": "2026-11-12T00:12:02.847Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-f3bba6ad25a385b97cba",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: Qbert never accesses backup-only saved games",
+        "project": "mobile-portrait",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 3340,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 3340,
+            "retry": 0,
+            "workerIndex": 1,
+            "startTime": "2026-11-12T00:12:05.955Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-2ba861888b13755eced5",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: Qbert never accesses unavailable saved games",
+        "project": "mobile-portrait",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 3143,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 3143,
+            "retry": 0,
+            "workerIndex": 1,
+            "startTime": "2026-11-12T00:12:09.302Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-ce2128f4b8eb661f80f1",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: fresh play never accesses missing saved games",
+        "project": "mobile-landscape",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 5860,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 5860,
+            "retry": 0,
+            "workerIndex": 2,
+            "startTime": "2026-11-12T00:12:13.133Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-004d902ffad608bf779d",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: fresh play never accesses valid saved games",
+        "project": "mobile-landscape",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 5732,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 5732,
+            "retry": 0,
+            "workerIndex": 2,
+            "startTime": "2026-11-12T00:12:19.207Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-942d41633f66678cc74a",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: fresh play never accesses corrupt saved games",
+        "project": "mobile-landscape",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 5390,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 5390,
+            "retry": 0,
+            "workerIndex": 2,
+            "startTime": "2026-11-12T00:12:24.948Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-f2aac0a1b2f5156ee688",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: fresh play never accesses backup-only saved games",
+        "project": "mobile-landscape",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 5577,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 5577,
+            "retry": 0,
+            "workerIndex": 2,
+            "startTime": "2026-11-12T00:12:30.344Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-12565df00087e1f9d9b7",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: fresh play never accesses unavailable saved games",
+        "project": "mobile-landscape",
+        "outcome": "unexpected",
+        "expectedStatus": "passed",
+        "durationMs": 30038,
+        "attempts": [
+          {
+            "status": "timedOut",
+            "durationMs": 30038,
+            "retry": 0,
+            "workerIndex": 2,
+            "startTime": "2026-11-12T00:12:35.928Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-b744edeb6c52fba42d83",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: diagnostic play never accesses missing saved games",
+        "project": "mobile-landscape",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 4477,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 4477,
+            "retry": 0,
+            "workerIndex": 3,
+            "startTime": "2026-11-12T00:13:06.627Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-6192b52af06a57b1a43d",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: diagnostic play never accesses valid saved games",
+        "project": "mobile-landscape",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 4676,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 4676,
+            "retry": 0,
+            "workerIndex": 3,
+            "startTime": "2026-11-12T00:13:11.320Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-464485475ada665e85d2",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: diagnostic play never accesses corrupt saved games",
+        "project": "mobile-landscape",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 4565,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 4565,
+            "retry": 0,
+            "workerIndex": 3,
+            "startTime": "2026-11-12T00:13:16.013Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-e91ecaca6e54abea9449",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: diagnostic play never accesses backup-only saved games",
+        "project": "mobile-landscape",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 4465,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 4465,
+            "retry": 0,
+            "workerIndex": 3,
+            "startTime": "2026-11-12T00:13:20.586Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-8ff1e57f6c9a8145b6cd",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: diagnostic play never accesses unavailable saved games",
+        "project": "mobile-landscape",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 4396,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 4396,
+            "retry": 0,
+            "workerIndex": 3,
+            "startTime": "2026-11-12T00:13:25.058Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-f5f0d09b0b5526c91059",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: Qbert never accesses missing saved games",
+        "project": "mobile-landscape",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 3009,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 3009,
+            "retry": 0,
+            "workerIndex": 3,
+            "startTime": "2026-11-12T00:13:29.460Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-3ea65ba52ff61d57f3a6",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: Qbert never accesses valid saved games",
+        "project": "mobile-landscape",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 3308,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 3308,
+            "retry": 0,
+            "workerIndex": 3,
+            "startTime": "2026-11-12T00:13:32.475Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-92a5c029b78a3245dbc6",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: Qbert never accesses corrupt saved games",
+        "project": "mobile-landscape",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 3084,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 3084,
+            "retry": 0,
+            "workerIndex": 3,
+            "startTime": "2026-11-12T00:13:35.791Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-448ff6c6292b3db0ddc2",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: Qbert never accesses backup-only saved games",
+        "project": "mobile-landscape",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 3253,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 3253,
+            "retry": 0,
+            "workerIndex": 3,
+            "startTime": "2026-11-12T00:13:38.882Z"
+          }
+        ]
+      },
+      {
+        "id": "8352ba8e75a15b46318d-7990c1428d1ea8e0a4df",
+        "file": "battle-persistence.spec.ts",
+        "title": "testing routes: Qbert never accesses unavailable saved games",
+        "project": "mobile-landscape",
+        "outcome": "expected",
+        "expectedStatus": "passed",
+        "durationMs": 3074,
+        "attempts": [
+          {
+            "status": "passed",
+            "durationMs": 3074,
+            "retry": 0,
+            "workerIndex": 3,
+            "startTime": "2026-11-12T00:13:42.145Z"
+          }
+        ]
+      }
+    ]
+  },
+  "reusedPassingIsolation": [
+    {
+      "id": "8352ba8e75a15b46318d-7dfe9619d127dc4198be",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: diagnostic play never accesses missing saved games",
+      "project": "desktop",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 4476,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 4476,
+          "retry": 0,
+          "workerIndex": 0,
+          "startTime": "2026-11-12T00:10:26.495Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-4cdb4db0d93af00a4b7d",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: diagnostic play never accesses valid saved games",
+      "project": "desktop",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 4732,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 4732,
+          "retry": 0,
+          "workerIndex": 0,
+          "startTime": "2026-11-12T00:10:30.979Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-238f2d6a23557e04905a",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: diagnostic play never accesses corrupt saved games",
+      "project": "desktop",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 4455,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 4455,
+          "retry": 0,
+          "workerIndex": 0,
+          "startTime": "2026-11-12T00:10:35.719Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-fef03ba6f761d11e7197",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: diagnostic play never accesses backup-only saved games",
+      "project": "desktop",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 4633,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 4633,
+          "retry": 0,
+          "workerIndex": 0,
+          "startTime": "2026-11-12T00:10:40.180Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-9f12cf0424639429659b",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: diagnostic play never accesses unavailable saved games",
+      "project": "desktop",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 4291,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 4291,
+          "retry": 0,
+          "workerIndex": 0,
+          "startTime": "2026-11-12T00:10:44.820Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-d109a31b1d29065c2148",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: Qbert never accesses missing saved games",
+      "project": "desktop",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 3056,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 3056,
+          "retry": 0,
+          "workerIndex": 0,
+          "startTime": "2026-11-12T00:10:49.118Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-770082e77c74d510d7fe",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: Qbert never accesses valid saved games",
+      "project": "desktop",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 3298,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 3298,
+          "retry": 0,
+          "workerIndex": 0,
+          "startTime": "2026-11-12T00:10:52.180Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-33d7eb5ca067393ec642",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: Qbert never accesses corrupt saved games",
+      "project": "desktop",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 3072,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 3072,
+          "retry": 0,
+          "workerIndex": 0,
+          "startTime": "2026-11-12T00:10:55.486Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-d563cc74393c5f2b8505",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: Qbert never accesses backup-only saved games",
+      "project": "desktop",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 3301,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 3301,
+          "retry": 0,
+          "workerIndex": 0,
+          "startTime": "2026-11-12T00:10:58.564Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-b351faec71e77f6c1397",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: Qbert never accesses unavailable saved games",
+      "project": "desktop",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 3161,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 3161,
+          "retry": 0,
+          "workerIndex": 0,
+          "startTime": "2026-11-12T00:11:01.872Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-93109cee059d3d6d0431",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: diagnostic play never accesses missing saved games",
+      "project": "mobile-portrait",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 4346,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 4346,
+          "retry": 0,
+          "workerIndex": 1,
+          "startTime": "2026-11-12T00:11:33.788Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-ae93eecf62ad68b5ad1b",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: diagnostic play never accesses valid saved games",
+      "project": "mobile-portrait",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 4614,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 4614,
+          "retry": 0,
+          "workerIndex": 1,
+          "startTime": "2026-11-12T00:11:38.141Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-24d459c8314265a7d775",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: diagnostic play never accesses corrupt saved games",
+      "project": "mobile-portrait",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 4381,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 4381,
+          "retry": 0,
+          "workerIndex": 1,
+          "startTime": "2026-11-12T00:11:42.762Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-23fb74c07f60aa88e095",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: diagnostic play never accesses backup-only saved games",
+      "project": "mobile-portrait",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 4781,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 4781,
+          "retry": 0,
+          "workerIndex": 1,
+          "startTime": "2026-11-12T00:11:47.150Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-b9b47dc432048cda493a",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: diagnostic play never accesses unavailable saved games",
+      "project": "mobile-portrait",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 4515,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 4515,
+          "retry": 0,
+          "workerIndex": 1,
+          "startTime": "2026-11-12T00:11:51.937Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-87d7b13e5fb296d6b656",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: Qbert never accesses missing saved games",
+      "project": "mobile-portrait",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 3053,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 3053,
+          "retry": 0,
+          "workerIndex": 1,
+          "startTime": "2026-11-12T00:11:56.459Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-39249e2c7cfeceade7e3",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: Qbert never accesses valid saved games",
+      "project": "mobile-portrait",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 3322,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 3322,
+          "retry": 0,
+          "workerIndex": 1,
+          "startTime": "2026-11-12T00:11:59.519Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-799f6d01cbae9a080c34",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: Qbert never accesses corrupt saved games",
+      "project": "mobile-portrait",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 3099,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 3099,
+          "retry": 0,
+          "workerIndex": 1,
+          "startTime": "2026-11-12T00:12:02.847Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-f3bba6ad25a385b97cba",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: Qbert never accesses backup-only saved games",
+      "project": "mobile-portrait",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 3340,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 3340,
+          "retry": 0,
+          "workerIndex": 1,
+          "startTime": "2026-11-12T00:12:05.955Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-2ba861888b13755eced5",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: Qbert never accesses unavailable saved games",
+      "project": "mobile-portrait",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 3143,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 3143,
+          "retry": 0,
+          "workerIndex": 1,
+          "startTime": "2026-11-12T00:12:09.302Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-b744edeb6c52fba42d83",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: diagnostic play never accesses missing saved games",
+      "project": "mobile-landscape",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 4477,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 4477,
+          "retry": 0,
+          "workerIndex": 3,
+          "startTime": "2026-11-12T00:13:06.627Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-6192b52af06a57b1a43d",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: diagnostic play never accesses valid saved games",
+      "project": "mobile-landscape",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 4676,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 4676,
+          "retry": 0,
+          "workerIndex": 3,
+          "startTime": "2026-11-12T00:13:11.320Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-464485475ada665e85d2",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: diagnostic play never accesses corrupt saved games",
+      "project": "mobile-landscape",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 4565,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 4565,
+          "retry": 0,
+          "workerIndex": 3,
+          "startTime": "2026-11-12T00:13:16.013Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-e91ecaca6e54abea9449",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: diagnostic play never accesses backup-only saved games",
+      "project": "mobile-landscape",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 4465,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 4465,
+          "retry": 0,
+          "workerIndex": 3,
+          "startTime": "2026-11-12T00:13:20.586Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-8ff1e57f6c9a8145b6cd",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: diagnostic play never accesses unavailable saved games",
+      "project": "mobile-landscape",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 4396,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 4396,
+          "retry": 0,
+          "workerIndex": 3,
+          "startTime": "2026-11-12T00:13:25.058Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-f5f0d09b0b5526c91059",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: Qbert never accesses missing saved games",
+      "project": "mobile-landscape",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 3009,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 3009,
+          "retry": 0,
+          "workerIndex": 3,
+          "startTime": "2026-11-12T00:13:29.460Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-3ea65ba52ff61d57f3a6",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: Qbert never accesses valid saved games",
+      "project": "mobile-landscape",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 3308,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 3308,
+          "retry": 0,
+          "workerIndex": 3,
+          "startTime": "2026-11-12T00:13:32.475Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-92a5c029b78a3245dbc6",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: Qbert never accesses corrupt saved games",
+      "project": "mobile-landscape",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 3084,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 3084,
+          "retry": 0,
+          "workerIndex": 3,
+          "startTime": "2026-11-12T00:13:35.791Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-448ff6c6292b3db0ddc2",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: Qbert never accesses backup-only saved games",
+      "project": "mobile-landscape",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 3253,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 3253,
+          "retry": 0,
+          "workerIndex": 3,
+          "startTime": "2026-11-12T00:13:38.882Z"
+        }
+      ]
+    },
+    {
+      "id": "8352ba8e75a15b46318d-7990c1428d1ea8e0a4df",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: Qbert never accesses unavailable saved games",
+      "project": "mobile-landscape",
+      "outcome": "expected",
+      "expectedStatus": "passed",
+      "durationMs": 3074,
+      "attempts": [
+        {
+          "status": "passed",
+          "durationMs": 3074,
+          "retry": 0,
+          "workerIndex": 3,
+          "startTime": "2026-11-12T00:13:42.145Z"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "path": "docs/qa/issue-270/records-desktop.png",
+      "source": "verification-receipts/issue270/inc3-final-captures-chromium/artifacts/main-menu-main-menu-five-s-3fcaf-yboard-and-touch-accessible-desktop/records-retained-best.png",
+      "sha256": "9b223ec08047cccc6c263240f1754cb816f135cf722b1e84c09822e087594398",
+      "profile": "desktop"
+    },
+    {
+      "path": "docs/qa/issue-270/records-portrait.png",
+      "source": "verification-receipts/issue270/inc3-final-captures-chromium/artifacts/main-menu-main-menu-five-s-3fcaf-yboard-and-touch-accessible-mobile-portrait/records-retained-best.png",
+      "sha256": "ddb9c195eac1649d209e6e04ddf5d39bcbe0887b2612e4e0ce92adc82174f552",
+      "profile": "mobile-portrait"
+    },
+    {
+      "path": "docs/qa/issue-270/records-landscape.png",
+      "source": "verification-receipts/issue270/inc3-final-captures-chromium/artifacts/main-menu-main-menu-five-s-3fcaf-yboard-and-touch-accessible-mobile-landscape/records-retained-best.png",
+      "sha256": "384e6e64adbe3a3154e33c9895f57c094152ad07fe9ec38e1afecb4faab17669",
+      "profile": "mobile-landscape"
+    },
+    {
+      "path": "docs/qa/issue-270/records-webkit-portrait.png",
+      "source": "verification-receipts/issue270/inc3-final-captures-webkit/artifacts/main-menu-main-menu-five-s-3fcaf-yboard-and-touch-accessible-acceptance-webkit-portrait/records-retained-best.png",
+      "sha256": "143d857320aad48dca6ce05479035858e53301880496fb7ff32a548a462161de",
+      "profile": "acceptance-webkit-portrait"
+    }
+  ],
+  "verificationEquivalence": {
+    "changedSinceVerification": [
+      "tests/battle-persistence.spec.ts"
+    ],
+    "explanation": "Runtime/build/assets/helpers/configs/dependencies are unchanged after the verified UI commit; the only verification-input change is the focused test waiting for actual ready dungeon mode before a restart, with new-identity acknowledgement. All 15 affected Chromium fresh-route permutations and all 30 WebKit isolation permutations run after this test repair. Other original passing isolation cases and all 15 UI/recovery cases have unchanged relevant inputs; 5 fresh screenshot cases reconfirm the final UI. Documentation/QA merge commits do not alter runtime inputs."
+  },
+  "inheritedEvidence": [
+    {
+      "path": "docs/qa/issue-270/increment-1.json",
+      "obligations": "Pure domain accumulator, accepted counters, exact progress projections, extension point and unchanged standalone/event/RNG parity."
+    },
+    {
+      "path": "docs/qa/issue-270/increment-2.json",
+      "obligations": "Active-only playtime, immutable ending/history/maxima, single/paired interrupted replacement, counter-only timed-v2 migration, supported legacy/corrupt recovery and actual lifecycle/earned legal journey obligations. UI-only changes do not alter any of these inputs."
+    }
+  ],
+  "selection": {
+    "path": "verification-receipts/issue270/inc3-selection-final.log",
+    "sha256": "bbeda5cc20c63b331f2087da26a2ccfaf37909fccc66d2fa6eac9c498e75d209",
+    "passed": 6,
+    "command": "node --test tests/tooling/verification-selection.test.mjs"
+  },
+  "acceptance": {
+    "AC1": "Pure versioned accepted accumulator persisted with active journeys: increments 1/2 units, core/resume and legal progression witnesses.",
+    "AC2": "Injected monotonic clock and current fake visibility/focus, closed/recovery/menu/dialog exclusion, actual Chromium background/navigation/BFCache: increment 2.",
+    "AC3": "Authoritative enemy defeat and player movement/undo batches; exact validated wins/unique floors; legal authored/dungeon reload, terminal/descent/backtrack and duplicate units: increments 1/2.",
+    "AC4": "Frozen terminal/abandoned stats, first result immutable, single/paired receipts and interruption/recovery, bounded maxima/eviction/ties/reset: increment 2.",
+    "AC5": "All five recent fields, per-mode bests and retained winning summary; unavailable/partial/N/A labels; keyboard focus, native touch/WebKit portrait/landscape: 15 current UI cases and reviewed retained screenshots.",
+    "AC6": "Timed stats v2, authored 11/dungeon 13 and history payload v2 preserve old readers/recovery/read-only behavior; literal actual counter-only writer fixtures and per-field completeness: increment 2 plus current UI/recovery proof.",
+    "AC7": "Short accepted-domain-event extension note in docs/run-records.md; future damage breakdowns remain out of scope.",
+    "AC8": "Every direct route/diagnostic/override/Qbert entry tested against missing/valid/corrupt/backup-only/unavailable player saves/history. 75 unique engine/profile permutations qualified as 30 unaffected Chromium +15 repaired Chromium +30 WebKit, plus active no-stats assertions and no storage reads/writes."
+  },
+  "preservedFailure": {
+    "path": "verification-receipts/issue270/inc3-final-isolation-chromium/report.json",
+    "errorContext": "verification-receipts/issue270/inc3-final-isolation-chromium/error-context.md",
+    "reason": "Original fresh/unavailable Pixel-landscape case clicked a transient dungeon loading-screen restart after a legal step entered battle. No storage-access violation observed; no app defect established.",
+    "repair": "Await accepted ready mode and use its actual restart control; require new journey identity. All affected fresh permutations rerun. Original batch remains failed, never relabeled a clean full run."
+  },
+  "limitations": [
+    "Browser/device emulation only; no physical hardware claimed.",
+    "History is device-local/best effort; old missing/evicted totals cannot be reconstructed; partial fields do not compete as whole-run maxima.",
+    "Abrupt process close can lose the last bounded checkpoint interval; native BFCache admission remains best effort (see increment 2).",
+    "Temporary detached comparison worktree retained after automatic approval review rejected cleanup."
+  ],
+  "remaining": "Review and merge #365, #368 and the final dependent UI PR in order; sync/archive OpenSpec after merge. No remaining implementation gate.",
+  "screenshotReview": {
+    "reviewed": true,
+    "findings": "Desktop, native touch portrait/landscape and WebKit portrait inspected. All five winning-summary values are readable; long IDs and authored N/A wrap within the modal; no horizontal overflow. Captures intentionally show the scrolled retained winner. Keyboard/touch recovery, reset and focus return assertions passed."
+  }
+}

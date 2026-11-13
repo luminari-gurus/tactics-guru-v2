@@ -7,6 +7,7 @@ import { defineConfig, type Plugin } from 'vite';
 import { battleAssets } from './src/content/assets.ts';
 import { desertAssets } from './src/content/desertAssets.ts';
 import { resolveAppEntry } from './src/app/routes.ts';
+import { APPLICATION_LOAD_FILES_MANIFEST, APPLICATION_LOAD_FILES_META } from './src/diagnostics/applicationLoadFailure.ts';
 
 const commit = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
 const dirty = execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8' }).trim().length > 0;
@@ -23,6 +24,11 @@ const phaserDefines = {
   'typeof FEATURE_SOUND': 'true',
   global: 'globalThis',
 };
+
+// WebKit can retain a failed modulepreload across reloads (bug 270357).
+// Let retryable entry/engine imports own their requests while keeping other dependency hints.
+const battleEntryChunk = /^assets\/startBattleApp-[\w-]{8}\.js$/;
+const dungeonEngineChunk = /(?:^|\/)(?:start|BattleScene)-[\w-]{8}\.js$/;
 
 /** Start only the selected game route's required requests while its entry script loads. */
 function gamePreloads(): Plugin {
@@ -45,9 +51,10 @@ function gamePreloads(): Plugin {
     generateBundle(_options, bundle) {
       for (const image of images) this.emitFile({type: 'asset', ...image});
       const root = new URL(base, 'https://build.invalid').pathname;
-      const paths = Object.values(bundle).map(file => file.fileName)
-        .filter(file => /^assets\/.+-[\w-]{8}\.(?:js|css)$/.test(file))
-        .concat(images.map(image => image.fileName));
+      const code = Object.values(bundle).map(file => file.fileName)
+        .filter(file => /^assets\/.+-[\w-]{8}\.(?:js|css)$/.test(file));
+      const paths = code.concat(images.map(image => image.fileName));
+      this.emitFile({ type: 'asset', fileName: APPLICATION_LOAD_FILES_MANIFEST, source: JSON.stringify(code.sort()) });
       this.emitFile({ type: 'asset', fileName: '_headers', source: paths
         .map(file => `${root}${file}\n  Cache-Control: public, max-age=31536000, immutable\n`)
         .join('\n') });
@@ -73,9 +80,11 @@ function gamePreloads(): Plugin {
         entries.forEach(visit);
         return {js: [...js], css: [...css]};
       };
+      const battleEntry = entry('src/app/startBattleApp.ts');
+      const battle = dependencies([battleEntry, entry('src/phaser/start.ts')]);
       const plan = {
         base,
-        battle: dependencies([entry('src/app/startBattleApp.ts'), entry('src/phaser/start.ts')]),
+        battle: { ...battle, js: battle.js.filter(file => file !== battleEntry) },
         run: dependencies([entry('src/app/startRunApp.ts')]),
         images: Object.values(battleAssets).map(asset => imageUrls[asset.runtimePath].slice(1)),
         runImages: Object.values(imageUrls).map(path => path.slice(1)),
@@ -83,14 +92,23 @@ function gamePreloads(): Plugin {
       // JSON is embedded as script text, never as executable content from a path.
       const data = JSON.stringify(plan).replaceAll('<', '\\u003c');
       const script = `(()=>{const p=${data},entry=(${resolveAppEntry.toString()})(location.pathname,location.search,p.base);if(entry.route!=="battle"&&entry.route!=="run")return;const run=entry.route==="run",route=run?p.run:p.battle,nonce=document.currentScript?.nonce;const add=(file,rel,as)=>{const link=document.createElement("link");link.rel=rel;link.href=p.base+file;if(as!=="image")link.crossOrigin="";if(as)link.as=as;if(nonce)link.nonce=nonce;document.head.appendChild(link)};route.js.forEach(file=>add(file,"modulepreload"));route.css.forEach(file=>add(file,"preload","style"));const scene=new URLSearchParams(location.search).get("scene");if(run||(scene!=="proof"&&scene!=="content-smoke"))(run?p.runImages:p.images).forEach(file=>add(file,"preload","image"))})();`;
-      return [{tag: 'script', attrs: {'data-game-preloads': true, ...(nonce === undefined ? {} : {nonce})}, children: script, injectTo: 'head-prepend'}];
+      return [
+        { tag: 'meta', attrs: { name: APPLICATION_LOAD_FILES_META, content: chunks.map(chunk => chunk.fileName).sort().join(' ') } },
+        { tag: 'script', attrs: {'data-game-preloads': true, ...(nonce === undefined ? {} : {nonce})}, children: script, injectTo: 'head-prepend' },
+      ];
     }},
   };
 }
 
 export default defineConfig({
   plugins: [gamePreloads()],
-  build: { sourcemap: process.env.POSTHOG_SOURCEMAPS === 'true' ? 'hidden' : false },
+  build: {
+    sourcemap: process.env.POSTHOG_SOURCEMAPS === 'true' ? 'hidden' : false,
+    modulePreload: {
+      resolveDependencies: (filename, dependencies) => dependencies.filter(file => !battleEntryChunk.test(file) &&
+        !(dungeonEngineChunk.test(filename) && dungeonEngineChunk.test(file))),
+    },
+  },
   resolve: { alias: [{ find: /^phaser$/, replacement: phaserArcade }] },
   // Vite's dev dependency optimizer does not inherit the top-level define map.
   optimizeDeps: { rolldownOptions: { transform: { define: phaserDefines } } },

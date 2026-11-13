@@ -1,150 +1,629 @@
-# Issue #297 — Keep proof diagnostics out of gameplay
+# Issue #270 — Recent and best runs with trustworthy statistics
 
-Planning date: 2026-11-07 (Asia/Jerusalem). [Issue #297](https://github.com/luminari-gurus/tactics-guru-v2/issues/297), assigned to `@moshehbenavraham`. Base: `origin/main` at `4148eb1043163587de30eb1243d4eee717b248bf`. Work branch: `branch/issue-297-hide-gameplay-diagnostics`.
+Date: 2026-11-10 (Asia/Jerusalem). Assigned to @moshehbenavraham.
+Issue: [#270](https://github.com/luminari-gurus/tactics-guru-v2/issues/270).
+Branch: [`branch/issue-270-run-statistics`](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-270-run-statistics).
+Base: `origin/main`, `f0bdac46dbd018ba11300c800e3dfb0d986fd6a5`.
+Status: **all AC1–AC8 qualified; [PR #369](https://github.com/luminari-gurus/tactics-guru-v2/pull/369) ready on #368 on #365 (2026-11-12)**.
+The user authorized implementation, verification and incremental PR publication.
 
-Status: implementation and affected qualification are complete; [PR #338](https://github.com/luminari-gurus/tactics-guru-v2/pull/338) is the review handoff, labeled `bug` and `risk:medium`. The caller authorized implementation on 2026-11-07. [OpenSpec tasks](../../openspec/changes/issue-297-hide-gameplay-diagnostics/tasks.md) track the delivered scope; do not archive or merge without the subsequent review workflow. The previous #172 plan is preserved in [issue-172-combat-consumables-revival-plan.md](issue-172-combat-consumables-revival-plan.md).
+## Current continuation point — 2026-11-12
 
-## Selection and readiness
+This section supersedes the historical work log below. PR #365 (counters) and
+PR #368 (active time/history) are open, ready and labeled enhancement. The final
+UI branch is `branch/issue-270-records-ui`, worktree
+`C:/Users/apexw/.codex/worktrees/issue-270-records-ui/Tactics-Guru`, stacked on
+`branch/issue-270-active-time-history` at `1d9eeb8`. All implementation and
+AC1–AC8 gates are qualified; OpenSpec is 9/9 complete.
 
-Reviewed all **59 open issues**, including bodies, labels and assignees, the relevant discussions, all **four open PRs**, 48 remote branches, current main and existing planning artifacts. GitHub's issue connection reports `totalCount: 59`, `hasNextPage: false`. Native blocked-by and linked-branch relationships were checked for all 59; they are empty, so body-level dependencies and active branch/PR evidence still govern eligibility. The authenticated login is `moshehbenavraham`, independently verified through the connector and GitHub API.
+Latest UI runtime input commit: `46e8f34`; `76c00bd` adds the focused isolation
+test readiness repair. Its full PR suite passed in 136.7 seconds (1,339 units,
+both type scopes, root/prefix build integrations, bundle, seven core journeys).
+All 15 records/recovery cases passed across desktop/Pixel/iPhone WebKit profiles.
+All 75 unique isolation permutations are qualified: 30 unchanged passing Chromium
+diagnostic/Qbert cases, 15 repaired Chromium fresh-route cases, and 30 WebKit
+cases. The original 45-case batch remains 44 passed/1 failed; the repaired 15-case
+batch passed separately. No assertions, timeouts or retries were relaxed.
+Five fresh final UI witnesses passed, and retained desktop, portrait/landscape
+and WebKit screenshots were visually reviewed. Six discovery/batch checks passed.
 
-GitHub Project draft items could not be inspected: the available credential lacks `read:project`, and the connector has no Projects capability. This selection covers the accessible issue backlog and repository work; it does not claim an audit of inaccessible draft cards.
+The source-bound [final AC audit](../qa/issue-270/increment-3.json) links inherited
+counter/time/history/legal evidence and preserves original failures. Review/merge
+#365 then #368 then [PR #369](https://github.com/luminari-gurus/tactics-guru-v2/pull/369). Keep #270 open until the stack merges; sync
+and archive OpenSpec afterward. No remaining implementation or acceptance work.
 
-Choose #297 because its later [dungeon report](https://github.com/luminari-gurus/tactics-guru-v2/issues/297#issuecomment-6667078355) identifies persistent production-facing controls as well as a first-load flash. Both have concrete source causes, no prerequisite or product decision is outstanding, and no existing PR/branch covers the fix. It repairs shared player-facing startup and a repeatable dungeon UI leak with a small change. No evidenced unclaimed foundation issue currently unlocks more immediately actionable downstream work: #161's remaining mechanics are assigned elsewhere, #170 requires separate biome-pack issues, and #174 still needs reward/economy decisions.
+Runtime tools: prepend `C:/Users/apexw/.codex/tmp/issue270-node-tools` to Windows
+PATH for npm/npx; use native Node for tests. Run OpenSpec through WSL Ubuntu in
+the corresponding `/mnt/c/Users/apexw/.codex/worktrees/.../Tactics-Guru` directory.
+Do not use WSL git to inspect this Windows-CRLF worktree. No secrets are needed.
+No merge/release/deployment/tag is part of this review-ready handoff.
+The temporary detached comparison worktree remains because automatic approval
+review rejected its cleanup with “blocked by policy”; do not retry via a workaround.
 
-The readiness pass considered unlabeled work equally. Added and read back the exact `ready for work` label on [#316](https://github.com/luminari-gurus/tactics-guru-v2/issues/316): its prerequisite #314 is merged, the current Mage helper still uses the seed-68 witness, and the issue defines bounded fixture/replay/progression and timing acceptance. #327's XP-picker reduction is already merged and does not complete that journey-resilience work. #316 remains unassigned and is the strongest follow-up for verification reliability; #297 has the clearer immediate player impact and smaller implementation uncertainty.
+## Live handoff — 2026-11-11
 
-Backlog accounting at selection, covering each open issue once:
+- Clean starting branch at `c6b053d`; fetched origin/main is still the planned base.
+- OpenSpec `issue-270-run-statistics`, spec-driven schema, initially 0/9 tasks.
+  Run its CLI through WSL Ubuntu (installed Node v24.15.0); Windows PATH does not
+  contain npm or OpenSpec. WSL repository:
+  `/mnt/c/Users/apexw/OneDrive/Desktop/Projects/Tactics-Guru`.
+- Outcome: all AC1–AC8 through the three increments below. Non-goals remain
+  combat/balance changes, extra storage/event frameworks and new art.
+- Ablation: store only irrecoverable kills/net moves/active milliseconds and one
+  bounded receipt; derive exact wins/floors from validated progress. This removes
+  redundant persisted counters and their consistency machinery without losing a stat.
+- Current files: pure `src/domain/runStats.ts`, existing journey snapshots,
+  envelopes, accepted callbacks/owners and focused tests/docs. Proof: reducer and
+  compatibility units, legal resume/undo paths, affected persistence consumers and
+  `verify:pr` per increment. No implementation acceptance is claimed yet.
+- PR #365 is open and ready for review, with `enhancement` labeling. Its coverage
+  and remaining acceptance work are posted on #270, which remains open. OpenSpec
+  tasks 1.1–1.3 are complete (3/9). Next: qualify and stack active time/history,
+  then records presentation and the whole-issue audit. No merge or release occurred.
+- Increment 1 qualification is complete at `c4654c6`: final `verify:pr` passed
+  in 120.8 seconds (1,319 units, both type scopes/build integrations, bundle and
+  all seven core journeys). All 22 extended legal Chromium/WebKit cases and 15
+  direct/diagnostic/Qbert isolation cases passed, with one worker and no retries
+  or skips. The six selection/batch contract checks passed too. Evidence and
+  exact case IDs are in [increment-1.json](../qa/issue-270/increment-1.json);
+  raw reports remain under the referenced `verification-receipts/` paths.
+  Desktop and touch-portrait screenshots were inspected and retained alongside it.
+  This is affected-scope qualification, not a full-regression claim.
+- Implemented: optional version-one counters, authored format 10/dungeon format
+  12, exact accepted-event callbacks, owner integration, atomic published steps,
+  compatible legacy reading and explicit testing-entry gating. Stats-bearing
+  backups now rotate complete matching battle/counter snapshots; old draught
+  compatibility checkpoints still apply to untracked saves.
+- Verification so far: both type scopes and 139 focused tests passed before the
+  backup adjustment. First `verify:pr` receipt
+  `verification-receipts/pr/1794424875822-103876` failed its units stage (1316/1318):
+  the old draught test expected legacy format 9 after an accepted stats upgrade;
+  the new complete legal owner journey exceeded its default 5-second unit budget
+  under full-suite load. Updated the intended format/backup assertions and gave
+  that new legal storage journey 15 seconds (existing equivalent has 20 seconds).
+  A focused follow-up caught the old pre-battle checkpoint assertion too; updated
+  it to require the exact prior committed battle bytes. Original failures retained.
+- Browser environment qualified locally: Windows x64, Node v24.22.1,
+  Playwright 1.64.1, Chromium 156.0.8078.4 and WebKit 27.2; report
+  `verification-receipts/browser-environment/run-QC1faH/environment.json`.
+  WSL is used for OpenSpec only; runtime verification uses native Windows tools.
+- Frozen implementation commit: `e7b20c0bb7937d1e1520dd8b33ac898d60ff600a`.
+  `verify:pr` passed in 114.6 seconds, receipt
+  `verification-receipts/pr/1794425159287-117812`: 1,319/1,319 units,
+  both type scopes, both build integrations, root bundle and 7/7 core journeys.
+  OpenSpec tasks 1.1–1.2 are complete (2/9); task 1.3 awaits affected browser
+  qualification and PR publication. Documentation follow-ups reuse this receipt;
+  runtime/test/config/dependency inputs remain unchanged from that commit.
+- Running 12 Chromium cases (desktop/Pixel portrait/landscape): the existing
+  legal testing and saved-menu dungeon first-floor/descent/backtrack journeys,
+  authored undo/reload/defeat and complete authored reward/terminal/restart journey.
+  Command: `node node_modules/@playwright/test/cli.js test -c playwright.regression.config.ts tests/run-progression.spec.ts tests/dungeon.spec.ts -g 'run battle undo survives reload|legal run outcomes, earned rewards|saved menu dungeon keeps proof tools hidden|testing dungeon legally clears a floor' --reporter=line,json --output=verification-receipts/issue270/inc1-chromium/artifacts`.
+  `PLAYWRIGHT_JSON_OUTPUT_NAME=verification-receipts/issue270/inc1-chromium/report.json`;
+  raw log is adjacent `run.log`. Runtime input hashes: `verification-receipts/issue270/inc1-inputs.json`.
+  WebKit authored acceptance and dungeon exploration profiles follow serially.
+- The 12 Chromium cases passed in 10.0 minutes, and both WebKit authored legal
+  reward/terminal/restart journeys passed in 3.0 minutes. Discovery revealed the
+  WebKit allowlist omitted the existing undo journey. Added that exact title;
+  both portrait/landscape undo/reload/defeat cases then passed (43.2 seconds).
+  Reports: `verification-receipts/issue270/inc1-authored-webkit/` and
+  `verification-receipts/issue270/inc1-undo-webkit/`. The added selection changes
+  no gameplay/build inputs or existing selected cases. Extended direct-route
+  spies to assert that run/dungeon snapshots have no stats; qualification pending.
+- Parallel preparation (same agent, isolated inputs) lives in
+  `C:/Users/apexw/.codex/worktrees/issue-270-active-time-history/Tactics-Guru`,
+  branch `branch/issue-270-active-time-history`. Its plan records the active-clock
+  and v2 history/bests implementation; 152 focused clock/owner/history tests pass,
+  but its browser qualification and PR remain pending. Do not mix those files
+  into this counter PR. Merge this branch's final documentation/selector updates
+  into that stack before its publication.
+OpenSpec: [proposal](../../openspec/changes/issue-270-run-statistics/proposal.md),
+[design](../../openspec/changes/issue-270-run-statistics/design.md),
+[requirements](../../openspec/changes/issue-270-run-statistics/specs/run-statistics/spec.md),
+[tasks](../../openspec/changes/issue-270-run-statistics/tasks.md).
+The prior [#176 plan](issue-176-local-records-plan.md) is preserved byte-for-byte.
 
-- Selected: #297.
-- Other bounded UX candidates: #284, #293, #294, #296, #307, #309, #311, #312. Some need confirmation of existing intended UI behavior; #309 is especially small but has less impact than the confirmed diagnostic leak.
-- Newly ready: #316.
-- Investigations needing cause/reproduction evidence: #257, #258, #268, #303, #306, #318, #322. In particular, `combatStats()` subtracts Weakened once; Guarded Strike adds its separate attack penalty, so #318's apparent double penalty is not yet a confirmed rules defect. Stair generation already excludes the entry/exit cells; #322 needs its actual arrival trigger identified before prescribing a placement fix.
-- Product decisions, epic decomposition, or remaining prerequisite/consumer contracts: #167, #168, #169, #170, #171, #173, #174, #175, #176, #178, #179, #180, #181, #182, #185, #199, #261, #262, #270, #287, #299, #301, #308, #313, #320, #323. Existing readiness labels do not remove those scope/dependency checks. Do not treat the parent references themselves as blockers.
-- Already assigned to another owner or active work: #85, #128, #161, #162, #184, #200, #208, #219, #254. Retain their assignments and acceptance records; an open tracker can represent remaining acceptance after substantial merged implementation.
-- Active fix PRs: #295 → #337; #324 → #334. Do not duplicate them. The other open PRs are design draft #237 and the separately gated SSH alternative #12.
-- Open reports whose corresponding fixes are already on main: #291 → #330, #292 → #333, #298 → #336, #302 → #331, #304 → #335. Leave issue closure and any remaining acceptance to those deliveries.
+## Selection and availability
 
-## Outcome
+Reviewed all **48 open issues**, their bodies/labels/assignees, relevant comments,
+all three open PRs, published branches, merged prerequisite work, repository and
+organization projects, native blocking/parent/sub-issue/linked-branch relationships,
+and outstanding OpenSpec work. GitHub reports `totalCount: 48`,
+`hasNextPage: false`; every nested relationship page was complete. There are no
+attached repository Projects v2, organization projects or open-issue project items.
+No native blocking edges exist; body dependencies still matter.
 
-Player-facing production routes show only a neutral loading/error state during boot and their proper gameplay UI after initialization. Proof-scene restart wording, fixture buttons, tree-opacity controls, diagnostic movement/audio controls, measurement panels and diagnostic landmark names never appear during ordinary menu, battle, run or dungeon use, including a cold load and dungeon battle re-entry.
+**Choose #270**, including it despite the absent `ready for work` label. Its
+explicit foundation #176 has just completed through merged #359/#360/#361/#363;
+the recording/recovery/replacement implementation is present on main. #153
+(menu), #157 (floors), #159 (encounters) and #259 (entry isolation) are closed
+and their owning paths are present. #174 is coordination for future reward
+counters, not a blocker for existing kills, moves, victories or floor clears.
+No published branch or PR claims #270. It adds visible player value to a newly
+delivered foundation without changing balance or needing external services.
 
-Keep intentional diagnostic entry points (`?scene=proof` and `?scene=content-smoke`) functional for existing QA and performance tools. These are explicitly selected test scenes, distinct from controls leaking into gameplay. Preserve the route resolver's first-scene-value and `/qbert` behavior. Preserve player restart/new-game, recovery, battle sound, privacy, targeting and accessibility controls.
+Complete disposition of the other 47 open issues:
 
-## Findings on the planning base, now repaired
+- **Assigned elsewhere:** #85, #128, #161, #162, #184, #200, #208, #219, #254,
+  #258, #306, #311. Preserve ownership. Several are delivered implementations or
+  investigations awaiting acceptance reconciliation. #311 is actively covered
+  by open PR #362; do not mix its ability-rail changes into this task.
+- **Epics needing bounded implementation slices:** #170 and #199. #170 explicitly
+  requires per-biome issues before coding; #199's remaining work has existing owners.
+- **Substantive mechanics/acquisition work:** #167, #168, #169, #171, #173, #174,
+  #175. #161 is partially delivered; its open state is not a blanket blocker, but
+  push/charge, typed damage, loot policy and their specific consumers remain real
+  additional scope. #175 also needs #174's reward/unlock contract.
+- **Design/presentation/rules choices:** #178, #180, #181, #182, #185, #261,
+  #262, #287. Potential planning candidates, with less direct implementation
+  readiness than the concrete follow-up to merged records storage.
+- **Explicit product/balance questions:** #301, #313, #320, #323. Do not invent
+  defeat/retry, revival, healing or final-floor loot rules while selecting work.
+- **Available smaller alternative:** #179, structured combat logs. It is explicitly
+  low priority and still needs history/storage scope choices. #270 uses stronger
+  existing boundaries and fulfills the planned next layer of records functionality.
+- **Merged work covers the reported area:** #291/#330, #292/#333, #296/#344,
+  #298/#336, #302/#331, #304/#335, #307/#345, #312/#346. Merge state was checked
+  live. #303 overlaps merged #314's contact repair. These need a current residual
+  reproduction/acceptance audit before another implementation; they are not
+  assumed closed or completely resolved by this planning pass.
+- **Mixed polish lists:** #299 and #308; separate remaining UI issues from merged
+  fixes and deliberate mechanics before claiming either entire list.
+- **Unresolved reproduction/attribution:** #268 and #318. #268 has an investigation
+  branch. #318's reported double-penalty diagnosis is not established; current
+  sources distinguish Weakened from elevation. Neither is treated as a ready fix.
 
-- [index.html](../../index.html) renders `#fit-panel` with the label `Proof scene diagnostics`, a visible `Restart proof scene` button, open Board controls and Measurements before any module has loaded. CSS is imported by route modules, so late hiding cannot prevent the initial HTML exposure.
-- [mountBattleLayout()](../../src/ui/battleLayout.ts) moves every existing panel child under `#battle-scroll`. [startDungeonApp.ts](../../src/app/startDungeonApp.ts) calls it before battle entry, then tries `#fit-panel > details` when starting a battle. Those details are no longer direct children, so they remain visible. The dungeon owner also never replaces the diagnostic panel label.
-- [startBattleApp.ts](../../src/app/startBattleApp.ts) and [startRunApp.ts](../../src/app/startRunApp.ts) hide direct-child details before reparenting and set player-facing labels. They must still work after changing the default HTML visibility. [main.ts](../../src/main.ts) reports application-import failure through `#fit-status`; hiding that live status with the diagnostic UI would break recovery.
-- Main menu and map entry replace/hide the shell after loading. Explicit proof/content-smoke scenes, [FitScene.ts](../../src/phaser/FitScene.ts), `window.fitDiagnostics`, layout/boot tests and performance collection consume the existing diagnostic IDs. Preserve those contracts rather than deleting the diagnostic subsystem.
+Other open PRs #12 and #237 concern separately owned deployment tooling and UI
+mockups. OpenSpec #127/#153 has historical unfinished acceptance work; preserve
+its failures without treating it as newly unassigned implementation. No other
+issue is assigned, closed or relabeled by this selection.
 
-## Non-goals
+## Outcome and definitions
 
-No combat, balance, seed, RNG, movement, save-format, telemetry-schema or routing-policy changes. No HUD redesign, broad scroll fix, removal of the Discovered places list (#309), general debug framework, new dependency, new configuration switch or new verification infrastructure. Do not close #308's separate scroll report merely because removing these controls may help it. Keep #295/#324 layout/camera work separate.
+For each admitted menu-origin authored run or dungeon, save an exact, bounded
+five-stat summary: **enemies killed, battles won, moves taken, floors cleared and
+active playtime**. Show newest 100 journeys plus personal bests, attributed to
+their originating journeys, even when a best holder leaves the recent list.
 
-## Files and implementation
+- A move is one accepted hero movement command, independent of path length, or
+  one published adjacent dungeon step. Enemy moves and floor travel itself do
+  not count. Accepted movement undo removes that move, retaining elapsed time.
+- Kills come from enemy `defeated` events, not damage numbers or sprite removal.
+  Wins and unique completed floors use validated progress. Authored floors are
+  N/A, since the three-encounter run has no dungeon floors.
+- Time counts visible, focused ongoing battle and ready dungeon exploration,
+  including battle animations/enemy turns. Loading, preparation, rewards,
+  terminal screens, menus, paused dialogs, hidden/unfocused pages and closed-app
+  intervals are excluded. No speculative inactivity timeout is added.
+- Bests are per mode and per applicable stat, using the **maximum**, including
+  **longest active playtime**. Include completed/abandoned outcomes. Ties select
+  newest recorded time then stable mode/ID order. Keep bounded winning summaries.
+- Old records retain known wins/floors. Missing historic kills/moves/time stay
+  unavailable; a continued old journey labels new counters as since upgrade.
+  Partial fields do not compete as whole-run maxima. Older evicted v1 history
+  cannot be reconstructed; show that historical best coverage limitation.
 
-Use one focused implementation PR. Per the caller's explicit continuation request, use the repository's OpenSpec workflow with a compact proposal, startup spec, design and tracked tasks. The original implementation scope stays unchanged.
+## Source findings and files
 
-1. **Default HTML to the player-facing state.** In `index.html`, retain a visible generic live loading/error status and stable shared gameplay nodes. Mark proof-only sections hidden in the markup, including before JavaScript or styles arrive, and use neutral initial landmark/restart wording. Keep visibility rules effective after layout reparenting. Do not hide the only error announcement or depend solely on post-load CSS.
-2. **Reveal diagnostics deliberately.** In `src/app/startBattleApp.ts`, reveal the existing proof controls and diagnostic wording only for the explicit proof scene; preserve content-smoke's restricted status output. Keep normal standalone and Q*bert gameplay controls correctly named and available. Reuse the existing scene decision and element IDs.
-3. **Keep gameplay owners consistent.** In `src/app/startDungeonApp.ts`, set the dungeon's player-facing panel name and use stable IDs or a scoped marker for diagnostic visibility, independent of direct-child topology. Verify subsequent battle starts after `mountBattleLayout()` cannot reveal the controls. Inspect `src/app/startRunApp.ts` and `src/ui/battleLayout.ts` as consumers; edit them only if the default visibility change needs corresponding initialization. Prefer static defaults plus the existing owner paths over another global state manager.
-4. **Add only missing behavioral proof.** Extend existing `tests/main-menu.spec.ts`, `tests/boot.spec.ts` and `tests/dungeon.spec.ts` as appropriate for the pre-module shell and dungeon re-entry regression. Reuse existing helpers and legal gameplay journeys. Retain proof-scene layout/boot and content-smoke checks. Update the existing startup/QA documentation only where it describes changed behavior; record final exact-source evidence with the implementation.
+- [BattleSession.ts](../../src/app/BattleSession.ts): accepted resolution and
+  undo already produce exact domain events before presentation. Extend its
+  state-only callback compatibly to expose the current accepted event batch.
+  Its standalone-battle consumers must retain identical rules/replay behavior.
+- Add `src/domain/runStats.ts` for the pure versioned accumulator, validation,
+  accepted-boundary deduplication and stat definitions. No DOM/time reads here.
+- [RunItemSession.ts](../../src/app/RunItemSession.ts),
+  [DungeonSession.ts](../../src/app/DungeonSession.ts),
+  [runBattle.ts](../../src/domain/runBattle.ts) and
+  [dungeon.ts](../../src/domain/dungeon.ts): publish stats with accepted state,
+  including the final kill before terminal battle removal and save-before-publish
+  exploration steps. Rejected spatial saves add no moves.
+- [runSaveEnvelope.ts](../../src/domain/runSaveEnvelope.ts) and
+  [dungeonSaveEnvelope.ts](../../src/domain/dungeonSaveEnvelope.ts): exact shapes
+  and currently supported formats need explicit compatible new versions, with
+  stats saved alongside active progress. Keep size/digest/recovery guarantees.
+- Add `src/app/ActivePlaytime.ts`, shared by both actual journey owners. Wire
+  eligibility/checkpoints in [startRunApp.ts](../../src/app/startRunApp.ts),
+  [startDungeonApp.ts](../../src/app/startDungeonApp.ts) and their existing
+  [dialogs.ts](../../src/ui/dialogs.ts)/[menuReturn.ts](../../src/ui/menuReturn.ts)
+  lifecycle boundaries. Flush before review/freeze/disposal; a timer must not
+  invalidate a reviewed replacement token. Use the existing save queues and locks.
+- [runRecords.ts](../../src/domain/runRecords.ts),
+  [RunHistory.ts](../../src/app/RunHistory.ts) and
+  [runRecordsStorage.ts](../../src/persistence/runRecordsStorage.ts): extend
+  frozen summaries, pending paired receipts and a bounded personal-best map in
+  the existing history store. Preserve first-result-wins and read-only opening.
+- [runRecords.ts](../../src/ui/runRecords.ts) and
+  [mainMenu.css](../../src/ui/mainMenu.css): extend the existing modal; retain
+  recovery actions, focus and responsive readability. Gate tracking with the
+  existing [entry.ts](../../src/app/entry.ts)/[routes.ts](../../src/app/routes.ts)
+  decision before constructing tracking or touching storage.
+- Extend relevant existing unit/browser files and helpers; add focused stats and
+  clock unit files. Update [run-records.md](../run-records.md), and retain
+  source-bound implementation receipts under `docs/qa/issue-270/`.
 
-Likely production edits are `index.html`, `src/app/startBattleApp.ts` and `src/app/startDungeonApp.ts`. Additional initialization, CSS or test/config edits require the traced consumer above, not cleanup preference.
+## Ablation and non-goals
 
-## Proof and acceptance gates
+**Keep:** accepted-event reduction, movement-undo handling, clock pause/flush,
+versioned active snapshots/history, legacy partial-data labels, exact terminal
+and paired replacement receipts, bounded best-holder summaries, route isolation
+and reachable UI verification. Each supplies an explicit #270 acceptance gate;
+dropping best-holder retention would incorrectly lose all-time bests at eviction.
 
-- **Before scripts/styles and while imports are delayed:** inspect the served initial shell and a controlled delayed-module navigation to `/`, saved menu modes, `/battle`, `/run` and `/dungeon`. A visible generic status is allowed; every listed diagnostic control and diagnostic landmark is absent from the visible/accessibility UI. Repeat the affected cold-start case with mobile emulation and capture a screenshot.
-- **Actual gameplay:** start a saved dungeon from the menu, enter a battle, make a legal reviewed action, finish the encounter through the existing journey and enter another battle. Assert the diagnostic controls stay hidden after reparenting/re-entry, panel naming is correct, and gameplay action, sound, restart and recovery controls remain usable. Cover desktop keyboard plus native touch portrait/landscape, including the ordinary run/standalone consumers. Reuse existing complete legal battle/run/dungeon tests rather than introducing a new simulated gameplay engine.
-- **Recovery:** the existing missing-engine-chunk cases still show a visible recoverable alert with reload guidance. Also cover route-module failure if a changed visibility boundary affects `main.ts`'s catch. Delayed/failed startup must not expose proof controls or leave a blank screen.
-- **Diagnostics remain intentional:** `?scene=proof` still exposes working fixtures, movement, sound and measurements; `?scene=content-smoke` retains its status/content/failure behavior. Preserve repeated `scene` parameter precedence and Q*bert semantics. Explicit diagnostics remain testable in production preview and development.
-- **Regression scope:** both TypeScript scopes, production build/content validation and root/prefix build integrations are required because the shared HTML/bootstrap changes. Run ordinary `verify:pr`, then only additional affected startup/layout/run/dungeon/proof cases and the relevant WebKit consumers. This plan does not require a full regression or performance recapture unless implementation reveals a broader behavioral or loading-budget change.
+**Simplify:** use existing event types and one compatible accepted notification,
+existing run/floor identities and command counters for deduplication, existing
+save/recovery/locking paths and records modal. Derive exact wins/floors from
+validated progress. One injected clock serves two consumers; completed intervals
+checkpoint on actions/lifecycle changes and one 5-second active interval.
 
-Commands to use during implementation, selecting exact test titles after discovery:
+**Drop:** a new event framework, per-event journal, separate stats storage,
+analytics transport, packages/services, historical event reconstruction,
+optional class damage totals, generic extension registry, fastest-clear scoring,
+new balance/economy behavior, standalone-battle scores and a broader UI redesign.
+Document the pure reducer's future granular-stat extension point without building
+that future feature. Implementation and incremental PR publication are now
+authorized; merge and production operations remain outside this task.
 
-```sh
-npm run typecheck
-npm run build
-npm run test:build
-npm run test:regression -- --list tests/main-menu.spec.ts tests/boot.spec.ts tests/dungeon.spec.ts tests/layout.spec.ts tests/content-loading.spec.ts
-npm run test:regression -- tests/main-menu.spec.ts tests/boot.spec.ts tests/dungeon.spec.ts tests/layout.spec.ts tests/content-loading.spec.ts --grep '<affected exact titles>'
-npm exec -- playwright test -c playwright.device-acceptance.config.ts --list
-npm exec -- playwright test -c playwright.exploration.config.ts --list
-npm run verify:pr
-git diff --check
-```
+## Implementation increments and acceptance mapping
 
-Use discovery to confirm selected project/test IDs before each focused run. Existing WebKit acceptance selects main-menu/standalone/run checks; exploration config owns dungeon checks. Add bounded selected tests to those existing configs only if a new title would otherwise be omitted. Prefix preview needs its matching successful build and existing asset configuration. Retain failed/skipped/incomplete runs and exact commit/build, browser, OS, worker and retry identity under the [verification policy](../verification-policy.md); focused recovery does not erase an earlier failure.
+1. **Persistent accepted counters** — first focused PR, `Refs #270`.
+   Add pure stats and compatible stats-bearing active snapshots; wire accepted
+   combat/undo/dungeon steps atomically, with tracking disabled on testing entries.
+   Land schema/counter tests, resume/undo browser proof and the delivered contract
+   documentation with this increment. Covers AC1, the counter portion of AC3,
+   active-save compatibility in AC6, AC7's extension note and affected AC8 paths.
+   Active time, record projection/bests and final UI remain open.
+2. **Active time and frozen history/bests** — depends on increment 1,
+   `Refs #270`. Add lifecycle eligibility/clock, compatible v2 history and
+   per-mode maxima, integrating terminal/abandoned/paired pending records.
+   Land fake-clock, storage/receipt and real reload/modal/replacement/lifecycle
+   proof with documentation. Covers AC2, AC4, remaining persistence/once-only
+   AC3/AC6 and the corresponding AC8 consumers. Recent/best presentation remains.
+3. **Records presentation and final qualification** — depends on 1–2.
+   Show all five stats, partial/legacy labels, recent list, best attribution and
+   retained winning summaries in the existing modal; land keyboard/touch tests
+   and screenshots. Audit every AC1–AC8, including full entry isolation and
+   complete legal terminal/replacement journeys. Use `Closes #270` only after all
+   eight criteria pass; otherwise `Refs #270` with an explicit remaining list.
 
-Browser/device emulation is sufficient under [AGENTS.md](../../AGENTS.md). Local `CAN_TEST_MOBILE` parses as `android`; no physical platform is required for this task and no hardware test is claimed. Browser CI uses the self-hosted runner with one worker and no automatic hosted fallback. The planning-only commit claimed no execution; actual qualification follows below.
+Each increment includes its own affected tests/docs and can be reviewed and
+verified independently. Keep #270 open through partial delivery and record the
+criteria covered, dependencies and remaining work on each PR and the issue.
+The OpenSpec tasks contain the executable breakdown and current completion state.
 
-## Ablation decisions
+## Proof
 
-- **Keep** HTML-level hiding: JavaScript-only cleanup leaves the reported cold-load flash possible.
-- **Keep** the visible generic status and explicit proof reveal: hiding the entire shell or deleting diagnostics breaks real error handling and existing QA consumers.
-- **Simplify** dungeon hiding to stable elements and player-facing naming: the current direct-child selector is invalid after the existing layout move. No new ownership/visibility framework is necessary.
-- **Keep** one pre-module witness and real repeated dungeon battle checks: a DOM/helper assertion after startup cannot prove no initial flash or later re-exposure.
-- **Drop** generalized feature flags, diagnostic service refactors, unrelated panel scrolling and broad full-matrix/performance repetition. No #297 requirement depends on them.
+For this documentation-only handoff: strict OpenSpec validation, local links and
+paths, command/config inspection, archived-plan byte equality, `git diff --check`,
+diff review, assignment/comment readback, native branch association and remote
+commit parity. No application or browser execution is needed for planning.
 
-## Planning validation
+Planning validation passed: OpenSpec strict validation, all 30 local links in
+the six new/updated review documents, diff whitespace checks and prior-plan Git
+blob equality (`cf3d32dd1db967aa9204220068a047da997189f7`). The branch is created
+through GitHub's native linked-branch operation for #270; publication and final
+commit readback are checked before handoff.
 
-Local Markdown link/path validation passed for both plan files, and the archived #172 plan matches the previous committed content after line-ending normalization. `git diff --check` passed. Playwright discovery succeeded: the five named Chromium regression files select 215 cases, WebKit acceptance selects 204, and WebKit exploration selects 168. These are discovery counts, not executed browser results or a recommendation to run every selected case for this fix. The work branch was created from the recorded base and linked natively to #297 using GitHub's `createLinkedBranch` mutation.
+For implementation, follow [verification-policy.md](../verification-policy.md):
 
-## Implementation progress — 2026-11-07
+- Iterate with the new pure stats/clock units and relevant existing
+  `battleSession`, `RunItemSession`, `RunHistory`, `runBattle`, `dungeonBattle`,
+  `dungeon`, `exploration`, `runSaveEnvelope`, `runStorage`, `runRecords`,
+  `runRecordsStorage` and `menuSaves` unit tests. Preserve domain-boundary checks.
+  Cover multi-hit kills, movement undo, duplicate/out-of-order boundary delivery,
+  final events, failed spatial writes, stale callbacks, max bounds and RNG parity.
+- For each increment's frozen inputs, run `npm run verify:pr` (all fast units,
+  both type scopes, root/prefix build integrations, build and seven core journeys).
+  Include the entire affected storage/envelope/session family because active
+  save admission changes. Keep all original failures and reused evidence explicit.
+- Extend existing `main-menu.spec.ts`, `run-progression.spec.ts`, `dungeon.spec.ts`,
+  `dungeon-exploration.spec.ts` and `dungeon-lifecycle.spec.ts` where their existing
+  helpers support the real path. Discover before running with
+  `npm run test:regression -- --list`,
+  `npx --no-install playwright test -c playwright.device-acceptance.config.ts --list`
+  and `npx --no-install playwright test -c playwright.exploration.config.ts --list`.
+  Match the actual added titles, update explicit acceptance grep only if needed,
+  and verify new cases enter the owning broad/special matrices and batch manifest.
+- Execute affected desktop Chromium and native-touch portrait/landscape cases,
+  plus both WebKit acceptance orientations and relevant dungeon WebKit profiles.
+  Retain a complete legal authored victory/defeat and dungeon terminal journey,
+  real undo/reload/Continue, final-kill counting, first-floor/descent/backtrack,
+  terminal Continue, admitted unsaved play and both paired replacement identities.
+- Use fake monotonic clocks and visibility/focus transitions for exact time
+  accounting; add actual normal navigation/reload, hidden-tab, paused-dialog,
+  disposal and Chromium BFCache witnesses. Never claim synthetic pagehide as
+  real BFCache or Chromium evidence as WebKit lifecycle proof.
+- Exercise legacy active formats/history, pending single/paired receipts, corrupt
+  and future bytes, backup recovery, read/write/readback denial, cross-tab conflicts,
+  history retention beyond 100, tied maxima and explicit history reset. Test clock
+  checkpoints racing review, delayed writes and terminal/replacement freeze.
+- Extend existing `testing routes:` storage spies across every direct route and
+  diagnostic entry, including `/run`, `/dungeon`, `/battle`, `/map` and `/qbert`.
+  Menu-origin journeys must track; these entries must not construct tracking or
+  read/write active saves/history. Stats must not alter gameplay/RNG/replay.
+- Retain exact source/build inputs, commands/config/project/test IDs, browser/OS,
+  workers 1, retries 0 and raw reports/screenshots. Use qualified self-hosted browser
+  capacity and existing per-runner concurrency groups; no automatic hosted fallback.
+  Reuse unchanged audio/telemetry/render evidence only with documented equivalence.
+  Widen verification only for actual affected consumers or failures, not merely
+  because this is a save-format change. Do not claim a full-regression run from
+  this affected-scope qualification.
 
-- The caller explicitly authorized implementation and requested OpenSpec. Change `issue-297-hide-gameplay-diagnostics` is valid under strict validation; its three tasks cover startup, repeated dungeon gameplay and integrated delivery.
-- Implemented native hidden defaults, neutral initial wording, explicit proof reveal, shared gameplay restart/caption reveal and dungeon panel naming. Removed the three obsolete direct-child diagnostic-hiding loops. No rules, saves, scene selection or dependencies changed.
-- New desktop regressions failed on the unchanged application: visible proof restart before modules and missing dungeon panel naming (`tmp/issue297-red.log`). The first fixed-build run retained two test-setup failures: the saved New Game seed was 29 instead of the unsaved witness's 28, and held stylesheets blocked the screenshot. The saved test now draws 27 to obtain playable seed 28 through the existing collision rule; styles are aborted while scripts are held. Neither repair changes gameplay or timeouts.
-- Root build passed both TypeScript scopes and 226 content checks. `tmp/issue297-focused-desktop.json` records **3/3 passes**, one worker, zero retries: delayed startup across nine routes, route-import recovery for all three game modes, and the saved legal three-battle/floor-travel journey. Battle screenshot visually reviewed: no proof tools overlap the playfield. Cross-device, explicit-proof and core qualification remain pending.
-- Local commands need the existing npm wrapper at `C:/Users/apexw/.codex/tmp/issue163-tools` on PATH. OpenSpec 1.14.1 is cached at `C:/Users/apexw/AppData/Local/npm-cache/_npx/c37562604d2d088d/node_modules/@fission-ai/openspec/bin/openspec.js`. Baseline content checks rewrote snapshot line endings; only those generated normalization changes were restored after confirming identical normalized content. Restore them again after later units if needed; never commit them.
-- Implementation source is committed and pushed as `ea70451`; [PR #338](https://github.com/luminari-gurus/tactics-guru-v2/pull/338) is open with `bug` and `risk:medium`, temporarily draft during qualification. Self-hosted [PR verification](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/42319614188) passed for that commit.
-- Local `verify:pr` passed in 106.9 seconds: 1,233 units, both types, two build integrations and seven core journeys. Receipt: `verification-receipts/pr/1794012062004-16564/summary.json`. Two earlier command attempts remain failed: bundled Node was not discoverable by npm exec (fixed with an ignored local node shim), then LF-only workflow parsing saw autocrlf CRLF bytes (restored the four unchanged workflows to their committed LF bytes). These are environment corrections; no workflow or tooling assertion was changed.
-- Additional Chromium qualification passed **59/59**, no skips/retries: `tmp/issue297-ui-chromium.json`, with exact discovery in `tmp/issue297-ui-chromium-discovery.json`. It covers delayed startup, import/engine recovery, explicit proof fixture/opacity/move/audio/measurements, content smoke, shared HUD/run restart and Q*bert precedence on desktop and native-touch portrait/landscape. Three existing consumer cases gained explicit hidden-diagnostic/restart assertions. Application/build inputs remain those of `ea70451`; only these assertions and handoff artifacts differ. Mobile/WebKit repeated encounters, development and prefix preview remain pending.
-- Touch dungeon qualification retained one portrait pass and a landscape setup failure from reading the seed before New Game mounted the map. An explicit `#dungeon-map` visible wait fixes that setup race; the landscape case passed alone (`tmp/issue297-dungeon-landscape-recovery.json`). The saved legal commands, assertions and timeouts were retained; the successful portrait evidence is reused because its map was already ready at that same boundary.
-- WebKit's eight-case UI selection retained six passes and two timeouts in the delayed-startup screenshot harness (`tmp/issue297-ui-webkit.json`). All cold-shell assertions passed, but WebKit required navigation to settle for a screenshot. The harness now rejects the held modules after inspecting each shell, so no application code executes while screenshotting. Exact recovery passed both WebKit orientations (`tmp/issue297-startup-webkit-recovery.json`) and all three Chromium profiles (`tmp/issue297-startup-chromium-final.json`). No assertion or timeout was relaxed.
-- WebKit dungeon qualification passed **6/6** in six minutes, one worker and zero retries (`tmp/issue297-dungeon-webkit.json`): all desktop/portrait/landscape saved three-battle journeys and active resume checks. Both implementation tasks are complete; the final delivery checks are recorded next. Production source has not changed since `ea70451`. Current selection discovery is 1,126 broad Chromium cases, 208 WebKit acceptance cases and 171 WebKit exploration cases; these inventory counts are not executed full-matrix claims.
+Playwright/device emulation is sufficient under AGENTS.md. Physical testing was
+not requested or performed. Local `CAN_TEST_MOBILE=android` declares access only;
+it does not certify a device or reserve self-hosted capacity.
 
-## Final qualification and handoff
+## Estimate, questions and risks
 
-All required runtime gates are covered. Final checks passed: both TypeScript scopes after the last test edits; explicit WebKit proof boot **1/1**; root development **8/8**; `/prototype/` production preview **4/4**, including native touch. The ordinary root build was restored successfully and its HTML SHA-256 again matches the earlier qualified root (`67cf434b62dfac1a75130936ebc065d079d468f7598f884555fd1a79c0309c6c`). All successful final selections have zero skips or retries. Earlier failed captures remain failed with their targeted recoveries recorded above.
+**My estimate: 6–9 hours of implementation, verification and PR preparation**
+for the complete issue, approximately 2–3 hours for the first increment. This
+excludes CI queue time, human review and unrelated environment failures. The
+main uncertainty is lifecycle/write ordering and compatibility fixtures, not
+the stat arithmetic. Re-estimate if the implementation exposes a wider real
+consumer than the inspected paths.
 
-Environment: Windows x64 `10.0.26300`, Node `24.22.1`, Playwright `1.64.1`, Chromium `156.0.8078.4` revision 1248, WebKit `27.2` revision 2370; one browser worker. These are browser/device emulation results. No physical-device, full-regression or new performance-budget claim is made. Development Vite/Phaser warnings are retained in logs; no renderer or warning-suppression change was added.
+**No blocking unanswered question.** The plan explicitly proposes longest active
+duration, one move per hero command/exploration step, per-mode maxima, 100 recent
+entries and honest legacy partial-data coverage. These are reviewable defaults,
+not claims of previously approved product decisions. Requested revisions can be
+folded into this concrete plan before implementation.
 
-[Verification summary and exact selectors](../qa/issue-297/verification.json), [receipt manifest](../qa/issue-297/manifest.json) and compressed original reports under `docs/qa/issue-297/` preserve source/build inputs, successful selections, failed attempts and recovery. Desktop, touch portrait, WebKit landscape, explicit proof and cold-shell screenshots were visually reviewed; representative [desktop](../qa/issue-297/desktop.png), [touch portrait](../qa/issue-297/touch-portrait.png), [WebKit landscape](../qa/issue-297/webkit-landscape.png), [proof](../qa/issue-297/proof.png) and [cold shell](../qa/issue-297/cold-start.png) images are retained.
+Known limits: abrupt browser/process termination or storage refusal can lose
+uncommitted progress; keep the existing unsaved/recovery behavior and never add
+closed time to hide it. Reverse compatibility with older application versions
+after writing newer saves is not promised. Pre-upgrade evicted records and past
+active time cannot be recovered from data that never stored them.
 
-Production, asset, dependency, build and browser configuration inputs still match `ea70451a3b13c495c6874a93ec62a42c14d64a85`. Subsequent changes add only explicit assertions in existing consumer cases, the two described test readiness/capture repairs, QA evidence, OpenSpec progress and documentation. Reuse follows that input comparison: unchanged core cases and units retain their passing source-bound results; changed harness cases have exact fresh recovery. The final PR checks provide current-head CI status. No acceptance item remains deferred.
+## Increment 2 workspace — 2026-11-11
 
-Completion audit: initial HTML and delayed/failed imports retain only player-facing status; repeated dungeon battles and resume keep diagnostics hidden and preserve controls; standalone/run/Q*bert and explicit proof/content-smoke consumers pass; root/prefix and development delivery pass; OpenSpec validates strictly; the published branch and issue remain linked. One focused PR completes #297. Leave review, merge, release tags and deployment to a subsequent instruction.
+Branch `branch/issue-270-active-time-history`, based on counter branch `41bc3cd`,
+in `C:/Users/apexw/.codex/worktrees/issue-270-active-time-history/Tactics-Guru`.
+The original workspace continues increment-1 browser qualification unchanged.
+Outcome: eligible active time plus frozen records/bounded all-time maxima; existing
+clock/save/history owners remain the integration points. No new event journal,
+storage key, inactivity heuristic or gameplay policy. Files: `ActivePlaytime.ts`,
+both session/app owners, existing records model/storage and their focused tests.
+Proof: injected-clock tests, review/queued-save races, records compatibility,
+retention/replacement units, affected lifecycle/browser journeys and `verify:pr`.
+Current work: clock/history implementation is complete; browser qualification and
+the increment-2 PR remain pending. Counter PR #365 is its dependency.
 
-## Estimate and delivery
+Implementation update: the injected clock, lifecycle/dialog/navigation eligibility,
+quiet 5-second checkpoints and final queued-save disposal are wired into both
+owners. Authored review waits for the existing save queue in a cancelable paused
+dialog, then reads exact bytes; Cancel resumes play without waiting for a held
+browser lock. Same-origin normal navigation flushes before leaving. No timestamp
+is persisted between processes. These paths still need real browser qualification.
 
-Estimated time for **me**: **2–3 hours** to implement the visibility/naming repair and focused regressions, plus **1–2 hours** for affected browser/build qualification, review and PR preparation: **3–5 hours total**, excluding runner queue/unavailability and unrelated pre-existing failures. This is an estimate, not execution evidence.
+History v2 is implemented in the existing keys: frozen version-one summaries,
+bounded per-mode maxima and retained winner summaries, max duration, newest/stable
+ties, partial-field exclusion and lazy v1 reading with an explicit historical
+coverage flag. Existing receipt/replacement reconciliation carries the frozen
+summaries. Reads and old pending receipts remain read-only; Reset clears maxima.
+Iteration found two expected old-test mismatches (v2 was previously classified as
+future; legacy reads previously returned v1 instead of normalized v2) and a typed
+max-size fixture still constructing v1. Updated those expectations/fixture, keeping
+exact old bytes and no-opening-write assertions. The 34-test records/history
+follow-up and the 60-test combined records/owner follow-up passed; both type scopes
+pass. New eviction/tie/partial/getter/immutable/paired recovery tests are included.
+No increment-2 OpenSpec checkbox or PR readiness is claimed yet. Next: finish
+clock/lifecycle and terminal/replacement browser evidence, then `verify:pr`,
+document actual failures/results and publish the stacked increment promptly.
 
-The original planning delivery is complete at `be97c75`. Continue implementation on the same branch, keep this document and OpenSpec tasks current, commit and push coherent work, and open a focused labeled PR. Do not create a release tag or deploy for this UI repair.
+Fresh increment-2 evidence: all 1,329 units passed at `7ab6000`, report
+`verification-receipts/issue270/inc2/units-first.json`; the ordinary production
+build and both type scopes passed (`inc2/build-first.log`). The two desktop
+clock browser cases passed in 7.6 seconds using that build, report
+`verification-receipts/issue270/inc2-clock-desktop/report.json`: exact 5-second
+active checkpoints, 60-second paused/hidden/blur exclusions, actual menu departure
+and Continue, and no menu-session time. Hidden/blur were synthetic lifecycle
+changes with a fake browser clock, not an actual background-tab claim.
+The parent counter branch through `49ad112` has been merged into this branch;
+the new authored clock case is included in both WebKit acceptance orientations.
 
-## Adversarial review and merge continuation — 2026-11-07
+Clock qualification follow-up: first native-background Chromium attempt failed
+because Playwright 1.64.1 forces focus/visibility. Disabling only its Chromium
+focus emulation via CDP made both real tab-switch cases pass; the full three-profile
+Chromium clock matrix then passed 12/12 in 23.5 seconds. WebKit also forces
+`Emulation.setActiveAndFocused` internally and exposes no equivalent public CDP
+session. Its two owning configs explicitly exclude these **new** native-focus
+cases; they retain fake visibility/focus plus actual navigation/Continue, and no
+WebKit-native-tab claim is made. Existing cases remain selected; no runtime skip
+or assertion weakening is used.
 
-The caller authorized independent adversarial review, repairs, local verification, merge and safe Git cleanup. The live PR base remains main at `4148eb1`; head `5e27e8a` is conflict-free. Existing review threads and submitted reviews are empty; the maintainer comment's CI follow-up is satisfied by successful run `42322069196`. Automated review summaries were not used as correctness evidence.
+The first WebKit clock run additionally caught a real 26-ms review-handoff gap:
+closing the temporary save dialog resumed time in a microtask before the real
+review opened, allowing a queued write to drift its token. The authored app now
+keeps that paused modal open until the caller replaces it or navigates. Failed
+reports remain in `inc2-background-desktop/` and `inc2-clocks-authored-webkit/`;
+the source fix and all engine-specific clock checks are being requalified.
 
-**Finding:** [manual review 5809152891](https://github.com/luminari-gurus/tactics-guru-v2/pull/338#pullrequestreview-5809152891) reports invisible post-mount and preparation errors. Three browser probes on `5e27e8a` confirmed hidden `#fit-status` alerts for late run/dungeon module exceptions and the run's preparation-screen runtime error handler. Raw probes are retained in `tmp/issue297-review/`; this is an observed current-head gap, without a claim that the PR introduced it.
+Review/cache follow-up: the held-write Cancel and paused replacement token cases
+pass. The native BFCache record-history case needed its byte baseline taken after
+exploration time was flushed into a paused recovery review; cancel/restore still
+preserves that exact reviewed snapshot. The original history-return/replacement
+assertions are retained, and a separate normal-navigation case explicitly asserts
+native `pageshow.persisted`.
 
-**Outcome:** error feedback remains visible when a preparation/loading screen owns the UI, including repeated errors, while saves and hidden diagnostics are preserved. **Non-goals:** no new renderer recovery, fatal-state manager, storage format or gameplay behavior. **Files:** `src/main.ts`, `src/app/startRunApp.ts`, one small `src/ui/gameError.ts` presentation helper and existing main-menu browser tests. **Proof:** post-evaluation module fault injection and actual run error-event dispatch, visible/in-viewport alert, deduplication and unchanged save bytes on Chromium/touch/WebKit; normal import-failure and core consumer checks remain required.
+A focused literal-parent comparison is retained under `cache-literal-base/` and
+`cache-current/`, with source `docs/qa/issue-270/cache-comparison-witness.ts`.
+Parent `49ad112`: typed and normal-link departures both used native BFCache (2/2).
+Current: normal-link departure used BFCache and preserved replacement bytes;
+unflushed programmatic/hard departure reloaded instead (1/2 for that exploratory
+native-cache assertion). The browser reports a masked non-restoration reason;
+queued final checkpoint locks are the likely cause, not a proven browser reason.
+Do not claim native caching for every hard departure: only the normal flushed
+navigation witness proves it. Both restore mechanisms preserve newer saved data.
+Keep this failed exploratory attempt and the normal-path proof explicit; no
+second lifecycle journal or unlocked write is added to force browser caching.
+The six required review/cache desktop cases now pass in 14.8 seconds, report
+`verification-receipts/issue270/inc2-review-cache-repair/report.json`.
 
-Ablation: keep one helper because both the entry catch and run error handler need this same concrete behavior. Reuse the current battle status for pre-mount/active-battle failures; add only one alert to the visible owner screen. Do not unhide the battle shell or diagnostics, duplicate route controllers, add configuration, or rerun unrelated complete progression matrices.
+Latest clock boundary repairs: a focused failing unit reproduced save-status
+rendering re-entering eligibility and resuming an in-progress pause. The shared
+observer now guards synchronous publication; its negative run is retained as
+`inc2/reentrant-pause-failure.log`, with the repaired 153-test family run retained.
+Accepted exploration steps now checkpoint elapsed time in the saved candidate.
+If spatial saving fails, elapsed time stays in memory as unsaved, with no ghost
+move; the next accepted retry preserves the accumulated interval. A focused unit
+covers that save/refusal/retry sequence. Clock flush fences also skip a second
+identical write, preserving the preceding backup instead of rotating it twice.
+The final focused clock/session family passes 115 tests; both type scopes pass.
 
-The visible-owner fix passes **12 Chromium** cases across desktop/native-touch portrait/landscape and **8 WebKit** cases across both orientations. The three new cases failed before the fix and now prove in-viewport recovery, repeated-error deduplication, unchanged saved bytes and hidden diagnostics. Screenshots were inspected. One initial test typing error was corrected with a literal tuple annotation; its failed build log is retained. Current discovery is 1,135 broad Chromium and 214 WebKit acceptance cases, not execution of those full matrices.
+All four desktop paired saved/unsaved replacement variants passed with explicit
+nonzero saved statistics and each live identity's own stats, including interrupted
+pending recovery (`inc2-paired-desktop/report.json`, 14.3 seconds). The original
+seed-13 authored witness is confirmed as three player victories; final tests now
+assert the earned victory, exact event-derived totals, frozen positive duration
+on both victory and defeat, and all five dungeon maxima after a legal clear,
+descent/backtrack and confirmed abandonment. Full affected engine qualification
+and final verify:pr follow on the frozen inputs before publishing this increment.
 
-An additional [P2 review finding 5809182451](https://github.com/luminari-gurus/tactics-guru-v2/pull/338#pullrequestreview-5809182451) confirms that the LF-only PR workflow contract fails on byte-equivalent CRLF workflows. The isolated LF check passed and CRLF check failed; all original workflow bytes were restored. Deliver that unrelated test-only repair in a companion PR, then merge its main base into this branch. The gameplay change does not include an unrelated parser workaround.
+Final durability feedback repair: a failing unit reproduced a coalesced clock
+write saving the current snapshot while leaving the older `Saving run…` message
+visible. Quiet writes now publish meaningful pending/error-to-saved transitions
+while keeping ordinary healthy checkpoints quiet. Dungeon clock recovery likewise
+clears stale unsaved feedback. Negative/positive runs are retained under
+`inc2/coalesced-status-failure.log` and `inc2/coalesced-status-repair.log`.
 
-### Review disposition and merge readiness
+Local command route for continuation: PowerShell tools use native Windows Node;
+prepend `C:/Users/apexw/.codex/tmp/issue270-node-tools` to PATH for npm/npx. Those
+local launchers invoke the installed WSL npm CLI using native Node, and the old
+node_modules/.bin Node shims were repaired to the current installed runtime.
+Use WSL Ubuntu for OpenSpec only. All test/build identities and browser versions
+remain recorded in the receipts; no unrelated .env values were read or copied.
 
-All three substantive P2 findings are verified and addressed:
+Frozen runtime `9e2d7cc` passed verify:pr in 120.7 seconds (1,333 units and all
+seven core journeys). The affected Chromium batch retained 72/78 passing cases in
+8.7 minutes, including legal authored victory/defeat with frozen exact totals,
+legal dungeon clear/descent/backtrack/abandonment with five maxima, paired stats,
+clock, recovery and native-cache cases. Six failures were two existing lifecycle
+tests across three profiles: reload legitimately saved ~335 ms of new exploration
+time, and a reset assertion read the old defeat before asynchronous replacement
+finished. The tests now checkpoint/pause before exact reload comparison (while
+requiring all non-time fields unchanged) and await the acknowledged new identity
+and map. No runtime change, retry, skip or timeout increase was needed. Retain the
+original `inc2-qualified-chromium/report.json`; fresh six-case repair plus WebKit
+qualification follows. Do not call that original batch a clean passing suite.
 
-- Visible-owner error feedback is repaired in `e0506a1`; stronger cases in `4fc9202` preserve both primary and backup bytes. The original three probes and regression cases failed before repair. Current Chromium **31/31**, WebKit **8/8**, development **4/4**, prefix error **4/4**, prefix asset **4/4** and rebuilt-root smoke **5/5** selections pass with zero skips/retries. Screenshots show the alert in the visible preparation screen.
-- CRLF fixture parsing is repaired in merged [#339](https://github.com/luminari-gurus/tactics-guru-v2/pull/339) and [#340](https://github.com/luminari-gurus/tactics-guru-v2/pull/340). The PR, risk-gate and final automatic-batch fixture paths now cover LF/CRLF while retaining every positive/negative guard. Original failure logs and the 140-pass/one-failure aggregate are preserved; that independent discovery failure is resolved by the next item.
-- The [nine missing Q*bert IDs](https://github.com/luminari-gurus/tactics-guru-v2/pull/338#issuecomment-6700609532) blocked full capture preparation. Merged [#341](https://github.com/luminari-gurus/tactics-guru-v2/pull/341) gives the runner a current manifest, assigns those cases once per profile, preserves all old assignments/job identities/budgets, and leaves historical timing data untouched. All **141** affected Node contracts pass both normally and with physical CRLF inputs; all **9** Q*bert browser cases passed. On the final combined branch the real-discovery contract again passes with all 1,135 canonical cases assigned exactly once.
+2026-11-12 handoff repair: WebKit's held-checkpoint case caught a real confirmation
+race: closing the confirmation could resume a pending enemy turn during history
+preparation, so the current-snapshot guard correctly refused replacement. Both
+journey apps now reuse `DialogChoice.keepOpen` and keep a native progress modal
+open until the old scene stops and replacement finishes; no engine/input framework
+was added. The original failing WebKit report is retained. All 16 focused repair
+cases passed (9 Chromium, 4 authored-WebKit, 3 dungeon-WebKit), including a new
+staged valid player-to-enemy dungeon boundary held behind a native history lock.
+Clock task 2.1 was reopened for that integration repair and is complete again;
+OpenSpec is 5/9. History model task 2.2 remains complete; PR publication task 2.3
+awaits final affected qualification and source-bound receipt publication.
 
-The only base-integration conflict was documentation counts: retain this branch's 1,135-case inventory and main's current-manifest guidance. Merge commits preserve the tested receipt SHAs; no rebase, history rewrite, release tag or version bump is needed. Production/content/dependency/browser-config blobs still match `e0506a1`. Reuse the passing source-bound `c96345c` PR check (1,233 units, both types, two builds and seven core journeys; 108.5 seconds) for unchanged application/core inputs. Fresh combined Node checks cover the changed tooling/configuration, and final typecheck/browser cases cover the stronger fault assertions.
+Requalification is proportional: new confirmation/handoff, reset, cache and
+replacement consumers rerun on the final UI change. The previously passing earned
+counter/terminal portions of the long journeys remain reusable: no domain,
+accumulator, session, history, content, asset or dependency inputs changed; their
+frozen summaries were produced before the changed post-record confirmation UI.
+Fresh short terminal/live replacement journeys and core checks cover that changed
+UI boundary. The original 78-case run remains 72 passing / 6 failed, with a clean
+six-case test repair recorded separately; it is never relabeled fully green.
 
-[Review completion and provenance](../qa/issue-297/review/completion.json) and the [review receipt manifest](../qa/issue-297/review/manifest.json) retain commands, source hashes, original failures and passing recoveries. Existing maintainer CI follow-up is answered with these local results; the caller explicitly made remote CI waiting a non-gate. All current review details are addressed; merge the qualified head, verify main/issue closure, then delete only merged, unreferenced, unchanged refs. Retain worktrees with unmerged commits, unpublished QA or ownership by another chat. Record the final merge and cleanup on the PR/issue.
+Cleanup note: automatic approval review rejected removal of the clean temporary
+literal-base comparison worktree with `blocked by policy`; it remains intact at
+`C:/Users/apexw/.codex/worktrees/issue-270-cache-base/Tactics-Guru` (detached
+`49ad112`, no running service). Its temporary test file was already removed, and
+reports/witness source remain in this feature workspace. Do not retry cleanup via
+another shell or a recursive-delete workaround. This is retained diagnostic
+state, not a feature or PR-readiness blocker.
+
+2026-11-12 inter-increment migration audit (required before PR 2 publication):
+The counter-only #365 writer stores stats v1 with reserved `activeMs: 0` and whole
+kill/move coverage. Treating that same v1 as fully timed would fabricate complete
+historic zero playtime if #365 merges before the clock increment. Timed stats
+therefore need v2 with a separate `timeCoverage` flag: preserve known kill/move
+coverage, mark older time since upgrade, and exclude only partial time from its
+maximum. New active envelopes become run 11 / dungeon 13, retaining counter-only
+10 / 12 and all earlier readers. Validate the old run digest against its raw v1
+payload before in-memory normalization; opening remains read-only.
+
+Next: add literal #365 counter-only fixtures, implement stats-v2 compatibility,
+per-field best eligibility and UI labels; update both OpenSpec design and the
+compatibility scenario; then run affected units/core and focused migration/clock/
+records proof. Existing numeric/event/RNG/eligibility witnesses remain useful for
+unchanged obligations, with explicit input equivalence; do not call the current
+v1-clock implementation publication-ready until this migration is fixed. The UI
+worktree must merge this new version and update its typed fixtures/time-only
+partial presentation. No first-PR runtime change is needed.
+
+Migration implementation: timed stats v2 now separate counter coverage from
+`timeCoverage`, use run 11 / dungeon 13, and accept literal counter-only 10/12.
+Fixtures were generated by actual #365 commit `49ad112` with one legal battle:
+run 3 kills/4 moves and dungeon 3 kills/5 moves, both reserved zero time. Exact
+legacy digest/read/roundtrip tests, read-only Continue and per-field best tests
+pass in the 191-test focused family. Earlier nested v1 summaries remain readable
+without retaining unproven complete-time maxima. A new browser migration witness
+covers both modes: read-only admission, known counters, accepted mutation/reset,
+frozen partial time and exclusion only from duration bests. First run: 6/6
+Chromium, 3/4 WebKit; the last test polled an absent history slot before async
+replacement finished. It now waits for the new identity and safely polls pending
+history, retaining the original failed report. Fresh final migration reports are
+`inc2-counter-upgrade-chromium-final` and `inc2-counter-upgrade-webkit-final`.
+
+## Records presentation workspace — 2026-11-11
+
+Branch `branch/issue-270-records-ui`, worktree
+`C:/Users/apexw/.codex/worktrees/issue-270-records-ui/Tactics-Guru`, based on the
+active-time/history branch at `0f1dbf3`. Outcome: five-stat recent summaries,
+honest unavailable/since-upgrade/N/A labels, and attributed personal bests that
+open their retained summaries. Non-goals: gameplay/HUD redesign, new art or UI
+frameworks. Files: existing `src/ui/runRecords.ts`, `src/ui/mainMenu.css`, menu
+browser tests and delivered contract docs. Proof: keyboard focus/disclosures,
+portrait/landscape native touch and WebKit, recovery/reset and best eviction
+fixtures, reviewed screenshots, `verify:pr` and final AC1–AC8 audit.
+Ablation: native details/summary elements use the existing modal focus trap;
+reuse one summary renderer for recent rows and retained best winners. Keep the
+existing forest-green/gold palette and serif headings, with tabular stat numerals.
+No presentation acceptance is claimed yet. Parent qualification is in progress.
+## Active time/history ready — 2026-11-12
+
+The migration audit above is resolved at `8fee762db48b469df763cdddbe9c180a99db9c4c`.
+Timed stats v2 separate counter coverage and time coverage; literal #365 saves
+keep complete known counters while elapsed time starts since upgrade. New envelopes
+are authored 11 / dungeon 13; older supported readers and read-only admission remain.
+OpenSpec tasks 2.1 and 2.2 are proven again (5/9); publication completes 2.3.
+
+Final `npm run verify:pr` passed in 127.5 seconds: 1,339 units, both type scopes,
+root/prefix build integrations, bundle and 7 core browser journeys. Receipt:
+`verification-receipts/pr/1794441623848-109888/summary.json`. Fresh timed-v2 coupled
+browser matrices passed 42 Chromium + 18 authored WebKit + 6 dungeon WebKit cases,
+with one worker, no retries or skips. Final literal-upgrade witnesses passed 6
+Chromium + 4 WebKit cases. Earlier 118 qualified handoff/lifecycle cases and 13
+passing earned-progression portions remain scoped to unchanged numeric/event/
+eligibility behavior. This does not relabel the earlier failed broad batches as
+clean runs or claim their v1 bytes were current timed-v2 proof.
+
+Source identities, commands, exact cases, compatibility boundaries, prior failures
+and limitations are retained in [increment-2.json](../qa/issue-270/increment-2.json).
+The final records UI is a dependent branch and still needs its current 15-case
+keyboard/touch/WebKit proof plus 75-case direct/diagnostic isolation audit. No
+merge, release, deployment or tag is needed for these review-ready increments.
+
+Publication: [PR #368](https://github.com/luminari-gurus/tactics-guru-v2/pull/368) is open, ready, labeled enhancement and stacked on #365. Issue #270 records coverage and remaining work. Six selection/batch contracts passed in 67.9 seconds. OpenSpec task 2.3 is complete (6/9). Next: finish UI/isolation proof and open the final dependent PR.
+
+Isolation qualification update: the first 45-case Chromium run retained 44 passes
+and one failure in fresh/unavailable Pixel landscape. A legal random dungeon step
+entered a battle while the test attempted the loading screen's transient restart
+button; the trace waited on a hidden control. The same assumption exists at the
+literal #365 base. No storage access violation was observed and no app defect is
+established. The test now waits for the accepted phase's actual ready screen,
+clicks its restart control normally, and also requires a new identity. Retain
+that failed report/error context; rerun all 15 affected fresh-route permutations,
+then the 30 WebKit isolation cases. Do not relabel the old full batch green.
+
+## Final qualification — 2026-11-12
+
+AC1–AC8 are all qualified by [increment-3.json](../qa/issue-270/increment-3.json), including explicit inherited evidence from increments 1/2. Screenshot review found readable five-stat summaries, wrapped IDs/N/A and no horizontal overflow. The fresh route repair passed 15/15, WebKit isolation 30/30, final captures 5/5. Earlier Chromium diagnostic/Qbert 30-case passes are reused with unchanged inputs; the original full batch remains failed. Both type scopes, strict OpenSpec, local links and diff checks pass. Final publication/task 3.3 is complete in PR #369.
+
+Publication complete: [PR #369](https://github.com/luminari-gurus/tactics-guru-v2/pull/369) is open, ready and labeled enhancement, based on #368 (which is based on #365). All nine OpenSpec tasks are complete. Issue #270 has the final AC1–AC8 accounting and remains open pending merge. Later commits change only handoff/QA/task tracking; runtime inputs remain those qualified above. Current self-hosted CI for new heads may be queued; local affected-scope qualification is complete. Review/merge and later OpenSpec sync/archive are the only follow-up.
+
+
+## Review repairs and final qualification — 2026-11-12
+
+All reported review findings are fixed in their owning increments and inherited here. The UI preserves disclosure state and focus on cross-tab history refresh, with sequential Tab/Enter and touch evidence. [review-365.json](../qa/issue-270/review-365.json), [review-368.json](../qa/issue-270/review-368.json) and [review-369.json](../qa/issue-270/review-369.json) retain final inputs, exact commands/cases, failed attempts and reuse limits. Local PR verification passed 1,357 units and all seven core journeys. The focused matrix qualifies 48 Chromium, 20 run/UI WebKit and nine dungeon WebKit cases with the explicit split-run accounting in the receipt. Merge #365 -> #368 -> #369; issue #270 remains open until that stack merges. Each PR has one focused commit; original heads remain in local backup refs. No release tag, merge or deployment was performed.

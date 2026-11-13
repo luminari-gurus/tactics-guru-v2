@@ -6,6 +6,50 @@ import { projectTile } from '../../src/geometry/iso';
 
 export { playerDecision } from './playerPolicy';
 
+/** Called with save recovery open. Fake browser time isolates lifecycle accounting;
+ * legal keyboard/touch journeys separately retain normal input/animation proof. */
+export async function checkActivePlaytime(page: Page, key: string, closeSelector: string) {
+  const stored = () => page.evaluate(key => localStorage.getItem(key)!, key);
+  const milliseconds = async () => JSON.parse(await stored()).payload.stats.activeMs as number;
+  const before = await milliseconds(), paused = await stored();
+  await page.clock.install(); await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
+  await page.clock.fastForward(60000); expect(await stored()).toBe(paused);
+  await page.locator(closeSelector).click({ force: true });
+  await page.clock.fastForward(5000); await expect.poll(milliseconds).toBe(before + 5000);
+  await page.evaluate(() => { Object.defineProperty(document, 'hidden', { configurable: true, value: true }); document.dispatchEvent(new Event('visibilitychange')); });
+  const hidden = await stored(); await page.clock.fastForward(60000); expect(await stored()).toBe(hidden);
+  await page.evaluate(() => { Object.defineProperty(document, 'hidden', { configurable: true, value: false }); document.dispatchEvent(new Event('visibilitychange')); });
+  await page.clock.fastForward(5000); await expect.poll(milliseconds).toBe(before + 10000);
+  await page.evaluate(() => window.dispatchEvent(new Event('blur')));
+  const blurred = await stored(); await page.clock.fastForward(60000); expect(await stored()).toBe(blurred);
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')));
+  await page.clock.fastForward(5000); await expect.poll(milliseconds).toBe(before + 15000);
+  return { before, activeMs: before + 15000 };
+}
+
+/** Actual tab focus/visibility changes, with virtual elapsed time for a bounded witness. */
+export async function checkBackgroundPlaytime(page: Page, key: string) {
+  // Playwright otherwise makes even background Chromium tabs appear focused/visible.
+  const nativeFocus = page.context().browser()?.browserType().name() === 'chromium'
+    ? await page.context().newCDPSession(page) : null;
+  await nativeFocus?.send('Emulation.setFocusEmulationEnabled', { enabled: false });
+  const other = await page.context().newPage();
+  try {
+    await other.goto(new URL('map', page.url()).href); await other.bringToFront();
+    await expect.poll(() => page.evaluate(() => document.hidden || !document.hasFocus())).toBe(true);
+    await page.evaluate(key => navigator.locks.request(key, () => {}), key);
+    const background = await page.evaluate(() => ({ hidden: document.hidden, focused: document.hasFocus(), visibility: document.visibilityState }));
+    const stored = () => page.evaluate(key => localStorage.getItem(key)!, key);
+    const before = await stored(), milliseconds = JSON.parse(before).payload.stats.activeMs as number;
+    await page.clock.install(); await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
+    await page.clock.fastForward(60000); expect(await stored()).toBe(before);
+    await page.bringToFront(); await expect.poll(() => page.evaluate(() => document.hasFocus())).toBe(true);
+    await page.clock.fastForward(5000);
+    await expect.poll(async () => JSON.parse(await stored()).payload.stats.activeMs).toBe(milliseconds + 5000);
+    return { background, activeBefore: milliseconds, activeAfter: milliseconds + 5000, excludedMs: 60000 };
+  } finally { await other.close(); await nativeFocus?.detach(); await page.clock.resume(); }
+}
+
 export async function readSession(page:Page):Promise<{state:BattleState;replay:Replay|null;continuation:{snapshot:BattleState;commands:ReplayCommand[];events:BattleEvent[]}|null;events:BattleEvent[];pending:Command|null;phase:string}> {
   return JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
 }
@@ -25,6 +69,12 @@ export async function confirmRestart(page:Page, force=false) {
 
 export async function combatSkin(page:Page): Promise<'radial'|'rail'> {
   return (await page.evaluate(() => document.body.dataset.combatSkin)) === 'radial' ? 'radial' : 'rail';
+}
+
+/** Finish panel layout, ResizeObserver and rendering before projecting a changed layout. */
+export async function settledReport(page:Page) {
+  await page.evaluate(()=>new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve())))));
+  return JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
 }
 
 export async function boardPoint(page:Page, cell:{x:number;y:number}) {
@@ -81,8 +131,7 @@ export async function playCommand(page:Page,command:Command){
     if(await chip.count()) await chip.click();
     return;
   }
-  if(command.type==='useAbility' && command.abilityId!=='ability:basic_attack')await page.locator('#battle-ability').selectOption(command.abilityId);
-  await page.locator(`[data-action="${command.type==='move'?'move':command.abilityId==='ability:basic_attack'?'basic':'signature'}"]`).click();
+  await page.locator(`[data-action="${command.type==='move'?'move':command.abilityId==='ability:basic_attack'?'basic':command.abilityId}"]`).click();
   await page.locator('#battle-target').selectOption(`${cell.x},${cell.y}`);
   await page.getByRole('button',{name:'Confirm action'}).click();
 }

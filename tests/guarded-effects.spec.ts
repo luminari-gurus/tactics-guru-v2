@@ -90,7 +90,7 @@ for (const mode of ['standalone', 'run', 'dungeon'] as const) for (const miss of
   expect((await readSession(page)).state).toEqual(f.before);
   await checkBadges(page);
   const bytes = await page.evaluate(key => localStorage.getItem(key), key);
-  await page.locator('[data-action=signature]').click();
+  await page.locator(`[data-action="${f.command.abilityId}"]`).click();
   const target = f.before.units.find(u => u.id === ('unitId' in f.command.target ? f.command.target.unitId : -1))!;
   await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
   await expect(page.locator('#battle-preview')).toContainText('uses action');
@@ -99,7 +99,7 @@ for (const mode of ['standalone', 'run', 'dungeon'] as const) for (const miss of
   await checkBadges(page);
   expect(await page.evaluate(key => localStorage.getItem(key), key)).toBe(bytes);
   if(mode==='standalone' && !miss) {
-    await page.locator('[data-action=signature]').click();
+    await page.locator(`[data-action="${f.command.abilityId}"]`).click();
     await page.locator('canvas').focus();
     const from=target.cell, self=f.before.units.find(u=>u.id===1)!.cell;
     for(let i=0;i<Math.abs(self.x-from.x);i++)await page.keyboard.press(self.x>from.x?'ArrowRight':'ArrowLeft');

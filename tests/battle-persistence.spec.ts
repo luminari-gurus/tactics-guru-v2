@@ -13,6 +13,8 @@ import type { BattleState } from '../src/domain/types';
 import { menuFixture } from './helpers/menuFixtures';
 import { RUN_STORAGE_KEYS } from '../src/persistence/runStorage';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
+import { RUN_RECORD_KEYS, encodeRunRecords } from '../src/persistence/runRecordsStorage';
+import { emptyRunRecords } from '../src/domain/runRecords';
 
 // Playwright disables BFCache by default; persistence coverage must include cached documents.
 test.use({launchOptions:async({browserName},use)=>{
@@ -27,12 +29,20 @@ declare global {
     testingSaveAudit: { calls: string[]; snapshot: () => Record<string, string | null> };
   }
 }
-for(const condition of ['missing','valid','corrupt','backup-only','unavailable'] as const) test(`testing routes: fresh play never accesses ${condition} saved games`,async({page})=>{
+for(const group of ['journeys','diagnostics','qbert'] as const)
+for(const condition of ['missing','valid','corrupt','backup-only','unavailable'] as const) test(group==='journeys'
+  ?`testing routes: fresh play never accesses ${condition} saved games`
+  :group==='qbert'?`testing routes: Qbert never accesses ${condition} saved games`
+  :`testing routes: diagnostic play never accesses ${condition} saved games`,async({page})=>{
   const families={battle:keys,run:RUN_STORAGE_KEYS,dungeon:DUNGEON_KEYS};
   const values:Record<string,string>={'isolation-unrelated':'preserve'};
   for(const mode of ['battle','run','dungeon'] as const)for(const slot of ['primary','backup'] as const){
     if(condition==='missing'||condition==='backup-only'&&slot==='primary')continue;
     values[families[mode][slot]]=condition==='corrupt'?'broken saved bytes':menuFixture(mode);
+  }
+  for(const slot of ['primary','backup'] as const){
+    if(condition==='missing'||condition==='backup-only'&&slot==='primary')continue;
+    values[RUN_RECORD_KEYS[slot]]=condition==='corrupt'?'broken history bytes':encodeRunRecords(emptyRunRecords())!;
   }
   // Harness setup precedes the application spy; subsequent assertion reads bypass it explicitly.
   await page.goto('./');
@@ -40,7 +50,7 @@ for(const condition of ['missing','valid','corrupt','backup-only','unavailable']
     for(const [key,text]of Object.entries(values))localStorage.setItem(key,text);
     sessionStorage.setItem('tactics-guru:menu-new-dungeon-review','review sentinel');
   },values);
-  const progressKeys=Object.values(families).flatMap(slots=>Object.values(slots));
+  const progressKeys=[...Object.values(families).flatMap(slots=>Object.values(slots)),...Object.values(RUN_RECORD_KEYS)];
   const expected=Object.fromEntries([...progressKeys,'isolation-unrelated'].map(key=>[key,values[key]??null]));
   expected['tactics-guru:menu-new-dungeon-review']='review sentinel';
   await page.addInitScript(({progressKeys,unavailable})=>{
@@ -63,16 +73,17 @@ for(const condition of ['missing','valid','corrupt','backup-only','unavailable']
     expect(await page.evaluate(()=>window.testingSaveAudit.snapshot())).toEqual(expected);
     await expect(page.getByRole('button',{name:/Continue saved|Save recovery|Play unsaved/})).toHaveCount(0);
   };
-  const entries=[
+  const entries={journeys:[
     ['battle','./battle/?game=dungeon&entry=continue'],['run','./run?game=battle&entry=recovery'],
     ['dungeon','./dungeon?game=run&entry=new'],['map','./map?game=dungeon&entry=new'],
+  ],diagnostics:[
     ['battle','./?scene=battle&game=run&entry=continue'],['proof','./?scene=proof&game=dungeon&entry=new'],
     ['content-smoke','./?scene=content-smoke&game=run&entry=recovery'],
-  ];
+  ],qbert:[['qbert','./qbert?game=run&entry=continue']]}[group];
   for(const [mode,url]of entries)await test.step(mode+' '+url,async()=>{
     await page.goto(url);
     const ready=async()=>{
-      if(mode==='battle')await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+      if(mode==='battle'||mode==='qbert')await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
       else if(mode==='run')await expect(page.locator('#run-start')).toBeVisible();
       else if(mode==='dungeon')await expect(page.getByRole('button',{name:'Start new dungeon',exact:true})).toBeVisible();
       else if(mode==='map')await expect(page.locator('#map-grid span')).toHaveCount(400);
@@ -84,6 +95,10 @@ for(const condition of ['missing','valid','corrupt','backup-only','unavailable']
       await expect.poll(async()=>(await readSession(page)).state.commandCount).toBeGreaterThan(before.state.commandCount);
       await page.locator('#fit-restart').click();
       await expect.poll(async()=>JSON.parse(await page.locator('#game').getAttribute('data-session')??'null')?.state.seed).toBe(2);
+    }else if(mode==='qbert'){
+      const before=await readSession(page);await page.locator('#battle-next').click();
+      await expect.poll(async()=>(await readSession(page)).state.commandCount).toBeGreaterThan(before.state.commandCount);
+      await page.locator('#fit-restart').click();await ready();
     }else if(mode==='run'){
       await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();
       await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await page.locator('#battle-next').click();
@@ -92,9 +107,20 @@ for(const condition of ['missing','valid','corrupt','backup-only','unavailable']
       await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();
       await expect(page.locator('#dungeon-map')).toBeVisible();
       await page.locator('.dungeon-directions button:not(:disabled)').first().click();
-      await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();
+      // A legal exploration step can enter an encounter. Wait for its actual
+      // screen rather than clicking the loading screen's transient restart.
+      const stepped=JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);
+      if(stepped.phase==='battle'){
+        await expect(page.locator('#game')).toHaveAttribute('data-ready','true');
+        await page.locator('#fit-restart').click();
+      }else await page.locator('#dungeon-screen').getByRole('button',{name:'Start new dungeon',exact:true}).click();
+      await expect.poll(async()=>JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!).id).not.toBe(stepped.id);
       await expect(page.locator('#dungeon-map')).toBeVisible();
     }else if(mode==='proof')await page.locator('#fit-restart').click();
+    if(mode==='run'||mode==='dungeon') {
+      const snapshot=await page.locator('#game').getAttribute(`data-${mode}-snapshot`);
+      expect(JSON.parse(snapshot??'null')?.stats).toBeUndefined();
+    }
     await audit();
     await page.evaluate(()=>{document.dispatchEvent(new Event('visibilitychange'));window.dispatchEvent(new PageTransitionEvent('pagehide',{persisted:true}));});
     await audit();await page.reload();await ready();await audit();
@@ -416,6 +442,38 @@ test.describe('browser history with BFCache enabled',()=>{
     await page.addInitScript(()=>window.addEventListener('pageshow',event=>{
       if(event.persisted)sessionStorage.setItem('test:bfcache-return',location.href);
     }));
+  });
+
+  for(const mode of ['run','dungeon'] as const)test(`cached ${mode} record history preserves the replacement and one old result`,async({page,baseURL})=>{
+    const slots=mode==='run'?RUN_STORAGE_KEYS:DUNGEON_KEYS,text=menuFixture(mode);
+    const old=JSON.parse(text).payload,oldId=mode==='run'?old.items.run.id:old.id;
+    const first=new URL(`./?game=${mode}&history=records-first`,baseURL).href,map=new URL('map',baseURL).href;
+    await page.goto('./');await page.evaluate(({slots,text})=>{localStorage.setItem(slots.primary,text);localStorage.setItem(slots.backup,text);},{slots,text});
+    await page.goto(first);
+    const continueJourney=async()=>{
+      await page.getByRole('button',{name:`Continue saved ${mode}`,exact:true}).click();
+      await expect(page.locator(mode==='run'?'#run-start-encounter':'#dungeon-map')).toBeVisible();
+    };
+    await continueJourney();await page.goto(map);await expect(page.locator('#map-grid span')).toHaveCount(400);
+    await page.goto(new URL(`./?game=${mode}`,baseURL).href);
+    if(mode==='run'){await page.locator('#run-start').click();await page.locator('#run-confirm-new').click();}
+    else {await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();}
+    await expect(page.locator(mode==='run'?'#run-start-encounter':'#dungeon-map')).toBeVisible();
+    if(mode==='dungeon'){
+      // Capture reviewed bytes after the legitimate exploration-time checkpoint.
+      await page.getByRole('button',{name:'Save recovery',exact:true}).click();
+      await expect(page.getByRole('heading',{name:'Dungeon save recovery',exact:true})).toBeVisible();
+    }
+    const saved=await page.evaluate(slots=>[localStorage.getItem(slots.primary),localStorage.getItem(slots.backup)],slots);
+    const history=await page.evaluate(key=>localStorage.getItem(key),RUN_RECORD_KEYS.primary);
+    expect(JSON.parse(history!).records).toMatchObject([{id:oldId,outcome:'abandoned'}]);
+    await page.goBack({waitUntil:'commit'});await expect(page).toHaveURL(map);await page.goBack({waitUntil:'commit'});
+    await expect(page.getByRole('button',{name:`Continue saved ${mode}`,exact:true})).toBeVisible();
+    expect(await page.evaluate(()=>sessionStorage.getItem('test:bfcache-return'))).toBe(first);
+    expect(await page.evaluate(key=>localStorage.getItem(key),RUN_RECORD_KEYS.primary)).toBe(history);
+    await continueJourney();
+    expect(await page.evaluate(slots=>[localStorage.getItem(slots.primary),localStorage.getItem(slots.backup)],slots)).toEqual(saved);
+    expect(await page.evaluate(key=>localStorage.getItem(key),RUN_RECORD_KEYS.primary)).toBe(history);
   });
 
   for(const cached of ['battle','recovery dialog'])test(`cached ${cached} cannot overwrite either slot of its replacement`,async({page,baseURL})=>{

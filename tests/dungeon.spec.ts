@@ -1,23 +1,51 @@
 import { dungeonContent } from '../src/content/dungeon';
-import { walkDungeon, reenterDungeonStair, continueSavedDungeon } from './helpers/dungeonTraversal';
-import { atEncounter, atStairApproach } from './helpers/dungeonFixtures';
+import { walkDungeon, reenterDungeonStair, continueSavedDungeon, openDungeonInventory } from './helpers/dungeonTraversal';
+import { atEncounter, atStairApproach, stagedMageAbility } from './helpers/dungeonFixtures';
 import { expect,railTest as test,type Page } from './helpers/dungeonEntropy';
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
+import type { Locator } from '@playwright/test';
 import { dungeonCapacityFixture, dungeonVictoryBoundary } from './helpers/dungeonFixtures';
 import { dungeonBattle, startDungeonBattle, acceptDungeonBattle, freshDungeon, type DungeonState } from '../src/domain/dungeon';
 import { progressHero } from '../src/domain/progression';
-import { encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
+import { decodeDungeon, encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
+import { RUN_RECORD_KEYS } from '../src/persistence/runRecordsStorage';
 import { COMBAT_CONTROLS_KEY } from '../src/ui/combatControls';
-import { readSession,playCommand,playUndo } from './helpers/battlePolicy';
+import { readSession,playCommand,playUndo,checkActivePlaytime,checkBackgroundPlaytime } from './helpers/battlePolicy';
 import { playerDecision, fighterDecision } from './helpers/playerPolicy';
 import { journeyPreparation, healedFighterBoundary, shamanJourney } from './helpers/dungeonFixtures';
-import { dispatch } from '../src/domain/turns';
+import { dispatch, replayCommandSequence } from '../src/domain/turns';
+import { previewMovement } from '../src/domain/grid';
 import { generateMap } from '../src/map/generate';
 import type { Command, BattleEvent } from '../src/domain/types';
 
 const fixedSeedTest = test.extend({ pinDungeonSeed: 28 });
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
+
+test('dungeon statistics: active exploration excludes recovery, visibility, blur and menu sessions',async({page},info)=>{
+ test.setTimeout(90000);await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();
+ await expect(page.locator('#dungeon-map')).toBeVisible();
+ await page.getByRole('button',{name:'Save recovery',exact:true}).click();
+ await expect(page.getByRole('heading',{name:'Dungeon save recovery',exact:true})).toBeVisible();
+ const clock=await checkActivePlaytime(page,DUNGEON_KEYS.primary,'#dungeon-close-recovery');
+ await page.getByRole('link',{name:'Main menu',exact:true}).last().click({force:true});
+ await expect(page.getByRole('button',{name:'Continue',exact:true})).toBeVisible();
+ const saved=await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary);
+ await page.clock.fastForward(60000);expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe(saved);
+ await page.clock.resume();await page.getByRole('button',{name:'Continue',exact:true}).click();
+ await expect(page.locator('#dungeon-map')).toBeVisible();expect((await snapshot(page)).stats?.activeMs).toBe(clock.activeMs);
+ await info.attach('active-playtime',{body:JSON.stringify({...clock,visibility:'synthetic hidden/blur; fake browser clock',navigation:'actual menu departure and Continue'}),contentType:'application/json'});
+});
+
+test('dungeon statistics: actual background tab pauses active exploration time',async({page},info)=>{
+ test.setTimeout(60000);await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();
+ await expect(page.locator('#dungeon-map')).toBeVisible();
+ const evidence=await checkBackgroundPlaytime(page,DUNGEON_KEYS.primary);
+ await info.attach('actual-background-playtime',{body:JSON.stringify(evidence),contentType:'application/json'});
+});
+async function historyRows(page:Page){return page.evaluate(keys=>{
+ const text=localStorage.getItem(keys.primary);return text?JSON.parse(text).records:[];
+},RUN_RECORD_KEYS);}
 
 // UI witnesses straddle the Frost Snare gate; exact XP/HP/caster projections and
 // forged save rejection live in dungeonProgressionBoundary.test.ts.
@@ -38,6 +66,30 @@ for(const [xp,level,maxHp]of [[0,1,11],[180,3,19]])test(`menu dungeon restores M
  if(missile.kind==='magicMissile')expect(missile.casterLevel).toBe(level);
 });
 
+for(const abilityId of ['ability:frost_snare','ability:magic_missile'] as const)test(`staged Mage ${abilityId} accepts exact effects replay and saved active reload`,async({page})=>{
+ // The level/position boundary is deliberately staged. The extended journey alone proves earned XP.
+ const fixture=stagedMageAbility(abilityId),catalog=dungeonBattle(fixture.state)!.catalog;
+ const expected=dispatch(fixture.state.activeBattle!,fixture.command,catalog);expect(expected.ok).toBe(true);if(!expected.ok)throw Error(expected.reason);
+ await seed(page,fixture.state);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ const before=await readSession(page);expect(before.state).toEqual(fixture.state.activeBattle);expect(before.events).toEqual([]);
+ await playCommand(page,fixture.command);
+ await expect.poll(async()=>(await readSession(page)).state.commandCount).toBe(before.state.commandCount+1);
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ const accepted=await readSession(page);expect(accepted.state).toEqual(expected.state);expect(accepted.events).toEqual(expected.events);
+ const history=accepted.replay??accepted.continuation!;
+ expect(replayCommandSequence('initial' in history?history.initial:history.snapshot,history.commands,catalog))
+   .toEqual({ok:true,state:accepted.state,events:accepted.events});
+ if(abilityId==='ability:frost_snare') {
+   expect(accepted.state.rng).toEqual(before.state.rng);expect(accepted.state.units.map(u=>u.hp)).toEqual(before.state.units.map(u=>u.hp));
+   expect(accepted.events).toContainEqual({type:'movementBlocked',unitId:fixture.command.target.unitId,sourceId:fixture.command.unitId,abilityId});
+ } else expect(accepted.events.filter(e=>e.type==='missileRolled')).toHaveLength(2);
+ const saved=await snapshot(page),slots=await page.evaluate(keys=>keys.map(key=>localStorage.getItem(key)),[DUNGEON_KEYS.primary,DUNGEON_KEYS.backup]);
+ await page.reload();await continueSavedDungeon(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ const resumed=await readSession(page);expect(await snapshot(page)).toEqual(saved);expect(resumed.state).toEqual(accepted.state);expect(resumed.events).toEqual([]);
+ expect(await page.evaluate(keys=>keys.map(key=>localStorage.getItem(key)),[DUNGEON_KEYS.primary,DUNGEON_KEYS.backup])).toEqual(slots);
+ await test.info().attach('staged-mage-boundary',{body:JSON.stringify({fixture:'staged level/position; not earned progression',command:fixture.command,before:before.state,after:accepted.state,events:accepted.events}),contentType:'application/json'});
+});
+
 // Saved New Game avoids its initial dormant seed; draw 27 so the playable seed
 // is 28, matching the existing complete legal first-floor witness.
 for(const saved of [false,true])(saved?test.extend({pinDungeonSeed:27}):fixedSeedTest)(saved?'saved menu dungeon keeps proof tools hidden across legal encounters':'testing dungeon legally clears a floor, descends and backtracks without accessing saves',async({page,isMobile})=>{
@@ -46,7 +98,7 @@ for(const saved of [false,true])(saved?test.extend({pinDungeonSeed:27}):fixedSee
  const errors:string[]=[];let taunted=false;page.on('pageerror',error=>errors.push(error.message));
  if(!saved)await page.addInitScript(()=>{
   const get=Storage.prototype.getItem,set=Storage.prototype.setItem,remove=Storage.prototype.removeItem;
-  const gameKey=(key:string)=>key.startsWith('tactics-guru:phaser:')||key==='tactics-guru:menu-new-dungeon-review';
+  const gameKey=(key:string)=>key.startsWith('tactics-guru:phaser:')||key.startsWith('tactics-guru:records:')||key==='tactics-guru:menu-new-dungeon-review';
   Storage.prototype.getItem=function(key){if(gameKey(key))throw Error('Testing saved-game read');return get.call(this,key);};
   Storage.prototype.setItem=function(key,value){if(gameKey(key))throw Error('Testing saved-game write');set.call(this,key,value);};
   Storage.prototype.removeItem=function(key){if(gameKey(key))throw Error('Testing saved-game removal');remove.call(this,key);};
@@ -55,9 +107,12 @@ for(const saved of [false,true])(saved?test.extend({pinDungeonSeed:27}):fixedSee
  else{await page.goto('./dungeon');await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();}
  await expect(page.locator('#dungeon-map')).toBeVisible();
  expect((await snapshot(page)).seed).toBe(28);
+ expect((await snapshot(page)).stats).toEqual(saved?expect.objectContaining({coverage:'whole-run',movesTaken:0,enemiesKilled:0}):undefined);
+ let expectedKills=0;
  for(let slot=0;slot<3;slot++){
   await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  expectedKills+=(await snapshot(page)).activeBattle!.units.filter(unit=>unit.side==='enemy').length;
   await expect(page.getByRole('complementary',{name:'Dungeon battle controls',exact:true})).toBeVisible();
   await expect(page.getByText('Board controls',{exact:true})).not.toBeVisible();
   await expect(page.getByText('Measurements',{exact:true})).not.toBeVisible();
@@ -78,11 +133,14 @@ for(const saved of [false,true])(saved?test.extend({pinDungeonSeed:27}):fixedSee
    await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||(await readSession(page))?.phase==='player';}).toBe(true);
   }
   const finished=await snapshot(page);expect(finished.phase).not.toBe('defeat');expect(finished.floors[0].completed).toBe(slot+1);
+  if(saved){expect(finished.stats?.enemiesKilled).toBe(expectedKills);expect(finished.stats!.movesTaken).toBeGreaterThan(0);}
+  else expect(finished.stats).toBeUndefined();
+  if(saved)expect(await historyRows(page)).toEqual([]);
   for(let i=0;i<20;i++){
    const s=await snapshot(page),command=journeyPreparation(s);if(!command)break;
    if(command.type==='claimReward')await page.getByRole('button',{name:`Claim ${dungeonContent.items[command.itemId].label}`,exact:true}).click();
-   else if(command.type==='useItem'){const label=dungeonContent.items[command.itemId].label;await page.getByRole('combobox',{name:`${label} target`,exact:true}).selectOption(command.heroId);await page.getByRole('button',{name:`Use ${label}`,exact:true}).click();}
-   else if(command.type==='equipItem'){const row=page.locator(`[data-instance-id="${command.instanceId}"]`);await row.locator('select').selectOption(command.heroId);const item=s.ownership.equipment.find(e=>e.instanceId===command.instanceId)!;await row.getByRole('button',{name:`Equip ${dungeonContent.items[item.itemId].label}`,exact:true}).click();}
+   else if(command.type==='useItem'){await openDungeonInventory(page);const label=dungeonContent.items[command.itemId].label;await page.getByRole('combobox',{name:`${label} target`,exact:true}).selectOption(command.heroId);await page.getByRole('button',{name:`Use ${label}`,exact:true}).click();}
+   else if(command.type==='equipItem'){await openDungeonInventory(page);const row=page.locator(`[data-instance-id="${command.instanceId}"]`);await row.locator('select').selectOption(command.heroId);const item=s.ownership.equipment.find(e=>e.instanceId===command.instanceId)!;await row.getByRole('button',{name:`Equip ${dungeonContent.items[item.itemId].label}`,exact:true}).click();}
    else throw Error('Unexpected preparation command');await page.locator('#dungeon-item-confirm').click();
   }
  }
@@ -90,7 +148,147 @@ for(const saved of [false,true])(saved?test.extend({pinDungeonSeed:27}):fixedSee
  const second=await snapshot(page);expect(second.depth).toBe(2);expect(second.party).toEqual(cleared.party);expect(second.ownership).toEqual(cleared.ownership);
  await reenterDungeonStair(page,'ascend',isMobile?'touch':'keyboard');
  const returned=await snapshot(page);expect(returned.depth).toBe(1);expect(returned.floors[0].completed).toBe(3);expect(returned.party).toEqual(cleared.party);expect(returned.ownership).toEqual(cleared.ownership);
- await expect(page.getByRole('button',{name:'Save recovery',exact:true})).toHaveCount(saved?1:0);expect(errors).toEqual([]);
+ if(saved){expect(returned.stats?.enemiesKilled).toBe(cleared.stats?.enemiesKilled);expect(returned.stats!.movesTaken).toBeGreaterThan(cleared.stats!.movesTaken);}
+ await expect(page.getByRole('button',{name:'Save recovery',exact:true})).toHaveCount(saved?1:0);
+ if(saved){
+  expect(await historyRows(page)).toEqual([]);
+  await page.getByRole('link',{name:'Main menu',exact:true}).last().click();
+  await page.getByRole('button',{name:'Hall of Records',exact:true}).click();
+  await expect(page.getByRole('dialog').getByRole('status')).toHaveText('No finished journeys recorded yet.');
+  await page.getByRole('dialog').getByRole('button',{name:'Close',exact:true}).click();
+  await page.getByRole('button',{name:'New Game',exact:true}).click();
+  await page.getByRole('dialog').getByRole('button',{name:'Start new dungeon',exact:true}).click();
+  await expect(page.locator('#dungeon-map')).toBeVisible();
+  await expect.poll(()=>historyRows(page)).toMatchObject([{id:returned.id,outcome:'abandoned',battlesWon:3,floorsCleared:1,
+   stats:{coverage:'whole-run',enemiesKilled:returned.stats!.enemiesKilled,movesTaken:returned.stats!.movesTaken}}]);
+  const rows=await historyRows(page);expect(rows[0].stats.activeMs).toBeGreaterThanOrEqual(returned.stats!.activeMs);
+  const bests=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!).bests.dungeon,RUN_RECORD_KEYS.primary);
+  expect(Object.keys(bests)).toHaveLength(5);expect(rows[0].stats.activeMs).toBeGreaterThan(0);
+  expect(Object.values(bests).every((row:any)=>row.id===returned.id)).toBe(true);
+ }
+ expect(errors).toEqual([]);
+});
+
+// Use the same legal New Game seed as the complete saved first-floor journey above.
+test.extend({pinDungeonSeed:27})('saved dungeon downloads only after explicit recovery export',async({page,isMobile})=>{
+ test.setTimeout(120000);
+ const downloads:string[]=[];
+ page.on('download',download=>downloads.push(download.suggestedFilename()));
+ const activate=async(control:Locator)=>{if(isMobile)await control.tap();else await control.click();};
+ const stored=()=>page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),DUNGEON_KEYS);
+ const dialog=page.getByRole('dialog'),recovery=page.getByRole('button',{name:'Save recovery',exact:true});
+
+ await test.step('ordinary exploration, accepted movement and an enemy turn never download',async()=>{
+  await page.goto('./');await activate(page.getByRole('button',{name:'New Game',exact:true}));
+  await expect(page.locator('#dungeon-map')).toBeVisible();
+  expect((await snapshot(page)).seed).toBe(28);
+  await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const before=await readSession(page),actor=before.state.initiative[before.state.activeIndex];
+  const reach=previewMovement(before.state,actor,dungeonBattle(await snapshot(page))!.catalog);
+  if(!reach.ok)throw Error(reach.reason);
+  const destination=reach.cells.find(cell=>cell.cost>0);
+  if(!destination)throw Error('Legal opening battle has no movement destination');
+  await activate(page.locator('#battle-move'));
+  await page.locator('#battle-target').selectOption(`${destination.cell.x},${destination.cell.y}`);
+  await activate(page.locator('#battle-review'));
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const moved=await readSession(page);
+  expect(moved.state.commandCount).toBe(before.state.commandCount+1);
+  expect(moved.state.units.find(unit=>unit.id===actor)?.cell).toEqual(destination.cell);
+  expect(downloads).toEqual([]);
+
+  const enemies=new Set(before.state.units.filter(unit=>unit.side==='enemy').map(unit=>unit.id));
+  let enemyTurn=false;
+  for(let turn=0;turn<before.state.initiative.length&&!enemyTurn;turn++){
+   const previous=await readSession(page);
+   await activate(page.getByRole('button',{name:'Wait / End turn',exact:true}));
+   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+   const current=await readSession(page);
+   expect(current.state.commandCount).toBeGreaterThan(previous.state.commandCount);
+   enemyTurn=current.events.slice(previous.events.length).some(event=>event.type==='turnStarted'&&enemies.has(event.unitId));
+   expect(downloads).toEqual([]);
+  }
+  expect(enemyTurn,'the legal witness must cross an enemy turn and return to player control').toBe(true);
+ });
+
+ const saved=await stored(),boundary=await snapshot(page),battle=(await readSession(page)).state;
+ expect(saved.primary).not.toBeNull();expect(saved.backup).not.toBeNull();
+ const unchanged=async()=>{
+  expect(await stored()).toEqual(saved);
+  expect(await snapshot(page)).toEqual(boundary);
+  expect((await readSession(page)).state).toEqual(battle);
+ };
+ await test.step('reload and Continue preserve the accepted boundary without downloading',async()=>{
+  await page.reload();await continueSavedDungeon(page);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await unchanged();expect(downloads).toEqual([]);
+ });
+
+ await test.step('native pointer or touch recovery open, close and removal cancel never download',async()=>{
+  await activate(recovery);await expect(dialog).toHaveAccessibleName('Dungeon save recovery');
+  await activate(page.locator('#dungeon-close-recovery'));await expect(dialog).not.toBeVisible();
+  await activate(recovery);await activate(page.locator('#dungeon-remove-primary'));
+  await expect(dialog).toHaveAccessibleName('Remove reviewed save?');
+  await activate(page.locator('#dungeon-remove-cancel'));await expect(dialog).toHaveAccessibleName('Dungeon save recovery');
+  await activate(page.locator('#dungeon-close-recovery'));await expect(dialog).not.toBeVisible();
+  await unchanged();expect(downloads).toEqual([]);
+ });
+
+ await test.step('a fresh Enter after opening recovery or cancelling removal cannot export',async()=>{
+  const heading=dialog.getByRole('heading',{name:'Dungeon save recovery'});
+  await recovery.focus();await page.keyboard.press('Enter');
+  await expect(dialog).toHaveAccessibleName('Dungeon save recovery');
+  await expect(heading).toBeFocused();
+  await page.keyboard.press('Enter');await expect(dialog).toHaveAccessibleName('Dungeon save recovery');
+  await page.keyboard.press('Tab');await expect(dialog.getByRole('button').first()).toBeFocused();
+  await page.keyboard.press('Escape');await expect(dialog).not.toBeVisible();
+  await unchanged();expect(downloads).toEqual([]);
+
+  await activate(recovery);await activate(page.locator('#dungeon-remove-primary'));
+  await expect(dialog).toHaveAccessibleName('Remove reviewed save?');
+  await page.locator('#dungeon-remove-cancel').focus();await page.keyboard.press('Enter');
+  await expect(dialog).toHaveAccessibleName('Dungeon save recovery');
+  await expect(heading).toBeFocused();
+  await page.keyboard.press('Enter');await expect(dialog).toHaveAccessibleName('Dungeon save recovery');
+  await page.keyboard.press('Escape');await expect(dialog).not.toBeVisible();
+  await unchanged();expect(downloads).toEqual([]);
+ });
+
+ for(const key of ['Enter','Space'])await test.step(`held ${key} cannot activate export across recovery or dialog replacement`,async()=>{
+  await recovery.focus();await page.keyboard.down(key);
+  if(key==='Enter')await expect(dialog).toHaveAccessibleName('Dungeon save recovery');
+  else await expect(dialog).not.toBeVisible(); // Native Space activates on release.
+  await page.keyboard.down(key);await page.keyboard.down(key);await page.keyboard.up(key);
+  await expect(dialog).toHaveAccessibleName('Dungeon save recovery');
+  await expect(dialog.getByRole('heading',{name:'Dungeon save recovery'})).toBeFocused();
+  await unchanged();expect(downloads).toEqual([]);
+
+  await activate(page.locator('#dungeon-remove-primary'));
+  await expect(dialog).toHaveAccessibleName('Remove reviewed save?');
+  await page.locator('#dungeon-remove-cancel').focus();await page.keyboard.down(key);
+  await expect(dialog).toHaveAccessibleName(key==='Enter'?'Dungeon save recovery':'Remove reviewed save?');
+  await page.keyboard.down(key);await page.keyboard.down(key);await page.keyboard.up(key);
+  await expect(dialog).toHaveAccessibleName('Dungeon save recovery');
+  await expect(dialog.getByRole('heading',{name:'Dungeon save recovery'})).toBeFocused();
+  await page.keyboard.press('Escape');await expect(dialog).not.toBeVisible();
+  await unchanged();expect(downloads).toEqual([]);
+ });
+
+ await test.step('one explicit export downloads the exact reviewed bytes without changing saves or state',async()=>{
+  await activate(recovery);await expect(dialog).toHaveAccessibleName('Dungeon save recovery');
+  const exportPrimary=page.getByRole('button',{name:'Export primary save',exact:true});
+  const exportId=await exportPrimary.getAttribute('id');expect(exportId).toMatch(/^dungeon-export-\d+$/);
+  const expectedName=`tactics-guru-dungeon-${exportId!.replace('dungeon-export-','')}.json`;
+  expect(downloads).toEqual([]);
+  const pending=page.waitForEvent('download');await activate(exportPrimary);
+  const download=await pending,file=await download.path();
+  expect(file).not.toBeNull();expect(await download.failure()).toBeNull();
+  expect(download.suggestedFilename()).toBe(expectedName);
+  expect(readFileSync(file!,'utf8')).toBe(saved.primary);
+  await expect(dialog).not.toBeVisible();await unchanged();
+  expect(downloads).toEqual([expectedName]);
+ });
 });
 
 test('new dungeons use fresh layouts across reloads and saved dungeons retain theirs',async({page})=>{
@@ -214,10 +412,16 @@ fixedSeedTest('dungeon battle undo survives reload and a legal defeat journey',a
   await expect.poll(async()=>{const state=await snapshot(page);return state.phase!=='battle'||(await readSession(page)).phase==='player';}).toBe(true);
  }
  await expect(page.getByRole('heading',{name:/Dungeon defeat/})).toBeVisible();
+ const ended=await snapshot(page);
+ await expect.poll(()=>historyRows(page)).toMatchObject([{id:ended.id,outcome:'defeat'}]);
+ const recorded=await historyRows(page),slots=await page.evaluate(keys=>[localStorage.getItem(keys.primary),localStorage.getItem(keys.backup)],DUNGEON_KEYS);
  await page.reload();await continueSavedDungeon(page);
  await expect(page.getByRole('heading',{name:/Dungeon defeat/})).toBeVisible();
+ expect(await snapshot(page)).toEqual(ended);expect(await historyRows(page)).toEqual(recorded);
+ expect(await page.evaluate(keys=>[localStorage.getItem(keys.primary),localStorage.getItem(keys.backup)],DUNGEON_KEYS)).toEqual(slots);
  await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();
  await expect(page.getByRole('heading',{name:/Dungeon · Floor 1/})).toBeVisible();
+ expect(await historyRows(page)).toEqual(recorded);
 });
 fixedSeedTest('read-only entry, keyboard new dungeon, real action and active resume',async({page,isMobile})=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
@@ -231,6 +435,11 @@ fixedSeedTest('read-only entry, keyboard new dungeon, real action and active res
  expect(await page.locator('#dungeon-screen').evaluate(n=>n.scrollWidth<=n.clientWidth)).toBe(true);
  await page.screenshot({path:test.info().outputPath('floor-entry.png'),fullPage:true});
  await walkDungeon(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ const shortcutEntry=await snapshot(page);
+ await page.locator('canvas').focus();await page.keyboard.press('a');
+ await expect(page.locator('[data-action=basic]')).toHaveAttribute('aria-pressed','true');
+ await page.keyboard.press('m');await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');
+ expect(await snapshot(page)).toEqual(shortcutEntry);
  await page.locator('#battle-party').focus();
  if(isMobile)await page.locator('#fit-restart').tap();else await page.locator('#fit-restart').click();
  await page.locator('#dungeon-cancel-new').click();await expect(page.locator('#fit-restart')).toBeFocused();
@@ -247,10 +456,13 @@ test('legal reward and guardian boundaries, travel reload, backtracking and isol
   await seed(page,f.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   await playCommand(page,f.command);await expect(page.locator('#dungeon-screen')).toBeVisible();
   const s=await snapshot(page),result=dispatch(f.snapshot.activeBattle!,f.command,dungeonBattle(f.snapshot)!.catalog);expect(result.ok).toBe(true);
-  if(result.ok){const expected=acceptDungeonBattle(f.snapshot,result.state);expect(expected.ok).toBe(true);if(expected.ok)expect(s).toEqual(expected.state);}
+  if(result.ok){const expected=acceptDungeonBattle(f.snapshot,result.state);expect(expected.ok).toBe(true);if(expected.ok){expect(s).toEqual({...expected.state,stats:expect.objectContaining({coverage:'since-upgrade',enemiesKilled:1,movesTaken:0})});expect(s.stats?.boundary).toEqual({battle:slot,command:result.state.commandCount});}}
   if(slot<2){
-   await expect(page.locator('#dungeon-descend')).toHaveCount(0);await expect(page.getByRole('heading',{name:'Choose one reward'})).toBeVisible();
+   await expect(page.locator('#dungeon-descend')).toHaveCount(0);
+   const rewards=page.getByRole('region',{name:'Rewards',exact:true});
+   await expect(rewards).toBeInViewport({ratio:1});
    await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(s);
+   await expect(rewards).toBeInViewport({ratio:1});
    const claim=page.getByRole('button',{name:/^Claim /}).first();
    const item=(await claim.textContent())!.replace(/^Claim /,'');
    await claim.click();await expect(page.locator('#battle-dialog-message')).toHaveText(`Claim ${item} and prepare the next encounter?`);
@@ -286,6 +498,13 @@ test('corrupt bytes stay exportable and uncertain travel requires explicit recov
 
 test('declining a dungeon reward preserves inventory and allows the next encounter',async({page,isMobile})=>{
  const initial=dungeonCapacityFixture();await seed(page,initial);
+ const viewport=page.viewportSize()!;
+ const rewards=page.getByRole('region',{name:'Rewards',exact:true});
+ for(const size of [{width:393,height:852},{width:740,height:360}]){
+  await page.setViewportSize(size);
+  await expect(rewards).toBeInViewport({ratio:1});
+ }
+ await page.setViewportSize(viewport);
  const decline=page.getByRole('button',{name:'Decline reward',exact:true});
  const activate=async()=>{if(isMobile)await decline.tap();else await decline.press('Enter');};
  await activate();await page.locator('#dungeon-item-cancel').click();
@@ -293,6 +512,7 @@ test('declining a dungeon reward preserves inventory and allows the next encount
  await activate();await page.locator('#dungeon-item-confirm').click();
  const next=await snapshot(page);
  expect(next).toMatchObject({phase:'ready',offer:null,ownership:initial.ownership});
+ await expect(rewards).toHaveCount(0);
  await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(next);
  await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
@@ -300,9 +520,22 @@ test('declining a dungeon reward preserves inventory and allows the next encount
 
 test('confirmed charm discard frees full capacity without cancelling or duplicating the pending reward',async({page,isMobile})=>{
  const initial=dungeonCapacityFixture();await seed(page,initial);
+ const rewards=page.getByRole('region',{name:'Rewards',exact:true});
+ const manage=rewards.getByRole('button',{name:'Manage owned items',exact:true});
+ const inventory=page.locator('#dungeon-inventory');
+ const saved=await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary);
+ await expect(rewards).toContainText('Charm inventory is full');
+ await expect(inventory).toHaveJSProperty('open',false);
+ await rewards.getByRole('button',{name:/^Claim /}).first().click();
+ await page.locator('#dungeon-item-confirm').click();
+ await expect(page.locator('.dungeon-status')).toContainText('Choice refused: capacity');
+ expect(await snapshot(page)).toEqual(initial);
+ expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe(saved);
+ if(isMobile)await manage.tap();else await manage.press('Enter');
+ await expect(inventory).toHaveJSProperty('open',true);
+ await expect(inventory.locator('summary')).toBeFocused();
  const target=initial.ownership.equipment[0].instanceId;
  const discard=()=>page.locator(`[data-instance-id="${target}"]`).getByRole('button',{name:'Discard Warding Charm',exact:true});
- const saved=await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary);
  for(const cancellation of ['Cancel','Escape']){
   if(isMobile)await discard().tap();else await discard().click();
   await expect(page.getByRole('dialog')).toContainText('unequip it from fighter');await expect(page.locator('#dungeon-discard-cancel')).toBeFocused();
@@ -311,12 +544,14 @@ test('confirmed charm discard frees full capacity without cancelling or duplicat
  }
  await discard().click();await page.locator('#dungeon-discard-confirm').click();
  const disposed=await snapshot(page);expect(disposed.ownership.equipment).toHaveLength(5);expect(disposed.ownership.assignments).toEqual([]);expect(disposed.offer).toEqual(initial.offer);expect(disposed.party).toEqual(initial.party);expect(disposed.phase).toBe('reward');
+ await expect(manage).toHaveCount(0);
  await expect(page.locator('#dungeon-descend')).toHaveCount(0);
  await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(disposed);
  await page.getByRole('button',{name:/^Claim /}).first().click();await page.locator('#dungeon-item-confirm').click();
  const claimed=await snapshot(page);expect(claimed.ownership.equipment).toHaveLength(6);expect(claimed.ownership.equipment.some(e=>e.instanceId===target)).toBe(false);expect(claimed.phase).toBe('ready');expect(claimed.offer).toBeNull();
  await page.screenshot({path:test.info().outputPath('discard-capacity-recovered.png'),fullPage:true});
  await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(claimed);
+ await openDungeonInventory(page);
  await page.getByRole('button',{name:/^Discard /}).first().click();await page.locator('#dungeon-discard-confirm').click();
  const prepared=await snapshot(page);expect(prepared.phase).toBe('ready');expect(prepared.ownership.equipment).toHaveLength(5);
  await walkDungeon(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
@@ -330,15 +565,21 @@ test('a claimed Revive Kit restores a fallen dungeon hero across Continue and ne
  const victory=acceptDungeonBattle(entry,result.state);if(!victory.ok)throw Error(victory.reason);
  expect(victory.state.party[2].hp).toBe(0);
  await seed(page,victory.state);
+ const mageHealth = page.locator('meter[aria-label="Mage health"]');
+ await expect(mageHealth).toHaveAttribute('aria-valuetext','0 of 11 hit points, defeated');
+ await expect(page.locator('#dungeon-hero-mage')).toBeEnabled();
  const activate=async(name:string)=>{const button=page.getByRole('button',{name,exact:true});if(isMobile)await button.tap();else await button.click();};
  await activate('Claim Revive Kit');await activate('Confirm');
+ await openDungeonInventory(page);
  await expect(page.getByRole('combobox',{name:'Revive Kit target'})).toHaveValue('mage');
  await activate('Use Revive Kit');
  await expect(page.getByRole('dialog')).toContainText('mage will have 3/11 HP');
  await activate('Confirm');
  expect((await snapshot(page)).ownership.consumables).toEqual([]);
+ await expect(mageHealth).toHaveAttribute('aria-valuetext','3 of 11 hit points, injured');
  await page.reload();await continueSavedDungeon(page);
  expect((await snapshot(page)).party[2].hp).toBe(3);
+ await expect(mageHealth).toHaveAttribute('aria-valuetext','3 of 11 hit points, injured');
  await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  expect((await readSession(page)).state.units.find(u=>u.defId==='mage')?.hp).toBe(3);
@@ -380,6 +621,46 @@ test('an earned Healing Draught survives dungeon Continue and settles once after
  expect(await snapshot(page)).toEqual(final);
 });
 
+test('fresh dungeon keeps the map and party in view and opens the selected character sheet', async ({page,isMobile}) => {
+ await page.route('**/battle/portraits/mage.png', route => route.abort());
+ await page.goto('./');
+ const newGame = page.getByRole('button',{name:'New Game',exact:true});
+ if (isMobile) await newGame.tap(); else await newGame.click();
+ const map = page.locator('#dungeon-map'), party = page.getByRole('region',{name:'Party',exact:true});
+ await expect(map).toBeInViewport();
+ await expect(party).toBeInViewport();
+ expect(await page.locator('#dungeon-screen').evaluate(node => node.scrollWidth <= node.clientWidth)).toBe(true);
+ const fighter = party.getByRole('button',{name:'Fighter',exact:true});
+ const mage = party.getByRole('button',{name:'Mage',exact:true});
+ await expect(fighter.locator('img')).toHaveJSProperty('naturalWidth',96);
+ await expect(mage.locator('img')).toHaveCount(0);
+ await expect(party.locator('meter[aria-label="Fighter health"]')).toHaveAttribute('aria-valuetext','18 of 18 hit points');
+ const before = await snapshot(page);
+ const direction = await page.locator('.dungeon-directions button:enabled').first().getAttribute('aria-label');
+ const arrow = {North:'ArrowUp',East:'ArrowRight',South:'ArrowDown',West:'ArrowLeft'}[direction as 'North'|'East'|'South'|'West'];
+ expect(arrow).toBeDefined();
+ if (isMobile) await fighter.tap();
+ else { await fighter.focus(); await page.keyboard.press('Enter'); }
+ const dialog = page.getByRole('dialog',{name:'Fighter character sheet'});
+ await expect(dialog.locator('img')).toHaveJSProperty('naturalWidth',192);
+ await expect(dialog).toContainText('18/18 HP');
+ await expect(dialog).toContainText('Level 1');
+ await expect(dialog).toContainText('Accuracy');
+ await expect(dialog).toContainText('Armor class');
+ await page.screenshot({path:test.info().outputPath('character-sheet.png')});
+ await page.keyboard.press(arrow);
+ expect(await snapshot(page)).toEqual(before);
+ await page.keyboard.press('Escape');
+ await expect(dialog).not.toBeVisible();
+ await expect(fighter).toBeFocused();
+ if (isMobile) await mage.tap(); else await mage.click();
+ const mageSheet = page.getByRole('dialog',{name:'Mage character sheet'});
+ await expect(mageSheet).toContainText('11/11 HP');
+ await mageSheet.getByRole('button',{name:'Close',exact:true}).click();
+ await expect(mage).toBeFocused();
+ expect(await snapshot(page)).toEqual(before);
+});
+
 test('hero progression commits once, heals at a threshold and survives inspection and reload',async({page})=>{
  test.setTimeout(90000);
  const f=fixture(1),built=dungeonBattle(f.snapshot)!;
@@ -392,8 +673,10 @@ test('hero progression commits once, heals at a threshold and survives inspectio
  await playCommand(page,f.command);
  await expect(page.locator('#dungeon-screen')).toBeVisible();
  expect((await snapshot(page)).party).toEqual(completed.state.party);
- await expect(page.locator('section[aria-label="Party"]')).toContainText('Level 2');
- await expect(page.locator('section[aria-label="Party"]')).toContainText('XP');
+ await page.locator(`#dungeon-hero-${leveled[0].heroId}`).click();
+ await expect(page.getByRole('dialog')).toContainText('Level 2');
+ await expect(page.getByRole('dialog')).toContainText('XP');
+ await page.locator('#dungeon-sheet-close').click();
  await expect(page.locator('.dungeon-status')).toContainText('reached level 2');
  await expect(page.locator('.dungeon-status')).toContainText('learned Second Wind');
  await expect(page.locator('.dungeon-status')).not.toContainText('ability:');
@@ -408,14 +691,99 @@ test('hero progression commits once, heals at a threshold and survives inspectio
  expect((await snapshot(page)).party).toEqual(saved.party);
 });
 
+test('character sheets switch heroes and show equipped charms through equip, resume, and unequip', async ({page,isMobile}) => {
+ const initial = dungeonCapacityFixture();
+ await seed(page, initial);
+ const party = page.getByRole('region',{name:'Party',exact:true});
+ const fighter = party.getByRole('button',{name:'Fighter',exact:true});
+ const ranger = party.getByRole('button',{name:'Ranger',exact:true});
+ const dialog = page.getByRole('dialog');
+ const close = dialog.getByRole('button',{name:'Close',exact:true});
+ const open = async (portrait: Locator) => {
+  if (isMobile) await portrait.tap();
+  else { await portrait.focus(); await page.keyboard.press('Enter'); }
+ };
+ const activate = async (control: Locator) => {
+  if (isMobile) await control.tap();
+  else { await expect(control).toBeFocused(); await page.keyboard.press('Enter'); }
+ };
+ const expectSheet = async (hero: string, stats: string[], expected: string) => {
+  await expect(dialog).toHaveAccessibleName(`${hero} character sheet`);
+  await expect(dialog.locator('.dungeon-sheet > dl dd')).toHaveText(stats);
+  const image = dialog.locator('img');
+  await expect(image).toHaveAttribute('src', new RegExp(`/${hero.toLowerCase()}[.-]`));
+  await expect(image).toHaveJSProperty('naturalWidth',192);
+  const equipment = dialog.getByRole('region',{name:'Equipment',exact:true});
+  await expect(equipment.locator('dt')).toHaveText('Charm');
+  await expect(equipment.locator('dd')).toHaveText(expected);
+ };
+ const previous = dialog.getByRole('button',{name:'Previous hero',exact:true});
+ const next = dialog.getByRole('button',{name:'Next hero',exact:true});
+ const charm = 'Warding Charm · +1 armor class';
+ await open(fighter);
+ await expectSheet('Fighter', ['18/18 HP','4','15'], charm);
+ await dialog.evaluate(element => {
+  element.addEventListener('close', () => element.setAttribute('data-closed-during-switch', 'true'), { once: true });
+ });
+ if (!isMobile) await page.keyboard.press('Tab');
+ await activate(previous);
+ await expectSheet('Mage', ['11/11 HP','3','11'], 'Empty');
+ if (!isMobile) { await page.keyboard.press('Tab'); await page.keyboard.press('Tab'); }
+ await activate(next);
+ await expectSheet('Fighter', ['18/18 HP','4','15'], charm);
+ if (!isMobile) { await page.keyboard.press('Tab'); await page.keyboard.press('Tab'); }
+ await activate(next);
+ await expectSheet('Ranger', ['12/12 HP','5','12'], 'Empty');
+ await expect(dialog).toBeVisible();
+ await expect(dialog).not.toHaveAttribute('data-closed-during-switch', 'true');
+ await page.keyboard.press('Escape');
+ await expect(dialog).not.toBeVisible();
+ await expect(fighter).toBeFocused();
+ const unassigned = initial.ownership.equipment[1];
+ const row = page.locator(`[data-instance-id="${unassigned.instanceId}"]`);
+ await openDungeonInventory(page);
+ await row.getByRole('combobox').selectOption('ranger');
+ await row.getByRole('button',{name:'Equip Warding Charm',exact:true}).click();
+ await page.locator('#dungeon-item-confirm').click();
+ await open(ranger);
+ await expectSheet('Ranger', ['12/12 HP','5','13'], charm);
+ if (!isMobile) { await page.keyboard.press('Tab'); await page.keyboard.press('Tab'); }
+ await activate(next);
+ await expectSheet('Mage', ['11/11 HP','3','11'], 'Empty');
+ if (isMobile) await close.tap();
+ else { await page.keyboard.press('Shift+Tab'); await activate(close); }
+ await expect(dialog).not.toBeVisible();
+ await expect(ranger).toBeFocused();
+ await expect.poll(async () => {
+  const text = await page.evaluate(key => localStorage.getItem(key), DUNGEON_KEYS.primary);
+  const saved = text === null ? null : decodeDungeon(text);
+  return saved?.ok ? saved.state.ownership.assignments : [];
+ }).toContainEqual({ heroId: 'ranger', slot: 'charm', instanceId: unassigned.instanceId });
+ await page.reload();
+ await continueSavedDungeon(page);
+ await open(ranger);
+ await expectSheet('Ranger', ['12/12 HP','5','13'], charm);
+ await close.click();
+ await openDungeonInventory(page);
+ await row.getByRole('button',{name:'Unequip Warding Charm',exact:true}).click();
+ await page.locator('#dungeon-item-confirm').click();
+ await open(ranger);
+ await expectSheet('Ranger', ['12/12 HP','5','12'], 'Empty');
+ if (!isMobile) await page.keyboard.press('Tab');
+ await activate(previous);
+ await expectSheet('Fighter', ['18/18 HP','4','15'], charm);
+ await close.click();
+});
+
 test('dungeon recovery separates status and preserves exploration scroll', async ({page}) => {
  await page.goto('./?game=dungeon');
  await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();
  await page.locator('#dungeon-confirm-new').click();
- await page.getByRole('button',{name:'Save recovery',exact:true}).focus();
+ await expect(page.locator('#dungeon-map')).toBeVisible();
+ await page.locator('#dungeon-recovery').focus();
  const before=await page.locator('#dungeon-screen').evaluate(node=>node.scrollTop);
  await page.keyboard.press('Enter');
- await expect(page.getByRole('dialog')).toBeVisible();
+ await expect(page.getByRole('dialog',{name:'Dungeon save recovery'})).toBeVisible();
  const message=await page.locator('#battle-dialog-message').boundingBox();
  const actions=await page.locator('#battle-dialog .fit-controls').boundingBox();
  expect(actions!.y-message!.y-message!.height).toBeGreaterThanOrEqual(15);

@@ -1,12 +1,12 @@
 import { HERO_PROGRESSION } from '../../src/content/progression';
 import { progressHero } from '../../src/domain/progression';
-import { atEncounter } from '../helpers/dungeonFixtures';
+import { atEncounter, withLegacySight } from '../helpers/dungeonFixtures';
 import { freshDungeon, floorDescriptor, floorMap, startDungeonBattle, readDungeon } from '../../src/domain/dungeon';
 import { guardedBoundary } from '../helpers/guardedBoundary';
 import { combatStats } from '../../src/domain/effects';
 import { assert,expect,it } from 'vitest';
 import { previewSupportAbility } from '../../src/domain/combat';
-import { dungeonJourney, dungeonVictoryBoundary, rangerJourney, mageJourney, healedFighterBoundary, shamanJourney, fighterJourney } from '../helpers/dungeonFixtures';
+import { dungeonJourney, dungeonVictoryBoundary, rangerJourney, selectMageJourney, MAGE_JOURNEY_SEEDS, healedFighterBoundary, shamanJourney, fighterJourney } from '../helpers/dungeonFixtures';
 import { dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState } from '../../src/domain/dungeon';
 import { BattleSession } from '../../src/app/BattleSession';
 import { playerDecision } from '../helpers/playerPolicy';
@@ -17,13 +17,15 @@ import { dispatch, replayCommandSequence } from '../../src/domain/turns';
 import { LEGACY_ENCOUNTER_POLICY } from '../../src/domain/dungeonEncounters';
 import { priorDungeonEnvelope } from '../helpers/dungeonFixtures';
 import { freshExploration } from '../../src/domain/exploration';
-import { createDungeonStorage } from '../../src/persistence/dungeonStorage';
+import { createDungeonStorage, DUNGEON_BACKUP_CHECKPOINT_KEY, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
 
-it('saves a battle draught with its heal, replays it and settles stock on either outcome', () => {
+it.each([[10, 11], [10, 15]])('saves a draught in checkpoint/battle formats %i/%i and settles stock on either outcome', (checkpointFormat, battleFormat) => {
   const base = freshDungeon('draught-test', 13);
   const ready = { ...base, party: base.party.map(hero => ({ ...hero, hp: 4 })),
     ownership: { ...base.ownership, consumables: [{ itemId: 'item:healing_draught' as const, quantity: 2 }] } };
-  const started = startDungeonBattle(atEncounter(ready)); assert(started.ok && started.state.activeBattle);
+  const atContact = atEncounter(ready);
+  const started = startDungeonBattle(battleFormat === 11 ? withLegacySight(atContact) : atContact);
+  assert(started.ok && started.state.activeBattle);
   const built = dungeonBattle(started.state)!;
   const battle = new BattleSession(built.catalog, started.state.activeBattle, built.state.seed, undefined, true, built.battlefield);
   while (battle.phase === 'enemy') { const step = battle.nextEnemy(); assert(step); battle.finishPresentation(step.token); }
@@ -35,13 +37,44 @@ it('saves a battle draught with its heal, replays it and settles stock on either
   expect(dispatch(step.after, use, built.catalog)).toEqual({ ok: false, reason: 'alreadyActed' });
   const updated = acceptDungeonBattle(started.state, step.after); assert(updated.ok);
   const bytes = new Map<string,string>();
-  const storage = createDungeonStorage(()=>({getItem:key=>bytes.get(key)??null,setItem:(key,value)=>{bytes.set(key,value);},removeItem:key=>{bytes.delete(key);}}));
+  let duringPrimaryWrite: (() => void) | undefined;
+  const adapter = {
+    getItem: (key: string) => bytes.get(key) ?? null,
+    setItem: (key: string, value: string) => {
+      if (key === DUNGEON_KEYS.primary) duringPrimaryWrite?.();
+      bytes.set(key, value);
+    },
+    removeItem: (key: string) => { bytes.delete(key); },
+  };
+  const storage = createDungeonStorage(() => adapter);
   expect(storage.save(started.state).ok).toBe(true);
   const checkpoint = storage.inspect().backup.text!;
-  expect(JSON.parse(checkpoint)).toMatchObject({format:10,payload:{phase:'ready',activeBattle:null}});
+  expect(JSON.parse(checkpoint)).toMatchObject({format:checkpointFormat,payload:{phase:'ready',activeBattle:null}});
   expect(storage.save(updated.state).ok).toBe(true);
   expect(storage.inspect().backup.text).toBe(checkpoint);
-  expect(JSON.parse(storage.inspect().primary.text!).format).toBe(11);
+  expect(JSON.parse(storage.inspect().primary.text!).format).toBe(battleFormat);
+  const remover = createDungeonStorage(() => adapter);
+  const reviewed = remover.inspect().backup; assert(reviewed.status === 'valid');
+  const previousPrimary = storage.lastSavedText();
+  const retained = { ...updated.state, revision: updated.state.revision + 1 };
+  duringPrimaryWrite = () => {
+    expect(remover.remove('backup', reviewed.text, reviewed.checkpoint ?? null)).toEqual({ ok: true });
+  };
+  expect(storage.save(retained, previousPrimary)).toEqual({ ok: false, reason: 'uncertainWrite' });
+  expect(storage.lastSavedText()).toBe(previousPrimary);
+  expect(storage.save(retained)).toEqual({ ok: false, reason: 'uncertainWrite' });
+  const recovery = storage.inspect();
+  expect(recovery.backup.status).toBe('missing');
+  expect(storage.acknowledge(recovery)).toBe(true);
+  duringPrimaryWrite = undefined;
+  expect(storage.save(retained, recovery.primary.text)).toEqual({ ok: true });
+  if (battleFormat === 15) {
+    const replacement = storage.inspect();
+    assert(replacement.backup.status === 'valid' && replacement.backup.checkpoint);
+    duringPrimaryWrite = () => { bytes.delete(DUNGEON_BACKUP_CHECKPOINT_KEY); };
+    expect(storage.save(retained, replacement.primary.text)).toEqual({ ok: false, reason: 'uncertainWrite' });
+    expect(storage.inspect().backup.text).toBe(replacement.backup.text);
+  }
   expect(updated.state.ownership).toEqual(ready.ownership);
   const wire = encodeDungeon(updated.state); assert(wire.ok);
   const resumed = decodeDungeon(wire.text); assert(resumed.ok && resumed.state.activeBattle);
@@ -118,7 +151,10 @@ it('roundtrips live Weakened and Shaman ally healing without broadening party HP
 });
 
 it('finds a legal earned Mage Snare and multi-missile journey with exact replay and terminal cleanup',()=>{
-  const journey=mageJourney(68);
+  const selected=selectMageJourney(),journey=selected.witness;
+  expect(selected.range).toEqual(MAGE_JOURNEY_SEEDS);
+  expect(selected.attempts.at(-1)).toEqual({seed:journey.seed,missing:[]});
+  expect(selected.attempts.slice(0,-1).every(a=>a.missing.length>0)).toBe(true);
   expect({used:journey.used,phase:journey.state.phase,party:journey.state.party}).toMatchObject({used:{snare:true,missiles:true},phase:'defeat'});
   expect(journey.state.party.find(h=>h.heroId==='mage')!.level).toBeGreaterThanOrEqual(3);
   expect(journey.records.some(r=>r.events.some(e=>e.type==='movementBlockExpired'&&e.abilityId==='ability:frost_snare'))).toBe(true);
@@ -133,6 +169,27 @@ it('finds a legal earned Mage Snare and multi-missile journey with exact replay 
     expect(state).toEqual(record.state);expect(events).toEqual(record.events);expect(state.units.every(u=>u.movementBlock===undefined)).toBe(true);
   }
   expect(blocked&&expiredAtTurnEnd).toBe(true);
+},120000);
+
+it('bounds Mage selection, records nonqualifying outcomes and never hides unexpected witness errors',()=>{
+  const {witness}=selectMageJourney(),range=[witness.seed-1,witness.seed] as const,visited:number[]=[];
+  const simulate=(seed:number)=>{visited.push(seed);return seed===witness.seed?witness:{...witness,seed,used:{snare:false,missiles:false}};};
+  const selected=selectMageJourney(range,simulate);
+  expect(visited).toEqual([...range]);
+  expect(selected.attempts).toEqual([{seed:range[0],missing:['Frost Snare','multiple missiles']},{seed:range[1],missing:[]}]);
+  expect(selected.witness).toEqual(witness);
+  expect(selectMageJourney([witness.seed,witness.seed]).witness).toEqual(witness);
+  const rejected:number[]=[];
+  expect(()=>selectMageJourney(range,seed=>{rejected.push(seed);return {...witness,seed,used:{snare:false,missiles:false}};}))
+    .toThrow(`No qualifying Mage journey in ${range[0]}–${range[1]}`);
+  expect(rejected).toEqual([...range]);
+  const broken=new Error('unexpected simulation failure'),failures:number[]=[];
+  expect(()=>selectMageJourney(range,seed=>{failures.push(seed);throw broken;})).toThrow(broken);
+  expect(failures).toEqual([range[0]]);
+  expect(()=>selectMageJourney([witness.seed,witness.seed],()=>({...witness,records:witness.records.map((r,i)=>i===0?{...r,events:[]}:r)})))
+    .toThrow('replay diverged');
+  for(const invalid of [[1,0],[-1,1],[64,80],[1,Infinity],[0,0x100000000],[1.5,2]] as const)
+    expect(()=>selectMageJourney(invalid)).toThrow('1–16 ascending uint32');
 },120000);
 
 it('roundtrips active Mage Snare in dungeon continuation and clears it before the next encounter',()=>{
