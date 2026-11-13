@@ -4,7 +4,8 @@ Date: 2026-11-13 (Asia/Jerusalem).
 Issue: [#376](https://github.com/luminari-gurus/tactics-guru-v2/issues/376).
 Owner: [@moshehbenavraham](https://github.com/moshehbenavraham).
 Branch: [`branch/issue-376-floor-progress`](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-376-floor-progress).
-Base: `origin/main`, `973b792f3e26b178b71dfa07d5654019cb34e24e`.
+Implementation base: `973b792f3e26b178b71dfa07d5654019cb34e24e`.
+Review base: `origin/main`, `4290b700` (merged prerequisite PR #395).
 Status: implementation and acceptance complete under OpenSpec
 `issue-376-floor-progress` (3/4 tasks); HUD PR publication remains outstanding.
 Working tree started clean. Current evidence and review handoff are below.
@@ -262,7 +263,8 @@ lockfile change was required.
 - Repair commit `1a634f59` is merged into this feature branch without rewriting
   history. Its fixed marker journey passed **3 Chromium + 3 WebKit profiles**
   (50.3s / 26.0s). Repair ordinary PR verification passed in 209.6s, and PR #395
-  is ready for review with the `bug` label; its remote PR verification also passed.
+  was published with the `bug` label; its remote PR verification passed and it
+  subsequently merged into `main` as `4290b700` during this session.
 - Feature typecheck and production bundle passed. Desktop fresh and final-reward
   screenshots inspected: count/labels readable, reward choices unobstructed,
   map and party retained. Focused final selection is still **39 cases per engine**
@@ -357,7 +359,7 @@ npm run test:regression -- tests/public-asset-base.spec.ts tests/battle-persiste
 npm run typecheck
 ```
 
-All executions used line/JSON reporters and distinct output directories recorded
+These browser executions used line/JSON reporters and distinct output directories recorded
 in the receipts. No assertion, timeout, retry or persistent matrix configuration
 was relaxed. The initial missing-legend failure, identical literal-base legend
 failure, 36/3 Chromium failure and passing literal-base defeat comparison remain
@@ -370,10 +372,11 @@ Representative final screenshots were inspected and committed for review:
 The changes retain the existing visual theme and use one pure domain projection;
 no new controller, saved fields, migration, timer, assets or dependencies were needed.
 
-Publication: push the QA/documentation checkpoint, open the HUD PR against
-`branch/issue-376-marker-guide-test`, add `enhancement`, then record its URL and
-finish OpenSpec task 3.2. PR #395 must merge first; retarget the HUD PR to `main`
-before merging it. Keep issue #376 open until the completing PR merges.
+Publication: PR #395 has merged. The feature branch incorporated updated main;
+its complete Git tree was identical before and after that ancestry-only merge.
+Main added only the already-inherited legend test repair, so no evidence was
+invalidated. Open the HUD PR against `main`, add `enhancement`, record its URL and
+finish OpenSpec task 3.2. Keep issue #376 open until the completing PR merges.
 
 An unused npm helper folder at `C:/Users/apexw/.codex/tmp/issue-376-tools` remains
 outside the repository: automatic approval rejected its optional deletion as
