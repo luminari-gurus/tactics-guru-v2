@@ -586,11 +586,12 @@ describe('dungeon persistence', () => {
 });
 
 describe('dungeon recovery limits', () => {
-  it('exports a removed backup once alongside live progress after repeated partial resets', async () => {
+  it('keeps a removed backup exportable through repeated partial resets and a successful retry', async () => {
     const data = memory(), storage = createDungeonStorage(() => data);
     const initial = freshDungeon('recovery-copies', 13, undefined, true);
     const session = new DungeonSession(initial, storage);
     assert(await session.save());
+    assert(session.continue(session.inspect()));
     const before = session.inspect();
     assert(before.primary.status === 'valid' && before.backup.status === 'valid');
 
@@ -609,6 +610,16 @@ describe('dungeon recovery limits', () => {
       { label: 'primary save', text: before.primary.text },
       { label: 'retained backup save (copy 1)', text: before.backup.text },
     ]);
+
+    data.removeItem = remove;
+    expect(await session.replace(session.inspect(), 'replacement-dungeon', 14)).toBe(true);
+    const replaced = session.inspect();
+    assert(replaced.primary.status === 'valid' && replaced.backup.status === 'valid');
+    expect(replaced.primary.state.id).toBe('replacement-dungeon');
+    expect(replaced.backup.text).not.toBe(before.backup.text);
+    const exports = session.exports(replaced);
+    expect(exports.filter(copy => copy.label === 'backup save').map(copy => copy.text)).toEqual([replaced.backup.text]);
+    expect(exports.filter(copy => copy.label.startsWith('retained backup save')).map(copy => copy.text)).toEqual([before.backup.text]);
   });
   it('keeps primary recoverable on backup-write/security failures and changed reset slots',async()=>{
     const m=memory(),store=createDungeonStorage(()=>m),s=clearFloor(fresh());store.save(s);const original=m.getItem(DUNGEON_KEYS.primary);

@@ -197,6 +197,8 @@ export class DungeonSession {
   }
   private retainExports(review: DungeonInspection) {
     for (const value of this.liveExports(review)) {
+      // Startup holds a placeholder until a dungeon starts or resumes.
+      if (!this.started && value.label === 'current progress') continue;
       if (!this.retained.some(copy => copy.label === value.label && copy.text === value.text)) this.retained.push(value);
     }
   }
@@ -249,6 +251,6 @@ export class DungeonSession {
   private reset(next: DungeonState) {
     this.battle?.dispose(); this.battle = null; this.current = next; this.expectedPrimary = null; this.completedBattle = null; this.review = null; this.unsaved = false;
     this.started = true;
-    if (this.saveNow()) this.retained = [];
+    this.saveNow();
   }
 }
