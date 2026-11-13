@@ -421,6 +421,8 @@ test('Mage real Frost Snare preserves keyboard touch previews cancellation inspe
   if(isMobile)await page.locator('#battle-sound').tap();else{await page.locator('#battle-sound').focus();await page.keyboard.press('Enter');}
   await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().battleAudio)).toMatchObject({enabled:true,status:'ready',started:0});
   const storage=await page.evaluate(()=>JSON.stringify(localStorage));
+  const snares=async()=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).units.filter((u:any)=>u.snare.visible).map((u:any)=>u.id);
+  expect(await snares()).toEqual([]);
   await picker.selectOption('ability:frost_snare');if(isMobile)await button.tap();else{await button.focus();await page.keyboard.press('Enter');}
   await page.locator('#battle-target').selectOption('2,0');await expect(page.locator('#battle-preview')).toContainText('Snared by Mage #3');await expect(page.locator('#battle-preview')).toContainText('no damage or roll');
   const pending=(await readSession(page)).pending;expect(pending).toMatchObject({abilityId:'ability:frost_snare'});
@@ -428,16 +430,20 @@ test('Mage real Frost Snare preserves keyboard touch previews cancellation inspe
   await page.locator('#battle-review').scrollIntoViewIfNeeded();await page.screenshot({path:test.info().outputPath('mage-snare-narrow-preview.png')});
   expect((await readSession(page)).state).toEqual(before.state);expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(storage);
   await page.setViewportSize(viewport);await page.keyboard.press('Escape');expect((await readSession(page)).pending).toBeNull();
+  expect(await snares()).toEqual([]);
   if(isMobile)await button.tap();else await button.click();await page.locator('#battle-target').selectOption('2,0');
   if(isMobile)await page.locator('#battle-review').tap();else{await page.locator('#battle-review').focus();await page.keyboard.press('Enter');}
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');const accepted=await readSession(page);
   expect(accepted.state.units.find(u=>u.id===5)?.movementBlock).toEqual({sourceId:3,abilityId:'ability:frost_snare'});expect(accepted.state.rng).toEqual(before.state.rng);expect(accepted.state.units.map(u=>u.hp)).toEqual(before.state.units.map(u=>u.hp));
   expect(accepted.state.commandCount).toBe(before.state.commandCount+1);await expect(picker).toBeDisabled();
+  expect(await snares()).toEqual([5]);
+  await page.screenshot({path:test.info().outputPath('mage-snared-board.png')});
   expect(await page.evaluate(()=>window.fitDiagnostics().battleAudio)).toMatchObject({enabled:true,status:'ready',started:0,completed:0,dropped:0,active:null,recent:[],ownedSounds:0});
   await page.locator('#battle-party').click();await page.locator('#inspect-unit-5').click();await expect(page.getByRole('dialog')).toContainText('Snared by Mage #3');await expect(page.getByRole('dialog')).toContainText('expires after this unit’s next turn ends or source/target defeat');
   await page.screenshot({path:test.info().outputPath('mage-snare-inspection.png')});await page.locator('#inspection-close').click();
   await page.locator('#battle-log-open').click();await expect(page.getByRole('dialog')).toContainText('Snared by Mage');await page.locator('#log-close').click();
   await page.reload();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');const fresh=await readSession(page);expect(fresh.state).toEqual(before.state);expect(fresh.events).toEqual([]);expect(fresh.pending).toBeNull();expect(errors).toEqual([]);
+  expect(await snares()).toEqual([]);
 });
 
 test('Ranger learned actions follow level one, two and three through the real picker',async({page})=>{

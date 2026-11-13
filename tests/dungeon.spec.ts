@@ -1,11 +1,11 @@
 import { dungeonContent } from '../src/content/dungeon';
 import { walkDungeon, reenterDungeonStair, continueSavedDungeon, openDungeonInventory } from './helpers/dungeonTraversal';
-import { atEncounter, atStairApproach, checkedDungeon, stagedMageAbility } from './helpers/dungeonFixtures';
+import { atEncounter, atStairApproach, checkedDungeon, stagedMageAbility, snaredDefeatBoundary } from './helpers/dungeonFixtures';
 import { expect,railTest as test,type Page } from './helpers/dungeonEntropy';
 import { readFileSync, writeFileSync } from 'node:fs';
 import type { Locator } from '@playwright/test';
 import { dungeonCapacityFixture, dungeonVictoryBoundary } from './helpers/dungeonFixtures';
-import { dungeonBattle, startDungeonBattle, acceptDungeonBattle, dungeonBoundary, dungeonItem, freshDungeon, type DungeonState } from '../src/domain/dungeon';
+import { dungeonBattle, startDungeonBattle, acceptDungeonBattle, dungeonBoundary, dungeonItem, freshDungeon, readDungeon, type DungeonState } from '../src/domain/dungeon';
 import { progressHero } from '../src/domain/progression';
 import { decodeDungeon, encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
@@ -18,9 +18,31 @@ import { dispatch, replayCommandSequence } from '../src/domain/turns';
 import { previewMovement } from '../src/domain/grid';
 import { generateMap } from '../src/map/generate';
 import type { Command, BattleEvent } from '../src/domain/types';
+import { movementBlockSource } from '../src/domain/effects';
 
 const fixedSeedTest = test.extend({ pinDungeonSeed: 28 });
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
+const boardReport=async(page:Page)=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
+async function checkSnares(page:Page, fitted=false) {
+ const state=(await readSession(page)).state,r=await boardReport(page);
+ for(const unit of state.units) {
+  const rendered=r.units.find((u:any)=>u.id===unit.id),badge=rendered.snare;
+  expect(badge.visible).toBe(unit.movementBlock?.abilityId==='ability:frost_snare'&&!!movementBlockSource(unit,state.units));
+  expect(badge.interactive).toBe(false);
+  if(!badge.visible)continue;
+  expect(badge.width).toBeGreaterThanOrEqual(11.99);
+  expect(badge.depth).toBeGreaterThan(rendered.depth);expect(badge.depth).toBeLessThan(10000);
+  expect(badge.screen.y+badge.height/2).toBeLessThan(rendered.health.screen.y-4);
+  expect(badge.screen.x).toBeCloseTo(r.transform.x+badge.position.x*r.transform.scale,4);
+  expect(badge.screen.y).toBeCloseTo(r.transform.y+badge.position.y*r.transform.scale,4);
+  if(fitted) {
+   expect(badge.screen.x-badge.width/2).toBeGreaterThanOrEqual(r.region.x);
+   expect(badge.screen.y-badge.height/2).toBeGreaterThanOrEqual(r.region.y);
+   expect(badge.screen.x+badge.width/2).toBeLessThanOrEqual(r.region.x+r.region.width);
+   expect(badge.screen.y+badge.height/2).toBeLessThanOrEqual(r.region.y+r.region.height);
+  }
+ }
+}
 
 test('dungeon statistics: active exploration excludes recovery, visibility, blur and menu sessions',async({page},info)=>{
  test.setTimeout(90000);await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();
@@ -72,6 +94,22 @@ for(const abilityId of ['ability:frost_snare','ability:magic_missile'] as const)
  const expected=dispatch(fixture.state.activeBattle!,fixture.command,catalog);expect(expected.ok).toBe(true);if(!expected.ok)throw Error(expected.reason);
  await seed(page,fixture.state);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const before=await readSession(page);expect(before.state).toEqual(fixture.state.activeBattle);expect(before.events).toEqual([]);
+ if(abilityId==='ability:frost_snare') {
+  await checkSnares(page,true);
+  const target=before.state.units.find(u=>u.id===fixture.command.target.unitId)!;
+  await page.locator('[data-action="ability:frost_snare"]').click();
+  await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
+  await page.locator('#battle-cancel').click();await checkSnares(page,true);
+  expect((await readSession(page)).state).toEqual(before.state);
+  await page.locator('[data-action="ability:frost_snare"]').click();await page.locator('canvas').focus();
+  // Native target selection moved the cursor; deliberately navigate back to the caster.
+  const caster=before.state.units.find(u=>u.id===fixture.command.unitId)!;
+  for(let i=0;i<Math.abs(caster.cell.x-target.cell.x);i++)await page.keyboard.press(caster.cell.x>target.cell.x?'ArrowRight':'ArrowLeft');
+  for(let i=0;i<Math.abs(caster.cell.y-target.cell.y);i++)await page.keyboard.press(caster.cell.y>target.cell.y?'ArrowDown':'ArrowUp');
+  await page.keyboard.press('Enter');await expect(page.locator('#battle-review')).toBeDisabled();
+  await checkSnares(page,true);expect((await readSession(page)).state).toEqual(before.state);
+  await page.locator('#battle-cancel').click();
+ }
  await playCommand(page,fixture.command);
  await expect.poll(async()=>(await readSession(page)).state.commandCount).toBe(before.state.commandCount+1);
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
@@ -80,6 +118,7 @@ for(const abilityId of ['ability:frost_snare','ability:magic_missile'] as const)
  expect(replayCommandSequence('initial' in history?history.initial:history.snapshot,history.commands,catalog))
    .toEqual({ok:true,state:accepted.state,events:accepted.events});
  if(abilityId==='ability:frost_snare') {
+   await checkSnares(page,true);await page.screenshot({path:test.info().outputPath('snared-cast.png')});
    expect(accepted.state.rng).toEqual(before.state.rng);expect(accepted.state.units.map(u=>u.hp)).toEqual(before.state.units.map(u=>u.hp));
    expect(accepted.events).toContainEqual({type:'movementBlocked',unitId:fixture.command.target.unitId,sourceId:fixture.command.unitId,abilityId});
  } else expect(accepted.events.filter(e=>e.type==='missileRolled')).toHaveLength(2);
@@ -87,7 +126,100 @@ for(const abilityId of ['ability:frost_snare','ability:magic_missile'] as const)
  await page.reload();await continueSavedDungeon(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const resumed=await readSession(page);expect(await snapshot(page)).toEqual(saved);expect(resumed.state).toEqual(accepted.state);expect(resumed.events).toEqual([]);
  expect(await page.evaluate(keys=>keys.map(key=>localStorage.getItem(key)),[DUNGEON_KEYS.primary,DUNGEON_KEYS.backup])).toEqual(slots);
+ if(abilityId==='ability:frost_snare') {
+  await checkSnares(page,true);expect((await boardReport(page)).feedbackBounds).toEqual([]);
+  await page.screenshot({path:test.info().outputPath('snared-resumed.png')});
+  // Accepted Mage and Ranger Waits plus an unrelated Archer attack preserve Snare.
+  for(const id of [3,2]) {
+   expect((await readSession(page)).state.initiative[(await readSession(page)).state.activeIndex]).toBe(id);
+   await playCommand(page,{type:'endTurn',unitId:id});await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+   await checkSnares(page,true);expect((await boardReport(page)).units.find((u:any)=>u.id===fixture.command.target.unitId).snare.visible).toBe(true);
+  }
+  expect((await readSession(page)).events.some(e=>e.type==='attackRolled'&&e.unitId===5)).toBe(true);
+  await playCommand(page,{type:'endTurn',unitId:1});await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const expired=await readSession(page);await checkSnares(page,true);
+  expect(expired.events).toContainEqual({type:'turnEnded',unitId:fixture.command.target.unitId});
+  expect(expired.events).toContainEqual({type:'movementBlockExpired',unitId:fixture.command.target.unitId,sourceId:3,abilityId});
+  expect((await boardReport(page)).units.every((u:any)=>!u.snare.visible)).toBe(true);
+  await page.screenshot({path:test.info().outputPath('snared-expired.png')});
+ }
  await test.info().attach('staged-mage-boundary',{body:JSON.stringify({fixture:'staged level/position; not earned progression',command:fixture.command,before:before.state,after:accepted.state,events:accepted.events}),contentType:'application/json'});
+});
+
+test('Snared badge follows camera and narrow portrait landscape layouts without capturing input',async({page,browserName},info)=>{
+ const f=stagedMageAbility('ability:frost_snare');await seed(page,f.state);
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await playCommand(page,f.command);
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ const state=(await readSession(page)).state,size=page.viewportSize()!;
+ for(const viewport of [{width:320,height:568},{width:568,height:320},size]) {
+  await page.setViewportSize(viewport);await expect.poll(async()=>(await boardReport(page)).viewport).toEqual(viewport);
+  await checkSnares(page,true);
+  await page.screenshot({path:info.outputPath(`snared-${viewport.width}x${viewport.height}.png`)});
+ }
+ const r=await boardReport(page),badge=r.units.find((u:any)=>u.id===f.command.target.unitId).snare;
+ const center={x:badge.screen.x,y:badge.screen.y};
+ if(info.project.use.hasTouch)await page.touchscreen.tap(center.x,center.y);else await page.mouse.click(center.x,center.y);
+ expect((await readSession(page)).state).toEqual(state);
+ if(browserName==='chromium'&&info.project.use.hasTouch) {
+  const cdp=await page.context().newCDPSession(page),points=(d:number)=>[{x:center.x-d,y:center.y,id:1},{x:center.x+d,y:center.y,id:2}];
+  await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:points(10)});
+  await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:points(20)});
+  await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.detach();
+ } else if(browserName==='webkit') {
+  // WebKit's driver has no multipoint touch; exercise the production pointer handlers.
+  await page.locator('canvas').evaluate((canvas,p)=>{
+   const capture=canvas.setPointerCapture;canvas.setPointerCapture=()=>{};
+   try {for(const [type,id,x] of [['pointerdown',91,-10],['pointerdown',92,10],['pointermove',92,20],['pointerup',92,20],['pointerup',91,-10]] as const)
+    canvas.dispatchEvent(new PointerEvent(type,{pointerId:id,pointerType:'touch',button:0,clientX:p.x+x,clientY:p.y,bubbles:true}));
+   } finally {canvas.setPointerCapture=capture;}
+  },center);
+ } else {await page.mouse.move(center.x,center.y);await page.mouse.wheel(0,-150);}
+ await expect.poll(async()=>(await boardReport(page)).transform.scale).toBeGreaterThan(r.transform.scale);
+ await checkSnares(page);
+ const zoomed=await boardReport(page),p={x:r.region.x+r.region.width/2,y:r.region.y+r.region.height/2};
+ await page.mouse.move(p.x,p.y);await page.mouse.down();await page.mouse.move(p.x+40,p.y+20,{steps:8});await page.mouse.up();
+ await expect.poll(async()=>(await boardReport(page)).transform.x).not.toBe(zoomed.transform.x);
+ await checkSnares(page);expect((await readSession(page)).state).toEqual(state);
+ await page.screenshot({path:info.outputPath('snared-camera.png')});
+ // Replace the scene while Snare is active, then enter a new battle with no stale badge.
+ await page.locator('#fit-restart').click();await page.locator('#dungeon-confirm-new').click();
+ await expect.poll(async()=>(await snapshot(page)).phase).toBe('ready');
+ await walkDungeon(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ await checkSnares(page,true);expect((await boardReport(page)).units.every((u:any)=>!u.snare.visible)).toBe(true);
+});
+
+for(const kind of ['source','target'] as const)test(`Snared badge clears on legal ${kind} defeat`,async({page})=>{
+ const f=snaredDefeatBoundary(kind),encoded=encodeDungeon(f.state);if(!encoded.ok)throw Error(encoded.reason);
+ const replayed=replayCommandSequence(f.initial,f.commands,dungeonBattle(f.state)!.catalog);
+ expect(replayed.ok).toBe(true);if(replayed.ok)expect(replayed.state).toEqual(f.expected);
+ await page.clock.install();await page.goto('./?game=dungeon');
+ await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});await page.reload();
+ await expect(page.locator('#dungeon-screen')).toHaveAttribute('data-boot','ready',{timeout:60000});
+ await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
+ await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click({force:true});
+ // The saved menu lazily imports its engine; advance RAF while waiting for that
+ // real scene, then sample its first presented snapshot before defeat settles.
+ await expect.poll(async()=>{await page.clock.runFor(16);return await page.locator('#game').getAttribute('data-battle-report')!==null;},{timeout:60000}).toBe(true);
+ expect((await boardReport(page)).units.find((u:any)=>u.id===f.targetId).snare.visible).toBe(true);
+ if(f.command) {
+  await page.clock.resume();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await checkSnares(page,true);
+  await playCommand(page,f.command);
+ } else await page.clock.runFor(1000);
+ await expect.poll(async()=>(await readSession(page)).state.units.find(u=>u.id===f.defeatedId)!.hp).toBe(0);
+ await expect.poll(async()=>(await boardReport(page)).units.find((u:any)=>u.id===f.targetId).snare.visible).toBe(false);
+ expect((await readSession(page)).events).toContainEqual({type:'movementBlockExpired',unitId:f.targetId,sourceId:3,abilityId:'ability:frost_snare'});
+ await page.screenshot({path:test.info().outputPath(`snared-${kind}-defeated.png`)});
+ await test.info().attach('legal-defeat-boundary',{body:JSON.stringify(f),contentType:'application/json'});
+});
+
+test('Snared badge excludes a legally Pinned enemy on saved resume',async({page})=>{
+ const f=stagedMageAbility('ability:frost_snare'),initial=f.state.activeBattle!,ranger=initial.units.find(u=>u.defId==='ranger')!,mage=initial.units.find(u=>u.defId==='mage')!;
+ const before={...initial,activeIndex:initial.initiative.indexOf(ranger.id),units:initial.units.map(u=>({...u,cell:u.id===mage.id?ranger.cell:u.id===ranger.id?mage.cell:u.cell}))};
+ const pin=dispatch(before,{type:'useAbility',unitId:ranger.id,abilityId:'ability:pinning_shot',target:f.command.target},dungeonBattle(f.state)!.catalog);
+ if(!pin.ok)throw Error(pin.reason);await seed(page,checkedDungeon(readDungeon({...f.state,activeBattle:pin.state})));
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await checkSnares(page,true);
+ expect((await readSession(page)).state.units.find(u=>u.id===f.command.target.unitId)!.movementBlock?.abilityId).toBe('ability:pinning_shot');
+ expect((await boardReport(page)).units.every((u:any)=>!u.snare.visible)).toBe(true);
 });
 
 // Saved New Game avoids its initial dormant seed; draw 27 so the playable seed
