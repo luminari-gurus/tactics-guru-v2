@@ -1,15 +1,14 @@
 import { writeFileSync } from 'node:fs';
 import { expect, test } from './helpers/forceRailControls';
 import { test as standardTest } from './helpers/coreGraphics';
-import { preparedSnapshot, runContext } from './helpers/runItemFixtures';
-import { encodeRunSave, runBattleCatalog } from '../src/domain/runSaveEnvelope';
-import { RUN_STORAGE_KEYS } from '../src/persistence/runStorage';
+import { runContext } from './helpers/runItemFixtures';
+import { runBattleCatalog } from '../src/domain/runSaveEnvelope';
 import { previewMovement } from '../src/domain/grid';
 import { readSession, playCommand } from './helpers/battlePolicy';
 import { pickTile } from '../src/geometry/picking';
 import { projectTile, type Tile } from '../src/geometry/iso';
 
-test('generated production board picks, moves and resumes the same desert after camera changes',async({page})=>{
+test('generated production board picks, moves and starts a fresh session after camera changes',async({page})=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto('/?game=run');await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
@@ -45,10 +44,14 @@ test('generated production board picks, moves and resumes the same desert after 
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const committed=JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!);
  await page.screenshot({path:test.info().outputPath('desert-grid.png')});
- await page.reload();await page.locator('#run-continue').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- expect((await readSession(page)).state).toEqual(committed.activeBattle);
- expect(JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!).battlefield).toEqual(committed.battlefield);
- expect((await readSession(page)).events).toEqual([]);expect(errors).toEqual([]);
+ await page.reload();await expect(page.locator('#run-start')).toBeVisible();
+ await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ const fresh=JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!);
+ expect(fresh.items.run.id).not.toBe(committed.items.run.id);
+ expect(fresh.battlefield.mapHash).toBe(committed.battlefield.mapHash);
+ expect(fresh.activeBattle).toEqual(snapshot.activeBattle);
+ expect(errors).toEqual([]);
 });
 
 standardTest('desert landmarks distinguish blocked ground in the battle view', async ({ page }) => {
@@ -80,21 +83,6 @@ standardTest('desert landmarks distinguish blocked ground in the battle view', a
 });
 
 
-test('authored final entry preserves carried heroes and equipped projection',async({page})=>{
- const snapshot=preparedSnapshot();
- const items={...snapshot.items,run:{...snapshot.items.run,encounterIndex:2,revision:4},ownership:{...snapshot.items.ownership,assignments:[{instanceId:snapshot.items.ownership.equipment[0].instanceId,heroId:'fighter' as const,slot:'charm' as const}]}};
- const encoded=encodeRunSave({...snapshot,items},runContext);expect(encoded.ok).toBe(true);if(!encoded.ok)throw Error('Invalid final fixture');
- await page.goto('/?game=run');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:RUN_STORAGE_KEYS.primary,text:encoded.text});await page.reload();
- await page.locator('#run-continue').click();await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- const current=JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!);
- expect(current.battlefield.kind).toBe('authored');expect(current.activeBattle.mapId).toBe('map:ruined_approach');
- expect(current.activeBattle.units.filter((u:any)=>u.side==='player').map((u:any)=>({heroId:u.defId,hp:u.hp}))).toEqual(items.run.party.filter(h=>h.hp>0).map(({heroId,hp})=>({heroId,hp})));
- expect(current.items.run.party).toEqual(items.run.party);
- expect(runBattleCatalog(current.items,runContext)!.heroes.fighter.stats.armorClass).toBe(runContext.catalog.heroes.fighter.stats.armorClass+1);
- await page.screenshot({path:test.info().outputPath('authored-final.png')});
-});
-
-
 test('repeated generated restarts keep the static shape cache bounded',async({page})=>{
  await page.goto('/?game=run');await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
@@ -107,7 +95,7 @@ test('repeated generated restarts keep the static shape cache bounded',async({pa
   expect(report.shapeTextures.length).toBeLessThanOrEqual(18);
   if(restart>0)expect(report.shapeTextures).toEqual(captures[0].textures);
   if(restart===3)break;
-  await page.locator('#fit-restart').click();await page.locator('#run-confirm-new').click();await page.locator('#run-start-encounter').click();
+  await page.locator('#fit-restart').click();await page.locator('#run-confirm-restart').click();await page.locator('#run-start-encounter').click();
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  }
  writeFileSync(test.info().outputPath('static-textures.json'),JSON.stringify(captures,null,2));

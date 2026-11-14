@@ -3,21 +3,21 @@ import { FitScene } from './FitScene';
 import { ContentSmokeScene } from './ContentSmokeScene';
 import { BattleScene, type BattleVariant } from './BattleScene';
 
-export function startProof(status: (state: 'loading' | 'ready' | 'error') => void, error: (message: string) => void, persistent = false, variant?: BattleVariant): () => void {
+export function startProof(status: (state: 'loading' | 'ready' | 'error') => void, error: (message: string) => void, variant?: BattleVariant): () => void {
   // A map variant route (e.g. /qbert) is always a battle; diagnostic scene queries never apply.
   const sceneName = variant ? null : new URLSearchParams(location.search).get('scene');
   const scene = sceneName === 'content-smoke' ? new ContentSmokeScene(status, error)
-    : sceneName === 'proof' ? new FitScene(status, error) : new BattleScene(status, error, undefined, persistent, variant);
+    : sceneName === 'proof' ? new FitScene(status, error) : new BattleScene(status, error, undefined, variant);
   const game = createGame(scene, scene instanceof BattleScene);
   if (scene instanceof BattleScene) {
     window.addEventListener('pagehide', () => {
       status('loading');
       // Stop synchronously: queued scene operations may not run before BFCache freezes us.
-      // Existing shutdown disposes the session, pending presentation and recovery controls.
+      // Existing shutdown disposes the session, pending presentation and controls.
       game.scene.stop(scene);
     }, { once: true });
     window.addEventListener('pageshow', event => {
-      // Another history entry may have replaced the save. Re-enter read-only startup.
+      // Returning to a cached document starts a fresh battle.
       if (event.persisted) location.reload();
     });
   }

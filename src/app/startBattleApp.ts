@@ -3,6 +3,9 @@ import '../style.css';
 import { diagnosticsSnapshot, measurements } from '../diagnostics/browser';
 import { mountBattleLayout } from '../ui/battleLayout';
 import { appEntry } from './entry';
+import { consumeEntryIntent } from './routes';
+
+consumeEntryIntent();
 
 const container = document.querySelector<HTMLElement>('#game')!;
 const statusLabel = document.querySelector<HTMLElement>('#fit-status')!;
@@ -71,7 +74,7 @@ window.addEventListener('unhandledrejection', () => showError('The scene encount
 try {
   const { startProof } = await import('../phaser/start');
   const variant = qbert ? await import('../content/qbertPyramid').then(m => ({ catalog: m.qbertCatalog, mapId: m.QBERT_MAP_ID, style: m.QBERT_BOARD_STYLE })) : undefined;
-  restart = startProof(setStatus, showError, appEntry.persistent, variant);
+  restart = startProof(setStatus, showError, variant);
 } catch {
   showError('Could not load or start Phaser');
 }

@@ -25,7 +25,7 @@ test('menu run entry attributes startup and context-only errors to run', async (
   await expect.poll(() => events.find(e => e.properties.failure === 'verification')?.properties.route).toBe('run');
 });
 
-test('mocked ingestion sees accepted run, rewards, completion and continue without replaying boundaries', async ({ page }) => {
+test('mocked ingestion sees accepted run, rewards, completion within one session', async ({ page }) => {
   test.setTimeout(300000);
   const events = await ingest(page);
   await page.goto('/?game=run&token=private#private'); await page.locator('#run-start').click();
@@ -64,7 +64,6 @@ test('mocked ingestion sees accepted run, rewards, completion and continue witho
         await page.locator('[id="target-item:healing_draught"]').selectOption(hero.heroId);
         await page.getByRole('button', { name: 'Use Healing Draught', exact: true }).click(); await page.locator('#item-confirm').click();
       }
-      await page.reload(); await page.locator('#run-continue').click();
       await page.locator('#run-start-encounter').click();
       await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
     }
@@ -72,8 +71,8 @@ test('mocked ingestion sees accepted run, rewards, completion and continue witho
   await expect.poll(() => events.filter(e => e.event === 'run_outcome').length).toBe(1);
   const terminal=JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!).items.run.phase;
   expect(events.find(e=>e.event==='run_outcome')!.properties).toMatchObject({phase:terminal,outcome:terminal,encounter:2});
-  await page.reload(); await page.locator('#run-continue').click();
-  await expect.poll(() => events.filter(e => e.event === 'run_continued').length).toBe(3);
+  await page.reload(); await expect(page.locator('#run-start')).toBeVisible();
+  expect(events.filter(e => e.event === 'run_continued')).toHaveLength(0);
   expect(events.filter(e => e.event === 'run_started')).toHaveLength(1);
   expect(events.filter(e => e.event === 'encounter_started')).toHaveLength(3);
   expect(events.filter(e => e.event === 'encounter_outcome')).toHaveLength(3);
@@ -83,13 +82,13 @@ test('mocked ingestion sees accepted run, rewards, completion and continue witho
   const errors = events.filter(e => e.event === '$exception'); expect(errors.length).toBeGreaterThan(0);
   if (process.env.PLAYWRIGHT_TELEMETRY_DEV !== 'true') expect(errors[0].properties.$exception_list[0].stacktrace.frames.length).toBeGreaterThan(0);
 });
-test('blocked ingestion leaves battle continue and save working', async ({ page }) => {
+test('blocked ingestion leaves battle play and fresh reload working', async ({ page }) => {
   await ingest(page, true); await page.goto('./?game=battle'); await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   const before = (await readSession(page)).state;
   await page.locator('#battle-next').click(); await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   const after = (await readSession(page)).state; expect(after.commandCount).toBeGreaterThan(before.commandCount);
-  await page.reload(); await page.locator('#save-continue').click();
-  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player'); expect((await readSession(page)).state).toEqual(after);
+  await page.reload();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player'); expect((await readSession(page)).state).toEqual(before);
 });
 
 test('fresh testing battles each report their outcome across reload', async ({ page }) => {
@@ -139,19 +138,20 @@ test('uncaught errors and rejections are sanitized and duplicate objects are rep
   expect(events.filter(e => e.properties.failure === 'unhandled_rejection')).toHaveLength(1);
   expect(JSON.stringify(events)).not.toContain('private');
 });
-test('failed parser loading preserves gameplay and saving without a reporting loop', async ({ page }) => {
+test('failed parser loading preserves gameplay without a reporting loop', async ({ page }) => {
   const events = await ingest(page);
   await page.route(process.env.PLAYWRIGHT_TELEMETRY_DEV === 'true' ? '**/src/telemetry/transport.ts' : '**/assets/transport-*.js', route => route.abort());
   await page.goto('./?game=battle'); await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   await page.locator('#battle-next').click(); await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
-  await expect(page.locator('#battle-persistence')).toContainText('saved'); expect(events).toEqual([]);
+  await expect(page.locator('#battle-persistence')).toContainText('Progress resets on reload'); expect(events).toEqual([]);
 });
-test('recovery inspections and retries report no raw data and no duplicate failure event', async ({ page }) => {
+test('legacy run saves are ignored without reporting contents or recovery failures', async ({ page }) => {
   const events = await ingest(page);
   await page.addInitScript(() => localStorage.setItem('tactics-guru:phaser:run:primary:v1','private broken save'));
-  await page.goto('/?game=run'); await page.locator('#run-recovery').click();
-  await page.locator('#run-retry-save').click(); await page.locator('#run-retry-save').click();
-  await expect.poll(() => events.filter(e => e.event === 'save_recovery_failed').length).toBe(1);
+  await page.goto('/?game=run&entry=recovery');
+  await page.locator('#run-start').click();
+  await expect.poll(() => events.filter(e => e.event === 'run_started').length).toBe(1);
+  expect(events.filter(e => e.event === 'save_recovery_failed')).toHaveLength(0);
   expect(JSON.stringify(events)).not.toContain('private');
 });
 test('privacy controls stop collection immediately, persist across routes, and allow future visits', async ({ page }) => {
@@ -196,7 +196,7 @@ test('privacy opt-out applies to another open tab without touching saves', async
 });
 
 
-test('production ingestion receives generation latency and resume metrics without layout identifiers',async({page})=>{
+test('production ingestion receives generation latency for fresh starts without layout identifiers',async({page})=>{
   const events=await ingest(page);
   await page.goto('/?game=run&private=seed#private');await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
@@ -208,8 +208,8 @@ test('production ingestion receives generation latency and resume metrics withou
   expect([1,2,3,4]).toContain(first.generation_attempts);expect(typeof first.release).toBe('string');
   for(const key of ['seed','layoutSeed','mapHash','runId','cells','spawns'])expect(first).not.toHaveProperty(key);
   const snapshot=JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!);
-  await page.reload();await page.locator('#run-continue').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-  await expect.poll(()=>samples().length).toBe(2);expect(samples()[1].properties.generation_context).toBe('resume');
+  await page.reload();await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await expect.poll(()=>samples().length).toBe(2);expect(samples()[1].properties.generation_context).toBe('entry');
   expect(JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!).activeBattle).toEqual(snapshot.activeBattle);
   expect(JSON.stringify(samples())).not.toContain('private');
 });

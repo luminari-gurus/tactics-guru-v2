@@ -381,27 +381,12 @@ for(const [seed,outcome] of [[1,'playerLoss'],[2,'playerWin']] as const){
     const replayPath=test.info().outputPath('replay.json');
     writeFileSync(replayPath,JSON.stringify(final,null,2));
     await test.info().attach('replay',{path:replayPath,contentType:'application/json'});
-    // Reload the legally completed battle and rebuild its outcome without historical cues.
-    await page.reload();await page.locator('#save-continue').click();
-    await expect(page.locator('#game')).toHaveAttribute('data-phase','ended');
-    const continued=await readSession(page);expect(continued.state).toEqual(final.state);
-    expect(continued.replay).toBeNull();expect(continued.events).toEqual([]);
-    expect(await page.evaluate(()=>window.fitDiagnostics().battleAudio?.lastToken)).toBe(0);
-    await expect(page.getByRole('dialog')).toContainText(outcome==='playerWin'?'Victory':'Defeat');
-    // An outcome reset can fail after removing backup; the ended session must stay usable.
-    await page.evaluate(()=>{
-      const remove=Storage.prototype.removeItem;
-      Storage.prototype.removeItem=function(key){if(key==='tactics-guru:phaser:battle:primary:v1')throw new DOMException('Denied','SecurityError');return remove.call(this,key);};
-      Object.assign(window,{restoreBattleRemoval:()=>{Storage.prototype.removeItem=remove;}});
-    });
-    await page.locator('#dialog-restart').click();await page.locator('#save-confirm-reset').click();
-    await expect(page.getByRole('dialog')).toContainText('Reset incomplete');
-    expect((await readSession(page)).state).toEqual(final.state);
-    await page.locator('#save-close').click();await expect(page.locator('#fit-restart')).toBeEnabled();
-    await expect(page.locator('#fit-status')).toHaveText('Battle ready');
-    await page.evaluate(()=>(window as unknown as {restoreBattleRemoval:()=>void}).restoreBattleRemoval());
+    await page.reload();
+    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    expect((await session(page)).state.seed).toBe(1);
+    await expect(page.getByRole('dialog')).not.toBeVisible();
     await page.locator('#fit-restart').click();await confirmRestart(page);
-    await expect.poll(async()=> (await session(page)).state.seed).toBe(seed+1);
+    await expect.poll(async()=> (await session(page)).state.seed).toBe(2);
     await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
     await expect(page.locator('#fit-status')).toHaveText('Battle ready');
     expect(await page.locator('canvas').count()).toBe(1);expect(errors).toEqual([]);
@@ -614,7 +599,7 @@ test('keyboard-only shortcuts respect presentation visibility and repeated scene
   await page.locator('#battle-target').selectOption(`${destination.x},${destination.y}`);await page.locator('canvas').focus();await page.keyboard.press('c');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   expect((await session(page)).state.commandCount).toBe(current.state.commandCount+1);
-  await page.reload();await page.locator('#save-continue').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await page.reload();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const resumed=await readSession(page);await page.locator('canvas').focus();await page.keyboard.press('w');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const after=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
@@ -624,7 +609,7 @@ test('keyboard-only shortcuts respect presentation visibility and repeated scene
 test('keyboard-only movement, attack confirmation and Wait use the shared decision flow',async({page})=>{
   await page.goto('./?game=battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   await page.locator('#fit-restart').focus();await page.keyboard.press('Enter');
-  await page.locator('#save-confirm-reset').focus();await page.keyboard.press('Enter');
+  await page.locator('#battle-confirm-restart').focus();await page.keyboard.press('Enter');
   await expect.poll(async()=> (await session(page)).state.seed).toBe(2);
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const enact=async(command:Command)=>{

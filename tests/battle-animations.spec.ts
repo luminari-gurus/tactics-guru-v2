@@ -4,7 +4,7 @@ import { writeFileSync } from 'node:fs';
 import { BattleSession } from '../src/app/BattleSession';
 import { standaloneCatalog as catalog } from './helpers/playerPolicy';
 import { dispatch } from '../src/domain/turns';
-import { encodeBattleSave } from '../src/domain/saveEnvelope';
+import { reachStandaloneBoundary } from './helpers/standaloneBoundary';
 import { BATTLE_STORAGE_KEYS as keys } from '../src/persistence/battleStorage';
 import { projectTile } from '../src/geometry/iso';
 import { HEALTH_BAR } from '../src/phaser/healthBar';
@@ -79,14 +79,9 @@ function sharedCellBoundary() {
 }
 
 async function boot(page:Page,fixture:Boundary) {
-  const encoded=encodeBattleSave(fixture.before,catalog);expect(encoded.ok).toBe(true);if(!encoded.ok)throw Error(encoded.reason);
-  await page.addInitScript(({keys,text})=>{
-    if(!sessionStorage.getItem('test:animation-seeded')){
-      localStorage.setItem(keys.primary,text);localStorage.setItem(keys.backup,text);
-      sessionStorage.setItem('test:animation-seeded','yes');
-    }
-  },{keys,text:encoded.text});
-  await page.clock.install();await page.goto('./?game=battle');await page.locator('#save-continue').click();await ready(page);
+  test.setTimeout(180000);
+  await page.clock.install();
+  await reachStandaloneBoundary(page, fixture.before);
   expect(new URL(page.url()).pathname).toBe(process.env.PLAYWRIGHT_BASE_PATH ?? '/');
   expect(new URL(page.url()).searchParams.get('game')).toBe('battle');
   expect((await readSession(page)).state).toEqual(fixture.before);
@@ -184,8 +179,8 @@ test('shared corpse cell keeps living target identity through inspection, confir
   await page.locator('#battle-target-info').evaluate(el=>{el.textContent='Target: Ranger #2 · Defeated';});
   await page.screenshot({path:info.outputPath('living-target-confirmation.png')});
   await confirmFrozen(page);
-  const accepted=await readSession(page);expect(accepted.continuation!.commands).toEqual([fixture.command]);
-  expect(accepted.events).toEqual(fixture.events);expect(accepted.state).toEqual(fixture.after);expect(accepted.state.units.find(u=>u.id===corpse.id)!.hp).toBe(0);
+  const accepted=await readSession(page);expect(accepted.replay!.commands.slice(-1)).toEqual([fixture.command]);
+  expect(accepted.events.slice(-fixture.events.length)).toEqual(fixture.events);expect(accepted.state).toEqual(fixture.after);expect(accepted.state.units.find(u=>u.id===corpse.id)!.hp).toBe(0);
   await page.clock.runFor(700);await ready(page);expect(errors).toEqual([]);
 });
 
@@ -241,8 +236,8 @@ for(const kind of kinds)test(`${kind}: real controls, travel/impact, transformed
   await expect(page.locator('#battle-active')).toHaveText(`Round ${fixture.before.round} · Resolving action (Animating)`);
   await expect(page.locator('#battle-budgets')).toHaveText('Move locked / Action locked');
   const accepted=await readSession(page),saved=await stored(page);
-  expect(accepted.state).toEqual(fixture.after);expect(accepted.events).toEqual(fixture.events);
-  expect(accepted.continuation!.commands).toEqual([fixture.command]);
+  expect(accepted.state).toEqual(fixture.after);expect(accepted.events.slice(-fixture.events.length)).toEqual(fixture.events);
+  expect(accepted.replay!.commands.slice(-1)).toEqual([fixture.command]);
   const expected=dispatch(fixture.before,fixture.command,catalog);expect(expected.ok).toBe(true);
   if(expected.ok)expect(accepted.state).toEqual(expected.state);
   // Exercise board input during the lock. Fresh keys on the usable Restart
@@ -290,7 +285,7 @@ for(const kind of kinds)test(`${kind}: repeated cancellation, modal refresh, res
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
   const fixture=boundary(kind);await boot(page,fixture);await prepareSignature(page,fixture);await confirmFrozen(page);await page.clock.runFor(96);
   const saved=await stored(page);
-  await page.locator('#fit-restart').click({force:true});await page.locator('#save-cancel-reset').click({force:true});
+  await page.locator('#fit-restart').click({force:true});await page.locator('#battle-cancel-restart').click({force:true});
   aligned(await report(page),fixture);
   const size=page.viewportSize()!;await page.setViewportSize({width:size.height,height:size.width});await page.clock.runFor(64);
   aligned(await report(page),fixture);
@@ -301,11 +296,9 @@ for(const kind of kinds)test(`${kind}: repeated cancellation, modal refresh, res
   await ready(page);expect((await report(page)).effect).toBeNull();expect((await readSession(page)).state).toEqual(fixture.after);expect(await stored(page)).toEqual(saved);
   await page.evaluate(()=>{delete (document as unknown as {hidden?:boolean}).hidden;document.dispatchEvent(new Event('visibilitychange'));});
   await page.clock.runFor(700);expect((await readSession(page)).state).toEqual(fixture.after);
-  // Restore only this known legal boundary via the real persisted-save startup for each teardown phase.
   for(const time of [96,288]){
-    const encoded=encodeBattleSave(fixture.before,catalog);if(!encoded.ok)throw Error(encoded.reason);
-    await page.evaluate(({keys,text})=>{localStorage.setItem(keys.primary,text);localStorage.setItem(keys.backup,text);},{keys,text:encoded.text});
-    await page.reload();await page.clock.resume();await page.locator('#save-continue').click();await ready(page);
+    await page.clock.resume();
+    await reachStandaloneBoundary(page,fixture.before);
     await prepareSignature(page,fixture);await confirmFrozen(page);await page.clock.runFor(time);
     const replacementSeed=((await readSession(page)).state.seed+1)>>>0;
     await page.locator('#fit-restart').click({force:true});await confirmRestart(page,true);await page.clock.resume();
@@ -317,11 +310,11 @@ for(const kind of kinds)test(`${kind}: repeated cancellation, modal refresh, res
   expect(errors).toEqual([]);
 });
 
-for(const kind of kinds)test(`${kind}: reload resumes accepted save without historical effects`,async({page})=>{
+for(const kind of kinds)test(`${kind}: reload discards the active presentation and starts fresh`,async({page})=>{
   const fixture=boundary(kind);await boot(page,fixture);await prepareSignature(page,fixture);await confirmFrozen(page);await page.clock.runFor(112);
-  const saved=await stored(page);await page.reload();await page.clock.resume();await expect(page.locator('#save-continue')).toBeVisible();
-  expect(await stored(page)).toEqual(saved);await page.locator('#save-continue').click();await ready(page);
-  expect((await readSession(page)).state).toEqual(fixture.after);expect((await readSession(page)).events).toEqual([]);
+  const saved=await stored(page);await page.reload();await page.clock.resume();await ready(page);
+  expect((await readSession(page)).state.seed).toBe(1);
+  expect((await readSession(page)).state).not.toEqual(fixture.after);
   expect((await report(page)).effect).toBeNull();expect(await stored(page)).toEqual(saved);
 });
 
@@ -343,17 +336,16 @@ test('elevated target remains anchored through rotation during impact',async({pa
 });
 
 test.describe('ability departure through real browser history',()=>{
-  for(const kind of kinds)test(`${kind}: cached return preserves exact accepted slots until Continue`,async({page,baseURL})=>{
+  for(const kind of kinds)test(`${kind}: cached return starts fresh after an accepted action`,async({page,baseURL})=>{
     const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
     await page.addInitScript(()=>window.addEventListener('pageshow',event=>{if(event.persisted)sessionStorage.setItem('test:animation-cached-return','yes');}));
     const fixture=boundary(kind);await boot(page,fixture);await prepareSignature(page,fixture);await confirmFrozen(page);await page.clock.runFor(112);
     const saved=await stored(page),map=new URL('map',baseURL).href;
     await page.evaluate(map=>location.assign(map),map);await expect(page.locator('#map-grid span')).toHaveCount(400);
-    await page.goBack({waitUntil:'commit'});await page.clock.resume();await expect(page.locator('#save-continue')).toBeVisible();
+    await page.goBack({waitUntil:'commit'});await page.clock.resume();await ready(page);
     expect(await page.evaluate(()=>sessionStorage.getItem('test:animation-cached-return'))).toBe('yes');
-    expect(await stored(page)).toEqual(saved);expect(await page.locator('#game').getAttribute('data-session')).toBeNull();
-    await page.locator('#save-continue').click();await ready(page);
-    expect((await readSession(page)).state).toEqual(fixture.after);expect((await readSession(page)).events).toEqual([]);
+    expect((await readSession(page)).state.seed).toBe(1);
+    expect((await readSession(page)).state).not.toEqual(fixture.after);
     expect((await report(page)).effect).toBeNull();expect(await stored(page)).toEqual(saved);expect(errors).toEqual([]);
   });
 });
@@ -387,10 +379,8 @@ for(const ability of ['ability:basic_attack','ability:guarded_strike'] as const)
 test('visible action feedback stays inside the drawable board at small sizes and zoomed edges',async({page},info)=>{
   const fixture=boundary('magic_missile','defeat');await boot(page,fixture);
   for(const size of [{width:320,height:568},{width:568,height:320}]){
-    // Reload the same legally reached boundary; this is presentation coverage, not a battle-completion claim.
-    const encoded=encodeBattleSave(fixture.before,catalog);if(!encoded.ok)throw Error(encoded.reason);
-    await page.evaluate(({keys,text})=>{localStorage.setItem(keys.primary,text);localStorage.setItem(keys.backup,text);},{keys,text:encoded.text});
-    await page.setViewportSize(size);await page.reload();await page.clock.resume();await page.locator('#save-continue').click();await ready(page);
+    await page.setViewportSize(size);await page.clock.resume();
+    await reachStandaloneBoundary(page,fixture.before);
     await prepareSignature(page,fixture);await confirmFrozen(page);await page.clock.runFor(288);
     const initial=await report(page),r=initial.region;
     const x=r.x+r.width/2,y=r.y+r.height/2;

@@ -16,7 +16,7 @@ export function resolveAppEntry(pathname: string, search = '', base = '/'): AppE
     }
     const games = params.getAll('game');
     if (games.length === 1 && (games[0] === 'battle' || games[0] === 'run' || games[0] === 'dungeon')) {
-      return { route: games[0], persistent: true };
+      return { route: games[0], persistent: games[0] === 'dungeon' };
     }
   }
   const invalid = path !== root || new URLSearchParams(search).has('game');
@@ -29,7 +29,7 @@ export function routeHref(route: AppRoute, base = '/'): string {
   return `${base.replace(/\/+$/, '')}/${route === 'menu' ? '' : route}`;
 }
 export function menuGameHref(mode: GameMode, base = '/', intent?: EntryIntent): string {
-  return `${routeHref('menu', base)}?game=${mode}${intent ? `&entry=${intent}` : ''}`;
+  return `${routeHref('menu', base)}?game=${mode}${mode === 'dungeon' && intent ? `&entry=${intent}` : ''}`;
 }
 /** Remove the request from history before using it; reloading cannot repeat it.
  * Unknown `entry` values are consumed and ignored so startup is unchanged. */
