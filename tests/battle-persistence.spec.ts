@@ -8,6 +8,7 @@ import { RUN_STORAGE_KEYS } from '../src/persistence/runStorage';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { RUN_RECORD_KEYS, encodeRunRecords } from '../src/persistence/runRecordsStorage';
 import { emptyRunRecords } from '../src/domain/runRecords';
+import type { RunSnapshot } from '../src/domain/runSaveEnvelope';
 
 // Playwright disables BFCache by default; persistence coverage must include cached documents.
 test.use({launchOptions:async({browserName},use)=>{
@@ -143,6 +144,44 @@ test.beforeEach(async({page})=>{
     if(event.persisted)sessionStorage.setItem('test:bfcache-return',location.href);
   }));
 });
+test('testing routes: browser Back resets the three-encounter run', async ({ page, browserName }) => {
+  const legacy = { [RUN_STORAGE_KEYS.primary]: menuFixture('run'), [RUN_STORAGE_KEYS.backup]: 'damaged run backup' };
+  await page.goto('./');
+  await page.evaluate(values => {
+    for (const [key, value] of Object.entries(values)) localStorage.setItem(key, value);
+  }, legacy);
+  await page.getByRole('link', { name: 'Three-encounter run', exact: true }).click();
+  const runUrl = page.url();
+  const snapshot = async (): Promise<RunSnapshot> =>
+    JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!);
+  await page.locator('#run-start').click();
+  await page.locator('#run-start-encounter').click();
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  const before = await readSession(page);
+  await page.locator('#battle-next').click();
+  await expect.poll(async () => (await readSession(page)).state.commandCount).toBeGreaterThan(before.state.commandCount);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  const oldId = (await snapshot()).items.run.id;
+
+  await page.getByRole('link', { name: 'Single battle', exact: true }).click();
+  await expect(page).toHaveURL(/\/battle$/);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  await page.goBack({ waitUntil: 'commit' });
+  await expect(page).toHaveURL(runUrl);
+  await expect(page.locator('#run-start')).toBeVisible();
+  // Chromium's regression profile enables BFCache. WebKit also covers a cold history return.
+  if (browserName === 'chromium') {
+    expect(await page.evaluate(() => sessionStorage.getItem('test:bfcache-return'))).toBe(runUrl);
+  }
+
+  const fresh = await snapshot();
+  expect(fresh.items.run.id).not.toBe(oldId);
+  expect(fresh.items.run.encounterIndex).toBe(0);
+  expect(fresh.activeBattle).toBeNull();
+  expect(await page.evaluate(keys => Object.fromEntries(keys.map(key => [key, localStorage.getItem(key)])),
+    Object.keys(legacy))).toEqual(legacy);
+});
+
 test('cached dungeon record history preserves the replacement and one old result',async({page,baseURL})=>{
   const mode='dungeon',slots=DUNGEON_KEYS,text=menuFixture(mode);
   const old=JSON.parse(text).payload,oldId=old.id;

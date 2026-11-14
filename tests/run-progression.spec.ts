@@ -5,6 +5,7 @@ import {playerDecision} from './helpers/playerPolicy';
 import {runContext} from './helpers/runItemFixtures';
 import {runBattleCatalog,type RunSnapshot} from '../src/domain/runSaveEnvelope';
 import {replayRunBattle} from '../src/domain/runBattle';
+import type {ItemId} from '../src/content/itemTypes';
 import {RUN_STORAGE_KEYS} from '../src/persistence/runStorage';
 import {RUN_RECORD_KEYS} from '../src/persistence/runRecordsStorage';
 
@@ -31,10 +32,8 @@ async function fight(page:Page,wait=false,useDraught=false){
  await expect(page.locator('#run-item-status')).not.toHaveText('Saving run…');
  return drank;
 }
-async function prepare(page:Page){
- const current=await snapshot(page),offer=current.items.offer!;
- const choice=offer.options.find(o=>o.itemId==='item:healing_draught')??offer.options[0];
- await page.getByRole('button',{name:`Claim ${runContext.items[choice.itemId].label}`,exact:true}).click();await page.locator('#item-confirm').click();
+async function prepare(page:Page, itemId:ItemId='item:healing_draught'){
+ await page.getByRole('button',{name:`Claim ${runContext.items[itemId].label}`,exact:true}).click();await page.locator('#item-confirm').click();
  await expect(page.locator('#run-start-encounter')).toBeVisible();
  for(const equipment of (await snapshot(page)).items.ownership.equipment){
   const now=await snapshot(page);if(now.items.ownership.assignments.some(a=>a.instanceId===equipment.instanceId))continue;
@@ -90,10 +89,35 @@ test('legal run outcomes, earned rewards and fresh restart',async({page})=>{
   const record=JSON.parse((await page.locator('#game').getAttribute('data-run-battle-record'))!);const replay=replayRunBattle(record.replay,record.entry,runContext);expect(replay.ok).toBe(true);if(replay.ok){expect(replay.state).toEqual(record.state);expect(replay.events).toEqual(record.events);}records.push(record);
   if(current.items.run.phase==='defeat')break;
   if(index<2){
-   await prepare(page);
-   expect((await snapshot(page)).items.run.encounterIndex).toBe(index+1);
+   await prepare(page, index===0 ? 'item:healing_draught' : 'item:aiming_charm');
+   const prepared=await snapshot(page);
+   expect(prepared.items.run.encounterIndex).toBe(index+1);
    await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
    await expect(page.locator('#battle-sound')).toHaveAttribute('aria-pressed','true');
+   if(index===1){
+    const entered=await snapshot(page);
+    const party=prepared.items.run.party;
+    // The second victory levels up and heals survivors. Preserve their raised HP pool at entry.
+    expect(party.some(hero=>hero.hp>runContext.catalog.heroes[hero.heroId].stats.maxHp)).toBe(true);
+    expect(entered.items.run.party).toEqual(party);
+    expect(entered.items.ownership).toEqual(prepared.items.ownership);
+    expect(entered.battlefield?.kind).toBe('authored');
+    const initial=(await readSession(page)).replay!.initial;
+    expect(initial.units.filter(unit=>unit.side==='player').map(unit=>({heroId:unit.defId,hp:unit.hp})))
+     .toEqual(party.filter(hero=>hero.hp>0).map(({heroId,hp})=>({heroId,hp})));
+    const equipment=prepared.items.ownership.equipment.find(item=>item.itemId==='item:aiming_charm');
+    const assignment=prepared.items.ownership.assignments.find(item=>item.instanceId===equipment?.instanceId);
+    if(!assignment)throw Error('Expected an equipped Aiming Charm before encounter three');
+    const equippedHero=initial.units.find(unit=>unit.side==='player' && unit.defId===assignment.heroId);
+    if(!equippedHero)throw Error('Expected the hero wearing the Aiming Charm to enter encounter three');
+    // The combat inspection reads the live battle catalog, including progression and equipment.
+    const withoutEquipment=runBattleCatalog({...prepared.items,ownership:{...prepared.items.ownership,assignments:[]}},runContext)!;
+    const accuracy=withoutEquipment.heroes[assignment.heroId].stats.accuracy+1;
+    await page.locator('#battle-party').click();
+    await page.locator(`#inspect-unit-${equippedHero.id}`).click();
+    await expect(page.getByRole('dialog')).toContainText(`Accuracy +${accuracy} · Power`);
+    await page.locator('#inspection-close').click();
+   }
   }
  }
  const final=await snapshot(page);await expect(page.getByRole('heading',{name:final.items.run.phase==='victory'?'Run victory':'Run defeat',exact:true})).toBeVisible();
@@ -106,6 +130,55 @@ test('legal run outcomes, earned rewards and fresh restart',async({page})=>{
  await page.locator('#run-new').dblclick();await expect(page.locator('#run-start-encounter')).toBeVisible();const fresh=await snapshot(page);expect(fresh.items.run.seed).toBe(14);expect(fresh.items.run.id).not.toBe(final.items.run.id);expect(fresh.items.ownership).toEqual({consumables:[],equipment:[],assignments:[]});expect(fresh.items.run.party.every(h=>h.hp===runContext.catalog.heroes[h.heroId].stats.maxHp)).toBe(true);
  expect(errors).toEqual([]);
 });
+test('run preparation and dialogs retain 44px controls, native touch and narrow layout', async ({ page, isMobile }) => {
+ const activate = async (selector:string) => {
+  if(isMobile) await page.locator(selector).tap();
+  else await page.locator(selector).click();
+ };
+ await page.goto('./?game=run');
+ await activate('#run-start');
+ await expect(page.locator('#run-start-encounter')).toBeVisible();
+ const original = page.viewportSize()!;
+ for(const viewport of [{width:320,height:568},{width:915,height:412},{width:412,height:915}]){
+  await page.setViewportSize(viewport);
+  const bounds=await page.locator('#run-screen :is(button,a,select):visible').evaluateAll(nodes=>nodes.map(node=>{
+   const {width,height,left,right}=node.getBoundingClientRect();
+   return {width,height,left,right};
+  }));
+  expect(bounds.length).toBeGreaterThan(0);
+  for(const {width,height,left,right} of bounds){
+   expect(width).toBeGreaterThanOrEqual(44);
+   expect(height).toBeGreaterThanOrEqual(44);
+   expect(left).toBeGreaterThanOrEqual(0);
+   expect(right).toBeLessThanOrEqual(viewport.width);
+  }
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ }
+ await page.setViewportSize(original);
+ await activate('#run-start-encounter');
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ await activate('#battle-next');
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ const before=await snapshot(page);
+ await activate('#fit-restart');
+ const dialog=page.getByRole('dialog');
+ await expect(dialog).toBeVisible();
+ await page.mouse.click(3,3);
+ await expect(dialog).toBeVisible();
+ expect(await snapshot(page)).toEqual(before);
+ await activate('#run-cancel-restart');
+ await expect(dialog).not.toBeVisible();
+ await expect(page.locator('#fit-restart')).toBeFocused();
+ expect(await snapshot(page)).toEqual(before);
+ await activate('#battle-sound');
+ await activate('#fit-restart');
+ await activate('#run-confirm-restart');
+ await activate('#run-start-encounter');
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ expect((await snapshot(page)).items.run.id).not.toBe(before.items.run.id);
+ await expect(page.locator('#battle-sound')).toHaveAttribute('aria-pressed','true');
+});
+
 test('testing routes: an earned combat draught stays in the transient authored run',async({page})=>{
  test.setTimeout(300000);
  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
