@@ -15,11 +15,15 @@ const WALL_SIGHT_STATS_SAVE_FORMAT = 17;
 const WALL_SIGHT_DUNGEON_SAVE_FORMAT = 14;
 const WALL_SIGHT_DRAUGHT_SAVE_FORMAT = 15;
 const ENCOUNTER_ENTRY_SAVE_FORMAT = 18;
+const GROUND_LOOT_SAVE_FORMAT = 19;
 export const hasWallSight = (state: DungeonState) => state.floors.some(floor => floor.exploration.sightVersion !== undefined);
+export const hasGroundLoot = (state: DungeonState) => state.floors.some(floor => floor.loot !== undefined);
 const CURRENT_IDENTITY = hashJson({ dungeonIdentity, progression: HERO_PROGRESSION });
 const PREVIOUS_IDENTITY = hashJson({ dungeonIdentity: previousDungeonIdentity, progression: HERO_PROGRESSION });
 const FINAL_REWARD_IDENTITY = hashJson({ dungeonIdentity, progression: HERO_PROGRESSION, rewardsPerFloor: 3 });
 const ENCOUNTER_ENTRY_IDENTITY = hashJson({ dungeonIdentity, progression: HERO_PROGRESSION, rewardsPerFloor: 3, encounterEntry: 'origin-contact-v1' });
+const GROUND_LOOT_IDENTITY = hashJson({ dungeonIdentity, progression: HERO_PROGRESSION, rewardsPerFloor: 3,
+  encounterEntry: 'origin-contact-v1', loot: 'one-seeded-item-in-completion-order-v1' });
 
 export function requiresFinalRewardSupport(state: DungeonState): boolean {
   return (state.phase === 'reward' && state.floors[state.depth - 1].completed === 3) ||
@@ -35,10 +39,10 @@ export function encodeDungeonWithState(input: unknown): { ok: true; text: string
   const checked = readDungeon(input);
   if (!checked.ok) return checked;
   const draughts = checked.state.activeBattle?.draughts;
-  const format = checked.state.encounterEntry ? ENCOUNTER_ENTRY_SAVE_FORMAT : checked.state.stats ? hasWallSight(checked.state) ? WALL_SIGHT_STATS_SAVE_FORMAT : STATS_DUNGEON_SAVE_FORMAT : hasWallSight(checked.state)
+  const format = hasGroundLoot(checked.state) ? GROUND_LOOT_SAVE_FORMAT : checked.state.encounterEntry ? ENCOUNTER_ENTRY_SAVE_FORMAT : checked.state.stats ? hasWallSight(checked.state) ? WALL_SIGHT_STATS_SAVE_FORMAT : STATS_DUNGEON_SAVE_FORMAT : hasWallSight(checked.state)
     ? draughts ? WALL_SIGHT_DRAUGHT_SAVE_FORMAT : WALL_SIGHT_DUNGEON_SAVE_FORMAT
     : draughts ? DRAUGHT_DUNGEON_SAVE_FORMAT : DUNGEON_SAVE_FORMAT;
-  const identity = checked.state.encounterEntry ? ENCOUNTER_ENTRY_IDENTITY : requiresFinalRewardSupport(checked.state) ? FINAL_REWARD_IDENTITY : CURRENT_IDENTITY;
+  const identity = hasGroundLoot(checked.state) ? GROUND_LOOT_IDENTITY : checked.state.encounterEntry ? ENCOUNTER_ENTRY_IDENTITY : requiresFinalRewardSupport(checked.state) ? FINAL_REWARD_IDENTITY : CURRENT_IDENTITY;
   const body = { kind: 'tactics-guru:dungeon', format, identity, payload: checked.state };
   const text = canonical({ ...body, digest: hashJson(body) });
   return utf8Bytes(text) > DUNGEON_SAVE_MAX_BYTES ? { ok: false, reason: 'tooLarge' } : { ok: true, text, state: checked.state };
@@ -93,6 +97,7 @@ export function decodeDungeon(text: string): DungeonResult {
     if (!hasShape(input, ['kind','format','identity','payload','digest'])) return { ok: false, reason: 'invalidEnvelope' };
     const previous = input.format === 9 && input.identity === PREVIOUS_IDENTITY;
     const encounterEntry = input.format === ENCOUNTER_ENTRY_SAVE_FORMAT && input.identity === ENCOUNTER_ENTRY_IDENTITY;
+    const groundLoot = input.format === GROUND_LOOT_SAVE_FORMAT && input.identity === GROUND_LOOT_IDENTITY;
     // Earlier #370 previews wrote 12/13 with wall-sight floors and no stats.
     // Accept those payloads for recovery. New wall-sight writes use 14/15.
     const payloadStats = typeof input.payload === 'object' && input.payload !== null && 'stats' in input.payload;
@@ -104,15 +109,15 @@ export function decodeDungeon(text: string): DungeonResult {
     const finalReward = input.identity === FINAL_REWARD_IDENTITY;
     const current = (input.format === DUNGEON_SAVE_FORMAT || input.format === DRAUGHT_DUNGEON_SAVE_FORMAT || stats || wallSight) &&
       (input.identity === CURRENT_IDENTITY || finalReward);
-    if (input.kind !== 'tactics-guru:dungeon' || !(previous || current || encounterEntry)) return { ok: false, reason: 'incompatible' };
+    if (input.kind !== 'tactics-guru:dungeon' || !(previous || current || encounterEntry || groundLoot)) return { ok: false, reason: 'incompatible' };
     const body = { kind: input.kind, format: input.format, identity: input.identity, payload: input.payload };
     if (input.digest !== hashJson(body)) return { ok: false, reason: 'digest' };
     const read = readDungeon(input.payload, previous ? previousItemCatalog : undefined);
     if (!read.ok) return read;
     // Older clients equate the party's cell with the encounter cell. New entry
     // semantics must never be passed off as one of those older formats.
-    if (encounterEntry !== (read.state.encounterEntry !== undefined)) return { ok: false, reason: 'incompatible' };
-    if (encounterEntry) {
+    if (groundLoot !== hasGroundLoot(read.state) || !groundLoot && encounterEntry !== (read.state.encounterEntry !== undefined)) return { ok: false, reason: 'incompatible' };
+    if (encounterEntry || groundLoot) {
       const version = (input.payload as { stats?: { version: unknown } }).stats?.version;
       if (read.state.stats && version !== 2) return { ok: false, reason: 'invalidState' };
       return read;

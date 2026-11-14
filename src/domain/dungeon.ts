@@ -3,7 +3,7 @@ import { HERO_PROGRESSION } from '../content/progression';
 import { freshArrivalExploration, freshExploration, readExploration, movableExploration, visit, poiCell, neighbors, type Exploration } from './exploration';
 import { HERO_IDS } from '../content/constants';
 import { dungeonContent, DUNGEON_TEMPLATE } from '../content/dungeon';
-import type { ItemCatalog, ItemOwnership } from '../content/itemTypes';
+import type { ItemCatalog, ItemId, ItemOwnership } from '../content/itemTypes';
 import { generateMap, type GeneratedMap } from '../map/generate';
 import { applyBiome } from '../map/biomes';
 import { DEFAULT_BEHAVIORS, stepMovement } from '../map/movement';
@@ -23,6 +23,8 @@ import { encounterHpLimit } from './effects';
 import { draughtHealing, enterWithDraughts, matchesDraughtStock } from './draughts';
 import { dungeonBattleCatalog } from '../content/dungeonEncounters';
 import { boundedStat, freshRunStats, readRunStats, type RunStats } from './runStats';
+import { nextUint32, seedRng } from './rng';
+import { UINT32_RANGE } from './constants';
 
 export interface FloorDescriptor {
   readonly depth: number; readonly seed: number; readonly template: typeof DUNGEON_TEMPLATE;
@@ -30,7 +32,15 @@ export interface FloorDescriptor {
   readonly upstairs: number; readonly downstairs: number;
   readonly encounters: readonly { readonly selection: EncounterSelection; readonly battlefield: BattlefieldDescriptor | null }[];
 }
-export interface DungeonFloor { readonly descriptor: FloorDescriptor; readonly position: number; readonly completed: number; readonly exploration: Exploration }
+export interface DungeonLoot {
+  readonly id: string; readonly slot: number; readonly rewardIndex: number; readonly cell: number;
+  readonly itemId: ItemId; readonly quantity: 1; readonly remaining: 0 | 1;
+}
+export interface DungeonFloor {
+  readonly descriptor: FloorDescriptor; readonly position: number; readonly completed: number; readonly exploration: Exploration;
+  /** Depleted records remain authoritative so a revisit cannot recreate a reward. */
+  readonly loot?: readonly DungeonLoot[];
+}
 /** The interrupted cardinal step, captured before an encounter moves the party. */
 export interface DungeonEncounterEntry { readonly origin: number; readonly contact: number; readonly slot: number }
 export interface DungeonState {
@@ -140,6 +150,39 @@ function dungeonRewardBoundary(s: DungeonState) {
 export function dungeonOffer(s: DungeonState) {
   return rewardOffer(dungeonRewardBoundary(s), dungeonContent.items)!;
 }
+/** One independent seeded draw from the existing catalog; never reads battle RNG. */
+export function dungeonLootReward(s: Pick<DungeonState, 'id' | 'seed' | 'depth'>, rewardIndex: number, slot: number, cell: number): DungeonLoot {
+  const items = Object.keys(dungeonContent.items).sort() as ItemId[];
+  const draw = nextUint32(seedRng(dungeonSeed(s.seed, s.depth, 'reward', rewardIndex)));
+  return { id: `${s.id}:floor:${s.depth}:reward:${rewardIndex}:loot`, slot, rewardIndex, cell,
+    itemId: items[Math.floor(draw.value * items.length / UINT32_RANGE)], quantity: 1, remaining: 1 };
+}
+function projectedLootPickup(s: DungeonState, cell: number) {
+  const floor = currentFloor(s), cleared = clearedDungeonSlots(floor);
+  let ownership = s.ownership;
+  const collected = new Set<string>();
+  if (s.phase !== 'ready' || floor.exploration.pois.some(poi => !cleared.includes(poi.encounterSlot) && poiCell(poi, floor.descriptor.size ?? 20) === cell))
+    return { ownership, collected };
+  // The reader stores records in completion order. Each fitting record is an
+  // independent grant, so a full stack cannot prevent a different item fitting.
+  for (const loot of floor.loot ?? []) if (loot.cell === cell && loot.remaining) {
+    const granted = grantOwnedItem(ownership, dungeonContent.items[loot.itemId], loot.id);
+    if (granted) { ownership = granted; collected.add(loot.id); }
+  }
+  return { ownership, collected };
+}
+/** Capacity preview uses the exact pickup rules and never changes state or RNG. */
+export function collectableDungeonLoot(s: DungeonState, cell: number): number {
+  return projectedLootPickup(s, cell).collected.size;
+}
+/** Part of an accepted move/preparation transition; never adds a revision or enemy tick. */
+function pickupDungeonLoot(s: DungeonState): DungeonState {
+  const floor = currentFloor(s), pickup = projectedLootPickup(s, floor.position);
+  if (!pickup.collected.size) return s;
+  const floors = [...s.floors];
+  floors[s.depth - 1] = { ...floor, loot: floor.loot!.map(loot => pickup.collected.has(loot.id) ? { ...loot, remaining: 0 } : loot) };
+  return { ...s, floors, ownership: pickup.ownership };
+}
 export function dungeonBattle(s: DungeonState) {
   const slot = activeDungeonSlot(s);
   if (slot >= 3) return null;
@@ -174,7 +217,8 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
   const floors: DungeonFloor[] = [];
   for (let i = 0; i < input.floors.length; i++) {
     const f = input.floors[i];
-    if (!hasShape(f, ['descriptor','position','completed','exploration']) || !hasShape(f.descriptor, f.descriptor && typeof f.descriptor === 'object' && 'size' in f.descriptor ? ['depth','seed','template','generator','size','biome','mapHash','upstairs','downstairs','encounters'] : ['depth','seed','template','generator','biome','mapHash','upstairs','downstairs','encounters']) ||
+    const looted = f !== null && typeof f === 'object' && Object.hasOwn(f, 'loot');
+    if (!hasShape(f, ['descriptor','position','completed','exploration', ...(looted ? ['loot'] : [])]) || !hasShape(f.descriptor, f.descriptor && typeof f.descriptor === 'object' && 'size' in f.descriptor ? ['depth','seed','template','generator','size','biome','mapHash','upstairs','downstairs','encounters'] : ['depth','seed','template','generator','biome','mapHash','upstairs','downstairs','encounters']) ||
       !safeCount(f.completed) || f.completed > 3 || !safeCount(f.position) || f.position >= (f.descriptor.size === undefined ? 400 : Number(f.descriptor.size) ** 2) ||
       f.descriptor.depth !== i + 1 || f.descriptor.seed !== dungeonSeed(input.seed, i + 1, 'floor') || f.descriptor.template !== DUNGEON_TEMPLATE ||
       !(f.descriptor.generator === 'rooms-v1' && f.descriptor.size === undefined || (f.descriptor.generator === 'sector-graph-v1' || f.descriptor.generator === 'arena-v1') && f.descriptor.size === floorSize(i + 1)) || (policy === LEGACY_ENCOUNTER_POLICY ? f.descriptor.biome !== 'grassland-v1' : !['forest-v1', 'desert-v1'].includes(f.descriptor.biome as string)) || typeof f.descriptor.mapHash !== 'string' || !/^sha256:[a-f0-9]{64}$/.test(f.descriptor.mapHash) ||
@@ -218,7 +262,24 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
     const exploration = readExploration(f.exploration, descriptor.seed, f.position, floorMap(descriptor));
     if (!exploration || exploration.version === 'exploration-v2' && exploration.cleared!.length !== f.completed) return fail('invalidExploration');
     if (exploration.version === 'exploration-v2' && i + 1 !== input.depth && exploration.active !== null) return fail('invalidExploration');
-    floors.push({ descriptor, position: f.position, completed: f.completed, exploration });
+    let loot: DungeonLoot[] | undefined;
+    if (looted) {
+      if (!isDenseArray(f.loot, 3) || exploration.version !== 'exploration-v2') return fail('invalidLoot');
+      loot = [];
+      const map = floorMap(descriptor);
+      for (const record of f.loot) {
+        if (!hasShape(record, ['id','slot','rewardIndex','cell','itemId','quantity','remaining']) ||
+            !safeCount(record.slot) || record.slot > 2 || !exploration.cleared!.includes(record.slot) ||
+            !safeCount(record.rewardIndex) || record.rewardIndex >= f.completed ||
+            loot.some(previous => previous.slot === record.slot || previous.rewardIndex >= (record.rewardIndex as number)) ||
+            !safeCount(record.cell) || !map.cells[record.cell] || record.cell !== poiCell(exploration.pois[record.slot], map.width) ||
+            (record.remaining !== 0 && record.remaining !== 1)) return fail('invalidLoot');
+        const expected = dungeonLootReward({ id: input.id, seed: input.seed, depth: i + 1 }, record.rewardIndex, record.slot, record.cell);
+        if (record.id !== expected.id || record.itemId !== expected.itemId || record.quantity !== 1 || !Object.hasOwn(items, expected.itemId)) return fail('invalidLoot');
+        loot.push({ ...expected, remaining: record.remaining });
+      }
+    }
+    floors.push({ descriptor, position: f.position, completed: f.completed, exploration, ...(loot ? { loot } : {}) });
   }
   const party: RunHero[] = [];
   for (let i = 0; i < 3; i++) {
@@ -228,19 +289,31 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
     party.push(checked);
   }
   const owned = readItemOwnership(input.ownership, input.id, items, id => {
+    const ground = new RegExp(`^${input.id}:floor:([1-9][0-9]*):reward:([0-2]):loot$`).exec(id);
+    if (ground) {
+      const record = floors[Number(ground[1]) - 1]?.loot?.find(loot => loot.id === id);
+      return record?.remaining === 0;
+    }
     const m = new RegExp(`^${input.id}:floor:([1-9][0-9]*):reward:([0-2]):option:[01]$`).exec(id);
     if (!m || !safeCount(Number(m[1]), 1) || Number(m[1]) > floors.length) return false;
     const floor = floors[Number(m[1]) - 1];
-    return floor.completed > Number(m[2]) && !(input.depth === Number(m[1]) && input.phase === 'reward' && floor.completed === Number(m[2]) + 1);
+    return floor.completed > Number(m[2]) && !floor.loot?.some(loot => loot.rewardIndex === Number(m[2])) &&
+      !(input.depth === Number(m[1]) && input.phase === 'reward' && floor.completed === Number(m[2]) + 1);
   });
   if (!owned.ok) return owned;
+  for (const equipment of owned.ownership.equipment) {
+    const source = new RegExp(`^${input.id}:floor:([1-9][0-9]*):reward:[0-2]:loot$`).exec(equipment.instanceId);
+    const ground = source && floors[Number(source[1]) - 1]?.loot?.find(loot => loot.id === equipment.instanceId);
+    if (ground && ground.itemId !== equipment.itemId) return fail('invalidOwnership');
+  }
   if (!['ready','battle','reward','defeat'].includes(input.phase as string)) return fail('invalidPhase');
   const state = { ...input, ...(stats ? { stats } : {}), encounterPolicy: policy, floors, party, ownership: owned.ownership } as unknown as DungeonState;
   const { encounters, ...geometry } = currentFloor(state).descriptor;
   if (canonical(geometry) !== canonical(floorGeometry(state.seed, state.depth, currentFloor(state).descriptor.biome, undefined, currentFloor(state).descriptor.generator))) return fail('invalidFloor');
   const slot = dungeonSlot(state), alive = party.some(h => h.hp > 0);
   if ((state.phase === 'defeat') === alive || state.phase === 'battle' && slot === 3 ||
-    state.phase === 'reward' && slot < 1 || state.phase !== 'reward' && state.offer !== null) return fail('invalidPhase');
+    state.phase === 'reward' && (slot < 1 || currentFloor(state).loot?.some(loot => loot.rewardIndex === slot - 1)) ||
+    state.phase !== 'reward' && state.offer !== null) return fail('invalidPhase');
   const offer = state.phase === 'reward' ? readRewardOffer(state.offer, dungeonRewardBoundary(state), items) : null;
   if (offer && !offer.ok) return fail('invalidPhase');
   const exp = currentFloor(state).exploration;
@@ -329,6 +402,13 @@ export function acceptDungeonBattle(s: DungeonState, battle: BattleState): Dunge
     exploration:{...exploration,cleared:[...exploration.cleared!,selected].sort((a,b)=>a-b),active:selected} };
   const next = { ...s, floors };
   const awarded = party.map(h => awardHero(h, HERO_PROGRESSION.awards[f.descriptor.encounters[selected].selection.kind], dungeonContent.catalog));
+  if (s.encounterEntry) {
+    const loot = dungeonLootReward(s, f.completed, selected, s.encounterEntry.contact);
+    floors[s.depth - 1] = { ...floors[s.depth - 1], loot: [...(f.loot ?? []), loot],
+      exploration: { ...floors[s.depth - 1].exploration, active: null } };
+    const { encounterEntry: _, ...settled } = s;
+    return advance(settled, { floors, party: awarded, ownership, phase: 'ready', offer: null, activeBattle: null, battlefield: null });
+  }
   return advance(s, { floors, party: awarded, ownership, phase: 'reward', offer: dungeonOffer(next), activeBattle: null, battlefield: null });
 }
 export type DungeonItemCommand = ItemCommand | (ReturnType<typeof dungeonBoundary> & (
@@ -344,10 +424,10 @@ export function dungeonItem(s: DungeonState, command: DungeonItemCommand): Dunge
   if (command.type === 'discardEquipment') {
     if (!hasShape(command, [...keys,'instanceId'])) return fail('invalidCommand');
     if (!s.ownership.equipment.some(item => item.instanceId === command.instanceId)) return fail('notOwned');
-    return advance(s, { ownership: { ...s.ownership,
+    return advance(pickupDungeonLoot({ ...s, ownership: { ...s.ownership,
       equipment: s.ownership.equipment.filter(item => item.instanceId !== command.instanceId),
       assignments: s.ownership.assignments.filter(assignment => assignment.instanceId !== command.instanceId),
-    } });
+    } }), {});
   }
   if (command.type === 'claimReward' || command.type === 'declineReward') {
     if (!hasShape(command, command.type === 'claimReward' ? [...keys,'offerId','itemId'] : [...keys,'offerId'])) return fail('invalidCommand');
@@ -366,7 +446,7 @@ export function dungeonItem(s: DungeonState, command: DungeonItemCommand): Dunge
     return advance(settled, { floors, ownership, phase: 'ready', offer: null });
   }
   const result = changePreparation(s.ownership, s.party, { ...command }, dungeonContent.catalog, dungeonContent.items);
-  return result.ok ? advance(s, { ownership: result.ownership, party: result.party }) : result;
+  return result.ok ? advance(pickupDungeonLoot({ ...s, ownership: result.ownership, party: result.party }), {}) : result;
 }
 
 export interface ExplorationCommand { readonly id: string; readonly depth: number; readonly revision: number; readonly destination: number }
@@ -381,6 +461,7 @@ export function stepDungeon(s: DungeonState, command: ExplorationCommand): Dunge
   floors[s.depth-1] = { ...f, position: command.destination, exploration: visit(f.exploration, command.destination, map) };
   let candidate: DungeonState = { ...s, floors,
     ...(s.stats ? { stats: { ...s.stats, movesTaken: boundedStat(s.stats.movesTaken + 1) } } : {}) };
+  candidate = pickupDungeonLoot(candidate);
   candidate = moveDungeonEnemies(candidate, f.position);
   // Only accepted movement enters stairs; arrival, rendering and restore never travel.
   if (command.destination === f.descriptor.upstairs && s.depth > 1) return travelDungeon(candidate, 'ascend', s.revision);

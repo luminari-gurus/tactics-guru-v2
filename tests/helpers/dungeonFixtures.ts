@@ -1,5 +1,5 @@
-import { freshExploration, neighbors, poiCell, reveal, visit } from '../../src/domain/exploration';
-import { freshDungeon, floorDescriptor, floorMap, dungeonOffer, readDungeon, startDungeonBattle, dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, travelDungeon, stepDungeon, clearedDungeonSlots, type DungeonState, type DungeonResult, type DungeonItemCommand } from '../../src/domain/dungeon';
+import { freshExploration, movableExploration, neighbors, poiCell, reveal, visit } from '../../src/domain/exploration';
+import { freshDungeon, floorDescriptor, floorMap, dungeonOffer, dungeonLootReward, readDungeon, startDungeonBattle, dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, travelDungeon, stepDungeon, clearedDungeonSlots, type DungeonState, type DungeonResult, type DungeonItemCommand } from '../../src/domain/dungeon';
 import { generateMap } from '../../src/map/generate';
 import { BattleSession } from '../../src/app/BattleSession';
 import { playerDecision, fighterDecision, rangerDecision, mageDecision } from './playerPolicy';
@@ -41,11 +41,18 @@ export function priorDungeonEnvelope(s: DungeonState, format: 1 | 2) {
 }
 export const checkedDungeon = (r: DungeonResult) => { if(!r.ok)throw Error(r.reason);return r.state; };
 /** Legal pure-domain play fixture, not a claim that all preceding turns used browser input. */
-export function dungeonVictoryBoundary(seed: number, slot = 0) {
+export function dungeonVictoryBoundary(seed: number, slot = 0, groundLoot = false) {
   let dungeon=freshDungeon('dungeon-browser-fixture',seed);
   const histories: unknown[]=[];
   for(let index=0;index<=slot;index++) {
-    dungeon=checkedDungeon(startDungeonBattle(atEncounter(dungeon)));
+    if (groundLoot) {
+      const floor = dungeon.floors[dungeon.depth - 1], map = floorMap(floor.descriptor), target = poiCell(floor.exploration.pois[index], map.width);
+      const origin = neighbors(target, map.width, map.height).find(cell => map.cells[cell] &&
+        !floor.exploration.pois.some(poi => !clearedDungeonSlots(floor).includes(poi.encounterSlot) && poiCell(poi, map.width) === cell));
+      if (origin === undefined) throw Error('No legal ground-loot encounter approach');
+      dungeon = atCell(dungeon, origin);
+      dungeon = checkedDungeon(stepDungeon(dungeon, { id: dungeon.id, depth: dungeon.depth, revision: dungeon.revision, destination: target }));
+    } else dungeon=checkedDungeon(startDungeonBattle(atEncounter(dungeon)));
     const built=dungeonBattle(dungeon)!;
     const battle=new BattleSession(built.catalog,dungeon.activeBattle!,dungeon.activeBattle!.seed,undefined,true,built.battlefield);
     let last: { snapshot: DungeonState; command: Command }|null=null;
@@ -62,14 +69,41 @@ export function dungeonVictoryBoundary(seed: number, slot = 0) {
     histories.push({ replay: battle.replay, entry: dungeon });
     if(index===slot)return {...last,histories};
     dungeon=checkedDungeon(acceptDungeonBattle(dungeon,battle.state));
-    const offer=dungeon.offer!;
-    const itemId=offer.options.find(o=>o.itemId==='item:healing_draught')?.itemId??offer.options[0].itemId;
-    dungeon=checkedDungeon(dungeonItem(dungeon,{...dungeonBoundary(dungeon),type:'claimReward',offerId:offer.id,itemId}));
+    if (dungeon.offer) {
+      const offer=dungeon.offer;
+      const itemId=offer.options.find(o=>o.itemId==='item:healing_draught')?.itemId??offer.options[0].itemId;
+      dungeon=checkedDungeon(dungeonItem(dungeon,{...dungeonBoundary(dungeon),type:'claimReward',offerId:offer.id,itemId}));
+    } else if (groundLoot) {
+      const loot = dungeon.floors[dungeon.depth - 1].loot!.at(-1)!;
+      dungeon = checkedDungeon(stepDungeon(dungeon, { id: dungeon.id, depth: dungeon.depth, revision: dungeon.revision, destination: loot.cell }));
+    }
     for(const hero of dungeon.party)if(hero.hp>0&&hero.hp<hero.maxHp&&dungeon.ownership.consumables.length) {
       const used=dungeonItem(dungeon,{...dungeonBoundary(dungeon),type:'useItem',itemId:'item:healing_draught',heroId:hero.heroId});if(used.ok)dungeon=used.state;
     }
   }
   return null;
+}
+
+/** Real domain contact/victory boundary with a staged legal adjacent approach, not preceding browser traversal. */
+export const dungeonGroundVictoryBoundary = (seed: number, slot = 0) => dungeonVictoryBoundary(seed, slot, true);
+
+/** Structural three-record same-cell pile for capacity/persistence tests, not a preceding legal journey. */
+export function dungeonGroundPileFixture(seed = 13, depth = 1): DungeonState {
+  const base = freshDungeon(`ground-pile-${seed}`, seed);
+  const floors = Array.from({ length: depth }, (_, index) => {
+    const descriptor = floorDescriptor(seed, index + 1), map = floorMap(descriptor);
+    return { descriptor, position: descriptor.upstairs, completed: 3,
+      exploration: movableExploration(freshExploration(descriptor.seed, descriptor.upstairs, map), descriptor.seed, 3, 'ready') };
+  });
+  const floor = floors[depth - 1], map = floorMap(floor.descriptor);
+  const cell = map.cells.findIndex((walkable, candidate) => walkable === 1 && candidate !== floor.descriptor.upstairs && candidate !== floor.descriptor.downstairs &&
+    neighbors(candidate, map.width, map.height).some(origin => map.cells[origin] && origin !== floor.descriptor.upstairs && origin !== floor.descriptor.downstairs));
+  const origin = neighbors(cell, map.width, map.height).find(candidate => map.cells[candidate] && candidate !== floor.descriptor.upstairs && candidate !== floor.descriptor.downstairs)!;
+  const context = { ...base, depth };
+  const pile = { ...floor, position: origin,
+    exploration: { ...visit(floor.exploration, origin, map), pois: floor.exploration.pois.map(poi => ({ ...poi, x: cell % map.width, y: Math.floor(cell / map.width) })) },
+    loot: [0, 1, 2].map(slot => dungeonLootReward(context, slot, slot, cell)) };
+  return checkedDungeon(readDungeon({ ...context, floors: [...floors.slice(0, -1), pile] }));
 }
 
 /** Structural capacity fixture; not evidence of a preceding legal full playthrough. */
@@ -161,6 +195,7 @@ export function shamanJourney(seed = 31) {
 }
 
 /** Full Fighter acceptance witness; source-backed encounters may require a new deterministic seed. */
+export const FIGHTER_JOURNEY_SEED = 64;
 export function fighterJourney(seed:number) {
   let state=freshDungeon('fighter-production-journey',seed),healed=false,taunted=false;
   const records:{entry:DungeonState;state:import('../../src/domain/types').BattleState;commands:readonly Command[];events:readonly import('../../src/domain/types').BattleEvent[]}[]=[];
@@ -179,6 +214,7 @@ export function fighterJourney(seed:number) {
       records.push({entry,state:battle.state,commands:witnessCommands(battle.replay?.commands??battle.continuation!.commands),events:battle.events});
       state=checkedDungeon(acceptDungeonBattle(state,battle.state));
       if(battle.state.outcome!=='playerWin')return {seed,records,state,healed,taunted,depth,slot};
+      state=collectEncounterLoot(state,entry);
       for(let i=0;i<20;i++){const command=journeyPreparation(state);if(!command)break;state=checkedDungeon(dungeonItem(state,command));}
     }
     if(depth<2)state=checkedDungeon(travelDungeon(atDownstairs(state),'descend',state.revision));
@@ -241,6 +277,14 @@ export function dungeonContactDetour(initial: DungeonState): number[] {
   throw Error('No bounded encounter interception');
 }
 
+/** A witness explicitly walks to its newly earned item; this is not a grant or an automatic transition. */
+function collectEncounterLoot(state: DungeonState, entry: DungeonState): DungeonState {
+  const contact = entry.encounterEntry?.contact, floor = state.floors[state.depth - 1];
+  if (state.phase !== 'ready' || contact === undefined || !floor.loot?.some(loot => loot.cell === contact && loot.remaining) ||
+      state.depth > 1 && contact === floor.descriptor.upstairs || floor.completed === 3 && contact === floor.descriptor.downstairs) return state;
+  return checkedDungeon(stepDungeon(state, { id: state.id, depth: state.depth, revision: state.revision, destination: contact }));
+}
+
 /** Current-source legal combat witness; its returned histories are replayable, never converted old saves. */
 export function rangerJourney(seed:number) {
   let state=freshDungeon('ranger-production-journey',seed);
@@ -259,6 +303,7 @@ export function rangerJourney(seed:number) {
       records.push({entry,state:battle.state,commands:witnessCommands(battle.replay?.commands??battle.continuation!.commands),events:battle.events});
       state=checkedDungeon(acceptDungeonBattle(state,battle.state));
       if(battle.state.outcome!=='playerWin')return {seed,records,state,used};
+      state=collectEncounterLoot(state,entry);
       for(let i=0;i<20;i++){const command=journeyPreparation(state);if(!command)break;state=checkedDungeon(dungeonItem(state,command));}
     }
     // Continue to a terminal boundary after proving both actions; a finite witness may end in victory or defeat.
@@ -288,6 +333,7 @@ export function mageJourney(seed:number) {
       records.push({entry,state:battle.state,commands:witnessCommands(battle.replay?.commands??battle.continuation!.commands),events:battle.events});
       state=checkedDungeon(acceptDungeonBattle(state,battle.state));
       if(battle.state.outcome!=='playerWin')return {seed,records,state,used};
+      state=collectEncounterLoot(state,entry);
       for(let i=0;i<20;i++){const command=journeyPreparation(state);if(!command)break;state=checkedDungeon(dungeonItem(state,command));}
     }
     if(depth<3)state=checkedDungeon(travelDungeon(atDownstairs(state),'descend',state.revision));

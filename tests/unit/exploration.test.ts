@@ -103,7 +103,7 @@ describe('accepted steps and battle ownership', () => {
   const before=atCell(s,origin),entered=stepDungeon(before,command(before,target));expect(entered.ok).toBe(true);if(!entered.ok)return;
   expect(entered.state.phase).toBe('battle');expect(entered.state.revision).toBe(before.revision+1);expect(currentFloor(entered.state).position).toBe(origin);
   expect(entered.state.encounterEntry).toEqual({origin,contact:target,slot:0});expect(currentFloor(entered.state).exploration.visited).toEqual(currentFloor(before).exploration.visited);
-  const b=entered.state.activeBattle!,win=acceptDungeonBattle(entered.state,{...b,outcome:'playerWin',units:b.units.map(u=>u.side==='enemy'?{...u,hp:0}:u)});expect(win.ok).toBe(true);if(win.ok){expect(currentFloor(win.state).position).toBe(origin);expect(win.state.phase).toBe('reward');expect(acceptDungeonBattle(win.state,b).ok).toBe(false);}
+  const b=entered.state.activeBattle!,win=acceptDungeonBattle(entered.state,{...b,outcome:'playerWin',units:b.units.map(u=>u.side==='enemy'?{...u,hp:0}:u)});expect(win.ok).toBe(true);if(win.ok){expect(currentFloor(win.state).position).toBe(origin);expect(win.state.phase).toBe('ready');expect(currentFloor(win.state).loot?.[0].cell).toBe(target);expect(acceptDungeonBattle(win.state,b).ok).toBe(false);}
   expect(travelDungeon({...atCell(s,target),floors:[{...currentFloor(atCell(s,target)),completed:3}]},'descend',0)).toEqual({ok:false,reason:'remoteStairs'});
  });
  it.each(['quota','security','unavailable','uncertain'])('refuses uncommitted spatial entry on %s',async failure=>{
