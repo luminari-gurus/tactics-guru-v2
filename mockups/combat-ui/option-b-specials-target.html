@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Option B · Target-first specials</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="reviewer">
+    <div>
+      <h1>B · Target-first specials</h1>
+      <small>Tap a target. The bar lists only specials that currently preview as legal. Last-used valid special is preselected.</small>
+    </div>
+    <nav class="b-alt-nav">
+      <a href="option-b.html?state=picker">Chevron</a> ·
+      <a href="option-b-specials-target.html" aria-current="page">Target-first</a> ·
+      <a href="option-b-specials-segment.html">Segment</a> ·
+      <a href="option-b-specials-chips.html">Board chips</a>
+    </nav>
+    <a href="index.html">All options</a>
+    <a href="option-b-specials-target.html?export=1">Export view</a>
+  </header>
+  <main class="stage b-stage">
+    <section class="board-photo b-board" aria-label="Battlefield">
+      <img class="scene" src="assets/board.png" alt="Forest Ruins board">
+      <div class="chip float-chip">
+        <img src="assets/fighter.png" alt="Fighter">
+        <div>
+          <p class="eyebrow">Round 1 · Your turn</p>
+          <h2>Fighter</h2>
+          <p class="hp">HP 18/18</p>
+          <div class="health"><span style="width:100%"></span></div>
+          <p class="meta">AC 14 · Accuracy +4 · Move ready · Action ready</p>
+        </div>
+      </div>
+      <div class="target-ring" aria-hidden="true"></div>
+      <aside class="forecast">
+        <strong>Guarded Strike → Goblin grunt</strong>
+        <span>Hit 55% · +2 vs AC 12 · 5 dmg · last-used, in range</span>
+      </aside>
+    </section>
+    <footer class="bar bar-target" aria-label="Combat actions">
+      <div>
+        <p class="smart">Goblin grunt · 2 specials in range</p>
+        <p class="meta">Far Shot omitted — no legal target. 1 / 2 pick a listed special.</p>
+        <p class="hotkey">Enter confirms Go</p>
+      </div>
+      <div class="valid-row" role="group" aria-label="Specials valid for this target">
+        <button type="button" aria-pressed="true"><strong>Guarded Strike</strong><span>Last used · 55%</span></button>
+        <button type="button"><strong>Extended Strike</strong><span>Range 1–5 · 65%</span></button>
+      </div>
+      <div class="verbs">
+        <button type="button"><strong>Move</strong><span>Reachable</span></button>
+        <button type="button"><strong>Attack</strong><span>Melee</span></button>
+        <button type="button"><strong>Wait</strong><span>End turn</span></button>
+      </div>
+      <button class="gold go">Go</button>
+    </footer>
+  </main>
+  <script src="export.js"></script>
+</body>
+</html>
