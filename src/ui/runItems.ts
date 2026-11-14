@@ -4,8 +4,7 @@ import type { ItemCommand } from '../domain/items';
 import { progressionLabel } from '../domain/progression';
 import { preparationItemTarget, projectItemCatalog } from '../domain/items';
 import type { RunItemSession } from '../app/RunItemSession';
-import type { RunLoadResult } from '../persistence/runStorage';
-import { BattleDialogs, type DialogChoice } from './dialogs';
+import { BattleDialogs } from './dialogs';
 import './runItems.css';
 
 const element = <K extends keyof HTMLElementTagNameMap>(tag: K, text = '') => {
@@ -17,8 +16,7 @@ const effect = (def: ItemDef) => def.effect.kind === 'restoreHp' ? `Restore ${de
   def.effect.kind === 'revive' ? `Revive a fallen hero at ${def.effect.percent}% HP (rounded down, minimum 1)` :
     `+${def.effect.amount} ${def.effect.stat === 'armorClass' ? 'armor class' : 'accuracy'}`;
 /** Mount once per flow, dispose before replacement. Caller owns the sole modal instance. */
-export function mountRunItems(root: HTMLElement, session: RunItemSession, dialogs: BattleDialogs,
-  host?: { continueRun: (load: RunLoadResult) => void; recover: () => void }) {
+export function mountRunItems(root: HTMLElement, session: RunItemSession, dialogs: BattleDialogs) {
   const abort = new AbortController();
   let renderAbort = new AbortController();
   dialogs.element.classList.add('run-item-dialog');
@@ -43,35 +41,6 @@ export function mountRunItems(root: HTMLElement, session: RunItemSession, dialog
   }, { capture: true, signal: abort.signal });
   root.addEventListener('pointerdown', event => event.stopPropagation(), { signal: abort.signal });
   root.addEventListener('click', event => event.stopPropagation(), { signal: abort.signal });
-  const showRecovery = (load: RunLoadResult = session.inspect()) => {
-    const choices: DialogChoice[] = [];
-    if (load.ok) {
-      for (const slot of ['primary', 'backup'] as const) {
-        const value = load.inspection[slot];
-        if ('text' in value && value.text !== null) {
-          const text = value.text;
-          choices.push({ id: `export-${slot}`, label: `Export ${slot} save`, run: () => {
-            const url = URL.createObjectURL(new Blob([JSON.stringify({ slot, text })], { type: 'application/json' }));
-            const link = element('a'); link.href = url; link.download = `tactics-guru-run-${slot}.json`; link.click();
-            setTimeout(() => URL.revokeObjectURL(url), 1000); focus();
-          } });
-          choices.push({ id: `remove-${slot}`, label: `Remove ${slot} save`, run: () => {
-            dialogs.showChoices('Remove saved data?', `Remove the reviewed ${slot} run save? Export it first if needed.`, [
-              { id: 'remove-confirm', label: 'Remove reviewed save', run: () => session.queueWrite(() => { session.remove(slot, load); focus(); }) },
-              { id: 'remove-cancel', label: 'Cancel', run: focus },
-            ], focus);
-          } });
-        }
-      }
-    }
-    choices.push({ id: 'retry-save', label: 'Retry saving', run: () => session.requestSave(focus) },
-      { id: 'recovery-cancel', label: 'Cancel', run: focus });
-    const message = load.ok ? ['primary', 'backup'].map(slot => `${slot}: ${load.inspection[slot as 'primary' | 'backup'].status}`).join('. ')
-      : `Storage ${load.kind}. Play can continue unsaved.`;
-    dialogs.showChoices('Save recovery', message, choices, focus);
-  };
-  // The live flow owns scene navigation and retained recovery copies.
-  const recover = (load?: RunLoadResult) => host ? host.recover() : showRecovery(load);
   const render = () => {
     renderAbort.abort(); renderAbort = new AbortController();
     const { items, activeBattle } = session.snapshot;
@@ -148,18 +117,6 @@ export function mountRunItems(root: HTMLElement, session: RunItemSession, dialog
       row.append(equip); inventory.append(row);
     }
     root.replaceChildren(title, description, status, element('p', unavailable || 'Items may be used now, before the next battle starts.'), party, rewards, inventory);
-    if (session.storage) {
-    const persistence = element('section'); persistence.setAttribute('aria-label', 'Run save');
-    persistence.append(button('Continue saved run', () => {
-      const load = session.inspect();
-      if (!load.ok || !load.selected) { recover(load); return; }
-      dialogs.showChoices('Continue saved run?', load.selected.slot === 'backup' ? 'Recover backup. Some progress may be lost.' : 'Restore the saved run boundary.', [
-        { id: 'continue-run', label: 'Continue', run: () => { if (host) host.continueRun(load); else session.continue(load); focus(); } },
-        { id: 'continue-cancel', label: 'Cancel', run: focus },
-      ], focus);
-    }), button('Save recovery', () => recover()));
-    root.append(persistence);
-    }
   };
   session.onChange = render;
   render();

@@ -1,9 +1,8 @@
+import { reachStandaloneBoundary } from './helpers/standaloneBoundary';
 import { expect, test, type Page } from './helpers/forceRailControls';
 import { BattleSession } from '../src/app/BattleSession';
 import { standaloneCatalog as catalog } from './helpers/playerPolicy';
-import { encodeBattleSave } from '../src/domain/saveEnvelope';
 import type { BattleState } from '../src/domain/types';
-import { BATTLE_STORAGE_KEYS as keys } from '../src/persistence/battleStorage';
 import { pickTile, screenToBoard } from '../src/geometry/picking';
 import { HEALTH_BAR, healthColor, healthFraction } from '../src/phaser/healthBar';
 import { playCommand, playerDecision, readSession, confirmRestart } from './helpers/battlePolicy';
@@ -46,13 +45,9 @@ function damageBoundary(defeat=false) {
   throw Error('No legal damage boundary');
 }
 async function bootBoundary(page:Page,state:BattleState) {
-  const encoded=encodeBattleSave(state,catalog);if(!encoded.ok)throw Error(encoded.reason);
-  await page.addInitScript(({keys,text})=>{
-    if(!sessionStorage.getItem('test:health-seeded')) {
-      localStorage.setItem(keys.primary,text);localStorage.setItem(keys.backup,text);sessionStorage.setItem('test:health-seeded','yes');
-    }
-  },{keys,text:encoded.text});
-  await page.clock.install();await page.goto('./?game=battle');await page.locator('#save-continue').click();await ready(page);
+  test.setTimeout(180000);
+  await page.clock.install();
+  await reachStandaloneBoundary(page,state);
 }
 async function confirmFrozen(page:Page) {
   await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
@@ -120,7 +115,7 @@ test('elevated movement keeps bars attached through refresh, rotation and restar
   await page.clock.runFor(48);const moving=await report(page);check(moving);
   const actor=moving.units.find((u:any)=>u.id===initial.activeId);expect(actor.position).not.toEqual(initial.units.find((u:any)=>u.id===initial.activeId).position);
   await page.screenshot({path:info.outputPath('health-moving.png')});
-  await page.locator('#fit-restart').click({force:true});await page.locator('#save-cancel-reset').click({force:true});check(await report(page));
+  await page.locator('#fit-restart').click({force:true});await page.locator('#battle-cancel-restart').click({force:true});check(await report(page));
   const size=page.viewportSize()!;await page.setViewportSize({width:size.height,height:size.width});await page.clock.runFor(32);check(await report(page));
   await page.clock.runFor(1000);await ready(page);check(await report(page),(await readSession(page)).state);
   expect((await report(page)).units.find((u:any)=>u.id===initial.activeId).tile).toEqual({...to,elevation:1});
@@ -132,7 +127,7 @@ test('elevated movement keeps bars attached through refresh, rotation and restar
   }
 });
 
-for(const defeat of [false,true])test(`health follows ${defeat?'defeat':'damage'} presentation, cancellation and save resume`,async({page},info)=>{
+for(const defeat of [false,true])test(`health follows ${defeat?'defeat':'damage'} presentation, cancellation and fresh reload`,async({page},info)=>{
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
   const fixture=damageBoundary(defeat);await bootBoundary(page,fixture.before);const baseline=(await report(page)).objectCount;
   check(await report(page),fixture.before);await prepareCommand(page,fixture);
@@ -147,8 +142,8 @@ for(const defeat of [false,true])test(`health follows ${defeat?'defeat':'damage'
   const after=await report(page);check(after,fixture.after);expect(after.objectCount).toBe(baseline);
   if(defeat)expect(after.units.filter((u:any)=>!u.health.visible).length).toBeGreaterThan(fixture.before.units.filter(u=>u.hp===0).length);
   await page.screenshot({path:info.outputPath(`health-${defeat?'defeat':'damage'}-complete.png`)});
-  await page.reload();await page.clock.resume();await page.locator('#save-continue').click();await ready(page);
-  check(await settled(page),fixture.after);expect((await readSession(page)).events).toEqual([]);expect((await report(page)).objectCount).toBe(baseline);expect(errors).toEqual([]);
+  await page.reload();await page.clock.resume();await ready(page);
+  check(await settled(page),(await readSession(page)).state);expect((await readSession(page)).state.seed).toBe(1);expect((await report(page)).objectCount).toBe(baseline);expect(errors).toEqual([]);
 });
 
 test('real run reward healing carries into the next encounter without old bars',async({page},info)=>{

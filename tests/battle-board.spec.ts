@@ -6,8 +6,7 @@ import { MAX_ZOOM, pickTile, screenToBoard } from '../src/geometry/picking';
 import { fitBoard, projectTile, tileFaces, type Point } from '../src/geometry/iso';
 import { BattleSession } from '../src/app/BattleSession';
 import { hoverPreview } from '../src/ui/targetPreview';
-import { encodeBattleSave } from '../src/domain/saveEnvelope';
-import { BATTLE_STORAGE_KEYS } from '../src/persistence/battleStorage';
+import { reachStandaloneBoundary } from './helpers/standaloneBoundary';
 import { playerDecision } from './helpers/playerPolicy';
 import { unitBounds } from '../src/geometry/canopy';
 
@@ -21,11 +20,8 @@ async function occlusionBoundary(page: Page, count: number) {
     session.finishPresentation(step.token);
   }
   expect(session.phase).toBe('player');
-  const save = encodeBattleSave(session.state, battleCatalog);
-  if (!save.ok) throw Error(save.reason);
-  await page.addInitScript(({key, text}) => localStorage.setItem(key, text), {key:BATTLE_STORAGE_KEYS.primary, text:save.text});
-  await page.goto('./?game=battle'); await page.locator('#save-continue').click();
-  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  test.setTimeout(180000);
+  await reachStandaloneBoundary(page, session.state);
   await expect(page).toHaveTitle('Tactics Guru v2');
   await expect(page.locator('#battle-shell')).toBeVisible();
   await expect(page.locator('vite-error-overlay')).toHaveCount(0);

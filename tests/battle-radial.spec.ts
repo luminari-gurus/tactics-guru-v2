@@ -508,17 +508,17 @@ test('combat controls persist Radial across a reload', async ({ page }) => {
   expect(await page.evaluate(key => localStorage.getItem(key), COMBAT_CONTROLS_KEY)).toBe('auto');
 });
 
-test.describe('radial saved-game boundary',()=>{
-  test('radial menu battle preserves its accepted state through Continue',async({page})=>{
+test.describe('radial session boundary',()=>{
+  test('radial menu battle starts fresh on reload',async({page})=>{
     await page.goto('./');await page.getByRole('link',{name:'Standalone battle',exact:true}).click();
     await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await expect.poll(()=>combatSkin(page)).toBe('radial');
     const initial=(await readSession(page)).state;
     await page.getByRole('button',{name:'End turn',exact:true}).click();
     await expect.poll(async()=>(await readSession(page)).state.commandCount).toBeGreaterThan(initial.commandCount);
-    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');const saved=(await readSession(page)).state;
-    const primary=await page.evaluate(key=>localStorage.getItem(key),BATTLE_STORAGE_KEYS.primary);expect(primary).not.toBeNull();
-    await page.reload();await page.locator('#save-continue').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-    expect((await readSession(page)).state).toEqual(saved);expect((await readSession(page)).events).toEqual([]);
+    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    const primary=await page.evaluate(key=>localStorage.getItem(key),BATTLE_STORAGE_KEYS.primary);expect(primary).toBeNull();
+    await page.reload();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    expect((await readSession(page)).state).toEqual(initial);
     expect(await page.evaluate(key=>localStorage.getItem(key),BATTLE_STORAGE_KEYS.primary)).toBe(primary);
   });
 });

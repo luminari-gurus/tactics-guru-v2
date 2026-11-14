@@ -1,74 +1,13 @@
-import {expect,test,type Page,installRailControls} from './helpers/forceRailControls';
-import {readFileSync,writeFileSync} from 'node:fs';
-import {readSession,playCommand,playUndo,checkActivePlaytime,checkBackgroundPlaytime} from './helpers/battlePolicy';
+import {expect,test,type Page} from './helpers/forceRailControls';
+import {writeFileSync} from 'node:fs';
+import {readSession,playCommand,playUndo} from './helpers/battlePolicy';
 import {playerDecision} from './helpers/playerPolicy';
 import {runContext} from './helpers/runItemFixtures';
 import {runBattleCatalog,type RunSnapshot} from '../src/domain/runSaveEnvelope';
 import {replayRunBattle} from '../src/domain/runBattle';
-// Exercise actual BFCache rather than Playwright's default disabled cache.
-test.use({launchOptions:async({browserName},use)=>{
-  await use({executablePath:browserName==='chromium'?process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE:undefined,ignoreDefaultArgs:['--disable-back-forward-cache']});
-}});
-import {legalDefeatSaves} from './helpers/runRecoveryFixtures';
 import {RUN_STORAGE_KEYS} from '../src/persistence/runStorage';
 import {RUN_RECORD_KEYS} from '../src/persistence/runRecordsStorage';
-async function historyRows(page:Page){return page.evaluate(keys=>{
- const text=localStorage.getItem(keys.primary);return text?JSON.parse(text).records:[];
-},RUN_RECORD_KEYS);}
 
-test('run statistics: active time excludes recovery, visibility, blur and menu sessions', async ({page}, info) => {
- test.setTimeout(90000); await start(page);
- await page.getByRole('button',{name:'Save recovery',exact:true}).click();
- await expect(page.getByRole('heading',{name:'Run save recovery',exact:true})).toBeVisible();
- const clock=await checkActivePlaytime(page,RUN_STORAGE_KEYS.primary,'#run-close-recovery');
- await page.getByRole('link',{name:'Main menu',exact:true}).last().click({force:true});
- await expect(page.getByRole('button',{name:'Continue',exact:true})).toBeVisible();
- const saved=await page.evaluate(key=>localStorage.getItem(key),RUN_STORAGE_KEYS.primary);
- await page.clock.fastForward(60000);expect(await page.evaluate(key=>localStorage.getItem(key),RUN_STORAGE_KEYS.primary)).toBe(saved);
- await page.clock.resume();await page.getByRole('button',{name:'Continue',exact:true}).click();
- await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- expect((await snapshot(page)).stats?.activeMs).toBe(clock.activeMs);
- await info.attach('active-playtime',{body:JSON.stringify({...clock,visibility:'synthetic hidden/blur; fake browser clock',navigation:'actual menu departure and Continue'}),contentType:'application/json'});
-});
-
-test('run statistics: actual background tab pauses active time',async({page},info)=>{
- test.setTimeout(60000);await start(page);
- const evidence=await checkBackgroundPlaytime(page,RUN_STORAGE_KEYS.primary);
- await info.attach('actual-background-playtime',{body:JSON.stringify(evidence),contentType:'application/json'});
-});
-
-test('run statistics: cancel a held checkpoint and keep reviewed replacement bytes stable',async({page})=>{
- test.setTimeout(60000);await start(page);const oldId=(await snapshot(page)).items.run.id;
- await page.evaluate(key=>new Promise<void>(granted=>{
-  void navigator.locks.request(key,()=>new Promise<void>(release=>{(window as any).releaseRunCheckpoint=release;granted();}));
- }),RUN_STORAGE_KEYS.primary);
- try {
-  await page.locator('#fit-restart').click();await expect(page.getByRole('heading',{name:'Saving journey',exact:true})).toBeVisible();
-  await page.locator('#run-cancel-flush').click();await expect(page.getByRole('dialog')).not.toBeVisible();
-  const before=await readSession(page);await playCommand(page,{type:'endTurn',unitId:before.state.initiative[before.state.activeIndex]});
-  await page.evaluate(()=>(window as any).releaseRunCheckpoint());
-  await expect.poll(()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)!).payload.activeBattle.commandCount,RUN_STORAGE_KEYS.primary)).toBeGreaterThan(before.state.commandCount);
-  await expect(page.getByRole('dialog')).not.toBeVisible();
-  await page.locator('#fit-restart').click();await expect(page.getByRole('heading',{name:'Start new run?',exact:true})).toBeVisible();
-  const bytes=await page.evaluate(keys=>[localStorage.getItem(keys.primary),localStorage.getItem(keys.backup)],RUN_STORAGE_KEYS);
-  await page.clock.install();await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));await page.clock.fastForward(60000);
-  expect(await page.evaluate(keys=>[localStorage.getItem(keys.primary),localStorage.getItem(keys.backup)],RUN_STORAGE_KEYS)).toEqual(bytes);
-  await page.locator('#run-confirm-new').click({force:true});await expect(page.locator('#run-start-encounter')).toBeVisible();
-  await expect.poll(()=>historyRows(page)).toMatchObject([{id:oldId,outcome:'abandoned',stats:{coverage:'whole-run'}}]);
- } finally {await page.evaluate(()=>(window as any).releaseRunCheckpoint?.());await page.clock.resume();}
-});
-async function loadLegalDefeat(page:Page){
- await test.step('reach legal outcome',async()=>{
-  const {primary,backup}=legalDefeatSaves();
-  await page.goto('/?game=run');
-  await page.evaluate(({keys,primary,backup})=>{
-   localStorage.setItem(keys.primary,primary);localStorage.setItem(keys.backup,backup);
-  },{keys:RUN_STORAGE_KEYS,primary,backup});
-  await page.reload();await page.locator('#run-continue').click();
-  await expect(page.getByRole('heading',{name:'Run defeat',exact:true})).toBeVisible();
-  expect(await page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),RUN_STORAGE_KEYS)).toEqual({primary,backup});
- });
-}
 async function snapshot(page:Page):Promise<RunSnapshot>{return JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!);}
 async function start(page:Page){
  await page.goto('/?game=run');await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
@@ -104,32 +43,25 @@ async function prepare(page:Page){
  }
  await expect(page.locator('#run-item-status')).not.toHaveText('Saving run…');
 }
-test('run battle undo survives reload and a legal terminal journey',async({page,isMobile})=>{
+test('run battle undo and a legal terminal journey reset on reload',async({page,isMobile})=>{
  test.setTimeout(300000);await start(page);const entry=await snapshot(page);
- expect(entry.stats).toMatchObject({coverage:'whole-run',movesTaken:0,enemiesKilled:0});
+ expect(entry.stats).toBeUndefined();
  await page.locator('canvas').focus();await page.keyboard.press('a');
  await expect(page.locator('[data-action=basic]')).toHaveAttribute('aria-pressed','true');
  await page.keyboard.press('m');await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');
  expect(await snapshot(page)).toEqual(entry);
  const catalog=runBattleCatalog(entry.items,runContext)!;const restored=await playUndo(page,catalog,isMobile);
- const statsAfterUndo=(await snapshot(page)).stats;expect(statsAfterUndo?.movesTaken).toBe(0);
- await page.reload();await page.locator('#run-continue').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- expect((await readSession(page)).state).toEqual(restored);await expect(page.locator('#battle-undo')).toBeDisabled();
- expect((await snapshot(page)).stats).toEqual(statsAfterUndo);
+ expect((await readSession(page)).state).toEqual(restored);
+ await expect(page.locator('#battle-undo')).toBeDisabled();
  await fight(page,true);await expect(page.getByRole('heading',{name:'Run defeat',exact:true})).toBeVisible();
  const ended=await snapshot(page);await page.keyboard.press('c');await page.keyboard.press('w');
- expect(ended.stats).toMatchObject({movesTaken:0,enemiesKilled:0});
- await expect.poll(()=>historyRows(page)).toMatchObject([{id:ended.items.run.id,outcome:'defeat'}]);
- const recorded=await historyRows(page);
- const {boundary:_receipt,...frozenStats}=ended.stats!;expect(recorded[0].stats).toEqual(frozenStats);
- expect(frozenStats.activeMs).toBeGreaterThan(0);
  expect(await snapshot(page)).toEqual(ended);
- await page.reload();await page.locator('#run-continue').click();await expect(page.getByRole('heading',{name:'Run defeat',exact:true})).toBeVisible();
- expect(await historyRows(page)).toEqual(recorded);
- await page.locator('#run-new').click();await expect(page.locator('#run-start-encounter')).toBeVisible();
- expect(await historyRows(page)).toEqual(recorded);
+ await page.reload();await expect(page.locator('#run-start')).toBeVisible();
+ await expect(page.locator('#run-continue')).toHaveCount(0);
+ expect((await snapshot(page)).items.run.id).not.toBe(ended.items.run.id);
+ expect(await page.evaluate(keys=>keys.map(key=>localStorage.getItem(key)),[...Object.values(RUN_STORAGE_KEYS),...Object.values(RUN_RECORD_KEYS)])).toEqual([null,null,null,null]);
 });
-test('legal run outcomes, earned rewards, terminal resume and fresh restart',async({page})=>{
+test('legal run outcomes, earned rewards and fresh restart',async({page})=>{
  test.setTimeout(300000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await start(page);await page.locator('#battle-sound').click();const records=[];let usedDraught=false;
  for(let index=0;index<3;index++){
   // Each encounter constructs a fresh shared renderer; prior selections cannot leak.
@@ -158,31 +90,21 @@ test('legal run outcomes, earned rewards, terminal resume and fresh restart',asy
   const record=JSON.parse((await page.locator('#game').getAttribute('data-run-battle-record'))!);const replay=replayRunBattle(record.replay,record.entry,runContext);expect(replay.ok).toBe(true);if(replay.ok){expect(replay.state).toEqual(record.state);expect(replay.events).toEqual(record.events);}records.push(record);
   if(current.items.run.phase==='defeat')break;
   if(index<2){
-   // The pending offer and claimed/prepared boundary survive the real Continue path.
-   if(index===1){await page.reload();await page.locator('#run-continue').click();expect(await snapshot(page)).toEqual(current);}
-   await prepare(page);const prepared=await snapshot(page);if(index===1){await page.reload();await page.locator('#run-continue').click();expect(await snapshot(page)).toEqual(prepared);}
+   await prepare(page);
+   expect((await snapshot(page)).items.run.encounterIndex).toBe(index+1);
    await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-   await expect(page.locator('#battle-sound')).toHaveAttribute('aria-pressed',index===0?'true':'false');
+   await expect(page.locator('#battle-sound')).toHaveAttribute('aria-pressed','true');
   }
  }
  const final=await snapshot(page);await expect(page.getByRole('heading',{name:final.items.run.phase==='victory'?'Run victory':'Run defeat',exact:true})).toBeVisible();
- await expect.poll(()=>historyRows(page)).toMatchObject([{id:final.items.run.id,outcome:final.items.run.phase}]);
- const recordedHistory=await historyRows(page);
  expect(final.items.run.phase).toBe('victory');
- const {boundary:_,...frozen}=final.stats!;
- expect(recordedHistory[0].stats).toEqual(frozen);expect(frozen.activeMs).toBeGreaterThan(0);
- expect(frozen.enemiesKilled).toBe(records.reduce((sum,record)=>sum+record.events.filter((event:{type:string;unitId:number})=>
-  event.type==='defeated'&&record.state.units.some((unit:{id:number;side:string})=>unit.id===event.unitId&&unit.side==='enemy')).length,0));
- expect(frozen.movesTaken).toBe(records.reduce((sum,record)=>sum+record.events.reduce((moves:number,event:{type:string;unitId:number})=>
-  moves+(record.state.units.some((unit:{id:number;side:string})=>unit.id===event.unitId&&unit.side==='player')?(event.type==='moved'?1:event.type==='moveUndone'?-1:0):0),0),0));
+ expect(records).toHaveLength(3);
  expect(usedDraught).toBe(true);
  expect(final.items.ownership.consumables.some(stack=>stack.itemId==='item:healing_draught')).toBe(false);
  await page.screenshot({path:test.info().outputPath('run-terminal.png')});
  writeFileSync(test.info().outputPath('run-records.json'),JSON.stringify(records,null,2));
- await page.reload();await page.locator('#run-continue').click();expect(await snapshot(page)).toEqual(final);
- expect(await historyRows(page)).toEqual(recordedHistory);
  await page.locator('#run-new').dblclick();await expect(page.locator('#run-start-encounter')).toBeVisible();const fresh=await snapshot(page);expect(fresh.items.run.seed).toBe(14);expect(fresh.items.run.id).not.toBe(final.items.run.id);expect(fresh.items.ownership).toEqual({consumables:[],equipment:[],assignments:[]});expect(fresh.items.run.party.every(h=>h.hp===runContext.catalog.heroes[h.heroId].stats.maxHp)).toBe(true);
- expect(await historyRows(page)).toEqual(recordedHistory);expect(errors).toEqual([]);
+ expect(errors).toEqual([]);
 });
 test('testing routes: an earned combat draught stays in the transient authored run',async({page})=>{
  test.setTimeout(300000);
@@ -214,285 +136,4 @@ test('testing routes: an earned combat draught stays in the transient authored r
  await expect(page.locator('#run-continue')).toHaveCount(0);
  expect(await attempts()).toEqual([]);
  expect(errors).toEqual([]);
-});
-test('legal defeat reload, native keyboard restart and isolated single-battle save',async({page})=>{
- test.setTimeout(180000);await start(page);
- await expect(page.locator('#fit-board-controls')).not.toBeVisible();
- await expect(page.locator('#fit-measurements')).not.toBeVisible();
- await expect(page.getByRole('button',{name:'Start new run',exact:true})).toBeEnabled();
- await fight(page,true);await expect(page.getByRole('heading',{name:'Run defeat',exact:true})).toBeVisible();
- const ended=await snapshot(page);await page.reload();await page.locator('#run-continue').click();expect(await snapshot(page)).toEqual(ended);
- await page.locator('#run-new').focus();await page.keyboard.press('Enter');await expect(page.locator('#run-start-encounter')).toBeVisible();
- const saved=await snapshot(page),slots=await page.evaluate(keys=>[localStorage.getItem(keys.primary),localStorage.getItem(keys.backup)],RUN_STORAGE_KEYS);
- await page.getByRole('link',{name:'Single battle',exact:true}).click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- const run=await page.evaluate(key=>localStorage.getItem(key),RUN_STORAGE_KEYS.primary);expect(JSON.parse(run!).payload.items.run.encounterIndex).toBe(0);
- await page.getByRole('link',{name:'Play three-encounter run'}).click();await expect(page.locator('#run-start')).toBeVisible();await expect(page.locator('#run-continue')).toHaveCount(0);
- expect(await page.evaluate(keys=>[localStorage.getItem(keys.primary),localStorage.getItem(keys.backup)],RUN_STORAGE_KEYS)).toEqual(slots);
- await page.getByRole('link',{name:'Main menu',exact:true}).click();await page.getByRole('button',{name:'Continue',exact:true}).click();
- await expect(page.locator('#run-start-encounter')).toBeVisible();expect(await snapshot(page)).toEqual(saved);
-});
-test('accepted player presentation reload preserves exact boundary without old cues',async({page})=>{
- await start(page);await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});
- await page.clock.install();await page.clock.pauseAt(new Date(Date.now()+1000));await page.locator('#battle-review').click({force:true});
- await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
- await expect(page.locator('#battle-persistence')).toContainText('Run saved on this device');
- const committed=await snapshot(page);
- await page.reload();await page.clock.resume();await page.locator('#run-continue').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- expect((await readSession(page)).state).toEqual(committed.activeBattle);expect((await readSession(page)).events).toEqual([]);expect(await page.evaluate(()=>window.fitDiagnostics().battleAudio?.lastToken)).toBe(0);
- await expect(page.locator('#battle-move')).toBeDisabled();await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','false');
-});
-test('enemy presentation reload resumes the same commands and RNG as an uninterrupted run',async({page,browser,baseURL})=>{
- const other=await browser.newContext({viewport:page.viewportSize(),baseURL});
- await installRailControls(other);
- const control=await other.newPage();
- try {
-  for(const p of [page,control]){
-   await p.clock.install();await start(p);await p.clock.pauseAt(await p.evaluate(()=>Date.now()+1000));
-   for(let i=0;i<100;i++){
-    const s=await readSession(p),last=s.replay?.commands.at(-1);
-    if(s.phase==='presenting' && last && s.state.units.find(u=>u.id===last.unitId)!.side==='enemy')break;
-    if(s.phase==='player')await p.locator('#battle-next').click({force:true});
-    await p.clock.runFor(32);
-   }
-  }
-  const boundary=await readSession(page);expect(boundary.phase).toBe('presenting');const last=boundary.replay!.commands.at(-1)!;expect(boundary.state.units.find(u=>u.id===last.unitId)!.side).toBe('enemy');
-  expect((await readSession(control)).state).toEqual(boundary.state);
-  await expect(page.locator('#battle-persistence')).toContainText('Run saved on this device');
-  await page.reload();await page.clock.resume();await page.locator('#run-continue').click();await control.clock.resume();
-  for(const p of [page,control])await expect(p.locator('#game')).toHaveAttribute('data-phase','player');
-  const resumed=await readSession(page),uninterrupted=await readSession(control);expect(resumed.state).toEqual(uninterrupted.state);
-  const catalog=runBattleCatalog((await snapshot(page)).items,runContext)!;const command=playerDecision(resumed.state,catalog);
-  for(const p of [page,control]){await playCommand(p,command);await expect(p.locator('#game')).toHaveAttribute('data-phase','player');}
-  expect((await readSession(page)).state).toEqual((await readSession(control)).state);
- }finally{await other.close();}
-});
-test('run startup preserves corrupt bytes, recovery captures input, and unavailable storage permits unsaved play',async({page})=>{
- await page.goto('/?game=run');
- await expect(page.locator('#run-start')).toBeVisible();
- expect(await page.evaluate(keys=>keys.map(key=>localStorage.getItem(key)),Object.values(RUN_STORAGE_KEYS))).toEqual([null,null]);
- expect((await snapshot(page)).activeBattle).toBeNull();
- await page.evaluate(key=>localStorage.setItem(key,'{bad'),RUN_STORAGE_KEYS.primary);await page.reload();
- expect(await page.evaluate(key=>localStorage.getItem(key),RUN_STORAGE_KEYS.primary)).toBe('{bad');
- await page.locator('#run-recovery').click();await expect(page.getByRole('dialog')).toContainText('primary: invalid');
- const visited=new Set<string>();
- for(const key of ['Tab','Shift+Tab'])for(let i=0;i<8;i++){
-  await page.keyboard.press(key);expect(await page.evaluate(()=>!!document.activeElement?.closest('dialog'))).toBe(true);
-  visited.add(await page.evaluate(()=>document.activeElement!.id));
- }
- for(const id of await page.getByRole('dialog').getByRole('button').evaluateAll(buttons=>buttons.map(b=>b.id)))expect(visited.has(id)).toBe(true);
- await page.locator('#run-close-recovery').click();await page.locator('#run-start').click();await page.locator('#run-confirm-new').click();await expect(page.locator('#run-start-encounter')).toBeVisible();
- await page.reload();await page.addInitScript(()=>{Object.defineProperty(window,'localStorage',{get(){throw new DOMException('denied','SecurityError');}});});await page.reload();
- await page.locator('#run-unsaved').click();await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await expect(page.locator('#battle-persistence')).toContainText('unsaved');
-});
-test('run preparation and dialogs retain 44px controls, native touch and narrow layout',async({page},info)=>{
- await page.goto('/?game=run');const activate=async(selector:string)=>{if(info.project.use.hasTouch)await page.locator(selector).tap();else await page.locator(selector).click();};
- await activate('#run-start');await expect(page.locator('#run-start-encounter')).toBeVisible();
- for(const viewport of [{width:320,height:568},{width:915,height:412},{width:412,height:915}]){
-  await page.setViewportSize(viewport);
-  const boxes=await page.locator('#run-screen button,#run-screen a,#run-screen select').evaluateAll(nodes=>nodes.filter(n=>n.getClientRects().length).map(n=>{n.scrollIntoView({block:'nearest'});const r=n.getBoundingClientRect();return{width:r.width,height:r.height,left:r.left,right:r.right};}));
-  for(const box of boxes){expect(box.width).toBeGreaterThanOrEqual(44);expect(box.height).toBeGreaterThanOrEqual(44);expect(box.left).toBeGreaterThanOrEqual(0);expect(box.right).toBeLessThanOrEqual(viewport.width);}
-  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
- }
- await activate('#run-start-encounter');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- await page.locator('#battle-party').focus();await page.locator('#fit-restart').click();await expect(page.getByRole('dialog')).toBeVisible();const before=await snapshot(page);await page.mouse.click(3,3);expect(await snapshot(page)).toEqual(before);await page.locator('#run-cancel-new').click();
- await expect(page.locator('#fit-restart')).toBeFocused();
- await page.locator('#battle-sound').click();await page.locator('#fit-restart').click();await page.locator('#run-confirm-new').click();await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await expect(page.locator('#battle-sound')).toHaveAttribute('aria-pressed','true');
-});
-
-for(const flushed of [false,true])test(flushed?'run statistics: Chromium BFCache survives normal navigation':'cached run return cannot overwrite either slot of a newer replacement',async({page,context,baseURL})=>{
- if(flushed)await page.addInitScript(()=>window.addEventListener('pageshow',event=>{if(event.persisted)sessionStorage.setItem('issue270:cached-run','yes');}));
- await start(page);const first=(await snapshot(page)).items.run.id;
- if(flushed){await expect(page.locator('#battle-persistence')).toContainText('Run saved on this device');await page.getByRole('link',{name:'Single battle',exact:true}).first().click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');}
- else {await page.goto(new URL('map',baseURL).href);await expect(page.locator('#map-grid span')).toHaveCount(400);}
- const replacement=await context.newPage();await replacement.goto('/?game=run');
- await replacement.locator('#run-start').click();await replacement.locator('#run-confirm-new').click();
- await expect(replacement.locator('#run-item-status')).toHaveText('Run saved on this device');
- const fresh=await snapshot(replacement);expect(fresh.items.run.id).not.toBe(first);expect(fresh.items.run.seed).toBe(14);
- const stored=()=>page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),RUN_STORAGE_KEYS);
- const before=await stored();await replacement.close();await page.goBack({waitUntil:'commit'});
- await expect(page.locator('#run-continue')).toBeVisible();expect(await stored()).toEqual(before);
- if(flushed)expect(await page.evaluate(()=>sessionStorage.getItem('issue270:cached-run'))).toBe('yes');
- await page.locator('#run-continue').click();expect(await snapshot(page)).toEqual(fresh);
-});
-
-test('review: in-flow Continue resumes an ongoing backup battle after legal defeat',async({page})=>{
- await loadLegalDefeat(page);
- await expect(page.getByRole('heading',{name:'Run defeat',exact:true})).toBeVisible();
- const backup=await page.evaluate(key=>localStorage.getItem(key),RUN_STORAGE_KEYS.backup);
- const expected=JSON.parse(backup!).payload.activeBattle;expect(expected.outcome).toBe('ongoing');
- await page.getByRole('button',{name:'Save recovery',exact:true}).click();
- await page.getByRole('dialog').getByRole('button',{name:'Remove primary save',exact:true}).click();
- await page.getByRole('dialog').getByRole('button',{name:'Remove reviewed save',exact:true}).click();
- await page.locator('#run-close-recovery').click();
- await page.getByRole('button',{name:'Continue saved run',exact:true}).click();
- await page.clock.install();await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
- await page.getByRole('dialog').getByRole('button',{name:'Continue',exact:true}).click({force:true});
- await page.clock.runFor(32);
- await expect(page.locator('#run-screen')).toBeHidden();await expect(page.locator('#game')).toHaveCSS('visibility','visible');
- // Asset decoding may finish after the first two frames; advance only until the restored projection is published.
- await expect.poll(async()=>{
-  if(await page.locator('#game').getAttribute('data-session'))return true;
-  await page.clock.runFor(16);return (await page.locator('#game').getAttribute('data-session'))!==null;
- },{intervals:[50,100,200]}).toBe(true);
- expect((await readSession(page)).continuation?.snapshot).toEqual(expected);expect(await page.locator('canvas').count()).toBe(1);
- await page.clock.resume();await expect(page.getByRole('heading',{name:'Run defeat',exact:true})).toBeVisible();
-});
-test('review: read-level SecurityError permits explicit unsaved play without changing inaccessible bytes',async({page})=>{
- await page.goto('/?game=run');await page.evaluate(keys=>{localStorage.setItem(keys.primary,'preserve primary');localStorage.setItem(keys.backup,'preserve backup');},RUN_STORAGE_KEYS);
- await page.addInitScript(keys=>{
-  const read=Storage.prototype.getItem,write=Storage.prototype.setItem,remove=Storage.prototype.removeItem,calls:string[]=[];
-  const owns=(key:string)=>Object.values(keys).some(value=>value===key);
-  Storage.prototype.getItem=function(key){if(owns(key))throw new DOMException('Read denied','SecurityError');return read.call(this,key);};
-  Storage.prototype.setItem=function(key,value){if(owns(key))calls.push('write:'+key);return write.call(this,key,value);};
-  Storage.prototype.removeItem=function(key){if(owns(key))calls.push('remove:'+key);return remove.call(this,key);};
-  Object.assign(window,{reviewReadEvidence:()=>({primary:read.call(localStorage,keys.primary),backup:read.call(localStorage,keys.backup),calls})});
- },RUN_STORAGE_KEYS);
- await page.reload();await expect(page.locator('#run-continue')).toHaveCount(0);
- await page.locator('#run-recovery').click();await expect(page.getByRole('dialog')).toContainText('primary: unavailable. backup: unavailable');await page.getByRole('button',{name:'Close',exact:true}).click();
- await page.locator('#run-unsaved').click();await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- await page.locator('#battle-next').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await expect(page.locator('#battle-persistence')).toContainText('unsaved');
- expect(await page.evaluate(()=>(window as unknown as {reviewReadEvidence:()=>unknown}).reviewReadEvidence())).toEqual({primary:'preserve primary',backup:'preserve backup',calls:[]});
-});
-test('review: reopened outcome recovery exports the exact retained backup after partial reset',async({page})=>{
- await loadLegalDefeat(page);const ended=await snapshot(page);
- const saved=await page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),RUN_STORAGE_KEYS);expect(saved.backup).not.toBeNull();
- await page.evaluate(primary=>{const remove=Storage.prototype.removeItem;Storage.prototype.removeItem=function(key){if(key===primary)throw new DOMException('Removal denied','SecurityError');return remove.call(this,key);};},RUN_STORAGE_KEYS.primary);
- await page.locator('#run-new').click();await expect(page.getByRole('button',{name:'Export backup save',exact:true})).toBeVisible();
- await page.getByRole('button',{name:'Close',exact:true}).click();await page.getByRole('button',{name:'Save recovery',exact:true}).click();
- await expect(page.getByRole('button',{name:'Export backup save',exact:true})).toBeVisible();
- const downloadPromise=page.waitForEvent('download');await page.getByRole('button',{name:'Export backup save',exact:true}).click();const download=await downloadPromise;
- expect(JSON.parse(readFileSync((await download.path())!,'utf8'))).toEqual({slot:'backup',text:saved.backup});
- expect(await snapshot(page)).toEqual(ended);
- expect(await page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),RUN_STORAGE_KEYS)).toEqual({primary:saved.primary,backup:null});
-});
-for(const dismiss of ['Escape','Close'] as const)test(`review: recovery dismissal via ${dismiss} retains connected visible keyboard focus`,async({page})=>{
- async function checkFocus(){
-  const recovery=page.getByRole('button',{name:'Save recovery',exact:true});const before=await snapshot(page);
-  await recovery.focus();await page.keyboard.press('Enter');await expect(page.getByRole('dialog')).toBeVisible();
-  if(before.activeBattle){
-   const viewport=page.viewportSize()!;
-   await page.setViewportSize({width:viewport.height,height:viewport.width});
-   await page.setViewportSize(viewport);
-  }
-  if(dismiss==='Escape')await page.keyboard.press('Escape');
-  else {await page.getByRole('dialog').getByRole('button',{name:'Close',exact:true}).focus();await page.keyboard.press('Enter');}
-  await expect(page.getByRole('dialog')).not.toBeVisible();await expect(recovery).toBeVisible();await expect(recovery).toBeFocused();await expect(recovery).toBeInViewport();
-  expect(await recovery.evaluate(node=>node.isConnected && document.activeElement===node)).toBe(true);expect(await snapshot(page)).toEqual(before);
- }
- await page.goto('/?game=run');await page.locator('#run-start').click();await expect(page.locator('#run-start-encounter')).toBeVisible();
- await checkFocus(); // The mounted preparation controls are replaced on dismissal.
- await page.reload();await expect(page.locator('#run-continue')).toBeVisible();await checkFocus();
- await page.locator('#run-continue').click();await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- await checkFocus(); // Battle controls stay mounted and keep their existing return behavior.
-});
-
-for(const exit of ['Cancel','Escape','Export'] as const)test(`review repair: startup Continue survives ${exit}`,async({page})=>{
- await page.goto('/?game=run');await page.locator('#run-start').click();
- const saved=await snapshot(page);expect(saved.items.run.seed).toBe(13);
- const bytes=await page.evaluate(keys=>Object.values(keys).map(k=>localStorage.getItem(k)),RUN_STORAGE_KEYS);
- await page.reload();
- if(exit==='Export'){
-  await page.locator('#run-recovery').click();const pending=page.waitForEvent('download');
-  await page.getByRole('button',{name:'Export primary save',exact:true}).click();const download=await pending;
-  expect(JSON.parse(readFileSync((await download.path())!,'utf8')).text).toBe(bytes[0]);
- }else{
-  await page.locator('#run-start').click();
-  if(exit==='Cancel')await page.locator('#run-cancel-new').click();else await page.keyboard.press('Escape');
- }
- await expect(page.getByRole('dialog')).not.toBeVisible();
- await page.locator('#run-continue').click();await expect(page.locator('#run-start-encounter')).toBeVisible();
- expect(await snapshot(page)).toEqual(saved);
- expect(await page.evaluate(keys=>Object.values(keys).map(k=>localStorage.getItem(k)),RUN_STORAGE_KEYS)).toEqual(bytes);
-});
-
-test('review repair: deleting both loaded slots starts a fresh playable run',async({page})=>{
- await start(page);const old=await snapshot(page);await page.reload();await page.locator('#run-recovery').click();
- for(const slot of ['primary','backup']){await page.locator('#run-remove-'+slot).click();await page.locator('#run-confirm-remove').click();}
- await expect.poll(()=>page.evaluate(keys=>Object.values(keys).map(k=>localStorage.getItem(k)),RUN_STORAGE_KEYS)).toEqual([null,null]);
- await page.locator('#run-close-recovery').click();await page.locator('#run-start').click();
- await expect(page.locator('#run-start-encounter')).toBeVisible();const fresh=await snapshot(page);
- expect(fresh.items.run.id).not.toBe(old.items.run.id);expect(fresh.items.run.seed).toBe((old.items.run.seed+1)>>>0);
- expect(fresh.activeBattle).toBeNull();expect(fresh.items.ownership).toEqual({consumables:[],equipment:[],assignments:[]});
- expect(fresh.items.run.party.every(h=>h.hp===runContext.catalog.heroes[h.heroId].stats.maxHp)).toBe(true);
- await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- await page.screenshot({path:test.info().outputPath('fresh-after-removal.png')});
-});
-
-for(const choice of ['continue','replace'] as const)test(`review repair: recovered storage preserves unsaved bytes until explicit ${choice}`,async({page})=>{
- const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
- await page.goto('/?game=run');await page.locator('#run-start').click();
- await expect(page.locator('#run-item-status')).toHaveText('Run saved on this device');
- await page.reload();
- await page.locator('#run-start').click();await page.locator('#run-confirm-new').click();
- await expect(page.locator('#run-item-status')).toHaveText('Run saved on this device');
- const saved=await snapshot(page);expect(saved.items.run.seed).toBe(14);
- const bytes=await page.evaluate(keys=>Object.values(keys).map(k=>localStorage.getItem(k)),RUN_STORAGE_KEYS);
- await page.addInitScript(keys=>{
-  Object.assign(window,{denyRunReads:true});const read=Storage.prototype.getItem;
-  Storage.prototype.getItem=function(key){if((window as unknown as {denyRunReads:boolean}).denyRunReads && Object.values(keys).some(value=>value===key))throw new DOMException('Read denied','SecurityError');return read.call(this,key);};
- },RUN_STORAGE_KEYS);
- await page.reload();await page.locator('#run-unsaved').click();await page.locator('#run-start-encounter').click();
- await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- await page.evaluate(()=>Object.assign(window,{denyRunReads:false}));
- for(let i=0;i<2;i++){await page.locator('#battle-next').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');}
- expect(await page.evaluate(keys=>Object.values(keys).map(k=>localStorage.getItem(k)),RUN_STORAGE_KEYS)).toEqual(bytes);
- await expect(page.locator('#battle-persistence')).toContainText('unsaved');
- await page.getByRole('button',{name:'Save recovery',exact:true}).click();await page.locator('#run-retry-save').click();
- expect(await page.evaluate(keys=>Object.values(keys).map(k=>localStorage.getItem(k)),RUN_STORAGE_KEYS)).toEqual(bytes);
- if(choice==='continue'){
-  await page.locator('#run-recover-continue').click();await expect(page.locator('#run-start-encounter')).toBeVisible();
-  expect(await snapshot(page)).toEqual(saved);await page.locator('#run-start-encounter').click();
- }else{
-  await page.locator('#run-close-recovery').click();await page.locator('#fit-restart').click();await page.locator('#run-confirm-new').click();
-  await expect(page.locator('#run-start-encounter')).toBeVisible();expect((await snapshot(page)).items.run.id).not.toBe(saved.items.run.id);
-  await page.locator('#run-start-encounter').click();
- }
- await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- const now=await snapshot(page);expect(JSON.parse((await page.evaluate(key=>localStorage.getItem(key),RUN_STORAGE_KEYS.primary))!).payload.items.run.id).toBe(now.items.run.id);
- await expect(page.locator('#battle-persistence')).toContainText('Run saved on this device');expect(errors).toEqual([]);
-});
-
-for(const destination of ['Single battle','Dungeon floors','Main menu'])for(const failure of ['quota','stale'])
-test('review repair: '+destination+' confirms unsaved departure after '+failure,async({page})=>{
- await start(page);
- await page.evaluate(({keys,failure})=>{
-  if(failure==='stale')localStorage.setItem(keys.primary,localStorage.getItem(keys.backup)!);
-  else {
-   const write=Storage.prototype.setItem;
-   Storage.prototype.setItem=function(key,value){if(key===keys.primary||key===keys.backup)throw new DOMException('denied','QuotaExceededError');write.call(this,key,value);};
-  }
- },{keys:RUN_STORAGE_KEYS,failure});
- const before=await readSession(page);
- await playCommand(page,{type:'endTurn',unitId:before.state.initiative[before.state.activeIndex]});
- await expect(page.locator('#battle-persistence')).toContainText('unsaved');
- const accepted=await snapshot(page),commands=accepted.activeBattle!.commandCount;
- const prompt=page.waitForEvent('dialog');
- const clicking=page.getByRole('link',{name:destination,exact:true}).last().click({force:true});
- const dialog=await prompt;expect(dialog.type()).toBe('confirm');await dialog.dismiss();await clicking;
- await expect(page.getByRole('heading',{name:'Run save recovery',exact:true})).toBeVisible();
- const recovered=await snapshot(page);expect(recovered.items.run.id).toBe(accepted.items.run.id);
- expect(recovered.activeBattle!.commandCount).toBeGreaterThanOrEqual(commands);
- const download=page.waitForEvent('download');await page.locator('#run-export-current').click();
- const file=await (await download).path();const exported=JSON.parse(readFileSync(file!,'utf8'));
- expect(exported.payload).toEqual(recovered);
- // Explicit discard remains available; cancellation above retained the current owner.
- const again=page.waitForEvent('dialog');
- const leaving=page.getByRole('link',{name:destination,exact:true}).last().click({force:true});
- await (await again).accept();await leaving;
- await expect(page).toHaveURL(new RegExp(destination==='Main menu' ? '/$' : '/'+(destination==='Single battle'?'battle':'dungeon')+'$'));
-});
-
-test('review repair: recovery removal stays deleted through repeated authored clock flushes',async({page})=>{
- await start(page);
- await page.getByRole('button',{name:'Save recovery',exact:true}).click();
- await expect(page.getByRole('heading',{name:'Run save recovery',exact:true})).toBeVisible();
- await page.locator('#run-remove-primary').click();await page.locator('#run-confirm-remove').click();
- await expect(page.getByRole('heading',{name:'Run save recovery',exact:true})).toBeVisible();
- expect(await page.evaluate(key=>localStorage.getItem(key),RUN_STORAGE_KEYS.primary)).toBeNull();
- const backup=await page.evaluate(key=>localStorage.getItem(key),RUN_STORAGE_KEYS.backup);
- const reviewed=null;
- await page.locator('#run-remove-backup').click();await page.locator('#run-cancel-remove').click();
- await expect(page.getByRole('heading',{name:'Run save recovery',exact:true})).toBeVisible();
- expect(await page.evaluate(key=>localStorage.getItem(key),RUN_STORAGE_KEYS.primary)).toBe(reviewed);
- if(reviewed===null)expect(await page.evaluate(key=>localStorage.getItem(key),RUN_STORAGE_KEYS.backup)).toBe(backup);
 });

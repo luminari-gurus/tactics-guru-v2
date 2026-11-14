@@ -1,4 +1,4 @@
-import { inspectMenuSaves, type MenuSave } from '../app/menuSaves';
+import { inspectMenuSave } from '../app/menuSaves';
 import { menuGameHref, routeHref } from '../app/routes';
 import { bothDungeonSlotsMissing, createDungeonStorage } from '../persistence/dungeonStorage';
 import { mountTelemetryPreferences } from '../telemetry/preferences';
@@ -46,27 +46,25 @@ export function startMainMenu() {
   });
   const buttons = new Map<string, HTMLButtonElement>();
   function refresh() {
-    const saves = inspectMenuSaves(), valid = saves.filter(save => save.resumable);
-    buttons.get('continue')!.disabled = !valid.length;
-    status.textContent = saves.some(save => save.needsRecovery) ? 'Some saved data needs recovery. Your saves have been preserved.'
-      : valid.length ? 'Saved progress is available on this device.' : 'Your journey begins here. Saves stay on this device.';
-    recovery.hidden = !saves.some(save => save.needsRecovery || save.fromBackup);
-    return saves;
+    const save = inspectMenuSave();
+    buttons.get('continue')!.disabled = !save.resumable;
+    status.textContent = save.needsRecovery ? 'Some saved data needs recovery. Your saves have been preserved.'
+      : save.resumable ? 'Saved progress is available on this device.' : 'Your journey begins here. Saves stay on this device.';
+    recovery.hidden = !(save.needsRecovery || save.fromBackup);
+    return save;
   }
-  function choose(saves: MenuSave[], recoveryMode: boolean) {
-    show(recoveryMode ? 'Save recovery' : 'Continue a journey', () => {
-      body.append(element('p', recoveryMode ? 'Open a mode to inspect, export or recover its saves. Nothing is removed here.' : 'Choose which saved journey to continue.'));
-      for (const save of saves) {
-        const link = element('a', `${save.label}${save.fromBackup ? ' · backup (some progress may be lost)' : ''}${save.needsRecovery ? ' · recovery needed' : ''}`);
-        link.href = menuGameHref(save.mode, import.meta.env.BASE_URL, recoveryMode ? 'recovery' : 'continue'); body.append(link);
-      }
+  function showRecovery() {
+    const save = refresh();
+    show('Save recovery', () => {
+      body.append(element('p', 'Inspect, export or recover your dungeon save.'));
+      const link = element('a', `Dungeon${save.fromBackup ? ' · backup (some progress may be lost)' : ''}${save.needsRecovery ? ' · recovery needed' : ''}`);
+      link.href = menuGameHref('dungeon', import.meta.env.BASE_URL, 'recovery');
+      body.append(link);
     });
   }
   const actions: Record<string, () => void> = {
     continue: () => {
-      const saves = refresh().filter(save => save.resumable);
-      if (saves.length === 1) location.assign(menuGameHref(saves[0].mode, import.meta.env.BASE_URL, 'continue'));
-      else if (saves.length) choose(saves, false);
+      if (refresh().resumable) location.assign(menuGameHref('dungeon', import.meta.env.BASE_URL, 'continue'));
     },
     new: () => {
       const review = createDungeonStorage().inspect();
@@ -102,7 +100,7 @@ export function startMainMenu() {
     button.onclick = () => { button.focus(); actions[entry.id](); }; buttons.set(entry.id, button); nav.append(button);
   }
   const recovery = element('button', 'Save recovery'); recovery.type = 'button'; recovery.className = 'menu-recovery';
-  recovery.onclick = () => { recovery.focus(); choose(refresh(), true); };
+  recovery.onclick = () => { recovery.focus(); showRecovery(); };
   const secondary = element('nav'); secondary.className = 'menu-secondary'; secondary.setAttribute('aria-label', 'Other modes');
   for (const [route, label] of [['battle', 'Standalone battle'], ['run', 'Three-encounter run'], ['map', 'Map inspection']] as const) {
     const link = element('a', label); link.href = route === 'map' ? routeHref(route, import.meta.env.BASE_URL) : menuGameHref(route, import.meta.env.BASE_URL); secondary.append(link);

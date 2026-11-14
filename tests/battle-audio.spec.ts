@@ -6,7 +6,6 @@ import { replayBattle } from '../src/domain/turns';
 import { battleCues, type BattleCue } from '../src/audio/battleCues';
 import { LOAD_TIMEOUT_MS } from '../src/phaser/BattleAudio';
 import { BATTLE_STORAGE_KEYS } from '../src/persistence/battleStorage';
-import { decodeBattleSave, encodeBattleSave } from '../src/domain/saveEnvelope';
 
 const audio=(page:Page)=>page.evaluate(()=>window.fitDiagnostics().battleAudio!);
 async function ready(page:Page) {await expect(page.locator('#game')).toHaveAttribute('data-phase','player');}
@@ -54,7 +53,7 @@ test('sound control uses real gestures, preserves previews, modal focus and rest
     expect((await audio(page)).ownedSounds).toBeLessThanOrEqual(8);
     await expect(page.locator('#battle-sound')).toHaveCount(1);
   }
-  await page.reload();await page.locator('#save-continue').click();await ready(page);expect(await audio(page)).toMatchObject({enabled:false,started:0});expect(found).toEqual([]);
+  await page.reload();await ready(page);expect(await audio(page)).toMatchObject({enabled:false,started:0});expect(found).toEqual([]);
 });
 
 test('mute, hidden and context interruptions discard active feedback while commands finish',async({page})=>{
@@ -322,16 +321,14 @@ async function startSeed(page:Page,seed:number,enabled:boolean) {
   if(enabled)await expect.poll(()=>audio(page)).toMatchObject({enabled:true,status:'ready'});
 }
 
-for(const seed of [1,2]) test(`seed ${seed}: short sound on/off legal checkpoints preserve session and saved bytes`,async({page})=>{
+for(const seed of [1,2]) test(`seed ${seed}: short sound on/off legal checkpoints preserve deterministic session state and leave storage empty`,async({page})=>{
   const found=errors(page),silent:{session:Awaited<ReturnType<typeof session>>;saved:{primary:string|null;backup:string|null}}[]=[];
   const stored=()=>page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),BATTLE_STORAGE_KEYS);
   for(const enabled of [false,true]){
-    if(enabled)await page.evaluate(keys=>Object.values(keys).forEach(key=>localStorage.removeItem(key)),BATTLE_STORAGE_KEYS);
     await startSeed(page,seed,enabled);
     for(let i=0;i<=2;i++){
       const current=await session(page),saved=await stored(),checkpoint={session:current,saved};
-      const encoded=encodeBattleSave(current.state,catalog);expect(encoded.ok).toBe(true);
-      if(encoded.ok){expect(saved.primary).toBe(encoded.text);expect(decodeBattleSave(encoded.text,catalog)).toEqual({ok:true,state:current.state});}
+      expect(saved).toEqual({primary:null,backup:null});
       const replay=replayBattle(current.replay,catalog);expect(replay.ok).toBe(true);if(replay.ok)expect(replay.state).toEqual(current.state);
       if(enabled)expect(checkpoint).toEqual(silent[i]);else {silent.push(checkpoint);expect((await audio(page)).started).toBe(0);}
       if(i===2)break;
@@ -346,8 +343,8 @@ for(const seed of [1,2]) test(`seed ${seed}: short sound on/off legal checkpoint
     if(enabled){
       expect((await audio(page)).started).toBeGreaterThan(0);
       await page.screenshot({path:test.info().outputPath('audio-checkpoint.png')});
-      await page.reload();await page.locator('#save-continue').click();await ready(page);
-      expect((await readSession(page)).state).toEqual(silent[2].session.state);
+      await page.reload();await ready(page);
+      expect((await readSession(page)).state.seed).toBe(1);
       await enable(page);expect((await audio(page)).started).toBe(0);
       expect(await stored()).toEqual(silent[2].saved);
     }
