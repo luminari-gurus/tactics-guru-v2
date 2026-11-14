@@ -45,3 +45,5 @@
 .run-records-actions,[data-records-confirm] { display:flex; flex-wrap:wrap; gap:.65rem; margin-top:1rem; }
 [data-records-confirm] p { flex-basis:100%; }
 @media (max-height:550px) { .menu-content > nav[aria-label='Main menu'] { margin-top:1.5rem; } .menu-title { max-width:22rem; margin-top:0; } }
+
+.menu-cutscene-setting { display:flex; align-items:center; gap:8px; min-height:44px; }

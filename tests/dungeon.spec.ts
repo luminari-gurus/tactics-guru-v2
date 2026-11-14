@@ -596,6 +596,45 @@ fixedSeedTest('read-only entry, keyboard new dungeon, real action and active res
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect((await readSession(page)).state).toEqual(saved.activeBattle);expect((await readSession(page)).events).toEqual([]);
  await page.screenshot({path:test.info().outputPath('battle-resumed.png')});expect(errors).toEqual([]);
 });
+test('dungeon cutscenes yield to the earned reward after skip, completion or fallback', async ({page,isMobile}) => {
+ test.setTimeout(90000);
+ const battle = fixture(0);
+ const skip = page.getByRole('button', {name:'Skip cutscene'});
+ const clip = page.locator('video.cutscene-video');
+ const requests: string[] = [];
+ page.on('request', request => {
+  if (request.url().includes('/cutscenes/')) requests.push(new URL(request.url()).pathname);
+ });
+ for (const mode of ['skip', 'complete', 'disabled', 'reduced', 'missing'] as const) {
+  if (mode==='missing') await page.route('**/cutscenes/*.mp4', route => route.fulfill({status:404}));
+  await page.emulateMedia({reducedMotion:mode==='reduced' ? 'reduce' : 'no-preference'});
+  await seed(page,battle.snapshot);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await page.evaluate(disabled => {
+   localStorage.setItem('tactics-guru:routine-cutscenes',disabled ? 'off' : 'on');
+  },mode==='disabled');
+  requests.length=0;
+  await playCommand(page,battle.command);
+  if (mode==='skip' || mode==='complete') {
+   await expect(skip).toBeFocused();
+   await expect.poll(() => clip.evaluate(video => (video as HTMLVideoElement).currentTime)).toBeGreaterThan(0);
+   if (mode==='skip') {
+    if (isMobile) await skip.tap();
+    else await page.keyboard.press('Enter');
+   }
+  }
+  const rewards = page.getByRole('region',{name:'Rewards',exact:true});
+  await expect(rewards).toBeVisible({timeout:10000});
+  await expect(clip).toHaveCount(0);
+  expect(new Set(requests)).toEqual(new Set(mode==='disabled'||mode==='reduced' ? [] : ['/cutscenes/victory.mp4']));
+  const settled = await snapshot(page);
+  await page.reload();
+  await continueSavedDungeon(page);
+  await expect(rewards).toBeVisible();
+  await expect(clip).toHaveCount(0);
+  expect(await snapshot(page)).toEqual(settled);
+ }
+});
 test('legal reward and guardian boundaries, travel reload, backtracking and isolated saves',async({page,isMobile})=>{
  test.setTimeout(180000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  for(const slot of [0,1,2]){

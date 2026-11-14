@@ -99,6 +99,8 @@ dialog button { touch-action: manipulation; }
 .battle-mode .battle-commit { grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
 .battle-mode dialog { color:var(--ink); background:var(--panel); border-color:var(--gold); }
 .battle-mode #battle-dialog-message { white-space:pre-line; overflow-wrap:anywhere; }
+.cutscene-video { display:block; width:min(720px, 80vw, 105dvh); max-width:100%; aspect-ratio:16 / 9; background:#111; }
+.battle-mode #battle-dialog:has(.cutscene-video) { max-width:calc(100vw - 48px); }
 .battle-mode #battle-log { padding-left:24px; }
 @media (max-width:759px) and (min-height:501px), (orientation:portrait) {
   .battle-mode #battle-shell { grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(0,1fr) min(56%,510px); gap:8px; padding:max(8px,env(safe-area-inset-top),var(--safe-top,0px)) max(8px,env(safe-area-inset-right),var(--safe-right,0px)) max(8px,env(safe-area-inset-bottom),var(--safe-bottom,0px)) max(8px,env(safe-area-inset-left),var(--safe-left,0px)); }
