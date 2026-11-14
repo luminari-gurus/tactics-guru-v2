@@ -1,0 +1,682 @@
+{
+  "scope": "Bounded issue408 compatibility composition with exact open PR397 and PR400 heads. Not full-regression or native-media certification.",
+  "inputs": {
+    "stage3": {
+      "head": "06447ab6b9c577d578b7684413f32402da38d3f9",
+      "overlay": "stage3-overlay.patch",
+      "snapshotCommit": "7590a6c40b876c311ddf461f2a3569e13f94370d",
+      "overlaySha256": "25000899f004db5c72a4d25cf4ca461f0d1cf1e956a1a4bfd5ad843b2ed34d5d"
+    },
+    "pr397": {
+      "id": 397,
+      "head": "codex/issue-287-battle-cutscenes",
+      "head_sha": "40ef9d76236f5fe93d8d21f539972f78b5532d10",
+      "base": "main",
+      "base_sha": "4290b700e3cde24906d0a6efb594783e2fd2523b",
+      "state": "open",
+      "merged": false,
+      "title": "Add skippable cutscenes to full dungeon runs"
+    },
+    "pr400": {
+      "id": 400,
+      "head": "work/issue-399-session-only-modes",
+      "head_sha": "62f4efcdfd6cbcba45da898a7349faa4e325400c",
+      "base": "main",
+      "base_sha": "75f3bf7a6494f881f956b972f78dcf706cdc9e96",
+      "state": "open",
+      "merged": false,
+      "title": "Make standalone battles and three-encounter runs session-only"
+    },
+    "combinedHead": "e2d321f0c33ef94cf6c00dd4a1ccea13a72e6536",
+    "merges": [
+      {
+        "pr": 400,
+        "commit": "f1d9fc91cbd782c5b2400c269c34968813f5191e",
+        "conflicts": []
+      },
+      {
+        "pr": 397,
+        "commit": "e2d321f0c33ef94cf6c00dd4a1ccea13a72e6536",
+        "conflicts": [
+          {
+            "path": "src/app/startDungeonApp.ts",
+            "resolution": "Retained delayed post-return ended handler and added showOutcomeCutscenes:true."
+          },
+          {
+            "path": "src/phaser/BattleScene.ts",
+            "resolution": "Added cutscene import while preserving PR400 deletion of obsolete BattleSaveControls import; remainder of outcome presentation merged automatically."
+          },
+          {
+            "path": "src/ui/mainMenu.ts",
+            "resolution": "Retained both independent preference imports and mounts."
+          },
+          {
+            "path": "tests/main-menu.spec.ts",
+            "resolution": "Retained PR400 deletion of old persistent standalone/run tests; added only PR397 routine-cutscene preference test from incoming conflicting block."
+          }
+        ]
+      }
+    ],
+    "scope": "Local scratch compatibility merge only; no PR or push. Production source from both exact open PR heads plus issue408 assembled source.",
+    "runtime": {
+      "node": "v24.22.1",
+      "playwright": "1.64.1",
+      "browser": "WebKit 27.2 (runtime path; version also recorded at execution)",
+      "PLAYWRIGHT_BROWSERS_PATH": "/workspace/scratch/c33ca9df3054/webkit-local",
+      "LD_LIBRARY_PATH": "/workspace/scratch/c33ca9df3054/webkit-local/root/usr/lib/x86_64-linux-gnu",
+      "PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS": "1",
+      "workers": 1,
+      "retries": 0,
+      "server": "production preview http://127.0.0.1:4198/"
+    },
+    "finalProductionCommit": "435a1104efdd372e31277c8cf6388b49658c4aa6",
+    "finalCopyAlignment": "Removed only new legacy migration paragraph after its shared narrow-viewport correction; retained Saved reward choice heading. Initial compact-string build not used for browser evidence."
+  },
+  "productionHead": "435a1104efdd372e31277c8cf6388b49658c4aa6",
+  "validation": {
+    "contentTests": 226,
+    "focusedUnitTests": 35,
+    "typeScopes": [
+      "tsconfig.json",
+      "tsconfig.domain.json"
+    ],
+    "productionBuild": "passed; final bundle after legacy paragraph removal",
+    "primaryBrowserCases": {
+      "passed": 11,
+      "failed": 1
+    },
+    "diagnosticCases": {
+      "failed": 1
+    },
+    "retries": 0
+  },
+  "cases": [
+    {
+      "run": "desktop-skip",
+      "project": "desktop-webkit",
+      "file": "issue408-compatibility.spec.ts",
+      "title": "compatibility: keyboard or touch cutscene Skip preserves exactly one delayed pickup",
+      "status": "passed",
+      "durationMs": 7446,
+      "retry": 0,
+      "returnToPickup": [
+        {
+          "returnAtMs": 4505,
+          "pickupAtMs": 4936,
+          "intervalMs": 431,
+          "victoryRevision": 2,
+          "pickupRevision": 3
+        }
+      ]
+    },
+    {
+      "run": "desktop-rest",
+      "project": "desktop-webkit",
+      "file": "issue408-compatibility.spec.ts",
+      "title": "compatibility: native cutscene completion precedes delayed pickup",
+      "status": "failed",
+      "durationMs": 12061,
+      "retry": 0,
+      "returnToPickup": [
+        {
+          "returnAtMs": 9637,
+          "pickupAtMs": 10065,
+          "intervalMs": 428,
+          "victoryRevision": 2,
+          "pickupRevision": 3
+        }
+      ],
+      "assertion": "Expected a native video ended event; none occurred before the cutscene watchdog returned."
+    },
+    {
+      "run": "desktop-rest",
+      "project": "desktop-webkit",
+      "file": "issue408-compatibility.spec.ts",
+      "title": "compatibility: disabled reduced-motion and missing media all reach the delayed pickup",
+      "status": "passed",
+      "durationMs": 11140,
+      "retry": 0,
+      "returnToPickup": [
+        {
+          "returnAtMs": 2124,
+          "pickupAtMs": 2551,
+          "intervalMs": 427,
+          "victoryRevision": 2,
+          "pickupRevision": 3
+        },
+        {
+          "returnAtMs": 1827,
+          "pickupAtMs": 2270,
+          "intervalMs": 443,
+          "victoryRevision": 2,
+          "pickupRevision": 3
+        },
+        {
+          "returnAtMs": 2007,
+          "pickupAtMs": 2442,
+          "intervalMs": 435,
+          "victoryRevision": 2,
+          "pickupRevision": 3
+        }
+      ]
+    },
+    {
+      "run": "desktop-rest",
+      "project": "desktop-webkit",
+      "file": "issue408-compatibility.spec.ts",
+      "title": "compatibility: hiding an active cutscene cancels pickup through visibility restoration",
+      "status": "passed",
+      "durationMs": 4062,
+      "retry": 0
+    },
+    {
+      "run": "desktop-rest",
+      "project": "desktop-webkit",
+      "file": "issue408-compatibility.spec.ts",
+      "title": "compatibility: both independent settings persist together",
+      "status": "passed",
+      "durationMs": 941,
+      "retry": 0
+    },
+    {
+      "run": "mobile",
+      "project": "portrait-webkit",
+      "file": "issue408-compatibility.spec.ts",
+      "title": "compatibility: keyboard or touch cutscene Skip preserves exactly one delayed pickup",
+      "status": "passed",
+      "durationMs": 6763,
+      "retry": 0,
+      "returnToPickup": [
+        {
+          "returnAtMs": 3827,
+          "pickupAtMs": 4248,
+          "intervalMs": 421,
+          "victoryRevision": 2,
+          "pickupRevision": 3
+        }
+      ]
+    },
+    {
+      "run": "mobile",
+      "project": "portrait-webkit",
+      "file": "issue408-compatibility.spec.ts",
+      "title": "compatibility: both independent settings persist together",
+      "status": "passed",
+      "durationMs": 1128,
+      "retry": 0
+    },
+    {
+      "run": "mobile",
+      "project": "landscape-webkit",
+      "file": "issue408-compatibility.spec.ts",
+      "title": "compatibility: keyboard or touch cutscene Skip preserves exactly one delayed pickup",
+      "status": "passed",
+      "durationMs": 6229,
+      "retry": 0,
+      "returnToPickup": [
+        {
+          "returnAtMs": 3453,
+          "pickupAtMs": 3891,
+          "intervalMs": 438,
+          "victoryRevision": 2,
+          "pickupRevision": 3
+        }
+      ]
+    },
+    {
+      "run": "mobile",
+      "project": "landscape-webkit",
+      "file": "issue408-compatibility.spec.ts",
+      "title": "compatibility: both independent settings persist together",
+      "status": "passed",
+      "durationMs": 1277,
+      "retry": 0
+    },
+    {
+      "run": "no-auto-native",
+      "project": "desktop-webkit",
+      "file": "issue408-compatibility.spec.ts",
+      "title": "compatibility diagnostic: native cutscene with victory observer removed",
+      "status": "failed",
+      "durationMs": 11366,
+      "retry": 0,
+      "assertion": "Expected a native video ended event; none occurred before the cutscene watchdog returned."
+    },
+    {
+      "run": "modes",
+      "project": "desktop-webkit",
+      "file": "battle-loop.spec.ts",
+      "title": "complete legal authored battle seed 2 reaches playerWin through controls and replays",
+      "status": "passed",
+      "durationMs": 34588,
+      "retry": 0
+    },
+    {
+      "run": "modes",
+      "project": "desktop-webkit",
+      "file": "battle-persistence.spec.ts",
+      "title": "testing routes: fresh play never accesses valid saved games",
+      "status": "passed",
+      "durationMs": 18921,
+      "retry": 0
+    },
+    {
+      "run": "modes",
+      "project": "desktop-webkit",
+      "file": "run-progression.spec.ts",
+      "title": "run battle undo and a legal terminal journey reset on reload",
+      "status": "passed",
+      "durationMs": 24494,
+      "retry": 0
+    }
+  ],
+  "mediaDiagnostic": {
+    "asset": {
+      "codec": "H.264 avc1",
+      "frames": 96,
+      "frameRate": "24/1",
+      "durationSeconds": 4
+    },
+    "change": "Only session.onVictory observer assignment replaced with null in a separately built scratch bundle; original source and production bundle preserved.",
+    "sourcePatch": "--- a/src/app/startDungeonApp.ts\n+++ b/src/app/startDungeonApp.ts\n@@ -210,10 +210,7 @@\n }\n // Loading or rendering a persisted reward never creates an intent. The session\n // emits this only for a newly accepted victory; freeze its preference now.\n-session.onVictory=intent=>{\n- cancelAutomaticStep();\n- if(live&&playing&&!document.hidden&&!dialogs.open&&!reviewing&&!replacing&&readAutoCollectLootPreference())pendingVictory=intent;\n-};\n+session.onVictory=null;\n session.onChange=()=>render();restart.addEventListener('click',()=>{restart.focus();requestNew();});\n // New exploration input takes priority even when the save lock has queued the\n // automatic step. Repeated held keys remain suppressed by DungeonMap itself.\n",
+    "samples": [
+      {
+        "kind": "media-sample",
+        "at": 2843,
+        "time": 0,
+        "duration": null,
+        "readyState": 0,
+        "networkState": 2,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "playing",
+        "at": 2929,
+        "time": 0.000460434
+      },
+      {
+        "kind": "media-sample",
+        "at": 3084,
+        "time": 0.155014658,
+        "duration": 4,
+        "readyState": 4,
+        "networkState": 1,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "media-sample",
+        "at": 3334,
+        "time": 0.1762462,
+        "duration": 4,
+        "readyState": 2,
+        "networkState": 2,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "media-sample",
+        "at": 3586,
+        "time": 0.1762462,
+        "duration": 4,
+        "readyState": 2,
+        "networkState": 2,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "media-sample",
+        "at": 3839,
+        "time": 0.1762462,
+        "duration": 4,
+        "readyState": 2,
+        "networkState": 2,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "media-sample",
+        "at": 4090,
+        "time": 0.1762462,
+        "duration": 4,
+        "readyState": 2,
+        "networkState": 2,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "media-sample",
+        "at": 4342,
+        "time": 0.1762462,
+        "duration": 4,
+        "readyState": 2,
+        "networkState": 2,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "media-sample",
+        "at": 4596,
+        "time": 0.1762462,
+        "duration": 4,
+        "readyState": 2,
+        "networkState": 2,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "media-sample",
+        "at": 4854,
+        "time": 0.1762462,
+        "duration": 4,
+        "readyState": 2,
+        "networkState": 2,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "media-sample",
+        "at": 5108,
+        "time": 0.1762462,
+        "duration": 4,
+        "readyState": 2,
+        "networkState": 2,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "media-sample",
+        "at": 5362,
+        "time": 0.1762462,
+        "duration": 4,
+        "readyState": 2,
+        "networkState": 2,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "media-sample",
+        "at": 5617,
+        "time": 0.1762462,
+        "duration": 4,
+        "readyState": 2,
+        "networkState": 2,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "media-sample",
+        "at": 5870,
+        "time": 0.1762462,
+        "duration": 4,
+        "readyState": 2,
+        "networkState": 2,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "media-sample",
+        "at": 6122,
+        "time": 0.1762462,
+        "duration": 4,
+        "readyState": 2,
+        "networkState": 2,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "media-sample",
+        "at": 6378,
+        "time": 0.1762462,
+        "duration": 4,
+        "readyState": 2,
+        "networkState": 2,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "media-sample",
+        "at": 6639,
+        "time": 0.1762462,
+        "duration": 4,
+        "readyState": 2,
+        "networkState": 2,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "media-sample",
+        "at": 6890,
+        "time": 0.1762462,
+        "duration": 4,
+        "readyState": 2,
+        "networkState": 2,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "media-sample",
+        "at": 7142,
+        "time": 0.1762462,
+        "duration": 4,
+        "readyState": 2,
+        "networkState": 2,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "media-sample",
+        "at": 7396,
+        "time": 0.1762462,
+        "duration": 4,
+        "readyState": 2,
+        "networkState": 2,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "media-sample",
+        "at": 7653,
+        "time": 0.1762462,
+        "duration": 4,
+        "readyState": 2,
+        "networkState": 2,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "media-sample",
+        "at": 7914,
+        "time": 0.1762462,
+        "duration": 4,
+        "readyState": 2,
+        "networkState": 2,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "media-sample",
+        "at": 8166,
+        "time": 0.1762462,
+        "duration": 4,
+        "readyState": 2,
+        "networkState": 2,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "media-sample",
+        "at": 8418,
+        "time": 0.1762462,
+        "duration": 4,
+        "readyState": 2,
+        "networkState": 2,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "media-sample",
+        "at": 8670,
+        "time": 0.1762462,
+        "duration": 4,
+        "readyState": 2,
+        "networkState": 2,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "media-sample",
+        "at": 8930,
+        "time": 0.1762462,
+        "duration": 4,
+        "readyState": 2,
+        "networkState": 2,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "media-sample",
+        "at": 9182,
+        "time": 0.1762462,
+        "duration": 4,
+        "readyState": 2,
+        "networkState": 2,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "media-sample",
+        "at": 9435,
+        "time": 0.1762462,
+        "duration": 4,
+        "readyState": 2,
+        "networkState": 2,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "media-sample",
+        "at": 9686,
+        "time": 0.1762462,
+        "duration": 4,
+        "readyState": 2,
+        "networkState": 2,
+        "paused": false,
+        "ended": false
+      },
+      {
+        "kind": "return",
+        "at": 9832
+      }
+    ],
+    "interpretation": "The native-ended failure also occurs without the automatic-collection observer. This does not establish an exact PR397-only baseline or certify native playback. The seven-second watchdog and subsequent optional pickup worked in the primary composition."
+  },
+  "fixtureProvenance": "Saved ongoing ground-loot battle with legal domain combat history and a staged adjacent exploration approach. Final winning command uses real HUD. Prior turns are not claimed as browser traversal.",
+  "visibilityProvenance": "Synthetic document.hidden override and visibilitychange event, not an actual background-tab/BFCache test.",
+  "concurrency": "One browser job at a time, workers1/retries0. Other non-browser checks ran during qualification; no performance-budget claim.",
+  "reports": {
+    "desktop-skip": {
+      "path": "/workspace/scratch/f77bb8a7baf3/issue408-compatibility-qa/desktop-skip/results.json",
+      "sha256": "f46c7bf4d120ec7c610695f07677c0ec6460d1274f11742bba0ad2338f2c60b9",
+      "stats": {
+        "startTime": "2026-11-14T14:13:23.865Z",
+        "duration": 10693.526,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    },
+    "desktop-rest": {
+      "path": "/workspace/scratch/f77bb8a7baf3/issue408-compatibility-qa/desktop-rest/results.json",
+      "sha256": "61f6704a4b117651a0119575d3b82fccbe0783ac1e66a6e79c4dfffaab576f53",
+      "stats": {
+        "startTime": "2026-11-14T14:13:49.234Z",
+        "duration": 32370.179999999997,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      }
+    },
+    "mobile": {
+      "path": "/workspace/scratch/f77bb8a7baf3/issue408-compatibility-qa/mobile/results.json",
+      "sha256": "b4993d9b19e38899db9c73aca09d9129a0eed659872717af89b3a770464e5a48",
+      "stats": {
+        "startTime": "2026-11-14T14:15:01.389Z",
+        "duration": 19609.393,
+        "expected": 4,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    },
+    "no-auto-native": {
+      "path": "/workspace/scratch/f77bb8a7baf3/issue408-compatibility-qa/no-auto-native/results.json",
+      "sha256": "39b9fa148af884b594a9dd3cfed7fe09917d388a410ff080889096b55248b0bb",
+      "stats": {
+        "startTime": "2026-11-14T14:17:35.371Z",
+        "duration": 14859.136999999999,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      }
+    },
+    "modes": {
+      "path": "/workspace/scratch/f77bb8a7baf3/issue408-compatibility-qa/modes/results.json",
+      "sha256": "53b0d95fe616098363055088035e9fa75a2a7bb4273f5e68fa2158320c6e3802",
+      "stats": {
+        "startTime": "2026-11-14T14:18:05.838Z",
+        "duration": 81203.07100000001,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    }
+  },
+  "sha256": {
+    "src/app/startDungeonApp.ts": "145a43ef7a51d5db48c03743813e7cb0b3927735a76239dd88e180059cd33e73",
+    "src/app/DungeonSession.ts": "bafd91699931fce2b7b9d7244f69a454ad504a3300f15c001f1bc959ce133b80",
+    "src/app/DelayedDungeonStep.ts": "81e033ff894f96301938142953c02838920894dda6fbaef942b8716da12cc281",
+    "src/domain/dungeon.ts": "58a94f3c10fd5765cb83bc504ba1d09ba2d49e2ffa7c28787ef2082894fb9d83",
+    "src/domain/dungeonAutoCollect.ts": "74542d2d706631d7ff310a1b8d052cf58d0c8249854d8fb0530d0c682734d102",
+    "src/domain/dungeonSaveEnvelope.ts": "9bbdbab6ae6c1d6439fb3e2d8772ba771dce60b2417f0094dfbabae6bb431b0c",
+    "src/persistence/dungeonStorage.ts": "355938478f275b09712960cbed609198039241ce753592a9ec7d77e79cc41fe4",
+    "src/phaser/BattleScene.ts": "0559278f321afaa3fe384c34416b80df4f4e88c1c1664422131beed9d0cf061f",
+    "src/ui/mainMenu.ts": "9bd6079cd8d79ea41423e992431854ef04e549678051669fe9d4e6a6a3713b46",
+    "src/ui/mainMenu.css": "5d13bb49dec7f3b357621e6124a8d18ca5552b4ba2f77a2e5036ca56304bb22c",
+    "src/ui/autoCollectLootPreference.ts": "3ecbace8f9c0f2193ce5dacff4d3f9f2dd54deadeaba0d27da7914fc52dcf90d",
+    "src/ui/cutscene.ts": "5141e0eafb9065a252373625d605432447749a97d031a3aa84b6a600c4db5b8c",
+    "src/ui/cutscenePreference.ts": "730d78082cc203dfe5af33fe74b3a85121f2ec9766c46f31e10131bfa05a7228",
+    "src/ui/dungeon.ts": "bf8109a6b7fbfa4e1d9c9a4f8658e7029a06093287248ffe879b7459cfc4521b",
+    "src/ui/dungeonMap.ts": "1bff6077c694db71ab3e4dfe22624e62e7f468e824fde3107fcf6c7d3a3fea66",
+    "src/ui/dungeon.css": "483e4fa1719cbb2566542448d8d12b113328d9c825c7c9cdc8ca22a98e1eb5ee",
+    "src/style.css": "d8da52089301a9698f6056032b1d483e54203f560721e3e570f27662d7d55691",
+    "package.json": "85fa4e08f42e81657e6d139fbaa02dba5122dcd4075ed21f3a906c2cd55e7c0b",
+    "package-lock.json": "e4768389a179a65df5f04502dab87e8875b465b939e55493d5820a7dc99a74ed",
+    "tests/helpers/dungeonFixtures.ts": "ca74dc03314c464ebb6e73f447106343d3fd2401c0bb6ee265ff01daeb4db7ee",
+    "tests/helpers/battlePolicy.ts": "fabefad1749cce0bc2309d77f378928a64fc0c6665265bc71d48b569c766b798",
+    "tests/helpers/forceRailControls.ts": "4c180d2bf1553cdf0af9520bbfab7c13b5eac8c321374008e40fcc74d20fac50",
+    "tests/battle-persistence.spec.ts": "addf5752ecc167c8ec67ed7fbcf405d28508e6fb823fdedebb0820d360742877",
+    "tests/battle-loop.spec.ts": "0a3557ee645f5617a9dd3b468ce641d96bbb8b8d87ca984f707d7f6a53b567d1",
+    "tests/run-progression.spec.ts": "bdcda9fe20e79620f94ba90a9d307329180ad03a641688b8fb516ca82878c81f",
+    "tests/issue408-compatibility.spec.ts": "31e499f3a2a84f01d7638c306d094662d43b66bc4454dd85743b5fd490d2891c",
+    "playwright.issue408-compatibility.config.ts": "908b4cb4b7c13875b39c47b3296c752ec34fc6b46ee7b4c14e2fbc8c4d8aef41",
+    "public/cutscenes/victory.mp4": "a866c4251df75f7bc7bce30d14adf5e48f0875bf687a8982c200952b8ee00a93",
+    "public/cutscenes/defeat.mp4": "053937a7df18e398268be7495cc313a1b4e9085485cc1ea431755129dc0e9afe",
+    "dist/index.html": "878faf911cd56e40db6affa1306f8db00d3be9d2d8fa8957a7f75b105d8b122a"
+  },
+  "retainedFailureTraces": {
+    "/workspace/scratch/f77bb8a7baf3/issue408-compatibility-qa/no-auto-native/artifacts/issue408-compatibility-com-0c24c-th-victory-observer-removed-desktop-webkit/trace.zip": "2870a7b8a3729d406649aeb3f14727a79159014284317d9a0b3b7371fd3d0e5b",
+    "/workspace/scratch/f77bb8a7baf3/issue408-compatibility-qa/desktop-rest/artifacts/issue408-compatibility-com-b9903-ion-precedes-delayed-pickup-desktop-webkit/trace.zip": "1fc3c50542b0d67d3867899df22d7947a38b6fcf072594f3b7d2a22a2b08810b"
+  },
+  "productionUnchangedAfterDiagnostic": true,
+  "primaryExecutedReproHashes": {
+    "tests/issue408-compatibility.spec.ts": "9f6f80644d902dfa4409c3a06d2eab08e7953ba6a8f471b4862d64e26eb498dc",
+    "playwright.issue408-compatibility.config.ts": "21915ec41da6a5624598c3896ed5a1a6aa174bb44592d42881f825e5fcef2cb1"
+  },
+  "reproChangeAfterPrimaryRuns": "Added read-only media samples to the unchanged native assertion, a separate observer-removed diagnostic, and an alternate-preview-output option. Passing primary-case bodies are unchanged."
+}

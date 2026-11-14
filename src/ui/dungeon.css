@@ -129,6 +129,28 @@ body:has(#dungeon-screen:not([hidden])) #battle-heading { display: none; }
 }
 #dungeon-map [data-player] { color: #8ce6ff; outline: 2px solid #8ce6ff; outline-offset: -2px; }
 #dungeon-map [data-poi] { font-weight: bold; }
+#dungeon-map [data-loot] { position:relative; color:#ffdc85; font-weight:bold; text-shadow:0 1px 2px #000; }
+#dungeon-map [data-loot][data-player] { color:#8ce6ff; }
+#dungeon-map [data-loot-overlay]::after {
+  content:'◆';
+  position:absolute;
+  right:0;
+  bottom:0;
+  display:grid;
+  place-items:center;
+  width:52%;
+  height:52%;
+  min-width:6px;
+  min-height:6px;
+  border-radius:2px;
+  background:#202314;
+  color:#ffdc85;
+  font-size:clamp(6px,1.5vw,10px);
+  line-height:1;
+  pointer-events:none;
+}
+#dungeon-screen .dungeon-loot-guide { margin:6px 0 0; font-size:.8rem; color:#f4d48b; }
+#dungeon-screen .dungeon-loot-here { margin:6px 0 0; padding:8px; max-width:480px; box-sizing:border-box; border-left:3px solid #e5ba59; background:#282b1c; font-size:.85rem; overflow-wrap:anywhere; }
 #dungeon-screen .dungeon-directions { display: grid; grid-template: repeat(3, 52px) / repeat(3, 52px); gap: 2px; width: max-content; padding: 16px; margin-block: 8px; }
 #dungeon-screen .dungeon-directions button { display: grid; place-items: center; width: 46px; height: 46px; min-width: 46px; min-height: 46px; margin: 0; padding: 0; justify-self: center; align-self: center; transform: rotate(45deg); border-radius: 5px; border-color: #a2a58a; background: #424a38; color: #f1edda; touch-action: manipulation; }
 #dungeon-screen .dungeon-directions button span { transform: rotate(-45deg); font-weight: bold; pointer-events: none; }
