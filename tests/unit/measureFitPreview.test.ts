@@ -116,7 +116,8 @@ describe('collector-owned preview', () => {
     } finally { const closed = once(sibling, 'close'); sibling.kill(); await closed; }
   });
 
-  it('uses pinned Vite with the fixture config and rejects foreign port ownership without probing it', async () => {
+  // Allow two real Vite startups (10s each) and two bounded child shutdowns (2.5s each).
+  it('uses pinned Vite with the fixture config and rejects foreign port ownership without probing it', { timeout: 30_000 }, async () => {
     await mkdir(join(root, 'built'));
     await writeFile(join(root, 'built/index.html'), 'real vite fixture');
     await writeFile(join(root, 'vite.config.mjs'), "export default {build:{outDir:'built'},base:'/fixture/'}");
