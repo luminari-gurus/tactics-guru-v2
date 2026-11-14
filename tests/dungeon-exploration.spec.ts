@@ -74,6 +74,8 @@ test('map markers respect stair availability, discovery and saved floor state',a
  await reload();await expect(cell(floor.descriptor.upstairs)).toHaveText('');
  // Completion alone cannot reveal an undiscovered staircase.
  await load({...base,floors:[{...floor,completed:3}]});
+ await expect(page.locator('#dungeon-encounter-progress')).toHaveText('Encounters: 3 / 3 cleared');
+ await expect(page.locator('#dungeon-stair-descend')).toHaveText('Downstairs: unlocked · walk onto the stairs');
  await expect(cell(floor.descriptor.downstairs)).toHaveClass('explore-hidden');
  await expect(accessibleMap).not.toHaveAccessibleDescription(/Downstairs at/);
  const hiddenPoi = floor.exploration.pois.map(p=>poiCell(p,firstMap.width)).find(i=>!floor.exploration.revealed.includes(i))!;
@@ -97,8 +99,10 @@ test('map markers respect stair availability, discovery and saved floor state',a
  await reload();await expect(cell(descriptor.upstairs)).toHaveText('↑');
  await page.locator('#dungeon-map').scrollIntoViewIfNeeded();
  await page.locator('#dungeon-map').screenshot({path:test.info().outputPath('markers-upper-floor-map.png')});
- if(isMobile){await page.setViewportSize({width:320,height:740});await page.locator('#dungeon-map').scrollIntoViewIfNeeded();}
+ if(isMobile){await page.setViewportSize({width:320,height:740});await page.locator('#dungeon-progress').scrollIntoViewIfNeeded();}
+ await expect(page.locator('#dungeon-progress')).not.toContainText(/row|column/);
  expect(await page.locator('#dungeon-screen').evaluate(n=>n.scrollWidth<=n.clientWidth)).toBe(true);
+ await page.screenshot({path:test.info().outputPath('floor-progress-narrow.png'),fullPage:true});
 });
 
 test('live markers follow current sight across movement, art changes and reload', async ({ page, isMobile }) => {
@@ -239,9 +243,13 @@ for(const control of ['arrows','wasd','compass','cell'] as const)test(`stairs tr
  // Structural clear-floor input isolates traversal. The legal guardian journey separately proves unlock.
  const approach=atStairApproach(cleared);await load(approach);
  const travelHint = page.locator('.dungeon-header');
- await expect(travelHint).toContainText('Descent unlocked. Walk onto the downstairs to continue.');
+ await expect(travelHint).toContainText('Encounters: 3 / 3 cleared');
+ await expect(travelHint).toContainText('Downstairs: unlocked · walk onto the stairs');
  await move(approach.floors[0].descriptor.downstairs);
  const second=await dungeonSnapshot(page),upper=second.floors[1];expect(second.depth).toBe(2);expect(second.revision).toBe(approach.revision+1);
+ await expect(travelHint).toContainText('Encounters: 0 / 3 cleared');
+ await expect(travelHint).toContainText('Downstairs: locked · clear 3 more encounters');
+ await expect(travelHint).toContainText('Upstairs: available');
  expect(upper.position).toBe(upper.descriptor.upstairs);expect(second.party).toEqual(approach.party);expect(second.ownership).toEqual(approach.ownership);
  await expect(page.locator('#dungeon-map')).toHaveAttribute('data-position',String(upper.position));
  await expect(page.locator('#dungeon-ascend, #dungeon-descend')).toHaveCount(0);
@@ -252,6 +260,7 @@ for(const control of ['arrows','wasd','compass','cell'] as const)test(`stairs tr
  await move(off);expect((await dungeonSnapshot(page)).depth).toBe(2);
  await move(upper.descriptor.upstairs);
  const first=await dungeonSnapshot(page);expect(first.depth).toBe(1);expect(first.revision).toBe(second.revision+2);
+ await expect(travelHint).toContainText('Encounters: 3 / 3 cleared');
  expect(first.floors[0].position).toBe(first.floors[0].descriptor.downstairs);
  await expect(travelHint).toContainText('Step off the downstairs and back onto it to descend.');
  await reload();expect(await dungeonSnapshot(page)).toEqual(first);

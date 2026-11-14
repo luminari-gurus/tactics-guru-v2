@@ -15,6 +15,8 @@ body:has(#dungeon-screen:not([hidden])) #battle-heading { display: none; }
 
 #dungeon-screen:has(.dungeon-play) { max-width: 1040px; container-type: inline-size; }
 .dungeon-header h1 { margin: 0; }
+#dungeon-screen #dungeon-progress { display: flex; flex-wrap: wrap; gap: 2px 16px; margin: 6px 0; padding: 0; list-style: none; font-size: .875rem; line-height: 1.4; overflow-wrap: anywhere; }
+#dungeon-encounter-progress { font-weight: 600; }
 .dungeon-header .dungeon-status { margin: 8px 0; }
 .dungeon-play {
   display: grid;

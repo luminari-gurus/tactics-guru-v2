@@ -2,7 +2,7 @@ import { progressionLabel } from '../domain/progression';
 import { DungeonMap, dungeonBiomeLabel } from './dungeonMap';
 import { poiCell } from '../domain/exploration';
 import { dungeonContent } from '../content/dungeon';
-import { dungeonBoundary, currentFloor, clearedDungeonSlots, FloorCache, type DungeonItemCommand, type DungeonState } from '../domain/dungeon';
+import { dungeonBoundary, currentFloor, clearedDungeonSlots, dungeonStairStatus, FloorCache, type DungeonItemCommand, type DungeonState } from '../domain/dungeon';
 import type { DungeonSession } from '../app/DungeonSession';
 import { EQUIPMENT_SLOTS, ITEM_BOUNDS } from '../content/itemTypes';
 import type { HeroId } from '../content/types';
@@ -54,16 +54,30 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
   }
   // Keep the map and host tools mounted to retain their state and focus.
   for (const child of [...root.children]) if (child !== header && child !== play && child !== after && child !== tools) child.remove();
-  header.replaceChildren(title,status);
-  if (s.phase === 'ready') {
-    if (s.depth > 1 && floor.position === floor.descriptor.upstairs) {
-      header.append(el('p', 'Step off the upstairs and back onto it to ascend.'));
-    } else if (floor.completed === 3 && floor.position === floor.descriptor.downstairs) {
-      header.append(el('p', 'Step off the downstairs and back onto it to descend.'));
-    } else if (floor.completed === 3) {
-      header.append(el('p', 'Descent unlocked. Walk onto the downstairs to continue.'));
-    }
+  const progress = el('ul'); progress.id = 'dungeon-progress'; progress.setAttribute('aria-label', 'Floor progress');
+  const total = floor.descriptor.encounters.length;
+  const encounters = el('li', `Encounters: ${floor.completed} / ${total} cleared`); encounters.id = 'dungeon-encounter-progress';
+  progress.append(encounters);
+  for (const direction of ['descend', 'ascend'] as const) {
+    const stair = direction === 'descend' ? 'Downstairs' : 'Upstairs';
+    const availability = dungeonStairStatus(s, direction);
+    let detail: string;
+    if (availability === 'available') {
+      detail = direction === 'descend' ? 'unlocked' : 'available';
+      if (floor.position === (direction === 'descend' ? floor.descriptor.downstairs : floor.descriptor.upstairs)) {
+        detail += ` · Step off the ${stair.toLowerCase()} and back onto it to ${direction}.`;
+      } else if (direction === 'descend') detail += ' · walk onto the stairs';
+    } else if (availability === 'encounters') {
+      const remaining = total - floor.completed;
+      detail = `locked · clear ${remaining} more encounter${remaining === 1 ? '' : 's'}`;
+    } else detail = {
+      floorOne: 'unavailable on floor 1', reward: 'locked · resolve reward',
+      battle: 'unavailable during battle', defeat: 'unavailable after defeat',
+    }[availability];
+    const label = el('li', `${stair}: ${detail}`); label.id = `dungeon-stair-${direction}`;
+    progress.append(label);
   }
+  header.replaceChildren(title,progress,status);
   sidebar.replaceChildren();
   const itemTargets = new Map([...after.querySelectorAll('select')].map(select => [select.id, select.value]));
   after.replaceChildren();

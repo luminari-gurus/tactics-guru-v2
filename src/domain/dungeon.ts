@@ -45,6 +45,14 @@ export const safeCount = (v: unknown, min = 0): v is number => typeof v === 'num
 const seedOk = (v: unknown): v is number => safeCount(v) && v <= 0xffffffff;
 export const currentFloor = (s: DungeonState) => s.floors[s.depth - 1];
 export const dungeonSlot = (s: DungeonState) => currentFloor(s).completed;
+export type DungeonStairStatus = 'available' | 'floorOne' | 'encounters' | 'reward' | 'battle' | 'defeat';
+/** Progression eligibility only; discovery and the player's position remain separate. */
+export function dungeonStairStatus(s: DungeonState, direction: 'ascend' | 'descend'): DungeonStairStatus {
+  if (direction === 'ascend' && s.depth === 1) return 'floorOne';
+  if (s.phase !== 'ready') return s.phase;
+  const floor = currentFloor(s);
+  return direction === 'descend' && floor.completed !== floor.descriptor.encounters.length ? 'encounters' : 'available';
+}
 export const clearedDungeonSlots = (f: DungeonFloor): readonly number[] =>
   f.exploration.version === 'exploration-v2' ? f.exploration.cleared! : Array.from({length:f.completed},(_,i)=>i);
 const activeDungeonSlot = (s: DungeonState): number => currentFloor(s).exploration.version === 'exploration-v2'
@@ -264,7 +272,7 @@ function advance(s: DungeonState, patch: Partial<DungeonState>): DungeonResult {
 export function travelDungeon(s: DungeonState, direction: 'ascend' | 'descend', revision: number): DungeonResult {
   if (direction !== 'ascend' && direction !== 'descend') return fail('invalidCommand');
   if (revision !== s.revision) return fail('staleBoundary');
-  if (s.phase !== 'ready' || direction === 'descend' && dungeonSlot(s) !== 3 || direction === 'ascend' && s.depth === 1) return fail('lockedStairs');
+  if (dungeonStairStatus(s, direction) !== 'available') return fail('lockedStairs');
   if (currentFloor(s).position !== (direction === 'descend' ? currentFloor(s).descriptor.downstairs : currentFloor(s).descriptor.upstairs)) return fail('remoteStairs');
   const depth = s.depth + (direction === 'descend' ? 1 : -1);
   if (!safeCount(depth, 1)) return fail('resourceLimit');
@@ -361,8 +369,8 @@ export function stepDungeon(s: DungeonState, command: ExplorationCommand): Dunge
   if (f.exploration.pois.some(p => !clearedDungeonSlots(f).includes(p.encounterSlot) && command.destination === poiCell(p, f.descriptor.size ?? 20))) return startDungeonBattle(candidate);
   candidate = moveDungeonEnemies(candidate, f.position);
   // Only accepted movement enters stairs; arrival, rendering and restore never travel.
-  if (command.destination === f.descriptor.upstairs && s.depth > 1) return travelDungeon(candidate, 'ascend', s.revision);
-  if (command.destination === f.descriptor.downstairs && f.completed === 3) return travelDungeon(candidate, 'descend', s.revision);
+  if (command.destination === f.descriptor.upstairs && dungeonStairStatus(candidate, 'ascend') === 'available') return travelDungeon(candidate, 'ascend', s.revision);
+  if (command.destination === f.descriptor.downstairs && dungeonStairStatus(candidate, 'descend') === 'available') return travelDungeon(candidate, 'descend', s.revision);
   return advance(candidate, {});
 }
 

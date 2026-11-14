@@ -1,5 +1,5 @@
 import type { DungeonState } from '../domain/dungeon';
-import { currentFloor, clearedDungeonSlots } from '../domain/dungeon';
+import { currentFloor, clearedDungeonSlots, dungeonStairStatus } from '../domain/dungeon';
 import { currentSight, neighbors, poiCell } from '../domain/exploration';
 import type { GeneratedMap } from '../map/generate';
 import { createMapArt, ART_STYLES, type ArtStyle } from '../map/art';
@@ -130,7 +130,7 @@ export class DungeonMap {
     const revealed = new Set(f.exploration.revealed);
     const sight = new Set(currentSight(f.position, map));
     const showUpstairs = s.depth > 1 && revealed.has(f.descriptor.upstairs);
-    const showDownstairs = s.phase === 'ready' && f.completed === 3 && revealed.has(f.descriptor.downstairs);
+    const showDownstairs = dungeonStairStatus(s, 'descend') === 'available' && revealed.has(f.descriptor.downstairs);
     const cleared=clearedDungeonSlots(f);
     const activeSlot = f.exploration.version === 'exploration-v2' ? f.exploration.active
       : s.phase === 'reward' ? f.completed - 1 : s.phase === 'battle' ? f.completed : null;
