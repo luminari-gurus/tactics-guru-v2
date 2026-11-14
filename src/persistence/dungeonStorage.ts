@@ -95,7 +95,8 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
         } else {
           const floors = state.floors.map((floor,index) => index === state.depth-1 && floor.exploration.version === 'exploration-v2'
             ? {...floor, exploration:{...floor.exploration,active:null}} : floor);
-          const checkpoint = encodeDungeonWithState({...state,floors,phase:'ready',activeBattle:null,battlefield:null});
+          const { encounterEntry: _, ...preparation } = state;
+          const checkpoint = encodeDungeonWithState({...preparation,floors,phase:'ready',activeBattle:null,battlefield:null});
           if (!checkpoint.ok) return checkpoint;
           backup = checkpoint.text;
           backupState = checkpoint.state;
@@ -104,6 +105,13 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
       // Keep a same-run checkpoint the prior build can still open after a rollback.
       if (backupState && requiresFinalRewardSupport(backupState) && old.backup.status === 'valid' &&
           old.backup.state.id === state.id && !requiresFinalRewardSupport(old.backup.state)) {
+        backup = null;
+        backupState = undefined;
+      }
+      // Keep the last actual pre-contact checkpoint when an older client cannot
+      // read the current origin/contact contract. Never manufacture an origin.
+      if (backupState?.encounterEntry && old.backup.status === 'valid' &&
+          old.backup.state.id === state.id && !old.backup.state.encounterEntry) {
         backup = null;
         backupState = undefined;
       }

@@ -463,7 +463,10 @@ fixedSeedTest('real traversal, art independence, keyboard locks, active battle a
  await page.locator('#dungeon-map').scrollIntoViewIfNeeded();await page.screenshot({path:test.info().outputPath('exploration-revealed.png'),fullPage:true});
  expect(await page.locator('#dungeon-screen').evaluate(n=>n.scrollWidth<=n.clientWidth)).toBe(true);
  await walkDungeon(page,undefined,isMobile?'touch':'keyboard');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- const battle=await dungeonSnapshot(page);expect(battle.phase).toBe('battle');expect(battle.floors[0].position).toBe(poiCell(battle.floors[0].exploration.pois[battle.floors[0].exploration.active!]));
+ const battle=await dungeonSnapshot(page);expect(battle.phase).toBe('battle');
+ const contact=poiCell(battle.floors[0].exploration.pois[battle.floors[0].exploration.active!]);
+ expect(battle.encounterEntry).toEqual({origin:battle.floors[0].position,contact,slot:battle.floors[0].exploration.active});
+ expect(neighbors(battle.floors[0].position,map.width,map.height)).toContain(contact);
  const command=playerDecision((await readSession(page)).state,dungeonBattle(battle)!.catalog);await playCommand(page,command);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');const saved=await dungeonSnapshot(page);
  await page.reload();await continueSavedDungeon(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expectSameProgress(await dungeonSnapshot(page), saved);
  writeFileSync(test.info().outputPath('spatial-battle-receipt.json'),JSON.stringify({initial,stepped,saved},null,2));expect(errors).toEqual([]);
@@ -788,6 +791,7 @@ test('closing on each wandering encounter holds contact and saves the matching b
   const adjacent=await dungeonSnapshot(page);
   expect(adjacent.phase).toBe('ready');
   expect(poiCell(adjacent.floors[0].exploration.pois[slot])).toBe(target);
+  expect(adjacent.floors[0].exploration.visited).not.toContain(target);
   await page.reload();await continueSavedDungeon(page);
   expect(await dungeonSnapshot(page)).toEqual(adjacent);
   // Use the reported WASD input on desktop, and the real compass tap on mobile.
@@ -797,7 +801,11 @@ test('closing on each wandering encounter holds contact and saves the matching b
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const entered=await dungeonSnapshot(page);
   expect(entered.phase).toBe('battle');
-  expect(entered.floors[0].position).toBe(target);
+  expect(entered.floors[0].position).toBe(approach);
+  expect(entered.encounterEntry).toEqual({origin:approach,contact:target,slot});
+  expect(entered.floors[0].exploration.visited).toEqual(adjacent.floors[0].exploration.visited);
+  expect(entered.floors[0].exploration.revealed).toEqual(adjacent.floors[0].exploration.revealed);
+  expect(entered.floors[0].exploration.pois).toEqual(adjacent.floors[0].exploration.pois);
   expect(entered.floors[0].exploration.active).toBe(slot);
   expect(entered.activeBattle!.seed).toBe(dungeonSeed(state.seed,1,'battle',slot));
   // Automatic enemy opening turns can add revisions after the atomic entry.
