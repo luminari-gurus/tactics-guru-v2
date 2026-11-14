@@ -1,0 +1,503 @@
+{
+  "issue": 408,
+  "increment": "manual ground loot",
+  "recordedOn": "2026-11-14",
+  "testTitle": "saved menu dungeon keeps proof tools hidden across legal encounters",
+  "normalization": "All recorded fields below matched on all three profiles after replacing only the run UUID with <run>. Full returned maps, revisions, clock statistics and browser event logs are omitted. encounterIndex is victory order; reward.slot is the floor encounter slot.",
+  "profiles": [
+    {
+      "profile": "desktop-webkit",
+      "sourceArtifact": "ground-loot-first-floor.json",
+      "sourceSha256": "b4573482a18f3b1dc7184d5179ba63e900f8fb1781d3f323f8b7ac4d47f884e5",
+      "runId": "b246d3b6-895b-4c64-8173-52b9198a2ebb"
+    },
+    {
+      "profile": "landscape-webkit",
+      "sourceArtifact": "ground-loot-first-floor.json",
+      "sourceSha256": "b859b7c13250eac1709fd7e4d3d6e3498825acf8d08716a498ef498c3de1c2ac",
+      "runId": "685929c9-6d94-4e41-b96c-71d8b45f075b"
+    },
+    {
+      "profile": "portrait-webkit",
+      "sourceArtifact": "ground-loot-first-floor.json",
+      "sourceSha256": "0b57bc402b34f92a4ac3feeeb6b1f0e674c6ba3deae46f2a9afb51786006f155",
+      "runId": "153a2b8b-4870-4a1e-864b-e73483aa93a8"
+    }
+  ],
+  "seed": 28,
+  "saved": true,
+  "collection": "manual",
+  "encounters": [
+    {
+      "encounterIndex": 0,
+      "contact": 128,
+      "reward": {
+        "id": "<run>:floor:1:reward:0:loot",
+        "slot": 0,
+        "rewardIndex": 0,
+        "cell": 128,
+        "itemId": "item:aiming_charm",
+        "quantity": 1,
+        "remaining": 1
+      },
+      "partyBeforeBattle": [
+        {
+          "heroId": "fighter",
+          "hp": 18,
+          "xp": 0,
+          "level": 1,
+          "maxHp": 18,
+          "learned": [
+            "ability:basic_attack",
+            "ability:guarded_strike"
+          ]
+        },
+        {
+          "heroId": "ranger",
+          "hp": 12,
+          "xp": 0,
+          "level": 1,
+          "maxHp": 12,
+          "learned": [
+            "ability:basic_attack",
+            "ability:high_shot"
+          ]
+        },
+        {
+          "heroId": "mage",
+          "hp": 11,
+          "xp": 0,
+          "level": 1,
+          "maxHp": 11,
+          "learned": [
+            "ability:basic_attack",
+            "ability:magic_missile"
+          ]
+        }
+      ],
+      "partyAfterBattle": [
+        {
+          "heroId": "fighter",
+          "hp": 14,
+          "xp": 30,
+          "level": 1,
+          "maxHp": 18,
+          "learned": [
+            "ability:basic_attack",
+            "ability:guarded_strike"
+          ]
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8,
+          "xp": 30,
+          "level": 1,
+          "maxHp": 12,
+          "learned": [
+            "ability:basic_attack",
+            "ability:high_shot"
+          ]
+        },
+        {
+          "heroId": "mage",
+          "hp": 11,
+          "xp": 30,
+          "level": 1,
+          "maxHp": 11,
+          "learned": [
+            "ability:basic_attack",
+            "ability:magic_missile"
+          ]
+        }
+      ],
+      "partyAfterPreparation": [
+        {
+          "heroId": "fighter",
+          "hp": 14,
+          "xp": 30,
+          "level": 1,
+          "maxHp": 18,
+          "learned": [
+            "ability:basic_attack",
+            "ability:guarded_strike"
+          ]
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8,
+          "xp": 30,
+          "level": 1,
+          "maxHp": 12,
+          "learned": [
+            "ability:basic_attack",
+            "ability:high_shot"
+          ]
+        },
+        {
+          "heroId": "mage",
+          "hp": 11,
+          "xp": 30,
+          "level": 1,
+          "maxHp": 11,
+          "learned": [
+            "ability:basic_attack",
+            "ability:magic_missile"
+          ]
+        }
+      ],
+      "ownership": {
+        "consumables": [],
+        "equipment": [
+          {
+            "instanceId": "<run>:floor:1:reward:0:loot",
+            "itemId": "item:aiming_charm"
+          }
+        ],
+        "assignments": [
+          {
+            "heroId": "fighter",
+            "slot": "charm",
+            "instanceId": "<run>:floor:1:reward:0:loot"
+          }
+        ]
+      }
+    },
+    {
+      "encounterIndex": 1,
+      "contact": 168,
+      "reward": {
+        "id": "<run>:floor:1:reward:1:loot",
+        "slot": 2,
+        "rewardIndex": 1,
+        "cell": 168,
+        "itemId": "item:warding_charm",
+        "quantity": 1,
+        "remaining": 1
+      },
+      "partyBeforeBattle": [
+        {
+          "heroId": "fighter",
+          "hp": 14,
+          "xp": 30,
+          "level": 1,
+          "maxHp": 18,
+          "learned": [
+            "ability:basic_attack",
+            "ability:guarded_strike"
+          ]
+        },
+        {
+          "heroId": "ranger",
+          "hp": 8,
+          "xp": 30,
+          "level": 1,
+          "maxHp": 12,
+          "learned": [
+            "ability:basic_attack",
+            "ability:high_shot"
+          ]
+        },
+        {
+          "heroId": "mage",
+          "hp": 11,
+          "xp": 30,
+          "level": 1,
+          "maxHp": 11,
+          "learned": [
+            "ability:basic_attack",
+            "ability:magic_missile"
+          ]
+        }
+      ],
+      "partyAfterBattle": [
+        {
+          "heroId": "fighter",
+          "hp": 24,
+          "xp": 120,
+          "level": 2,
+          "maxHp": 24,
+          "learned": [
+            "ability:basic_attack",
+            "ability:guarded_strike",
+            "ability:second_wind"
+          ]
+        },
+        {
+          "heroId": "ranger",
+          "hp": 17,
+          "xp": 120,
+          "level": 2,
+          "maxHp": 17,
+          "learned": [
+            "ability:basic_attack",
+            "ability:high_shot",
+            "ability:mark_target"
+          ]
+        },
+        {
+          "heroId": "mage",
+          "hp": 15,
+          "xp": 120,
+          "level": 2,
+          "maxHp": 15,
+          "learned": [
+            "ability:basic_attack",
+            "ability:magic_missile"
+          ]
+        }
+      ],
+      "partyAfterPreparation": [
+        {
+          "heroId": "fighter",
+          "hp": 24,
+          "xp": 120,
+          "level": 2,
+          "maxHp": 24,
+          "learned": [
+            "ability:basic_attack",
+            "ability:guarded_strike",
+            "ability:second_wind"
+          ]
+        },
+        {
+          "heroId": "ranger",
+          "hp": 17,
+          "xp": 120,
+          "level": 2,
+          "maxHp": 17,
+          "learned": [
+            "ability:basic_attack",
+            "ability:high_shot",
+            "ability:mark_target"
+          ]
+        },
+        {
+          "heroId": "mage",
+          "hp": 15,
+          "xp": 120,
+          "level": 2,
+          "maxHp": 15,
+          "learned": [
+            "ability:basic_attack",
+            "ability:magic_missile"
+          ]
+        }
+      ],
+      "ownership": {
+        "consumables": [],
+        "equipment": [
+          {
+            "instanceId": "<run>:floor:1:reward:0:loot",
+            "itemId": "item:aiming_charm"
+          },
+          {
+            "instanceId": "<run>:floor:1:reward:1:loot",
+            "itemId": "item:warding_charm"
+          }
+        ],
+        "assignments": [
+          {
+            "heroId": "fighter",
+            "slot": "charm",
+            "instanceId": "<run>:floor:1:reward:0:loot"
+          },
+          {
+            "heroId": "ranger",
+            "slot": "charm",
+            "instanceId": "<run>:floor:1:reward:1:loot"
+          }
+        ]
+      }
+    },
+    {
+      "encounterIndex": 2,
+      "contact": 208,
+      "reward": {
+        "id": "<run>:floor:1:reward:2:loot",
+        "slot": 1,
+        "rewardIndex": 2,
+        "cell": 208,
+        "itemId": "item:healing_draught",
+        "quantity": 1,
+        "remaining": 1
+      },
+      "partyBeforeBattle": [
+        {
+          "heroId": "fighter",
+          "hp": 24,
+          "xp": 120,
+          "level": 2,
+          "maxHp": 24,
+          "learned": [
+            "ability:basic_attack",
+            "ability:guarded_strike",
+            "ability:second_wind"
+          ]
+        },
+        {
+          "heroId": "ranger",
+          "hp": 17,
+          "xp": 120,
+          "level": 2,
+          "maxHp": 17,
+          "learned": [
+            "ability:basic_attack",
+            "ability:high_shot",
+            "ability:mark_target"
+          ]
+        },
+        {
+          "heroId": "mage",
+          "hp": 15,
+          "xp": 120,
+          "level": 2,
+          "maxHp": 15,
+          "learned": [
+            "ability:basic_attack",
+            "ability:magic_missile"
+          ]
+        }
+      ],
+      "partyAfterBattle": [
+        {
+          "heroId": "fighter",
+          "hp": 24,
+          "xp": 175,
+          "level": 2,
+          "maxHp": 24,
+          "learned": [
+            "ability:basic_attack",
+            "ability:guarded_strike",
+            "ability:second_wind"
+          ]
+        },
+        {
+          "heroId": "ranger",
+          "hp": 17,
+          "xp": 175,
+          "level": 2,
+          "maxHp": 17,
+          "learned": [
+            "ability:basic_attack",
+            "ability:high_shot",
+            "ability:mark_target"
+          ]
+        },
+        {
+          "heroId": "mage",
+          "hp": 0,
+          "xp": 120,
+          "level": 2,
+          "maxHp": 15,
+          "learned": [
+            "ability:basic_attack",
+            "ability:magic_missile"
+          ]
+        }
+      ],
+      "partyAfterPreparation": [
+        {
+          "heroId": "fighter",
+          "hp": 24,
+          "xp": 175,
+          "level": 2,
+          "maxHp": 24,
+          "learned": [
+            "ability:basic_attack",
+            "ability:guarded_strike",
+            "ability:second_wind"
+          ]
+        },
+        {
+          "heroId": "ranger",
+          "hp": 17,
+          "xp": 175,
+          "level": 2,
+          "maxHp": 17,
+          "learned": [
+            "ability:basic_attack",
+            "ability:high_shot",
+            "ability:mark_target"
+          ]
+        },
+        {
+          "heroId": "mage",
+          "hp": 0,
+          "xp": 120,
+          "level": 2,
+          "maxHp": 15,
+          "learned": [
+            "ability:basic_attack",
+            "ability:magic_missile"
+          ]
+        }
+      ],
+      "ownership": {
+        "consumables": [
+          {
+            "itemId": "item:healing_draught",
+            "quantity": 1
+          }
+        ],
+        "equipment": [
+          {
+            "instanceId": "<run>:floor:1:reward:0:loot",
+            "itemId": "item:aiming_charm"
+          },
+          {
+            "instanceId": "<run>:floor:1:reward:1:loot",
+            "itemId": "item:warding_charm"
+          }
+        ],
+        "assignments": [
+          {
+            "heroId": "fighter",
+            "slot": "charm",
+            "instanceId": "<run>:floor:1:reward:0:loot"
+          },
+          {
+            "heroId": "ranger",
+            "slot": "charm",
+            "instanceId": "<run>:floor:1:reward:1:loot"
+          }
+        ]
+      }
+    }
+  ],
+  "returnedToFirstFloor": {
+    "depth": 1,
+    "phase": "ready",
+    "completed": 3,
+    "loot": [
+      {
+        "id": "<run>:floor:1:reward:0:loot",
+        "slot": 0,
+        "rewardIndex": 0,
+        "cell": 128,
+        "itemId": "item:aiming_charm",
+        "quantity": 1,
+        "remaining": 0
+      },
+      {
+        "id": "<run>:floor:1:reward:1:loot",
+        "slot": 2,
+        "rewardIndex": 1,
+        "cell": 168,
+        "itemId": "item:warding_charm",
+        "quantity": 1,
+        "remaining": 0
+      },
+      {
+        "id": "<run>:floor:1:reward:2:loot",
+        "slot": 1,
+        "rewardIndex": 2,
+        "cell": 208,
+        "itemId": "item:healing_draught",
+        "quantity": 1,
+        "remaining": 0
+      }
+    ],
+    "partyEqualsLastPreparation": true,
+    "ownershipEqualsLastPreparation": true
+  }
+}

@@ -6,7 +6,7 @@ import { guardedBoundary } from '../helpers/guardedBoundary';
 import { combatStats } from '../../src/domain/effects';
 import { assert,expect,it } from 'vitest';
 import { previewSupportAbility } from '../../src/domain/combat';
-import { dungeonJourney, dungeonVictoryBoundary, rangerJourney, selectMageJourney, MAGE_JOURNEY_SEEDS, healedFighterBoundary, shamanJourney, fighterJourney } from '../helpers/dungeonFixtures';
+import { dungeonJourney, dungeonVictoryBoundary, rangerJourney, selectMageJourney, MAGE_JOURNEY_SEEDS, FIGHTER_JOURNEY_SEED, healedFighterBoundary, shamanJourney, fighterJourney } from '../helpers/dungeonFixtures';
 import { dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState } from '../../src/domain/dungeon';
 import { BattleSession } from '../../src/app/BattleSession';
 import { playerDecision } from '../helpers/playerPolicy';
@@ -113,7 +113,7 @@ it('completes production Shaman Hex and healing through the real session with ex
 });
 
 it('retains a legal six-battle Fighter level-three witness with healing, Taunt and exact terminal replay',()=>{
-  const witness=fighterJourney(50);
+  const witness=fighterJourney(FIGHTER_JOURNEY_SEED);
   expect({phase:witness.state.phase,healed:witness.healed,taunted:witness.taunted,depth:witness.depth,slot:witness.slot})
     .toEqual({phase:'defeat',healed:true,taunted:true,depth:2,slot:2});
   expect(witness.records).toHaveLength(6);
@@ -125,6 +125,14 @@ it('retains a legal six-battle Fighter level-three witness with healing, Taunt a
     expect({state,events}).toEqual({state:record.state,events:record.events});
   }
 },120000);
+
+it('retains the earlier Fighter seed outcome after ground loot removes reward choice', () => {
+  const witness = fighterJourney(50);
+  expect({ phase: witness.state.phase, healed: witness.healed, taunted: witness.taunted, depth: witness.depth, slot: witness.slot })
+    .toEqual({ phase: 'defeat', healed: true, taunted: false, depth: 2, slot: 0 });
+  expect(witness.records).toHaveLength(4);
+  expect(witness.state.party.find(hero => hero.heroId === 'fighter')!.level).toBe(2);
+}, 120000);
 
 it('roundtrips live Weakened and Shaman ally healing without broadening party HP or carrying status to the next battle',()=>{
   let entry;

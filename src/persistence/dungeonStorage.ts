@@ -1,4 +1,4 @@
-import { DUNGEON_SAVE_MAX_BYTES, decodeDungeon, encodeDungeonRollback, encodeDungeonWithState, hasWallSight, requiresFinalRewardSupport, restoreDungeonRollback } from '../domain/dungeonSaveEnvelope';
+import { DUNGEON_SAVE_MAX_BYTES, decodeDungeon, encodeDungeonRollback, encodeDungeonWithState, hasGroundLoot, hasWallSight, requiresFinalRewardSupport, restoreDungeonRollback } from '../domain/dungeonSaveEnvelope';
 import type { DungeonState } from '../domain/dungeon';
 import type { RunStorageProvider } from './runStorage';
 export const DUNGEON_KEYS = { primary: 'tactics-guru:phaser:dungeon:primary:v1', backup: 'tactics-guru:phaser:dungeon:backup:v1' } as const;
@@ -118,7 +118,7 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
       let checkpoint: string | null = null;
       // Inspection caches the exact record that restored the reviewed backup.
       const retainedRecord = old.backup.status === 'valid' && old.backup.checkpoint ? restoredBackup?.record : undefined;
-      if (!(backup === null && retainedRecord !== undefined) && backupState && !backupState.stats && hasWallSight(backupState)) {
+      if (!(backup === null && retainedRecord !== undefined) && backupState && !backupState.stats && !hasGroundLoot(backupState) && hasWallSight(backupState)) {
         const rollback = encodeDungeonRollback(backupState);
         if (rollback.ok) {
           backup = rollback.text;

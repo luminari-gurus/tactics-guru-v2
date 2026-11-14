@@ -38,7 +38,6 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
   const focusId = active?.id;
   const el = dungeonElement, floor = currentFloor(s);
   const title = el('h1', s.phase === 'defeat' ? `Dungeon defeat · ${dungeonBiomeLabel(s)} · Floor ${s.depth}` : `Dungeon · Floor ${s.depth} · ${dungeonBiomeLabel(s)}`); title.id = 'dungeon-title'; title.tabIndex = -1;
-  const status = el('p',session.status);status.className='dungeon-status';status.setAttribute('role','status');
   let header=root.querySelector<HTMLElement>(':scope > .dungeon-header');
   let play=root.querySelector<HTMLElement>(':scope > .dungeon-play');
   let sidebar=play?.querySelector<HTMLElement>('.dungeon-sidebar');
@@ -54,7 +53,18 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
   }
   // Keep the map and host tools mounted to retain their state and focus.
   for (const child of [...root.children]) if (child !== header && child !== play && child !== after && child !== tools) child.remove();
-  header.replaceChildren(title,status);
+  // Keep the live region connected while its text changes. Replacing it with a
+  // populated node can leave pickup and capacity feedback unannounced.
+  let status = header.querySelector<HTMLElement>(':scope > .dungeon-status');
+  if (!status) {
+    status=el('p');status.className='dungeon-status';status.setAttribute('role','status');
+    status.setAttribute('aria-live','polite');status.setAttribute('aria-atomic','true');
+    header.append(status);
+  }
+  const previousTitle=header.querySelector(':scope > h1');
+  if(previousTitle)previousTitle.replaceWith(title);else header.prepend(title);
+  for(const child of [...header.children])if(child!==title&&child!==status)child.remove();
+  if(status.textContent!==session.status)status.textContent=session.status;
   if (s.phase === 'ready') {
     if (s.depth > 1 && floor.position === floor.descriptor.upstairs) {
       header.append(el('p', 'Step off the upstairs and back onto it to ascend.'));
@@ -79,7 +89,7 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
     const b=el('button',label);b.type='button';b.disabled=disabled;if(id)b.id=id;b.onclick=run;return b;
   };
   const review = (label: string, command: DungeonItemCommand) => dialogs.showChoices('Review item choice', label,[
-    {id:'dungeon-item-confirm',label:'Confirm',run:()=>{session.dispatch(command);root.querySelector<HTMLElement>('h1')?.focus();}},
+    {id:'dungeon-item-confirm',label:'Confirm',run:async()=>{await session.dispatch(command);root.querySelector<HTMLElement>('h1')?.focus();}},
     {id:'dungeon-item-cancel',label:'Cancel',run:()=>root.querySelector<HTMLElement>('h1')?.focus()},
   ]);
 
@@ -89,8 +99,9 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
   const travel=disclosure('dungeon-travel','Travel and map guide');
   travel.append(
     el('p','Tap an adjacent cell, use the compass, or press the arrow keys or WASD (when enabled) to move. Enemies move when you move.'),
-    el('p','● Player · M encounter or guardian · ✓ cleared · ↑ upstairs · ↓ downstairs. Hatching marks remembered terrain.'),
-    el('p','Walk onto an uncleared enemy to start an encounter. Clear all three encounters and resolve pending rewards to unlock descent.'),
+    el('p','● Player · M encounter or guardian · ◆ loot · ✓ cleared · ↑ upstairs · ↓ downstairs. Hatching marks remembered terrain.'),
+    el('p','Attempt to enter an uncleared enemy square to start combat before moving. Clear all three encounters to unlock descent. Loot can be left behind without blocking travel.'),
+    el('p','Stepping onto loot collects what fits. Remaining items stay on the ground. Freeing inventory space while standing on a pile retries pickup without moving enemies. Loot does not equip gear or use healing items.'),
     el('p','Move onto an available stair to travel automatically. On arrival or after continuing a save, step off and back onto the stair to travel again. Upstairs is unavailable on floor 1.'),
   );
   const party = el('section');
@@ -165,7 +176,7 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
   }
   sidebar.append(party);
   const inventory=disclosure('dungeon-inventory','Owned items');
-  if(s.offer){const rewards=el('section');rewards.setAttribute('aria-label','Rewards');rewards.append(el('h2','Choose one reward'));
+  if(s.offer){const rewards=el('section');rewards.setAttribute('aria-label','Rewards');rewards.append(el('h2','Saved reward choice'));
     const nextStep = floor.completed === 3 ? 'unlock descent' : 'prepare the next encounter';
     for(const o of s.offer.options){const command:DungeonItemCommand={...dungeonBoundary(s),type:'claimReward',offerId:s.offer.id,itemId:o.itemId};rewards.append(button(`Claim ${dungeonContent.items[o.itemId].label}`,()=>review(`Claim ${dungeonContent.items[o.itemId].label} and ${nextStep}?`,command)));}
     const decline:DungeonItemCommand={...dungeonBoundary(s),type:'declineReward',offerId:s.offer.id};
@@ -213,7 +224,7 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
       const focus=()=>root.querySelector<HTMLElement>('h1')?.focus();
       row.append(button(`Discard ${def.label}`,()=>dialogs.showChoices('Discard charm?',`Permanently discard ${def.label}${assignment?` and unequip it from ${assignment.heroId}`:''}? No item or currency is received.`,[
         {id:'dungeon-discard-cancel',label:'Cancel',run:focus},
-        {id:'dungeon-discard-confirm',label:'Discard charm',run:()=>{session.dispatch(command);focus();}},
+        {id:'dungeon-discard-confirm',label:'Discard charm',run:async()=>{await session.dispatch(command);focus();}},
       ],focus),!['ready','reward'].includes(s.phase),`dungeon-discard-${itemKey}`));
     }
     inventory.append(row);

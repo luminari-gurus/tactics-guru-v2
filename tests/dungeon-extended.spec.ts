@@ -4,14 +4,15 @@ import { dungeonContent } from '../src/content/dungeon';
 import { dungeonBattle, freshDungeon, type DungeonState } from '../src/domain/dungeon';
 import { encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
+import { AUTO_COLLECT_LOOT_KEY } from '../src/ui/autoCollectLootPreference';
 import { dispatch } from '../src/domain/turns';
-import { walkDungeon, continueSavedDungeon, openDungeonInventory } from './helpers/dungeonTraversal';
+import { walkDungeon, continueSavedDungeon, openDungeonInventory, collectDungeonEncounterLoot } from './helpers/dungeonTraversal';
 import { readSession, playCommand } from './helpers/battlePolicy';
 import { fighterDecision, rangerDecision, mageDecision } from './helpers/playerPolicy';
-import { journeyPreparation, rangerJourney, selectMageJourney, fighterJourney } from './helpers/dungeonFixtures';
+import { journeyPreparation, rangerJourney, selectMageJourney, fighterJourney, FIGHTER_JOURNEY_SEED } from './helpers/dungeonFixtures';
 
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
-async function seed(page:Page,s:DungeonState){const encoded=encodeDungeon(s);if(!encoded.ok)throw Error(encoded.reason);await page.goto('./?game=dungeon');await page.evaluate(({key,text})=>{localStorage.setItem(key,text);}, {key:DUNGEON_KEYS.primary,text:encoded.text});await page.reload();await continueSavedDungeon(page);}
+async function seed(page:Page,s:DungeonState){const encoded=encodeDungeon(s);if(!encoded.ok)throw Error(encoded.reason);await page.goto('./?game=dungeon');await page.evaluate(({key,text,preferenceKey})=>{localStorage.setItem(preferenceKey,'off');localStorage.setItem(key,text);}, {key:DUNGEON_KEYS.primary,text:encoded.text,preferenceKey:AUTO_COLLECT_LOOT_KEY});await page.reload();await continueSavedDungeon(page);}
 
 /** Read fresh progress from the same public DOM records without transferring full histories for polling. */
 async function mageProgress(page:Page) {
@@ -65,6 +66,7 @@ test('Mage legal progression journey earns level three uses Frost Snare and mult
    expired ||= r.events.some(e=>e.type==='movementBlockExpired'&&e.abilityId==='ability:frost_snare');
   }
   expect(replayed).toEqual(record.state);expect(events).toEqual(record.events);records.push(record);
+  await collectDungeonEncounterLoot(page,entry,isMobile?'touch':'keyboard');
   for(let i=0;i<20;i++) {
    const s=await snapshot(page),command=journeyPreparation(s);if(!command)break;
    if(command.type==='claimReward')await page.getByRole('button',{name:`Claim ${dungeonContent.items[command.itemId].label}`,exact:true}).click();
@@ -117,6 +119,7 @@ test('Ranger legal progression journey earns level three uses Mark and Pin and r
   expect(record.state).toEqual(expected.state);let replayed=record.replay?.initial??record.continuation.snapshot;const events:unknown[]=[];
   for(const c of record.replay?.commands??record.continuation.commands){const r=dispatch(replayed,c,dungeonBattle(record.entry)!.catalog);if(!r.ok)throw Error(r.reason);replayed=r.state;events.push(...r.events);}
   expect(replayed).toEqual(record.state);expect(events).toEqual(record.events);records.push(record);
+  await collectDungeonEncounterLoot(page,entry,isMobile?'touch':'keyboard');
   for(let i=0;i<20;i++) {
    const s=await snapshot(page),command=journeyPreparation(s);if(!command)break;
    if(command.type==='claimReward')await page.getByRole('button',{name:`Claim ${dungeonContent.items[command.itemId].label}`,exact:true}).click();
@@ -132,7 +135,7 @@ test('Ranger legal progression journey earns level three uses Mark and Pin and r
 
 test('Fighter legal progression journey earns level three uses both abilities and resumes',async({page,isMobile})=>{
  test.setTimeout(600000);page.setDefaultTimeout(10000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
- const witness=fighterJourney(50);expect(witness.healed&&witness.taunted).toBe(true);
+ const witness=fighterJourney(FIGHTER_JOURNEY_SEED);expect(witness.healed&&witness.taunted).toBe(true);
  // Canonical unplayed level-1 seed, with no fabricated progression, inventory or combat boundary.
  await seed(page,freshDungeon('fighter-production-journey',witness.seed));
  const records:unknown[]=[];let healed=false,taunted=false;
@@ -172,6 +175,7 @@ test('Fighter legal progression journey earns level three uses both abilities an
    for(const c of record.replay?.commands??record.continuation.commands){const r=dispatch(replayed,c,dungeonBattle(record.entry)!.catalog);if(!r.ok)throw Error(r.reason);replayed=r.state;events.push(...r.events);}
    expect(replayed).toEqual(record.state);expect(events).toEqual(record.events);records.push(record);
    if(completed.phase==='defeat')break;
+   await collectDungeonEncounterLoot(page,entry,isMobile?'touch':'keyboard');
    for(let i=0;i<20;i++) {
     const s=await snapshot(page),command=journeyPreparation(s);if(!command)break;
     if(command.type==='claimReward')await page.getByRole('button',{name:`Claim ${dungeonContent.items[command.itemId].label}`,exact:true}).click();

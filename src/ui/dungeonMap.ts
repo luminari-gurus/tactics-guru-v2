@@ -1,5 +1,7 @@
-import type { DungeonState } from '../domain/dungeon';
+import type { DungeonFloor, DungeonState } from '../domain/dungeon';
 import { currentFloor, clearedDungeonSlots } from '../domain/dungeon';
+import { dungeonContent } from '../content/dungeon';
+import type { ItemId } from '../content/itemTypes';
 import { currentSight, neighbors, poiCell } from '../domain/exploration';
 import type { GeneratedMap } from '../map/generate';
 import { createMapArt, ART_STYLES, type ArtStyle } from '../map/art';
@@ -15,6 +17,27 @@ export function dungeonEncounterLabel(s: DungeonState, slot: number): string {
 
 const WASD_PREFERENCE_KEY = 'tactics-guru:dungeon-wasd';
 
+type LootContent = { readonly cell: number; readonly itemId: ItemId; readonly remaining: 0 | 1 };
+
+/** Presentation groups contents without changing encounter reward identities or pickup order. */
+export function dungeonLootPiles(floor: DungeonFloor & { readonly loot?: readonly LootContent[] }): Map<number, readonly LootContent[]> {
+  const piles = new Map<number, LootContent[]>();
+  for (const loot of floor.loot ?? []) {
+    if (!loot.remaining) continue;
+    const contents = piles.get(loot.cell) ?? [];
+    contents.push(loot);
+    piles.set(loot.cell, contents);
+  }
+  return piles;
+}
+
+export function dungeonLootContents(contents: readonly LootContent[]): string {
+  const quantities = new Map<ItemId, number>();
+  for (const loot of contents) if (loot.remaining) quantities.set(loot.itemId, (quantities.get(loot.itemId) ?? 0) + loot.remaining);
+  return [...quantities].sort(([a], [b]) => a.localeCompare(b))
+    .map(([itemId, quantity]) => `${dungeonContent.items[itemId].label} ×${quantity}`).join(', ');
+}
+
 /** View-local art state and bindings; no simulation timer or authoritative DOM state. */
 export class DungeonMap {
   readonly root = document.createElement('section');
@@ -28,6 +51,8 @@ export class DungeonMap {
   private readonly wasd: HTMLInputElement;
   private readonly grid = document.createElement('div');
   private readonly markerDescription = document.createElement('p');
+  private readonly lootGuide = document.createElement('p');
+  private readonly lootHere = document.createElement('p');
   private readonly feedback = document.createElement('p');
   private readonly controls: { button: HTMLButtonElement; dx: number; dy: number }[] = [];
   private readonly cells: HTMLSpanElement[] = [];
@@ -63,6 +88,11 @@ export class DungeonMap {
     this.markerDescription.id = 'dungeon-map-markers';
     this.markerDescription.hidden = true;
     this.grid.setAttribute('aria-describedby', this.markerDescription.id);
+    this.lootGuide.className = 'dungeon-loot-guide';
+    this.lootGuide.textContent = '◆ Loot · Step onto it to collect what fits.';
+    this.lootGuide.hidden = true;
+    this.lootHere.className = 'dungeon-loot-here';
+    this.lootHere.hidden = true;
     this.grid.addEventListener('click',e=>{
       if(!this.live||!this.state||!this.map||this.locked()||document.hidden||!(e.target instanceof Element))return;
       const cell=e.target.closest<HTMLElement>('[data-cell]');if(!cell)return;
@@ -79,7 +109,7 @@ export class DungeonMap {
       this.controls.push({button,dx,dy});directions.append(button);
     }
     const center=el('span');center.className='dungeon-compass-center';center.setAttribute('aria-hidden','true');directions.append(center);
-    this.root.append(this.heading,this.grid,this.markerDescription);
+    this.root.append(this.heading,this.grid,this.markerDescription,this.lootGuide,this.lootHere);
     this.controlsRoot.className = 'dungeon-map-controls';
     this.controlsRoot.append(directions,this.feedback,label,keyboardPreference);
     document.addEventListener('keydown',e => {
@@ -129,6 +159,8 @@ export class DungeonMap {
     if(grid.dataset.biome!==biome.id)grid.dataset.biome=biome.id;
     const revealed = new Set(f.exploration.revealed);
     const sight = new Set(currentSight(f.position, map));
+    const piles = dungeonLootPiles(f);
+    const shownLoot = new Map([...piles].filter(([cell]) => revealed.has(cell)));
     const showUpstairs = s.depth > 1 && revealed.has(f.descriptor.upstairs);
     const showDownstairs = s.phase === 'ready' && f.completed === 3 && revealed.has(f.descriptor.downstairs);
     const cleared=clearedDungeonSlots(f);
@@ -150,9 +182,17 @@ export class DungeonMap {
         : slot === activeSlot && s.phase === 'battle' ? 'In battle' : 'Available';
       markerDescriptions.push(`${dungeonEncounterLabel(s, slot)} at ${location(cell)}. ${status}.`);
     }
+    for (const [cell, contents] of shownLoot) {
+      markerDescriptions.push(`Loot at ${location(cell)}: ${dungeonLootContents(contents)}.${cell === f.position ? ' Beneath the party.' : ''}`);
+    }
     if (showDownstairs) markerDescriptions.push(`Downstairs at ${location(f.descriptor.downstairs)}.`);
-    const description = markerDescriptions.join(' ') || 'No visible encounters or discovered stairs.';
+    const description = markerDescriptions.join(' ') || 'No visible encounters, loot or discovered stairs.';
     if (this.markerDescription.textContent !== description) this.markerDescription.textContent = description;
+    this.lootGuide.hidden = shownLoot.size === 0;
+    const beneathParty = piles.get(f.position);
+    this.lootHere.hidden = !beneathParty;
+    const contentsHere = beneathParty ? `Loot here: ${dungeonLootContents(beneathParty)}. Items stay on the ground until they fit in your inventory.` : '';
+    if (this.lootHere.textContent !== contentsHere) this.lootHere.textContent = contentsHere;
     const pois=new Map([...shownPois].sort((a,b)=>Number(cleared.includes(b.encounterSlot))-Number(cleared.includes(a.encounterSlot))).map(p=>[poiCell(p,map.width),p]));
     const total=map.width*map.height;
     let rebuild=this.cells.length!==total||grid.children.length!==total;
@@ -163,7 +203,7 @@ export class DungeonMap {
     }
     const prior=this.visual;
     rebuild ||= !prior || prior.map!==map || prior.biome!==biome.id;
-    const markers=[f.position,f.descriptor.upstairs,f.descriptor.downstairs,...pois.keys()];
+    const markers=[f.position,f.descriptor.upstairs,f.descriptor.downstairs,...pois.keys(),...shownLoot.keys()];
     const dirty=new Set<number>(),artDirty=new Set<HTMLElement>();
     if(rebuild) {for(let i=0;i<total;i++)dirty.add(i);}
     else if(prior) {
@@ -181,6 +221,7 @@ export class DungeonMap {
       const className = known ? terrainClass + (sight.has(i) ? '' : ' explore-remembered') : 'explore-hidden';
       if(cell.className!==className)cell.className=className;
       let text='', poi: string | undefined;
+      const loot = shownLoot.get(i);
       if(known){
         const terrain=`${biome.id}-${open?'open':'blocked'}`;
         if(cell.dataset.terrain!==terrain){cell.dataset.terrain=terrain;artDirty.add(cell);}
@@ -188,11 +229,21 @@ export class DungeonMap {
         if(showUpstairs&&i===f.descriptor.upstairs)text='↑';
         if(showDownstairs&&i===f.descriptor.downstairs)text='↓';
         const p=pois.get(i);if(p){if(!cleared.includes(p.encounterSlot))text='M';else if(!(showUpstairs&&i===f.descriptor.upstairs)&&!(showDownstairs&&i===f.descriptor.downstairs))text='✓';poi=p.id;}
+        if (loot && (!text || text === '✓')) text = '◆';
       } else if(cell.dataset.terrain!==undefined) {
         delete cell.dataset.terrain;cell.style.backgroundImage='';this.terrainCells.delete(cell);this.fallbackCells.delete(cell);
       }
       if(i===f.position)text='●';
       if(cell.textContent!==text)cell.textContent=text;
+      if (loot) {
+        const count = String(loot.length);
+        if (cell.dataset.loot !== count) cell.dataset.loot = count;
+        if (text !== '◆') cell.dataset.lootOverlay = 'true';
+        else delete cell.dataset.lootOverlay;
+      } else {
+        delete cell.dataset.loot;
+        delete cell.dataset.lootOverlay;
+      }
       if(poi===undefined){if(cell.dataset.poi!==undefined)delete cell.dataset.poi;}else if(cell.dataset.poi!==poi)cell.dataset.poi=poi;
       if(i===f.position){if(cell.dataset.player!=='true')cell.dataset.player='true';}else if(cell.dataset.player!==undefined)delete cell.dataset.player;
     }

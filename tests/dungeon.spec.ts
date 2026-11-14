@@ -1,5 +1,5 @@
 import { dungeonContent } from '../src/content/dungeon';
-import { walkDungeon, reenterDungeonStair, continueSavedDungeon, openDungeonInventory } from './helpers/dungeonTraversal';
+import { walkDungeon, reenterDungeonStair, continueSavedDungeon, openDungeonInventory, collectDungeonEncounterLoot } from './helpers/dungeonTraversal';
 import { atEncounter, atStairApproach, checkedDungeon, stagedMageAbility, snaredDefeatBoundary } from './helpers/dungeonFixtures';
 import { expect,railTest as test,type Page } from './helpers/dungeonEntropy';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -11,6 +11,7 @@ import { decodeDungeon, encodeDungeon } from '../src/domain/dungeonSaveEnvelope'
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { RUN_RECORD_KEYS } from '../src/persistence/runRecordsStorage';
 import { COMBAT_CONTROLS_KEY } from '../src/ui/combatControls';
+import { AUTO_COLLECT_LOOT_KEY } from '../src/ui/autoCollectLootPreference';
 import { readSession,playCommand,playUndo,checkActivePlaytime,checkBackgroundPlaytime } from './helpers/battlePolicy';
 import { playerDecision, fighterDecision } from './helpers/playerPolicy';
 import { journeyPreparation, healedFighterBoundary, shamanJourney } from './helpers/dungeonFixtures';
@@ -23,6 +24,33 @@ import { movementBlockSource } from '../src/domain/effects';
 const fixedSeedTest = test.extend({ pinDungeonSeed: 28 });
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
 const boardReport=async(page:Page)=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
+async function setJourneyAutoCollect(page:Page,enabled:boolean,touch:boolean) {
+ await page.goto('./');
+ const activate=async(control:Locator)=>{if(touch)await control.tap();else await control.click();};
+ await activate(page.getByRole('button',{name:'Settings',exact:true}));
+ const setting=page.getByRole('checkbox',{name:'Auto-collect loot',exact:true});
+ // Exercise a real saved choice even when the default already matches it.
+ if(await setting.isChecked()===enabled)await activate(setting);
+ await activate(setting);await expect(setting).toBeChecked({checked:enabled});
+ expect(await page.evaluate(key=>localStorage.getItem(key),AUTO_COLLECT_LOOT_KEY)).toBe(enabled?'on':'off');
+ await activate(page.getByRole('button',{name:'Close',exact:true}));
+ await page.reload();await activate(page.getByRole('button',{name:'Settings',exact:true}));
+ await expect(setting).toBeChecked({checked:enabled});
+ await activate(page.getByRole('button',{name:'Close',exact:true}));
+}
+/** Observe the actual winning boundary before the natural timer, without holding or replacing it. */
+async function observeDungeonReturn(page:Page) {
+ await page.evaluate(()=>{
+  const game=document.querySelector('#game')!;
+  const evidence=window as unknown as {issue408Return:DungeonState|null};evidence.issue408Return=null;
+  const observer=new MutationObserver(()=>{
+   const state=JSON.parse(game.getAttribute('data-dungeon-snapshot')!) as DungeonState;
+   if(state.phase==='battle')return;
+   evidence.issue408Return=state;observer.disconnect();
+  });
+  observer.observe(game,{attributes:true,attributeFilter:['data-dungeon-snapshot']});
+ });
+}
 async function checkSnares(page:Page, fitted=false) {
  const state=(await readSession(page)).state,r=await boardReport(page);
  for(const unit of state.units) {
@@ -224,18 +252,23 @@ test('Snared badge excludes a legally Pinned enemy on saved resume',async({page}
 
 // Saved New Game avoids its initial dormant seed; draw 27 so the playable seed
 // is 28, matching the existing complete legal first-floor witness.
-for(const saved of [false,true])(saved?test.extend({pinDungeonSeed:27}):fixedSeedTest)(saved?'saved menu dungeon keeps proof tools hidden across legal encounters':'testing dungeon legally clears a floor, descends and backtracks without accessing saves',async({page,isMobile})=>{
+for(const {saved,autoCollect,title} of [
+ {saved:false,autoCollect:false,title:'testing dungeon legally clears a floor, descends and backtracks without accessing saves'},
+ {saved:true,autoCollect:false,title:'saved menu dungeon keeps proof tools hidden across legal encounters'},
+ {saved:true,autoCollect:true,title:'saved menu dungeon auto-collects loot across a complete first floor'},
+])(saved?test.extend({pinDungeonSeed:27}):fixedSeedTest)(title,async({page,isMobile})=>{
  test.setTimeout(300000); // Three complete battles plus normal exploration and stair input.
  // Reuse the complete first floor of the existing legal Fighter journey.
- const errors:string[]=[];let taunted=false;page.on('pageerror',error=>errors.push(error.message));
- if(!saved)await page.addInitScript(()=>{
+ const errors:string[]=[];let taunted=false;const lootJourney:unknown[]=[];page.on('pageerror',error=>errors.push(error.message));
+ if(!saved)await page.addInitScript(preferenceKey=>{
+  localStorage.setItem(preferenceKey,'off');
   const get=Storage.prototype.getItem,set=Storage.prototype.setItem,remove=Storage.prototype.removeItem;
   const gameKey=(key:string)=>key.startsWith('tactics-guru:phaser:')||key.startsWith('tactics-guru:records:')||key==='tactics-guru:menu-new-dungeon-review';
   Storage.prototype.getItem=function(key){if(gameKey(key))throw Error('Testing saved-game read');return get.call(this,key);};
   Storage.prototype.setItem=function(key,value){if(gameKey(key))throw Error('Testing saved-game write');set.call(this,key,value);};
   Storage.prototype.removeItem=function(key){if(gameKey(key))throw Error('Testing saved-game removal');remove.call(this,key);};
- });
- if(saved){await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();}
+ },AUTO_COLLECT_LOOT_KEY);
+ if(saved){await setJourneyAutoCollect(page,autoCollect,isMobile);await page.getByRole('button',{name:'New Game',exact:true}).click();}
  else{await page.goto('./dungeon');await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();}
  await expect(page.locator('#dungeon-map')).toBeVisible();
  expect((await snapshot(page)).seed).toBe(28);
@@ -244,7 +277,9 @@ for(const saved of [false,true])(saved?test.extend({pinDungeonSeed:27}):fixedSee
  for(let slot=0;slot<3;slot++){
   await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-  expectedKills+=(await snapshot(page)).activeBattle!.units.filter(unit=>unit.side==='enemy').length;
+  const encounterEntry=await snapshot(page);
+  await observeDungeonReturn(page);
+  expectedKills+=encounterEntry.activeBattle!.units.filter(unit=>unit.side==='enemy').length;
   await expect(page.getByRole('complementary',{name:'Dungeon battle controls',exact:true})).toBeVisible();
   await expect(page.getByText('Board controls',{exact:true})).not.toBeVisible();
   await expect(page.getByText('Measurements',{exact:true})).not.toBeVisible();
@@ -264,10 +299,42 @@ for(const saved of [false,true])(saved?test.extend({pinDungeonSeed:27}):fixedSee
    await playCommand(page,command);taunted ||= command.type==='useAbility'&&command.abilityId==='ability:taunt';
    await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||(await readSession(page))?.phase==='player';}).toBe(true);
   }
-  const finished=await snapshot(page);expect(finished.phase).not.toBe('defeat');expect(finished.floors[0].completed).toBe(slot+1);
+  const finished=await page.evaluate(()=>(window as unknown as {issue408Return:DungeonState|null}).issue408Return);
+  if(!finished)throw Error('Missing observed dungeon return');
+  expect(finished.phase).not.toBe('defeat');expect(finished.floors[0].completed).toBe(slot+1);
+  expect(finished.phase).toBe('ready');expect(finished.offer).toBeNull();expect(finished.floors[0].loot).toHaveLength(slot+1);
+  const entry=encounterEntry.encounterEntry!,entryFloor=encounterEntry.floors[0],reward=finished.floors[0].loot!.at(-1)!;
+  expect(finished.floors[0].position).toBe(entry.origin);expect(reward).toMatchObject({slot:entry.slot,cell:entry.contact,quantity:1,remaining:1});
+  expect(finished.floors[0].exploration.movement).toEqual(entryFloor.exploration.movement);
+  await expect(page.getByRole('region',{name:'Rewards',exact:true})).toHaveCount(0);
   if(saved){expect(finished.stats?.enemiesKilled).toBe(expectedKills);expect(finished.stats!.movesTaken).toBeGreaterThan(0);}
   else expect(finished.stats).toBeUndefined();
   if(saved)expect(await historyRows(page)).toEqual([]);
+  await expect(page.locator('#dungeon-map')).toBeVisible();
+  if(autoCollect) {
+   // No input, fake clock or timer hook: allow the real post-return step to run.
+   await expect.poll(async()=>{const state=await snapshot(page);return {
+    position:state.floors[0].position,remaining:state.floors[0].loot?.find(item=>item.id===reward.id)?.remaining,
+   };}).toEqual({position:entry.contact,remaining:0});
+  } else {
+   // Observe beyond the 400 ms automatic window before any manual input cancels it.
+   await page.waitForTimeout(500);
+   const waiting=await snapshot(page);expect(waiting.floors[0]).toEqual(finished.floors[0]);
+   expect(waiting.ownership).toEqual(finished.ownership);
+   await collectDungeonEncounterLoot(page,encounterEntry,isMobile?'touch':'keyboard');
+  }
+  const collected=await snapshot(page),collectedFloor=collected.floors[0];
+  expect(collectedFloor.position).toBe(entry.contact);
+  expect(collectedFloor.loot!.find(item=>item.id===reward.id)).toEqual({...reward,remaining:0});
+  // Cleared floors have no enemy update; earlier pickups advance the ordinary enemy tick once.
+  expect(collectedFloor.exploration.movement!.step).toBe(entryFloor.exploration.movement!.step+(slot<2?1:0));
+  expect(collected.party).toEqual(finished.party);expect(collected.ownership.assignments).toEqual(finished.ownership.assignments);
+  if(saved) {
+   expect(collected.stats!.movesTaken).toBe(finished.stats!.movesTaken+1);
+   const decoded=decodeDungeon((await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary))!);
+   if(!decoded.ok)throw Error(`Pickup save is invalid: ${decoded.reason}`);
+   expect({...decoded.state,stats:{...decoded.state.stats!,activeMs:collected.stats!.activeMs}}).toEqual(collected);
+  }
   for(let i=0;i<20;i++){
    const s=await snapshot(page),command=journeyPreparation(s);if(!command)break;
    if(command.type==='claimReward')await page.getByRole('button',{name:`Claim ${dungeonContent.items[command.itemId].label}`,exact:true}).click();
@@ -275,11 +342,19 @@ for(const saved of [false,true])(saved?test.extend({pinDungeonSeed:27}):fixedSee
    else if(command.type==='equipItem'){await openDungeonInventory(page);const row=page.locator(`[data-instance-id="${command.instanceId}"]`);await row.locator('select').selectOption(command.heroId);const item=s.ownership.equipment.find(e=>e.instanceId===command.instanceId)!;await row.getByRole('button',{name:`Equip ${dungeonContent.items[item.itemId].label}`,exact:true}).click();}
    else throw Error('Unexpected preparation command');await page.locator('#dungeon-item-confirm').click();
   }
+  const prepared=await snapshot(page);
+  lootJourney.push({slot,origin:entry.origin,contact:entry.contact,reward,lootAfterPickup:collectedFloor.loot!.at(-1),
+   enemyMovementBeforeBattle:entryFloor.exploration.movement,enemyMovementAfterPickup:collectedFloor.exploration.movement,
+   movesBeforeBattle:encounterEntry.stats?.movesTaken,movesAfterBattle:finished.stats?.movesTaken,movesAfterPickup:collected.stats?.movesTaken,
+   partyBeforeBattle:encounterEntry.party,partyAfterBattle:finished.party,partyAfterPreparation:prepared.party,
+   ownershipAfterPickup:collected.ownership,ownership:prepared.ownership});
  }
  const cleared=await snapshot(page);await walkDungeon(page,cleared.floors[0].descriptor.downstairs,isMobile?'touch':'keyboard');
  const second=await snapshot(page);expect(second.depth).toBe(2);expect(second.party).toEqual(cleared.party);expect(second.ownership).toEqual(cleared.ownership);
  await reenterDungeonStair(page,'ascend',isMobile?'touch':'keyboard');
  const returned=await snapshot(page);expect(returned.depth).toBe(1);expect(returned.floors[0].completed).toBe(3);expect(returned.party).toEqual(cleared.party);expect(returned.ownership).toEqual(cleared.ownership);
+ expect(returned.floors[0].loot).toEqual(cleared.floors[0].loot);
+ writeFileSync(test.info().outputPath('ground-loot-first-floor.json'),JSON.stringify({seed:returned.seed,saved,collection:autoCollect?'automatic':'manual',preference:autoCollect?'on':'off',encounters:lootJourney,returned},null,2));
  if(saved){expect(returned.stats?.enemiesKilled).toBe(cleared.stats?.enemiesKilled);expect(returned.stats!.movesTaken).toBeGreaterThan(cleared.stats!.movesTaken);}
  await expect(page.getByRole('button',{name:'Save recovery',exact:true})).toHaveCount(saved?1:0);
  if(saved){
@@ -669,6 +744,7 @@ test('declining a dungeon reward preserves inventory and allows the next encount
  const rewards=page.getByRole('region',{name:'Rewards',exact:true});
  for(const size of [{width:393,height:852},{width:740,height:360}]){
   await page.setViewportSize(size);
+  await page.screenshot({path:test.info().outputPath(`saved-reward-choice-${size.width}x${size.height}.png`)});
   await expect(rewards).toBeInViewport({ratio:1});
  }
  await page.setViewportSize(viewport);
