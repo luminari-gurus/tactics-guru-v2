@@ -1,0 +1,290 @@
+{
+  "schemaVersion": 1,
+  "scope": "Issue 408 automatic-loot boundary acceptance; bounded fixture browser checks, not complete journeys or Chromium execution",
+  "startedAt": "2026-11-14T14:11:56.617Z",
+  "environment": {
+    "node": "24.22.1",
+    "playwright": "1.64.1",
+    "browser": "WebKit 27.2",
+    "browserRevision": 2370,
+    "os": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "workers": 1,
+    "retries": 0,
+    "repeatEach": 1,
+    "testTimeoutMs": 30000,
+    "previewPort": 4183,
+    "basePath": "/",
+    "profiles": [
+      {
+        "name": "desktop-webkit",
+        "device": "Desktop Safari",
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "hasTouch": false
+      },
+      {
+        "name": "portrait-webkit",
+        "device": "iPhone 13",
+        "viewport": {
+          "width": 390,
+          "height": 664
+        },
+        "hasTouch": true
+      },
+      {
+        "name": "landscape-webkit",
+        "device": "iPhone 13",
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "hasTouch": true
+      }
+    ]
+  },
+  "results": {
+    "passed": 18,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "durationMs": 66279.095,
+    "roundedDurationSeconds": 66.279
+  },
+  "cases": [
+    {
+      "id": 1,
+      "title": "auto loot defaults on: one delayed ordinary step, pickup, enemy tick and durable resume",
+      "profiles": {
+        "desktop-webkit": {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 3757
+        },
+        "portrait-webkit": {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2705
+        },
+        "landscape-webkit": {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2842
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "auto loot Settings are accessible and persist; off waits at origin and re-enabling does not sweep old loot",
+      "profiles": {
+        "desktop-webkit": {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 4187
+        },
+        "portrait-webkit": {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 4159
+        },
+        "landscape-webkit": {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 3909
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "fresh manual movement cancels a pending automatic step, including its stale callback",
+      "profiles": {
+        "desktop-webkit": {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2278
+        },
+        "portrait-webkit": {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2091
+        },
+        "landscape-webkit": {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2176
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "fresh preparation cancels a pending step, and a full inventory refuses automatic movement",
+      "profiles": {
+        "desktop-webkit": {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 5323
+        },
+        "portrait-webkit": {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 5247
+        },
+        "landscape-webkit": {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 5029
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "visibility interruption and explicit recovery each cancel the pending automatic step without replay",
+      "profiles": {
+        "desktop-webkit": {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 3924
+        },
+        "portrait-webkit": {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 3639
+        },
+        "landscape-webkit": {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 3720
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "reload before the pending step restores the ground pile without surprise movement or collection",
+      "profiles": {
+        "desktop-webkit": {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2685
+        },
+        "portrait-webkit": {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2836
+        },
+        "landscape-webkit": {
+          "status": "passed",
+          "retry": 0,
+          "durationMs": 2534
+        }
+      }
+    }
+  ],
+  "fixtures": [
+    {
+      "seed": 28,
+      "encounterSlot": 0,
+      "origin": 108,
+      "contact": 128,
+      "reward": "item:aiming_charm",
+      "source": "dungeonGroundVictoryBoundary(28); legal pure-domain battle history with a staged adjacent spatial approach, real final HUD command in browser"
+    },
+    {
+      "seed": 13,
+      "encounterSlot": 0,
+      "origin": 265,
+      "contact": 285,
+      "reward": "item:revive_kit",
+      "startingStock": [
+        1,
+        9
+      ],
+      "source": "dungeonGroundVictoryBoundary(13) with explicit structural Revive Kit stock for preparation and capacity; real final HUD command in browser"
+    }
+  ],
+  "limits": [
+    "Only setTimeout callbacks with delay 400 while the dungeon map is visible are held; this verifies the pending boundary and released action, not observed natural 400 ms elapsed timing.",
+    "Cancelled callbacks are retained and released to test stale callback invalidation.",
+    "Visibility uses a synthetic document.hidden property and visibilitychange event; no native background-tab or BFCache claim.",
+    "Seeded terminal snapshots do not prove preceding browser traversal or a complete floor journey.",
+    "Only activeMs is normalized in state/save comparisons; movement, RNG, revision, loot and ownership remain exact.",
+    "No local Chromium run is claimed. Chromium batch discovery and registration are tooling evidence only.",
+    "Final all-unit, full journey and combined issue 397/400 verification are recorded separately."
+  ],
+  "sourceComparison": {
+    "testedHead": "06447ab6b9c577d578b7684413f32402da38d3f9",
+    "testedTreeHadUncommittedOverlays": true,
+    "browserTestsCommit": "e97bae43",
+    "assembledHead": "1b50b4e0459a341153f370512579631f78d09acd",
+    "assembledBrowserTestsCommit": "1b50b4e0459a341153f370512579631f78d09acd",
+    "comparedAt": "2026-11-14T14:16:40.687276+00:00",
+    "comparedFiles": 167,
+    "exactMatches": 166,
+    "changesDuringExecution": 0,
+    "differences": [
+      {
+        "path": "src/ui/dungeon.ts",
+        "testedSha256": "c9e81abd0d79f81239334e26dea8fb1832347cff1fec41245e2df5bc4b086b50",
+        "assembledSha256": "bf8109a6b7fbfa4e1d9c9a4f8658e7029a06093287248ffe879b7459cfc4521b"
+      }
+    ],
+    "differenceExplanation": "Only the legacy saved-reward explanatory paragraph inside if (s.offer) was removed in the assembled tree. These new-entry auto cases settle with offer null and do not render that branch.",
+    "matchingRelevantSha256": {
+      "src/app/startDungeonApp.ts": "87dd5c5086ff6a0199e8159cf527ad0218ffd48986d37001678f7f5a05927b63",
+      "src/app/DelayedDungeonStep.ts": "81e033ff894f96301938142953c02838920894dda6fbaef942b8716da12cc281",
+      "src/app/DungeonSession.ts": "bafd91699931fce2b7b9d7244f69a454ad504a3300f15c001f1bc959ce133b80",
+      "src/domain/dungeonAutoCollect.ts": "74542d2d706631d7ff310a1b8d052cf58d0c8249854d8fb0530d0c682734d102",
+      "src/domain/dungeon.ts": "58a94f3c10fd5765cb83bc504ba1d09ba2d49e2ffa7c28787ef2082894fb9d83",
+      "src/domain/dungeonSaveEnvelope.ts": "9bbdbab6ae6c1d6439fb3e2d8772ba771dce60b2417f0094dfbabae6bb431b0c",
+      "src/persistence/dungeonStorage.ts": "355938478f275b09712960cbed609198039241ce753592a9ec7d77e79cc41fe4",
+      "src/ui/autoCollectLootPreference.ts": "3ecbace8f9c0f2193ce5dacff4d3f9f2dd54deadeaba0d27da7914fc52dcf90d",
+      "src/ui/mainMenu.ts": "a075ba0e5260fc9a27d3fe4a96a136d7a96a1d152a18bb1a2d61b6483a8051ac",
+      "src/ui/dungeonMap.ts": "1bff6077c694db71ab3e4dfe22624e62e7f468e824fde3107fcf6c7d3a3fea66",
+      "tests/dungeon-loot.spec.ts": "5898c128814fba2ab95fecc255e2464410d6507beb34d7c656f5aa35765a1067",
+      "tests/helpers/dungeonFixtures.ts": "ca74dc03314c464ebb6e73f447106343d3fd2401c0bb6ee265ff01daeb4db7ee",
+      "tests/helpers/dungeonTraversal.ts": "21e7e2d8e4a1c8622ad2eae764a444610d0698a7e6d2e15cffac058c9fc277ee",
+      "tests/helpers/battlePolicy.ts": "7aa26a38234a3f5b969b050af1f21ca7fe0da8a328881347b9681fa47496b355",
+      "tests/helpers/playerPolicy.ts": "ef7e8e2970e6ef24ac3b4e94be6a69675249e25d34c5ee490a094fd92316d5c4",
+      "tests/helpers/forceRailControls.ts": "4c180d2bf1553cdf0af9520bbfab7c13b5eac8c321374008e40fcc74d20fac50",
+      "scripts/verification-batches.json": "24243aa6af6393d30c0752002f8dab98c7195909e0deb3599ed1f8d9b13efc56",
+      "playwright.exploration.config.ts": "4aed5c1f24bf7a8139a9026214d5b7b8e39e8f980847ca698ace33c757665a6a",
+      "playwright.regression.config.ts": "bd83dc6dfe646e86bef0a53bae3ebecdb86ec91711243eee64da364f6aba3fa7",
+      "package.json": "85fa4e08f42e81657e6d139fbaa02dba5122dcd4075ed21f3a906c2cd55e7c0b",
+      "package-lock.json": "e4768389a179a65df5f04502dab87e8875b465b939e55493d5820a7dc99a74ed",
+      "vite.config.ts": "70de760bb2f7f3543da38b391d1574435836a580d6f3bbcbfa6565a61c26ed50"
+    }
+  },
+  "otherChecks": {
+    "productionBuild": {
+      "command": "npm run build",
+      "status": "passed",
+      "includedContentTests": 226,
+      "includedContentFiles": 8
+    },
+    "typecheck": {
+      "command": "npm run typecheck",
+      "status": "passed",
+      "scopes": [
+        "application/tests",
+        "domain"
+      ]
+    },
+    "batchTooling": {
+      "command": "npm run test:verification-batches",
+      "status": "passed",
+      "tests": 31,
+      "durationMs": 57249.195587,
+      "includes": "Exact nine-batch partition of canonical reduced discovery"
+    }
+  },
+  "originalArtifactDirectory": "/workspace/scratch/f77bb8a7baf3",
+  "artifactSha256": {
+    "issue408-auto-browser-initial.json": "38831c5ecf386cb4fcf71f068fa65b78e37ad654f61b55475e5cbeabba8f6fa4",
+    "issue408-auto-browser-initial.log": "662617d725e03348b63381c3fccc724874891b2d7c2a4d95d712846d4766dd30",
+    "issue408-auto-browser-initial-inputs.json": "87b3b311eb5f04a1c3fd80a76516107a24fe4e5bfe756a95e9025288630336b2",
+    "issue408-auto-browser-build.log": "725fd76be9e0e28259242dc9fb63835b3c093703b2c03f77887eebcaacb2d38d",
+    "issue408-auto-browser-typecheck.log": "4594117359b10c92691cf4e4c676394d6ec926cdc9e700c3f29d33f709288540",
+    "issue408-auto-browser-batches-tooling.log": "baa840e58d05cc57e4443bc5bcb6915946aef04ed9b44adb1e300c466f1529e4",
+    "issue408-auto-browser.config.ts": "7076984eea908e5c304b1f00b739e25441010521a89a90886e74b272051076f3"
+  }
+}

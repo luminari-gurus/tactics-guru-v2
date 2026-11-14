@@ -23,6 +23,7 @@ import { encodeDungeon, utf8Bytes } from '../src/domain/dungeonSaveEnvelope';
 import { holdFinalRecordsWrite } from './helpers/recordsWriteGate';
 import { startBattleModuleFaultServer } from './helpers/battleModuleFaultServer';
 import { progressHero } from '../src/domain/progression';
+import { AUTO_COLLECT_LOOT_KEY } from '../src/ui/autoCollectLootPreference';
 
 // Lifecycle checkpoints can advance playtime without changing dungeon progress.
 function expectSameProgress(actual: DungeonState, expected: DungeonState) {
@@ -39,7 +40,8 @@ test.beforeEach(async ({ context }) => { await installRailControls(context); });
 async function loadGroundLootBoundary(page: Page, state: DungeonState) {
  const encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
  await page.goto('./?game=dungeon');
- await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
+ await page.evaluate(({key,text,preferenceKey})=>{localStorage.setItem(preferenceKey,'off');localStorage.setItem(key,text);},
+  {key:DUNGEON_KEYS.primary,text:encoded.text,preferenceKey:AUTO_COLLECT_LOOT_KEY});
  await page.reload();await continueSavedDungeon(page);
 }
 

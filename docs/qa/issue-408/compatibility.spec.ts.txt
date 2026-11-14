@@ -1,0 +1,236 @@
+import { test, expect, type Page } from './helpers/forceRailControls';
+import { dungeonGroundVictoryBoundary } from './helpers/dungeonFixtures';
+import { continueSavedDungeon } from './helpers/dungeonTraversal';
+import { playCommand } from './helpers/battlePolicy';
+import { currentFloor, readDungeon, type DungeonState } from '../src/domain/dungeon';
+import { decodeDungeon, encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
+import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
+import { AUTO_COLLECT_LOOT_KEY } from '../src/ui/autoCollectLootPreference';
+import { ROUTINE_CUTSCENES_KEY } from '../src/ui/cutscenePreference';
+
+function fixture() {
+  for (let seed = 1; seed <= 50; seed++) {
+    const result = dungeonGroundVictoryBoundary(seed);
+    if (result) return result;
+  }
+  throw Error('No legal ongoing ground-loot victory boundary');
+}
+const boundary = fixture();
+const original = boundary.snapshot.encounterEntry!;
+type Event = { kind: string; at: number; state?: DungeonState; time?: number; code?: number | null;
+  duration?: number; readyState?: number; networkState?: number; paused?: boolean; ended?: boolean };
+declare global { interface Window { compatibilityEvents: Event[]; } }
+const snapshot = async (page: Page): Promise<DungeonState> => JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);
+
+test.afterEach(async ({ page, browser }, info) => {
+  const state = await page.evaluate(() => ({
+    events: window.compatibilityEvents,
+    snapshot: document.querySelector<HTMLElement>('#game')?.dataset.dungeonSnapshot,
+    status: document.querySelector('.dungeon-status')?.textContent,
+    hidden: document.hidden,
+    videoSupport: document.createElement('video').canPlayType('video/mp4; codecs="avc1.42E01E"'),
+  })).catch(() => null);
+  await info.attach('final-browser-state', { body: JSON.stringify({ browser: browser.version(), state }), contentType: 'application/json' });
+});
+
+async function boot(page: Page, mode: 'ordinary' | 'disabled' | 'reduced' | 'missing' = 'ordinary') {
+  const checked = readDungeon(boundary.snapshot);
+  expect(checked.ok).toBe(true);
+  expect(boundary.snapshot.activeBattle?.outcome).toBe('ongoing');
+  const encoded = encodeDungeon(boundary.snapshot);
+  if (!encoded.ok) throw Error(encoded.reason);
+  await page.emulateMedia({ reducedMotion: mode === 'reduced' ? 'reduce' : 'no-preference' });
+  await page.goto('./');
+  await page.evaluate(({ keys, text, auto, cutscene, disabled }) => {
+    localStorage.setItem(keys.primary, text);
+    localStorage.removeItem(keys.backup);
+    localStorage.removeItem(auto);
+    localStorage.setItem(cutscene, disabled ? 'off' : 'on');
+  }, { keys: DUNGEON_KEYS, text: encoded.text, auto: AUTO_COLLECT_LOOT_KEY, cutscene: ROUTINE_CUTSCENES_KEY, disabled: mode === 'disabled' });
+  await page.goto('./?game=dungeon');
+  await continueSavedDungeon(page);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  await page.evaluate(() => {
+    window.compatibilityEvents = [];
+    const events = window.compatibilityEvents;
+    const game = document.querySelector<HTMLElement>('#game')!;
+    const screen = document.querySelector<HTMLElement>('#dungeon-screen')!;
+    const stamp = (kind: string) => events.push({ kind, at: performance.now() });
+    new MutationObserver(() => {
+      const state = JSON.parse(game.dataset.dungeonSnapshot!);
+      events.push({ kind: 'snapshot', at: performance.now(), state });
+    }).observe(game, { attributes: true, attributeFilter: ['data-dungeon-snapshot'] });
+    let hidden = screen.hidden;
+    new MutationObserver(() => {
+      if (hidden && !screen.hidden) stamp('return');
+      hidden = screen.hidden;
+    }).observe(screen, { attributes: true, attributeFilter: ['hidden'] });
+    for (const kind of ['playing', 'ended', 'error']) document.addEventListener(kind, event => {
+      if (event.target instanceof HTMLVideoElement) events.push({ kind, at: performance.now(),
+        time: event.target.currentTime, code: event.target.error?.code });
+    }, true);
+  });
+  await test.info().attach('legal-boundary', { body: JSON.stringify({
+    provenance: 'Legal pure-domain combat history with a staged adjacent exploration approach; the winning command is executed through the real browser HUD.',
+    fixture: boundary,
+  }), contentType: 'application/json' });
+}
+
+async function collected(page: Page) {
+  await expect(page.locator('#dungeon-map')).toBeVisible();
+  await expect.poll(async () => currentFloor(await snapshot(page)).position).toBe(original.contact);
+  const after = await snapshot(page), floor = currentFloor(after);
+  expect(floor.loot).toHaveLength(1);
+  expect(floor.loot![0].remaining).toBe(0);
+  expect(after.offer).toBeNull();
+  const events = await page.evaluate(() => window.compatibilityEvents);
+  const won = events.find(event => event.state?.phase === 'ready' && currentFloor(event.state).position === original.origin)?.state;
+  expect(won).toBeDefined();
+  expect(after.revision).toBe(won!.revision + 1);
+  expect(floor.exploration.movement!.step).toBe(currentFloor(won!).exploration.movement!.step + 1);
+  const returned = events.find(event => event.kind === 'return');
+  const pickup = events.find(event => event.state?.phase === 'ready' && currentFloor(event.state).position === original.contact);
+  expect(returned).toBeDefined();
+  expect(pickup).toBeDefined();
+  // Browser timestamp jitter is bounded here; the exact 399/400 ms boundary has a unit test.
+  expect(pickup!.at - returned!.at).toBeGreaterThanOrEqual(350);
+  await page.waitForTimeout(650);
+  const stable = await snapshot(page);
+  expect(stable.revision).toBe(after.revision);
+  expect(currentFloor(stable).loot).toEqual(floor.loot);
+  const text = await page.evaluate(key => localStorage.getItem(key), DUNGEON_KEYS.primary);
+  const decoded = decodeDungeon(text!);
+  expect(decoded.ok).toBe(true);
+  if (decoded.ok) {
+    expect(decoded.state.revision).toBe(after.revision);
+    expect(currentFloor(decoded.state).position).toBe(original.contact);
+    expect(currentFloor(decoded.state).loot).toEqual(floor.loot);
+  }
+  await test.info().attach('return-and-pickup-timeline', { body: JSON.stringify(events), contentType: 'application/json' });
+  return after;
+}
+
+async function observeMediaProgress(page: Page) {
+  await page.evaluate(() => {
+    const timer = window.setInterval(() => {
+      const video = document.querySelector<HTMLVideoElement>('video.cutscene-video');
+      if (video) window.compatibilityEvents.push({ kind: 'media-sample', at: performance.now(),
+        time: video.currentTime, duration: video.duration, readyState: video.readyState,
+        networkState: video.networkState, paused: video.paused, ended: video.ended, code: video.error?.code });
+    }, 250);
+    window.setTimeout(() => clearInterval(timer), 10000);
+  });
+}
+
+test('compatibility: keyboard or touch cutscene Skip preserves exactly one delayed pickup', async ({ page, isMobile }) => {
+  const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+  await boot(page);
+  await playCommand(page, boundary.command);
+  const skip = page.getByRole('button', { name: 'Skip cutscene', exact: true });
+  await expect(skip).toBeFocused();
+  const won = await snapshot(page);
+  expect(currentFloor(won).position).toBe(original.origin);
+  expect(currentFloor(won).loot![0].remaining).toBe(1);
+  await expect(page.locator('#dungeon-screen')).toBeHidden();
+  await page.screenshot({ path: test.info().outputPath('cutscene-before-skip.png') });
+  if (isMobile) await skip.tap();
+  else await page.keyboard.press('Enter');
+  const after = await collected(page);
+  await page.screenshot({ path: test.info().outputPath('automatic-pickup-after-skip.png') });
+  await page.reload(); await continueSavedDungeon(page);
+  await expect(page.locator('#dungeon-map')).toBeVisible();
+  await page.waitForTimeout(650);
+  const restored = await snapshot(page);
+  expect(restored.revision).toBe(after.revision);
+  expect(currentFloor(restored).position).toBe(original.contact);
+  expect(currentFloor(restored).loot).toEqual(currentFloor(after).loot);
+  expect(errors).toEqual([]);
+});
+
+test('compatibility: native cutscene completion precedes delayed pickup', async ({ page }) => {
+  await boot(page);
+  await observeMediaProgress(page);
+  await playCommand(page, boundary.command);
+  await expect(page.getByRole('button', { name: 'Skip cutscene', exact: true })).toBeVisible();
+  await expect.poll(async () => page.evaluate(() => window.compatibilityEvents.some(event => event.kind === 'playing'))).toBe(true);
+  const after = await collected(page);
+  const events = await page.evaluate(() => window.compatibilityEvents);
+  const ended = events.find(event => event.kind === 'ended'), returned = events.find(event => event.kind === 'return');
+  expect(ended).toBeDefined();
+  expect(ended!.time).toBeGreaterThan(3);
+  expect(returned!.at).toBeGreaterThanOrEqual(ended!.at);
+  expect(after.phase).toBe('ready');
+});
+
+test('compatibility diagnostic: native cutscene with victory observer removed', async ({ page }) => {
+  await boot(page);
+  await observeMediaProgress(page);
+  await playCommand(page, boundary.command);
+  await expect(page.getByRole('button', { name: 'Skip cutscene', exact: true })).toBeVisible();
+  await expect.poll(async () => page.evaluate(() => window.compatibilityEvents.some(event => event.kind === 'playing'))).toBe(true);
+  await expect(page.locator('#dungeon-map')).toBeVisible();
+  const after = await snapshot(page), events = await page.evaluate(() => window.compatibilityEvents);
+  expect(currentFloor(after).position).toBe(original.origin);
+  expect(currentFloor(after).loot![0].remaining).toBe(1);
+  const ended = events.find(event => event.kind === 'ended'), returned = events.find(event => event.kind === 'return');
+  await test.info().attach('no-auto-observer-native-timeline', { body: JSON.stringify(events), contentType: 'application/json' });
+  expect(ended).toBeDefined();
+  expect(ended!.time).toBeGreaterThan(3);
+  expect(returned!.at).toBeGreaterThanOrEqual(ended!.at);
+});
+
+test('compatibility: disabled reduced-motion and missing media all reach the delayed pickup', async ({ page }) => {
+  const requests: string[] = [];
+  page.on('request', request => { if (request.url().includes('/cutscenes/')) requests.push(request.url()); });
+  for (const mode of ['disabled', 'reduced', 'missing'] as const) {
+    await test.step(mode, async () => {
+      if (mode === 'missing') await page.route('**/cutscenes/*.mp4', route => route.fulfill({ status: 404 }));
+      await boot(page, mode); requests.length = 0;
+      await playCommand(page, boundary.command);
+      await collected(page);
+      await expect(page.locator('video.cutscene-video')).toHaveCount(0);
+      if (mode === 'missing') expect(requests.length).toBeGreaterThan(0);
+      else expect(requests).toEqual([]);
+    });
+  }
+});
+
+test('compatibility: hiding an active cutscene cancels pickup through visibility restoration', async ({ page }) => {
+  await boot(page);
+  await playCommand(page, boundary.command);
+  await expect(page.getByRole('button', { name: 'Skip cutscene', exact: true })).toBeVisible();
+  const won = await snapshot(page);
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'hidden', { configurable: true, value: true });
+    document.dispatchEvent(new globalThis.Event('visibilitychange'));
+  });
+  await expect(page.locator('video.cutscene-video')).toHaveCount(0);
+  await expect(page.locator('#dungeon-map')).toBeVisible();
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'hidden', { configurable: true, value: false });
+    document.dispatchEvent(new globalThis.Event('visibilitychange'));
+  });
+  await page.waitForTimeout(800);
+  const after = await snapshot(page);
+  expect(after.revision).toBe(won.revision);
+  expect(currentFloor(after).position).toBe(original.origin);
+  expect(currentFloor(after).loot![0].remaining).toBe(1);
+  await test.info().attach('visibility-witness', { body: JSON.stringify({
+    provenance: 'Synthetic document.hidden + native visibilitychange event path; no claim of actual background-tab visibility.',
+    before: won, after, events: await page.evaluate(() => window.compatibilityEvents),
+  }), contentType: 'application/json' });
+});
+
+test('compatibility: both independent settings persist together', async ({ page, isMobile }) => {
+  await page.goto('./');
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  const auto = page.getByRole('checkbox', { name: 'Auto-collect loot', exact: true });
+  const cutscene = page.getByRole('checkbox', { name: 'Play routine cutscenes', exact: true });
+  await expect(auto).toBeChecked(); await expect(cutscene).toBeChecked();
+  await expect(auto).toHaveAccessibleDescription("After victory, automatically move onto the defeated enemy's square and collect its loot.");
+  if (isMobile) { await auto.tap(); await cutscene.tap(); }
+  else { await auto.focus(); await page.keyboard.press('Space'); await cutscene.focus(); await page.keyboard.press('Space'); }
+  await page.reload(); await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await expect(auto).not.toBeChecked(); await expect(cutscene).not.toBeChecked();
+  expect(await page.evaluate(keys => keys.map(key => localStorage.getItem(key)), [AUTO_COLLECT_LOOT_KEY, ROUTINE_CUTSCENES_KEY])).toEqual(['off', 'off']);
+});
