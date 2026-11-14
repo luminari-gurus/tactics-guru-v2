@@ -15,12 +15,22 @@ import { readSession,playCommand } from './helpers/battlePolicy';
 import { installRailControls } from './helpers/forceRailControls';
 import { playerDecision } from './helpers/playerPolicy';
 import { dungeonBattle } from '../src/domain/dungeon';
+import { freshRunStats } from '../src/domain/runStats';
 import { atCell, atEncounter, atStairApproach, dungeonCapacityFixture, priorDungeonEnvelope, dungeonContactApproach, dungeonVictoryBoundary } from './helpers/dungeonFixtures';
 import { LEGACY_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
 import { freshExploration, movableExploration } from '../src/domain/exploration';
 import { encodeDungeon, utf8Bytes } from '../src/domain/dungeonSaveEnvelope';
 import { holdFinalRecordsWrite } from './helpers/recordsWriteGate';
 import { startBattleModuleFaultServer } from './helpers/battleModuleFaultServer';
+
+// Lifecycle checkpoints can advance playtime without changing dungeon progress.
+function expectSameProgress(actual: DungeonState, expected: DungeonState) {
+ expect({
+  ...actual,
+  stats: actual.stats ? { ...actual.stats, activeMs: expected.stats?.activeMs } : undefined,
+ }).toEqual(expected);
+ expect(actual.stats?.activeMs ?? 0).toBeGreaterThanOrEqual(expected.stats?.activeMs ?? 0);
+}
 
 const fixedSeedTest = test.extend({ pinDungeonSeed: 28 });
 test.beforeEach(async ({ context }) => { await installRailControls(context); });
@@ -92,7 +102,8 @@ test('map markers respect stair availability, discovery and saved floor state',a
 });
 
 test('live markers follow current sight across movement, art changes and reload', async ({ page, isMobile }) => {
- const base = freshDungeon('sight-movement', 1), map = floorMap(base.floors[0].descriptor);
+ const base = { ...freshDungeon('sight-movement', 1), stats: freshRunStats('since-upgrade') };
+ const map = floorMap(base.floors[0].descriptor);
  const encounterCell = (state: DungeonState, slot: number) => poiCell(state.floors[0].exploration.pois[slot], map.width);
  for (const entering of [true, false]) {
   let witness: { before: DungeonState; after: DungeonState; slot: number } | undefined;
@@ -148,12 +159,12 @@ test('live markers follow current sight across movement, art changes and reload'
   await expect(rememberedCell).toHaveClass(/explore-remembered/);
   await page.locator('#dungeon-art').selectOption('legacy-8bit');
   await check(after, entering);
-  expect(await dungeonSnapshot(page)).toEqual(after);
+  expectSameProgress(await dungeonSnapshot(page), after);
   await page.reload();
   await continueSavedDungeon(page);
   await check(after, entering);
   await expect(rememberedCell).toHaveClass(/explore-remembered/);
-  expect(await dungeonSnapshot(page)).toEqual(after);
+  expectSameProgress(await dungeonSnapshot(page), after);
  }
 });
 
@@ -351,11 +362,6 @@ test('compass keeps keyboard focus when movement disables the activated directio
 });
 
 fixedSeedTest('map shortcuts work on entry and outside the map without taking over other controls', async ({page}) => {
- const expectSameProgress = async (expected: Awaited<ReturnType<typeof dungeonSnapshot>>) => {
-  const actual = await dungeonSnapshot(page);
-  expect({...actual,stats:actual.stats ? {...actual.stats,activeMs:expected.stats?.activeMs} : undefined}).toEqual(expected);
-  expect(actual.stats?.activeMs ?? 0).toBeGreaterThanOrEqual(expected.stats?.activeMs ?? 0);
- };
  await page.goto('./?game=dungeon');
  await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();
  await page.locator('#dungeon-confirm-new').click();
@@ -381,7 +387,7 @@ fixedSeedTest('map shortcuts work on entry and outside the map without taking ov
  const art = page.getByRole('combobox',{name:'Map art',exact:true});
  await art.focus();
  await page.keyboard.press(direction.reverse);
- await expectSameProgress(moved);
+ expectSameProgress(await dungeonSnapshot(page), moved);
  await page.evaluate(() => {
   const input = document.createElement('input');
   input.id = 'shortcut-test-input';
@@ -390,11 +396,11 @@ fixedSeedTest('map shortcuts work on entry and outside the map without taking ov
  });
  await page.keyboard.press(direction.reverse);
  await expect(page.locator('#shortcut-test-input')).toHaveValue(direction.reverse);
- await expectSameProgress(moved);
+ expectSameProgress(await dungeonSnapshot(page), moved);
  const restart = page.getByRole('button',{name:'Start new dungeon',exact:true});
  await restart.click();
  await page.keyboard.press(direction.reverse);
- await expectSameProgress(moved);
+ expectSameProgress(await dungeonSnapshot(page), moved);
  await page.locator('#dungeon-cancel-new').click();
 
  await restart.focus();
@@ -419,10 +425,10 @@ fixedSeedTest('map shortcuts work on entry and outside the map without taking ov
  await expect(grid).toHaveAccessibleName(/Arrow keys move one cell/);
  await restart.focus();
  await page.keyboard.press(direction.reverse);
- await expectSameProgress(movedAgain);
+ expectSameProgress(await dungeonSnapshot(page), movedAgain);
  await grid.focus();
  await page.keyboard.press(direction.reverse);
- await expectSameProgress(movedAgain);
+ expectSameProgress(await dungeonSnapshot(page), movedAgain);
  await expect(grid).toBeFocused();
 
  await page.reload();
@@ -446,12 +452,12 @@ fixedSeedTest('real traversal, art independence, keyboard locks, active battle a
  const adjacent=neighbors(f.position).find(n=>map.cells[n])!;
  await walkDungeon(page,adjacent,isMobile?'touch':'pointer');const stepped=await dungeonSnapshot(page);expect(stepped.revision).toBe(initial.revision+1);
  await page.locator('#dungeon-map').focus();await page.keyboard.down('ArrowUp');await page.keyboard.up('ArrowUp');const after=await dungeonSnapshot(page);
- await page.locator('#dungeon-map').dispatchEvent('keydown',{key:'ArrowUp',repeat:true});expect(await dungeonSnapshot(page)).toEqual(after);
- await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.keyboard.press('ArrowDown');expect(await dungeonSnapshot(page)).toEqual(after);await page.locator('#dungeon-cancel-new').click();
+ await page.locator('#dungeon-map').dispatchEvent('keydown',{key:'ArrowUp',repeat:true});expectSameProgress(await dungeonSnapshot(page), after);
+ await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.keyboard.press('ArrowDown');expectSameProgress(await dungeonSnapshot(page), after);await page.locator('#dungeon-cancel-new').click();
  await page.locator('#dungeon-map').evaluate(n=>n.dataset.identity='retained');
  await page.getByRole('combobox',{name:'Map art',exact:true}).selectOption('legacy-8bit');await expect(page.locator('#dungeon-map')).toHaveAttribute('data-art','legacy-8bit');
- if(f.descriptor.biome==='desert-v1')await expect(page.locator('#dungeon-map-feedback')).toContainText('fallback');else await expect(page.locator('#dungeon-map-feedback')).not.toContainText('fallback');expect(await dungeonSnapshot(page)).toEqual(after);
- await page.getByRole('combobox',{name:'Map art',exact:true}).selectOption('simple');expect(await dungeonSnapshot(page)).toEqual(after);
+ if(f.descriptor.biome==='desert-v1')await expect(page.locator('#dungeon-map-feedback')).toContainText('fallback');else await expect(page.locator('#dungeon-map-feedback')).not.toContainText('fallback');expectSameProgress(await dungeonSnapshot(page), after);
+ await page.getByRole('combobox',{name:'Map art',exact:true}).selectOption('simple');expectSameProgress(await dungeonSnapshot(page), after);
  await expect(page.locator('#dungeon-map')).toHaveAttribute('data-identity','retained');
  await expect.poll(()=>page.locator('.dungeon-directions button').evaluateAll(nodes=>nodes.length===4&&nodes.every(n=>{const b=n.getBoundingClientRect();return b.width>=44&&b.height>=44;}))).toBe(true);
  await page.locator('#dungeon-map').scrollIntoViewIfNeeded();await page.screenshot({path:test.info().outputPath('exploration-revealed.png'),fullPage:true});
@@ -459,7 +465,7 @@ fixedSeedTest('real traversal, art independence, keyboard locks, active battle a
  await walkDungeon(page,undefined,isMobile?'touch':'keyboard');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const battle=await dungeonSnapshot(page);expect(battle.phase).toBe('battle');expect(battle.floors[0].position).toBe(poiCell(battle.floors[0].exploration.pois[battle.floors[0].exploration.active!]));
  const command=playerDecision((await readSession(page)).state,dungeonBattle(battle)!.catalog);await playCommand(page,command);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');const saved=await dungeonSnapshot(page);
- await page.reload();await continueSavedDungeon(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect(await dungeonSnapshot(page)).toEqual(saved);
+ await page.reload();await continueSavedDungeon(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expectSameProgress(await dungeonSnapshot(page), saved);
  writeFileSync(test.info().outputPath('spatial-battle-receipt.json'),JSON.stringify({initial,stepped,saved},null,2));expect(errors).toEqual([]);
 });
 test('pre-progression dungeon remains incompatible and exportable',async({page})=>{
@@ -548,7 +554,22 @@ for(const biome of ['forest','desert'] as const)test(`${biome} saved kinds, scal
   await expect(page.locator('#dungeon-screen h1')).toHaveText(`Dungeon · Floor 2 · ${biome==='forest'?'Forest':'Desert'}`);
   const undiscovered=state.floors[1].exploration.pois.filter(p=>!state!.floors[1].exploration.revealed.includes(poiCell(p,map.width)));
   for(const p of undiscovered)await expect(page.locator(`#dungeon-map [data-poi="${p.id}"]`)).toHaveCount(0);
-  await walkDungeon(page,target,isMobile?'touch':'keyboard');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await walkDungeon(page,target,isMobile?'touch':'keyboard');
+  try {
+   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  } catch (error) {
+   const snapshot = await page.locator('#game').getAttribute('data-session', { timeout: 1000 }).catch(() => null);
+   const opening: Awaited<ReturnType<typeof readSession>> | null = snapshot ? JSON.parse(snapshot) : null;
+   await test.info().attach('encounter-opening', {
+    body: JSON.stringify({
+     biome, kind, seed: state.seed, phase: opening?.phase,
+     commandCount: opening?.state.commandCount,
+     activeUnit: opening?.state.initiative[opening.state.activeIndex],
+    }),
+    contentType: 'application/json',
+   });
+   throw error;
+  }
   const label=kind==='boss'?'Guardian · Goblins':`${kind[0].toUpperCase()}${kind.slice(1)} encounter ${slot+1}`;
   await expect(page.locator('#battle-heading h1')).toHaveText(`Dungeon · Floor 2 · ${biome==='forest'?'Forest':'Desert'} · ${label}`);
   expect(await page.locator('#battle-shell').evaluate(n=>n.scrollWidth<=n.clientWidth)).toBe(true);
@@ -557,9 +578,9 @@ for(const biome of ['forest','desert'] as const)test(`${biome} saved kinds, scal
   await page.locator('#battle-party').click();await page.locator(`#inspect-unit-${enemy.id}`).click();
   await expect(page.locator('#battle-dialog-message')).toContainText(`HP ${enemy.hp}/${stats.maxHp}`);await expect(page.locator('#battle-dialog-message')).toContainText(`AC ${stats.armorClass}`);
   await page.locator('#battle-dialog-title').scrollIntoViewIfNeeded();await page.screenshot({path:test.info().outputPath(`${biome}-${kind}-scaled-inspection.png`)});await page.locator('#inspection-close').click();
-  expect(await dungeonSnapshot(page)).toEqual(before);
+  expectSameProgress(await dungeonSnapshot(page), before);
   await page.reload();await continueSavedDungeon(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-  expect(await dungeonSnapshot(page)).toEqual(before);await expect(page.locator('#battle-heading h1')).toContainText(label);
+  expectSameProgress(await dungeonSnapshot(page), before);await expect(page.locator('#battle-heading h1')).toContainText(label);
  }
 });
 
