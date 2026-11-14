@@ -24,7 +24,45 @@ Legacy fixed-policy floor plans may defer their derived battlefield with `battle
 
 Cold format-3 reads validate all saved selection/source identities, then fully verify only the current floor's battlefield geometry. Historical hashes remain saved exactly; switching to a historical floor verifies those hashes before travel can be saved or published. A bad historical geometry hash therefore blocks that travel without changing the current floor or durable save. This removes cold-start graph work proportional to history and keeps the admission cache at a bounded 128-entry working set. Descriptor shapes, source/map IDs and layout seeds still reject immediately on every floor.
 
-Attempt a cardinal step onto any uncleared `M` encounter marker to start its associated encounter; encounters may be cleared in any order. Battle starts before the party moves: the accepted state keeps the origin, the enemy's actual contact cell and its encounter slot. Entering battle does not visit or reveal the destination, increment exploration move counts, or advance enemies. The party stays at that origin through victory or defeat. A cleared marker never relaunches. An explicit Enter encounter control remains available for a legacy save whose party is already on an available encounter cell; that path preserves the occupied-cell state without inventing an earlier origin. Each new victory generates one seeded item, quantity one, on the defeated enemy’s actual contact cell. XP, encounter completion and the third-victory descent unlock are awarded immediately; collecting loot is optional. The party returns to exploration at the origin with no reward picker or claim/decline gate. The default-on Auto-collect loot setting and its single interrupted-step orchestration remain a subsequent increment of #408. Previously saved floors that were already cleared remain ready for descent. A party wipe ends the dungeon. Start new dungeon requires confirmation and replaces only the dungeon namespace. It restores the full starting party and empty inventory. A cancelled choice does nothing.
+Attempt a cardinal step onto any uncleared `M` encounter marker to start its associated encounter; encounters may be cleared in any order. Battle starts before the party moves: the accepted state keeps the origin, the enemy's actual contact cell and its encounter slot. Entering battle does not visit or reveal the destination, increment exploration move counts, or advance enemies. The party stays at that origin through victory or defeat. A cleared marker never relaunches. An explicit Enter encounter control remains available for a legacy save whose party is already on an available encounter cell; that path preserves the occupied-cell state without inventing an earlier origin. Each new victory generates one seeded item, quantity one, on the defeated enemy’s actual contact cell. XP, encounter completion and the third-victory descent unlock are awarded immediately; collecting loot is optional. The party returns to exploration at the origin with no reward picker or claim/decline gate. Auto-collect loot defaults on and may complete that single interrupted step after the return presentation; turning it off leaves the party at the origin until normal input. Previously saved floors that were already cleared remain ready for descent. A party wipe ends the dungeon. Start new dungeon requires confirmation and replaces only the dungeon namespace. It restores the full starting party and empty inventory. A cancelled choice does nothing.
+
+Auto-collect loot is an accessible checkbox in main-menu Settings. Its description
+is: “After victory, automatically move onto the defeated enemy's square and collect
+its loot.” The independent `tactics-guru:auto-collect-loot` preference stores `on`
+or `off` across runs; absent or unrecognized values default on. If browser storage
+refuses the write, the choice applies for the current visit and Settings explains
+that limit. Changing the preference affects subsequent victories and never moves
+the party, sweeps existing piles, or changes another preference.
+
+A newly accepted origin/contact victory can capture one transient intent. After
+the battle return presentation finishes, active exploration shows the original
+position and ground loot for 400 milliseconds before attempting that step. The
+intent is never encoded in the save and cannot be reconstructed by loading,
+rendering, changing Settings or restoring visibility. An existing active battle
+resumed before its real victory can earn a new intent normally; restoring an
+already finished battle or ready ground-loot state cannot.
+
+Immediately before committing, inside the exclusive save boundary, automatic
+collection rechecks the dungeon ID, depth, revision, original party position,
+adjacent destination, cleared encounter slot, exact remaining loot identity,
+capacity and active interaction state. A live encounter, blocked or stale target,
+failed victory save, or available stair cancels the automatic step without
+redirecting the party. If nothing fits, the party remains at the origin with
+brief capacity feedback. If anything fits, the ordinary movement/pickup reducer
+collects eligible contents, records one ordinary move, runs the usual enemy
+update once, and saves the accepted transition; the exact remainder stays on
+the ground. Once all encounters are cleared, that ordinary enemy update is a
+no-op, just as it is for a manual step.
+
+Fresh movement, preparation or other exploration input cancels pending automatic
+movement. Recovery, restart, navigation, hidden documents, scene disposal and
+incompatible dialogs also invalidate it, including while it waits for a save
+lock. Held or queued combat input cannot resume a route. Outcome cutscenes own
+the return callback, so completion, Skip, disabled scenes and reduced-motion
+bypass all reach the same single scheduling boundary. Hiding the page cancels
+an intent; becoming visible does not recreate it. A reload before the step
+restores the saved origin and pile, while a reload afterward restores the one
+accepted pickup without repeating it.
 
 Ascend is unavailable on floor 1. Travel is unavailable during a battle or an older saved pending reward choice. Descend requires all three encounters to be cleared; ordinary ground loot does not block it. Moving onto an available matching stair automatically ascends or descends in the same accepted movement revision; no separate activation is required. Arrival, rendering and restoring a saved position on stairs never trigger travel. Move off and back onto the stair to travel again; remote stair requests are rejected. Travel retains the departing position and enters the retained position on the destination floor (new floors start upstairs). Revisit restores geometry, position, revealed/visited cells, POIs, completion, stair state and each remaining or depleted loot record, and cannot restart cleared encounters or grant rewards again. Party HP, defeated heroes, inventory and equipment carry through travel. New encounters reset battle-local movement/actions/Guarded state; reload preserves the accepted active battle instead. Equipment is projected once from the immutable base catalog. Healing Draught can heal a living hero during preparation or as an ordinary hero action in an active battle; it cannot revive a defeated hero. Revive Kit is a preparation action for a fallen hero while the dungeon remains active, and cannot undo a final party wipe.
 

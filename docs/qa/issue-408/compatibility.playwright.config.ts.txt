@@ -1,0 +1,22 @@
+import { defineConfig, devices } from '@playwright/test';
+
+const receipt = `/workspace/scratch/f77bb8a7baf3/issue408-compatibility-qa/${process.env.ISSUE408_COMPAT_RUN ?? 'browser'}`;
+const diagnosticOutput = process.env.ISSUE408_COMPAT_NO_AUTO === '1'
+  ? ' --outDir /workspace/scratch/f77bb8a7baf3/issue408-compatibility-qa/no-auto-dist' : '';
+export default defineConfig({
+  testDir: './tests',
+  testMatch: ['issue408-compatibility.spec.ts', 'battle-persistence.spec.ts', 'battle-loop.spec.ts', 'run-progression.spec.ts'],
+  timeout: 90000,
+  expect: { timeout: 15000 },
+  workers: 1,
+  retries: 0,
+  outputDir: `${receipt}/artifacts`,
+  reporter: [['line'], ['json', { outputFile: `${receipt}/results.json` }]],
+  use: { baseURL: 'http://127.0.0.1:4198/', trace: 'retain-on-failure', screenshot: 'only-on-failure' },
+  webServer: { command: `npm run preview -- --port 4198 --strictPort${diagnosticOutput}`, url: 'http://127.0.0.1:4198/', reuseExistingServer: false },
+  projects: [
+    { name: 'desktop-webkit', use: { ...devices['Desktop Safari'], screen: undefined } },
+    { name: 'portrait-webkit', use: { ...devices['iPhone 13'], screen: undefined } },
+    { name: 'landscape-webkit', use: { ...devices['iPhone 13'], screen: undefined, viewport: { width: 844, height: 390 } } },
+  ],
+});

@@ -4,6 +4,7 @@ import { dungeonContent } from '../src/content/dungeon';
 import { dungeonBattle, freshDungeon, type DungeonState } from '../src/domain/dungeon';
 import { encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
+import { AUTO_COLLECT_LOOT_KEY } from '../src/ui/autoCollectLootPreference';
 import { dispatch } from '../src/domain/turns';
 import { walkDungeon, continueSavedDungeon, openDungeonInventory, collectDungeonEncounterLoot } from './helpers/dungeonTraversal';
 import { readSession, playCommand } from './helpers/battlePolicy';
@@ -11,7 +12,7 @@ import { fighterDecision, rangerDecision, mageDecision } from './helpers/playerP
 import { journeyPreparation, rangerJourney, selectMageJourney, fighterJourney, FIGHTER_JOURNEY_SEED } from './helpers/dungeonFixtures';
 
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
-async function seed(page:Page,s:DungeonState){const encoded=encodeDungeon(s);if(!encoded.ok)throw Error(encoded.reason);await page.goto('./?game=dungeon');await page.evaluate(({key,text})=>{localStorage.setItem(key,text);}, {key:DUNGEON_KEYS.primary,text:encoded.text});await page.reload();await continueSavedDungeon(page);}
+async function seed(page:Page,s:DungeonState){const encoded=encodeDungeon(s);if(!encoded.ok)throw Error(encoded.reason);await page.goto('./?game=dungeon');await page.evaluate(({key,text,preferenceKey})=>{localStorage.setItem(preferenceKey,'off');localStorage.setItem(key,text);}, {key:DUNGEON_KEYS.primary,text:encoded.text,preferenceKey:AUTO_COLLECT_LOOT_KEY});await page.reload();await continueSavedDungeon(page);}
 
 /** Read fresh progress from the same public DOM records without transferring full histories for polling. */
 async function mageProgress(page:Page) {

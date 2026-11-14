@@ -9,6 +9,7 @@ import { acceptBattleStats, boundedStat, dungeonProgressStats, freshRunStats, ty
 import type { BattleState } from '../domain/types';
 import { ActivePlaytime } from './ActivePlaytime';
 import { dungeonContent } from '../content/dungeon';
+import { autoCollectDungeon, victoryAutoCollectIntent, type DungeonAutoCollectIntent } from '../domain/dungeonAutoCollect';
 
 /** Describe the accepted transfer, including pickups that accompany a stair step. */
 function pickupFeedback(before: DungeonState, after: DungeonState, cell: number) {
@@ -41,6 +42,7 @@ export class DungeonSession {
   private message = 'Progress has not been saved';
   get status() { return this.history?.status ? `${this.message}. ${this.history.status}` : this.message; }
   onChange: (() => void) | null = null;
+  onVictory: ((intent: DungeonAutoCollectIntent) => void) | null = null;
   completedBattle: unknown = null;
   constructor(initial: unknown, readonly storage: ReturnType<typeof createDungeonStorage> | null = createDungeonStorage(), history: RunHistory | null = null,
     now: () => number = () => performance.now(),
@@ -65,7 +67,7 @@ export class DungeonSession {
     return result;
   }
   private report(text: string) { this.message = text; try { this.onChange?.(); } catch { /* Observers cannot undo state. */ } }
-  dispose() { this.flushPlaytime(); this.disposed = true; this.battle?.dispose(); this.battle = null; this.onChange = null; if (this.history) this.history.onChange = null; }
+  dispose() { this.flushPlaytime(); this.disposed = true; this.battle?.dispose(); this.battle = null; this.onChange = null; this.onVictory = null; if (this.history) this.history.onChange = null; }
   private capturePlaytime(active?: boolean) {
     if (!this.started || !this.playtime) return false;
     const elapsed = this.playtime.sample(active);
@@ -141,6 +143,28 @@ export class DungeonSession {
       state: { ...candidate.state, stats: { ...candidate.state.stats!, activeMs: this.current.stats!.activeMs } } });
     return this.publishSpatial(candidate);
   }
+  autoCollect(intent: DungeonAutoCollectIntent, isCurrent: () => boolean) {
+    return this.mutate(() => {
+      // This runs inside the same exclusive write boundary as manual movement.
+      // A user interaction while waiting for the lock must win the race.
+      if (this.disposed || !isCurrent() || this.battle && !['ended', 'disposed'].includes(this.battle.phase)) return false;
+      if (this.storage && !this.unsaved && this.hasUnsavedProgress) {
+        this.report('Loot remains on the ground. Open Save recovery before automatic collection.');
+        return false;
+      }
+      const source = this.storage && !this.current.stats ? { ...this.current, stats: freshRunStats('since-upgrade') } : this.current;
+      const candidate = autoCollectDungeon(source, intent);
+      if (!candidate.ok) {
+        this.report(candidate.reason === 'capacity'
+          ? 'Inventory full. Loot remains on the ground; the party has not moved.'
+          : 'Loot remains on the ground. Automatic movement was canceled.');
+        return false;
+      }
+      if (this.capturePlaytime()) return this.publishSpatial({ ...candidate,
+        state: { ...candidate.state, stats: { ...candidate.state.stats!, activeMs: this.current.stats!.activeMs } } });
+      return this.publishSpatial(candidate);
+    }, false, !this.unsaved);
+  }
   startEncounter() { return this.mutate(() => this.startEncounterNow(), null, !this.unsaved); }
   private startEncounterNow(): BattleSession | null {
     if (this.disposed) return null;
@@ -157,10 +181,13 @@ export class DungeonSession {
       const next = acceptDungeonBattle(this.current, session.state);
       if (!next.ok) { this.report(`Dungeon boundary rejected: ${next.reason}`); return; }
       const feedback = levelUpFeedback(this.current.party, next.state.party);
+      const previous = this.current;
       this.current = this.storage && batch ? { ...next.state, stats: acceptBattleStats(
         this.current.stats ?? freshRunStats('since-upgrade'), dungeonProgressStats(this.current).battlesWon, batch) } : next.state;
       this.review = null;
       if (session.state.outcome !== 'ongoing') this.completedBattle = { entry, selection: source.selection, state: session.state, replay: session.replay, continuation: session.continuation, events: session.events };
+      const intent = victoryAutoCollectIntent(previous, this.current);
+      if (intent) { try { this.onVictory?.(intent); } catch { /* Observers cannot undo an accepted victory. */ } }
       this.save(false, feedback);
     };
     // A persisted boundary resumes; fresh entry retains its canonical replay origin.
