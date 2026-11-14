@@ -637,6 +637,21 @@ test('main menu: failed new-game write retains exportable recovery copies',async
  await expect(page.locator('#dungeon-screen')).toContainText('Progress unsaved');
 });
 
+test('main menu: routine cutscene preference persists after reload', async ({page,isMobile}) => {
+ const settings = page.getByRole('button',{name:'Settings',exact:true});
+ const toggle = page.getByRole('checkbox',{name:'Play routine cutscenes'});
+ await page.goto('./');
+ await settings.click();
+ await expect(toggle).toBeChecked();
+ await expect(toggle).toHaveAccessibleDescription(/Designated story or progression cutscenes may still play/);
+ if (isMobile) await toggle.tap();
+ else { await toggle.focus(); await page.keyboard.press('Space'); }
+ await expect(toggle).not.toBeChecked();
+ await page.reload();
+ await settings.click();
+ await expect(toggle).not.toBeChecked();
+});
+
 test('main menu: terminal battle saves resume their existing outcome UI',async({page})=>{
  const text=terminalMenuBattle();await page.addInitScript(({key,text})=>localStorage.setItem(key,text),{key:keys.battle.primary,text});
  await page.goto('./');await page.getByRole('button',{name:'Continue',exact:true}).click();

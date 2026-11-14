@@ -12,6 +12,7 @@ import { measurements, setBattleAudioDiagnostics } from '../diagnostics/browser'
 import type { Point, BoardRegion } from '../geometry/iso';
 import { BattleHud, unitFeedback } from '../ui/hud';
 import { BattleDialogs } from '../ui/dialogs';
+import { battleCutscenes, playCutscene } from '../ui/cutscene';
 import { BattleSaveControls } from '../ui/persistence';
 import { menuReturnLink } from '../ui/menuReturn';
 import { track } from '../telemetry/telemetry';
@@ -30,6 +31,7 @@ import { BattleAudio } from './BattleAudio';
 export interface RunBattleHost {
   catalog: ContentCatalog; session: BattleSession; dialogs: BattleDialogs;
   sound: { enabled: boolean }; modalTransition: () => void;
+  showOutcomeCutscenes?: boolean;
   ended: () => void; restart: () => void;
 }
 export const FIRST_BATTLE_MAP_ID = 'map:forest_ruins';
@@ -95,6 +97,8 @@ export class BattleScene extends Phaser.Scene {
   }
   private begin(catalog:ContentCatalog,session:BattleSession,dialogs:BattleDialogs,setModalTransition:(fn:()=>void)=>void,returnToMenu?:()=>void):void {
     const selection=new BattleSelection(session);
+    const enteredOngoing = session.state.outcome === 'ongoing';
+    const outcomePresentation = new AbortController();
     let live=true,ready=false,outcomeShown=false,initialFit=true,skin:CombatSkin=resolveCombatControlsSkin();
     let movingPresentation=false,planInFlight=false,planInterrupted=false;
     let presentationStart:Presentation['before']|null=null;
@@ -146,7 +150,24 @@ export class BattleScene extends Phaser.Scene {
       game.dataset.session=JSON.stringify({state:session.state,replay:session.replay,continuation:session.continuation,events:session.events,pending:session.pending,phase:session.phase});
       if(session.phase!=='player' || dialogs.open)radial.hide();
       if(radial.mode!=='hold')restoreCaptionHeight();
-      if(ready && !dialogs.open && session.phase==='ended' && !outcomeShown){outcomeShown=true;if(this.host){queueMicrotask(()=>{if(live)this.host?.ended();});return;}dialogs.showChoices(session.state.outcome==='playerWin'?'Victory':'Defeat','Battle complete. Restart for a fresh battle.',[{id:'dialog-restart',label:'Restart battle',run:()=>this.requestRestart()},...(returnToMenu?[{id:'save-main-menu',label:'Main menu',run:returnToMenu}]:[])],()=>{});}
+      const outcome = session.state.outcome;
+      if (ready && !dialogs.open && session.phase === 'ended' && !outcomeShown && outcome !== 'ongoing') {
+        outcomeShown = true;
+        const clip = battleCutscenes[outcome];
+        const showResult = () => {
+          if (!live) return;
+          if (this.host) {
+            queueMicrotask(() => { if (live) this.host?.ended(); });
+            return;
+          }
+          dialogs.showChoices(clip.title, 'Battle complete. Restart for a fresh battle.', [
+            { id: 'dialog-restart', label: 'Restart battle', run: () => this.requestRestart() },
+            ...(returnToMenu ? [{ id: 'save-main-menu', label: 'Main menu', run: returnToMenu }] : []),
+          ], () => {});
+        };
+        if (enteredOngoing && this.host?.showOutcomeCutscenes) playCutscene(dialogs, clip, outcomePresentation.signal, showResult);
+        else showResult();
+      }
     };
     const openRadial=(cell:CellPosition, mode:'hold'|'tap', origin:Point)=>{
       session.clearPrepared();
@@ -401,7 +422,9 @@ export class BattleScene extends Phaser.Scene {
     this.game.events.on(Phaser.Core.Events.POST_RENDER,onRender);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{
       restoreCaptionHeight();
-      live=false;ready=false;this.game.events.off(Phaser.Core.Events.POST_RENDER,onRender);audio.destroy();setBattleAudioDiagnostics(null);session.dispose();animation?.cancel();radial.dispose();hud.dispose();removeInput();stopSkinWatch();observer.disconnect();
+      live=false;
+      outcomePresentation.abort();
+      ready=false;this.game.events.off(Phaser.Core.Events.POST_RENDER,onRender);audio.destroy();setBattleAudioDiagnostics(null);session.dispose();animation?.cancel();radial.dispose();hud.dispose();removeInput();stopSkinWatch();observer.disconnect();
       canvas.removeEventListener('keydown',key);canvas.removeAttribute('tabindex');canvas.removeAttribute('aria-label');
       document.removeEventListener('keydown',shortcut);canvas.style.clipPath='';
       document.removeEventListener('visibilitychange',visibility);this.scale.off(Phaser.Scale.Events.RESIZE,fit);this.game.events.off(Phaser.Core.Events.POST_RENDER,onReady);
