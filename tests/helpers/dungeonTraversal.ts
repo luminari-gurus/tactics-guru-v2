@@ -3,6 +3,7 @@ import type { DungeonState } from '../../src/domain/dungeon';
 import { generateMap } from '../../src/map/generate';
 import { neighbors, poiCell } from '../../src/domain/exploration';
 import { clearedDungeonSlots, floorMap } from '../../src/domain/dungeon';
+import { dungeonContactDetour } from './dungeonFixtures';
 export async function dungeonSnapshot(page: Page): Promise<DungeonState> { return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!); }
 /** Wait for the dungeon DOM entry (`#dungeon-screen[data-boot=ready]`), then heading and an enabled Continue. */
 export async function continueSavedDungeon(page: Page) {
@@ -23,11 +24,17 @@ export async function walkDungeon(page: Page, target?: number, mode: 'keyboard'|
   const initial=await dungeonSnapshot(page), floor=initial.floors[initial.depth-1];
   const targetPoi=target===undefined ? undefined : floor.exploration.pois.find(p=>poiCell(p,floor.descriptor.size ?? 20)===target&&!clearedDungeonSlots(floor).includes(p.encounterSlot));
   const path:number[]=[];
+  const seen=new Set<string>();let detour:number[]=[];
   for(let attempt=0;attempt<400;attempt++) {
     const s=await dungeonSnapshot(page), f=s.floors[s.depth-1];
     if(s.depth!==initial.depth||s.phase!=='ready')return path;
     const width=f.descriptor.size ?? 20;
     const live=f.exploration.pois.filter(p=>!clearedDungeonSlots(f).includes(p.encounterSlot));
+    // Match the pure journey's bounded interception when a same-speed enemy
+    // circles the greedy route. Every planned step still uses real input below.
+    const geometry=`${f.position}:${live.map(p=>`${p.encounterSlot}@${poiCell(p,width)}`).join(',')}`;
+    const repeated=seen.has(geometry);if(repeated)seen.clear();seen.add(geometry);
+    if(target===undefined&&repeated&&!detour.length)detour=dungeonContactDetour(s);
     let destination=targetPoi ? poiCell(f.exploration.pois.find(p=>p.id===targetPoi.id)!,width) : target;
     if(f.position===destination)return path;
     const blocked=new Set(live.filter(p=>p.id!==targetPoi?.id).map(p=>poiCell(p,width)));
@@ -46,12 +53,26 @@ export async function walkDungeon(page: Page, target?: number, mode: 'keyboard'|
       if(!choices.length)throw Error('No safe step toward fixture destination');
       n=choices[attempt%choices.length];
     } else { n=destination;while(previous.get(n)!==f.position)n=previous.get(n)!; }
+    n=detour.shift()??n;
     const delta=n-f.position,name=delta===-width?'north':delta===width?'south':delta===1?'east':'west';
 
     if(mode==='keyboard'){await page.locator('#dungeon-map').focus();await page.keyboard.press(delta===-width?'ArrowUp':delta===width?'ArrowDown':delta===1?'ArrowRight':'ArrowLeft');}
     else if(mode==='touch')await page.locator(`#dungeon-step-${name}`).tap();
     else await page.locator(`#dungeon-map [data-cell="${n}"]`).click();
-    await expect.poll(async () => (await dungeonSnapshot(page)).floors[s.depth-1].position).toBe(n);path.push(n);
+    // Encounter contact interrupts the attempted step. Wait for the accepted
+    // boundary without treating the destination as a completed exploration move.
+    await expect.poll(async () => {
+      const after=await dungeonSnapshot(page);
+      return after.floors[s.depth-1].position===n || (after.phase==='battle' &&
+        after.encounterEntry?.origin===f.position && after.encounterEntry.contact===n);
+    }).toBe(true);
+    path.push(n);
+    const after=await dungeonSnapshot(page);
+    if(after.phase==='battle') {
+      expect(after.floors[s.depth-1].position).toBe(f.position);
+      expect(after.encounterEntry).toMatchObject({origin:f.position,contact:n});
+      return path;
+    }
   }
   throw Error('Could not reach moving encounter within 400 steps');
 }

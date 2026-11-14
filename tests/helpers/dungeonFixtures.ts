@@ -189,9 +189,18 @@ export function fighterJourney(seed:number) {
 /** Follow the nearest live marker with actual player steps and enemy movement. */
 function walkWitness(initial:DungeonState):DungeonState {
   let state=initial;
+  const seen = new Set<string>(); let detour: number[] = [];
   for(let attempt=0;attempt<400;attempt++) {
     const f=state.floors[state.depth-1], live=f.exploration.pois.filter(p=>!clearedDungeonSlots(f).includes(p.encounterSlot));
     const width=f.descriptor.size ?? 20;
+    // A same-speed chaser and greedy player can circle a corridor forever after
+    // victory leaves the party at its origin. Plan a bounded legal interception
+    // only when the ordinary nearest-marker route repeats its spatial state.
+    const geometry = `${f.position}:${live.map(p => `${p.encounterSlot}@${poiCell(p,width)}`).join(',')}`;
+    const repeated = seen.has(geometry);
+    if (repeated) seen.clear();
+    seen.add(geometry);
+    if (repeated && !detour.length) detour = dungeonContactDetour(state);
     const blocked=new Set(live.map(p => poiCell(p,width)));
     if(state.depth>1)blocked.add(f.descriptor.upstairs);
     if(f.completed===3)blocked.add(f.descriptor.downstairs);
@@ -203,10 +212,33 @@ function walkWitness(initial:DungeonState):DungeonState {
     }
     if(destination===undefined)throw Error('No reachable encounter');
     let n=destination;while(previous.get(n)!==f.position)n=previous.get(n)!;
+    n = detour.shift() ?? n;
     state=checkedDungeon(stepDungeon(state,{id:state.id,depth:state.depth,revision:state.revision,destination:n}));
     if(state.phase==='battle')return state;
   }
   throw Error('Encounter not reached');
+}
+
+/** Test route planning only. Callers still enact every selected step through their real owner/input. */
+export function dungeonContactDetour(initial: DungeonState): number[] {
+  const queue = [{ state: initial, path: [] as number[] }], seen = new Set<string>();
+  for (let index = 0; index < queue.length && index < 512; index++) {
+    const { state, path } = queue[index], floor = state.floors[state.depth - 1], map = floorMap(floor.descriptor);
+    if (path.length >= 16) continue;
+    for (const destination of neighbors(floor.position, map.width, map.height)) {
+      if (!map.cells[destination] || state.depth > 1 && destination === floor.descriptor.upstairs ||
+          floor.completed === 3 && destination === floor.descriptor.downstairs) continue;
+      const moved = stepDungeon(state, { id: state.id, depth: state.depth, revision: state.revision, destination });
+      if (!moved.ok) continue;
+      const route = [...path, destination];
+      if (moved.state.phase === 'battle') return route;
+      const next = moved.state.floors[state.depth - 1], exploration = next.exploration;
+      const key = canonical({ position: next.position, pois: exploration.pois, rng: exploration.movement?.rng });
+      if (seen.has(key)) continue;
+      seen.add(key); queue.push({ state: moved.state, path: route });
+    }
+  }
+  throw Error('No bounded encounter interception');
 }
 
 /** Current-source legal combat witness; its returned histories are replayable, never converted old saves. */

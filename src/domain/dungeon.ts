@@ -31,6 +31,8 @@ export interface FloorDescriptor {
   readonly encounters: readonly { readonly selection: EncounterSelection; readonly battlefield: BattlefieldDescriptor | null }[];
 }
 export interface DungeonFloor { readonly descriptor: FloorDescriptor; readonly position: number; readonly completed: number; readonly exploration: Exploration }
+/** The interrupted cardinal step, captured before an encounter moves the party. */
+export interface DungeonEncounterEntry { readonly origin: number; readonly contact: number; readonly slot: number }
 export interface DungeonState {
   readonly stats?: RunStats;
   readonly encounterPolicy: DungeonEncounterPolicy;
@@ -38,6 +40,8 @@ export interface DungeonState {
   readonly floors: readonly DungeonFloor[]; readonly party: readonly RunHero[]; readonly ownership: ItemOwnership;
   readonly phase: 'ready' | 'battle' | 'reward' | 'defeat'; readonly offer: RewardOffer | null;
   readonly activeBattle: BattleState | null; readonly battlefield: BattlefieldDescriptor | null;
+  /** Absent on legacy occupied-cell encounters whose origin cannot be recovered. */
+  readonly encounterEntry?: DungeonEncounterEntry;
 }
 export type DungeonResult = { readonly ok: true; readonly state: DungeonState } | { readonly ok: false; readonly reason: string };
 const fail = (reason: string): DungeonResult => ({ ok: false, reason });
@@ -159,7 +163,8 @@ export function readDungeon(input: unknown, items: ItemCatalog = dungeonContent.
 }
 function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
   const tracked = typeof input === 'object' && input !== null && Object.hasOwn(input, 'stats');
-  if (!hasShape(input, ['id','seed','revision','depth','floors','party','ownership','phase','offer','activeBattle','battlefield', 'encounterPolicy', ...(tracked ? ['stats'] : [])]) ||
+  const entered = typeof input === 'object' && input !== null && Object.hasOwn(input, 'encounterEntry');
+  if (!hasShape(input, ['id','seed','revision','depth','floors','party','ownership','phase','offer','activeBattle','battlefield', 'encounterPolicy', ...(tracked ? ['stats'] : []), ...(entered ? ['encounterEntry'] : [])]) ||
     typeof input.id !== 'string' || !/^[A-Za-z0-9-]{1,64}$/.test(input.id) || !seedOk(input.seed) || !safeCount(input.revision) || !safeCount(input.depth, 1) ||
     !isDenseArray(input.floors, MAX_DUNGEON_FLOORS) || !input.floors.length || input.depth > input.floors.length || !isDenseArray(input.party, 3) || input.party.length !== 3) return fail('invalidState');
   const stats = tracked ? readRunStats(input.stats) : null;
@@ -241,9 +246,19 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
   const exp = currentFloor(state).exploration;
   const active = exp.version === 'exploration-v2' ? exp.active : state.phase === 'battle' ? slot : state.phase === 'reward' ? slot - 1 : null;
   if (exp.version === 'exploration-v2' && ((state.phase === 'battle' || state.phase === 'reward') !== (active !== null))) return fail('invalidEncounterPosition');
+  const entry = input.encounterEntry;
+  if (entered) {
+    const floor = currentFloor(state), map = floorMap(floor.descriptor);
+    if (!hasShape(entry, ['origin','contact','slot']) || !safeCount(entry.origin) || !safeCount(entry.contact) || !safeCount(entry.slot) ||
+        (state.phase !== 'battle' && state.phase !== 'reward') || exp.version !== 'exploration-v2' || entry.slot !== active ||
+        floor.position !== entry.origin || !map.cells[entry.origin] || !map.cells[entry.contact] ||
+        !neighbors(entry.origin, map.width, map.height).includes(entry.contact) ||
+        entry.contact !== poiCell(exp.pois[entry.slot], map.width)) return fail('invalidEncounterPosition');
+  }
   if ((state.phase === 'battle' || state.phase === 'reward') && (active === null || active === undefined ||
-      currentFloor(state).position !== poiCell(exp.pois[active], currentFloor(state).descriptor.size ?? 20) || exp.version === 'exploration-v2' &&
+      (!entered && currentFloor(state).position !== poiCell(exp.pois[active], currentFloor(state).descriptor.size ?? 20)) || exp.version === 'exploration-v2' &&
       (state.phase === 'battle' ? exp.cleared!.includes(active) : !exp.cleared!.includes(active)))) return fail('invalidEncounterPosition');
+  const admitted = entered ? { ...state, encounterEntry: { ...state.encounterEntry! } } : state;
   if (state.phase === 'battle') {
     const battle = dungeonBattle(state);
     const read = battle && readBattleState(state.activeBattle, battle.catalog);
@@ -251,10 +266,10 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
       read.state.seed !== battle.state.seed || read.state.mapId !== battle.state.mapId ||
       read.state.units.some(u => u.side === 'player' && u.hp > encounterHpLimit(u,party.find(h => h.heroId === u.defId)!.hp,battle.catalog,
         draughtHealing(read.state.draughts,u.defId)))) return fail('invalidBattle');
-    return { ok: true, state: { ...state, activeBattle: read.state, battlefield: battle.battlefield } };
+    return { ok: true, state: { ...admitted, activeBattle: read.state, battlefield: battle.battlefield } };
   }
   if (state.activeBattle !== null || state.battlefield !== null) return fail('invalidBattle');
-  return { ok: true, state: { ...state, offer: offer?.offer ?? null } };
+  return { ok: true, state: { ...admitted, offer: offer?.offer ?? null } };
 }
 function advance(s: DungeonState, patch: Partial<DungeonState>): DungeonResult {
   if (s.revision === Number.MAX_SAFE_INTEGER) return fail('resourceLimit');
@@ -277,15 +292,20 @@ export function travelDungeon(s: DungeonState, direction: 'ascend' | 'descend', 
   }
   return advance(s, { depth, floors });
 }
-export function startDungeonBattle(s: DungeonState): DungeonResult {
+export function startDungeonBattle(s: DungeonState, destination?: number): DungeonResult {
   if (s.phase !== 'ready') return fail('wrongPhase');
-  const f = currentFloor(s), cleared = clearedDungeonSlots(f);
-  const poi = f.exploration.pois.find(p => !cleared.includes(p.encounterSlot) && f.position === poiCell(p, f.descriptor.size ?? 20));
+  const f = currentFloor(s), cleared = clearedDungeonSlots(f), map = floorMap(f.descriptor);
+  // The no-destination path only resumes a legacy occupied-cell boundary. It
+  // cannot recover an origin and must not manufacture an interrupted movement.
+  const contact = destination ?? f.position;
+  if (destination !== undefined && (!safeCount(destination) || !map.cells[destination] ||
+      !neighbors(f.position, map.width, map.height).includes(destination))) return fail('blockedStep');
+  const poi = f.exploration.pois.find(p => !cleared.includes(p.encounterSlot) && contact === poiCell(p, map.width));
   if (!poi) return fail('remoteEncounter');
   const exploration = movableExploration(f.exploration, f.descriptor.seed, f.completed, s.phase);
   const floors = [...s.floors];
   floors[s.depth-1] = {...f, exploration:{...exploration,active:poi.encounterSlot}};
-  const staged = {...s,floors};
+  const staged = {...s,floors, ...(destination !== undefined ? { encounterEntry: { origin: f.position, contact, slot: poi.encounterSlot } } : {})};
   const battle = dungeonBattle(staged);
   return battle ? advance(staged, { phase: 'battle', activeBattle: battle.state, battlefield: battle.battlefield }) : fail('invalidBattle');
 }
@@ -302,7 +322,8 @@ export function acceptDungeonBattle(s: DungeonState, battle: BattleState): Dunge
   const exploration = movableExploration(f.exploration, f.descriptor.seed, f.completed, s.phase);
   if (battle.outcome === 'playerLoss') {
     floors[s.depth-1] = {...f,exploration:{...exploration,active:null}};
-    return advance(s, { floors, party, ownership, phase: 'defeat', activeBattle: null, battlefield: null });
+    const { encounterEntry: _, ...settled } = s;
+    return advance(settled, { floors, party, ownership, phase: 'defeat', activeBattle: null, battlefield: null });
   }
   floors[s.depth - 1] = { ...f, completed: f.completed + 1,
     exploration:{...exploration,cleared:[...exploration.cleared!,selected].sort((a,b)=>a-b),active:selected} };
@@ -341,7 +362,8 @@ export function dungeonItem(s: DungeonState, command: DungeonItemCommand): Dunge
     }
     const floors = [...s.floors], f = currentFloor(s);
     if (f.exploration.version === 'exploration-v2') floors[s.depth-1] = {...f,exploration:{...f.exploration,active:null}};
-    return advance(s, { floors, ownership, phase: 'ready', offer: null });
+    const { encounterEntry: _, ...settled } = s;
+    return advance(settled, { floors, ownership, phase: 'ready', offer: null });
   }
   const result = changePreparation(s.ownership, s.party, { ...command }, dungeonContent.catalog, dungeonContent.items);
   return result.ok ? advance(s, { ownership: result.ownership, party: result.party }) : result;
@@ -354,11 +376,11 @@ export function stepDungeon(s: DungeonState, command: ExplorationCommand): Dunge
   if (s.phase !== 'ready') return fail('wrongPhase');
   const f = currentFloor(s), map = floorMap(f.descriptor);
   if (!neighbors(f.position, map.width, map.height).includes(command.destination) || !map.cells[command.destination]) return fail('blockedStep');
+  if (f.exploration.pois.some(p => !clearedDungeonSlots(f).includes(p.encounterSlot) && command.destination === poiCell(p, map.width))) return startDungeonBattle(s, command.destination);
   const floors = [...s.floors];
   floors[s.depth-1] = { ...f, position: command.destination, exploration: visit(f.exploration, command.destination, map) };
   let candidate: DungeonState = { ...s, floors,
     ...(s.stats ? { stats: { ...s.stats, movesTaken: boundedStat(s.stats.movesTaken + 1) } } : {}) };
-  if (f.exploration.pois.some(p => !clearedDungeonSlots(f).includes(p.encounterSlot) && command.destination === poiCell(p, f.descriptor.size ?? 20))) return startDungeonBattle(candidate);
   candidate = moveDungeonEnemies(candidate, f.position);
   // Only accepted movement enters stairs; arrival, rendering and restore never travel.
   if (command.destination === f.descriptor.upstairs && s.depth > 1) return travelDungeon(candidate, 'ascend', s.revision);
