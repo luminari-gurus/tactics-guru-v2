@@ -8,6 +8,24 @@ import type { RunHistory } from './RunHistory';
 import { acceptBattleStats, boundedStat, dungeonProgressStats, freshRunStats, type AcceptedBattle } from '../domain/runStats';
 import type { BattleState } from '../domain/types';
 import { ActivePlaytime } from './ActivePlaytime';
+import { dungeonContent } from '../content/dungeon';
+
+/** Describe the accepted transfer, including pickups that accompany a stair step. */
+function pickupFeedback(before: DungeonState, after: DungeonState, cell: number) {
+  const oldLoot = before.floors[before.depth - 1].loot ?? [];
+  const newLoot = after.floors[before.depth - 1].loot ?? [];
+  const collected = oldLoot.filter(item => item.cell === cell && item.remaining > 0 &&
+    newLoot.some(next => next.id === item.id && next.remaining === 0));
+  const left = newLoot.filter(item => item.cell === cell && item.remaining > 0);
+  const labels = new Map<string, number>();
+  for (const item of collected) {
+    const label = dungeonContent.items[item.itemId].label;
+    labels.set(label, (labels.get(label) ?? 0) + 1);
+  }
+  const acquired = labels.size ? `Picked up ${[...labels].map(([label, count]) => `${label}${count > 1 ? ` ×${count}` : ''}`).join(', ')}.` : '';
+  const capacity = left.length ? `Inventory full: ${left.length} ${left.length === 1 ? 'item remains' : 'items remain'} on the ground.` : '';
+  return [acquired, capacity].filter(Boolean).join(' ');
+}
 export class DungeonSession {
   private current: DungeonState;
   private battle: BattleSession | null = null;
@@ -97,17 +115,21 @@ export class DungeonSession {
     return result.ok;
   }
   playUnsaved() { if (!this.storage) return; this.unsaved = true; this.started = true; this.report('Playing unsaved. Floor travel requires saving; open Save recovery.'); }
-  private publishSpatial(candidate: ReturnType<typeof stepDungeon>) {
+  private publishSpatial(candidate: ReturnType<typeof stepDungeon>, preparation = false) {
     if (!candidate.ok) { this.report(`Movement refused: ${{blockedStep:'Choose an adjacent walkable cell',staleBoundary:'The floor changed; choose again',wrongPhase:'Finish the current encounter or reward first',remoteEncounter:'Walk onto the available encounter marker',resourceLimit:'Progress has reached a storage or counter limit'}[candidate.reason] ?? 'This step is unavailable'}. Nothing changed.`); return false; }
     const traveling = candidate.state.depth !== this.current.depth;
     if (traveling && this.unsaved) { this.report('Travel requires saving. Open Save recovery to retry or export.'); return false; }
     if (this.storage && !this.unsaved) {
       const saved = this.write(candidate.state);
-      if (!saved.ok) { this.report(`${traveling ? 'Travel' : 'Movement'} not published: ${saved.reason}. Current floor retained; open Save recovery to retry or export.`); return false; }
+      if (!saved.ok) { this.report(`${preparation ? 'Item choice' : traveling ? 'Travel' : 'Movement'} not published: ${saved.reason}. Current ${preparation ? 'progress' : 'floor'} retained; open Save recovery to retry or export.`); return false; }
     }
+    const feedback = candidate.state.phase === 'battle' ? '' : pickupFeedback(this.current, candidate.state,
+      candidate.state.floors[this.current.depth - 1].position);
     this.battle?.dispose(); this.battle = null; this.current = candidate.state; this.started = true; this.review = null;
     this.progressSaved = this.storage !== null && !this.unsaved;
-    this.report(!this.storage ? 'Testing dungeon. Progress resets on reload.' : this.unsaved ? 'Playing unsaved. Floor travel requires saving; open Save recovery.' : traveling ? 'Travel saved on this device' : 'Exploration saved on this device');
+    const status = !this.storage ? 'Testing dungeon. Progress resets on reload.' : this.unsaved ? 'Playing unsaved. Floor travel requires saving; open Save recovery.' :
+      preparation ? 'Dungeon saved on this device' : traveling ? 'Travel saved on this device' : 'Exploration saved on this device';
+    this.report(feedback ? `${status.replace(/\.$/, '')}. ${feedback}` : status);
     return true;
   }
   step(command: ExplorationCommand) { return this.mutate(() => this.stepNow(command), false, !this.unsaved); }
@@ -149,10 +171,15 @@ export class DungeonSession {
     return session;
   }
   dispatch(command: DungeonItemCommand) {
+    return this.mutate(() => this.dispatchNow(command), false, !this.unsaved);
+  }
+  private dispatchNow(command: DungeonItemCommand) {
     if (this.disposed || this.battle && !['ended','disposed'].includes(this.battle.phase)) return false;
     const next = dungeonItem(this.current, command);
     if (!next.ok) { this.report(`Choice refused: ${next.reason}. Nothing changed.`); return false; }
-    this.battle?.dispose(); this.battle = null; this.current = next.state; this.started = true; this.review = null; this.save(); return true;
+    if (this.capturePlaytime()) return this.publishSpatial({ ...next,
+      state: { ...next.state, stats: { ...this.current.stats! } } }, true);
+    return this.publishSpatial(next, true);
   }
   inspect() { if (!this.storage) throw Error('Testing dungeons have no save storage'); const review = this.storage.inspect(); this.review = review; return review; }
   continue(review: DungeonInspection, slot: DungeonSlot = review.primary.status === 'valid' ? 'primary' : 'backup') {

@@ -1,5 +1,5 @@
 import { dungeonContent } from '../src/content/dungeon';
-import { walkDungeon, reenterDungeonStair, continueSavedDungeon, openDungeonInventory } from './helpers/dungeonTraversal';
+import { walkDungeon, reenterDungeonStair, continueSavedDungeon, openDungeonInventory, collectDungeonEncounterLoot } from './helpers/dungeonTraversal';
 import { atEncounter, atStairApproach, checkedDungeon, stagedMageAbility, snaredDefeatBoundary } from './helpers/dungeonFixtures';
 import { expect,railTest as test,type Page } from './helpers/dungeonEntropy';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -227,7 +227,7 @@ test('Snared badge excludes a legally Pinned enemy on saved resume',async({page}
 for(const saved of [false,true])(saved?test.extend({pinDungeonSeed:27}):fixedSeedTest)(saved?'saved menu dungeon keeps proof tools hidden across legal encounters':'testing dungeon legally clears a floor, descends and backtracks without accessing saves',async({page,isMobile})=>{
  test.setTimeout(300000); // Three complete battles plus normal exploration and stair input.
  // Reuse the complete first floor of the existing legal Fighter journey.
- const errors:string[]=[];let taunted=false;page.on('pageerror',error=>errors.push(error.message));
+ const errors:string[]=[];let taunted=false;const lootJourney:unknown[]=[];page.on('pageerror',error=>errors.push(error.message));
  if(!saved)await page.addInitScript(()=>{
   const get=Storage.prototype.getItem,set=Storage.prototype.setItem,remove=Storage.prototype.removeItem;
   const gameKey=(key:string)=>key.startsWith('tactics-guru:phaser:')||key.startsWith('tactics-guru:records:')||key==='tactics-guru:menu-new-dungeon-review';
@@ -244,7 +244,8 @@ for(const saved of [false,true])(saved?test.extend({pinDungeonSeed:27}):fixedSee
  for(let slot=0;slot<3;slot++){
   await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-  expectedKills+=(await snapshot(page)).activeBattle!.units.filter(unit=>unit.side==='enemy').length;
+  const encounterEntry=await snapshot(page);
+  expectedKills+=encounterEntry.activeBattle!.units.filter(unit=>unit.side==='enemy').length;
   await expect(page.getByRole('complementary',{name:'Dungeon battle controls',exact:true})).toBeVisible();
   await expect(page.getByText('Board controls',{exact:true})).not.toBeVisible();
   await expect(page.getByText('Measurements',{exact:true})).not.toBeVisible();
@@ -265,9 +266,12 @@ for(const saved of [false,true])(saved?test.extend({pinDungeonSeed:27}):fixedSee
    await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||(await readSession(page))?.phase==='player';}).toBe(true);
   }
   const finished=await snapshot(page);expect(finished.phase).not.toBe('defeat');expect(finished.floors[0].completed).toBe(slot+1);
+  expect(finished.phase).toBe('ready');expect(finished.offer).toBeNull();expect(finished.floors[0].loot).toHaveLength(slot+1);
+  await expect(page.getByRole('region',{name:'Rewards',exact:true})).toHaveCount(0);
   if(saved){expect(finished.stats?.enemiesKilled).toBe(expectedKills);expect(finished.stats!.movesTaken).toBeGreaterThan(0);}
   else expect(finished.stats).toBeUndefined();
   if(saved)expect(await historyRows(page)).toEqual([]);
+  await collectDungeonEncounterLoot(page,encounterEntry,isMobile?'touch':'keyboard');
   for(let i=0;i<20;i++){
    const s=await snapshot(page),command=journeyPreparation(s);if(!command)break;
    if(command.type==='claimReward')await page.getByRole('button',{name:`Claim ${dungeonContent.items[command.itemId].label}`,exact:true}).click();
@@ -275,11 +279,16 @@ for(const saved of [false,true])(saved?test.extend({pinDungeonSeed:27}):fixedSee
    else if(command.type==='equipItem'){await openDungeonInventory(page);const row=page.locator(`[data-instance-id="${command.instanceId}"]`);await row.locator('select').selectOption(command.heroId);const item=s.ownership.equipment.find(e=>e.instanceId===command.instanceId)!;await row.getByRole('button',{name:`Equip ${dungeonContent.items[item.itemId].label}`,exact:true}).click();}
    else throw Error('Unexpected preparation command');await page.locator('#dungeon-item-confirm').click();
   }
+  const prepared=await snapshot(page);
+  lootJourney.push({slot,contact:encounterEntry.encounterEntry?.contact,reward:finished.floors[0].loot!.at(-1),
+   partyBeforeBattle:encounterEntry.party,partyAfterBattle:finished.party,partyAfterPreparation:prepared.party,ownership:prepared.ownership});
  }
  const cleared=await snapshot(page);await walkDungeon(page,cleared.floors[0].descriptor.downstairs,isMobile?'touch':'keyboard');
  const second=await snapshot(page);expect(second.depth).toBe(2);expect(second.party).toEqual(cleared.party);expect(second.ownership).toEqual(cleared.ownership);
  await reenterDungeonStair(page,'ascend',isMobile?'touch':'keyboard');
  const returned=await snapshot(page);expect(returned.depth).toBe(1);expect(returned.floors[0].completed).toBe(3);expect(returned.party).toEqual(cleared.party);expect(returned.ownership).toEqual(cleared.ownership);
+ expect(returned.floors[0].loot).toEqual(cleared.floors[0].loot);
+ writeFileSync(test.info().outputPath('ground-loot-first-floor.json'),JSON.stringify({seed:returned.seed,saved,collection:'manual',encounters:lootJourney,returned},null,2));
  if(saved){expect(returned.stats?.enemiesKilled).toBe(cleared.stats?.enemiesKilled);expect(returned.stats!.movesTaken).toBeGreaterThan(cleared.stats!.movesTaken);}
  await expect(page.getByRole('button',{name:'Save recovery',exact:true})).toHaveCount(saved?1:0);
  if(saved){
@@ -669,6 +678,7 @@ test('declining a dungeon reward preserves inventory and allows the next encount
  const rewards=page.getByRole('region',{name:'Rewards',exact:true});
  for(const size of [{width:393,height:852},{width:740,height:360}]){
   await page.setViewportSize(size);
+  await page.screenshot({path:test.info().outputPath(`saved-reward-choice-${size.width}x${size.height}.png`)});
   await expect(rewards).toBeInViewport({ratio:1});
  }
  await page.setViewportSize(viewport);

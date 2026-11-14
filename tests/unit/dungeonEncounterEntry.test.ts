@@ -112,26 +112,20 @@ describe('dungeon interrupted encounter entry', () => {
     expect(read.state.encounterEntry).toEqual(entry);
   });
 
-  it.each(['claimReward', 'declineReward'] as const)('retains origin through the existing reward, then settles %s without a hidden move', type => {
+  it('settles victory at the origin, preserving the reward until a normal pickup step', () => {
     const { state, target } = contact(), entered = step(state, target), won = victory(entered);
-    expect(won.encounterEntry).toEqual(entered.encounterEntry);
+    expect(won.encounterEntry).toBeUndefined();
     expect(currentFloor(won).position).toBe(currentFloor(state).position);
     expect(currentFloor(won).completed).toBe(1);
-    expect(won.phase).toBe('reward'); assert(won.offer);
+    expect(won.phase).toBe('ready'); expect(won.offer).toBeNull();
+    expect(currentFloor(won).loot).toMatchObject([{slot:0,cell:target,quantity:1,remaining:1}]);
     const encoded = encodeDungeon(won); assert(encoded.ok);
     expect(decodeDungeon(encoded.text)).toEqual({ ok: true, state: won });
-    const command = type === 'claimReward'
-      ? { ...dungeonBoundary(won), type, offerId: won.offer.id, itemId: won.offer.options[0].itemId }
-      : { ...dungeonBoundary(won), type, offerId: won.offer.id };
-    const settled = checkedDungeon(dungeonItem(won, command));
-    expect(settled.encounterEntry).toBeUndefined();
-    expect(settled.phase).toBe('ready');
-    expect(currentFloor(settled).position).toBe(currentFloor(state).position);
-    expect(currentFloor(settled).exploration.movement).toEqual(currentFloor(state).exploration.movement);
+    expect(currentFloor(won).exploration.movement).toEqual(currentFloor(state).exploration.movement);
     expect(acceptDungeonBattle(won, entered.activeBattle!)).toEqual({ ok: false, reason: 'staleBoundary' });
-    expect(dungeonItem(settled, command)).toEqual({ ok: false, reason: 'staleBoundary' });
-    const moved = step(settled, target);
+    const moved = step(won, target);
     expect(currentFloor(moved).position).toBe(target);
+    expect(currentFloor(moved).loot?.[0].remaining).toBe(0);
     expect(currentFloor(moved).exploration.movement!.step).toBe(currentFloor(state).exploration.movement!.step + 1);
   });
 
@@ -175,7 +169,8 @@ describe('dungeon interrupted encounter entry', () => {
     assert(storage.save(victory(entered)).ok);
     expect(storage.inspect().backup.text).toBe(backup.text);
     const primary = storage.inspect().primary; assert(primary.status === 'valid');
-    expect(primary.state.encounterEntry).toEqual(entered.encounterEntry);
+    expect(primary.state.encounterEntry).toBeUndefined();
+    expect(currentFloor(primary.state).loot?.[0].cell).toBe(entered.encounterEntry?.contact);
   });
 
   it('creates a valid pre-contact preparation checkpoint for a ledger battle with no previous save', () => {

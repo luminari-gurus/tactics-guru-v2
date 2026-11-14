@@ -77,6 +77,18 @@ export async function walkDungeon(page: Page, target?: number, mode: 'keyboard'|
   throw Error('Could not reach moving encounter within 400 steps');
 }
 
+/** Match the legal witness policy: explicitly collect the new encounter's pile before preparation. */
+export async function collectDungeonEncounterLoot(page: Page, entry: DungeonState, mode: 'keyboard'|'touch'|'pointer') {
+  const state=await dungeonSnapshot(page),cell=entry.encounterEntry?.contact;
+  if(state.phase!=='ready'||cell===undefined||state.depth!==entry.depth)return;
+  const floor=state.floors[state.depth-1];
+  if(!floor.loot?.some(item=>item.cell===cell&&item.remaining))return;
+  // An available staircase is a separate, deliberate traversal decision.
+  if(state.depth>1&&cell===floor.descriptor.upstairs||floor.completed===3&&cell===floor.descriptor.downstairs)return;
+  await expect(page.locator('#dungeon-map')).toBeVisible();
+  await walkDungeon(page,cell,mode);
+}
+
 /** Arrival is inert: leave the staircase and enter it again through normal input. */
 export async function reenterDungeonStair(page: Page, direction: 'ascend'|'descend', mode: 'keyboard'|'touch'|'pointer' = 'keyboard') {
   const s=await dungeonSnapshot(page),f=s.floors[s.depth-1],map=floorMap(f.descriptor);
