@@ -16,6 +16,12 @@ import './dungeon.css';
 export const dungeonElement = <K extends keyof HTMLElementTagNameMap>(tag: K, text = '') => { const n = document.createElement(tag); n.textContent = text; return n; };
 
 const sheetPortraits: Record<HeroId, string> = { fighter: fighterSheet, ranger: rangerSheet, mage: mageSheet };
+// Only complete routine messages belong at the bottom; appended loot, progression,
+// and history feedback must remain prominent beside the map.
+const routineSaveStatuses = new Set([
+  'Saving dungeon…', 'Dungeon saved on this device', 'Exploration saved on this device',
+  'Travel saved on this device', 'Continued saved dungeon',
+]);
 
 function portrait(name: string, src: string | undefined, size: number) {
   const frame = dungeonElement('span', name[0]);
@@ -42,17 +48,19 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
   let play=root.querySelector<HTMLElement>(':scope > .dungeon-play');
   let sidebar=play?.querySelector<HTMLElement>('.dungeon-sidebar');
   let after=root.querySelector<HTMLElement>(':scope > .dungeon-secondary');
+  let saveNote=root.querySelector<HTMLElement>(':scope > .dungeon-save-note');
   const openPanels = new Set([...after?.querySelectorAll('details[open]') ?? []].map(panel => panel.id));
-  if (!header || !play || !sidebar || !after || mapView.root.parentElement !== play) {
+  if (!header || !play || !sidebar || !after || !saveNote || mapView.root.parentElement !== play) {
     header=el('header');header.className='dungeon-header';
     play=el('div');play.className='dungeon-play';
     sidebar=el('div');sidebar.className='dungeon-sidebar';
     after=el('div');after.className='dungeon-secondary';
+    saveNote=el('p');saveNote.className='dungeon-save-note';saveNote.setAttribute('aria-hidden','true');
     play.append(mapView.root,sidebar,mapView.controlsRoot);
-    root.replaceChildren(header,play,after);
+    root.replaceChildren(header,play,after,tools,saveNote);
   }
   // Keep the map and host tools mounted to retain their state and focus.
-  for (const child of [...root.children]) if (child !== header && child !== play && child !== after && child !== tools) child.remove();
+  for (const child of [...root.children]) if (child !== header && child !== play && child !== after && child !== tools && child !== saveNote) child.remove();
   // Keep the live region connected while its text changes. Replacing it with a
   // populated node can leave pickup and capacity feedback unannounced.
   let status = header.querySelector<HTMLElement>(':scope > .dungeon-status');
@@ -70,7 +78,12 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
   }
   let travelHint=header.querySelector<HTMLElement>(':scope > .dungeon-travel-hint');
   for(const child of [...header.children])if(child!==title&&child!==status&&child!==travelHint)child.remove();
-  if(status.textContent!==session.status)status.textContent=session.status;
+  const statusText=session.status,quietSave=routineSaveStatuses.has(statusText);
+  // Preserve one connected live region while the routine visual copy sits after the tools.
+  status.classList.toggle('dungeon-status-quiet',quietSave);
+  if(status.textContent!==statusText)status.textContent=statusText;
+  if(saveNote.hidden===quietSave)saveNote.hidden=!quietSave;
+  if(quietSave&&saveNote.textContent!==statusText)saveNote.textContent=statusText;
   let hintText='';
   if (s.phase === 'ready') {
     if (s.depth > 1 && floor.position === floor.descriptor.upstairs) {

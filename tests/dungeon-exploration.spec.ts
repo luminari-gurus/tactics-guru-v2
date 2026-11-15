@@ -107,11 +107,15 @@ test('ground loot: legal victory saves one item at contact and a manual pickup s
  },DUNGEON_KEYS.primary);
  const enter=async()=>{if(isMobile)await tile.tap();else await tile.click();};
  await enter();await expect(page.locator('.dungeon-status')).toContainText('Movement not published');
+ await expect(page.locator('.dungeon-header .dungeon-status')).toBeInViewport({ratio:1});
+ await expect(page.locator('.dungeon-save-note')).toBeHidden();
  const refused=await dungeonSnapshot(page);expect(refused.floors).toEqual(resumed.floors);expect(refused.ownership).toEqual(resumed.ownership);
  await page.evaluate(()=>(window as unknown as {restoreLootStorage:()=>void}).restoreLootStorage());
  await page.getByRole('button',{name:'Save recovery',exact:true}).click();await page.locator('#dungeon-retry-save').click();
  const statusNode=await page.locator('.dungeon-status').elementHandle();if(!statusNode)throw Error('Missing acquisition status');
  await enter();await expect(page.locator('.dungeon-status')).toContainText(`Picked up ${label}`);
+ await expect(page.locator('.dungeon-header .dungeon-status')).toBeInViewport({ratio:1});
+ await expect(page.locator('.dungeon-save-note')).toBeHidden();
  expect(await statusNode.evaluate(node=>node.isConnected&&node===document.querySelector('.dungeon-status'))).toBe(true);
  await expect(page.locator('.dungeon-status')).toHaveAttribute('aria-live','polite');
  await expect(page.locator('.dungeon-status')).toHaveAttribute('aria-atomic','true');
@@ -557,6 +561,7 @@ test('movement controls stay visible with the player without scrolling on entry 
   await page.screenshot({path:test.info().outputPath(`map-edge-${index}-${size.width}x${size.height}.png`)});
   const before=await dungeonSnapshot(page),scrollTop=await activate(`dungeon-step-${name}`);
   await expect.poll(async()=>(await dungeonSnapshot(page)).floors[0].position).toBe(destination);
+  await expect(page.locator('.dungeon-save-note')).toHaveText('Exploration saved on this device');
   expect((await dungeonSnapshot(page)).revision).toBe(before.revision+1);
   expect((await expectDungeonMovementVisible(page)).scrollTop).toBe(scrollTop);
   await activate(`dungeon-step-${reverse}`);
