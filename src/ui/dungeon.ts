@@ -2,7 +2,7 @@ import { progressionLabel } from '../domain/progression';
 import { DungeonMap, dungeonBiomeLabel } from './dungeonMap';
 import { poiCell } from '../domain/exploration';
 import { dungeonContent } from '../content/dungeon';
-import { dungeonBoundary, currentFloor, clearedDungeonSlots, FloorCache, type DungeonItemCommand, type DungeonState } from '../domain/dungeon';
+import { dungeonBoundary, currentFloor, clearedDungeonSlots, dungeonStairStatus, FloorCache, type DungeonItemCommand, type DungeonState } from '../domain/dungeon';
 import type { DungeonSession } from '../app/DungeonSession';
 import { EQUIPMENT_SLOTS, ITEM_BOUNDS } from '../content/itemTypes';
 import type { HeroId } from '../content/types';
@@ -77,28 +77,42 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
     title=el('h1',titleText);title.id='dungeon-title';title.tabIndex=-1;
     if(previousTitle)previousTitle.replaceWith(title);else header.prepend(title);
   }
-  let travelHint=header.querySelector<HTMLElement>(':scope > .dungeon-travel-hint');
-  for(const child of [...header.children])if(child!==title&&child!==status&&child!==travelHint)child.remove();
+  const previousProgress=header.querySelector<HTMLUListElement>(':scope > #dungeon-progress');
+  for(const child of [...header.children])if(child!==title&&child!==status&&child!==previousProgress)child.remove();
   const statusText=session.status,quietSave=routineSaveStatuses.has(statusText);
   // Preserve one connected live region while the routine visual copy sits after the tools.
   status.classList.toggle('dungeon-status-quiet',quietSave);
   if(status.textContent!==statusText)status.textContent=statusText;
   if(saveNote.hidden===quietSave)saveNote.hidden=!quietSave;
   if(quietSave&&saveNote.textContent!==statusText)saveNote.textContent=statusText;
-  let hintText='';
-  if (s.phase === 'ready') {
-    if (s.depth > 1 && floor.position === floor.descriptor.upstairs) {
-      hintText='Step off the upstairs and back onto it to ascend.';
-    } else if (floor.completed === 3 && floor.position === floor.descriptor.downstairs) {
-      hintText='Step off the downstairs and back onto it to descend.';
-    } else if (floor.completed === 3) {
-      hintText='Descent unlocked. Walk onto the downstairs to continue.';
-    }
+  const progress=previousProgress??el('ul');
+  if(!previousProgress){
+    progress.id='dungeon-progress';progress.setAttribute('aria-label','Floor progress');
+    for(const id of ['dungeon-encounter-progress','dungeon-stair-descend','dungeon-stair-ascend']){const item=el('li');item.id=id;progress.append(item);}
   }
-  if(hintText){
-    if(!travelHint){travelHint=el('p');travelHint.className='dungeon-travel-hint';header.append(travelHint);}
-    if(travelHint.textContent!==hintText)travelHint.textContent=hintText;
-  }else travelHint?.remove();
+  if(progress.previousElementSibling!==title)title.after(progress);
+  // Update rows in place so ordinary movement keeps the header mounted.
+  const progressRow=(id:string,text:string)=>{const item=progress.querySelector<HTMLElement>(`#${id}`)!;if(item.textContent!==text)item.textContent=text;};
+  const total = floor.descriptor.encounters.length;
+  progressRow('dungeon-encounter-progress', `Encounters: ${floor.completed} / ${total} cleared`);
+  for (const direction of ['descend', 'ascend'] as const) {
+    const stair = direction === 'descend' ? 'Downstairs' : 'Upstairs';
+    const availability = dungeonStairStatus(s, direction);
+    let detail: string;
+    if (availability === 'available') {
+      detail = direction === 'descend' ? 'unlocked' : 'available';
+      if (floor.position === (direction === 'descend' ? floor.descriptor.downstairs : floor.descriptor.upstairs)) {
+        detail += ` · Step off the ${stair.toLowerCase()} and back onto it to ${direction}.`;
+      } else if (direction === 'descend') detail += ' · walk onto the stairs';
+    } else if (availability === 'encounters') {
+      const remaining = total - floor.completed;
+      detail = `locked · clear ${remaining} more encounter${remaining === 1 ? '' : 's'}`;
+    } else detail = {
+      floorOne: 'unavailable on floor 1', reward: 'locked · resolve reward',
+      battle: 'unavailable during battle', defeat: 'unavailable after defeat',
+    }[availability];
+    progressRow(`dungeon-stair-${direction}`, `${stair}: ${detail}`);
+  }
   // Session snapshots are cloned, so compare the values used by cards and sheet handlers.
   // Keep unchanged portraits mounted during movement; revision-bound actions below stay fresh.
   const partyKey=JSON.stringify([s.id,s.phase,s.party,s.ownership,

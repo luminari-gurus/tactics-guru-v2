@@ -1,4 +1,4 @@
-import { clearedDungeonSlots, collectableDungeonLoot, currentFloor, floorMap, stepDungeon,
+import { clearedDungeonSlots, collectableDungeonLoot, currentFloor, dungeonStairStatus, floorMap, stepDungeon,
   type DungeonResult, type DungeonState } from './dungeon';
 import { neighbors, poiCell } from './exploration';
 import { hasShape } from './validation';
@@ -38,8 +38,9 @@ export function autoCollectDungeon(state: DungeonState, intent: DungeonAutoColle
     item.cell === intent.destination && item.remaining > 0);
   if (!loot || !cleared.includes(intent.slot)) return fail('staleLoot');
   if (floor.exploration.pois.some(poi => !cleared.includes(poi.encounterSlot) && poiCell(poi, map.width) === intent.destination)) return fail('occupiedLoot');
-  if (intent.destination === floor.descriptor.upstairs && state.depth > 1 ||
-      intent.destination === floor.descriptor.downstairs && floor.completed === 3) return fail('automaticStairs');
+  // Share the travel projection so automatic pickup never enters a stair the step reducer would travel.
+  if (intent.destination === floor.descriptor.upstairs && dungeonStairStatus(state, 'ascend') === 'available' ||
+      intent.destination === floor.descriptor.downstairs && dungeonStairStatus(state, 'descend') === 'available') return fail('automaticStairs');
   if (collectableDungeonLoot(state, intent.destination) === 0) return fail('capacity');
   return stepDungeon(state, { id: intent.id, depth: intent.depth, revision: intent.revision, destination: intent.destination });
 }

@@ -7,7 +7,7 @@ import { HERO_PROGRESSION } from '../../src/content/progression';
 import { assert, describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { dungeonCapacityFixture, dungeonVictoryBoundary } from '../helpers/dungeonFixtures';
-import { clearedDungeonSlots, freshDungeon, newDungeonSeed, stepDungeon, dungeonBattle, dungeonOffer, floorDescriptor, floorMap, FloorCache, dungeonSeed, readDungeon, travelDungeon, startDungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
+import { dungeonStairStatus, clearedDungeonSlots, freshDungeon, newDungeonSeed, stepDungeon, dungeonBattle, dungeonOffer, floorDescriptor, floorMap, FloorCache, dungeonSeed, readDungeon, travelDungeon, startDungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
 import { encodeDungeon, decodeDungeon, encodeDungeonRollback, utf8Bytes } from '../../src/domain/dungeonSaveEnvelope';
 import { dungeonContent, dungeonIdentity, previousDungeonIdentity } from '../../src/content/dungeon';
 import { bothDungeonSlotsMissing, createDungeonStorage, serializeBrowserDungeonWrite, DUNGEON_BACKUP_CHECKPOINT_KEY, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
@@ -22,6 +22,32 @@ import { RunHistory } from '../../src/app/RunHistory';
 import { createRunRecordsStorage, RUN_RECORD_KEYS, selectedRunRecords } from '../../src/persistence/runRecordsStorage';
 import * as battlefields from '../../src/domain/battlefield';
 import { freshRunStats } from '../../src/domain/runStats';
+
+it('projects stair eligibility for both exploration versions without changing state or travel rejections', () => {
+  const base = freshDungeon('stair-status', 1), descriptor = floorDescriptor(base.seed, 2);
+  for (const depth of [1, 2]) for (const completed of [0, 1, 2, 3]) {
+    for (const phase of ['ready', 'reward', 'battle', 'defeat'] as const) {
+      for (const modern of [false, true]) {
+        const floor = depth === 1 ? base.floors[0] : {
+          descriptor, position: descriptor.upstairs,
+          exploration: freshExploration(descriptor.seed, descriptor.upstairs, floorMap(descriptor)), completed: 0,
+        };
+        const exploration = modern ? movableExploration(floor.exploration, floor.descriptor.seed, completed, phase) : floor.exploration;
+        const state: DungeonState = { ...base, depth, phase, floors: depth === 1
+          ? [{ ...floor, completed, exploration }] : [base.floors[0], { ...floor, completed, exploration }] };
+        const before = canonical(state);
+        for (const direction of ['ascend', 'descend'] as const) {
+          const expected = direction === 'ascend' && depth === 1 ? 'floorOne'
+            : phase !== 'ready' ? phase : direction === 'descend' && completed < 3 ? 'encounters' : 'available';
+          expect(dungeonStairStatus(state, direction)).toBe(expected);
+          expect(travelDungeon(state, direction, state.revision - 1)).toEqual({ok:false,reason:'staleBoundary'});
+          if (expected !== 'available') expect(travelDungeon(state, direction, state.revision)).toEqual({ok:false,reason:'lockedStairs'});
+        }
+        expect(canonical(state)).toBe(before);
+      }
+    }
+  }
+});
 
 it('reads literal counter-only format 12 while retaining whole kills/moves and partial time', () => {
   const raw=readFileSync('tests/fixtures/saves/issue-270/counter-dungeon-v1.json','utf8'),old=JSON.parse(raw);
