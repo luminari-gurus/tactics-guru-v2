@@ -1,4 +1,5 @@
 import { inspectMenuSave } from '../app/menuSaves';
+import { RunHistory } from '../app/RunHistory';
 import { readRunRecord } from '../domain/runRecords';
 import { menuGameHref, routeHref } from '../app/routes';
 import { bothDungeonSlotsMissing, createDungeonStorage } from '../persistence/dungeonStorage';
@@ -38,7 +39,9 @@ export function startMainMenu() {
   close.onclick = () => dialog.close(); dialog.addEventListener('close', () => { disposeContent(); disposeContent = () => {}; restore(); });
   function show(label: string, fill: () => void) {
     disposeContent(); disposeContent = () => {};
-    invoker = document.activeElement as HTMLElement; heading.textContent = label; body.replaceChildren(); fill(); dialog.showModal();
+    if (!dialog.open) invoker = document.activeElement as HTMLElement;
+    heading.textContent = label; body.replaceChildren(); fill();
+    if (dialog.open) close.focus(); else dialog.showModal();
   }
   // Match native dialog focus behavior on WebKit's button-skipping Tab policy.
   dialog.addEventListener('keydown', event => {
@@ -54,7 +57,7 @@ export function startMainMenu() {
     buttons.get('continue')!.disabled = !save.resumable;
     status.textContent = save.needsRecovery ? 'Some saved data needs recovery. Your saves have been preserved.'
       : save.resumable ? 'Saved progress is available on this device.' : 'Your journey begins here. Saves stay on this device.';
-    recovery.hidden = !(save.needsRecovery || save.fromBackup);
+    recovery.hidden = !(save.needsRecovery || save.fromBackup || save.hasDefeatedSave);
     return save;
   }
   function showRecovery() {
@@ -115,6 +118,7 @@ export function startMainMenu() {
   }
   content.append(title, nav, status, recovery, secondary, element('p', 'Choose your next adventure.'));
   main.append(art, content); document.body.append(main, dialog); refresh();
+  void new RunHistory('dungeon').reconcileDungeonDefeat(createDungeonStorage().inspect());
   // The dungeon hands off a single terminal result. Consume before opening so
   // a reload cannot replay an old defeat announcement.
   let defeatText: string | null = null;
@@ -137,8 +141,8 @@ export function startMainMenu() {
         for (const [name,value] of rows) { const cell=element('div'),dt=element('dt',name),dd=element('dd',value);cell.append(dt,dd);stats.append(cell); }
         body.append(stats);
         const actions=element('div'); actions.className='run-records-actions';
-        const newGame=element('button','New Game');newGame.type='button';newGame.onclick=()=>{dialog.close();actionsMenu.new();};
-        const records=element('button','Hall of Records');records.type='button';records.onclick=()=>{dialog.close();actionsMenu.records();};
+        const newGame=element('button','New Game');newGame.type='button';newGame.onclick=()=>{invoker=buttons.get('new')!;actionsMenu.new();};
+        const records=element('button','Hall of Records');records.type='button';records.onclick=()=>{invoker=buttons.get('records')!;actionsMenu.records();};
         actions.append(newGame,records);body.append(actions);
       });
     }

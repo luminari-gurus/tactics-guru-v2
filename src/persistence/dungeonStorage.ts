@@ -7,6 +7,13 @@ export type DungeonSlot = keyof typeof DUNGEON_KEYS;
 type Slot = { status: 'missing'; text: null } | { status: 'valid'; text: string; state: DungeonState; checkpoint?: string }
   | { status: 'invalid'; text: string; reason: string } | { status: 'unavailable'; text: null };
 export interface DungeonInspection { readonly primary: Slot; readonly backup: Slot }
+export function isResumableDungeonSlot(slot: Slot): slot is Extract<Slot, { status: 'valid' }> {
+  return slot.status === 'valid' && slot.state.phase !== 'defeat';
+}
+export function resumableDungeonSlot(review: DungeonInspection): DungeonSlot | null {
+  if (isResumableDungeonSlot(review.primary)) return 'primary';
+  return isResumableDungeonSlot(review.backup) ? 'backup' : null;
+}
 export type DungeonWrite = { ok: true } | { ok: false; reason: string };
 /** True only when both slots are missing. Unavailable, backup-only, and unreadable saves are not empty. */
 export function bothDungeonSlotsMissing(review: DungeonInspection): boolean {

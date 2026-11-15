@@ -2,7 +2,7 @@ import { levelUpFeedback } from '../domain/progression';
 import { BattleSession } from './BattleSession';
 import { stepDungeon, type ExplorationCommand, acceptDungeonBattle, dungeonBattle, dungeonItem, freshDungeon, readDungeon, startDungeonBattle, type DungeonState, type DungeonItemCommand } from '../domain/dungeon';
 import { encodeDungeon } from '../domain/dungeonSaveEnvelope';
-import { createDungeonStorage, type DungeonInspection, type DungeonSlot } from '../persistence/dungeonStorage';
+import { createDungeonStorage, isResumableDungeonSlot, resumableDungeonSlot, type DungeonInspection, type DungeonSlot } from '../persistence/dungeonStorage';
 import { dungeonRunRecord } from '../domain/runRecords';
 import type { RunHistory } from './RunHistory';
 import { acceptBattleStats, boundedStat, dungeonProgressStats, freshRunStats, type AcceptedBattle } from '../domain/runStats';
@@ -211,9 +211,10 @@ export class DungeonSession {
     return this.publishSpatial(next, true);
   }
   inspect() { if (!this.storage) throw Error('Testing dungeons have no save storage'); const review = this.storage.inspect(); this.review = review; return review; }
-  continue(review: DungeonInspection, slot: DungeonSlot = review.primary.status === 'valid' ? 'primary' : 'backup') {
-    if (!this.storage || this.disposed || review !== this.review || review[slot].status !== 'valid' || review[slot].state.phase === 'defeat' || !this.storage.acknowledge(review)) return false;
-    const selected = review[slot]; if (selected.status !== 'valid') return false;
+  continue(review: DungeonInspection, slot: DungeonSlot | null = resumableDungeonSlot(review)) {
+    if (!this.storage || this.disposed || review !== this.review || slot === null) return false;
+    const selected = review[slot];
+    if (!isResumableDungeonSlot(selected) || !this.storage.acknowledge(review)) return false;
     this.battle?.dispose(); this.battle = null; this.current = structuredClone(selected.state); this.expectedPrimary = review.primary.text; this.unsaved = false; this.progressSaved = true; this.review = null;
     this.started = true;
     this.report(slot === 'backup' ? 'Continued backup; some progress may be lost.' : 'Continued saved dungeon');
