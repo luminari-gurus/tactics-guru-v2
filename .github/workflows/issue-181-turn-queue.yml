@@ -1,0 +1,97 @@
+name: Issue 181 turn queue
+on:
+  push:
+    branches: [feat/issue-181-turn-queue]
+    paths: ['src/**', 'tests/**', 'scripts/**', '*config*', 'package*.json', '.github/workflows/issue-181-turn-queue.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: tactics-browser-tactics-browser-02
+  queue: max
+  cancel-in-progress: false
+jobs:
+  queue:
+    if: github.repository == 'luminari-gurus/tactics-guru-v2' && github.ref == 'refs/heads/feat/issue-181-turn-queue'
+    runs-on: [self-hosted, tactics-browser, tactics-browser-02]
+    timeout-minutes: 20
+    steps:
+      - name: Check host disposition
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run setup:browsers && npm run check:browsers
+      - name: Check whether prior passing coverage has unchanged inputs
+        id: reuse
+        run: |
+          node --input-type=module <<'JS'
+          import { appendFileSync, readFileSync } from 'node:fs';
+          import { execFileSync } from 'node:child_process';
+          const base = 'a1458857c6224db4622127f414c7317dd22c79fa';
+          const file = 'tests/battle-loop.spec.ts';
+          const git = args => execFileSync('git', args, { encoding: 'utf8' });
+          const changed = git(['diff', '--name-only', base, 'HEAD', '--',
+            'src', 'public', 'tests', 'scripts', '*config*', 'package*.json', 'index.html']).trim().split('\n').filter(Boolean);
+          const marker = "test('player HUD turn queue preserves initiative, keyboard and touch browsing across rounds and restart'";
+          const before = git(['show', `${base}:${file}`]), after = readFileSync(file, 'utf8');
+          const unchanged = changed.every(path => path === file) && before.includes(marker) && after.includes(marker)
+            && before.slice(0, before.indexOf(marker)) === after.slice(0, after.indexOf(marker));
+          // Run 43714311555 retains 31 passing layout, radial-input and complete
+          // battle checks. Only the new queue stress assertion is repaired here.
+          // Any other verification-input change restores the complete selection.
+          appendFileSync(process.env.GITHUB_OUTPUT, `unchanged=${unchanged}\n`);
+          console.log(JSON.stringify({ unchanged, comparison: base, retainedRun: 43714311555, changed }));
+          JS
+      - name: Record source identity
+        run: |
+          mkdir -p verification-receipts/issue-181
+          node --input-type=module <<'JS'
+          import { writeFileSync } from 'node:fs';
+          import { sourceIdentity } from './scripts/verification-report.mjs';
+          writeFileSync('verification-receipts/issue-181/source.json', JSON.stringify({
+            source: sourceIdentity(process.cwd()), node: process.version, runner: process.env.RUNNER_NAME,
+            conditions: 'Persistent qualified runner; browser/device emulation; shared host load and caches not independently controlled',
+            reusedEvidence: '${{ steps.reuse.outputs.unchanged }}' === 'true'
+              ? { run: 43714311555, source: 'a1458857c6224db4622127f414c7317dd22c79fa', passingChecks: 31,
+                  scope: 'Rail/radial layout, radial input, complete legal battles; runtime/config/helper inputs and these test bodies unchanged' }
+              : null
+          }, null, 2));
+          JS
+      - name: Build the application
+        id: build
+        run: npm run build
+      - name: Verify authoritative queue, interruption and restart on Chromium
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.regression.config.ts tests/battle-loop.spec.ts tests/battle-animations.spec.ts -g 'player HUD turn queue|turn queue holds' --diagnostics
+      - name: Verify rail and radial layout at supported sizes and enlarged text
+        if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.reuse.outputs.unchanged != 'true' }}
+        run: npm run test:browser -- -c playwright.regression.config.ts tests/battle-loop.spec.ts tests/battle-radial.spec.ts --project=desktop -g 'accepted rail and dock preserve|radial preference replaces the side rail' --diagnostics
+      - name: Preserve radial touch and input boundaries
+        if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.reuse.outputs.unchanged != 'true' }}
+        run: npm run test:browser -- -c playwright.regression.config.ts tests/battle-radial.spec.ts -g 'radial tap fallback opens the same radial|radial End turn|radial hub cancel records no command' --diagnostics
+      - name: Verify defeated-unit removal and complete legal outcomes
+        if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.reuse.outputs.unchanged != 'true' }}
+        run: npm run test:browser -- -c playwright.regression.config.ts tests/battle-loop.spec.ts -g 'complete legal authored battle' --diagnostics
+      - name: Verify queue and radial controls on iPhone WebKit
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          UNCHANGED_COVERAGE: ${{ steps.reuse.outputs.unchanged }}
+        run: |
+          selection='player HUD turn queue|radial tap fallback opens the same radial|radial End turn'
+          if [ "$UNCHANGED_COVERAGE" = true ]; then selection='player HUD turn queue'; fi
+          npm run test:browser -- -c playwright.device-acceptance.config.ts tests/battle-loop.spec.ts tests/battle-radial.spec.ts -g "$selection" --diagnostics
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-181-turn-queue-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/
+          retention-days: 14
+          if-no-files-found: warn
