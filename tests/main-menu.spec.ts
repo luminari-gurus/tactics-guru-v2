@@ -777,3 +777,78 @@ test('main menu: class guidance settings persist and reset tutorials without cha
   expect(await preferences()).toMatchObject({version:1,enabled:false,seen:[]});
   expect(await otherStorage()).toEqual(untouchedStorage);expect(errors).toEqual([]);
 });
+
+test('main menu: combat pace persists through Settings and More with native controls and an independent Normal reset',async({page},info)=>{
+  test.setTimeout(90000);
+  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+  const paceKey='tactics-guru:combat-pace',guidanceKey='tactics-guru:class-guidance';
+  const preferences=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)!),paceKey);
+  const guidance=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)!),guidanceKey);
+  const otherStorage=()=>page.evaluate(excluded=>Object.fromEntries(Object.keys(localStorage).filter(key=>!excluded.includes(key)).sort()
+    .map(key=>[key,localStorage.getItem(key)])),[paceKey,guidanceKey]);
+  await page.addInitScript(({slots,run,dungeon})=>{
+    if(sessionStorage.getItem('test:combat-pace-saves'))return;
+    localStorage.setItem(slots.run.primary,run);localStorage.setItem(slots.run.backup,run);
+    localStorage.setItem(slots.dungeon.primary,dungeon);localStorage.setItem(slots.dungeon.backup,dungeon);
+    sessionStorage.setItem('test:combat-pace-saves','yes');
+  },{slots:keys,run:menuFixture('run'),dungeon:menuFixture('dungeon')});
+  const activate=async(control:Locator)=>{
+    if(info.project.use.hasTouch)await control.tap();else {await control.focus();await page.keyboard.press('Enter');}
+  };
+  const choose=async(container:Locator,pace:'normal'|'fast')=>{
+    const radio=container.locator(`[data-combat-pace-value="${pace}"]`);
+    if(info.project.use.hasTouch)await radio.tap();
+    else {
+      await container.locator('[data-combat-pace-value]:checked').focus();
+      await page.keyboard.press(pace==='fast'?'ArrowRight':'ArrowLeft');await expect(radio).toBeFocused();
+    }
+    await expect(radio).toBeChecked();expect(await preferences()).toEqual({version:1,pace});
+  };
+  const viewport=page.viewportSize()!;
+  const checkSmallControls=async(container:Locator,name:string)=>{
+    await page.setViewportSize({width:320,height:568});
+    await page.evaluate(()=>{document.documentElement.style.fontSize='32px';});
+    for(const pace of ['normal','fast']){
+      const radio=container.locator(`[data-combat-pace-value="${pace}"]`);
+      await radio.scrollIntoViewIfNeeded();await expect(radio).toBeInViewport();
+      const bounds=await radio.evaluate(input=>{const rect=input.closest('label')!.getBoundingClientRect();return {left:rect.left,right:rect.right,height:rect.height};});
+      expect(bounds.height).toBeGreaterThanOrEqual(44);expect(bounds.left).toBeGreaterThanOrEqual(0);expect(bounds.right).toBeLessThanOrEqual(321);
+    }
+    expect(await container.evaluate(element=>element.scrollWidth<=element.clientWidth+1)).toBe(true);
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
+    await page.screenshot({path:info.outputPath(`combat-pace-${name}-large-text.png`)});
+    await page.evaluate(()=>{document.documentElement.style.fontSize='';});await page.setViewportSize(viewport);
+  };
+  await page.goto('./');
+  const settings=page.getByRole('button',{name:'Settings',exact:true});await activate(settings);
+  const dialog=page.getByRole('dialog',{name:'Settings',exact:true});
+  await expect(dialog.locator('[data-combat-pace]')).toHaveAccessibleName('Battle speed');
+  await expect(dialog.locator('[data-combat-pace-value="normal"]')).toBeChecked();expect(await preferences()).toBeNull();
+  const preserved=await otherStorage();
+  await choose(dialog,'fast');expect(await otherStorage()).toEqual(preserved);
+  await activate(dialog.getByRole('button',{name:'Close',exact:true}));await expect(settings).toBeFocused();
+  await page.reload();await activate(settings);await expect(dialog.locator('[data-combat-pace-value="fast"]')).toBeChecked();
+  await checkSmallControls(dialog,'settings');
+  await activate(dialog.getByRole('button',{name:'Close',exact:true}));
+  await activate(page.getByRole('link',{name:'Standalone battle',exact:true}));
+  const ready=()=>expect(page.locator('#game')).toHaveAttribute('data-phase','player');await ready();
+  const initial=await readSession(page);await activate(page.locator('#battle-guidance-dismiss'));
+  const seen=await guidance();expect(seen.seen.length).toBeGreaterThan(0);expect(await readSession(page)).toEqual(initial);
+  const more=page.locator('#battle-overflow');await activate(more.locator('summary'));
+  await expect(more.locator('[data-combat-pace-value="fast"]')).toBeChecked();
+  await choose(more,'normal');expect(await readSession(page)).toEqual(initial);expect(await guidance()).toEqual(seen);
+  await choose(more,'fast');expect(await readSession(page)).toEqual(initial);expect(await guidance()).toEqual(seen);
+  const reset=more.locator('[data-class-guidance-reset]');await activate(reset);
+  await expect(page.locator('#battle-class-guidance')).toBeVisible();expect(await guidance()).toMatchObject({version:1,enabled:true,seen:[]});
+  expect(await preferences()).toEqual({version:1,pace:'fast'});expect(await readSession(page)).toEqual(initial);
+  if(!info.project.use.hasTouch)await expect(reset).toBeFocused();
+  await checkSmallControls(more,'more');
+  await choose(more,'normal');expect(await readSession(page)).toEqual(initial);
+  expect(await otherStorage()).toEqual(preserved);
+  await page.reload();await ready();await activate(more.locator('summary'));
+  await expect(more.locator('[data-combat-pace-value="normal"]')).toBeChecked();
+  expect(await preferences()).toEqual({version:1,pace:'normal'});expect(await guidance()).toMatchObject({version:1,enabled:true,seen:[]});
+  expect(await readSession(page)).toEqual(initial);expect(await otherStorage()).toEqual(preserved);
+  await page.goto('./');await activate(settings);await expect(dialog.locator('[data-combat-pace-value="normal"]')).toBeChecked();
+  expect(await otherStorage()).toEqual(preserved);expect(errors).toEqual([]);
+});

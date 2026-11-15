@@ -79,6 +79,10 @@ dialog button { touch-action: manipulation; }
 .battle-mode :focus-visible { outline:3px solid var(--gold); outline-offset:2px; }
 .battle-mode:has(canvas:focus-visible) #battle-board-region { outline:3px solid var(--gold); outline-offset:-4px; }
 .battle-mode .battle-section-label { font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin:0 0 8px; }
+.battle-mode [data-combat-pace] { min-width:0; border:1px solid var(--edge); border-radius:6px; padding:8px; margin:12px 0; font-size:.8rem; overflow-wrap:anywhere; }
+.battle-mode [data-combat-pace] legend { font-weight:650; }
+.battle-mode [data-combat-pace] label { display:flex; align-items:center; gap:8px; min-height:44px; cursor:pointer; }
+.battle-mode [data-combat-pace] input { flex-shrink:0; width:20px; height:20px; }
 .battle-mode #battle-class-guidance { min-width:0; margin:0 0 10px; padding:8px; border:1px solid var(--edge); border-radius:6px; background:#192739; font-size:.75rem; line-height:1.4; overflow-wrap:anywhere; }
 .battle-mode #battle-class-guidance:not([hidden]) { display:grid; grid-template-columns:minmax(0,1fr) 44px; gap:6px 8px; align-items:start; }
 .battle-mode #battle-class-tip-title { color:var(--gold); font-weight:650; }

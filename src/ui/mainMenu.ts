@@ -5,6 +5,7 @@ import { mountTelemetryPreferences } from '../telemetry/preferences';
 import { mountCombatControlsPreference } from './combatControls';
 import { mountAutoCollectLootPreference } from './autoCollectLootPreference';
 import { mountClassGuidancePreferences } from './classGuidancePreferences';
+import { mountCombatPacePreference } from './combatPacePreference';
 import { mountRunRecords } from './runRecords';
 import './mainMenu.css';
 export const menuDefinition = [
@@ -94,8 +95,10 @@ export function startMainMenu() {
     settings: () => show('Settings', () => {
       body.append(element('p', 'Use the in-game Sound controls to enable or mute audio. Sound starts after your interaction.'));
       mountCombatControlsPreference(body);
+      const disposePace = mountCombatPacePreference(body);
       mountAutoCollectLootPreference(body);
-      disposeContent = mountClassGuidancePreferences(body);
+      const disposeGuidance = mountClassGuidancePreferences(body);
+      disposeContent = () => { disposePace(); disposeGuidance(); };
       mountTelemetryPreferences(body);
     }),
   };

@@ -56,9 +56,18 @@ test('sound control uses real gestures, preserves previews, modal focus and rest
   await page.reload();await ready(page);expect(await audio(page)).toMatchObject({enabled:false,started:0});expect(found).toEqual([]);
 });
 
-test('mute, hidden and context interruptions discard active feedback while commands finish',async({page})=>{
+for(const pace of ['normal','fast'] as const)test(pace==='normal'
+  ? 'mute, hidden and context interruptions discard active feedback while commands finish'
+  : 'combat pace: fast mute, hidden and context interruptions discard active feedback while commands finish',async({page})=>{
   // Fixed future anchors avoid a protocol round-trip racing a running Date.now().
   const start=Date.UTC(2026,0,1),found=errors(page);await page.clock.install({time:start});await page.goto('./?game=battle');await ready(page);
+  if(pace==='fast'){
+    const more=page.locator('#battle-overflow');
+    await more.locator('summary').focus();await page.keyboard.press('Enter');
+    const radio=more.locator('[data-combat-pace-value="fast"]');
+    await radio.focus();await page.keyboard.press('Space');await expect(radio).toBeChecked();
+    await more.locator('summary').focus();await page.keyboard.press('Enter');
+  }
   // WebKit can omit the synthetic mouse click here; the gesture case owns pointer/touch proof.
   await page.locator('#battle-sound').focus();await page.keyboard.press('Enter');
   await expect.poll(()=>audio(page)).toMatchObject({enabled:true,status:'ready'});

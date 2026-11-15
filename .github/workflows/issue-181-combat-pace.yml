@@ -1,0 +1,65 @@
+name: Issue 181 combat pace
+on:
+  push:
+    branches: [feat/issue-181-combat-pace]
+    paths: ['src/**', 'tests/**', 'scripts/**', '*config*', 'package*.json', '.github/workflows/issue-181-combat-pace.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: tactics-browser-tactics-browser-02
+  queue: max
+  cancel-in-progress: false
+jobs:
+  pace:
+    if: github.repository == 'luminari-gurus/tactics-guru-v2' && github.ref == 'refs/heads/feat/issue-181-combat-pace'
+    runs-on: [self-hosted, tactics-browser, tactics-browser-02]
+    timeout-minutes: 30
+    steps:
+      - name: Check host disposition
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run setup:browsers && npm run check:browsers
+      - name: Record source identity
+        run: |
+          mkdir -p verification-receipts/issue-181-pace
+          node --input-type=module <<'JS'
+          import { writeFileSync } from 'node:fs';
+          import { sourceIdentity } from './scripts/verification-report.mjs';
+          writeFileSync('verification-receipts/issue-181-pace/source.json', JSON.stringify({
+            source: sourceIdentity(process.cwd()), node: process.version, runner: process.env.RUNNER_NAME,
+            conditions: 'Persistent qualified runner; browser/device emulation; shared host load and caches not independently controlled'
+          }, null, 2));
+          JS
+      - name: Build the application
+        id: build
+        run: npm run build
+      - name: Verify pace, reduced motion, settings and replay equivalence on Chromium
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.regression.config.ts tests/battle-animations.spec.ts tests/battle-audio.spec.ts tests/main-menu.spec.ts -g 'combat pace' --diagnostics
+      - name: Preserve Normal signature effects, cancellation and HUD handoff
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          npm run test:browser -- -c playwright.regression.config.ts tests/battle-animations.spec.ts -g 'real controls, travel/impact|magic_missile: repeated cancellation|active bob: presentation, actor change|active bob: initial reduced motion|turn queue holds|class guidance retains' --diagnostics
+      - name: Verify layout and Settings focus at supported sizes and enlarged text
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          npm run test:browser -- -c playwright.regression.config.ts tests/battle-loop.spec.ts tests/battle-radial.spec.ts tests/main-menu.spec.ts --project=desktop -g 'accepted rail and dock preserve|radial preference replaces the side rail|main menu: read-only root' --diagnostics
+      - name: Verify pace and settings on iPhone WebKit
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.combat-pace.config.ts --diagnostics
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-181-combat-pace-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/
+          retention-days: 14
+          if-no-files-found: warn

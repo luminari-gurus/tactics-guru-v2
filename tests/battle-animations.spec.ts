@@ -4,6 +4,7 @@ import { writeFileSync } from 'node:fs';
 import { BattleSession } from '../src/app/BattleSession';
 import { standaloneCatalog as catalog } from './helpers/playerPolicy';
 import { dispatch } from '../src/domain/turns';
+import { previewMove, previewMovement } from '../src/domain/grid';
 import { reachStandaloneBoundary } from './helpers/standaloneBoundary';
 import { BATTLE_STORAGE_KEYS as keys } from '../src/persistence/battleStorage';
 import { projectTile } from '../src/geometry/iso';
@@ -58,6 +59,17 @@ function fixtureAbilitySelector(fixture:Boundary) {
 const report=async(page:Page)=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
 const stored=(page:Page)=>page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),keys);
 const ready=(page:Page)=>expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+
+async function chooseCombatPace(page:Page,pace:'normal'|'fast',arrow=false) {
+  const more=page.locator('#battle-overflow');
+  if(await more.getAttribute('open')===null){await more.locator('summary').focus();await page.keyboard.press('Enter');}
+  const radio=more.locator(`[data-combat-pace-value="${pace}"]`);
+  if(arrow){await more.locator('[data-combat-pace-value]:checked').focus();await page.keyboard.press(pace==='fast'?'ArrowRight':'ArrowLeft');}
+  else {await radio.focus();await page.keyboard.press('Space');}
+  await expect(radio).toBeChecked();await expect(radio).toBeFocused();
+  await more.locator('summary').focus();await page.keyboard.press('Enter');
+  await expect(more).not.toHaveAttribute('open','');
+}
 
 function sharedCellBoundary() {
   const session=new BattleSession(catalog,'map:forest_ruins',1);
@@ -624,5 +636,169 @@ test('class guidance retains the presented player and never acknowledges interru
   await expect(guidance).toBeVisible();await expect(guidance).toHaveAttribute('data-unit-id',String(expected.active.id));
   await expect(dismiss).toBeEnabled();expect(await preferences()).toBeNull();
   expect(await guidance.evaluate(element=>element.contains(document.activeElement))).toBe(false);
+  expect(errors).toEqual([]);
+});
+
+test('combat pace: normal and fast preserve accepted results and enemy continuation while changes wait for the next animation',async({page},info)=>{
+  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  const fixture=boundary('high_shot');await boot(page,fixture);
+  const results:Awaited<ReturnType<typeof readSession>>[]=[];
+  for(const pace of ['normal','fast'] as const){
+    if(pace==='fast'){await page.clock.resume();await reachStandaloneBoundary(page,fixture.before);}
+    await prepareSignature(page,fixture,true);
+    const prepared=await readSession(page),preview=await page.locator('#battle-preview').textContent(),saved=await stored(page);
+    await chooseCombatPace(page,pace);
+    expect(await readSession(page)).toEqual(prepared);expect(await page.locator('#battle-preview').textContent()).toBe(preview);
+    expect(await stored(page)).toEqual(saved);
+    await confirmFrozen(page);
+    const accepted=await readSession(page),durationMs=pace==='normal'?560:280;
+    expect(accepted.state).toEqual(fixture.after);expect(accepted.replay!.commands.slice(-1)).toEqual([fixture.command]);
+    expect(accepted.events.slice(-fixture.events.length)).toEqual(fixture.events);
+    expect((await report(page)).presentation).toEqual({pace,reducedMotion:false,durationMs,kind:'signature'});
+    await page.clock.runFor(96);
+    const travel=await report(page);aligned(travel,fixture);expect(travel.effect.progress).toBeGreaterThan(0);
+    const nextPace=pace==='normal'?'fast':'normal';
+    // Native radio arrows must neither dispatch a board command nor retime an accepted tween.
+    await chooseCombatPace(page,nextPace,true);
+    const unchanged=await report(page);
+    expect(unchanged.presentation).toEqual(travel.presentation);expect(unchanged.effect.progress).toBe(travel.effect.progress);
+    expect(await readSession(page)).toEqual(accepted);expect(await stored(page)).toEqual(saved);
+    await page.clock.runFor(64);
+    const frame=await report(page);aligned(frame,fixture);
+    if(pace==='normal')expect(frame.effect.progress).toBeLessThan(0.45);
+    else expect(frame.effect.progress).toBeGreaterThanOrEqual(0.45);
+    expect(frame.effect.feedback.every((item:any)=>item.visible)).toBe(pace==='fast');
+    await page.screenshot({path:info.outputPath(`combat-pace-${pace}-160ms.png`)});
+    await page.clock.runFor(160);
+    if(pace==='normal'){
+      await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
+      expect((await report(page)).presentation.durationMs).toBe(560);
+      await page.clock.runFor(320);
+    }
+    await ready(page);expect((await report(page)).presentation).toBeNull();expect((await report(page)).effect).toBeNull();
+    expect((await readSession(page)).state).toEqual(fixture.after);
+    let enemyCommands=0;
+    // End at most one initiative cycle, stopping as soon as real AI commands have resolved.
+    for(let turn=0;turn<fixture.after.initiative.length && enemyCommands===0;turn++){
+      const before=await readSession(page),expected=new BattleSession(catalog,before.state,before.state.seed);
+      const command:Command={type:'endTurn',unitId:expected.active.id};
+      expect(expected.prepare(command).ok).toBe(true);
+      const end=expected.confirm();if(!end)throw Error('Expected legal player handoff');
+      expected.finishPresentation(end.token);
+      while(expected.phase==='enemy'){
+        const step=expected.nextEnemy();if(!step)throw Error('Expected legal enemy command');
+        enemyCommands++;expected.finishPresentation(step.token);
+      }
+      await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
+      await page.locator('#battle-next').focus();await page.keyboard.press('Enter');
+      await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
+      expect((await report(page)).presentation).toEqual({pace:nextPace,reducedMotion:false,durationMs:nextPace==='normal'?25:12.5,kind:'turn'});
+      expect((await readSession(page)).state).toEqual(end.after);
+      await page.clock.resume();await ready(page);
+      const actual=await readSession(page);
+      expect(actual.state).toEqual(expected.state);
+      expect(actual.replay!.commands).toEqual([...before.replay!.commands,...expected.continuation!.commands]);
+      expect(actual.events).toEqual([...before.events,...expected.events]);
+    }
+    expect(enemyCommands).toBeGreaterThan(0);expect(await stored(page)).toEqual(saved);
+    results.push(await readSession(page));
+  }
+  expect(results[1]).toEqual(results[0]);
+  writeFileSync(info.outputPath('combat-pace-equivalent-results.json'),JSON.stringify(results,null,2));
+  expect(errors).toEqual([]);
+});
+
+test('combat pace: fast visibility cancellation and restart clear presentation once without replaying accepted actions',async({page},info)=>{
+  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  const fixture=boundary('magic_missile');await boot(page,fixture);await chooseCombatPace(page,'fast');
+  const baseline=(await report(page)).objectCount;
+  await prepareSignature(page,fixture);await confirmFrozen(page);await page.clock.runFor(64);
+  expect((await report(page)).presentation).toEqual({pace:'fast',reducedMotion:false,durationMs:280,kind:'signature'});
+  aligned(await report(page),fixture);
+  const accepted=await readSession(page),saved=await stored(page);
+  await page.evaluate(()=>{
+    Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});
+    for(let i=0;i<3;i++)document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await ready(page);
+  expect(await readSession(page)).toEqual({...accepted,phase:'player'});
+  expect((await report(page)).presentation).toBeNull();expect((await report(page)).effect).toBeNull();
+  expect((await report(page)).objectCount).toBe(baseline);
+  // Ordinary frames must cross the old tween's end, even after repeated cancellation.
+  await page.clock.runFor(640);
+  expect(await readSession(page)).toEqual({...accepted,phase:'player'});expect(await stored(page)).toEqual(saved);
+  await page.evaluate(()=>{delete (document as unknown as {hidden?:boolean}).hidden;document.dispatchEvent(new Event('visibilitychange'));});
+  await page.clock.runFor(640);
+  expect(await readSession(page)).toEqual({...accepted,phase:'player'});expect(await stored(page)).toEqual(saved);
+  await page.clock.resume();await reachStandaloneBoundary(page,fixture.before);
+  await prepareSignature(page,fixture);await confirmFrozen(page);await page.clock.runFor(160);
+  const impact=await report(page);expect(impact.presentation.pace).toBe('fast');expect(impact.effect.progress).toBeGreaterThanOrEqual(0.45);
+  await page.screenshot({path:info.outputPath('combat-pace-fast-before-restart.png')});
+  const replacementSeed=(fixture.before.seed+1)>>>0;
+  await page.locator('#fit-restart').click({force:true});await confirmRestart(page,true);await page.clock.resume();
+  await expect.poll(async()=>JSON.parse((await page.locator('#game').getAttribute('data-session'))??'null')?.state.seed).toBe(replacementSeed);await ready(page);
+  const fresh=await readSession(page),freshObjects=(await report(page)).objectCount;
+  await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));await page.clock.runFor(640);
+  expect(await readSession(page)).toEqual(fresh);expect((await report(page)).objectCount).toBe(freshObjects);
+  expect((await report(page)).presentation).toBeNull();expect((await report(page)).effect).toBeNull();
+  await expect(page.locator('canvas')).toHaveCount(1);
+  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('tactics-guru:combat-pace')!))).toEqual({version:1,pace:'fast'});
+  expect(await stored(page)).toEqual(saved);expect(errors).toEqual([]);
+});
+
+test('combat pace: reduced motion keeps movement at endpoints and result text stationary until the sampled boundary',async({page},info)=>{
+  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+  const fixture=boundary('guarded_strike');await page.clock.install();
+  test.setTimeout(180000);
+  for(const pace of ['normal','fast'] as const){
+    await page.emulateMedia({reducedMotion:'reduce'});await page.clock.resume();
+    await page.goto('./?game=battle');await ready(page);await chooseCombatPace(page,pace);
+    const before=await readSession(page),actor=before.state.initiative[before.state.activeIndex],saved=await stored(page);
+    const reachable=previewMovement(before.state,actor,catalog);if(!reachable.ok)throw Error('Expected legal player movement');
+    const move=[...reachable.cells].reverse().map(({cell})=>previewMove(before.state,{type:'move',unitId:actor,to:cell},catalog))
+      .find(result=>result.ok && result.path.length>2);
+    if(!move?.ok)throw Error('Expected a legal movement spanning multiple tiles');
+    const resolved=dispatch(before.state,move.command,catalog);if(!resolved.ok)throw Error('Expected legal movement result');
+    await press(page,'[data-action="move"]',true);await page.locator('#battle-target').selectOption(`${move.command.to.x},${move.command.to.y}`);
+    await confirmFrozen(page);
+    const start=await report(page),origin=start.units.find((unit:any)=>unit.id===actor).position;
+    const target=projectTile(start.tiles.find((tile:any)=>tile.x===move.command.to.x && tile.y===move.command.to.y));
+    expect(start.presentation).toEqual({pace,reducedMotion:true,durationMs:pace==='normal'?25:12.5,kind:'move'});
+    // Sample actual rendered positions over successive frames; no intermediate travel is allowed.
+    for(let tick=0;tick<12;tick++){
+      const frame=await report(page);expect([origin,target]).toContainEqual(frame.units.find((unit:any)=>unit.id===actor).position);
+      expect(frame.effect).toBeNull();
+      if((await readSession(page)).phase==='player')break;
+      await page.clock.runFor(8);
+    }
+    await ready(page);expect((await report(page)).units.find((unit:any)=>unit.id===actor).position).toEqual(target);
+    const moved=await readSession(page);expect(moved.state).toEqual(resolved.state);expect(moved.state.rng).toEqual(before.state.rng);
+    expect(moved.replay!.commands).toEqual([...before.replay!.commands,move.command]);expect(await stored(page)).toEqual(saved);
+    await page.clock.resume();await reachStandaloneBoundary(page,fixture.before);
+    await prepareSignature(page,fixture,true);await confirmFrozen(page);
+    const accepted=await readSession(page),still=await report(page),durationMs=pace==='normal'?180:90;
+    expect(still.presentation).toEqual({pace,reducedMotion:true,durationMs,kind:'signature'});expect(still.effect).toBeNull();
+    expect(still.feedbackBounds.map((label:any)=>label.text)).toEqual(abilityPresentation(fixture.events).feedback.map(item=>item.text));
+    expect(still.feedbackBounds.length).toBeGreaterThan(0);
+    await page.emulateMedia({reducedMotion:'no-preference'});
+    await expect.poll(()=>page.evaluate(()=>matchMedia('(prefers-reduced-motion: reduce)').matches)).toBe(false);
+    await page.clock.runFor(64);
+    const unchanged=await report(page);expect(unchanged.presentation).toEqual(still.presentation);expect(unchanged.effect).toBeNull();
+    expect(unchanged.feedbackBounds).toEqual(still.feedbackBounds);expect(await readSession(page)).toEqual(accepted);
+    await page.screenshot({path:info.outputPath(`combat-pace-${pace}-reduced-motion.png`)});
+    await page.clock.runFor(64);
+    if(pace==='normal'){
+      await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
+      expect((await report(page)).feedbackBounds).toEqual(still.feedbackBounds);await page.clock.runFor(128);
+    }
+    await ready(page);expect((await report(page)).presentation).toBeNull();expect((await report(page)).feedbackBounds).toEqual([]);
+    expect((await readSession(page)).state).toEqual(fixture.after);
+    await page.locator('#battle-next').focus();await page.keyboard.press('Enter');
+    await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
+    expect((await report(page)).presentation).toEqual({pace,reducedMotion:false,durationMs:pace==='normal'?25:12.5,kind:'turn'});
+    await page.clock.resume();await ready(page);expect(await stored(page)).toEqual(saved);
+  }
   expect(errors).toEqual([]);
 });
