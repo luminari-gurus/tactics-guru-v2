@@ -1354,7 +1354,11 @@ test('a second dungeon encounter reuses the engine after a legal victory without
  const dismissedTip=await tip.getAttribute('data-tutorial-id');expect(dismissedTip).toBeTruthy();
  const dismiss=page.locator('#battle-guidance-dismiss');
  if(isMobile)await dismiss.tap();else {await dismiss.focus();await page.keyboard.press('Enter');}
- await expect(guidance).toBeHidden();await expect(page.locator('#battle-move')).toBeFocused();
+ // This legal victory boundary has already used movement; focus returns to
+ // the enabled End turn control, not the unavailable Move control.
+ expect(dismissedActor.hasMoved).toBe(true);
+ await expect(guidance).toBeHidden();await expect(page.locator('#battle-move')).toBeDisabled();
+ await expect(page.locator('#battle-next')).toBeFocused();
  expect(await readSession(page)).toEqual(beforeDismiss);expectSameProgress(await dungeonSnapshot(page),beforeDungeon);
  const acknowledged=await page.evaluate(()=>localStorage.getItem('tactics-guru:class-guidance'));
  expect(JSON.parse(acknowledged!).seen).toContain(dismissedTip);
