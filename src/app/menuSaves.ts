@@ -9,8 +9,8 @@ export function inspectMenuSave(provider?: BattleStorageProvider) {
   return {
     primary,
     backup,
-    resumable: primary === 'valid' || backup === 'valid',
+    resumable: [dungeon.primary,dungeon.backup].some(slot => slot.status === 'valid' && slot.state.phase !== 'defeat'),
     needsRecovery: [primary, backup].some(status => status === 'invalid' || status === 'unavailable'),
-    fromBackup: primary !== 'valid' && backup === 'valid',
+    fromBackup: !(dungeon.primary.status === 'valid' && dungeon.primary.state.phase !== 'defeat') && dungeon.backup.status === 'valid' && dungeon.backup.state.phase !== 'defeat',
   };
 }
