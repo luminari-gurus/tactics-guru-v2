@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { menuFixture } from './helpers/menuFixtures';
 import { generateMap } from '../src/map/generate';
 import { readFileSync } from 'node:fs';
-import { type Page, type Response } from '@playwright/test';
+import { type Page, type Response, type Locator } from '@playwright/test';
 import { test as base, expect } from './helpers/dungeonEntropy';
 import { encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
 import { freshRunStats } from '../src/domain/runStats';
@@ -713,4 +713,67 @@ test('main menu: five-stat records and retained personal bests stay keyboard and
   await expect(dialog.locator('.run-personal-bests')).toHaveCount(0);await expect(dialog.getByRole('status')).toContainText('No finished journeys recorded yet.');
   const cleared=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!),RUN_RECORD_KEYS.primary);
   expect(cleared.records).toEqual([]);expect(cleared.bests).toEqual({run:{},dungeon:{}});
+});
+
+test('main menu: class guidance settings persist and reset tutorials without changing battle progress',async({page},info)=>{
+  test.setTimeout(90000);
+  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+  const key='tactics-guru:class-guidance';
+  const preferences=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)!),key);
+  const otherStorage=()=>page.evaluate(key=>Object.fromEntries(Object.keys(localStorage).filter(name=>name!==key).sort()
+    .map(name=>[name,localStorage.getItem(name)])),key);
+  const activate=async(control:Locator)=>{
+    if(info.project.use.hasTouch)await control.tap();
+    else {await control.focus();await page.keyboard.press('Enter');}
+  };
+  const toggle=async(control:Locator)=>{
+    if(info.project.use.hasTouch)await control.tap();
+    else {await control.focus();await page.keyboard.press('Space');}
+  };
+  const ready=()=>expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const guidance=page.locator('#battle-class-guidance');
+  await page.goto('./?game=battle');await ready();
+  const skin=await page.evaluate(()=>document.body.dataset.combatSkin);
+  await expect(page.locator('#battle-guidance-teaching')).toHaveAttribute('data-tutorial-id',`preview:${skin}:v1`);
+  await expect(page.locator('#battle-guidance-teaching')).toContainText(skin==='radial'?'Tapping an action':'Confirm action');
+  const first=await readSession(page);await activate(page.locator('#battle-guidance-dismiss'));
+  await expect(guidance).toBeHidden();expect(await readSession(page)).toEqual(first);
+  const acknowledged=await preferences();expect(acknowledged.seen.length).toBeGreaterThan(0);
+  const untouchedStorage=await otherStorage();
+  await page.goto('./');
+  const settings=page.getByRole('button',{name:'Settings',exact:true});
+  await activate(settings);
+  const dialog=page.getByRole('dialog',{name:'Settings',exact:true});
+  const enabled=dialog.locator('[data-class-guidance-enabled]'),reset=dialog.locator('[data-class-guidance-reset]');
+  expect(await enabled.evaluate(input=>input.closest('label')!.getBoundingClientRect().height)).toBeGreaterThanOrEqual(44);
+  await expect(enabled).toBeChecked();await toggle(enabled);await expect(enabled).not.toBeChecked();
+  expect(await preferences()).toEqual({...acknowledged,enabled:false});
+  await activate(dialog.getByRole('button',{name:'Close',exact:true}));await expect(settings).toBeFocused();
+  await page.reload();await activate(settings);await expect(enabled).not.toBeChecked();
+  await activate(reset);await expect(enabled).not.toBeChecked();
+  expect(await preferences()).toMatchObject({version:1,enabled:false,seen:[]});
+  if(!info.project.use.hasTouch)await expect(reset).toBeFocused();
+  await page.screenshot({path:info.outputPath('class-guidance-settings-reset-disabled.png')});
+  await toggle(enabled);await expect(enabled).toBeChecked();
+  await activate(dialog.getByRole('button',{name:'Close',exact:true}));
+  await activate(page.getByRole('link',{name:'Standalone battle',exact:true}));await ready();
+  await expect(guidance).toBeVisible();await expect(page.locator('#battle-guidance-teaching')).toBeVisible();
+  const before=await readSession(page);await activate(page.locator('#battle-guidance-dismiss'));
+  await expect(guidance).toBeHidden();expect(await readSession(page)).toEqual(before);
+  const more=page.locator('#battle-overflow');await activate(more.locator('summary'));
+  const moreEnabled=more.locator('[data-class-guidance-enabled]'),moreReset=more.locator('[data-class-guidance-reset]');
+  expect(await moreEnabled.evaluate(input=>input.closest('label')!.getBoundingClientRect().height)).toBeGreaterThanOrEqual(44);
+  await expect(moreEnabled).toBeChecked();await activate(moreReset);
+  await expect(guidance).toBeVisible();await expect(page.locator('#battle-guidance-teaching')).toBeVisible();
+  expect(await preferences()).toMatchObject({version:1,enabled:true,seen:[]});
+  expect(await readSession(page)).toEqual(before);
+  if(!info.project.use.hasTouch)await expect(moreReset).toBeFocused();
+  expect(await guidance.evaluate(element=>element.contains(document.activeElement))).toBe(false);
+  await toggle(moreEnabled);await expect(guidance).toBeHidden();
+  expect(await readSession(page)).toEqual(before);
+  expect(await preferences()).toMatchObject({version:1,enabled:false,seen:[]});
+  await page.reload();await ready();await expect(guidance).toBeHidden();
+  await activate(more.locator('summary'));await expect(moreEnabled).not.toBeChecked();
+  expect(await preferences()).toMatchObject({version:1,enabled:false,seen:[]});
+  expect(await otherStorage()).toEqual(untouchedStorage);expect(errors).toEqual([]);
 });

@@ -67,20 +67,48 @@ for browser evidence, with no GitHub-hosted fallback. Receipts include the exact
 source identity, environment, results and screenshots. Browser/device emulation
 is the accepted device evidence; no physical-device test is claimed.
 
-## Increment 2: contextual class guidance (remaining)
+## Increment 2: contextual class guidance
 
-- Preserve the issue's per-turn tip requirement, with dismissal for the current
-  turn and a persistent Settings toggle. Keep first-seen teaching separate from
-  repeated tactical hints; define explicit replay/reset behavior before adding it.
-- Derive skill names, availability and rules from current catalog/preview truth.
-  Legacy Ember Burst and older Guarded Strike prose are not authoritative V2 text.
-- Include preview/confirm guidance without obscuring the board or stealing focus.
-- Coordinate existing skill UI and #153 Settings. Store seen/preference data in
-  a versioned preference boundary, independently of active battle snapshots.
-- Verify skipped/repeated tips, disabled guidance, reset, keyboard/touch dismissal,
-  restart, reload and the shared standalone/run/dungeon hosts.
+Implementation starts from main `31b2931df092216d17023137a4451ae48b379dd6` after
+queue PR #421 merged, on `feat/issue-181-class-guidance`. Presentation pace remains
+a separate increment.
 
-Implementation starts at `mainMenu.ts` Settings and `hud.ts` overflow controls.
+- Show one compact skill tip in the existing action-panel scroll area at settled
+  player turns, with an accessible 44 px dismissal control. Use the current
+  session catalog's learned ownership, damage/healing values and shared rule
+  constants. Prioritize unacknowledged skills, then rotate known skills by round.
+- Keep the same tip through previews and accepted actions in that turn. During
+  presentation retain the displayed player's tip with dismissal disabled; hide
+  it on settled enemy turns and terminal/error states. Appearance never requests
+  focus. Dismissal returns focus to the existing rail/radial action control.
+- Dismissal lasts until the next player turn or a fresh battle HUD, including
+  reload/restart. It does not reopen after movement, action use or undo in the
+  same turn. Merely seeing or skipping a tip does not acknowledge it.
+- Explicit dismissal acknowledges that skill lesson and any displayed first-time
+  preview/confirm lesson. Rail and radial teaching have separate IDs because a
+  radial action tap/hold release may execute immediately. Acknowledged skill tips
+  still recur; only the first-time interaction lesson is suppressed.
+- Store enabled/seen preferences in the independent version-1
+  `tactics-guru:class-guidance` envelope. Default Class tips on. Validate and bound
+  lesson IDs; retain explicit choices in memory when persistence fails. Preserve
+  unknown future-version data rather than downgrade it. No combat snapshot is
+  read or changed by preference operations.
+- Main-menu Settings and in-battle More both provide Class tips and Reset tutorials.
+  Reset clears seen lessons and current-turn dismissal while preserving opt-out;
+  enabling remains an explicit choice. Same-page/cross-tab changes notify open
+  controls, and subscriptions are disposed with the HUD or Settings content.
+
+Verification covers pure learned-skill projection and catalog/preview equivalence,
+preference corruption/future-version/storage-failure/reset boundaries, explicit
+acknowledgment versus skipped tips, unchanged prepared commands/replay, repeated
+tips, keyboard/touch focus, small/enlarged-text layouts, reduced motion, restart,
+and repeated visibility interruption. The focused self-hosted workflow also keeps
+the existing hover, turn-queue, rail/radial layout/input and menu focus witnesses.
+Ordinary PR verification covers all units/build boundaries plus shared standalone,
+run and dungeon gameplay/resume consumers. Record results and source identities
+in the PR, including any failed or incomplete initial runs.
+
+The implementation uses `mainMenu.ts` Settings and `hud.ts` overflow controls.
 Existing `combatControls.ts` and `autoCollectLootPreference.ts` provide independent
 storage/change-notification patterns, but their values are unversioned and there
 is no shared settings reset. Use `ownedAbilities` with the session's projected
