@@ -628,11 +628,18 @@ fixedSeedTest('dungeon battle undo survives reload and a legal defeat journey',a
  await page.reload();await continueSavedDungeon(page);
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect((await readSession(page)).state).toEqual(restored);
  await expect(page.locator('#battle-undo')).toBeDisabled();
+ const battleProgress=()=>page.locator('#game').evaluate(game=>{
+  const text=game.getAttribute('data-dungeon-snapshot');
+  return {dungeonPhase:text?JSON.parse(text).phase:null,battlePhase:game.getAttribute('data-phase')};
+ });
  for(let i=0;i<100;i++){
-  if((await snapshot(page)).phase!=='battle')break;
+  if((await battleProgress()).dungeonPhase!=='battle')break;
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   if(isMobile)await page.locator('#battle-next').tap();else await page.locator('#battle-next').click();
-  await expect.poll(async()=>{const state=await snapshot(page);return state.phase!=='battle'||(await readSession(page)).phase==='player';}).toBe(true);
+  await expect.poll(async()=>{
+   const {dungeonPhase,battlePhase}=await battleProgress();
+   return dungeonPhase!=='battle'||battlePhase==='player';
+  }).toBe(true);
  }
  const summary=page.getByRole('dialog',{name:'Dungeon defeat',exact:true});
  await expect(summary).toBeVisible();
