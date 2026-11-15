@@ -1,5 +1,5 @@
 import { dungeonContent } from '../src/content/dungeon';
-import { walkDungeon, reenterDungeonStair, continueSavedDungeon, openDungeonInventory, collectDungeonEncounterLoot } from './helpers/dungeonTraversal';
+import { walkDungeon, acceptedDungeonSnapshot, reenterDungeonStair, continueSavedDungeon, openDungeonInventory, collectDungeonEncounterLoot } from './helpers/dungeonTraversal';
 import { atEncounter, atStairApproach, checkedDungeon, hobgoblinDungeonBoundary, stagedMageAbility, snaredDefeatBoundary } from './helpers/dungeonFixtures';
 import { expect,railTest as test,type Page } from './helpers/dungeonEntropy';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -406,6 +406,7 @@ for(const {saved,autoCollect,title} of [
    else if(command.type==='useItem'){await openDungeonInventory(page);const label=dungeonContent.items[command.itemId].label;await page.getByRole('combobox',{name:`${label} target`,exact:true}).selectOption(command.heroId);await page.getByRole('button',{name:`Use ${label}`,exact:true}).click();}
    else if(command.type==='equipItem'){await openDungeonInventory(page);const row=page.locator(`[data-instance-id="${command.instanceId}"]`);await row.locator('select').selectOption(command.heroId);const item=s.ownership.equipment.find(e=>e.instanceId===command.instanceId)!;await row.getByRole('button',{name:`Equip ${dungeonContent.items[item.itemId].label}`,exact:true}).click();}
    else throw Error('Unexpected preparation command');await page.locator('#dungeon-item-confirm').click();
+   await acceptedDungeonSnapshot(page,s);
   }
   const prepared=await snapshot(page);
   lootJourney.push({slot,origin:entry.origin,contact:entry.contact,reward,lootAfterPickup:collectedFloor.loot!.at(-1),
@@ -577,12 +578,12 @@ test.extend({pinDungeonSeed:27})('saved dungeon downloads only after explicit re
 
 test('new dungeons use fresh layouts across reloads and saved dungeons retain theirs',async({page})=>{
  await page.goto('./?game=dungeon');
- await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();
- const first=await snapshot(page);
- await page.reload();await page.getByRole('button',{name:'Continue saved dungeon',exact:true}).click();
- expect(await snapshot(page)).toEqual(first);
- await page.reload();await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();
- const second=await snapshot(page);
+ const startNew=async()=>{await expect(page.locator('#dungeon-screen')).toHaveAttribute('data-boot','ready',{timeout:60_000});const dormant=await snapshot(page);await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();return acceptedDungeonSnapshot(page,dormant);};
+ const first=await startNew();
+ await page.reload();await continueSavedDungeon(page);
+ const resumed=await snapshot(page);expect(resumed.stats!.activeMs).toBeGreaterThanOrEqual(first.stats!.activeMs);
+ expect({...resumed,stats:first.stats}).toEqual(first);
+ await page.reload();const second=await startNew();
  expect(second.seed).not.toBe(first.seed);
  expect(generateMap(second.floors[0].descriptor.seed,'rooms').cells).not.toEqual(generateMap(first.floors[0].descriptor.seed,'rooms').cells);
 });
@@ -879,7 +880,7 @@ test('declining a dungeon reward preserves inventory and allows the next encount
  await activate();await page.locator('#dungeon-item-cancel').click();
  expect(await snapshot(page)).toEqual(initial);
  await activate();await page.locator('#dungeon-item-confirm').click();
- const next=await snapshot(page);
+ const next=await acceptedDungeonSnapshot(page,initial);
  expect(next).toMatchObject({phase:'ready',offer:null,ownership:initial.ownership});
  await expect(progress).toHaveText('Encounters: 1 / 3 cleared');
  await expect(stairs).toHaveText('Downstairs: locked · clear 2 more encounters');
@@ -917,17 +918,17 @@ test('confirmed charm discard frees full capacity without cancelling or duplicat
   expect(await snapshot(page)).toEqual(initial);expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe(saved);
  }
  await discard().click();await page.locator('#dungeon-discard-confirm').click();
- const disposed=await snapshot(page);expect(disposed.ownership.equipment).toHaveLength(5);expect(disposed.ownership.assignments).toEqual([]);expect(disposed.offer).toEqual(initial.offer);expect(disposed.party).toEqual(initial.party);expect(disposed.phase).toBe('reward');
+ const disposed=await acceptedDungeonSnapshot(page,initial);expect(disposed.ownership.equipment).toHaveLength(5);expect(disposed.ownership.assignments).toEqual([]);expect(disposed.offer).toEqual(initial.offer);expect(disposed.party).toEqual(initial.party);expect(disposed.phase).toBe('reward');
  await expect(manage).toHaveCount(0);
  await expect(page.locator('#dungeon-descend')).toHaveCount(0);
  await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(disposed);
  await page.getByRole('button',{name:/^Claim /}).first().click();await page.locator('#dungeon-item-confirm').click();
- const claimed=await snapshot(page);expect(claimed.ownership.equipment).toHaveLength(6);expect(claimed.ownership.equipment.some(e=>e.instanceId===target)).toBe(false);expect(claimed.phase).toBe('ready');expect(claimed.offer).toBeNull();
+ const claimed=await acceptedDungeonSnapshot(page,disposed);expect(claimed.ownership.equipment).toHaveLength(6);expect(claimed.ownership.equipment.some(e=>e.instanceId===target)).toBe(false);expect(claimed.phase).toBe('ready');expect(claimed.offer).toBeNull();
  await page.screenshot({path:test.info().outputPath('discard-capacity-recovered.png'),fullPage:true});
  await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(claimed);
  await openDungeonInventory(page);
  await page.getByRole('button',{name:/^Discard /}).first().click();await page.locator('#dungeon-discard-confirm').click();
- const prepared=await snapshot(page);expect(prepared.phase).toBe('ready');expect(prepared.ownership.equipment).toHaveLength(5);
+ const prepared=await acceptedDungeonSnapshot(page,claimed);expect(prepared.phase).toBe('ready');expect(prepared.ownership.equipment).toHaveLength(5);
  await walkDungeon(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  await expect(page.getByRole('button',{name:/^Discard /})).toHaveCount(0);
 });
@@ -968,6 +969,7 @@ test('an earned Healing Draught survives dungeon Continue and settles once after
  const claim=page.getByRole('button',{name:'Claim Healing Draught',exact:true});
  if(isMobile)await claim.tap();else await claim.click();
  await page.locator('#dungeon-item-confirm').click();
+ await acceptedDungeonSnapshot(page,victory.state);
  await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
  let used=false;
  for(let i=0;i<500;i++){

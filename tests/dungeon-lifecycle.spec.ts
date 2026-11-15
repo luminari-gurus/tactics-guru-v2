@@ -79,7 +79,9 @@ test('restart during accepted presentation discards old callbacks and history',a
  const checkpoint=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!).payload,DUNGEON_KEYS.primary);
  expect(checkpoint.stats.activeMs).toBeGreaterThanOrEqual(fresh.stats!.activeMs);
  expect({...checkpoint,stats:{...checkpoint.stats,activeMs:fresh.stats!.activeMs}}).toEqual(fresh);
- await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(checkpoint);
+ await page.reload();await continueSavedDungeon(page);
+ const resumed=await snapshot(page);expect(resumed.stats!.activeMs).toBeGreaterThanOrEqual(checkpoint.stats.activeMs);
+ expect({...resumed,stats:{...resumed.stats!,activeMs:checkpoint.stats.activeMs}}).toEqual(checkpoint);
 });
 test('legal enemy defeat waits for its save and returns to the menu during a pending history write',async({page,isMobile})=>{
  const made=startDungeonBattle(atEncounter(freshDungeon('dungeon-defeat-fixture',1)));if(!made.ok)throw Error(made.reason);const entry=made.state,built=dungeonBattle(entry)!;

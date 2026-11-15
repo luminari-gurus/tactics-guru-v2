@@ -4,7 +4,7 @@ import { expect,test } from './helpers/startupDiagnostics';
 import type { Locator, Page } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
-import { dungeonSnapshot, walkDungeon, continueSavedDungeon, openDungeonInventory, reenterDungeonStair } from './helpers/dungeonTraversal';
+import { dungeonSnapshot, acceptedDungeonSnapshot, walkDungeon, continueSavedDungeon, openDungeonInventory, reenterDungeonStair } from './helpers/dungeonTraversal';
 import { currentSight, neighbors, poiCell } from '../src/domain/exploration';
 import { generateMap } from '../src/map/generate';
 import { freshDungeon, floorDescriptor, floorMap, readDungeon, dungeonSeed, dungeonLootReward, stepDungeon, type DungeonState } from '../src/domain/dungeon';
@@ -154,7 +154,7 @@ for(const ownedCount of [5,6])test(`ground loot: ${ownedCount===5?'partial':'ful
   if(isMobile)await discard.tap();else await discard.click();
   await page.locator('#dungeon-discard-confirm').click();
   await expect(page.locator('.dungeon-status')).toContainText(`Picked up ${dungeonContent.items[pending.itemId].label}`);
-  const after=await dungeonSnapshot(page),afterFloor=after.floors[after.depth-1];
+  const after=await acceptedDungeonSnapshot(page,before),afterFloor=after.floors[after.depth-1];
   expect(afterFloor.position).toBe(cell);expect(afterFloor.exploration).toEqual(floor.exploration);
   expect(after.ownership.equipment).toHaveLength(6);expect(after.ownership.equipment.some(item=>item.instanceId===pending.id)).toBe(true);
   expect(afterFloor.loot!.find(item=>item.id===pending.id)?.remaining).toBe(0);
@@ -391,7 +391,8 @@ test('fresh descent leaves room to move off the arrival stairs before battle', a
  expect(floor.position).toBe(floor.descriptor.upstairs);
  const east=floor.position+1;
  expect(map.cells[east]).toBe(1);
- await expect(page.getByRole('heading',{name:'Explore Desert · Floor 2'})).toBeVisible();
+ // Compact landscape hides the exploration subheading; the page heading names floor and biome everywhere.
+ await expect(page.locator('#dungeon-screen h1')).toHaveText('Dungeon · Floor 2 · Desert');
  await page.reload();await continueSavedDungeon(page);
  expect(await dungeonSnapshot(page)).toEqual(arrived);
 
@@ -884,16 +885,19 @@ test('dungeon enemies move only after a player step and persist across reload', 
  const f=before.floors[0];
  const destination=neighbors(f.position).find(n=>map.cells[n]&&!f.exploration.pois.some(p=>poiCell(p,map.width)===n));if(destination===undefined)throw Error('No safe step');
  const cell=page.locator(`#dungeon-map [data-cell="${destination}"]`);if(isMobile)await cell.tap();else await cell.click();
- const after=await dungeonSnapshot(page);expect(after.revision).toBe(before.revision+1);expect(after.floors[0].exploration.movement!.step).toBe(1);
+ const after=await acceptedDungeonSnapshot(page,before);expect(after.revision).toBe(before.revision+1);expect(after.floors[0].exploration.movement!.step).toBe(1);
  expect(after.floors[0].exploration.pois).not.toEqual(before.floors[0].exploration.pois);
  const moved=after.floors[0].exploration.pois.find(p=>poiCell(p,map.width)!==poiCell(f.exploration.pois.find(old=>old.id===p.id)!,map.width))!;
  const markerCell=poiCell(moved,map.width);
  const location=new RegExp(`at row ${Math.floor(markerCell / map.width) + 1}, column ${markerCell % map.width + 1}\\. Available\\.`);
  const accessibleMap=page.getByRole('application',{name:/Floor 1 map/});
- await expect(accessibleMap).toHaveAccessibleDescription(location);
+ // Uncleared enemies are described only within current sight.
+ const described=currentSight(after.floors[0].position,map).includes(markerCell);
+ const expectMarker=()=>described?expect(accessibleMap).toHaveAccessibleDescription(location):expect(accessibleMap).not.toHaveAccessibleDescription(location);
+ await expectMarker();
  await page.clock.runFor(5000);expect(await dungeonSnapshot(page)).toEqual(after);
  await page.reload();await continueSavedDungeon(page);
- await expect(accessibleMap).toHaveAccessibleDescription(location);
+ await expectMarker();
  expect(await dungeonSnapshot(page)).toEqual(after);await page.clock.runFor(5000);expect(await dungeonSnapshot(page)).toEqual(after);
 });
 
@@ -1389,7 +1393,7 @@ test('a second dungeon encounter reuses the engine after a legal victory without
  const decline=page.getByRole('button',{name:'Decline reward',exact:true});
  if(isMobile)await decline.tap();else await decline.click();
  await page.locator('#dungeon-item-confirm').click();
- const ready=await dungeonSnapshot(page);
+ const ready=await acceptedDungeonSnapshot(page,won);
  expect(ready.phase).toBe('ready');expect(ready.offer).toBeNull();expect(ready.ownership).toEqual(won.ownership);
  const floor=ready.floors[0],next=floor.exploration.pois.find(p=>p.encounterSlot===1)!;
  await walkDungeon(page,poiCell(next,floor.descriptor.size??20),isMobile?'touch':'keyboard');

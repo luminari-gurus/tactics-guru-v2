@@ -5,6 +5,11 @@ import { neighbors, poiCell } from '../../src/domain/exploration';
 import { clearedDungeonSlots, floorMap } from '../../src/domain/dungeon';
 import { dungeonContactDetour } from './dungeonFixtures';
 export async function dungeonSnapshot(page: Page): Promise<DungeonState> { return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!); }
+/** Steps and confirms apply asynchronously; wait for a new revision (or dungeon) before reading the accepted state. */
+export async function acceptedDungeonSnapshot(page: Page, before: Pick<DungeonState, 'id' | 'revision'> | null): Promise<DungeonState> {
+  await expect.poll(async () => { const s = await dungeonSnapshot(page); return !!s && (!before || s.id !== before.id || s.revision > before.revision); }).toBe(true);
+  return dungeonSnapshot(page);
+}
 /** Wait for the dungeon DOM entry (`#dungeon-screen[data-boot=ready]`), then heading and an enabled Continue. */
 export async function continueSavedDungeon(page: Page) {
   const boot = { timeout: 60_000 };
