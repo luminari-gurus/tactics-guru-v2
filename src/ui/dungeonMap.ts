@@ -43,6 +43,7 @@ const issue415LayoutProbe = {
   renderCalls: 0, mapChanges: 0, phaseChanges: 0, parentChanges: 0, renderRefits: 0, renderMoves: 0,
   renderMilliseconds: 0, renderMaxMilliseconds: 0,
   renderSamples: [] as { at: number; milliseconds: number }[],
+  suppressScheduling: false, suppressedSchedules: 0,
   scheduleCalls: 0, scheduleReveals: 0, scheduleRefits: 0, scheduleCoalesced: 0,
   rafCalls: 0, hiddenFrames: 0, rafMilliseconds: 0, rafMaxMilliseconds: 0,
   rafSamples: [] as { at: number; milliseconds: number; fits: number }[],
@@ -212,6 +213,11 @@ export class DungeonMap {
     issue415LayoutProbe.scheduleCoalesced += Number(!!this.layoutFrame);
     this.revealPlayer ||= reveal;
     this.layoutDirty ||= refit;
+    // Verification-only isolation: enabled after the static timing fixture has settled.
+    if (issue415LayoutProbe.suppressScheduling) {
+      issue415LayoutProbe.suppressedSchedules++;
+      return;
+    }
     if (!this.live || this.layoutFrame) return;
     this.layoutFrame = requestAnimationFrame(() => {
       const probeStart = performance.now(), probeFits = issue415LayoutProbe.fitCalls;

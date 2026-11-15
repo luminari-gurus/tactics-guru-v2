@@ -1,4 +1,4 @@
-name: Measure movement layout work
+name: Isolate movement layout and scheduling costs
 on:
   push:
     branches: [verify/issue-415-map-edge-controls]
@@ -37,7 +37,7 @@ jobs:
           writeFileSync('verification-receipts/issue-415/source.json', JSON.stringify({
             source: sourceIdentity(process.cwd()), node: process.version, runner: process.env.RUNNER_NAME,
             conditions: 'Our PR verification run 43669892682 completed before this run was queued. Selected timing checks run before the candidate is published to the PR and before its new core suite starts. Other host workloads and caches are not independently controlled. Qualified runner; browser/device emulation.',
-            purpose: 'Issue 415 diagnostic only. Counters and timings added to DungeonMap and warm receipt. This instrumented run does not qualify final runtime performance.'
+            purpose: 'Issue 415 diagnostic only. Counters and timings added to DungeonMap and warm receipt; unchanged, fixed-tracks, and no-follow diagnostic variants. This instrumented run does not qualify final runtime performance.'
           }, null, 2));
           JS
       - name: Build and check affected presentation units
@@ -47,11 +47,11 @@ jobs:
           npm run build
       - name: Measure layout work in warm WebKit movement
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'warm.*maximum-size.*floor' --project=desktop-webkit --project=landscape-webkit --max-failures=2
+        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'warm.*maximum-size.*floor' --project=desktop-webkit --project=landscape-webkit --max-failures=6
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: issue-415-layout-probe-${{ github.run_id }}-${{ github.run_attempt }}
+          name: issue-415-layout-variants-${{ github.run_id }}-${{ github.run_attempt }}
           path: verification-receipts/
           retention-days: 14
           if-no-files-found: warn
