@@ -20,6 +20,7 @@ import { previewMovement } from '../src/domain/grid';
 import { generateMap } from '../src/map/generate';
 import type { Command, BattleEvent } from '../src/domain/types';
 import { movementBlockSource } from '../src/domain/effects';
+import { expectDungeonMovementVisible } from './helpers/dungeonLayout';
 
 const fixedSeedTest = test.extend({ pinDungeonSeed: 28 });
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
@@ -819,8 +820,8 @@ test('a claimed Revive Kit restores a fallen dungeon hero across Continue and ne
  await activate('Use Revive Kit');
  await expect(page.getByRole('dialog')).toContainText('mage will have 3/11 HP');
  await activate('Confirm');
- expect((await snapshot(page)).ownership.consumables).toEqual([]);
  await expect(mageHealth).toHaveAttribute('aria-valuetext','3 of 11 hit points, injured');
+ expect((await snapshot(page)).ownership.consumables).toEqual([]);
  await page.reload();await continueSavedDungeon(page);
  expect((await snapshot(page)).party[2].hp).toBe(3);
  await expect(mageHealth).toHaveAttribute('aria-valuetext','3 of 11 hit points, injured');
@@ -871,9 +872,17 @@ test('fresh dungeon keeps the map and party in view and opens the selected chara
  const newGame = page.getByRole('button',{name:'New Game',exact:true});
  if (isMobile) await newGame.tap(); else await newGame.click();
  const map = page.locator('#dungeon-map'), party = page.getByRole('region',{name:'Party',exact:true});
+ const initialLayout=await expectDungeonMovementVisible(page);
  await expect(map).toBeInViewport();
  await expect(party).toBeInViewport();
  expect(await page.locator('#dungeon-screen').evaluate(node => node.scrollWidth <= node.clientWidth)).toBe(true);
+ const saveNote=page.locator('.dungeon-save-note');
+ await expect(saveNote).toHaveText('Dungeon saved on this device');
+ const header=(await page.locator('.dungeon-header').boundingBox())!;
+ const title=(await page.locator('.dungeon-header h1').boundingBox())!;
+ expect(header.height,'Routine save feedback must not take space above the map').toBe(title.height);
+ const privacy=(await page.locator('#dungeon-screen .telemetry-preferences').boundingBox())!;
+ expect((await saveNote.boundingBox())!.y,'Save feedback belongs after the last page tool').toBeGreaterThanOrEqual(privacy.y+privacy.height);
  const fighter = party.getByRole('button',{name:'Fighter',exact:true});
  const mage = party.getByRole('button',{name:'Mage',exact:true});
  await expect(fighter.locator('img')).toHaveJSProperty('naturalWidth',96);
@@ -897,11 +906,13 @@ test('fresh dungeon keeps the map and party in view and opens the selected chara
  await page.keyboard.press('Escape');
  await expect(dialog).not.toBeVisible();
  await expect(fighter).toBeFocused();
+ expect((await expectDungeonMovementVisible(page)).scrollTop).toBe(initialLayout.scrollTop);
  if (isMobile) await mage.tap(); else await mage.click();
  const mageSheet = page.getByRole('dialog',{name:'Mage character sheet'});
  await expect(mageSheet).toContainText('11/11 HP');
  await mageSheet.getByRole('button',{name:'Close',exact:true}).click();
  await expect(mage).toBeFocused();
+ expect((await expectDungeonMovementVisible(page)).scrollTop).toBe(initialLayout.scrollTop);
  expect(await snapshot(page)).toEqual(before);
 });
 
@@ -989,6 +1000,8 @@ test('character sheets switch heroes and show equipped charms through equip, res
  await row.getByRole('combobox').selectOption('ranger');
  await row.getByRole('button',{name:'Equip Warding Charm',exact:true}).click();
  await page.locator('#dungeon-item-confirm').click();
+ await expect.poll(async () => (await snapshot(page)).ownership.assignments)
+  .toContainEqual({ heroId: 'ranger', slot: 'charm', instanceId: unassigned.instanceId });
  await open(ranger);
  await expectSheet('Ranger', ['12/12 HP','5','13'], charm);
  if (!isMobile) { await page.keyboard.press('Tab'); await page.keyboard.press('Tab'); }
@@ -1011,6 +1024,8 @@ test('character sheets switch heroes and show equipped charms through equip, res
  await openDungeonInventory(page);
  await row.getByRole('button',{name:'Unequip Warding Charm',exact:true}).click();
  await page.locator('#dungeon-item-confirm').click();
+ await expect.poll(async () => (await snapshot(page)).ownership.assignments)
+  .not.toContainEqual({ heroId: 'ranger', slot: 'charm', instanceId: unassigned.instanceId });
  await open(ranger);
  await expectSheet('Ranger', ['12/12 HP','5','12'], 'Empty');
  if (!isMobile) await page.keyboard.press('Tab');
