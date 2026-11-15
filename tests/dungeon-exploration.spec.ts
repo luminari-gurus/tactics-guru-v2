@@ -1291,6 +1291,7 @@ test('adopting a recovered dungeon invalidates the pending encounter load',async
 });
 
 test('a second dungeon encounter reuses the engine after a legal victory without reloading',async({page,isMobile})=>{
+ test.setTimeout(90000);
  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
  // The fixture reaches this ongoing battle through legal domain commands; the browser enacts its final attack.
  const witness=dungeonVictoryBoundary(1,0);if(!witness)throw Error('Missing legal victory boundary');
@@ -1300,6 +1301,26 @@ test('a second dungeon encounter reuses the engine after a legal victory without
  await page.reload();await continueSavedDungeon(page);
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  expect((await readSession(page)).state).toEqual(witness.snapshot.activeBattle);
+ const guidance=page.locator('#battle-class-guidance'),tip=page.locator('#battle-class-tip');
+ await expect(guidance).toBeVisible();
+ const beforeDismiss=await readSession(page),beforeDungeon=await dungeonSnapshot(page);
+ const dismissedActor=beforeDismiss.state.units.find(unit=>unit.id===beforeDismiss.state.initiative[beforeDismiss.state.activeIndex])!;
+ const dismissedTip=await tip.getAttribute('data-tutorial-id');expect(dismissedTip).toBeTruthy();
+ const dismiss=page.locator('#battle-guidance-dismiss');
+ if(isMobile)await dismiss.tap();else {await dismiss.focus();await page.keyboard.press('Enter');}
+ await expect(guidance).toBeHidden();await expect(page.locator('#battle-move')).toBeFocused();
+ expect(await readSession(page)).toEqual(beforeDismiss);expectSameProgress(await dungeonSnapshot(page),beforeDungeon);
+ const acknowledged=await page.evaluate(()=>localStorage.getItem('tactics-guru:class-guidance'));
+ expect(JSON.parse(acknowledged!).seen).toContain(dismissedTip);
+ // Continuing the same saved dungeon must retain this run's dismissal, even
+ // though it reconstructs the battle HUD. Both encounters below then reuse
+ // the resumed engine without another page load.
+ await page.reload();await continueSavedDungeon(page);
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ expect((await dungeonSnapshot(page)).id).toBe(witness.snapshot.id);
+ expect((await readSession(page)).state).toEqual(beforeDismiss.state);
+ await expect(guidance).toBeHidden();
+ expect(await page.evaluate(()=>localStorage.getItem('tactics-guru:class-guidance'))).toBe(acknowledged);
  await expect(page.locator('canvas')).toHaveCount(1);
  const canvas=await page.locator('#game canvas').elementHandle();if(!canvas)throw Error('Missing initial battle canvas');
  await playCommand(page,witness.command);
@@ -1333,6 +1354,22 @@ test('a second dungeon encounter reuses the engine after a legal victory without
  expect((after.replay?.commands??after.continuation!.commands)[beforeCommands.length]).toEqual(accepted);
  expect(after.state).toEqual(saved.activeBattle);
  expect(JSON.parse((await dungeonSlots(page)).primary!).payload).toEqual(saved);
+ // The normal first encounter leaves this class at level one. Its only tip
+ // remains dismissed in the next encounter, while other classes still teach.
+ expect(second.party.find(hero=>hero.heroId===dismissedActor.defId)!.level).toBe(1);
+ let current=after;
+ for(let turns=0;turns<second.activeBattle!.initiative.length;turns++){
+  const actor=current.state.units.find(unit=>unit.id===current.state.initiative[current.state.activeIndex])!;
+  if(actor.defId===dismissedActor.defId)break;
+  await expect(guidance).toBeVisible();await expect(tip).not.toHaveAttribute('data-tutorial-id',dismissedTip!);
+  const commands=current.state.commandCount,wait=page.locator('#battle-next');
+  if(isMobile)await wait.tap();else {await wait.focus();await page.keyboard.press('Enter');}
+  await expect.poll(async()=>(await readSession(page)).state.commandCount).toBeGreaterThan(commands);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');current=await readSession(page);
+ }
+ expect(current.state.units.find(unit=>unit.id===current.state.initiative[current.state.activeIndex])!.defId).toBe(dismissedActor.defId);
+ await expect(guidance).toBeHidden();
+ expect(await page.evaluate(()=>localStorage.getItem('tactics-guru:class-guidance'))).toBe(acknowledged);
  await expect(page.locator('canvas')).toHaveCount(1);
  expect(await canvas.evaluate(node=>node.isConnected&&node===document.querySelector('#game canvas'))).toBe(true);
  expect(errors).toEqual([]);

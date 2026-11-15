@@ -18,10 +18,11 @@ async function start(page:Page){
  expect(drawable!.height).toBeGreaterThanOrEqual(page.viewportSize()!.height*0.3-1);
 }
 async function ready(page:Page){await expect.poll(async()=>await page.locator('#game').getAttribute('data-phase')??'boundary',{timeout:15000}).toMatch(/player|ended|boundary/);}
-async function fight(page:Page,wait=false,useDraught=false){
+async function fight(page:Page,wait=false,useDraught=false,dismissedTip?:string){
  let drank=false;
  for(let i=0;i<500;i++){
   await ready(page);const current=await snapshot(page);if(current.items.run.phase!=='battle')break;
+  if(dismissedTip)await expect(page.locator(`#battle-class-guidance:visible #battle-class-tip[data-tutorial-id="${dismissedTip}"]`)).toHaveCount(0);
   const battle=await readSession(page);expect(battle.phase).toBe('player');const catalog=runBattleCatalog(current.items,runContext)!;
   const unitId=battle.state.initiative[battle.state.activeIndex];
   if(useDraught && !drank && battle.state.draughts && await page.locator('#battle-draught').isEnabled()) {
@@ -61,7 +62,19 @@ test('run battle undo and a legal terminal journey reset on reload',async({page,
  expect(await page.evaluate(keys=>keys.map(key=>localStorage.getItem(key)),[...Object.values(RUN_STORAGE_KEYS),...Object.values(RUN_RECORD_KEYS)])).toEqual([null,null,null,null]);
 });
 test('legal run outcomes, earned rewards and fresh restart',async({page})=>{
+ const savedDungeonTips=[{runId:'dungeon:unfinished',ids:['skill:ability:guarded_strike:v1']}];
+ await page.addInitScript(dismissedRuns=>{
+  localStorage.setItem('tactics-guru:class-guidance',JSON.stringify({version:1,enabled:true,seen:[],dismissedRuns}));
+ },savedDungeonTips);
  test.setTimeout(300000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await start(page);await page.locator('#battle-sound').click();const records=[];let usedDraught=false;
+ const guidance=page.locator('#battle-class-guidance'),tip=page.locator('#battle-class-tip');
+ await expect(guidance).toBeVisible();
+ const dismissedTip=(await tip.getAttribute('data-tutorial-id'))!;
+ const beforeDismiss=await snapshot(page),battleBeforeDismiss=await readSession(page);
+ await page.locator('#battle-guidance-dismiss').click();await expect(guidance).toBeHidden();
+ expect(await snapshot(page)).toEqual(beforeDismiss);expect(await readSession(page)).toEqual(battleBeforeDismiss);
+ // Transient attempts must never consume or evict a saved dungeon's dismissal scope.
+ expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('tactics-guru:class-guidance')!).dismissedRuns)).toEqual(savedDungeonTips);
  for(let index=0;index<3;index++){
   // Each encounter constructs a fresh shared renderer; prior selections cannot leak.
   const board=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
@@ -84,7 +97,7 @@ test('legal run outcomes, earned rewards and fresh restart',async({page})=>{
   const beforeBob=await snapshot(page);
   await page.screenshot({path:test.info().outputPath(`encounter-${index+1}-active-bob.png`)});
   expect(await snapshot(page)).toEqual(beforeBob);
-  usedDraught=(await fight(page,false,true))||usedDraught;
+  usedDraught=(await fight(page,false,true,dismissedTip))||usedDraught;
   await expect(page.locator('#game')).not.toHaveAttribute('data-battle-report');if(index===0)await page.screenshot({path:test.info().outputPath('run-reward.png')});const current=await snapshot(page);expect(index===2?['victory','defeat']:['reward','defeat']).toContain(current.items.run.phase);expect(current.items.run.encounterIndex).toBe(index);
   const record=JSON.parse((await page.locator('#game').getAttribute('data-run-battle-record'))!);const replay=replayRunBattle(record.replay,record.entry,runContext);expect(replay.ok).toBe(true);if(replay.ok){expect(replay.state).toEqual(record.state);expect(replay.events).toEqual(record.events);}records.push(record);
   if(current.items.run.phase==='defeat')break;
@@ -128,6 +141,12 @@ test('legal run outcomes, earned rewards and fresh restart',async({page})=>{
  await page.screenshot({path:test.info().outputPath('run-terminal.png')});
  writeFileSync(test.info().outputPath('run-records.json'),JSON.stringify(records,null,2));
  await page.locator('#run-new').dblclick();await expect(page.locator('#run-start-encounter')).toBeVisible();const fresh=await snapshot(page);expect(fresh.items.run.seed).toBe(14);expect(fresh.items.run.id).not.toBe(final.items.run.id);expect(fresh.items.ownership).toEqual({consumables:[],equipment:[],assignments:[]});expect(fresh.items.run.party.every(h=>h.hp===runContext.catalog.heroes[h.heroId].stats.maxHp)).toBe(true);
+ await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ for(let turn=0;turn<4&&await tip.getAttribute('data-tutorial-id')!==dismissedTip;turn++){
+  const current=await readSession(page);
+  await playCommand(page,{type:'endTurn',unitId:current.state.initiative[current.state.activeIndex]});await ready(page);
+ }
+ await expect(guidance).toBeVisible();await expect(tip).toHaveAttribute('data-tutorial-id',dismissedTip);
  expect(errors).toEqual([]);
 });
 test('run preparation and dialogs retain 44px controls, native touch and narrow layout', async ({ page, isMobile }) => {

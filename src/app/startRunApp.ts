@@ -15,11 +15,15 @@ import { createGame } from '../phaser/start';
 import { diagnosticsSnapshot } from '../diagnostics/browser';
 import { mountBattleLayout } from '../ui/battleLayout';
 import { showGameError } from '../ui/gameError';
+import { watchClassGuidancePreferences } from '../ui/classGuidancePreferences';
 
 const menuRun = new URLSearchParams(location.search).get('game') === 'run' &&
   resolveAppEntry(location.pathname, '', import.meta.env.BASE_URL).route === 'menu';
 consumeEntryIntent();
 const controller = new RunItemSession(freshRunSnapshot(crypto.randomUUID(), 13, context), context, null);
+const guidance = { dismissed: new Set<string>() };
+// The controller outlives its battle HUDs, including the reward/preparation screens.
+const stopGuidanceWatch = watchClassGuidancePreferences(reset => { if (reset) guidance.dismissed.clear(); });
 const container = document.querySelector<HTMLElement>('#game')!;
 const panel = document.querySelector<HTMLElement>('#fit-panel')!;
 const status = document.querySelector<HTMLElement>('#fit-status')!;
@@ -65,7 +69,7 @@ function startBattle() {
  renderProgress();
  sessionNotice.hidden=false;
  sessionNotice.replaceChildren(testingProgress('run'));
- host={catalog:session.catalog,session,dialogs,sound,modalTransition:()=>{},ended:endBattle,restart:requestNew};
+ host={catalog:session.catalog,session,dialogs,sound,guidance,modalTransition:()=>{},ended:endBattle,restart:requestNew};
  const scene=new BattleScene(setStatus,fail,host);
  setStatus('loading');
  engine.scene.remove('battle');engine.scene.add('battle',scene,true);
@@ -85,6 +89,7 @@ function requestNew() {
 function restartRun() {
  if(startup)controller.startNew();
  else controller.restart(crypto.randomUUID(),(controller.snapshot.items.run.seed+1)>>>0);
+ guidance.dismissed.clear();
  startup=false;stopBattle();render();screen.querySelector<HTMLElement>('h1')?.focus();
 }
 function renderProgress() {
@@ -133,7 +138,7 @@ restart.addEventListener('click',()=>{restart.focus();requestNew();});
 document.addEventListener('keydown',e=>{if(e.repeat && (e.key==='Enter'||e.key===' ')){e.preventDefault();e.stopImmediatePropagation();}},true);
 window.addEventListener('error',()=>fail('The run encountered a runtime error',false));
 window.addEventListener('unhandledrejection',()=>fail('The run encountered an asynchronous error',false));
-window.addEventListener('pagehide',()=>{live=false;controller.dispose();stopBattle();unmount();dialogs.dispose();},{once:true});
+window.addEventListener('pagehide',()=>{live=false;stopGuidanceWatch();controller.dispose();stopBattle();unmount();dialogs.dispose();},{once:true});
 window.addEventListener('pageshow',event=>{if(event.persisted)location.reload();});
 render();
 // Prepare the one engine while the read-only start screen is displayed. No
