@@ -23,7 +23,7 @@ body:has(#dungeon-screen:not([hidden])) #battle-heading { display: none; }
   align-items: start;
   gap: 12px;
 }
-.dungeon-play > section { grid-area: map; }
+.dungeon-play > section { grid-area: map; min-width: 0; }
 .dungeon-sidebar { grid-area: party; }
 .dungeon-map-controls { grid-area: controls; }
 #dungeon-screen .dungeon-play section { margin: 0; }
@@ -68,17 +68,22 @@ body:has(#dungeon-screen:not([hidden])) #battle-heading { display: none; }
 .dungeon-secondary details[open] { padding: 0 12px 12px; }
 .dungeon-secondary details[open] summary { margin-inline: -12px; }
 .dungeon-secondary details p { margin: 8px 0; }
-/* Leave 471px for a 36-column floor after the gap and the party column. */
-@container (min-width: 798px) {
+/* Leave room for a 36-column floor, its edge controls, and the party column. */
+@container (min-width: 956px) {
   .dungeon-play {
     grid-template-columns: minmax(0, 1fr) minmax(280px, 0.65fr);
     grid-template-areas: "map party" "controls party";
     gap: 0 20px;
   }
 }
-/* The map region can scroll larger floors when landscape safe areas narrow the first column. */
+/* A bounded map window keeps all four directions reachable in short landscape. */
 @media (orientation: landscape) and (max-height: 480px) {
-  @container (520px <= width < 798px) {
+  #dungeon-screen .dungeon-header h1 { font-size: 1.2rem; }
+  #dungeon-screen .dungeon-header .dungeon-status { margin: 6px 0; padding: 6px 8px; font-size: .8rem; }
+  #dungeon-screen .dungeon-header > p:not(.dungeon-status) { margin: 4px 0; font-size: .8rem; }
+  /* Floor and biome are already named in the header. */
+  #dungeon-screen .dungeon-play > section > h2 { display: none; }
+  @container (520px <= width < 956px) {
     .dungeon-play {
       grid-template-columns: minmax(0, 1fr) 216px;
       grid-template-areas: "map party" "controls party";
@@ -151,9 +156,13 @@ body:has(#dungeon-screen:not([hidden])) #battle-heading { display: none; }
 }
 #dungeon-screen .dungeon-loot-guide { margin:6px 0 0; font-size:.8rem; color:#f4d48b; }
 #dungeon-screen .dungeon-loot-here { margin:6px 0 0; padding:8px; max-width:480px; box-sizing:border-box; border-left:3px solid #e5ba59; background:#282b1c; font-size:.85rem; overflow-wrap:anywhere; }
-#dungeon-screen .dungeon-directions { display: grid; grid-template: repeat(3, 52px) / repeat(3, 52px); gap: 2px; width: max-content; padding: 16px; margin-block: 8px; }
-#dungeon-screen .dungeon-directions button { display: grid; place-items: center; width: 46px; height: 46px; min-width: 46px; min-height: 46px; margin: 0; padding: 0; justify-self: center; align-self: center; transform: rotate(45deg); border-radius: 5px; border-color: #a2a58a; background: #424a38; color: #f1edda; touch-action: manipulation; }
-#dungeon-screen .dungeon-directions button span { transform: rotate(-45deg); font-weight: bold; pointer-events: none; }
+#dungeon-screen .dungeon-directions { display: grid; grid-template: 44px auto 44px / 44px minmax(0, 1fr) 44px; gap: 4px; width: min(100%, 576px); }
+.dungeon-map-viewport { grid-area: 2 / 2; width: 100%; min-height: 64px; aspect-ratio: 1; max-height: var(--dungeon-map-max-height, calc(100dvh - 260px)); overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; background: #0b1119; }
+.dungeon-map-viewport:has(#dungeon-map:focus-visible) { outline: 3px solid #f4cf70; outline-offset: 1px; }
+#dungeon-screen .dungeon-directions button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; width: 44px; height: 64px; min-width: 44px; min-height: 44px; margin: 0; padding: 0; justify-self: center; align-self: center; border-radius: 8px; border-color: #a2a58a; background: #424a38; color: #f1edda; touch-action: manipulation; }
+#dungeon-screen .dungeon-directions button span { font-size: .7rem; line-height: 1; font-weight: bold; pointer-events: none; }
+#dungeon-screen .dungeon-directions button .dungeon-direction-arrow { font-size: 1.4rem; }
+#dungeon-screen .dungeon-directions #dungeon-step-north, #dungeon-screen .dungeon-directions #dungeon-step-south { width: 64px; height: 44px; }
 #dungeon-step-north { grid-area: 1 / 2; }
 #dungeon-step-east { grid-area: 2 / 3; }
 #dungeon-step-south { grid-area: 3 / 2; }
@@ -162,9 +171,6 @@ body:has(#dungeon-screen:not([hidden])) #battle-heading { display: none; }
 #dungeon-screen .dungeon-directions button:enabled:active { background: #78734a; border-color: #f4cf70; box-shadow: inset 0 0 0 3px #302f20; }
 #dungeon-screen .dungeon-directions button:disabled { background: #262d2b; border-color: #657064; color: #9ba397; opacity: .55; }
 #dungeon-screen .dungeon-directions button:focus-visible { outline: 3px solid #f4cf70; outline-offset: 3px; }
-#dungeon-screen .dungeon-compass-center { grid-area: 2 / 2; place-self: center; width: 10px; height: 10px; transform: rotate(45deg); border: 1px solid #a2a58a; border-radius: 2px; background: #b2a070; pointer-events: none; }
-
-#dungeon-screen section[aria-label="Floor exploration"] { overflow-x: auto; }
 
 /* Keep recovery status distinct from its action grid, including outside battle mode. */
 body:has(#dungeon-screen) #battle-dialog-message { margin-bottom:16px; white-space:pre-line; overflow-wrap:anywhere; }

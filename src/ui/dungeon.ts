@@ -98,7 +98,7 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
   if(canEnter)sidebar.append(button('Enter encounter',actions.start,false,'dungeon-start-encounter'));
   const travel=disclosure('dungeon-travel','Travel and map guide');
   travel.append(
-    el('p','Tap an adjacent cell, use the compass, or press the arrow keys or WASD (when enabled) to move. Enemies move when you move.'),
+    el('p','Use the direction buttons around the map, tap an adjacent cell, or press the arrow keys or WASD (when enabled) to move. Scroll within the map to inspect the floor; the view follows your next step. Enemies move when you move.'),
     el('p','● Player · M encounter or guardian · ◆ loot · ✓ cleared · ↑ upstairs · ↓ downstairs. Hatching marks remembered terrain.'),
     el('p','Attempt to enter an uncleared enemy square to start combat before moving. Clear all three encounters to unlock descent. Loot can be left behind without blocking travel.'),
     el('p','Stepping onto loot collects what fits. Remaining items stay on the ground. Freeing inventory space while standing on a pile retries pickup without moving enemies. Loot does not equip gear or use healing items.'),

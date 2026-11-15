@@ -24,6 +24,7 @@ import { holdFinalRecordsWrite } from './helpers/recordsWriteGate';
 import { startBattleModuleFaultServer } from './helpers/battleModuleFaultServer';
 import { progressHero } from '../src/domain/progression';
 import { AUTO_COLLECT_LOOT_KEY } from '../src/ui/autoCollectLootPreference';
+import { dungeonMovementGeometry, expectDungeonMovementVisible } from './helpers/dungeonLayout';
 
 // Lifecycle checkpoints can advance playtime without changing dungeon progress.
 function expectSameProgress(actual: DungeonState, expected: DungeonState) {
@@ -83,6 +84,7 @@ test('ground loot: legal victory saves one item at contact and a manual pickup s
  await loadGroundLootBoundary(page,witness.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const before=await dungeonSnapshot(page),entry=before.encounterEntry!;
  await playCommand(page,witness.command);await expect(page.locator('#dungeon-map')).toBeVisible();
+ await expectDungeonMovementVisible(page);
  const won=await dungeonSnapshot(page),floor=won.floors[won.depth-1],loot=floor.loot!;
  expect(won).toMatchObject({phase:'ready',offer:null,activeBattle:null});
  expect(floor.position).toBe(entry.origin);expect(floor.completed).toBe(1);expect(loot).toHaveLength(1);
@@ -97,6 +99,7 @@ test('ground loot: legal victory saves one item at contact and a manual pickup s
  await page.screenshot({path:test.info().outputPath('ground-loot-after-victory.png'),fullPage:true});
  await page.reload();await continueSavedDungeon(page);
  const resumed=await dungeonSnapshot(page);expect(resumed.floors).toEqual(won.floors);expect(resumed.ownership).toEqual(won.ownership);
+ await expectDungeonMovementVisible(page);
  await page.evaluate(key=>{
   const original=Storage.prototype.setItem;
   (window as unknown as {restoreLootStorage:()=>void}).restoreLootStorage=()=>{Storage.prototype.setItem=original;};
@@ -445,7 +448,7 @@ for(const control of ['arrows','wasd','compass','cell'] as const)test(`stairs tr
  }
 });
 
-test('diamond compass directions, focus, touch targets and unavailable states',async({page,isMobile,browserName})=>{
+test('map-edge direction controls, focus, touch targets and unavailable states',async({page,isMobile,browserName})=>{
  const fresh=freshDungeon('compass-browser',1),base={...fresh,floors:[{...fresh.floors[0],completed:3}]},floor=base.floors[0],map=generateMap(floor.descriptor.seed,'rooms');
  const directions=[['North',-20],['East',1],['South',20],['West',-1]] as const;
  const safe=(cell:number)=>map.cells[cell]&&!floor.exploration.pois.some(p=>poiCell(p)===cell);
@@ -459,40 +462,47 @@ test('diamond compass directions, focus, touch targets and unavailable states',a
  await load(atCell(base,center));
  const compass=page.getByRole('group',{name:'Move player',exact:true});
  await expect(compass.getByRole('button')).toHaveCount(4);
- await expect(compass.locator('.dungeon-compass-center')).toHaveAttribute('aria-hidden','true');
- expect(await compass.locator('.dungeon-compass-center').evaluate(node=>getComputedStyle(node).pointerEvents)).toBe('none');
- await compass.scrollIntoViewIfNeeded();
+ await expectDungeonMovementVisible(page);
  const boxes=[];
  for(const [name] of directions){
-  const button=compass.getByRole('button',{name,exact:true});await expect(button).toHaveText(name[0]);await expect(button).toBeEnabled();
+  const button=compass.getByRole('button',{name,exact:true});await expect(button).toBeEnabled();
   const box=(await button.boundingBox())!;expect(box.width).toBeGreaterThanOrEqual(44);expect(box.height).toBeGreaterThanOrEqual(44);boxes.push(box);
   expect(await button.evaluate(node=>{
    const rect=node.getBoundingClientRect(),cx=rect.x+rect.width/2,cy=rect.y+rect.height/2;
    return [[0,0],[20,0],[-20,0],[0,20],[0,-20]].every(([dx,dy])=>node.contains(document.elementFromPoint(cx+dx,cy+dy)));
   })).toBe(true);
-  const upright=await button.locator('span').evaluate(node=>({button:getComputedStyle(node.parentElement!).transform,label:getComputedStyle(node).transform}));
-  expect(upright.button).toBe('matrix(0.707107, 0.707107, -0.707107, 0.707107, 0, 0)');
-  expect(upright.label).toBe('matrix(0.707107, -0.707107, 0.707107, 0.707107, 0, 0)');
  }
  expect(boxes[0].y).toBeLessThan(boxes[1].y);expect(boxes[2].y).toBeGreaterThan(boxes[1].y);expect(boxes[3].x).toBeLessThan(boxes[0].x);expect(boxes[1].x).toBeGreaterThan(boxes[0].x);
+ const region=(await compass.locator('.dungeon-map-viewport').boundingBox())!;
+ expect(boxes[0].y+boxes[0].height).toBeLessThanOrEqual(region.y);
+ expect(boxes[1].x).toBeGreaterThanOrEqual(region.x+region.width);
+ expect(boxes[2].y).toBeGreaterThanOrEqual(region.y+region.height);
+ expect(boxes[3].x+boxes[3].width).toBeLessThanOrEqual(region.x);
  const tab = browserName === 'webkit' ? 'Alt+Tab' : 'Tab';
  await page.locator('#dungeon-map').focus();
+ for(const [name] of directions){
+  await page.keyboard.press(tab);
+  await expect(compass.getByRole('button',{name,exact:true})).toBeFocused();
+ }
  const party = page.getByRole('region', { name: 'Party', exact: true });
  for (const hero of ['Fighter', 'Ranger', 'Mage']) {
   await page.keyboard.press(tab);
   await expect(party.getByRole('button', { name: hero, exact: true })).toBeFocused();
  }
- await page.keyboard.press(tab);
+ await compass.getByRole('button',{name:'North',exact:true}).focus();
  await expect(compass.getByRole('button',{name:'North',exact:true})).toBeFocused();
  expect(await compass.getByRole('button',{name:'North',exact:true}).evaluate(node=>node.matches(':focus-visible')&&getComputedStyle(node).outlineStyle==='solid')).toBe(true);
  await page.screenshot({path:test.info().outputPath('compass-focus.png')});
  for(const [name,delta] of directions){
   const before=await dungeonSnapshot(page),button=compass.getByRole('button',{name,exact:true});
-  if(isMobile)await button.tap();else {await button.focus();await page.keyboard.press(name==='North'?'Enter':'Space');}
+  const geometry=await expectDungeonMovementVisible(page),target=geometry.buttons.find(control=>control.id===`dungeon-step-${name.toLowerCase()}`)!;
+  if(isMobile)await page.touchscreen.tap(target.x,target.y);else {await button.focus();await page.keyboard.press(name==='North'?'Enter':'Space');}
   await expect.poll(async () => (await dungeonSnapshot(page)).floors[0].position).toBe(center+delta);
   expect((await dungeonSnapshot(page)).revision).toBe(before.revision+1);
+  expect((await expectDungeonMovementVisible(page)).scrollTop).toBe(geometry.scrollTop);
   const reverse=directions.find(([,offset])=>offset===-delta)![0];
-  const back=compass.getByRole('button',{name:reverse,exact:true});if(isMobile)await back.tap();else await back.click();
+  const back=compass.getByRole('button',{name:reverse,exact:true}),reverseTarget=(await dungeonMovementGeometry(page)).buttons.find(control=>control.id===`dungeon-step-${reverse.toLowerCase()}`)!;
+  if(isMobile)await page.touchscreen.tap(reverseTarget.x,reverseTarget.y);else await back.click();
   await expect.poll(async () => (await dungeonSnapshot(page)).floors[0].position).toBe(center);
  }
  if(!isMobile){
@@ -509,13 +519,52 @@ test('diamond compass directions, focus, touch targets and unavailable states',a
   else await expect(button).toBeEnabled();
  }
  expect(await dungeonSnapshot(page)).toEqual(before);
- await compass.scrollIntoViewIfNeeded();await page.screenshot({path:test.info().outputPath('compass-unavailable.png')});
- if(isMobile){await page.setViewportSize({width:320,height:740});await compass.scrollIntoViewIfNeeded();}
+ await expectDungeonMovementVisible(page);await page.screenshot({path:test.info().outputPath('compass-unavailable.png')});
+ if(isMobile){await page.setViewportSize({width:320,height:740});await expectDungeonMovementVisible(page);}
  expect(await page.locator('#dungeon-screen').evaluate(node=>node.scrollWidth<=node.clientWidth)).toBe(true);
  const compassBox=(await compass.boundingBox())!;expect(compassBox.x).toBeGreaterThanOrEqual(0);expect(compassBox.x+compassBox.width).toBeLessThanOrEqual(page.viewportSize()!.width);
  await load(dungeonCapacityFixture());
  for(const [name] of directions)await expect(compass.getByRole('button',{name,exact:true})).toBeDisabled();
  const reward=await dungeonSnapshot(page);await page.locator('#dungeon-map').focus();await page.keyboard.press('ArrowUp');expect(await dungeonSnapshot(page)).toEqual(reward);
+});
+
+test('movement controls stay visible with the player without scrolling on entry and resize',async({page,isMobile})=>{
+ const fresh=freshDungeon('visible-controls-browser',1),base={...fresh,floors:[{...fresh.floors[0],completed:3}]};
+ const terrain=floorMap(base.floors[0].descriptor),stairs=[base.floors[0].descriptor.upstairs,base.floors[0].descriptor.downstairs];
+ const origin=terrain.cells.findIndex((open,cell)=>open===1&&!stairs.includes(cell)&&neighbors(cell,terrain.width).some(next=>terrain.cells[next]&&!stairs.includes(next)));
+ const destination=neighbors(origin,terrain.width).find(next=>terrain.cells[next]&&!stairs.includes(next));
+ if(origin<0||destination===undefined)throw Error('No safe visibility witness');
+ const encoded=encodeDungeon(atCell(base,origin));if(!encoded.ok)throw Error(encoded.reason);
+ await page.goto('./?game=dungeon');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
+ await page.reload();await continueSavedDungeon(page);
+ const originalViewport=page.viewportSize()!;
+ const sizes=[originalViewport,{width:320,height:568},{width:393,height:684},{width:568,height:320},{width:667,height:375},{width:740,height:360},{width:393,height:852},originalViewport];
+ const delta=destination-origin,name=delta===-terrain.width?'north':delta===terrain.width?'south':delta===1?'east':'west';
+ const reverse={north:'south',south:'north',east:'west',west:'east'}[name];
+ const activate=async(id:string)=>{
+  const geometry=await expectDungeonMovementVisible(page),target=geometry.buttons.find(control=>control.id===id)!;
+  expect(target.disabled).toBe(false);
+  // Coordinate input deliberately cannot invoke locator auto-scroll.
+  if(isMobile)await page.touchscreen.tap(target.x,target.y);else await page.mouse.click(target.x,target.y);
+  return geometry.scrollTop;
+ };
+ for(const [index,size] of sizes.entries()){
+  if(index)await page.setViewportSize(size);
+  const initial=await expectDungeonMovementVisible(page);
+  expect(initial.scrollTop,'Exploration should stay at its initial outer scroll position').toBe(0);
+  await page.screenshot({path:test.info().outputPath(`map-edge-${index}-${size.width}x${size.height}.png`)});
+  const before=await dungeonSnapshot(page),scrollTop=await activate(`dungeon-step-${name}`);
+  await expect.poll(async()=>(await dungeonSnapshot(page)).floors[0].position).toBe(destination);
+  expect((await dungeonSnapshot(page)).revision).toBe(before.revision+1);
+  expect((await expectDungeonMovementVisible(page)).scrollTop).toBe(scrollTop);
+  await activate(`dungeon-step-${reverse}`);
+  await expect.poll(async()=>(await dungeonSnapshot(page)).floors[0].position).toBe(origin);
+  expect((await expectDungeonMovementVisible(page)).scrollTop).toBe(scrollTop);
+ }
+ await page.screenshot({path:test.info().outputPath('map-edge-movement-visible.png')});
+ const beforeReload=await dungeonSnapshot(page);await page.reload();await continueSavedDungeon(page);
+ expect(await dungeonSnapshot(page)).toEqual(beforeReload);
+ expect((await expectDungeonMovementVisible(page)).scrollTop).toBe(0);
 });
 
 test('compass keeps keyboard focus when movement disables the activated direction',async({page})=>{
@@ -882,23 +931,28 @@ test('maximum-size saved floor renders and accepts a step after reload', async (
  await page.reload(); await continueSavedDungeon(page);
  const map=page.locator('#dungeon-map'); await expect(map.locator('[data-cell]')).toHaveCount(36*36);
  const assertLayout=async()=>{
+  await expectDungeonMovementVisible(page);
   const geometry=await map.evaluate(grid=>{
    const bounds=grid.getBoundingClientRect();
    const cells=[...grid.querySelectorAll<HTMLElement>('[data-cell]')].map(cell=>cell.getBoundingClientRect());
    const screen=document.querySelector<HTMLElement>('#dungeon-screen')!;
    const controls=[...screen.querySelectorAll<HTMLElement>('.dungeon-directions button')];
+   const region=grid.parentElement!,regionBounds=region.getBoundingClientRect();
+   const clip={left:regionBounds.left+region.clientLeft,top:regionBounds.top+region.clientTop,right:regionBounds.left+region.clientLeft+region.clientWidth,bottom:regionBounds.top+region.clientTop+region.clientHeight};
+   const visibleCells=cells.map(cell=>({left:Math.max(cell.left,clip.left),top:Math.max(cell.top,clip.top),right:Math.min(cell.right,clip.right),bottom:Math.min(cell.bottom,clip.bottom)}))
+    .filter(cell=>cell.right>cell.left&&cell.bottom>cell.top);
    return {
     count:cells.length,
     outside:cells.filter(cell=>cell.left<bounds.left-.1||cell.right>bounds.right+.1||cell.top<bounds.top-.1||cell.bottom>bounds.bottom+.1).length,
     squareError:Math.max(...cells.map(cell=>Math.abs(cell.width-cell.height))),
-    overlappingControls:controls.filter(control=>{const button=control.getBoundingClientRect();return cells.some(cell=>Math.min(cell.right,button.right)-Math.max(cell.left,button.left)>.1&&Math.min(cell.bottom,button.bottom)-Math.max(cell.top,button.top)>.1);}).map(control=>control.id),
+    overlappingControls:controls.filter(control=>{const button=control.getBoundingClientRect();return visibleCells.some(cell=>Math.min(cell.right,button.right)-Math.max(cell.left,button.left)>.1&&Math.min(cell.bottom,button.bottom)-Math.max(cell.top,button.top)>.1);}).map(control=>control.id),
     screenOverflow:screen.scrollWidth-screen.clientWidth,
    };
   });
   expect(geometry.count).toBe(36*36);
   expect(geometry.outside,'Every cell must fit inside the map border box').toBe(0);
   expect(geometry.squareError).toBeLessThan(.1);
-  expect(geometry.overlappingControls,'The compass must not cover any map cell').toEqual([]);
+  expect(geometry.overlappingControls,'Direction controls must not cover a visible map cell').toEqual([]);
   expect(geometry.screenOverflow,'Only the exploration region should scroll horizontally').toBe(0);
  };
  await assertLayout();
@@ -912,16 +966,23 @@ test('maximum-size saved floor renders and accepts a step after reload', async (
  }
  await page.setViewportSize({width:320,height:740});
  await assertLayout();
+ const beforePan=await dungeonMovementGeometry(page);
  const horizontal=await map.evaluate(grid=>{
   const region=grid.parentElement!;
   region.scrollLeft=region.scrollWidth;
   const last=grid.lastElementChild!.getBoundingClientRect(), bounds=region.getBoundingClientRect();
   const result={scrollLeft:region.scrollLeft,lastColumnVisible:last.left>=bounds.left-.1&&last.right<=bounds.right+.1};
-  region.scrollLeft=0;return result;
+  return result;
  });
  expect(horizontal.scrollLeft).toBeGreaterThan(0);
  expect(horizontal.lastColumnVisible,'The final column must be reachable by scrolling').toBe(true);
+ const afterPan=await expectDungeonMovementVisible(page,false);
+ expect(afterPan.buttons,'Panning the map must not move its controls').toEqual(beforePan.buttons);
+ expect(afterPan.scrollTop).toBe(beforePan.scrollTop);
+ await page.locator('#dungeon-art').selectOption('legacy-8bit');
+ expect((await dungeonMovementGeometry(page,false)).mapScroll,'Changing art must preserve manual map inspection').toEqual(afterPan.mapScroll);
  await page.setViewportSize(viewport);
+ await page.locator('#dungeon-screen').evaluate(screen=>{screen.scrollTop=0;});
  await map.evaluate(grid=>{const state={grid,controls:[...document.querySelectorAll<HTMLElement>('#dungeon-art, .dungeon-directions button')],removed:false};(window as unknown as {__floorMount:typeof state}).__floorMount=state;new MutationObserver(records=>{if(records.some(record=>[...record.removedNodes].some(node=>node===grid || node.contains(grid))))state.removed=true;}).observe(document.querySelector('#dungeon-screen')!,{childList:true,subtree:true});});
  const before=await dungeonSnapshot(page), floor=before.floors[4], layout=floorMap(floor.descriptor);
  const destination=neighbors(floor.position,layout.width).find(n=>layout.cells[n]&&!floor.exploration.pois.some(p=>poiCell(p,layout.width)===n));

@@ -20,6 +20,7 @@ import { previewMovement } from '../src/domain/grid';
 import { generateMap } from '../src/map/generate';
 import type { Command, BattleEvent } from '../src/domain/types';
 import { movementBlockSource } from '../src/domain/effects';
+import { expectDungeonMovementVisible } from './helpers/dungeonLayout';
 
 const fixedSeedTest = test.extend({ pinDungeonSeed: 28 });
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
@@ -871,6 +872,7 @@ test('fresh dungeon keeps the map and party in view and opens the selected chara
  const newGame = page.getByRole('button',{name:'New Game',exact:true});
  if (isMobile) await newGame.tap(); else await newGame.click();
  const map = page.locator('#dungeon-map'), party = page.getByRole('region',{name:'Party',exact:true});
+ const initialLayout=await expectDungeonMovementVisible(page);
  await expect(map).toBeInViewport();
  await expect(party).toBeInViewport();
  expect(await page.locator('#dungeon-screen').evaluate(node => node.scrollWidth <= node.clientWidth)).toBe(true);
@@ -897,11 +899,13 @@ test('fresh dungeon keeps the map and party in view and opens the selected chara
  await page.keyboard.press('Escape');
  await expect(dialog).not.toBeVisible();
  await expect(fighter).toBeFocused();
+ expect((await expectDungeonMovementVisible(page)).scrollTop).toBe(initialLayout.scrollTop);
  if (isMobile) await mage.tap(); else await mage.click();
  const mageSheet = page.getByRole('dialog',{name:'Mage character sheet'});
  await expect(mageSheet).toContainText('11/11 HP');
  await mageSheet.getByRole('button',{name:'Close',exact:true}).click();
  await expect(mage).toBeFocused();
+ expect((await expectDungeonMovementVisible(page)).scrollTop).toBe(initialLayout.scrollTop);
  expect(await snapshot(page)).toEqual(before);
 });
 

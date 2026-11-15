@@ -50,6 +50,8 @@ export class DungeonMap {
   private readonly select = document.createElement('select');
   private readonly wasd: HTMLInputElement;
   private readonly grid = document.createElement('div');
+  private readonly viewport = document.createElement('div');
+  private readonly directions = document.createElement('div');
   private readonly markerDescription = document.createElement('p');
   private readonly lootGuide = document.createElement('p');
   private readonly lootHere = document.createElement('p');
@@ -60,6 +62,9 @@ export class DungeonMap {
   private readonly fallbackCells = new Set<HTMLElement>();
   private visual: { map: GeneratedMap; biome: string; revealed: Set<number>; sight: Set<number>; markers: number[] } | null = null;
   private readonly abort = new AbortController();
+  private readonly resize = new ResizeObserver(() => this.scheduleLayout(true));
+  private layoutFrame = 0;
+  private revealPlayer = false;
   private readonly treatment = createMapArt(() => { if (this.live) this.paintArt(); });
   constructor(private readonly move: (destination: number) => void, private readonly locked: () => boolean) {
     const el = <K extends keyof HTMLElementTagNameMap>(tag:K,text='') => { const n=document.createElement(tag);n.textContent=text;return n; };
@@ -85,6 +90,9 @@ export class DungeonMap {
     this.wasd = wasd;
     keyboardPreference.append(wasd, ' Enable WASD movement');
     this.grid.id='dungeon-map';this.grid.tabIndex=0;this.grid.setAttribute('role','application');
+    this.viewport.className = 'dungeon-map-viewport';
+    this.viewport.append(this.grid);
+    this.grid.addEventListener('focus', () => this.scheduleLayout(true), {signal});
     this.markerDescription.id = 'dungeon-map-markers';
     this.markerDescription.hidden = true;
     this.grid.setAttribute('aria-describedby', this.markerDescription.id);
@@ -101,17 +109,22 @@ export class DungeonMap {
       else this.feedback.textContent='Choose an adjacent cell or use the direction controls.';
     },{signal});
     this.feedback.id='dungeon-map-feedback';this.feedback.setAttribute('role','status');
-    const directions=el('div');directions.className='dungeon-directions';directions.setAttribute('role','group');directions.setAttribute('aria-label','Move player');
-    for(const [name,dx,dy] of [['North',0,-1],['East',1,0],['South',0,1],['West',-1,0]] as const){
+    const directions=this.directions;directions.className='dungeon-directions';directions.setAttribute('role','group');directions.setAttribute('aria-label','Move player');
+    directions.append(this.viewport);
+    for(const [name,dx,dy,arrow] of [['North',0,-1,'↑'],['East',1,0,'→'],['South',0,1,'↓'],['West',-1,0,'←']] as const){
       const button=el('button');button.id=`dungeon-step-${name.toLowerCase()}`;button.type='button';button.setAttribute('aria-label',name);
-      button.append(el('span',name[0]));
+      const icon=el('span',arrow);icon.className='dungeon-direction-arrow';icon.setAttribute('aria-hidden','true');
+      const label=el('span',name[0]);label.setAttribute('aria-hidden','true');
+      button.append(icon,label);
       button.addEventListener('click',()=>this.step(dx+dy*(this.map?.width??20)),{signal});
       this.controls.push({button,dx,dy});directions.append(button);
     }
-    const center=el('span');center.className='dungeon-compass-center';center.setAttribute('aria-hidden','true');directions.append(center);
-    this.root.append(this.heading,this.grid,this.markerDescription,this.lootGuide,this.lootHere);
+    this.root.append(this.heading,directions,this.markerDescription,this.lootGuide,this.lootHere);
     this.controlsRoot.className = 'dungeon-map-controls';
-    this.controlsRoot.append(directions,this.feedback,label,keyboardPreference);
+    this.controlsRoot.append(this.feedback,label,keyboardPreference);
+    this.resize.observe(this.viewport);
+    window.addEventListener('resize', () => this.scheduleLayout(true), {signal});
+    window.visualViewport?.addEventListener('resize', () => this.scheduleLayout(true), {signal});
     document.addEventListener('keydown',e => {
       if (this.state?.phase !== 'ready' || !this.root.isConnected || this.root.closest('[hidden]') ||
         this.locked() || document.hidden || e.defaultPrevented || e.isComposing ||
@@ -128,8 +141,47 @@ export class DungeonMap {
       if (!e.repeat) this.step(delta);
     },{signal});
   }
-  dispose() { this.live = false; this.abort.abort(); }
-  render(state: DungeonState, map: GeneratedMap) { this.state = state; this.map = map; this.draw(); }
+  dispose() { this.live = false; this.abort.abort(); this.resize.disconnect(); cancelAnimationFrame(this.layoutFrame); }
+  render(state: DungeonState, map: GeneratedMap) {
+    const moved = !this.state || this.map !== map || currentFloor(this.state).position !== currentFloor(state).position;
+    this.state = state; this.map = map; this.draw(); this.scheduleLayout(moved);
+  }
+  /** Fit controls to the visible screen; scroll only the map window when following movement. */
+  private scheduleLayout(reveal: boolean) {
+    this.revealPlayer ||= reveal;
+    if (!this.live || this.layoutFrame) return;
+    this.layoutFrame = requestAnimationFrame(() => {
+      this.layoutFrame = 0;
+      if (!this.live || !this.root.isConnected || this.root.closest('[hidden]')) return;
+      const screen = this.root.closest<HTMLElement>('#dungeon-screen');
+      if (!screen) return;
+      const frame = this.directions.getBoundingClientRect(), screenBounds = screen.getBoundingClientRect();
+      const visible = window.visualViewport;
+      const bottom = Math.min(screenBounds.bottom, visible ? visible.offsetTop + visible.height : innerHeight);
+      const padding = parseFloat(getComputedStyle(screen).paddingBottom);
+      const gap = parseFloat(getComputedStyle(this.directions).rowGap);
+      const rails = this.controls[0].button.offsetHeight + this.controls[2].button.offsetHeight + 2 * gap;
+      // Including outer scroll keeps the size stable while inspecting secondary panels.
+      const available = Math.max(64, Math.floor(bottom - frame.top - screen.scrollTop - padding - rails));
+      const height = `${available}px`;
+      if (this.viewport.style.getPropertyValue('--dungeon-map-max-height') !== height) {
+        this.viewport.style.setProperty('--dungeon-map-max-height', height);
+      }
+      if (!this.revealPlayer || !this.state) return;
+      this.revealPlayer = false;
+      const player = this.cells[currentFloor(this.state).position];
+      if (!player) return;
+      const cell = player.getBoundingClientRect(), view = this.viewport.getBoundingClientRect();
+      const left = view.left + this.viewport.clientLeft, top = view.top + this.viewport.clientTop;
+      const right = left + this.viewport.clientWidth, bottomEdge = top + this.viewport.clientHeight;
+      // Retain nearby terrain as context, without recentering an already-visible player.
+      const margin = Math.max(cell.width, cell.height);
+      if (cell.left - margin < left) this.viewport.scrollLeft += cell.left - margin - left;
+      else if (cell.right + margin > right) this.viewport.scrollLeft += cell.right + margin - right;
+      if (cell.top - margin < top) this.viewport.scrollTop += cell.top - margin - top;
+      else if (cell.bottom + margin > bottomEdge) this.viewport.scrollTop += cell.bottom + margin - bottomEdge;
+    });
+  }
   private step(delta: number) {
     if (!this.live || !this.state || this.locked() || document.hidden) return;
     const f = currentFloor(this.state), destination = f.position + delta;
