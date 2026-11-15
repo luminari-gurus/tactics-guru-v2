@@ -1330,8 +1330,8 @@ test('a second dungeon encounter reuses the engine after a legal victory without
  expect(errors).toEqual([]);
 });
 
-for(const layoutVariant of ['unchanged','fixed-tracks','no-follow'] as const){
-test(`warm maximum-size floor step responsiveness meets the established budget after a legal victory · diagnostic ${layoutVariant}`,async({page,isMobile})=>{
+for(const layoutVariant of ['unchanged','simple-focus','padded-block'] as const){
+test(`warm maximum-size floor step responsiveness meets the established budget after a legal victory · CSS diagnostic ${layoutVariant}`,async({page,isMobile})=>{
  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
  // Legal domain play reaches the ongoing boundary; the real HUD enacts its winning command.
  const witness=dungeonVictoryBoundary(1,0);if(!witness)throw Error('Missing legal victory boundary');
@@ -1372,17 +1372,64 @@ test(`warm maximum-size floor step responsiveness meets the established budget a
  await page.keyboard.press('Tab');
  await page.locator(`#dungeon-map [data-cell="${first}"]`).evaluate(cell=>cell.scrollIntoView({block:'center',inline:'center',behavior:'instant'}));
  await page.locator('#dungeon-map').evaluate(grid=>(grid as HTMLElement).focus({preventScroll:true}));
- // Settle the same static fixture for all diagnostic variants, before any geometry capture or timing.
+ // Verification-only CSS isolation; each variant settles before geometry capture and timing.
  const layoutDiagnostic=await page.evaluate(async variant=>{
-  await new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve())));
-  const directions=document.querySelector<HTMLElement>('.dungeon-directions')!;
-  const probe=(window as Window & {__issue415LayoutProbe?:{suppressScheduling:boolean}}).__issue415LayoutProbe;
-  if(!probe)throw Error('Missing issue 415 layout probe');
-  const resolvedRows=getComputedStyle(directions).gridTemplateRows;
-  if(variant==='fixed-tracks')directions.style.gridTemplateRows=resolvedRows;
-  if(variant==='no-follow')probe.suppressScheduling=true;
-  return {variant,resolvedRows,appliedRows:directions.style.gridTemplateRows,suppressScheduling:probe.suppressScheduling};
+  const settle=()=>new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve())));
+  const geometry=()=>Object.fromEntries([
+   ['directions','.dungeon-directions'],['viewport','.dungeon-map-viewport'],
+   ['north','#dungeon-step-north'],['east','#dungeon-step-east'],
+   ['south','#dungeon-step-south'],['west','#dungeon-step-west'],
+  ].map(([name,selector])=>{
+   const bounds=document.querySelector<HTMLElement>(selector)!.getBoundingClientRect();
+   return [name,{left:bounds.left,top:bounds.top,right:bounds.right,bottom:bounds.bottom,width:bounds.width,height:bounds.height}];
+  }));
+  await settle();
+  const before=geometry();
+  const changedRules:{before:string;after:string;declarations:string}[]=[];
+  if(variant==='simple-focus'){
+   const target='.dungeon-map-viewport:has(#dungeon-map:focus-visible)';
+   const replacement='.dungeon-map-viewport:focus-within';
+   const replace=(rules:CSSRuleList)=>{
+    for(const rule of Array.from(rules)){
+     if(rule instanceof CSSStyleRule&&rule.selectorText===target){
+      const declarations=rule.style.cssText;
+      rule.selectorText=replacement;
+      changedRules.push({before:target,after:rule.selectorText,declarations});
+     }else if('cssRules' in rule)replace((rule as CSSGroupingRule).cssRules);
+    }
+   };
+   for(const sheet of Array.from(document.styleSheets)){
+    let rules:CSSRuleList;
+    try{rules=sheet.cssRules;}catch{continue;}
+    replace(rules);
+   }
+   if(changedRules.length!==1)throw Error(`Expected one focus rule; replaced ${changedRules.length}`);
+  }else if(variant==='padded-block'){
+   const style=document.createElement('style');
+   style.dataset.issue415Diagnostic='padded-block';
+   style.textContent=`
+    #dungeon-screen .dungeon-directions { display:block; position:relative; box-sizing:border-box; width:min(100%,576px); padding:48px; gap:4px; overflow:visible; }
+    #dungeon-screen .dungeon-directions button { position:absolute; }
+    #dungeon-screen .dungeon-directions #dungeon-step-north,
+    #dungeon-screen .dungeon-directions #dungeon-step-south { left:50%; transform:translateX(-50%); }
+    #dungeon-screen .dungeon-directions #dungeon-step-north { top:0; }
+    #dungeon-screen .dungeon-directions #dungeon-step-south { bottom:0; }
+    #dungeon-screen .dungeon-directions #dungeon-step-east,
+    #dungeon-screen .dungeon-directions #dungeon-step-west { top:50%; transform:translateY(-50%); }
+    #dungeon-screen .dungeon-directions #dungeon-step-east { right:0; }
+    #dungeon-screen .dungeon-directions #dungeon-step-west { left:0; }
+   `;
+   document.head.append(style);
+  }
+  await settle();
+  return {variant,before,after:geometry(),changedRules};
  },layoutVariant);
+ writeFileSync(test.info().outputPath('warm-layout-variant-geometry.json'),JSON.stringify(layoutDiagnostic,null,2));
+ for(const [name,bounds] of Object.entries(layoutDiagnostic.before)){
+  for(const edge of ['left','top','right','bottom','width','height'] as const){
+   expect(Math.abs(layoutDiagnostic.after[name][edge]-bounds[edge]),`${layoutVariant}: ${name} ${edge}`).toBeLessThanOrEqual(.1);
+  }
+ }
  const visibleGrid=()=>page.locator('#dungeon-map').evaluate((grid,{first,second})=>{
   const rect=(element:Element)=>{const b=element.getBoundingClientRect();return {left:b.left,top:b.top,right:b.right,bottom:b.bottom,width:b.width,height:b.height};};
   const region=grid.parentElement!,screen=document.querySelector<HTMLElement>('#dungeon-screen')!;
