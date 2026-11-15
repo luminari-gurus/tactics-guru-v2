@@ -544,6 +544,8 @@ test('movement controls stay visible with the player without scrolling on entry 
  await page.goto('./?game=dungeon');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
  await page.reload();await continueSavedDungeon(page);
  const originalViewport=page.viewportSize()!;
+ const party=await page.getByRole('region',{name:'Party',exact:true}).elementHandle();
+ if(!party)throw Error('Missing party summary');
  const sizes=[originalViewport,{width:320,height:568},{width:393,height:684},{width:568,height:320},{width:667,height:375},{width:740,height:360},{width:393,height:852},originalViewport];
  const delta=destination-origin,name=delta===-terrain.width?'north':delta===terrain.width?'south':delta===1?'east':'west';
  const reverse={north:'south',south:'north',east:'west',west:'east'}[name];
@@ -562,6 +564,7 @@ test('movement controls stay visible with the player without scrolling on entry 
   const before=await dungeonSnapshot(page),scrollTop=await activate(`dungeon-step-${name}`);
   await expect.poll(async()=>(await dungeonSnapshot(page)).floors[0].position).toBe(destination);
   await expect(page.locator('.dungeon-save-note')).toHaveText('Exploration saved on this device');
+  expect(await party.evaluate(node=>node.isConnected),'Ordinary movement keeps the unchanged party mounted').toBe(true);
   expect((await dungeonSnapshot(page)).revision).toBe(before.revision+1);
   expect((await expectDungeonMovementVisible(page)).scrollTop).toBe(scrollTop);
   await activate(`dungeon-step-${reverse}`);
