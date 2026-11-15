@@ -402,8 +402,9 @@ for(const control of ['arrows','wasd','compass','cell'] as const)test(`stairs tr
   const encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
   await page.goto('./?game=dungeon');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
   await page.reload();await continueSavedDungeon(page);
+  if(control==='compass')await expectDungeonMovementVisible(page);
  };
- const reload=async()=>{await page.reload();await continueSavedDungeon(page);};
+ const reload=async()=>{await page.reload();await continueSavedDungeon(page);if(control==='compass')await expectDungeonMovementVisible(page);};
  const move=async(destination:number)=>{
   const before=await dungeonSnapshot(page),delta=destination-before.floors[before.depth-1].position, width=before.floors[before.depth-1].descriptor.size ?? 20;
   const direction=delta===-width?'north':delta===width?'south':delta===1?'east':'west';
@@ -416,6 +417,7 @@ for(const control of ['arrows','wasd','compass','cell'] as const)test(`stairs tr
    if(isMobile)await target.tap();else await target.click();
   }
   await expect.poll(async()=> (await dungeonSnapshot(page)).revision).toBe(before.revision+1);
+  if(control==='compass')await expectDungeonMovementVisible(page);
  };
  // Structural clear-floor input isolates traversal. The legal guardian journey separately proves unlock.
  const approach=atStairApproach(cleared);await load(approach);
@@ -563,7 +565,7 @@ test('movement controls stay visible with the player without scrolling on entry 
  }
  await page.screenshot({path:test.info().outputPath('map-edge-movement-visible.png')});
  const beforeReload=await dungeonSnapshot(page);await page.reload();await continueSavedDungeon(page);
- expect(await dungeonSnapshot(page)).toEqual(beforeReload);
+ expectSameProgress(await dungeonSnapshot(page),beforeReload);
  expect((await expectDungeonMovementVisible(page)).scrollTop).toBe(0);
 });
 
@@ -673,7 +675,13 @@ fixedSeedTest('map shortcuts work on entry and outside the map without taking ov
 fixedSeedTest('real traversal, art independence, keyboard locks, active battle and exact reload',async({page,isMobile})=>{
  test.setTimeout(120000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  // Qualify input/art/reload on a traversable witness, independently of fresh entropy.
- await page.goto('./?game=dungeon');await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();
+ await page.goto('./?game=dungeon');await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();
+ const previousId=(await dungeonSnapshot(page)).id;
+ await page.locator('#dungeon-confirm-new').click();
+ // Confirm persists a replacement asynchronously; do not plan a step against the placeholder floor.
+ await expect.poll(async()=>(await dungeonSnapshot(page)).id).not.toBe(previousId);
+ await expect(page.locator('#battle-dialog')).toBeHidden();
+ await expect(page.locator('#dungeon-map')).toBeVisible();
  const initial=await dungeonSnapshot(page),f=initial.floors[0],map=generateMap(f.descriptor.seed,'rooms');
  await expect(page.locator('#dungeon-start-encounter')).toHaveCount(0);await expect(page.locator('#dungeon-map')).not.toContainText('↑');
  const adjacent=neighbors(f.position).find(n=>map.cells[n])!;
@@ -923,7 +931,7 @@ test('chase follows the previous cell while block targets the resulting cell', a
  }
 });
 
-test('maximum-size saved floor renders and accepts a step after reload', async ({page,isMobile}) => {
+test('maximum-size saved floor renders and accepts a step after reload', async ({page,isMobile,browserName}) => {
  const base=freshDungeon('large-floor-browser',19);
  const floors=Array.from({length:5},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1),map=floorMap(descriptor);return {descriptor,position:descriptor.upstairs,completed:i===4?0:3,exploration:freshExploration(descriptor.seed,descriptor.upstairs,map)};});
  const state={...base,depth:5,floors}, encoded=encodeDungeon(state); if(!encoded.ok)throw Error(encoded.reason);
@@ -966,6 +974,32 @@ test('maximum-size saved floor renders and accepts a step after reload', async (
  }
  await page.setViewportSize({width:320,height:740});
  await assertLayout();
+ if(isMobile&&browserName==='chromium'){
+  const beforeSwipe=await dungeonSnapshot(page),geometry=await dungeonMovementGeometry(page);
+  const swipe=await map.evaluate(grid=>{
+   const region=grid.parentElement!,bounds=region.getBoundingClientRect();
+   const increase=region.scrollWidth-region.clientWidth-region.scrollLeft>=region.scrollLeft;
+   const start=bounds.left+region.clientLeft+region.clientWidth*(increase?.8:.2);
+   const finish=bounds.left+region.clientLeft+region.clientWidth*(increase?.2:.8);
+   return {start,finish,y:bounds.top+region.clientTop+region.clientHeight/2};
+  });
+  const session=await page.context().newCDPSession(page);
+  try{
+   await session.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:swipe.start,y:swipe.y,id:1}]});
+   for(let step=1;step<=8;step++){
+    await session.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:swipe.start+(swipe.finish-swipe.start)*step/8,y:swipe.y,id:1}]});
+   }
+   // Observe native scrolling, then hold the finger still so release does not add kinetic motion.
+   await expect.poll(async()=>Math.abs((await dungeonMovementGeometry(page,false)).mapScroll.left-geometry.mapScroll.left)).toBeGreaterThan(1);
+   await page.waitForTimeout(150);
+   await session.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  }finally{await session.detach();}
+  const afterSwipe=await expectDungeonMovementVisible(page,false),stateAfterSwipe=await dungeonSnapshot(page);
+  expect(afterSwipe.buttons,'A native map swipe must not move the direction controls').toEqual(geometry.buttons);
+  expect(afterSwipe.scrollTop).toBe(geometry.scrollTop);
+  expect(stateAfterSwipe.revision,'Swiping the map must not issue a movement command').toBe(beforeSwipe.revision);
+  expect(stateAfterSwipe.floors).toEqual(beforeSwipe.floors);
+ }
  const beforePan=await dungeonMovementGeometry(page);
  const horizontal=await map.evaluate(grid=>{
   const region=grid.parentElement!;
@@ -979,10 +1013,16 @@ test('maximum-size saved floor renders and accepts a step after reload', async (
  const afterPan=await expectDungeonMovementVisible(page,false);
  expect(afterPan.buttons,'Panning the map must not move its controls').toEqual(beforePan.buttons);
  expect(afterPan.scrollTop).toBe(beforePan.scrollTop);
+ await page.evaluate(async()=>{
+  window.dispatchEvent(new Event('resize'));
+  await new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve())));
+ });
+ expect((await dungeonMovementGeometry(page,false)).mapScroll,'A resize notification without new map dimensions must preserve manual inspection').toEqual(afterPan.mapScroll);
  await page.locator('#dungeon-art').selectOption('legacy-8bit');
  expect((await dungeonMovementGeometry(page,false)).mapScroll,'Changing art must preserve manual map inspection').toEqual(afterPan.mapScroll);
  await page.setViewportSize(viewport);
  await page.locator('#dungeon-screen').evaluate(screen=>{screen.scrollTop=0;});
+ await expectDungeonMovementVisible(page);
  await map.evaluate(grid=>{const state={grid,controls:[...document.querySelectorAll<HTMLElement>('#dungeon-art, .dungeon-directions button')],removed:false};(window as unknown as {__floorMount:typeof state}).__floorMount=state;new MutationObserver(records=>{if(records.some(record=>[...record.removedNodes].some(node=>node===grid || node.contains(grid))))state.removed=true;}).observe(document.querySelector('#dungeon-screen')!,{childList:true,subtree:true});});
  const before=await dungeonSnapshot(page), floor=before.floors[4], layout=floorMap(floor.descriptor);
  const destination=neighbors(floor.position,layout.width).find(n=>layout.cells[n]&&!floor.exploration.pois.some(p=>poiCell(p,layout.width)===n));
@@ -1311,6 +1351,7 @@ test('warm maximum-size floor step responsiveness meets the established budget a
  const decline=page.getByRole('button',{name:'Decline reward',exact:true});
  if(isMobile)await decline.tap();else await decline.click();
  await page.locator('#dungeon-item-confirm').click();
+ await expect.poll(async()=>(await dungeonSnapshot(page)).phase).toBe('ready');
  const ready=await dungeonSnapshot(page);expect(ready.phase).toBe('ready');expect(ready.offer).toBeNull();
 
  // This history is structural, not earned floor-five progression. Real recovery adopts it
@@ -1350,15 +1391,46 @@ test('warm maximum-size floor step responsiveness meets the established budget a
  for(const cell of before.grid.cells){expect(cell.intersection.width).toBeGreaterThanOrEqual(cell.bounds.width-.1);expect(cell.intersection.height).toBeGreaterThanOrEqual(cell.bounds.height-.1);expect(cell.unoccluded).toBe(true);}
  expect(before.grid.cells.find(cell=>cell.player)?.index).toBe(first);
 
- // Preserve the cold case's 40 idle intervals, 20 synchronous clicks and 40 moving frames.
+ // Measure dispatch separately from async save publication. Every sampled click must commit.
+ // Retain 40 idle intervals, 20 dispatch samples and every frame across 40 accepted moves.
  const idleFrames=await page.evaluate(async()=>{const samples:number[]=[];let previous=await new Promise<number>(resolve=>requestAnimationFrame(resolve));for(let i=0;i<40;i++){const now=await new Promise<number>(resolve=>requestAnimationFrame(resolve));samples.push((Math.round(now*1000)-Math.round(previous*1000))/1000);previous=now;}return samples;});
  const times:number[]=[];
- for(let i=0;i<20;i++)times.push(await page.evaluate(destination=>{const start=performance.now();document.querySelector<HTMLElement>(`#dungeon-map [data-cell="${destination}"]`)!.click();return performance.now()-start;},i%2===0?second:first));
- const frames=await page.evaluate(async({a,b})=>{const samples:number[]=[];let previous=await new Promise<number>(resolve=>requestAnimationFrame(resolve));for(let i=0;i<40;i++){document.querySelector<HTMLElement>(`#dungeon-map [data-cell="${i%2===0?b:a}"]`)!.click();const now=await new Promise<number>(resolve=>requestAnimationFrame(resolve));samples.push((Math.round(now*1000)-Math.round(previous*1000))/1000);previous=now;}return samples;},{a:first,b:second});
+ for(let i=0;i<20;i++){
+  const destination=i%2===0?second:first;
+  times.push(await page.evaluate(destination=>{const start=performance.now();document.querySelector<HTMLElement>(`#dungeon-map [data-cell="${destination}"]`)!.click();return performance.now()-start;},destination));
+  // Waiting is outside the dispatch-cost sample and cannot turn a refused click into a sample.
+  await expect.poll(async()=>{const current=await dungeonSnapshot(page);return {id:current.id,depth:current.depth,phase:current.phase,revision:current.revision,position:current.floors[4].position};})
+   .toEqual({id:adopted.id,depth:5,phase:'ready',revision:adopted.revision+i+1,position:destination});
+ }
+ const acceptanceTimeoutMs=5000;
+ const frames=await page.evaluate(async({a,b,id,initialRevision,acceptanceTimeoutMs})=>{
+  const samples:number[]=[];
+  const nextFrame=(deadline:number)=>new Promise<number>((resolve,reject)=>{
+   let frame=0;
+   const timer=setTimeout(()=>{cancelAnimationFrame(frame);reject(Error('Timed out waiting for an accepted movement frame'));},Math.max(0,deadline-performance.now()));
+   frame=requestAnimationFrame(now=>{clearTimeout(timer);resolve(now);});
+  });
+  let previous=await nextFrame(performance.now()+acceptanceTimeoutMs);
+  for(let i=0;i<40;i++){
+   const destination=i%2===0?b:a,expectedRevision=initialRevision+i+1;
+   const deadline=performance.now()+acceptanceTimeoutMs;
+   document.querySelector<HTMLElement>(`#dungeon-map [data-cell="${destination}"]`)!.click();
+   for(;;){
+    const now=await nextFrame(deadline);
+    samples.push((Math.round(now*1000)-Math.round(previous*1000))/1000);previous=now;
+    const current=JSON.parse(document.querySelector<HTMLElement>('#game')!.dataset.dungeonSnapshot!) as DungeonState;
+    if(current.id!==id||current.depth!==5||current.phase!=='ready'||current.revision>expectedRevision)
+     throw Error('Unexpected dungeon boundary while measuring accepted movement');
+    if(current.revision===expectedRevision&&current.floors[4].position===destination)break;
+    if(performance.now()>=deadline)throw Error(`Movement revision ${expectedRevision} was not published`);
+   }
+  }
+  return samples;
+ },{a:first,b:second,id:adopted.id,initialRevision:adopted.revision+20,acceptanceTimeoutMs});
  const percentile=(values:number[],q:number)=>[...values].sort((a,b)=>a-b)[Math.ceil(values.length*q)-1];
  const p95=percentile(times,.95),frameP95=percentile(frames,.95),stepped=await dungeonSnapshot(page);
  const after={canvas:await canvasIdentity(),grid:await visibleGrid()};
- writeFileSync(test.info().outputPath('warm-maximum-floor-step-performance.json'),JSON.stringify({fixture:'structural five-floor history adopted through recovery; not earned floor-five progression',warmup:{seed:witness.snapshot.seed,depth:witness.snapshot.depth,command:witness.command,completed:won.floors[0].completed},dimension:map.width,first,second,before,after,idleFrames,times,p95,frames,frameP95,budgetMs:33.4,revision:{before:adopted.revision,after:stepped.revision}},null,2));
+ writeFileSync(test.info().outputPath('warm-maximum-floor-step-performance.json'),JSON.stringify({fixture:'structural five-floor history adopted through recovery; not earned floor-five progression',warmup:{seed:witness.snapshot.seed,depth:witness.snapshot.depth,command:witness.command,completed:won.floors[0].completed},measurement:{times:'20 synchronous click-dispatch costs; async revision and position confirmation occurs outside each sample',frames:'Every animation-frame interval across 40 sequential accepted moves, including all intervals waiting for async publication',acceptanceTimeoutMs},dimension:map.width,first,second,before,after,idleFrames,times,p95,frames,frameP95,budgetMs:33.4,revision:{before:adopted.revision,after:stepped.revision}},null,2));
  expect(after.canvas).toEqual(originalCanvas);
  expect(after.grid.visibility).toBe('visible');expect(after.grid.focused).toBe(true);expect(after.grid.focusVisible).toBe(true);
  for(const cell of after.grid.cells){expect(cell.intersection.width).toBeGreaterThanOrEqual(cell.bounds.width-.1);expect(cell.intersection.height).toBeGreaterThanOrEqual(cell.bounds.height-.1);expect(cell.unoccluded).toBe(true);}
