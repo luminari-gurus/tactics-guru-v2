@@ -115,21 +115,57 @@ is no shared settings reset. Use `ownedAbilities` with the session's projected
 catalog for learned skills. Passive guidance must not call `BattleSelection.describe`,
 which prepares an intent; use read-only previews and the existing formatting helpers.
 
-## Increment 3: presentation pace (remaining)
+## Increment 3: presentation pace
 
-- Choose and review normal/fast timings in the presentation layer; synchronize
-  travel, impact and feedback without changing command order, RNG, effects or AI.
-- Define persistence/default/reset behavior through Settings, separately from
-  active combat saves, and respect reduced-motion behavior.
-- Verify deterministic state/replay equivalence at both speeds, mid-animation
-  changes, interrupted visibility, restart and shared battle hosts.
+Implementation starts from main `347b971f7c66f341a6f4c40bfe3f628d724cf54a`, after
+class-guidance PR #423 merged, on `feat/issue-181-combat-pace`.
 
-`BoardRenderer.animate` is the timing boundary; sample the preference once per
-presentation and retain its idempotent completion/cancellation contract. Avoid
-global Phaser time scaling or changes to input/audio timeout behavior. Current
-reduced motion disables idle bob, not action travel, so the action-animation policy
-must be defined explicitly. Normal/fast radio inputs fit the current Settings
-focus trap, whose selectable controls do not yet include native `select` elements.
+Normal retains the existing V2 timings. Fast uses a 0.5 multiplier so the user-facing
+choice is a clear 2× speed; the legacy 0.48 multiplier is not copied as an arbitrary
+V2 constant. Travel, impact and feedback share the existing animation progress.
+
+| Presentation | Normal | Fast (2×) |
+| --- | --- | --- |
+| Movement | 70 ms per path step, at least one step | 35 ms per path step |
+| Signature ability | 560 ms | 280 ms |
+| Other result feedback | 180 ms | 90 ms |
+| Turn transition without feedback | 25 ms | 12.5 ms |
+| Reduced motion with result text | 180 ms, stationary | 90 ms, stationary |
+| Reduced motion without result text | 25 ms, then snap | 12.5 ms, then snap |
+
+- Sample the pace and reduced-motion preference once at `BoardRenderer.animate`.
+  Changes during playback apply to the next accepted action; an active tween is
+  neither restarted nor retimed. Keep the existing idempotent completion and
+  cancellation path for hidden pages, restart and scene shutdown.
+- Reduced motion omits sprite travel, projectiles, blade sweeps and expanding
+  impact graphics. Stationary result text appears immediately, then the board
+  snaps to the already accepted state. Existing idle-bob suppression remains.
+- Store `{ version: 1, pace: 'normal' | 'fast' }` under the independent
+  `tactics-guru:combat-pace` key. Reading never writes. Default to Normal; choosing
+  Normal resets the speed. Tutorial resets leave this separate preference alone.
+  Preserve future/oversized envelopes; retain explicit unsaved choices in memory
+  and report that persistence failed. Retry writes only on an explicit choice.
+- Main-menu Settings and in-battle More use native Normal/Fast radio controls,
+  unique group/help IDs, 44 px labels and the existing scrolling/focus boundaries.
+  Same-page and filtered cross-tab updates refresh mounted controls; disposal
+  removes their subscriptions and event listeners.
+- Keep timing in the presentation layer. The domain, session, command sequence,
+  RNG, effect expiry, AI, combat snapshots, audio and input/hold timeouts do not
+  read or write this preference. Global Phaser time scaling is unchanged.
+  Audio keeps its existing pitch, playback rate and latest-accepted-batch policy;
+  faster action handoff can replace a preceding cue sooner. The Fast audio
+  interruption witness verifies that mute/visibility/context handling still
+  leaves command completion independent of sound playback.
+
+Verification includes pure exact-timing and preference boundaries, real-control
+Normal/Fast state/replay and enemy-continuation equivalence, next-action sampling,
+Fast interruption/restart, reduced-motion endpoints and stationary feedback,
+menu/More persistence and reset independence, keyboard/touch focus and enlarged
+text. Existing signature, idle-bob, HUD handoff and layout witnesses remain in
+scope. Ordinary PR verification covers all units, both type/build boundaries and
+shared standalone/run/dungeon journeys. Browser execution uses qualified
+self-hosted runners and device emulation; retain actual results and initial
+failures in the final PR.
 
 Use `Refs #181` for incremental PRs; reserve `Closes #181` for the final verified
 increment. Queue completion alone does not satisfy the tutorial or pace criteria.

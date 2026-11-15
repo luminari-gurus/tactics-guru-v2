@@ -8,7 +8,9 @@ import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, BASE_THICKNE
 import { constrainView, DRAG_THRESHOLD, MAX_ZOOM, pickTileCandidates, screenToBoard, type View } from '../geometry/picking';
 import { HEALTH_BAR, HEALTH_COLORS, healthArc, healthBarScale, healthColor, healthFraction } from './healthBar';
 import { abilityPresentation, type SignatureKind } from './abilityPresentation';
+import { combatPresentationTiming, type CombatPresentationTiming } from './combatPace';
 import type { TargetOverlay, HoverPreview } from '../ui/targetPreview';
+import { readCombatPacePreference } from '../ui/combatPacePreference';
 import { drawDesertLandmark } from './desertLandmark';
 
 const REACHABLE_COLOR = 0x46d7c7;
@@ -60,6 +62,7 @@ export class BoardRenderer {
   private selectionEvents = 0;
   private picking: { point: Point; keys: string; index: number } | null = null;
   private animatedSnapshot: BattleState | undefined;
+  private presentation: CombatPresentationTiming | null = null;
   private effect: { kind: SignatureKind; actorId: number; targetId: number; progress: number;
     from: Point; to: Point; feedback: {unitId: number; text: string; x: number; y: number; visible: boolean}[] } | null = null;
   private effectLabels: {text: Phaser.GameObjects.Text; anchor: Point; kind: 'result'|'defeat'|'guard'}[] = [];
@@ -236,6 +239,7 @@ export class BoardRenderer {
     scene.events.on(Phaser.Scenes.Events.UPDATE, this.updateBob);
     scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.idle = false;
+      this.presentation = null;
       this.bobId = null;
       this.bobOffset = 0;
       scene.events.off(Phaser.Scenes.Events.UPDATE, this.updateBob);
@@ -366,12 +370,16 @@ export class BoardRenderer {
 
   /** Tween view objects only; snapshots and command results remain unchanged. */
   animate(before: BattleState, after: BattleState, events: readonly BattleEvent[]): { done: Promise<void>; cancel: () => void } {
-    this.animatedSnapshot = before;
-    this.present(before, [], null);
     const move = events.find((e): e is Extract<BattleEvent,{type:'moved'}> => e.type==='moved');
     const {signature, feedback} = abilityPresentation(events);
-    const STEP_MS=70, COMBAT_MS=180, TURN_MS=25;
-    const duration=move ? Math.max(1,move.path.length-1)*STEP_MS : signature ? 560 : feedback.length ? COMBAT_MS : TURN_MS;
+    // Preferences take effect on the next action, never midway through this tween.
+    const timing = combatPresentationTiming(move
+      ? { kind: 'move', steps: move.path.length - 1, hasFeedback: feedback.length > 0 }
+      : { kind: signature ? 'signature' : feedback.length ? 'feedback' : 'turn', hasFeedback: feedback.length > 0 },
+    readCombatPacePreference(), this.reducedMotion.matches);
+    this.presentation = timing;
+    this.animatedSnapshot = before;
+    this.present(before, [], null);
     const marker={progress:0};
     const labels:Phaser.GameObjects.Text[]=[];
     const anchor=(id:number)=>projectTile(this.byCell.get(cellKey(before.units.find(u=>u.id===id)!.cell))!);
@@ -380,11 +388,11 @@ export class BoardRenderer {
       const y=p.y+(item.kind==='guard'?16:item.kind==='defeat'?-88:-64);
       const text=this.scene.add.text(p.x,y,item.text,{fontFamily:'sans-serif',fontSize:'18px',fontStyle:'bold',
         color:item.kind==='guard'?'#a9f3e6':'#ffffff',backgroundColor:'#172033',padding:{x:4,y:2}})
-        .setResolution(2).setOrigin(0.5).setDepth(10001).setVisible(!signature);
+        .setResolution(2).setOrigin(0.5).setDepth(10001).setVisible(!signature || timing.reducedMotion);
       this.root.add(text);labels.push(text);
       this.effectLabels.push({text,anchor:p,kind:item.kind});
     }
-    const graphics=signature ? this.scene.add.graphics().setDepth(10000) : null;
+    const graphics=signature && !timing.reducedMotion ? this.scene.add.graphics().setDepth(10000) : null;
     if(graphics && signature){
       this.root.add(graphics);
       const a=anchor(signature.actorId),b=anchor(signature.targetId);
@@ -401,15 +409,17 @@ export class BoardRenderer {
     const finish=()=>{
       if(finished)return;finished=true;tween?.stop();
       labels.forEach(l=>{if(l.scene)l.destroy();});if(graphics?.scene)graphics.destroy();
-      this.effectLabels=[];this.animatedSnapshot=undefined;this.effect=null;this.moving=null;
+      this.effectLabels=[];this.animatedSnapshot=undefined;this.presentation=null;this.effect=null;this.moving=null;
       // Scene shutdown destroys the display list before canceling this presentation.
       // Resolve cancellation without touching images whose scene/texture binding is gone.
       if(this.root.scene)this.present(after,[],null);
       complete();
     };
-    tween=this.scene.tweens.add({targets:marker,progress:1,duration,onUpdate:()=>{
+    tween=this.scene.tweens.add({targets:marker,progress:1,duration:timing.durationMs,onUpdate:()=>{
       if(finished)return;
       if(!this.root.scene){finish();return;}
+      // Reduced motion holds only stationary result text, then snaps to the accepted state.
+      if(timing.reducedMotion)return;
       if(graphics && signature && this.effect){
         const {from:a,to:b}=this.effect,p=marker.progress;
         const travel=Math.min(1,p/0.45),impact=Math.max(0,(p-0.45)/0.55);
@@ -749,6 +759,7 @@ export class BoardRenderer {
         return {key,width:source.width,height:source.height,rgbaBytes:source.width*source.height*4};
       }),
       effect: this.effect,
+      presentation: this.presentation,
       feedbackBounds: this.feedbackBounds(),
       depthOrder: this.root.list.map(object => Number('depth' in object ? object.depth : 0)),
       surfaceCornerError: Math.max(...surfaceErrors),

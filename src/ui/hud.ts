@@ -17,6 +17,7 @@ import { draughtsSpent } from '../domain/draughts';
 import { BattleTurnQueue } from './battleTurnQueue';
 import { BattleClassGuidance } from './battleClassGuidance';
 import { mountClassGuidancePreferences } from './classGuidancePreferences';
+import { mountCombatPacePreference } from './combatPacePreference';
 export const displayName = (id: string) => id.replace(/^ability:/,'').replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase());
 export function shortcutHint(control: HTMLElement, key: string, label: string) {
   const hint=key==='Escape'?key:key.toUpperCase();
@@ -104,6 +105,7 @@ export class BattleHud {
   private readonly turnQueue: BattleTurnQueue;
   private readonly classGuidance: BattleClassGuidance;
   private readonly disposeGuidancePreferences: () => void;
+  private readonly disposePacePreference: () => void;
   private readonly abort=new AbortController();
   private readonly log:string[]=[];
   constructor(private readonly session:BattleSession, private readonly callbacks:{action:(a:Action)=>void;target:(c:CellPosition|null)=>void;confirm:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void;inspect:()=>void;inspectTarget:(id:number)=>void;danger:()=>void;plan:()=>void;undo:()=>void;draught:()=>void;log:(lines:readonly string[])=>void}) {
@@ -160,6 +162,7 @@ export class BattleHud {
     this.root.querySelector('#battle-plan-cancel')!.addEventListener('click',callbacks.cancel,{signal});
     this.root.querySelector('#battle-next')!.addEventListener('click',callbacks.wait,{signal});
     mountCombatControlsPreference(this.root.querySelector('#battle-overflow')!);
+    this.disposePacePreference = mountCombatPacePreference(this.root.querySelector('#battle-overflow')!);
     this.disposeGuidancePreferences = mountClassGuidancePreferences(this.root.querySelector('#battle-overflow')!);
     this.classGuidance = new BattleClassGuidance(this.root, session, () => this.focusAction());
   }
@@ -382,5 +385,5 @@ export class BattleHud {
     for(const e of events) {const text=eventText(e,id=>displayName(this.session.state.units.find(u=>u.id===id)!.defId)+` #${id}`);if(text)this.log.push(text);}
     this.log.splice(0,Math.max(0,this.log.length-LOG_LIMIT));
   }
-  dispose(){this.abort.abort();this.classGuidance.dispose();this.disposeGuidancePreferences();this.turnQueue.dispose();this.root.replaceChildren();this.actorRoot.replaceChildren();this.actorRoot.hidden=true;}
+  dispose(){this.abort.abort();this.classGuidance.dispose();this.disposePacePreference();this.disposeGuidancePreferences();this.turnQueue.dispose();this.root.replaceChildren();this.actorRoot.replaceChildren();this.actorRoot.hidden=true;}
 }
