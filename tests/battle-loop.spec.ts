@@ -914,7 +914,7 @@ async function expectTurnQueue(page:Page,state:BattleState) {
 test('player HUD turn queue preserves initiative, keyboard and touch browsing across rounds and restart',async({page},info)=>{
   test.setTimeout(90000);
   const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
-  await page.goto('./battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await page.goto('./?game=battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const initial=await session(page),saved=await page.evaluate(()=>JSON.stringify(localStorage));
   await expectTurnQueue(page,initial.state);
   const queue=page.locator('#battle-turn-queue');
