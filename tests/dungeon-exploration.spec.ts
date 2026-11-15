@@ -1403,7 +1403,9 @@ test('a second dungeon encounter reuses the engine after a legal victory without
   ?{...command,target:{unitId:command.target.missileTargets[0]}}:command;
  expect((after.replay?.commands??after.continuation!.commands)[beforeCommands.length]).toEqual(accepted);
  expect(after.state).toEqual(saved.activeBattle);
- expect(JSON.parse((await dungeonSlots(page)).primary!).payload).toEqual(saved);
+ const persisted=JSON.parse((await dungeonSlots(page)).primary!).payload as DungeonState;
+ // Playtime checkpoints can run between the persisted and rendered snapshots.
+ expect({...persisted,stats:{...persisted.stats!,activeMs:saved.stats!.activeMs}}).toEqual(saved);
  // The normal first encounter leaves this class at level one. Its only tip
  // remains dismissed in the next encounter, while other classes still teach.
  expect(second.party.find(hero=>hero.heroId===dismissedActor.defId)!.level).toBe(1);

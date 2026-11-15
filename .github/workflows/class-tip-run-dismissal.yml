@@ -27,7 +27,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run setup:browsers && npm run check:browsers
-      - name: Check unchanged passing coverage before the fixture assertion repair
+      - name: Check unchanged passing coverage before the fixture assertion repairs
         id: reuse
         run: |
           node --input-type=module <<'JS'
@@ -42,11 +42,16 @@ jobs:
           const after = readFileSync(file, 'utf8');
           const oldAssertion = " if(isMobile)await dismiss.tap();else {await dismiss.focus();await page.keyboard.press('Enter');}\n await expect(guidance).toBeHidden();await expect(page.locator('#battle-move')).toBeFocused();";
           const repairedAssertion = " if(isMobile)await dismiss.tap();else {await dismiss.focus();await page.keyboard.press('Enter');}\n // This legal victory boundary has already used movement; focus returns to\n // the enabled End turn control, not the unavailable Move control.\n expect(dismissedActor.hasMoved).toBe(true);\n await expect(guidance).toBeHidden();await expect(page.locator('#battle-move')).toBeDisabled();\n await expect(page.locator('#battle-next')).toBeFocused();";
+          const oldSaveAssertion = ' expect(JSON.parse((await dungeonSlots(page)).primary!).payload).toEqual(saved);';
+          const repairedSaveAssertion = ' const persisted=JSON.parse((await dungeonSlots(page)).primary!).payload as DungeonState;\n // Playtime checkpoints can run between the persisted and rendered snapshots.\n expect({...persisted,stats:{...persisted.stats!,activeMs:saved.stats!.activeMs}}).toEqual(saved);';
           const unchanged = changed.every(path => path === file || path === workflow)
             && before.split(oldAssertion).length === 2
-            && before.replace(oldAssertion, repairedAssertion) === after;
+            && before.split(oldSaveAssertion).length === 2
+            && before.replace(oldAssertion, repairedAssertion).replace(oldSaveAssertion, repairedSaveAssertion) === after;
           // Run 43742436140 retains 23 passing cases. Its five failures all
-          // stopped at the fixture's incorrect Move-focus assertion. Reuse
+          // stopped at the fixture's incorrect Move-focus assertion. The repair
+          // run 43744350468 then passed four profiles; desktop exposed a save
+          // comparison race with the monotonic elapsed-time checkpoint. Reuse
           // nothing if runtime, fixtures, helpers, dependencies or other tests differ.
           appendFileSync(process.env.GITHUB_OUTPUT, `unchanged=${unchanged}\n`);
           console.log(JSON.stringify({ unchanged, comparison: base, retainedRun: 43742436140, changed }));
