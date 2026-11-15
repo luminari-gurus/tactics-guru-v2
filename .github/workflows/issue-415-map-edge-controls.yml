@@ -1,4 +1,4 @@
-name: Verify save-note footer and retained party
+name: Verify party acceptance waits and literal base
 on:
   push:
     branches: [verify/issue-415-map-edge-controls]
@@ -28,47 +28,34 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run setup:browsers && npm run check:browsers
-      - name: Record source identity
+      - name: Fetch implementation and literal base
+        run: git fetch origin 8c1eb585facc190ce7de74e7a773859611b91f3d 65211c809e86ecab223c9ae1afef8576aad3179b
+      - name: Check original witnesses on the literal base
+        id: base
         run: |
+          git checkout --detach 65211c809e86ecab223c9ae1afef8576aad3179b
+          npm run build:bundle
           mkdir -p verification-receipts/issue-415
-          node --input-type=module <<'JS'
-          import { writeFileSync } from 'node:fs';
-          import { sourceIdentity } from './scripts/verification-report.mjs';
-          writeFileSync('verification-receipts/issue-415/source.json', JSON.stringify({
-            source: sourceIdentity(process.cwd()), node: process.version, runner: process.env.RUNNER_NAME,
-            conditions: 'No concurrent repository Actions observed before queueing this run. Focused warm timing runs before the follow-up is published to PR419 and before its core suite starts. Other host workloads and caches are not independently controlled. Qualified runner; browser/device emulation.',
-            purpose: 'Issue415 follow-up: move routine save confirmations to the page bottom while retaining prominent actionable feedback. Verification-only workflow; runtime and tests compared to the implementation PR.'
-          }, null, 2));
-          JS
-      - name: Build and check affected presentation units
-        id: build
+          node --input-type=module -e "import { writeFileSync } from 'node:fs'; import { sourceIdentity } from './scripts/verification-report.mjs'; writeFileSync('verification-receipts/issue-415/literal-base-source.json',JSON.stringify({source:sourceIdentity(process.cwd()),node:process.version,runner:process.env.RUNNER_NAME},null,2));"
+          npm run test:browser -- -c playwright.regression.config.ts tests/dungeon.spec.ts -g 'claimed Revive Kit|character sheets switch heroes' --project=desktop --max-failures=2
+      - name: Build the final implementation
+        id: candidate
+        if: ${{ !cancelled() }}
         run: |
-          npm run test:unit -- tests/unit/dungeonLootPresentation.test.ts
-          npm run build
-      - name: Check warm large-floor responsiveness on WebKit
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'warm.*maximum-size.*floor' --max-failures=3
-      - name: Verify save-note layout and actionable feedback on Chromium
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: |
-          selection=(-c playwright.regression.config.ts tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts -g 'movement controls stay visible|fresh dungeon keeps the map|ground loot: legal victory|dungeon recovery separates status')
-          npx --no-install playwright test "${selection[@]}" --list > verification-receipts/issue-415/chromium-selection.txt
-          npm run test:browser -- "${selection[@]}" --diagnostics
-      - name: Verify save-note layout and actionable feedback on WebKit
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: |
-          selection=(-c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts -g 'movement controls stay visible|fresh dungeon keeps the map|ground loot: legal victory|dungeon recovery separates status')
-          npx --no-install playwright test "${selection[@]}" --list > verification-receipts/issue-415/webkit-selection.txt
-          npm run test:browser -- "${selection[@]}" --diagnostics
-      - name: Verify party health, progression, and equipment refresh
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: |
-          npm run test:browser -- -c playwright.regression.config.ts tests/dungeon.spec.ts -g 'claimed Revive Kit|character sheets switch heroes|hero progression commits once' --project=desktop
-          npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon.spec.ts -g 'claimed Revive Kit|character sheets switch heroes|hero progression commits once' --project=landscape-webkit
+          git checkout --detach 8c1eb585facc190ce7de74e7a773859611b91f3d
+          npm run build:bundle
+          mkdir -p verification-receipts/issue-415
+          node --input-type=module -e "import { writeFileSync } from 'node:fs'; import { sourceIdentity } from './scripts/verification-report.mjs'; writeFileSync('verification-receipts/issue-415/final-source.json',JSON.stringify({source:sourceIdentity(process.cwd()),node:process.version,runner:process.env.RUNNER_NAME},null,2));"
+      - name: Verify accepted party changes on desktop Chromium
+        if: ${{ !cancelled() && steps.candidate.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.regression.config.ts tests/dungeon.spec.ts -g 'claimed Revive Kit|character sheets switch heroes|hero progression commits once' --project=desktop
+      - name: Verify accepted party changes on landscape WebKit
+        if: ${{ !cancelled() && steps.candidate.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon.spec.ts -g 'claimed Revive Kit|character sheets switch heroes|hero progression commits once' --project=landscape-webkit
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: issue-415-save-note-party-${{ github.run_id }}-${{ github.run_attempt }}
+          name: issue-415-party-acceptance-${{ github.run_id }}-${{ github.run_attempt }}
           path: verification-receipts/
           retention-days: 14
           if-no-files-found: warn

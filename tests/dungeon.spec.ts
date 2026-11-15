@@ -820,8 +820,8 @@ test('a claimed Revive Kit restores a fallen dungeon hero across Continue and ne
  await activate('Use Revive Kit');
  await expect(page.getByRole('dialog')).toContainText('mage will have 3/11 HP');
  await activate('Confirm');
- expect((await snapshot(page)).ownership.consumables).toEqual([]);
  await expect(mageHealth).toHaveAttribute('aria-valuetext','3 of 11 hit points, injured');
+ expect((await snapshot(page)).ownership.consumables).toEqual([]);
  await page.reload();await continueSavedDungeon(page);
  expect((await snapshot(page)).party[2].hp).toBe(3);
  await expect(mageHealth).toHaveAttribute('aria-valuetext','3 of 11 hit points, injured');
@@ -1000,6 +1000,8 @@ test('character sheets switch heroes and show equipped charms through equip, res
  await row.getByRole('combobox').selectOption('ranger');
  await row.getByRole('button',{name:'Equip Warding Charm',exact:true}).click();
  await page.locator('#dungeon-item-confirm').click();
+ await expect.poll(async () => (await snapshot(page)).ownership.assignments)
+  .toContainEqual({ heroId: 'ranger', slot: 'charm', instanceId: unassigned.instanceId });
  await open(ranger);
  await expectSheet('Ranger', ['12/12 HP','5','13'], charm);
  if (!isMobile) { await page.keyboard.press('Tab'); await page.keyboard.press('Tab'); }
@@ -1022,6 +1024,8 @@ test('character sheets switch heroes and show equipped charms through equip, res
  await openDungeonInventory(page);
  await row.getByRole('button',{name:'Unequip Warding Charm',exact:true}).click();
  await page.locator('#dungeon-item-confirm').click();
+ await expect.poll(async () => (await snapshot(page)).ownership.assignments)
+  .not.toContainEqual({ heroId: 'ranger', slot: 'charm', instanceId: unassigned.instanceId });
  await open(ranger);
  await expectSheet('Ranger', ['12/12 HP','5','12'], 'Empty');
  if (!isMobile) await page.keyboard.press('Tab');
