@@ -1330,8 +1330,7 @@ test('a second dungeon encounter reuses the engine after a legal victory without
  expect(errors).toEqual([]);
 });
 
-for(const layoutVariant of ['unchanged','simple-focus','padded-block'] as const){
-test(`warm maximum-size floor step responsiveness meets the established budget after a legal victory · CSS diagnostic ${layoutVariant}`,async({page,isMobile})=>{
+test('warm maximum-size floor step responsiveness meets the established budget after a legal victory',async({page,isMobile})=>{
  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
  // Legal domain play reaches the ongoing boundary; the real HUD enacts its winning command.
  const witness=dungeonVictoryBoundary(1,0);if(!witness)throw Error('Missing legal victory boundary');
@@ -1372,64 +1371,6 @@ test(`warm maximum-size floor step responsiveness meets the established budget a
  await page.keyboard.press('Tab');
  await page.locator(`#dungeon-map [data-cell="${first}"]`).evaluate(cell=>cell.scrollIntoView({block:'center',inline:'center',behavior:'instant'}));
  await page.locator('#dungeon-map').evaluate(grid=>(grid as HTMLElement).focus({preventScroll:true}));
- // Verification-only CSS isolation; each variant settles before geometry capture and timing.
- const layoutDiagnostic=await page.evaluate(async variant=>{
-  const settle=()=>new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve())));
-  const geometry=()=>Object.fromEntries([
-   ['directions','.dungeon-directions'],['viewport','.dungeon-map-viewport'],
-   ['north','#dungeon-step-north'],['east','#dungeon-step-east'],
-   ['south','#dungeon-step-south'],['west','#dungeon-step-west'],
-  ].map(([name,selector])=>{
-   const bounds=document.querySelector<HTMLElement>(selector)!.getBoundingClientRect();
-   return [name,{left:bounds.left,top:bounds.top,right:bounds.right,bottom:bounds.bottom,width:bounds.width,height:bounds.height}];
-  }));
-  await settle();
-  const before=geometry();
-  const changedRules:{before:string;after:string;declarations:string}[]=[];
-  if(variant==='simple-focus'){
-   const target='.dungeon-map-viewport:has(#dungeon-map:focus-visible)';
-   const replacement='.dungeon-map-viewport:focus-within';
-   const replace=(rules:CSSRuleList)=>{
-    for(const rule of Array.from(rules)){
-     if(rule instanceof CSSStyleRule&&rule.selectorText===target){
-      const declarations=rule.style.cssText;
-      rule.selectorText=replacement;
-      changedRules.push({before:target,after:rule.selectorText,declarations});
-     }else if('cssRules' in rule)replace((rule as CSSGroupingRule).cssRules);
-    }
-   };
-   for(const sheet of Array.from(document.styleSheets)){
-    let rules:CSSRuleList;
-    try{rules=sheet.cssRules;}catch{continue;}
-    replace(rules);
-   }
-   if(changedRules.length!==1)throw Error(`Expected one focus rule; replaced ${changedRules.length}`);
-  }else if(variant==='padded-block'){
-   const style=document.createElement('style');
-   style.dataset.issue415Diagnostic='padded-block';
-   style.textContent=`
-    #dungeon-screen .dungeon-directions { display:block; position:relative; box-sizing:border-box; width:min(100%,576px); padding:48px; gap:4px; overflow:visible; }
-    #dungeon-screen .dungeon-directions button { position:absolute; }
-    #dungeon-screen .dungeon-directions #dungeon-step-north,
-    #dungeon-screen .dungeon-directions #dungeon-step-south { left:50%; transform:translateX(-50%); }
-    #dungeon-screen .dungeon-directions #dungeon-step-north { top:0; }
-    #dungeon-screen .dungeon-directions #dungeon-step-south { bottom:0; }
-    #dungeon-screen .dungeon-directions #dungeon-step-east,
-    #dungeon-screen .dungeon-directions #dungeon-step-west { top:50%; transform:translateY(-50%); }
-    #dungeon-screen .dungeon-directions #dungeon-step-east { right:0; }
-    #dungeon-screen .dungeon-directions #dungeon-step-west { left:0; }
-   `;
-   document.head.append(style);
-  }
-  await settle();
-  return {variant,before,after:geometry(),changedRules};
- },layoutVariant);
- writeFileSync(test.info().outputPath('warm-layout-variant-geometry.json'),JSON.stringify(layoutDiagnostic,null,2));
- for(const [name,bounds] of Object.entries(layoutDiagnostic.before)){
-  for(const edge of ['left','top','right','bottom','width','height'] as const){
-   expect(Math.abs(layoutDiagnostic.after[name][edge]-bounds[edge]),`${layoutVariant}: ${name} ${edge}`).toBeLessThanOrEqual(.1);
-  }
- }
  const visibleGrid=()=>page.locator('#dungeon-map').evaluate((grid,{first,second})=>{
   const rect=(element:Element)=>{const b=element.getBoundingClientRect();return {left:b.left,top:b.top,right:b.right,bottom:b.bottom,width:b.width,height:b.height};};
   const region=grid.parentElement!,screen=document.querySelector<HTMLElement>('#dungeon-screen')!;
@@ -1450,12 +1391,6 @@ test(`warm maximum-size floor step responsiveness meets the established budget a
  for(const cell of before.grid.cells){expect(cell.intersection.width).toBeGreaterThanOrEqual(cell.bounds.width-.1);expect(cell.intersection.height).toBeGreaterThanOrEqual(cell.bounds.height-.1);expect(cell.unoccluded).toBe(true);}
  expect(before.grid.cells.find(cell=>cell.player)?.index).toBe(first);
 
- // Verification-only snapshots; no measured operation or assertion depends on probe data.
- const layoutProbeSnapshot=()=>page.evaluate(()=>({
-  at:performance.now(),
-  counters:JSON.parse(JSON.stringify((window as Window & {__issue415LayoutProbe?:unknown}).__issue415LayoutProbe??null)),
- }));
- const layoutProbeBefore=await layoutProbeSnapshot();
  // Measure dispatch separately from async save publication. Every sampled click must commit.
  // Retain 40 idle intervals, 20 dispatch samples and every frame across 40 accepted moves.
  const idleFrames=await page.evaluate(async()=>{const samples:number[]=[];let previous=await new Promise<number>(resolve=>requestAnimationFrame(resolve));for(let i=0;i<40;i++){const now=await new Promise<number>(resolve=>requestAnimationFrame(resolve));samples.push((Math.round(now*1000)-Math.round(previous*1000))/1000);previous=now;}return samples;});
@@ -1467,7 +1402,6 @@ test(`warm maximum-size floor step responsiveness meets the established budget a
   await expect.poll(async()=>{const current=await dungeonSnapshot(page);return {id:current.id,depth:current.depth,phase:current.phase,revision:current.revision,position:current.floors[4].position};})
    .toEqual({id:adopted.id,depth:5,phase:'ready',revision:adopted.revision+i+1,position:destination});
  }
- const layoutProbeBeforeFrames=await layoutProbeSnapshot();
  const acceptanceTimeoutMs=5000;
  const frames=await page.evaluate(async({a,b,id,initialRevision,acceptanceTimeoutMs})=>{
   const samples:number[]=[];
@@ -1493,11 +1427,10 @@ test(`warm maximum-size floor step responsiveness meets the established budget a
   }
   return samples;
  },{a:first,b:second,id:adopted.id,initialRevision:adopted.revision+20,acceptanceTimeoutMs});
- const layoutProbeAfter=await layoutProbeSnapshot();
  const percentile=(values:number[],q:number)=>[...values].sort((a,b)=>a-b)[Math.ceil(values.length*q)-1];
  const p95=percentile(times,.95),frameP95=percentile(frames,.95),stepped=await dungeonSnapshot(page);
  const after={canvas:await canvasIdentity(),grid:await visibleGrid()};
- writeFileSync(test.info().outputPath('warm-maximum-floor-step-performance.json'),JSON.stringify({layoutDiagnostic,layoutProbe:{before:layoutProbeBefore,beforeFrames:layoutProbeBeforeFrames,after:layoutProbeAfter},fixture:'structural five-floor history adopted through recovery; not earned floor-five progression',warmup:{seed:witness.snapshot.seed,depth:witness.snapshot.depth,command:witness.command,completed:won.floors[0].completed},measurement:{times:'20 synchronous click-dispatch costs; async revision and position confirmation occurs outside each sample',frames:'Every animation-frame interval across 40 sequential accepted moves, including all intervals waiting for async publication',acceptanceTimeoutMs},dimension:map.width,first,second,before,after,idleFrames,times,p95,frames,frameP95,budgetMs:33.4,revision:{before:adopted.revision,after:stepped.revision}},null,2));
+ writeFileSync(test.info().outputPath('warm-maximum-floor-step-performance.json'),JSON.stringify({fixture:'structural five-floor history adopted through recovery; not earned floor-five progression',warmup:{seed:witness.snapshot.seed,depth:witness.snapshot.depth,command:witness.command,completed:won.floors[0].completed},measurement:{times:'20 synchronous click-dispatch costs; async revision and position confirmation occurs outside each sample',frames:'Every animation-frame interval across 40 sequential accepted moves, including all intervals waiting for async publication',acceptanceTimeoutMs},dimension:map.width,first,second,before,after,idleFrames,times,p95,frames,frameP95,budgetMs:33.4,revision:{before:adopted.revision,after:stepped.revision}},null,2));
  expect(after.canvas).toEqual(originalCanvas);
  expect(after.grid.visibility).toBe('visible');expect(after.grid.focused).toBe(true);expect(after.grid.focusVisible).toBe(true);
  for(const cell of after.grid.cells){expect(cell.intersection.width).toBeGreaterThanOrEqual(cell.bounds.width-.1);expect(cell.intersection.height).toBeGreaterThanOrEqual(cell.bounds.height-.1);expect(cell.unoccluded).toBe(true);}
@@ -1507,7 +1440,6 @@ test(`warm maximum-size floor step responsiveness meets the established budget a
  expect(JSON.parse((await dungeonSlots(page)).primary!).payload).toEqual(stepped);expect(errors).toEqual([]);
  expect(p95).toBeLessThanOrEqual(33.4);expect(frameP95).toBeLessThanOrEqual(33.4);
 });
-}
 
 for(const depth of [1,5])test(`Guardian-first reward, map and encounter state survive claim and reload at depth ${depth}`,async({page})=>{
  // Structural reward boundary isolates marker rendering, not preceding combat.

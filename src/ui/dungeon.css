@@ -157,7 +157,7 @@ body:has(#dungeon-screen:not([hidden])) #battle-heading { display: none; }
 #dungeon-screen .dungeon-loot-guide { margin:6px 0 0; font-size:.8rem; color:#f4d48b; }
 #dungeon-screen .dungeon-loot-here { margin:6px 0 0; padding:8px; max-width:480px; box-sizing:border-box; border-left:3px solid #e5ba59; background:#282b1c; font-size:.85rem; overflow-wrap:anywhere; }
 #dungeon-screen .dungeon-directions { display: grid; grid-template: 44px auto 44px / 44px minmax(0, 1fr) 44px; gap: 4px; width: min(100%, 576px); }
-.dungeon-map-viewport { grid-area: 2 / 2; width: 100%; min-height: 64px; aspect-ratio: 1; max-height: var(--dungeon-map-max-height, calc(100dvh - 260px)); contain: size layout; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; background: #0b1119; }
+.dungeon-map-viewport { grid-area: 2 / 2; width: 100%; min-height: 64px; aspect-ratio: 1; max-height: var(--dungeon-map-max-height, calc(100dvh - 260px)); overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; background: #0b1119; }
 .dungeon-map-viewport:has(#dungeon-map:focus-visible) { outline: 3px solid #f4cf70; outline-offset: 1px; }
 #dungeon-screen .dungeon-directions button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; width: 44px; height: 64px; min-width: 44px; min-height: 44px; margin: 0; padding: 0; justify-self: center; align-self: center; border-radius: 8px; border-color: #a2a58a; background: #424a38; color: #f1edda; touch-action: manipulation; }
 #dungeon-screen .dungeon-directions button span { font-size: .7rem; line-height: 1; font-weight: bold; pointer-events: none; }

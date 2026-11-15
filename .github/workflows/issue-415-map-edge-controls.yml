@@ -1,4 +1,4 @@
-name: Isolate map frame and focus styling costs
+name: Compare stable header with current and base movement
 on:
   push:
     branches: [verify/issue-415-map-edge-controls]
@@ -27,7 +27,8 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
-      - run: npm run setup:browsers && npm run check:browsers
+      - id: qualification
+        run: npm run setup:browsers && npm run check:browsers
       - name: Record source identity
         run: |
           mkdir -p verification-receipts/issue-415
@@ -36,22 +37,112 @@ jobs:
           import { sourceIdentity } from './scripts/verification-report.mjs';
           writeFileSync('verification-receipts/issue-415/source.json', JSON.stringify({
             source: sourceIdentity(process.cwd()), node: process.version, runner: process.env.RUNNER_NAME,
-            conditions: 'Our PR verification run 43669892682 completed before this run was queued. Selected timing checks run before the candidate is published to the PR and before its new core suite starts. Other host workloads and caches are not independently controlled. Qualified runner; browser/device emulation.',
-            purpose: 'Issue 415 diagnostic only. Counters and timings added to DungeonMap and warm receipt; unchanged, simple-focus, and padded-block CSS-only diagnostic variants. This instrumented run does not qualify final runtime performance.'
+            conditions: 'Qualified persistent runner; no other repository Actions run in progress when queued; browser/device emulation; other host workloads not independently controlled. Predetermined base, current569, stable-header candidate, base order.',
+            purpose: 'Issue 415 map-edge controls. Verification-only workflow; runtime and tests are compared to the implementation PR.'
           }, null, 2));
           JS
-      - name: Build and check affected presentation units
-        id: build
+      - name: Build literal base first
+        if: ${{ !cancelled() && steps.qualification.outcome == 'success' }}
+        id: base_build_first
         run: |
-          npm run test:unit -- tests/unit/dungeonLootPresentation.test.ts
+          git restore --worktree -- tests/dungeon-exploration.spec.ts
+          git switch --detach 65211c809e86ecab223c9ae1afef8576aad3179b
+          git diff --exit-code
+          mkdir -p verification-receipts/issue-415-base-first
+          git rev-parse HEAD > verification-receipts/issue-415-base-first/runtime-commit.txt
           npm run build
-      - name: Measure layout work in warm WebKit movement
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'warm.*maximum-size.*floor' --project=desktop-webkit --project=landscape-webkit --max-failures=6
+          python3 - <<'PY'
+          import os, pathlib, subprocess, hashlib, json
+          path = pathlib.Path('tests/dungeon-exploration.spec.ts')
+          candidate = subprocess.check_output(['git', 'show', os.environ['GITHUB_SHA'] + ':' + str(path)], text=True)
+          original = path.read_text()
+          begin = "test('warm maximum-size floor step responsiveness meets the established budget after a legal victory'"
+          end = '\nfor(const depth of [1,5])test('
+          def span(text):
+              a = text.index(begin)
+              return a, text.index(end, a)
+          a, b = span(candidate)
+          c, d = span(original)
+          block = candidate[a:b]
+          path.write_text(original[:c] + block + original[d:])
+          receipt = pathlib.Path('verification-receipts/issue-415-base-first')
+          (receipt / 'harness.json').write_text(json.dumps({
+              'source': os.environ['GITHUB_SHA'],
+              'overlay': str(path),
+              'blockSHA256': hashlib.sha256(block.encode()).hexdigest(),
+              'runtime': 'Literal base production build; only the repaired warm test block is overlaid after the build',
+              'buildAssets': {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(pathlib.Path('dist').rglob('*')) if p.is_file()}
+          }, indent=2))
+          PY
+          git diff -- tests/dungeon-exploration.spec.ts > verification-receipts/issue-415-base-first/harness.patch
+          git diff --exit-code -- src public scripts package.json package-lock.json
+      - name: Measure literal-base warm WebKit desktop and landscape first
+        if: ${{ !cancelled() && steps.base_build_first.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'warm.*maximum-size.*floor' --project=desktop-webkit --project=landscape-webkit --max-failures=2
+      - name: Build published cached movement
+        if: ${{ !cancelled() && steps.qualification.outcome == 'success' }}
+        id: current_build
+        run: |
+          git restore --worktree -- tests/dungeon-exploration.spec.ts
+          git switch --detach 569bc43b5e960c3b953a15c9d88c0d9790602760
+          git diff --exit-code
+          npm run build
+      - name: Measure published cached movement
+        if: ${{ !cancelled() && steps.current_build.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'warm.*maximum-size.*floor' --project=desktop-webkit --project=landscape-webkit --max-failures=2
+      - name: Build stable header candidate
+        if: ${{ !cancelled() && steps.qualification.outcome == 'success' }}
+        id: header_build
+        run: |
+          git restore --worktree -- tests/dungeon-exploration.spec.ts
+          git switch --detach "$GITHUB_SHA"
+          git diff --exit-code
+          npm run build
+      - name: Measure stable header candidate
+        if: ${{ !cancelled() && steps.header_build.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'warm.*maximum-size.*floor' --project=desktop-webkit --project=landscape-webkit --max-failures=2
+      - name: Build literal base last
+        if: ${{ !cancelled() && steps.qualification.outcome == 'success' }}
+        id: base_build_last
+        run: |
+          git restore --worktree -- tests/dungeon-exploration.spec.ts
+          git switch --detach 65211c809e86ecab223c9ae1afef8576aad3179b
+          git diff --exit-code
+          mkdir -p verification-receipts/issue-415-base-last
+          git rev-parse HEAD > verification-receipts/issue-415-base-last/runtime-commit.txt
+          npm run build
+          python3 - <<'PY'
+          import os, pathlib, subprocess, hashlib, json
+          path = pathlib.Path('tests/dungeon-exploration.spec.ts')
+          candidate = subprocess.check_output(['git', 'show', os.environ['GITHUB_SHA'] + ':' + str(path)], text=True)
+          original = path.read_text()
+          begin = "test('warm maximum-size floor step responsiveness meets the established budget after a legal victory'"
+          end = '\nfor(const depth of [1,5])test('
+          def span(text):
+              a = text.index(begin)
+              return a, text.index(end, a)
+          a, b = span(candidate)
+          c, d = span(original)
+          block = candidate[a:b]
+          path.write_text(original[:c] + block + original[d:])
+          receipt = pathlib.Path('verification-receipts/issue-415-base-last')
+          (receipt / 'harness.json').write_text(json.dumps({
+              'source': os.environ['GITHUB_SHA'],
+              'overlay': str(path),
+              'blockSHA256': hashlib.sha256(block.encode()).hexdigest(),
+              'runtime': 'Literal base production build; only the repaired warm test block is overlaid after the build',
+              'buildAssets': {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(pathlib.Path('dist').rglob('*')) if p.is_file()}
+          }, indent=2))
+          PY
+          git diff -- tests/dungeon-exploration.spec.ts > verification-receipts/issue-415-base-last/harness.patch
+          git diff --exit-code -- src public scripts package.json package-lock.json
+      - name: Measure literal-base warm WebKit desktop and landscape last
+        if: ${{ !cancelled() && steps.base_build_last.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'warm.*maximum-size.*floor' --project=desktop-webkit --project=landscape-webkit --max-failures=2
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: issue-415-css-variants-${{ github.run_id }}-${{ github.run_attempt }}
+          name: issue-415-header-comparison-${{ github.run_id }}-${{ github.run_attempt }}
           path: verification-receipts/
           retention-days: 14
           if-no-files-found: warn
