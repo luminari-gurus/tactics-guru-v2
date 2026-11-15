@@ -14,6 +14,7 @@ import { GUARDED_STRIKE_TRADEOFF } from '../content/constants';
 import { BATTLE_KEYS, ownedAbilities, actionCommand, actionTargets, type Action } from './battleActions';
 import { mountCombatControlsPreference, type CombatSkin } from './combatControls';
 import { draughtsSpent } from '../domain/draughts';
+import { BattleTurnQueue } from './battleTurnQueue';
 export const displayName = (id: string) => id.replace(/^ability:/,'').replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase());
 export function shortcutHint(control: HTMLElement, key: string, label: string) {
   const hint=key==='Escape'?key:key.toUpperCase();
@@ -98,9 +99,11 @@ export class BattleHud {
   private openingEnemyTurn: boolean;
   private skin: CombatSkin = 'rail';
   private readonly actorRoot=document.querySelector<HTMLElement>('#battle-actor')!;
+  private readonly turnQueue: BattleTurnQueue;
   private readonly abort=new AbortController();
   private readonly log:string[]=[];
   constructor(private readonly session:BattleSession, private readonly callbacks:{action:(a:Action)=>void;target:(c:CellPosition|null)=>void;confirm:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void;inspect:()=>void;inspectTarget:(id:number)=>void;danger:()=>void;plan:()=>void;undo:()=>void;draught:()=>void;log:(lines:readonly string[])=>void}) {
+    this.turnQueue = new BattleTurnQueue(this.actorRoot, session.catalog);
     this.openingEnemyTurn = !session.resumed && session.phase === 'enemy';
     // Snapshot construction has no command events. Establish the current turn
     // before appending any AI actions, including when continuing a saved battle.
@@ -236,6 +239,9 @@ export class BattleHud {
     this.lastRender = inputs;
     const s=this.session, enabled=s.phase==='player', actor=s.active;
     const presenting=s.phase==='presenting';
+    // The accepted state may already contain the next actor or a defeat. Keep
+    // the queue aligned with the board and actor card until presentation finishes.
+    this.turnQueue.render(presentationStart ?? s.state);
     const showPlanCancel=this.skin==='radial' && planWaiting && enabled;
     this.root.dataset.planWaiting=String(showPlanCancel);
     this.root.querySelector<HTMLButtonElement>('#battle-plan-cancel')!.hidden=!showPlanCancel;
@@ -369,5 +375,5 @@ export class BattleHud {
     for(const e of events) {const text=eventText(e,id=>displayName(this.session.state.units.find(u=>u.id===id)!.defId)+` #${id}`);if(text)this.log.push(text);}
     this.log.splice(0,Math.max(0,this.log.length-LOG_LIMIT));
   }
-  dispose(){this.abort.abort();this.root.replaceChildren();this.actorRoot.replaceChildren();this.actorRoot.hidden=true;}
+  dispose(){this.abort.abort();this.turnQueue.dispose();this.root.replaceChildren();this.actorRoot.replaceChildren();this.actorRoot.hidden=true;}
 }

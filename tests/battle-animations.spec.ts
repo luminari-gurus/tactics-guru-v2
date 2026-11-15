@@ -533,3 +533,48 @@ test('active bob: initial reduced motion keeps sprite and static actor marker an
   await page.screenshot({path: info.outputPath('initial-reduced-motion.png')});
   expect(await stored(page)).toEqual(saved);
 });
+
+test('turn queue holds the presented actor until handoff and survives repeated visibility interruption',async({page})=>{
+  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await page.clock.install();await page.goto('./battle');await ready(page);
+  const queue=page.locator('#battle-turn-queue'),before=await readSession(page);
+  const beforeQueue=await queue.innerHTML(),previousId=before.state.initiative[before.state.activeIndex];
+  await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
+  await page.locator('#battle-next').focus();await page.keyboard.press('Enter');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
+  const accepted=await readSession(page),nextId=accepted.state.initiative[accepted.state.activeIndex];
+  expect(nextId).not.toBe(previousId);
+  expect(accepted.state.commandCount).toBe(before.state.commandCount+1);
+  expect(await queue.innerHTML()).toBe(beforeQueue);
+  await expect(queue.locator('[aria-current="step"]')).toHaveAttribute('data-unit-id',String(previousId));
+  await expect(page.locator('#battle-active')).toContainText(`Round ${before.state.round} · Resolving action`);
+  const saved=await stored(page);
+  await page.evaluate(()=>{
+    Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});
+    for(let i=0;i<3;i++)document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await expect.poll(async()=>(await readSession(page)).phase).toMatch(/^(player|enemy)$/);
+  expect((await readSession(page)).state).toEqual(accepted.state);
+  await expect(queue.locator('[aria-current="step"]')).toHaveAttribute('data-unit-id',String(nextId));
+  await expect(queue.locator('[aria-current="step"]')).toHaveAttribute('data-round',String(accepted.state.round));
+  const hiddenQueue=await queue.innerHTML();
+  await page.clock.fastForward(5000);
+  expect((await readSession(page)).state).toEqual(accepted.state);
+  expect(await queue.innerHTML()).toBe(hiddenQueue);expect(await stored(page)).toEqual(saved);
+  // Only the already accepted handoff and any legitimate subsequent AI commands
+  // may run after visibility resumes; no cancelled animation resolves twice.
+  const expected=new BattleSession(catalog,accepted.state,accepted.state.seed);
+  while(expected.phase==='enemy'){
+    const step=expected.nextEnemy();if(!step)throw Error('Expected legal enemy command');
+    expected.finishPresentation(step.token);
+  }
+  await page.evaluate(()=>{delete (document as unknown as {hidden?:boolean}).hidden;document.dispatchEvent(new Event('visibilitychange'));});
+  await page.clock.resume();await ready(page);
+  expect((await readSession(page)).state).toEqual(expected.state);
+  await expect(queue.locator('[aria-current="step"]')).toHaveAttribute('data-unit-id',String(expected.active.id));
+  await page.emulateMedia({reducedMotion:'reduce'});
+  expect((await readSession(page)).state).toEqual(expected.state);
+  await expect(queue.locator('[aria-current="step"]')).toHaveAttribute('data-unit-id',String(expected.active.id));
+  expect(errors).toEqual([]);
+});
