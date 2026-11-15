@@ -15,6 +15,8 @@ import { BATTLE_KEYS, ownedAbilities, actionCommand, actionTargets, type Action 
 import { mountCombatControlsPreference, type CombatSkin } from './combatControls';
 import { draughtsSpent } from '../domain/draughts';
 import { BattleTurnQueue } from './battleTurnQueue';
+import { BattleClassGuidance } from './battleClassGuidance';
+import { mountClassGuidancePreferences } from './classGuidancePreferences';
 export const displayName = (id: string) => id.replace(/^ability:/,'').replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase());
 export function shortcutHint(control: HTMLElement, key: string, label: string) {
   const hint=key==='Escape'?key:key.toUpperCase();
@@ -100,6 +102,8 @@ export class BattleHud {
   private skin: CombatSkin = 'rail';
   private readonly actorRoot=document.querySelector<HTMLElement>('#battle-actor')!;
   private readonly turnQueue: BattleTurnQueue;
+  private readonly classGuidance: BattleClassGuidance;
+  private readonly disposeGuidancePreferences: () => void;
   private readonly abort=new AbortController();
   private readonly log:string[]=[];
   constructor(private readonly session:BattleSession, private readonly callbacks:{action:(a:Action)=>void;target:(c:CellPosition|null)=>void;confirm:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void;inspect:()=>void;inspectTarget:(id:number)=>void;danger:()=>void;plan:()=>void;undo:()=>void;draught:()=>void;log:(lines:readonly string[])=>void}) {
@@ -156,6 +160,8 @@ export class BattleHud {
     this.root.querySelector('#battle-plan-cancel')!.addEventListener('click',callbacks.cancel,{signal});
     this.root.querySelector('#battle-next')!.addEventListener('click',callbacks.wait,{signal});
     mountCombatControlsPreference(this.root.querySelector('#battle-overflow')!);
+    this.disposeGuidancePreferences = mountClassGuidancePreferences(this.root.querySelector('#battle-overflow')!);
+    this.classGuidance = new BattleClassGuidance(this.root, session, () => this.focusAction());
   }
   shortcut(key:string):boolean {
     if(/^[1-9]$/.test(key)) {
@@ -237,6 +243,7 @@ export class BattleHud {
       this.session.error, action, selected?.x, selected?.y, message, danger, threats, planWaiting, planMove?.to.x, planMove?.to.y, this.skin];
     if (inputs.every((value, i) => Object.is(value, this.lastRender[i]))) return;
     this.lastRender = inputs;
+    this.classGuidance.render(this.skin);
     const s=this.session, enabled=s.phase==='player', actor=s.active;
     const presenting=s.phase==='presenting';
     // The accepted state may already contain the next actor or a defeat. Keep
@@ -375,5 +382,5 @@ export class BattleHud {
     for(const e of events) {const text=eventText(e,id=>displayName(this.session.state.units.find(u=>u.id===id)!.defId)+` #${id}`);if(text)this.log.push(text);}
     this.log.splice(0,Math.max(0,this.log.length-LOG_LIMIT));
   }
-  dispose(){this.abort.abort();this.turnQueue.dispose();this.root.replaceChildren();this.actorRoot.replaceChildren();this.actorRoot.hidden=true;}
+  dispose(){this.abort.abort();this.classGuidance.dispose();this.disposeGuidancePreferences();this.turnQueue.dispose();this.root.replaceChildren();this.actorRoot.replaceChildren();this.actorRoot.hidden=true;}
 }

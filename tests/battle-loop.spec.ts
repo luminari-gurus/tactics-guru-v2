@@ -377,6 +377,7 @@ for(const [seed,outcome] of [[1,'playerLoss'],[2,'playerWin']] as const){
     const final=await session(page);expect(final.state.outcome).toBe(outcome);
     expect(checkedDefeatedQueue).toBe(true);
     await expect(page.locator('#battle-turn-order')).toBeHidden();
+    await expect(page.locator('#battle-class-guidance')).toBeHidden();
     expect(final.replay.commands.some(c=>c.type==='move')).toBe(true);
     expect(final.replay.commands.some(c=>c.type==='useAbility' && c.abilityId==='ability:basic_attack')).toBe(true);
     if(seed===2)expect(final.replay.commands.filter(c=>c.type==='useAbility').map(c=>c.abilityId)).toEqual(expect.arrayContaining(['ability:guarded_strike','ability:high_shot','ability:magic_missile']));
@@ -1008,5 +1009,84 @@ test('player HUD turn queue preserves initiative, keyboard and touch browsing ac
   const restarted=await session(page);expect(restarted.state.seed).toBe(initial.state.seed+1);
   await expectTurnQueue(page,restarted.state);
   await expect(page.locator('#battle-turn-order')).toHaveCount(1);
+  expect(errors).toEqual([]);
+});
+
+test('player HUD class guidance is read-only, acknowledges dismissal and returns on later turns and restart',async({page},info)=>{
+  test.setTimeout(90000);
+  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+  const key='tactics-guru:class-guidance';
+  const saved=()=>page.evaluate(key=>localStorage.getItem(key),key);
+  const activate=async(control:Locator)=>{
+    if(info.project.use.hasTouch)await control.tap();
+    else {await control.focus();await page.keyboard.press('Enter');}
+  };
+  const ready=()=>expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const guidance=page.locator('#battle-class-guidance'),tip=page.locator('#battle-class-tip');
+  const teaching=page.locator('#battle-guidance-teaching'),dismiss=page.locator('#battle-guidance-dismiss');
+  await page.goto('./?game=battle');await ready();
+  const first=await session(page),firstActor=first.state.initiative[first.state.activeIndex];
+  await expect(guidance).toBeVisible();await expect(guidance).toHaveAttribute('data-unit-id',String(firstActor));
+  await expect(teaching).toBeVisible();await expect(teaching).toHaveAttribute('data-tutorial-id','preview:rail:v1');
+  expect(await saved()).toBeNull();
+  expect(await guidance.evaluate(element=>element.contains(document.activeElement))).toBe(false);
+  await page.screenshot({path:info.outputPath('class-guidance-standard.png')});
+  // Merely seeing or skipping a tip must not acknowledge it.
+  await activate(page.locator('#battle-next'));
+  await expect.poll(async()=>(await session(page)).state.commandCount).toBeGreaterThan(first.state.commandCount);
+  await ready();await expect(guidance).toBeVisible();expect(await saved()).toBeNull();
+  expect(await guidance.evaluate(element=>element.contains(document.activeElement))).toBe(false);
+  await page.reload();await ready();
+  await expect(guidance).toHaveAttribute('data-unit-id',String(firstActor));
+  await expect(teaching).toBeVisible();expect(await saved()).toBeNull();
+  const original=page.viewportSize()!;
+  await page.setViewportSize({width:320,height:568});
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.evaluate(()=>document.documentElement.style.fontSize='32px');
+  await dismiss.scrollIntoViewIfNeeded();await expect(dismiss).toBeInViewport({ratio:1});
+  const bounds=await dismiss.boundingBox();expect(bounds).not.toBeNull();
+  expect(bounds!.width).toBeGreaterThanOrEqual(44);expect(bounds!.height).toBeGreaterThanOrEqual(44);
+  expect(await guidance.evaluate(element=>element.scrollWidth<=element.clientWidth+1)).toBe(true);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth&&document.documentElement.scrollHeight<=innerHeight)).toBe(true);
+  await page.screenshot({path:info.outputPath('class-guidance-narrow-large-text.png')});
+  await page.evaluate(()=>document.documentElement.style.fontSize='');await page.setViewportSize(original);
+  const untouched=await session(page),tipText=await tip.textContent();
+  const lessons=[await tip.getAttribute('data-tutorial-id'),await teaching.getAttribute('data-tutorial-id')];
+  expect(lessons.every(Boolean)).toBe(true);expect(new Set(lessons).size).toBe(2);
+  await page.locator('#battle-target').selectOption({index:1});
+  await expect(page.locator('#battle-review')).toBeEnabled();
+  const prepared=await session(page),preview=await page.locator('#battle-preview').textContent();
+  expect(prepared.state).toEqual(untouched.state);expect(prepared.replay).toEqual(untouched.replay);
+  await expect(tip).toHaveText(tipText!);expect(await saved()).toBeNull();
+  await activate(dismiss);await expect(guidance).toBeHidden();
+  await expect(page.locator('#battle-move')).toBeFocused();
+  expect(await session(page)).toEqual(prepared);await expect(page.locator('#battle-preview')).toHaveText(preview!);
+  const acknowledged=JSON.parse((await saved())!);
+  expect(acknowledged).toMatchObject({version:1,enabled:true});
+  expect([...acknowledged.seen].sort()).toEqual([...lessons].sort());
+  // Dismissal remains in force after a real action in this same turn.
+  if(prepared.pending?.type!=='move')throw Error('Expected the prepared movement');
+  await activate(page.locator('#battle-review'));await ready();
+  const moved=await session(page);
+  expect(moved.state.commandCount).toBe(prepared.state.commandCount+1);
+  expect(moved.state.units.find(unit=>unit.id===prepared.pending!.unitId)!.cell).toEqual(prepared.pending.to);
+  expect(moved.replay.commands).toEqual([...prepared.replay.commands,prepared.pending]);
+  await expect(guidance).toBeHidden();expect(JSON.parse((await saved())!)).toEqual(acknowledged);
+  const beforeWait=await session(page);
+  await activate(page.locator('#battle-next'));
+  await expect.poll(async()=>(await session(page)).state.commandCount).toBeGreaterThan(beforeWait.state.commandCount);
+  await ready();await expect(guidance).toBeVisible();await expect(teaching).toBeHidden();
+  expect(JSON.parse((await saved())!)).toEqual(acknowledged);
+  // Reload repeats the already-acknowledged class's per-turn tip, but not its
+  // first-time preview lesson; tutorial history is separate from battle state.
+  await page.reload();await ready();
+  await expect(guidance).toHaveAttribute('data-unit-id',String(firstActor));
+  await expect(tip).toHaveText(tipText!);await expect(teaching).toBeHidden();
+  expect(JSON.parse((await saved())!)).toEqual(acknowledged);
+  await activate(dismiss);await expect(guidance).toBeHidden();
+  await activate(page.locator('#fit-restart'));await confirmRestart(page);await ready();
+  expect((await session(page)).state.seed).toBe(first.state.seed+1);
+  await expect(guidance).toBeVisible();await expect(teaching).toBeHidden();
+  expect(JSON.parse((await saved())!)).toEqual(acknowledged);
   expect(errors).toEqual([]);
 });

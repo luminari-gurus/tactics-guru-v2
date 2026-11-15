@@ -578,3 +578,51 @@ test('turn queue holds the presented actor until handoff and survives repeated v
   await expect(queue.locator('[aria-current="step"]')).toHaveAttribute('data-unit-id',String(expected.active.id));
   expect(errors).toEqual([]);
 });
+
+test('class guidance retains the presented player and never acknowledges interrupted or enemy turns',async({page})=>{
+  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+  const key='tactics-guru:class-guidance';
+  const preferences=()=>page.evaluate(key=>localStorage.getItem(key),key);
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await page.clock.install();await page.goto('./?game=battle');await ready(page);
+  const guidance=page.locator('#battle-class-guidance'),tip=page.locator('#battle-class-tip');
+  const dismiss=page.locator('#battle-guidance-dismiss'),before=await readSession(page);
+  const actor=before.state.initiative[before.state.activeIndex],text=await tip.textContent();
+  await expect(guidance).toHaveAttribute('data-unit-id',String(actor));
+  await expect(dismiss).toBeEnabled();expect(await preferences()).toBeNull();
+  await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
+  await page.locator('#battle-next').focus();await page.keyboard.press('Enter');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
+  const accepted=await readSession(page);
+  expect(accepted.state.initiative[accepted.state.activeIndex]).not.toBe(actor);
+  expect(accepted.state.commandCount).toBe(before.state.commandCount+1);
+  await expect(guidance).toBeVisible();await expect(guidance).toHaveAttribute('data-unit-id',String(actor));
+  await expect(guidance).toHaveAttribute('data-round',String(before.state.round));
+  await expect(tip).toHaveText(text!);await expect(dismiss).toBeDisabled();
+  expect(await guidance.evaluate(element=>element.contains(document.activeElement))).toBe(false);
+  await page.evaluate(()=>{
+    Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});
+    for(let i=0;i<3;i++)document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await expect.poll(async()=>(await readSession(page)).phase).toMatch(/^(player|enemy)$/);
+  const settled=await readSession(page);expect(settled.state).toEqual(accepted.state);
+  if(settled.phase==='enemy')await expect(guidance).toBeHidden();
+  else {
+    await expect(guidance).toHaveAttribute('data-unit-id',String(settled.state.initiative[settled.state.activeIndex]));
+    await expect(dismiss).toBeEnabled();
+  }
+  await page.clock.fastForward(5000);
+  expect((await readSession(page)).state).toEqual(accepted.state);expect(await preferences()).toBeNull();
+  const expected=new BattleSession(catalog,accepted.state,accepted.state.seed);
+  while(expected.phase==='enemy'){
+    const step=expected.nextEnemy();if(!step)throw Error('Expected legal enemy command');
+    expected.finishPresentation(step.token);
+  }
+  await page.evaluate(()=>{delete (document as unknown as {hidden?:boolean}).hidden;document.dispatchEvent(new Event('visibilitychange'));});
+  await page.clock.resume();await ready(page);
+  expect((await readSession(page)).state).toEqual(expected.state);
+  await expect(guidance).toBeVisible();await expect(guidance).toHaveAttribute('data-unit-id',String(expected.active.id));
+  await expect(dismiss).toBeEnabled();expect(await preferences()).toBeNull();
+  expect(await guidance.evaluate(element=>element.contains(document.activeElement))).toBe(false);
+  expect(errors).toEqual([]);
+});
