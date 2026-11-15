@@ -770,6 +770,9 @@ test('accepted rail and dock preserve drawable floors, readable controls and foc
       await expect.poll(async()=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).viewport).toEqual({width,height});
       await page.evaluate(()=>new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve()))));
       if(!stress){await page.locator('#fit-restart').click();await confirmRestart(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');}
+      // Measure secondary controls only after their disclosure makes them available.
+      const more=page.locator('#battle-overflow');
+      await more.locator('summary').click();await expect(more).toHaveAttribute('open','');
       const measurement=await page.evaluate(()=>{
         const rect=(s:string)=>document.querySelector(s)!.getBoundingClientRect().toJSON();
         const controls=[...document.querySelectorAll<HTMLElement>('#fit-panel button:not([hidden]), #battle-target')].filter(e=>e.getClientRects().length).map(e=>{
@@ -788,6 +791,7 @@ test('accepted rail and dock preserve drawable floors, readable controls and foc
       expect(measurement.overflow).toBe(false);expect(measurement.actor.height).toBeLessThanOrEqual(measurement.panel.height*.45+.02);
       for(const control of measurement.controls){expect(control.width,control.name!).toBeGreaterThanOrEqual(44);expect(control.height,control.name!).toBeGreaterThanOrEqual(44);expect(control.left).toBeGreaterThanOrEqual(0);expect(control.right).toBeLessThanOrEqual(width);expect(control.reachable,control.name!).toBe(true);}
       expect(measurement.contrast.text).toBeGreaterThan(4.5);expect(measurement.contrast.hint).toBeGreaterThan(4.5);expect(measurement.contrast.edge).toBeGreaterThan(3);
+      await more.locator('summary').click();await expect(more).not.toHaveAttribute('open','');
       await page.locator('#battle-scroll').evaluate(e=>e.scrollTop=0);
       await page.screenshot({path:info.outputPath(`responsive-${width}x${height}${stress?'-stress':''}.png`)});
       await page.locator('#battle-actor').focus();await page.keyboard.press('End');await page.keyboard.press('Tab');
