@@ -22,6 +22,7 @@ const routineSaveStatuses = new Set([
   'Saving dungeon…', 'Dungeon saved on this device', 'Exploration saved on this device',
   'Travel saved on this device', 'Continued saved dungeon',
 ]);
+const partyPresentations = new WeakMap<HTMLElement, { key: string; node: HTMLElement }>();
 
 function portrait(name: string, src: string | undefined, size: number) {
   const frame = dungeonElement('span', name[0]);
@@ -98,7 +99,13 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
     if(!travelHint){travelHint=el('p');travelHint.className='dungeon-travel-hint';header.append(travelHint);}
     if(travelHint.textContent!==hintText)travelHint.textContent=hintText;
   }else travelHint?.remove();
-  sidebar.replaceChildren();
+  // Session snapshots are cloned, so compare the values used by cards and sheet handlers.
+  // Keep unchanged portraits mounted during movement; revision-bound actions below stay fresh.
+  const partyKey=JSON.stringify([s.id,s.phase,s.party,s.ownership,
+    s.activeBattle?.units.filter(unit=>unit.side==='player').map(unit=>[unit.defId,unit.hp])]);
+  const previousParty=partyPresentations.get(sidebar);
+  const keepParty=previousParty?.key===partyKey&&previousParty.node.parentElement===sidebar;
+  for(const child of [...sidebar.children])if(!keepParty||child!==previousParty.node)child.remove();
   const itemTargets = new Map([...after.querySelectorAll('select')].map(select => [select.id, select.value]));
   after.replaceChildren();
   const disclosure = (id: string, label: string) => {
@@ -119,7 +126,7 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
 
   mapView.render(s,cache.resolve(floor.descriptor.seed, floor.descriptor.generator, floor.descriptor.size ?? 20));
   const canEnter=s.phase==='ready'&&floor.completed<3&&floor.exploration.pois.some(p=>!clearedDungeonSlots(floor).includes(p.encounterSlot)&&floor.position===poiCell(p, floor.descriptor.size ?? 20));
-  if(canEnter)sidebar.append(button('Enter encounter',actions.start,false,'dungeon-start-encounter'));
+  if(canEnter)sidebar.prepend(button('Enter encounter',actions.start,false,'dungeon-start-encounter'));
   const travel=disclosure('dungeon-travel','Travel and map guide');
   travel.append(
     el('p','Use the direction buttons around the map, tap an adjacent cell, or press the arrow keys or WASD (when enabled) to move. Scroll within the map to inspect the floor; the view follows your next step. Enemies move when you move.'),
@@ -128,13 +135,14 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
     el('p','Stepping onto loot collects what fits. Remaining items stay on the ground. Freeing inventory space while standing on a pile retries pickup without moving enemies. Loot does not equip gear or use healing items.'),
     el('p','Move onto an available stair to travel automatically. On arrival or after continuing a save, step off and back onto the stair to travel again. Upstairs is unavailable on floor 1.'),
   );
+  const { catalog, items } = dungeonContent;
+  if(!keepParty){
   const party = el('section');
   party.className = 'dungeon-party';
   party.setAttribute('aria-label', 'Party');
   const roster = el('div');
   roster.className = 'dungeon-roster';
   party.append(el('h2', 'Party'), roster);
-  const { catalog, items } = dungeonContent;
   const rosterMembers = s.party.map(hero => {
     const { heroId, maxHp } = hero;
     const name = heroId[0].toUpperCase() + heroId.slice(1);
@@ -199,6 +207,8 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
     roster.append(card);
   }
   sidebar.append(party);
+  partyPresentations.set(sidebar,{key:partyKey,node:party});
+  }
   const inventory=disclosure('dungeon-inventory','Owned items');
   if(s.offer){const rewards=el('section');rewards.setAttribute('aria-label','Rewards');rewards.append(el('h2','Saved reward choice'));
     const nextStep = floor.completed === 3 ? 'unlock descent' : 'prepare the next encounter';
