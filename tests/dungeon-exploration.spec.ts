@@ -1,7 +1,7 @@
 import { dungeonOffer } from '../src/domain/dungeon';
 import { checkedDungeon } from './helpers/dungeonFixtures';
 import { expect,test } from './helpers/startupDiagnostics';
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { dungeonSnapshot, walkDungeon, continueSavedDungeon, openDungeonInventory, reenterDungeonStair } from './helpers/dungeonTraversal';
@@ -1288,6 +1288,52 @@ test('adopting a recovered dungeon invalidates the pending encounter load',async
   expect(JSON.parse((await dungeonSlots(page)).primary!).payload).toEqual(stepped);
   await expect(page.locator('canvas')).toHaveCount(0);expect(errors).toEqual([]);
  }finally {release();}
+});
+
+fixedSeedTest('class guidance: unsaved dungeon keeps dismissals in memory until saving and resuming the same run',async({page,isMobile})=>{
+ test.setTimeout(90000);
+ const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+ const key='tactics-guru:class-guidance';
+ const sentinel={runId:'dungeon:saved-guidance-sentinel',ids:['skill:ability:taunt:v1']};
+ await page.addInitScript(({key,sentinel})=>{
+  if(localStorage.getItem(key)===null)localStorage.setItem(key,JSON.stringify({version:1,enabled:true,seen:[],dismissedRuns:[sentinel],resetRevision:0}));
+ },{key,sentinel});
+ const preferences=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)!),key);
+ const activate=async(control:Locator)=>{
+  if(isMobile)await control.tap();else {await control.focus();await page.keyboard.press('Enter');}
+ };
+ await page.goto('./?game=dungeon');
+ await activate(page.getByRole('button',{name:'Play unsaved dungeon',exact:true}));
+ await expect(page.locator('#dungeon-map')).toBeVisible();
+ const runId=(await dungeonSnapshot(page)).id;
+ await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ const guidance=page.locator('#battle-class-guidance'),tip=page.locator('#battle-class-tip');
+ await expect(guidance).toBeVisible();
+ const tipId=await tip.getAttribute('data-tutorial-id');expect(tipId).toBeTruthy();
+ const before=await readSession(page),dungeonBefore=await dungeonSnapshot(page);
+ expect(dungeonBefore.id).toBe(runId);expect(await dungeonSlots(page)).toEqual({primary:null,backup:null});
+ await activate(page.locator('#battle-guidance-dismiss'));
+ await expect(guidance).toBeHidden();await expect(page.locator('#battle-move')).toBeFocused();
+ expect(await readSession(page)).toEqual(before);expectSameProgress(await dungeonSnapshot(page),dungeonBefore);
+ // A throwaway attempt may acknowledge lessons without consuming a durable
+ // dismissal-history slot belonging to a saved dungeon.
+ expect((await preferences()).seen).toContain(tipId);
+ expect((await preferences()).dismissedRuns).toEqual([sentinel]);
+ expect(await dungeonSlots(page)).toEqual({primary:null,backup:null});
+ await activate(page.getByRole('button',{name:'Save recovery',exact:true}));
+ await activate(page.locator('#dungeon-retry-save'));
+ await expect(page.locator('#battle-dialog')).toBeHidden();
+ await expect.poll(async()=>JSON.parse((await dungeonSlots(page)).primary??'null')?.payload?.id).toBe(runId);
+ const expectedDismissals=[sentinel,{runId:`dungeon:${runId}`,ids:[tipId]}];
+ await expect.poll(async()=>(await preferences()).dismissedRuns).toEqual(expectedDismissals);
+ expect((await readSession(page)).state).toEqual(before.state);await expect(guidance).toBeHidden();
+ expectSameProgress(JSON.parse((await dungeonSlots(page)).primary!).payload,dungeonBefore);
+ await page.reload();await continueSavedDungeon(page);
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ expect((await dungeonSnapshot(page)).id).toBe(runId);expect((await readSession(page)).state).toEqual(before.state);
+ await expect(guidance).toBeHidden();expect((await preferences()).dismissedRuns).toEqual(expectedDismissals);
+ expect(errors).toEqual([]);
 });
 
 test('a second dungeon encounter reuses the engine after a legal victory without reloading',async({page,isMobile})=>{

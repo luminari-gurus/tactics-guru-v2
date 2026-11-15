@@ -18,13 +18,27 @@ import { mountBattleLayout } from '../ui/battleLayout';
 import { diagnosticsSnapshot } from '../diagnostics/browser';
 import { observeActivePlaytime } from './ActivePlaytime';
 import { readAutoCollectLootPreference } from '../ui/autoCollectLootPreference';
-import { watchClassGuidancePreferences } from '../ui/classGuidancePreferences';
+import { dismissClassGuidanceTip, watchClassGuidancePreferences } from '../ui/classGuidancePreferences';
+import type { ClassGuidanceRun } from '../ui/classGuidance';
 function newSeed(previous?: number) {
  return newDungeonSeed(()=>crypto.getRandomValues(new Uint32Array(1))[0],previous);
 }
 const storage=appEntry.persistent?createDungeonStorage():null,session=new DungeonSession(freshDungeon(crypto.randomUUID(),newSeed(),undefined,appEntry.persistent),storage,storage?new RunHistory('dungeon'):null,undefined,serializeBrowserDungeonWrite),cache=new FloorCache();
-const sandboxGuidance = { dismissed: new Set<string>() };
-const stopGuidanceWatch = watchClassGuidancePreferences(reset => { if (reset) sandboxGuidance.dismissed.clear(); });
+let guidanceScope: { id: string; run: ClassGuidanceRun; persistent: boolean } | null = null;
+const stopGuidanceWatch = watchClassGuidancePreferences(reset => { if (reset) guidanceScope?.run.dismissed.clear(); });
+function guidanceForRun(id: string): ClassGuidanceRun {
+ if(guidanceScope?.id!==id)guidanceScope={id,persistent:session.savesProgress,run:{
+  get runId(){return session.savesProgress?`dungeon:${id}`:undefined;},dismissed:new Set(),
+ }};
+ const scope=guidanceScope,persistent=session.savesProgress;
+ // Explicitly saving an unsaved attempt also retains tips dismissed earlier
+ // in that same attempt. Rendering a saved run with no new choices is read-only.
+ if(persistent&&!scope.persistent&&scope.run.dismissed.size) {
+  dismissClassGuidanceTip(`dungeon:${id}`,[...scope.run.dismissed]);
+ }
+ scope.persistent=persistent;
+ return scope.run;
+}
 const screen=el('main');screen.id='dungeon-screen';screen.dataset.boot='loading';document.body.append(screen);
 const shell=document.querySelector<HTMLElement>('#battle-shell')!,panel=document.querySelector<HTMLElement>('#fit-panel')!,container=document.querySelector<HTMLElement>('#game')!,status=document.querySelector<HTMLElement>('#fit-status')!,controls=document.querySelector<HTMLElement>('#battle-controls')!,restart=document.querySelector<HTMLButtonElement>('#fit-restart')!,persistence=document.querySelector<HTMLElement>('#battle-persistence')!;
 let live=true,playing=false,startup=true,reviewing=false,loading=false,loadError=false,loadGeneration=0,host:RunBattleHost|null=null;
@@ -69,7 +83,7 @@ if (sandboxNotice) explorationTools.append(sandboxNotice);
 explorationTools.append(returnLink());
 mountTelemetryPreferences(explorationTools);
 function render(){
- if(!live)return;const state=session.snapshot;evidence(state);
+ if(!live)return;const state=session.snapshot;guidanceForRun(state.id);evidence(state);
  if(playing){persistence.querySelector('span')!.textContent=session.status;playtime?.sync();return;}
  shell.hidden=true;panel.hidden=true;screen.hidden=false;
  if(replacing){
@@ -112,7 +126,6 @@ async function requestNew(){
  if(dialogs.open||!live||replacing)return;
  if(!storage){
   if(startup)session.save();else session.restart(crypto.randomUUID(),newSeed(session.snapshot.seed));
-  sandboxGuidance.dismissed.clear();
   startup=false;stop();render();screen.querySelector<HTMLElement>('h1')?.focus();return;
  }
  if(!await pauseForReview())return;
@@ -187,7 +200,7 @@ async function start(){
     document.querySelector<HTMLElement>('#battle-heading h1')!.textContent=title;
     document.querySelector<HTMLElement>('#board-caption')!.textContent='Tap to select · Drag to pan · Wheel/pinch to zoom · Arrows and Enter to select';
     restart.textContent='Start new dungeon';persistence.hidden=false;persistence.replaceChildren(...(storage?[button('Save recovery',recovery)]:[]),el('span',session.status), returnLink());
-    host={catalog:battle.catalog,session:battle,dialogs,sound,guidance:storage?{runId:`dungeon:${state.id}`,dismissed:new Set()}:sandboxGuidance,modalTransition:()=>{},ended:()=>{
+    host={catalog:battle.catalog,session:battle,dialogs,sound,guidance:guidanceForRun(state.id),modalTransition:()=>{},ended:()=>{
      if(!live||!playing||generation!==loadGeneration)return;
      // This callback follows encounter-return presentation (including #397's
      // cutscene completion). Capture once before stop invalidates old work.

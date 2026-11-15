@@ -81,27 +81,30 @@ a separate increment.
   presentation retain the displayed player's tip with dismissal disabled; hide
   it on settled enemy turns and terminal/error states. Appearance never requests
   focus. Dismissal returns focus to the existing rail/radial action control.
-- Dismissal lasts until the next player turn or a fresh battle HUD, including
-  reload/restart. It does not reopen after movement, action use or undo in the
-  same turn. Merely seeing or skipping a tip does not acknowledge it.
+- Dismissal lasts for the rest of the current run, including later turns and
+  encounters. Saved dungeon resumes retain it; fresh attempts and Reset tutorials
+  make the tip eligible again. Standalone/testing attempts reset on reload.
+  Merely seeing or skipping a tip does not acknowledge it.
 - Explicit dismissal acknowledges that skill lesson and any displayed first-time
   preview/confirm lesson. Rail and radial teaching have separate IDs because a
-  radial action tap/hold release may execute immediately. Acknowledged skill tips
-  still recur; only the first-time interaction lesson is suppressed.
+  radial action tap/hold release may execute immediately. Other eligible skill
+  tips can appear on later turns; a dismissed tip cannot recur in that run.
 - Store enabled/seen preferences in the independent version-1
   `tactics-guru:class-guidance` envelope. Default Class tips on. Validate and bound
-  lesson IDs; retain explicit choices in memory when persistence fails. Preserve
+  lesson IDs and saved-dungeon dismissal scopes; transient runs keep dismissals
+  in memory without evicting saved-dungeon history. Retain explicit choices in
+  memory when persistence fails. Preserve
   unknown future-version data rather than downgrade it. No combat snapshot is
   read or changed by preference operations.
 - Main-menu Settings and in-battle More both provide Class tips and Reset tutorials.
-  Reset clears seen lessons and current-turn dismissal while preserving opt-out;
+  Reset clears seen lessons and run dismissals while preserving opt-out;
   enabling remains an explicit choice. Same-page/cross-tab changes notify open
   controls, and subscriptions are disposed with the HUD or Settings content.
 
 Verification covers pure learned-skill projection and catalog/preview equivalence,
 preference corruption/future-version/storage-failure/reset boundaries, explicit
-acknowledgment versus skipped tips, unchanged prepared commands/replay, repeated
-tips, keyboard/touch focus, small/enlarged-text layouts, reduced motion, restart,
+acknowledgment versus skipped tips, unchanged prepared commands/replay, per-run
+suppression, keyboard/touch focus, small/enlarged-text layouts, reduced motion, restart,
 and repeated visibility interruption. The focused self-hosted workflow also keeps
 the existing hover, turn-queue, rail/radial layout/input and menu focus witnesses.
 Ordinary PR verification covers all units/build boundaries plus shared standalone,

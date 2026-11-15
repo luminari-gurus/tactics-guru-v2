@@ -42,13 +42,13 @@ jobs:
         run: npm run build
       - name: Verify turns, settings, run encounters and saved dungeon resume on Chromium
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:browser -- -c playwright.regression.config.ts tests/battle-loop.spec.ts tests/battle-animations.spec.ts tests/main-menu.spec.ts tests/run-progression.spec.ts tests/dungeon-exploration.spec.ts -g 'player HUD class guidance|class guidance retains|main menu: class guidance|a second dungeon encounter|legal run outcomes' --diagnostics
+        run: npm run test:browser -- -c playwright.regression.config.ts tests/battle-loop.spec.ts tests/battle-animations.spec.ts tests/main-menu.spec.ts tests/run-progression.spec.ts tests/dungeon-exploration.spec.ts -g 'player HUD class guidance|class guidance retains|main menu: class guidance|class guidance: unsaved dungeon|a second dungeon encounter|legal run outcomes' --diagnostics
       - name: Verify battle and run guidance on iPhone WebKit
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:browser -- -c playwright.device-acceptance.config.ts tests/battle-loop.spec.ts tests/main-menu.spec.ts tests/run-progression.spec.ts -g 'player HUD class guidance|main menu: class guidance|legal run outcomes' --diagnostics
       - name: Verify saved dungeon dismissal on iPhone WebKit
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts --project=portrait-webkit --project=landscape-webkit -g 'a second dungeon encounter' --diagnostics
+        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts --project=portrait-webkit --project=landscape-webkit -g 'class guidance: unsaved dungeon|a second dungeon encounter' --diagnostics
       - uses: actions/upload-artifact@v4
         if: always()
         with:
