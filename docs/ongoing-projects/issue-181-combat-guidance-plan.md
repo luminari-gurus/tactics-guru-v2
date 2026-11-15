@@ -80,6 +80,13 @@ is the accepted device evidence; no physical-device test is claimed.
 - Verify skipped/repeated tips, disabled guidance, reset, keyboard/touch dismissal,
   restart, reload and the shared standalone/run/dungeon hosts.
 
+Implementation starts at `mainMenu.ts` Settings and `hud.ts` overflow controls.
+Existing `combatControls.ts` and `autoCollectLootPreference.ts` provide independent
+storage/change-notification patterns, but their values are unversioned and there
+is no shared settings reset. Use `ownedAbilities` with the session's projected
+catalog for learned skills. Passive guidance must not call `BattleSelection.describe`,
+which prepares an intent; use read-only previews and the existing formatting helpers.
+
 ## Increment 3: presentation pace (remaining)
 
 - Choose and review normal/fast timings in the presentation layer; synchronize
@@ -88,6 +95,13 @@ is the accepted device evidence; no physical-device test is claimed.
   active combat saves, and respect reduced-motion behavior.
 - Verify deterministic state/replay equivalence at both speeds, mid-animation
   changes, interrupted visibility, restart and shared battle hosts.
+
+`BoardRenderer.animate` is the timing boundary; sample the preference once per
+presentation and retain its idempotent completion/cancellation contract. Avoid
+global Phaser time scaling or changes to input/audio timeout behavior. Current
+reduced motion disables idle bob, not action travel, so the action-animation policy
+must be defined explicitly. Normal/fast radio inputs fit the current Settings
+focus trap, whose selectable controls do not yet include native `select` elements.
 
 Use `Refs #181` for incremental PRs; reserve `Closes #181` for the final verified
 increment. Queue completion alone does not satisfy the tutorial or pace criteria.

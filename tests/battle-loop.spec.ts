@@ -973,11 +973,19 @@ test('player HUD turn queue preserves initiative, keyboard and touch browsing ac
     },edge)).toBe(true);
   }
   await page.keyboard.press('End');
-  await expect.poll(()=>queue.evaluate(element=>{
+  const lastEdgeVisible=(edge:'left'|'right')=>queue.evaluate((element,edge)=>{
     const last=[...element.querySelectorAll<HTMLElement>('li[data-unit-id]')].at(-1)!;
-    const bounds=element.getBoundingClientRect(),item=last.getBoundingClientRect();
-    return item.left>=bounds.left-1&&item.right<=bounds.right+1;
-  })).toBe(true);
+    const bounds=element.getBoundingClientRect(),item=last.getBoundingClientRect(),name=last.querySelector('strong')!.getBoundingClientRect();
+    const left=bounds.left+element.clientLeft,right=left+element.clientWidth;
+    return [item[edge],name[edge]].every(position=>position>=left-1&&position<=right+1);
+  },edge);
+  // A 24px name plus portrait can be wider than this short rail. Keyboard
+  // scrolling must expose both ends, without requiring the whole card to fit.
+  await expect.poll(()=>lastEdgeVisible('right')).toBe(true);
+  const scrollSteps=await queue.evaluate(element=>Math.ceil(element.scrollWidth/80)+1);
+  for(let step=0;step<scrollSteps&&!await lastEdgeVisible('left');step++)await page.keyboard.press('ArrowLeft');
+  await expect.poll(()=>lastEdgeVisible('left')).toBe(true);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth&&document.documentElement.scrollHeight<=innerHeight)).toBe(true);
   await page.screenshot({path:info.outputPath('turn-queue-short-landscape-large-text.png')});
   expect((await session(page)).state).toEqual(initial.state);
   expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
