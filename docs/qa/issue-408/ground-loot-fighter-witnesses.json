@@ -1,0 +1,233 @@
+[
+  {
+    "seed": 28,
+    "phase": "defeat",
+    "battles": 4,
+    "depth": 2,
+    "slot": 0,
+    "healed": true,
+    "taunted": false,
+    "level": 2,
+    "firstFloor": [
+      "playerWin",
+      "playerWin",
+      "playerWin"
+    ]
+  },
+  {
+    "seed": 50,
+    "phase": "defeat",
+    "battles": 4,
+    "depth": 2,
+    "slot": 0,
+    "healed": true,
+    "taunted": false,
+    "level": 2,
+    "firstFloor": [
+      "playerWin",
+      "playerWin",
+      "playerWin"
+    ]
+  },
+  {
+    "seed": 51,
+    "phase": "defeat",
+    "battles": 2,
+    "depth": 1,
+    "slot": 1,
+    "healed": false,
+    "taunted": false,
+    "level": 1,
+    "firstFloor": [
+      "playerWin",
+      "playerLoss"
+    ]
+  },
+  {
+    "seed": 52,
+    "phase": "defeat",
+    "battles": 2,
+    "depth": 1,
+    "slot": 1,
+    "healed": true,
+    "taunted": false,
+    "level": 2,
+    "firstFloor": [
+      "playerWin",
+      "playerLoss"
+    ]
+  },
+  {
+    "seed": 53,
+    "phase": "defeat",
+    "battles": 4,
+    "depth": 2,
+    "slot": 0,
+    "healed": true,
+    "taunted": false,
+    "level": 2,
+    "firstFloor": [
+      "playerWin",
+      "playerWin",
+      "playerWin"
+    ]
+  },
+  {
+    "seed": 54,
+    "phase": "defeat",
+    "battles": 1,
+    "depth": 1,
+    "slot": 0,
+    "healed": false,
+    "taunted": false,
+    "level": 1,
+    "firstFloor": [
+      "playerLoss"
+    ]
+  },
+  {
+    "seed": 55,
+    "phase": "defeat",
+    "battles": 3,
+    "depth": 1,
+    "slot": 2,
+    "healed": true,
+    "taunted": false,
+    "level": 2,
+    "firstFloor": [
+      "playerWin",
+      "playerWin",
+      "playerLoss"
+    ]
+  },
+  {
+    "seed": 56,
+    "phase": "defeat",
+    "battles": 2,
+    "depth": 1,
+    "slot": 1,
+    "healed": true,
+    "taunted": false,
+    "level": 2,
+    "firstFloor": [
+      "playerWin",
+      "playerLoss"
+    ]
+  },
+  {
+    "seed": 57,
+    "phase": "ready",
+    "battles": 6,
+    "depth": 2,
+    "slot": 2,
+    "healed": true,
+    "taunted": true,
+    "level": 4,
+    "firstFloor": [
+      "playerWin",
+      "playerWin",
+      "playerWin"
+    ]
+  },
+  {
+    "seed": 58,
+    "phase": "defeat",
+    "battles": 2,
+    "depth": 1,
+    "slot": 1,
+    "healed": true,
+    "taunted": false,
+    "level": 2,
+    "firstFloor": [
+      "playerWin",
+      "playerLoss"
+    ]
+  },
+  {
+    "seed": 59,
+    "phase": "defeat",
+    "battles": 2,
+    "depth": 1,
+    "slot": 1,
+    "healed": true,
+    "taunted": false,
+    "level": 2,
+    "firstFloor": [
+      "playerWin",
+      "playerLoss"
+    ]
+  },
+  {
+    "seed": 60,
+    "phase": "ready",
+    "battles": 6,
+    "depth": 2,
+    "slot": 2,
+    "healed": true,
+    "taunted": true,
+    "level": 3,
+    "firstFloor": [
+      "playerWin",
+      "playerWin",
+      "playerWin"
+    ]
+  },
+  {
+    "seed": 61,
+    "phase": "defeat",
+    "battles": 3,
+    "depth": 1,
+    "slot": 2,
+    "healed": true,
+    "taunted": false,
+    "level": 2,
+    "firstFloor": [
+      "playerWin",
+      "playerWin",
+      "playerLoss"
+    ]
+  },
+  {
+    "seed": 62,
+    "phase": "defeat",
+    "battles": 4,
+    "depth": 2,
+    "slot": 0,
+    "healed": true,
+    "taunted": true,
+    "level": 3,
+    "firstFloor": [
+      "playerWin",
+      "playerWin",
+      "playerWin"
+    ]
+  },
+  {
+    "seed": 63,
+    "phase": "defeat",
+    "battles": 1,
+    "depth": 1,
+    "slot": 0,
+    "healed": false,
+    "taunted": false,
+    "level": 1,
+    "firstFloor": [
+      "playerLoss"
+    ]
+  },
+  {
+    "seed": 64,
+    "phase": "defeat",
+    "battles": 6,
+    "depth": 2,
+    "slot": 2,
+    "healed": true,
+    "taunted": true,
+    "level": 3,
+    "firstFloor": [
+      "playerWin",
+      "playerWin",
+      "playerWin"
+    ]
+  }
+]

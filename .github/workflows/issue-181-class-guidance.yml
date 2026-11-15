@@ -1,0 +1,99 @@
+name: Issue 181 class guidance
+on:
+  push:
+    branches: [feat/issue-181-class-guidance]
+    paths: ['src/**', 'tests/**', 'scripts/**', '*config*', 'package*.json', '.github/workflows/issue-181-class-guidance.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: tactics-browser-tactics-browser-02
+  queue: max
+  cancel-in-progress: false
+jobs:
+  guidance:
+    if: github.repository == 'luminari-gurus/tactics-guru-v2' && github.ref == 'refs/heads/feat/issue-181-class-guidance'
+    runs-on: [self-hosted, tactics-browser, tactics-browser-02]
+    timeout-minutes: 20
+    steps:
+      - name: Check host disposition
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run setup:browsers && npm run check:browsers
+      - name: Check whether prior passing coverage has unchanged inputs
+        id: reuse
+        run: |
+          node --input-type=module <<'JS'
+          import { appendFileSync, readFileSync } from 'node:fs';
+          import { execFileSync } from 'node:child_process';
+          const base = 'fb1f89d965e8f732c95d8e0155a0dd155a0abaac';
+          const file = 'tests/battle-loop.spec.ts';
+          const workflow = '.github/workflows/issue-181-class-guidance.yml';
+          const git = args => execFileSync('git', args, { encoding: 'utf8' });
+          const changed = git(['diff', '--name-only', base, 'HEAD']).trim().split('\n').filter(Boolean);
+          const start = "test('accepted rail and dock preserve drawable floors, readable controls and focus at five sizes'";
+          const end = "test('opening handoff keeps ability and party inspection on the animating actor'";
+          const outsideRepair = source => {
+            if (source.split(start).length !== 2 || source.split(end).length !== 2) return null;
+            const first = source.indexOf(start), last = source.indexOf(end);
+            return first < last ? [source.slice(0, first), source.slice(last)] : null;
+          };
+          const before = outsideRepair(git(['show', `${base}:${file}`]));
+          const after = outsideRepair(readFileSync(file, 'utf8'));
+          const unchanged = changed.every(path => path === file || path === workflow)
+            && before !== null && after !== null && JSON.stringify(before) === JSON.stringify(after);
+          // Run 43718770099 retains 52 passing guidance, settings, queue, hover,
+          // radial-input and WebKit checks. Its layout failure remains recorded.
+          // Only the repaired layout test can differ; rerun both layout witnesses.
+          // Any other tracked-input change restores the complete selection.
+          appendFileSync(process.env.GITHUB_OUTPUT, `unchanged=${unchanged}\n`);
+          console.log(JSON.stringify({ unchanged, comparison: base, retainedRun: 43718770099, changed }));
+          JS
+      - name: Record source identity
+        run: |
+          mkdir -p verification-receipts/issue-181-guidance
+          node --input-type=module <<'JS'
+          import { writeFileSync } from 'node:fs';
+          import { sourceIdentity } from './scripts/verification-report.mjs';
+          writeFileSync('verification-receipts/issue-181-guidance/source.json', JSON.stringify({
+            source: sourceIdentity(process.cwd()), node: process.version, runner: process.env.RUNNER_NAME,
+            conditions: 'Persistent qualified runner; browser/device emulation; shared host load and caches not independently controlled',
+            reusedEvidence: '${{ steps.reuse.outputs.unchanged }}' === 'true'
+              ? { run: 43718770099, source: 'fb1f89d965e8f732c95d8e0155a0dd155a0abaac', passingChecks: 52,
+                  scope: 'Guidance, settings, queue, hover, radial input and WebKit; runtime, dependencies, assets, configs, helpers and these test bodies unchanged' }
+              : null
+          }, null, 2));
+          JS
+      - name: Build the application
+        id: build
+        run: npm run build
+      - name: Verify guidance, settings, hover and queue lifecycle on Chromium
+        if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.reuse.outputs.unchanged != 'true' }}
+        run: |
+          npm run test:browser -- -c playwright.regression.config.ts tests/battle-loop.spec.ts tests/battle-animations.spec.ts tests/main-menu.spec.ts -g 'class guidance|player HUD turn queue|turn queue holds|QA: hover refresh preserves|main menu: read-only root' --diagnostics
+      - name: Verify rail and radial layout at supported sizes and enlarged text
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.regression.config.ts tests/battle-loop.spec.ts tests/battle-radial.spec.ts --project=desktop -g 'accepted rail and dock preserve|radial preference replaces the side rail' --diagnostics
+      - name: Preserve radial touch and input boundaries
+        if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.reuse.outputs.unchanged != 'true' }}
+        run: npm run test:browser -- -c playwright.regression.config.ts tests/battle-radial.spec.ts -g 'radial tap fallback opens the same radial|radial End turn|radial hub cancel records no command' --diagnostics
+      - name: Verify guidance, settings and controls on iPhone WebKit
+        if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.reuse.outputs.unchanged != 'true' }}
+        run: |
+          npm run test:browser -- -c playwright.device-acceptance.config.ts tests/battle-loop.spec.ts tests/main-menu.spec.ts tests/battle-radial.spec.ts -g 'class guidance|player HUD turn queue|main menu: read-only root|radial tap fallback opens the same radial|radial End turn' --diagnostics
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-181-class-guidance-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/
+          retention-days: 14
+          if-no-files-found: warn

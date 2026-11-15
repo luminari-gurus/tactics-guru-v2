@@ -9,13 +9,6 @@ import {encodeDungeon} from '../src/domain/dungeonSaveEnvelope';
 import {DUNGEON_KEYS} from '../src/persistence/dungeonStorage';
 import {playCommand,readSession} from './helpers/battlePolicy';
 import { readFileSync } from 'node:fs';
-import { encodeBattleSave } from '../src/domain/saveEnvelope';
-import { standaloneCatalog } from './helpers/playerPolicy';
-import { BATTLE_STORAGE_KEYS } from '../src/persistence/battleStorage';
-import { RUN_STORAGE_KEYS } from '../src/persistence/runStorage';
-import { encodeRunSave } from '../src/domain/runSaveEnvelope';
-import { freshRunSnapshot } from '../src/domain/runBattle';
-import { runContext } from './helpers/runItemFixtures';
 import { canonical, hashJson } from '../src/domain/contentIdentity';
 import { RUN_RECORD_KEYS } from '../src/persistence/runRecordsStorage';
 
@@ -43,32 +36,27 @@ test('dungeon statistics: confirmed replacement pauses pending enemy turns throu
  }finally{await page.evaluate(()=>(window as any).releaseHistoryBoundary?.());await page.clock.resume();}
 });
 
-for(const route of ['battle','run','dungeon'] as const)test(`${route} previous-format recovery preserves and exports both original slots`,async({page})=>{
- const encoded=route==='battle'?encodeBattleSave(new BattleSession(standaloneCatalog,'map:forest_ruins',2).state,standaloneCatalog):
-  route==='run'?encodeRunSave(freshRunSnapshot('previous-format-run',1,runContext),runContext):encodeDungeon(freshDungeon('previous-format-dungeon',1));
+test('dungeon previous-format recovery preserves and exports both original slots',async({page})=>{
+ const encoded=encodeDungeon(freshDungeon('previous-format-dungeon',1));
  if(!encoded.ok)throw Error(encoded.reason);
  // Explicit version-boundary fixtures, not a claim that a current payload ran in
  // the historical build. Recompute the digest so corruption is not the trigger.
  const {digest,...body}=JSON.parse(encoded.text);
- if(route==='battle'){body.payload.format=2;body.payload.versions.rules=3;}else body.format=route==='run'?4:5;
+ body.format=5;
  const old=canonical({...body,digest:hashJson(body)}),texts={primary:` \n${old}\n `,backup:`\t${old}\n`};
- const keys=route==='battle'?BATTLE_STORAGE_KEYS:route==='run'?RUN_STORAGE_KEYS:DUNGEON_KEYS;
- await page.goto(`./?game=${route}`);
+ const keys=DUNGEON_KEYS;
+ await page.goto('./?game=dungeon');
  await page.evaluate(({keys,texts})=>{localStorage.setItem(keys.primary,texts.primary);localStorage.setItem(keys.backup,texts.backup);localStorage.setItem('issue164-unrelated','retain');},{keys,texts});
  await page.reload();
  const stored=()=>page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup),unrelated:localStorage.getItem('issue164-unrelated')}),keys);
  expect(await stored()).toEqual({...texts,unrelated:'retain'});
- if(route!=='battle')await page.getByRole('button',{name:'Save recovery',exact:true}).click();
- await expect(page.getByRole('dialog')).toContainText(route==='battle'?'incompatible':'primary: invalid. backup: invalid.');
- if(route==='battle') {
-  const pending=page.waitForEvent('download');await page.locator('#save-export').click();const download=await pending,file=await download.path();
-  const exported=JSON.parse(readFileSync(file!,'utf8'));
-  expect(exported.slots).toEqual(expect.arrayContaining([{slot:'primary',text:texts.primary},{slot:'backup',text:texts.backup}]));
- } else for(const slot of ['primary','backup'] as const) {
+ await page.getByRole('button',{name:'Save recovery',exact:true}).click();
+ await expect(page.getByRole('dialog')).toContainText('primary: invalid. backup: invalid.');
+ for(const slot of ['primary','backup'] as const) {
   if(slot==='backup')await page.getByRole('button',{name:'Save recovery',exact:true}).click();
   const pending=page.waitForEvent('download');await page.getByRole('button',{name:`Export ${slot} save`,exact:true}).click();
   const download=await pending,file=await download.path(),raw=readFileSync(file!,'utf8');
-  if(route==='dungeon')expect(raw).toBe(texts[slot]);else expect(JSON.parse(raw)).toEqual({slot,text:texts[slot]});
+  expect(raw).toBe(texts[slot]);
  }
  expect(await stored()).toEqual({...texts,unrelated:'retain'});
  await page.reload();expect(await stored()).toEqual({...texts,unrelated:'retain'});

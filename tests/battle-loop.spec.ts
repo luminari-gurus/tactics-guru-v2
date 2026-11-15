@@ -1,5 +1,5 @@
 import { confirmRestart } from './helpers/battlePolicy';
-import { expect, test, type Locator } from './helpers/forceRailControls';
+import { expect, test, type Locator, type Page } from './helpers/forceRailControls';
 import { writeFileSync } from 'node:fs';
 import { previewMove, previewMovement } from '../src/domain/grid';
 import { BattleSession } from '../src/app/BattleSession';
@@ -352,7 +352,7 @@ test('player HUD and preview cancellation preserve state and modal capture', asy
 import { playerDecision, session, readSession, playCommand, playUndo } from './helpers/battlePolicy';
 import { standaloneCatalog as catalog } from './helpers/playerPolicy';
 import { replayBattle } from '../src/domain/turns';
-import type { Command } from '../src/domain/types';
+import type { BattleState, Command } from '../src/domain/types';
 
 for(const [seed,outcome] of [[1,'playerLoss'],[2,'playerWin']] as const){
   test(`complete legal authored battle seed ${seed} reaches ${outcome} through controls and replays`,async({page,isMobile})=>{
@@ -363,14 +363,21 @@ for(const [seed,outcome] of [[1,'playerLoss'],[2,'playerWin']] as const){
     await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
     await playUndo(page,catalog,isMobile);
     const boardObjects=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).objectCount;
+    let checkedDefeatedQueue=false;
     for(let i=0;i<200;i++){
       await expect.poll(async()=> (await session(page)).phase,{timeout:10000}).toMatch(/^(player|ended|error)$/);
       const board=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
       expect(board.effect).toBeNull();expect(board.objectCount).toBe(boardObjects);
       const s=await session(page);if(s.phase==='ended')break;expect(s.phase).toBe('player');
+      if(!checkedDefeatedQueue && s.state.units.some(unit=>unit.hp===0)){
+        await expectTurnQueue(page,s.state);checkedDefeatedQueue=true;
+      }
       await playCommand(page,playerDecision(s.state));
     }
     const final=await session(page);expect(final.state.outcome).toBe(outcome);
+    expect(checkedDefeatedQueue).toBe(true);
+    await expect(page.locator('#battle-turn-order')).toBeHidden();
+    await expect(page.locator('#battle-class-guidance')).toBeHidden();
     expect(final.replay.commands.some(c=>c.type==='move')).toBe(true);
     expect(final.replay.commands.some(c=>c.type==='useAbility' && c.abilityId==='ability:basic_attack')).toBe(true);
     if(seed===2)expect(final.replay.commands.filter(c=>c.type==='useAbility').map(c=>c.abilityId)).toEqual(expect.arrayContaining(['ability:guarded_strike','ability:high_shot','ability:magic_missile']));
@@ -381,27 +388,13 @@ for(const [seed,outcome] of [[1,'playerLoss'],[2,'playerWin']] as const){
     const replayPath=test.info().outputPath('replay.json');
     writeFileSync(replayPath,JSON.stringify(final,null,2));
     await test.info().attach('replay',{path:replayPath,contentType:'application/json'});
-    // Reload the legally completed battle and rebuild its outcome without historical cues.
-    await page.reload();await page.locator('#save-continue').click();
-    await expect(page.locator('#game')).toHaveAttribute('data-phase','ended');
-    const continued=await readSession(page);expect(continued.state).toEqual(final.state);
-    expect(continued.replay).toBeNull();expect(continued.events).toEqual([]);
-    expect(await page.evaluate(()=>window.fitDiagnostics().battleAudio?.lastToken)).toBe(0);
-    await expect(page.getByRole('dialog')).toContainText(outcome==='playerWin'?'Victory':'Defeat');
-    // An outcome reset can fail after removing backup; the ended session must stay usable.
-    await page.evaluate(()=>{
-      const remove=Storage.prototype.removeItem;
-      Storage.prototype.removeItem=function(key){if(key==='tactics-guru:phaser:battle:primary:v1')throw new DOMException('Denied','SecurityError');return remove.call(this,key);};
-      Object.assign(window,{restoreBattleRemoval:()=>{Storage.prototype.removeItem=remove;}});
-    });
-    await page.locator('#dialog-restart').click();await page.locator('#save-confirm-reset').click();
-    await expect(page.getByRole('dialog')).toContainText('Reset incomplete');
-    expect((await readSession(page)).state).toEqual(final.state);
-    await page.locator('#save-close').click();await expect(page.locator('#fit-restart')).toBeEnabled();
-    await expect(page.locator('#fit-status')).toHaveText('Battle ready');
-    await page.evaluate(()=>(window as unknown as {restoreBattleRemoval:()=>void}).restoreBattleRemoval());
+    await page.reload();
+    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    expect((await session(page)).state.seed).toBe(1);
+    await expectTurnQueue(page,(await session(page)).state);
+    await expect(page.getByRole('dialog')).not.toBeVisible();
     await page.locator('#fit-restart').click();await confirmRestart(page);
-    await expect.poll(async()=> (await session(page)).state.seed).toBe(seed+1);
+    await expect.poll(async()=> (await session(page)).state.seed).toBe(2);
     await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
     await expect(page.locator('#fit-status')).toHaveText('Battle ready');
     expect(await page.locator('canvas').count()).toBe(1);expect(errors).toEqual([]);
@@ -614,7 +607,7 @@ test('keyboard-only shortcuts respect presentation visibility and repeated scene
   await page.locator('#battle-target').selectOption(`${destination.x},${destination.y}`);await page.locator('canvas').focus();await page.keyboard.press('c');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   expect((await session(page)).state.commandCount).toBe(current.state.commandCount+1);
-  await page.reload();await page.locator('#save-continue').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await page.reload();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const resumed=await readSession(page);await page.locator('canvas').focus();await page.keyboard.press('w');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const after=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
@@ -624,7 +617,7 @@ test('keyboard-only shortcuts respect presentation visibility and repeated scene
 test('keyboard-only movement, attack confirmation and Wait use the shared decision flow',async({page})=>{
   await page.goto('./?game=battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   await page.locator('#fit-restart').focus();await page.keyboard.press('Enter');
-  await page.locator('#save-confirm-reset').focus();await page.keyboard.press('Enter');
+  await page.locator('#battle-confirm-restart').focus();await page.keyboard.press('Enter');
   await expect.poll(async()=> (await session(page)).state.seed).toBe(2);
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const enact=async(command:Command)=>{
@@ -777,6 +770,9 @@ test('accepted rail and dock preserve drawable floors, readable controls and foc
       await expect.poll(async()=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).viewport).toEqual({width,height});
       await page.evaluate(()=>new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve()))));
       if(!stress){await page.locator('#fit-restart').click();await confirmRestart(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');}
+      // Measure secondary controls only after their disclosure makes them available.
+      const more=page.locator('#battle-overflow');
+      await more.locator('summary').click();await expect(more).toHaveAttribute('open','');
       const measurement=await page.evaluate(()=>{
         const rect=(s:string)=>document.querySelector(s)!.getBoundingClientRect().toJSON();
         const controls=[...document.querySelectorAll<HTMLElement>('#fit-panel button:not([hidden]), #battle-target')].filter(e=>e.getClientRects().length).map(e=>{
@@ -795,6 +791,7 @@ test('accepted rail and dock preserve drawable floors, readable controls and foc
       expect(measurement.overflow).toBe(false);expect(measurement.actor.height).toBeLessThanOrEqual(measurement.panel.height*.45+.02);
       for(const control of measurement.controls){expect(control.width,control.name!).toBeGreaterThanOrEqual(44);expect(control.height,control.name!).toBeGreaterThanOrEqual(44);expect(control.left).toBeGreaterThanOrEqual(0);expect(control.right).toBeLessThanOrEqual(width);expect(control.reachable,control.name!).toBe(true);}
       expect(measurement.contrast.text).toBeGreaterThan(4.5);expect(measurement.contrast.hint).toBeGreaterThan(4.5);expect(measurement.contrast.edge).toBeGreaterThan(3);
+      await more.locator('summary').click();await expect(more).not.toHaveAttribute('open','');
       await page.locator('#battle-scroll').evaluate(e=>e.scrollTop=0);
       await page.screenshot({path:info.outputPath(`responsive-${width}x${height}${stress?'-stress':''}.png`)});
       await page.locator('#battle-actor').focus();await page.keyboard.press('End');await page.keyboard.press('Tab');
@@ -891,4 +888,209 @@ test('battle log starts with the initial actor before opening enemy actions', as
   expect(lines[0]).toBe(`Round ${initial.round}: ${displayName(actor.defId)} #${actor.id}'s turn`);
   expect(lines.some(line => /moves to|waits|uses/.test(line))).toBe(true);
   await page.locator('#log-close').click();
+});
+
+/** Assert the rendered sequence independently of the presentation projection. */
+async function expectTurnQueue(page:Page,state:BattleState) {
+  const region=page.locator('#battle-turn-order'),queue=page.locator('#battle-turn-queue');
+  await expect(region).toBeVisible();await expect(region).toHaveAccessibleName('Turn order');
+  const live=(ids:readonly number[],round:number)=>ids.filter(id=>state.units.some(unit=>unit.id===id&&unit.hp>0))
+    .map(id=>({id,round,current:id===state.initiative[state.activeIndex]}));
+  const expected=[
+    ...live(state.initiative.slice(state.activeIndex),state.round),
+    {boundary:state.round+1},
+    ...live(state.initiative.slice(0,state.activeIndex),state.round+1),
+  ];
+  await expect.poll(()=>queue.locator(':scope > li').evaluateAll(items=>items.map(item=>{
+    const node=item as HTMLElement;
+    return node.dataset.roundStart!==undefined ? {boundary:Number(node.dataset.roundStart)}
+      : {id:Number(node.dataset.unitId),round:Number(node.dataset.round),current:node.getAttribute('aria-current')==='step'};
+  }))).toEqual(expected);
+  const current=queue.locator('[aria-current="step"]');
+  await expect(current).toHaveCount(1);await expect(current).toContainText('Now');
+  for(const unit of state.units.filter(unit=>unit.hp>0)){
+    const card=queue.locator(`[data-unit-id="${unit.id}"]`);
+    await expect(card).toContainText(`${displayName(unit.defId)} #${unit.id}`);
+    await expect(card).toContainText(unit.side==='player'?'Ally':'Enemy');
+  }
+  await expect(queue.locator('[data-round-start]')).toHaveText(`Round ${state.round+1}`);
+}
+
+test('player HUD turn queue preserves initiative, keyboard and touch browsing across rounds and restart',async({page},info)=>{
+  test.setTimeout(90000);
+  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+  await page.goto('./?game=battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const initial=await session(page),saved=await page.evaluate(()=>JSON.stringify(localStorage));
+  await expectTurnQueue(page,initial.state);
+  const queue=page.locator('#battle-turn-queue');
+  await expect(queue).toHaveAttribute('tabindex','0');
+  await page.screenshot({path:info.outputPath('turn-queue-standard.png')});
+  // Retain the profile's native touch capability while testing the narrowest dock.
+  const original=page.viewportSize()!;await page.setViewportSize({width:320,height:568});
+  await expect.poll(()=>queue.evaluate(element=>element.scrollWidth>element.clientWidth)).toBe(true);
+  const bounds=await queue.boundingBox();expect(bounds).not.toBeNull();
+  expect(bounds!.x).toBeGreaterThanOrEqual(0);expect(bounds!.x+bounds!.width).toBeLessThanOrEqual(320);
+  expect(bounds!.y).toBeGreaterThanOrEqual(0);expect(bounds!.y+bounds!.height).toBeLessThanOrEqual(568);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  const current=queue.locator('[aria-current="step"]');
+  if(info.project.use.hasTouch)await current.tap();else await current.click();
+  expect(await session(page)).toEqual(initial);
+  await queue.focus();await page.keyboard.press('End');
+  await expect.poll(()=>queue.evaluate(element=>element.scrollLeft)).toBeGreaterThan(0);
+  const scrolled=await queue.evaluate(element=>element.scrollLeft);
+  await page.keyboard.press('ArrowLeft');
+  await expect.poll(()=>queue.evaluate(element=>element.scrollLeft)).toBeLessThan(scrolled);
+  await page.keyboard.press('Home');await expect.poll(()=>queue.evaluate(element=>element.scrollLeft)).toBe(0);
+  await page.keyboard.press('ArrowRight');
+  await expect.poll(()=>queue.evaluate(element=>element.scrollLeft)).toBeGreaterThan(0);
+  await page.keyboard.press('End');
+  const beforePreview=await queue.evaluate(element=>element.scrollLeft);
+  const authoritative=await session(page);
+  await page.locator('#battle-target').selectOption({index:1});
+  await expect(page.locator('#battle-review')).toBeEnabled();
+  expect(await queue.evaluate(element=>element.scrollLeft)).toBe(beforePreview);
+  expect((await session(page)).state).toEqual(authoritative.state);
+  expect((await session(page)).replay).toEqual(authoritative.replay);
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
+  await page.locator('#battle-cancel').click();
+  await queue.focus();await page.keyboard.press('Home');
+  await expect(current).toBeInViewport();
+  await page.screenshot({path:info.outputPath('turn-queue-narrow.png')});
+  await page.setViewportSize({width:568,height:234});
+  await page.evaluate(()=>document.documentElement.style.fontSize='32px');
+  const strip=page.locator('#battle-turn-order');
+  await expect.poll(()=>strip.evaluate(element=>{
+    const rect=element.getBoundingClientRect();
+    return rect.width>0&&rect.height>0&&rect.left>=0&&rect.top>=0&&rect.right<=innerWidth&&rect.bottom<=innerHeight;
+  })).toBe(true);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth&&document.documentElement.scrollHeight<=innerHeight)).toBe(true);
+  await queue.focus();await page.keyboard.press('Home');
+  // Enlarged cards can exceed the bounded strip's height. Both ends must be
+  // reachable through its vertical scroll, without spilling onto the board.
+  for(const edge of ['top','bottom'] as const){
+    await expect.poll(()=>strip.evaluate((element,edge)=>{
+      const card=element.querySelector<HTMLElement>('[aria-current="step"]')!;
+      const bounds=element.getBoundingClientRect(),item=card.getBoundingClientRect();
+      const top=bounds.top+element.clientTop,bottom=top+element.clientHeight;
+      element.scrollTop+=edge==='top'?item.top-top:item.bottom-bottom;
+      const moved=card.getBoundingClientRect(),position=edge==='top'?moved.top:moved.bottom;
+      return position>=top-1&&position<=bottom+1;
+    },edge)).toBe(true);
+  }
+  await page.keyboard.press('End');
+  const lastEdgeVisible=(edge:'left'|'right')=>queue.evaluate((element,edge)=>{
+    const last=[...element.querySelectorAll<HTMLElement>('li[data-unit-id]')].at(-1)!;
+    const bounds=element.getBoundingClientRect(),item=last.getBoundingClientRect(),name=last.querySelector('strong')!.getBoundingClientRect();
+    const left=bounds.left+element.clientLeft,right=left+element.clientWidth;
+    return [item[edge],name[edge]].every(position=>position>=left-1&&position<=right+1);
+  },edge);
+  // A 24px name plus portrait can be wider than this short rail. Keyboard
+  // scrolling must expose both ends, without requiring the whole card to fit.
+  await expect.poll(()=>lastEdgeVisible('right')).toBe(true);
+  const scrollSteps=await queue.evaluate(element=>Math.ceil(element.scrollWidth/80)+1);
+  for(let step=0;step<scrollSteps&&!await lastEdgeVisible('left');step++)await page.keyboard.press('ArrowLeft');
+  await expect.poll(()=>lastEdgeVisible('left')).toBe(true);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth&&document.documentElement.scrollHeight<=innerHeight)).toBe(true);
+  await page.screenshot({path:info.outputPath('turn-queue-short-landscape-large-text.png')});
+  expect((await session(page)).state).toEqual(initial.state);
+  expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
+  await page.evaluate(()=>document.documentElement.style.fontSize='');
+  await page.setViewportSize(original);
+  let currentState=initial.state;
+  for(let turns=0;turns<initial.state.initiative.length&&currentState.round===initial.state.round;turns++){
+    const commandCount=currentState.commandCount;
+    if(info.project.use.hasTouch)await page.locator('#battle-next').tap();
+    else {await page.locator('#battle-next').focus();await page.keyboard.press('Enter');}
+    await expect.poll(async()=>(await session(page)).state.commandCount).toBeGreaterThan(commandCount);
+    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    currentState=(await session(page)).state;
+    await expectTurnQueue(page,currentState);
+    await expect.poll(()=>queue.evaluate(element=>element.scrollLeft)).toBe(0);
+  }
+  expect(currentState.round).toBeGreaterThan(initial.state.round);
+  await page.locator('#fit-restart').click();await confirmRestart(page);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const restarted=await session(page);expect(restarted.state.seed).toBe(initial.state.seed+1);
+  await expectTurnQueue(page,restarted.state);
+  await expect(page.locator('#battle-turn-order')).toHaveCount(1);
+  expect(errors).toEqual([]);
+});
+
+test('player HUD class guidance is read-only, acknowledges dismissal and returns on later turns and restart',async({page},info)=>{
+  test.setTimeout(90000);
+  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+  const key='tactics-guru:class-guidance';
+  const saved=()=>page.evaluate(key=>localStorage.getItem(key),key);
+  const activate=async(control:Locator)=>{
+    if(info.project.use.hasTouch)await control.tap();
+    else {await control.focus();await page.keyboard.press('Enter');}
+  };
+  const ready=()=>expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const guidance=page.locator('#battle-class-guidance'),tip=page.locator('#battle-class-tip');
+  const teaching=page.locator('#battle-guidance-teaching'),dismiss=page.locator('#battle-guidance-dismiss');
+  await page.goto('./?game=battle');await ready();
+  const first=await session(page),firstActor=first.state.initiative[first.state.activeIndex];
+  await expect(guidance).toBeVisible();await expect(guidance).toHaveAttribute('data-unit-id',String(firstActor));
+  await expect(teaching).toBeVisible();await expect(teaching).toHaveAttribute('data-tutorial-id','preview:rail:v1');
+  expect(await saved()).toBeNull();
+  expect(await guidance.evaluate(element=>element.contains(document.activeElement))).toBe(false);
+  await page.screenshot({path:info.outputPath('class-guidance-standard.png')});
+  // Merely seeing or skipping a tip must not acknowledge it.
+  await activate(page.locator('#battle-next'));
+  await expect.poll(async()=>(await session(page)).state.commandCount).toBeGreaterThan(first.state.commandCount);
+  await ready();await expect(guidance).toBeVisible();expect(await saved()).toBeNull();
+  expect(await guidance.evaluate(element=>element.contains(document.activeElement))).toBe(false);
+  await page.reload();await ready();
+  await expect(guidance).toHaveAttribute('data-unit-id',String(firstActor));
+  await expect(teaching).toBeVisible();expect(await saved()).toBeNull();
+  const original=page.viewportSize()!;
+  await page.setViewportSize({width:320,height:568});
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.evaluate(()=>document.documentElement.style.fontSize='32px');
+  await dismiss.scrollIntoViewIfNeeded();await expect(dismiss).toBeInViewport({ratio:1});
+  const bounds=await dismiss.boundingBox();expect(bounds).not.toBeNull();
+  expect(bounds!.width).toBeGreaterThanOrEqual(44);expect(bounds!.height).toBeGreaterThanOrEqual(44);
+  expect(await guidance.evaluate(element=>element.scrollWidth<=element.clientWidth+1)).toBe(true);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth&&document.documentElement.scrollHeight<=innerHeight)).toBe(true);
+  await page.screenshot({path:info.outputPath('class-guidance-narrow-large-text.png')});
+  await page.evaluate(()=>document.documentElement.style.fontSize='');await page.setViewportSize(original);
+  const untouched=await session(page),tipText=await tip.textContent();
+  const lessons=[await tip.getAttribute('data-tutorial-id'),await teaching.getAttribute('data-tutorial-id')];
+  expect(lessons.every(Boolean)).toBe(true);expect(new Set(lessons).size).toBe(2);
+  await page.locator('#battle-target').selectOption({index:1});
+  await expect(page.locator('#battle-review')).toBeEnabled();
+  const prepared=await session(page),preview=await page.locator('#battle-preview').textContent();
+  expect(prepared.state).toEqual(untouched.state);expect(prepared.replay).toEqual(untouched.replay);
+  await expect(tip).toHaveText(tipText!);expect(await saved()).toBeNull();
+  await activate(dismiss);await expect(guidance).toBeHidden();
+  await expect(page.locator('#battle-move')).toBeFocused();
+  expect(await session(page)).toEqual(prepared);await expect(page.locator('#battle-preview')).toHaveText(preview!);
+  const acknowledged=JSON.parse((await saved())!);
+  expect(acknowledged).toMatchObject({version:1,enabled:true});
+  expect([...acknowledged.seen].sort()).toEqual([...lessons].sort());
+  // Dismissal remains in force after a real action in this same turn.
+  if(prepared.pending?.type!=='move')throw Error('Expected the prepared movement');
+  await activate(page.locator('#battle-review'));await ready();
+  const moved=await session(page);
+  expect(moved.state.commandCount).toBe(prepared.state.commandCount+1);
+  expect(moved.state.units.find(unit=>unit.id===prepared.pending!.unitId)!.cell).toEqual(prepared.pending.to);
+  expect(moved.replay.commands).toEqual([...prepared.replay.commands,prepared.pending]);
+  await expect(guidance).toBeHidden();expect(JSON.parse((await saved())!)).toEqual(acknowledged);
+  const beforeWait=await session(page);
+  await activate(page.locator('#battle-next'));
+  await expect.poll(async()=>(await session(page)).state.commandCount).toBeGreaterThan(beforeWait.state.commandCount);
+  await ready();await expect(guidance).toBeVisible();await expect(teaching).toBeHidden();
+  expect(JSON.parse((await saved())!)).toEqual(acknowledged);
+  // Reload repeats the already-acknowledged class's per-turn tip, but not its
+  // first-time preview lesson; tutorial history is separate from battle state.
+  await page.reload();await ready();
+  await expect(guidance).toHaveAttribute('data-unit-id',String(firstActor));
+  await expect(tip).toHaveText(tipText!);await expect(teaching).toBeHidden();
+  expect(JSON.parse((await saved())!)).toEqual(acknowledged);
+  await activate(dismiss);await expect(guidance).toBeHidden();
+  await activate(page.locator('#fit-restart'));await confirmRestart(page);await ready();
+  expect((await session(page)).state.seed).toBe(first.state.seed+1);
+  await expect(guidance).toBeVisible();await expect(teaching).toBeHidden();
+  expect(JSON.parse((await saved())!)).toEqual(acknowledged);
+  expect(errors).toEqual([]);
 });

@@ -21,16 +21,16 @@ describe('base-aware menu routing', () => {
     });
     it(`admits only one supported menu game at the base root ${base}`, () => {
       for (const game of ['battle', 'run', 'dungeon'] as const) {
-        expect(menuGameHref(game, base, 'new')).toBe(`${base}?game=${game}&entry=new`);
+        expect(menuGameHref(game, base, 'new')).toBe(`${base}?game=${game}${game === 'dungeon' ? '&entry=new' : ''}`);
         for (const path of [base, base.replace(/\/$/, '')]) {
-          expect(resolveAppEntry(path, `?game=${game}&entry=continue`, base)).toEqual({ route: game, persistent: true });
+          expect(resolveAppEntry(path, `?game=${game}&entry=continue`, base)).toEqual({ route: game, persistent: game === 'dungeon' });
         }
       }
       for (const search of ['?game=map', '?game=unknown', '?game=', '?game=battle&game=run', '?game=run&game=run', '?scene=unknown', '?entry=new']) {
         expect(resolveAppEntry(base, search, base)).toEqual({ route: 'menu', persistent: false, ...(search.includes('game=') ? { redirectToMenu: true } : {}) });
       }
-      expect(resolveAppEntry(base, '?game=run&scene=unknown', base)).toEqual({ route: 'run', persistent: true });
-      expect(resolveAppEntry(base, '?game=run&scene=unknown&scene=proof', base)).toEqual({ route: 'run', persistent: true });
+      expect(resolveAppEntry(base, '?game=run&scene=unknown', base)).toEqual({ route: 'run', persistent: false });
+      expect(resolveAppEntry(base, '?game=run&scene=unknown&scene=proof', base)).toEqual({ route: 'run', persistent: false });
       expect(resolveAppEntry(base, '?scene=unknown&scene=proof', base)).toEqual({ route: 'menu', persistent: false });
       expect(resolveAppEntry(base, '?game=run&scene=proof&scene=unknown', base)).toEqual({ route: 'battle', persistent: false });
     });

@@ -13,7 +13,7 @@ test('PR discovery contains exactly the seven core journeys on their intended de
     ['pr-desktop', 'boot.spec.ts', 'missing engine chunk reports a recoverable startup error on battle'],
     ['pr-desktop', 'battle-loop.spec.ts', 'complete legal authored battle seed 2 reaches playerWin through controls and replays'],
     ['pr-desktop', 'dungeon.spec.ts', dungeon],
-    ['pr-desktop', 'run-progression.spec.ts', 'run battle undo survives reload and a legal terminal journey'],
+    ['pr-desktop', 'run-progression.spec.ts', 'run battle undo and a legal terminal journey reset on reload'],
     ['pr-touch', 'battle-loop.spec.ts', 'real touch previews a board move, modal backdrop captures it, and suspend resumes exactly once'],
     ['pr-webkit', 'dungeon.spec.ts', dungeon],
   ].sort());

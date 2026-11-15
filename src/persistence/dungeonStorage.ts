@@ -1,4 +1,4 @@
-import { DUNGEON_SAVE_MAX_BYTES, decodeDungeon, encodeDungeonRollback, encodeDungeonWithState, hasWallSight, requiresFinalRewardSupport, restoreDungeonRollback } from '../domain/dungeonSaveEnvelope';
+import { DUNGEON_SAVE_MAX_BYTES, decodeDungeon, encodeDungeonRollback, encodeDungeonWithState, hasGroundLoot, hasWallSight, requiresFinalRewardSupport, restoreDungeonRollback } from '../domain/dungeonSaveEnvelope';
 import type { DungeonState } from '../domain/dungeon';
 import type { RunStorageProvider } from './runStorage';
 export const DUNGEON_KEYS = { primary: 'tactics-guru:phaser:dungeon:primary:v1', backup: 'tactics-guru:phaser:dungeon:backup:v1' } as const;
@@ -95,7 +95,8 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
         } else {
           const floors = state.floors.map((floor,index) => index === state.depth-1 && floor.exploration.version === 'exploration-v2'
             ? {...floor, exploration:{...floor.exploration,active:null}} : floor);
-          const checkpoint = encodeDungeonWithState({...state,floors,phase:'ready',activeBattle:null,battlefield:null});
+          const { encounterEntry: _, ...preparation } = state;
+          const checkpoint = encodeDungeonWithState({...preparation,floors,phase:'ready',activeBattle:null,battlefield:null});
           if (!checkpoint.ok) return checkpoint;
           backup = checkpoint.text;
           backupState = checkpoint.state;
@@ -107,10 +108,17 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
         backup = null;
         backupState = undefined;
       }
+      // Keep the last actual pre-contact checkpoint when an older client cannot
+      // read the current origin/contact contract. Never manufacture an origin.
+      if (backupState?.encounterEntry && old.backup.status === 'valid' &&
+          old.backup.state.id === state.id && !old.backup.state.encounterEntry) {
+        backup = null;
+        backupState = undefined;
+      }
       let checkpoint: string | null = null;
       // Inspection caches the exact record that restored the reviewed backup.
       const retainedRecord = old.backup.status === 'valid' && old.backup.checkpoint ? restoredBackup?.record : undefined;
-      if (!(backup === null && retainedRecord !== undefined) && backupState && !backupState.stats && hasWallSight(backupState)) {
+      if (!(backup === null && retainedRecord !== undefined) && backupState && !backupState.stats && !hasGroundLoot(backupState) && hasWallSight(backupState)) {
         const rollback = encodeDungeonRollback(backupState);
         if (rollback.ok) {
           backup = rollback.text;

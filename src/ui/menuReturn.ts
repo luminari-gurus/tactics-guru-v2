@@ -7,9 +7,10 @@ export function confirmMenuDeparture(unsaved: () => boolean, recover: () => void
   return true;
 }
 /** Keep save/recovery available if the current owner reports unsaved progress. */
-export function menuReturnLink(unsaved: () => boolean, recover: () => void, beforeLeave?: () => void | boolean | Promise<void | boolean>) {
+export function menuReturnLink(unsaved?: () => boolean, recover?: () => void, beforeLeave?: () => void | boolean | Promise<void | boolean>) {
   const link = document.createElement('a'); link.href = routeHref('menu', import.meta.env.BASE_URL);
   link.textContent = 'Main menu'; link.className = 'run-entry-link';
+  if (!unsaved || !recover) return link;
   link.addEventListener('click', async event => {
     if (beforeLeave && event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
       event.preventDefault(); if (await beforeLeave() === false) return;

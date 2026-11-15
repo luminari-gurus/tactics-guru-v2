@@ -62,7 +62,7 @@ export async function session(page:Page) {
 /** Complete the explicit destructive choice, then wait for the replacement scene. */
 export async function confirmRestart(page:Page, force=false) {
   const seed=(await readSession(page)).state.seed;
-  await page.locator('#save-confirm-reset').click({force});
+  await page.locator('#battle-confirm-restart').click({force});
   if(force)return; // The caller resumes its paused RAF before checking the new scene.
   await expect.poll(async()=>JSON.parse((await page.locator('#game').getAttribute('data-session'))??'null')?.state.seed).toBe((seed+1)>>>0);
 }
