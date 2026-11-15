@@ -48,21 +48,61 @@ jobs:
       - name: Verify movement layout on Chromium
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: |
-          selection=(-c playwright.regression.config.ts tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts -g 'map-edge direction controls|movement controls stay visible|maximum-size saved floor|fresh dungeon keeps the map|ground loot: legal victory|compass keeps keyboard focus|map shortcuts work|real traversal, art independence|map input stays inert|exploration keeps the map first|dungeon recovery separates status')
+          selection=(-c playwright.regression.config.ts tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts -g 'map-edge direction controls|movement controls stay visible|maximum-size saved floor|fresh dungeon keeps the map|ground loot: legal victory|compass keeps keyboard focus|map shortcuts work|real traversal, art independence|map input stays inert|exploration keeps the map first|dungeon recovery separates status|stairs travel once per entry with compass')
           npx --no-install playwright test "${selection[@]}" --list > verification-receipts/issue-415/chromium-selection.txt
           npm run test:browser -- "${selection[@]}" --max-failures=5 --diagnostics
       - name: Verify movement layout on WebKit
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: |
-          selection=(-c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts -g 'map-edge direction controls|movement controls stay visible|maximum-size saved floor|fresh dungeon keeps the map|ground loot: legal victory|compass keeps keyboard focus|map shortcuts work|real traversal, art independence|map input stays inert|exploration keeps the map first|dungeon recovery separates status')
+          selection=(-c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts -g 'map-edge direction controls|movement controls stay visible|maximum-size saved floor|fresh dungeon keeps the map|ground loot: legal victory|compass keeps keyboard focus|map shortcuts work|real traversal, art independence|map input stays inert|exploration keeps the map first|dungeon recovery separates status|stairs travel once per entry with compass')
           npx --no-install playwright test "${selection[@]}" --list > verification-receipts/issue-415/webkit-selection.txt
           npm run test:browser -- "${selection[@]}" --max-failures=5 --diagnostics
       - name: Check large-floor movement responsiveness on Chromium
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:browser -- -c playwright.regression.config.ts tests/dungeon-exploration.spec.ts -g 'maximum-size floor step responsiveness|warm.*maximum-size.*floor' --max-failures=2
+        run: npm run test:browser -- -c playwright.regression.config.ts tests/dungeon-exploration.spec.ts -g 'maximum-size floor step responsiveness|warm.*maximum-size.*floor' --max-failures=3
       - name: Check large-floor movement responsiveness on WebKit
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'maximum-size floor step responsiveness|warm.*maximum-size.*floor' --max-failures=2
+        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'maximum-size floor step responsiveness|warm.*maximum-size.*floor' --max-failures=3
+      - name: Build unchanged runtime with repaired warm-test harness
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        id: base_build
+        run: |
+          git switch --detach 65211c809e86ecab223c9ae1afef8576aad3179b
+          git diff --exit-code
+          mkdir -p verification-receipts/issue-415-base-repaired
+          git rev-parse HEAD > verification-receipts/issue-415-base-repaired/runtime-commit.txt
+          npm run build
+          python3 - <<'PY'
+          import os, pathlib, subprocess, hashlib, json
+          path = pathlib.Path('tests/dungeon-exploration.spec.ts')
+          candidate = subprocess.check_output(['git', 'show', os.environ['GITHUB_SHA'] + ':' + str(path)], text=True)
+          original = path.read_text()
+          begin = "test('warm maximum-size floor step responsiveness meets the established budget after a legal victory'"
+          end = '\nfor(const depth of [1,5])test('
+          def span(text):
+              a = text.index(begin)
+              return a, text.index(end, a)
+          a, b = span(candidate)
+          c, d = span(original)
+          block = candidate[a:b]
+          path.write_text(original[:c] + block + original[d:])
+          receipt = pathlib.Path('verification-receipts/issue-415-base-repaired')
+          (receipt / 'harness.json').write_text(json.dumps({
+              'source': os.environ['GITHUB_SHA'],
+              'overlay': str(path),
+              'blockSHA256': hashlib.sha256(block.encode()).hexdigest(),
+              'runtime': 'Literal base production build; only the repaired warm test block is overlaid after the build',
+              'buildAssets': {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(pathlib.Path('dist').rglob('*')) if p.is_file()}
+          }, indent=2))
+          PY
+          git diff -- tests/dungeon-exploration.spec.ts > verification-receipts/issue-415-base-repaired/harness.patch
+          git diff --exit-code -- src public scripts package.json package-lock.json
+      - name: Compare repaired warm-floor harness on unchanged Chromium runtime
+        if: ${{ !cancelled() && steps.base_build.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.regression.config.ts tests/dungeon-exploration.spec.ts -g 'warm.*maximum-size.*floor' --max-failures=3
+      - name: Compare repaired warm-floor harness on unchanged WebKit runtime
+        if: ${{ !cancelled() && steps.base_build.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'warm.*maximum-size.*floor' --max-failures=3
       - uses: actions/upload-artifact@v4
         if: always()
         with:

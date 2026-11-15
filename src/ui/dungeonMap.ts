@@ -62,9 +62,10 @@ export class DungeonMap {
   private readonly fallbackCells = new Set<HTMLElement>();
   private visual: { map: GeneratedMap; biome: string; revealed: Set<number>; sight: Set<number>; markers: number[] } | null = null;
   private readonly abort = new AbortController();
-  private readonly resize = new ResizeObserver(() => this.scheduleLayout(true));
+  private readonly resize = new ResizeObserver(() => this.scheduleLayout(false));
   private layoutFrame = 0;
   private revealPlayer = false;
+  private layoutSize = { width: 0, height: 0 };
   private readonly treatment = createMapArt(() => { if (this.live) this.paintArt(); });
   constructor(private readonly move: (destination: number) => void, private readonly locked: () => boolean) {
     const el = <K extends keyof HTMLElementTagNameMap>(tag:K,text='') => { const n=document.createElement(tag);n.textContent=text;return n; };
@@ -123,8 +124,8 @@ export class DungeonMap {
     this.controlsRoot.className = 'dungeon-map-controls';
     this.controlsRoot.append(this.feedback,label,keyboardPreference);
     this.resize.observe(this.viewport);
-    window.addEventListener('resize', () => this.scheduleLayout(true), {signal});
-    window.visualViewport?.addEventListener('resize', () => this.scheduleLayout(true), {signal});
+    window.addEventListener('resize', () => this.scheduleLayout(false), {signal});
+    window.visualViewport?.addEventListener('resize', () => this.scheduleLayout(false), {signal});
     document.addEventListener('keydown',e => {
       if (this.state?.phase !== 'ready' || !this.root.isConnected || this.root.closest('[hidden]') ||
         this.locked() || document.hidden || e.defaultPrevented || e.isComposing ||
@@ -152,7 +153,11 @@ export class DungeonMap {
     if (!this.live || this.layoutFrame) return;
     this.layoutFrame = requestAnimationFrame(() => {
       this.layoutFrame = 0;
-      if (!this.live || !this.root.isConnected || this.root.closest('[hidden]')) return;
+      if (!this.live) return;
+      if (!this.root.isConnected || this.root.closest('[hidden]')) {
+        this.layoutSize = { width: 0, height: 0 };
+        return;
+      }
       const screen = this.root.closest<HTMLElement>('#dungeon-screen');
       if (!screen) return;
       const frame = this.directions.getBoundingClientRect(), screenBounds = screen.getBoundingClientRect();
@@ -167,6 +172,11 @@ export class DungeonMap {
       if (this.viewport.style.getPropertyValue('--dungeon-map-max-height') !== height) {
         this.viewport.style.setProperty('--dungeon-map-max-height', height);
       }
+      const size = { width: this.viewport.clientWidth, height: this.viewport.clientHeight };
+      // Resize notifications can arrive after a player has started inspecting the map.
+      // Follow once for an actual size change, not again for a delayed duplicate event.
+      this.revealPlayer ||= size.width !== this.layoutSize.width || size.height !== this.layoutSize.height;
+      this.layoutSize = size;
       if (!this.revealPlayer || !this.state) return;
       this.revealPlayer = false;
       const player = this.cells[currentFloor(this.state).position];
