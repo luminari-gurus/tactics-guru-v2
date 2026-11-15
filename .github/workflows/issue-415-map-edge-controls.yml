@@ -1,4 +1,4 @@
-name: Issue 415 optimized map-edge verification
+name: Verify mobile movement after core checks
 on:
   push:
     branches: [verify/issue-415-map-edge-controls]
@@ -36,7 +36,7 @@ jobs:
           import { sourceIdentity } from './scripts/verification-report.mjs';
           writeFileSync('verification-receipts/issue-415/source.json', JSON.stringify({
             source: sourceIdentity(process.cwd()), node: process.version, runner: process.env.RUNNER_NAME,
-            conditions: 'Qualified persistent runner; browser/device emulation; shared host load and caches not independently controlled',
+            conditions: 'Our PR verification run 43669892682 completed before this run was queued. One of our browser jobs is active; other host workloads and caches are not independently controlled. Qualified runner; browser/device emulation.',
             purpose: 'Issue 415 map-edge controls. Verification-only workflow; runtime and tests are compared to the implementation PR.'
           }, null, 2));
           JS
@@ -72,7 +72,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: issue-415-optimized-movement-${{ github.run_id }}-${{ github.run_attempt }}
+          name: issue-415-coordinated-movement-${{ github.run_id }}-${{ github.run_attempt }}
           path: verification-receipts/
           retention-days: 14
           if-no-files-found: warn
