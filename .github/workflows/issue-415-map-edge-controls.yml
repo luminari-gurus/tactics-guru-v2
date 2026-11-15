@@ -1,4 +1,4 @@
-name: Issue 415 map-edge movement verification
+name: Issue 415 bounded WebKit timing comparison
 on:
   push:
     branches: [verify/issue-415-map-edge-controls]
@@ -40,29 +40,12 @@ jobs:
             purpose: 'Issue 415 map-edge controls. Verification-only workflow; runtime and tests are compared to the implementation PR.'
           }, null, 2));
           JS
-      - name: Build and check affected presentation units
+      - name: Build unchanged candidate
         id: build
-        run: |
-          npm run test:unit -- tests/unit/dungeonLootPresentation.test.ts
-          npm run build
-      - name: Verify movement layout on Chromium
+        run: npm run build
+      - name: Measure candidate warm WebKit desktop and landscape three times
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: |
-          selection=(-c playwright.regression.config.ts tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts -g 'map-edge direction controls|movement controls stay visible|maximum-size saved floor|fresh dungeon keeps the map|ground loot: legal victory|compass keeps keyboard focus|map shortcuts work|real traversal, art independence|map input stays inert|exploration keeps the map first|dungeon recovery separates status|stairs travel once per entry with compass')
-          npx --no-install playwright test "${selection[@]}" --list > verification-receipts/issue-415/chromium-selection.txt
-          npm run test:browser -- "${selection[@]}" --max-failures=5 --diagnostics
-      - name: Verify movement layout on WebKit
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: |
-          selection=(-c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts -g 'map-edge direction controls|movement controls stay visible|maximum-size saved floor|fresh dungeon keeps the map|ground loot: legal victory|compass keeps keyboard focus|map shortcuts work|real traversal, art independence|map input stays inert|exploration keeps the map first|dungeon recovery separates status|stairs travel once per entry with compass')
-          npx --no-install playwright test "${selection[@]}" --list > verification-receipts/issue-415/webkit-selection.txt
-          npm run test:browser -- "${selection[@]}" --max-failures=5 --diagnostics
-      - name: Check large-floor movement responsiveness on Chromium
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:browser -- -c playwright.regression.config.ts tests/dungeon-exploration.spec.ts -g 'maximum-size floor step responsiveness|warm.*maximum-size.*floor' --max-failures=3
-      - name: Check large-floor movement responsiveness on WebKit
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'maximum-size floor step responsiveness|warm.*maximum-size.*floor' --max-failures=3
+        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'warm.*maximum-size.*floor' --project=desktop-webkit --project=landscape-webkit --repeat-each=3 --max-failures=6
       - name: Build unchanged runtime with repaired warm-test harness
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         id: base_build
@@ -97,16 +80,13 @@ jobs:
           PY
           git diff -- tests/dungeon-exploration.spec.ts > verification-receipts/issue-415-base-repaired/harness.patch
           git diff --exit-code -- src public scripts package.json package-lock.json
-      - name: Compare repaired warm-floor harness on unchanged Chromium runtime
+      - name: Measure literal-base warm WebKit desktop and landscape three times
         if: ${{ !cancelled() && steps.base_build.outcome == 'success' }}
-        run: npm run test:browser -- -c playwright.regression.config.ts tests/dungeon-exploration.spec.ts -g 'warm.*maximum-size.*floor' --max-failures=3
-      - name: Compare repaired warm-floor harness on unchanged WebKit runtime
-        if: ${{ !cancelled() && steps.base_build.outcome == 'success' }}
-        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'warm.*maximum-size.*floor' --max-failures=3
+        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'warm.*maximum-size.*floor' --project=desktop-webkit --project=landscape-webkit --repeat-each=3 --max-failures=6
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: issue-415-movement-${{ github.run_id }}-${{ github.run_attempt }}
+          name: issue-415-paired-webkit-${{ github.run_id }}-${{ github.run_attempt }}
           path: verification-receipts/
           retention-days: 14
           if-no-files-found: warn
