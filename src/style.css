@@ -105,6 +105,7 @@ dialog button { touch-action: manipulation; }
 .battle-mode .battle-commit { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; }
 .battle-mode #battle-review:not(:disabled) { color:var(--panel); background:var(--gold); border-color:var(--gold); font-weight:650; }
 .battle-mode .battle-tools { display:flex; gap:6px; flex-wrap:wrap; border-top:1px solid #66768d; padding-top:12px; margin-top:16px; }
+.battle-mode #battle-overflow { min-width:0; max-width:100%; overflow-wrap:anywhere; }
 .battle-mode .battle-tools button, .battle-mode #battle-persistence, .battle-mode #battle-scroll > .fit-controls { font-size:.8rem; }
 .battle-mode #battle-shortcuts { flex-basis:100%; min-width:0; font-size:.8rem; }
 .battle-mode #battle-shortcuts summary { min-height:44px; padding:10px 0; box-sizing:border-box; cursor:pointer; }
@@ -161,7 +162,7 @@ dialog button { touch-action: manipulation; }
   .battle-mode.battle-skin-radial #battle-turn-order { max-height:none; }
   .battle-mode.battle-skin-radial #battle-actor { max-height:none; border-bottom:0; border-right:1px solid var(--edge); }
 }
-.battle-mode [data-combat-controls] { border:1px solid var(--edge); border-radius:6px; padding:8px; margin:8px 0; }
+.battle-mode [data-combat-controls] { min-width:0; border:1px solid var(--edge); border-radius:6px; padding:8px; margin:8px 0; }
 .battle-mode [data-combat-controls] legend, .menu-dialog [data-combat-controls] legend { font-weight:650; }
 .battle-mode [data-combat-controls] label, .menu-dialog [data-combat-controls] label { display:flex; align-items:center; gap:8px; min-height:44px; }
 .menu-dialog [data-combat-controls] { border:1px solid #b49a61; border-radius:6px; padding:8px 12px; margin:12px 0; text-align:left; }

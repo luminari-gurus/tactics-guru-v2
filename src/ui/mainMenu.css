@@ -17,7 +17,8 @@
 .menu-secondary { display:flex; flex-wrap:wrap; justify-content:center; gap:.25rem 1rem; margin-top:auto; padding-top:2rem; }
 .menu-secondary a,.menu-dialog a { color:#f1ddb0; min-height:44px; display:inline-flex; align-items:center; line-height:1.5; }
 .menu-content > p:last-child { color:#c1c9b0; font-size:.8rem; }
-.menu-dialog { box-sizing:border-box; width:min(calc(100% - 2rem),30rem); max-height:calc(100svh - 2rem); overflow:auto; border:1px solid #b49a61; border-radius:8px; background:#14241f; color:#f5eed7; padding:1.5rem; font:1rem/1.6 system-ui,sans-serif; }
+.menu-dialog { box-sizing:border-box; width:min(calc(100% - 2rem),30rem); max-height:calc(100svh - 2rem); overflow:auto; overflow-wrap:anywhere; border:1px solid #b49a61; border-radius:8px; background:#14241f; color:#f5eed7; padding:1.5rem; font:1rem/1.6 system-ui,sans-serif; }
+.menu-dialog fieldset { min-width:0; }
 .menu-dialog::backdrop { background:#000b; }
 .menu-dialog h2 { font-family:Georgia,serif; }
 .menu-dialog a { display:flex; padding:.5rem 0; }

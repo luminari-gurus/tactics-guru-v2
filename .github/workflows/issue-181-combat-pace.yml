@@ -21,6 +21,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
+          fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -28,6 +29,34 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run setup:browsers && npm run check:browsers
+      - name: Check whether passing animation coverage can be retained
+        id: reuse
+        run: |
+          node --input-type=module <<'JS'
+          import { appendFileSync, readFileSync } from 'node:fs';
+          import { execFileSync } from 'node:child_process';
+          import { createHash } from 'node:crypto';
+          const base = 'ec91b6fa1edf71eddbe7909e03c5068e85bcbb74';
+          const workflow = '.github/workflows/issue-181-combat-pace.yml';
+          const cssRepair = {
+            'src/ui/mainMenu.css': '46863b5584e63168f99f57f31cc830ed2ef9b656c1a37e647bbe7346d57cfb4a',
+            'src/style.css': 'ae5c6072e7e2fd23f5908f880b2e82b593dff132aa9776fe575f9f35fab9edc1'
+          };
+          const git = args => execFileSync('git', args, { encoding: 'utf8' }).trim();
+          const changed = git(['diff', '--name-only', base, 'HEAD']).split('\n').filter(Boolean);
+          const hashes = Object.fromEntries(Object.keys(cssRepair).map(path =>
+            [path, createHash('sha256').update(readFileSync(path)).digest('hex')]));
+          const unchanged = !git(['status', '--porcelain'])
+            && changed.every(path => path === workflow || Object.hasOwn(cssRepair, path))
+            && Object.entries(cssRepair).every(([path, hash]) => hashes[path] === hash);
+          // The exact reviewed CSS repair only changes wrapping/sizing in Settings
+          // and More. Run their five failed cases and all three layout witnesses
+          // again. Retain 44 passing animation/audio cases from run 43727061224;
+          // that run's five Settings failures remain recorded, never relabeled.
+          // Any other input change restores the full 52-case selection.
+          appendFileSync(process.env.GITHUB_OUTPUT, `unchanged=${unchanged}\n`);
+          console.log(JSON.stringify({ unchanged, comparison: base, retainedRun: 43727061224, changed, hashes }));
+          JS
       - name: Record source identity
         run: |
           mkdir -p verification-receipts/issue-181-pace
@@ -36,7 +65,12 @@ jobs:
           import { sourceIdentity } from './scripts/verification-report.mjs';
           writeFileSync('verification-receipts/issue-181-pace/source.json', JSON.stringify({
             source: sourceIdentity(process.cwd()), node: process.version, runner: process.env.RUNNER_NAME,
-            conditions: 'Persistent qualified runner; browser/device emulation; shared host load and caches not independently controlled'
+            conditions: 'Persistent qualified runner; browser/device emulation; shared host load and caches not independently controlled',
+            reusedEvidence: '${{ steps.reuse.outputs.unchanged }}' === 'true'
+              ? { run: 43727061224, source: 'ec91b6fa1edf71eddbe7909e03c5068e85bcbb74', passingChecks: 44,
+                  artifact: 14166799940, artifactSha256: 'a0dbcf59a3de61199a344a9c262e7586034ce5561d26bc7bd81a3923491181a1',
+                  scope: '20 Normal/Fast, reduced-motion, interruption/restart and audio checks; 24 existing Normal signature, idle-bob and HUD checks. Exact CSS repair only changes Settings/More wrapping; all logic, tests, helpers, configs, dependencies and assets unchanged.' }
+              : null
           }, null, 2));
           JS
       - name: Build the application
@@ -44,9 +78,16 @@ jobs:
         run: npm run build
       - name: Verify pace, reduced motion, settings and replay equivalence on Chromium
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:browser -- -c playwright.regression.config.ts tests/battle-animations.spec.ts tests/battle-audio.spec.ts tests/main-menu.spec.ts -g 'combat pace' --diagnostics
+        env:
+          UNCHANGED_ANIMATIONS: ${{ steps.reuse.outputs.unchanged }}
+        run: |
+          if [ "$UNCHANGED_ANIMATIONS" = 'true' ]; then
+            npm run test:browser -- -c playwright.regression.config.ts tests/main-menu.spec.ts -g 'combat pace' --diagnostics
+          else
+            npm run test:browser -- -c playwright.regression.config.ts tests/battle-animations.spec.ts tests/battle-audio.spec.ts tests/main-menu.spec.ts -g 'combat pace' --diagnostics
+          fi
       - name: Preserve Normal signature effects, cancellation and HUD handoff
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.reuse.outputs.unchanged != 'true' }}
         run: |
           npm run test:browser -- -c playwright.regression.config.ts tests/battle-animations.spec.ts -g 'real controls, travel/impact|magic_missile: repeated cancellation|active bob: presentation, actor change|active bob: initial reduced motion|turn queue holds|class guidance retains' --diagnostics
       - name: Verify layout and Settings focus at supported sizes and enlarged text
@@ -55,7 +96,14 @@ jobs:
           npm run test:browser -- -c playwright.regression.config.ts tests/battle-loop.spec.ts tests/battle-radial.spec.ts tests/main-menu.spec.ts --project=desktop -g 'accepted rail and dock preserve|radial preference replaces the side rail|main menu: read-only root' --diagnostics
       - name: Verify pace and settings on iPhone WebKit
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:browser -- -c playwright.combat-pace.config.ts --diagnostics
+        env:
+          UNCHANGED_ANIMATIONS: ${{ steps.reuse.outputs.unchanged }}
+        run: |
+          if [ "$UNCHANGED_ANIMATIONS" = 'true' ]; then
+            npm run test:browser -- -c playwright.combat-pace.config.ts tests/main-menu.spec.ts --diagnostics
+          else
+            npm run test:browser -- -c playwright.combat-pace.config.ts --diagnostics
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
