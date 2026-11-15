@@ -212,7 +212,7 @@ export class DungeonSession {
   }
   inspect() { if (!this.storage) throw Error('Testing dungeons have no save storage'); const review = this.storage.inspect(); this.review = review; return review; }
   continue(review: DungeonInspection, slot: DungeonSlot = review.primary.status === 'valid' ? 'primary' : 'backup') {
-    if (!this.storage || this.disposed || review !== this.review || review[slot].status !== 'valid' || !this.storage.acknowledge(review)) return false;
+    if (!this.storage || this.disposed || review !== this.review || review[slot].status !== 'valid' || review[slot].state.phase === 'defeat' || !this.storage.acknowledge(review)) return false;
     const selected = review[slot]; if (selected.status !== 'valid') return false;
     this.battle?.dispose(); this.battle = null; this.current = structuredClone(selected.state); this.expectedPrimary = review.primary.text; this.unsaved = false; this.progressSaved = true; this.review = null;
     this.started = true;
