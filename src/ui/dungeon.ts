@@ -37,7 +37,7 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
   const active = root.contains(document.activeElement) ? document.activeElement : null;
   const focusId = active?.id;
   const el = dungeonElement, floor = currentFloor(s);
-  const title = el('h1', s.phase === 'defeat' ? `Dungeon defeat · ${dungeonBiomeLabel(s)} · Floor ${s.depth}` : `Dungeon · Floor ${s.depth} · ${dungeonBiomeLabel(s)}`); title.id = 'dungeon-title'; title.tabIndex = -1;
+  const titleText = s.phase === 'defeat' ? `Dungeon defeat · ${dungeonBiomeLabel(s)} · Floor ${s.depth}` : `Dungeon · Floor ${s.depth} · ${dungeonBiomeLabel(s)}`;
   let header=root.querySelector<HTMLElement>(':scope > .dungeon-header');
   let play=root.querySelector<HTMLElement>(':scope > .dungeon-play');
   let sidebar=play?.querySelector<HTMLElement>('.dungeon-sidebar');
@@ -61,19 +61,30 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
     status.setAttribute('aria-live','polite');status.setAttribute('aria-atomic','true');
     header.append(status);
   }
-  const previousTitle=header.querySelector(':scope > h1');
-  if(previousTitle)previousTitle.replaceWith(title);else header.prepend(title);
-  for(const child of [...header.children])if(child!==title&&child!==status)child.remove();
+  const previousTitle=header.querySelector<HTMLHeadingElement>(':scope > h1');
+  let title=previousTitle;
+  // Ordinary movement retains the header; real title transitions keep the focus restoration below.
+  if(!title||title.textContent!==titleText){
+    title=el('h1',titleText);title.id='dungeon-title';title.tabIndex=-1;
+    if(previousTitle)previousTitle.replaceWith(title);else header.prepend(title);
+  }
+  let travelHint=header.querySelector<HTMLElement>(':scope > .dungeon-travel-hint');
+  for(const child of [...header.children])if(child!==title&&child!==status&&child!==travelHint)child.remove();
   if(status.textContent!==session.status)status.textContent=session.status;
+  let hintText='';
   if (s.phase === 'ready') {
     if (s.depth > 1 && floor.position === floor.descriptor.upstairs) {
-      header.append(el('p', 'Step off the upstairs and back onto it to ascend.'));
+      hintText='Step off the upstairs and back onto it to ascend.';
     } else if (floor.completed === 3 && floor.position === floor.descriptor.downstairs) {
-      header.append(el('p', 'Step off the downstairs and back onto it to descend.'));
+      hintText='Step off the downstairs and back onto it to descend.';
     } else if (floor.completed === 3) {
-      header.append(el('p', 'Descent unlocked. Walk onto the downstairs to continue.'));
+      hintText='Descent unlocked. Walk onto the downstairs to continue.';
     }
   }
+  if(hintText){
+    if(!travelHint){travelHint=el('p');travelHint.className='dungeon-travel-hint';header.append(travelHint);}
+    if(travelHint.textContent!==hintText)travelHint.textContent=hintText;
+  }else travelHint?.remove();
   sidebar.replaceChildren();
   const itemTargets = new Map([...after.querySelectorAll('select')].map(select => [select.id, select.value]));
   after.replaceChildren();
