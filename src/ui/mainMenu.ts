@@ -1,4 +1,5 @@
 import { inspectMenuSave } from '../app/menuSaves';
+import { readRunRecord } from '../domain/runRecords';
 import { menuGameHref, routeHref } from '../app/routes';
 import { bothDungeonSlotsMissing, createDungeonStorage } from '../persistence/dungeonStorage';
 import { mountTelemetryPreferences } from '../telemetry/preferences';
@@ -65,7 +66,7 @@ export function startMainMenu() {
       body.append(link);
     });
   }
-  const actions: Record<string, () => void> = {
+  const actionsMenu: Record<string, () => void> = {
     continue: () => {
       if (refresh().resumable) location.assign(menuGameHref('dungeon', import.meta.env.BASE_URL, 'continue'));
     },
@@ -104,7 +105,7 @@ export function startMainMenu() {
   };
   for (const entry of menuDefinition) {
     const button = element('button', entry.label); button.type = 'button'; button.dataset.menuAction = entry.id;
-    button.onclick = () => { button.focus(); actions[entry.id](); }; buttons.set(entry.id, button); nav.append(button);
+    button.onclick = () => { button.focus(); actionsMenu[entry.id](); }; buttons.set(entry.id, button); nav.append(button);
   }
   const recovery = element('button', 'Save recovery'); recovery.type = 'button'; recovery.className = 'menu-recovery';
   recovery.onclick = () => { recovery.focus(); showRecovery(); };
@@ -114,6 +115,34 @@ export function startMainMenu() {
   }
   content.append(title, nav, status, recovery, secondary, element('p', 'Choose your next adventure.'));
   main.append(art, content); document.body.append(main, dialog); refresh();
+  // The dungeon hands off a single terminal result. Consume before opening so
+  // a reload cannot replay an old defeat announcement.
+  let defeatText: string | null = null;
+  try { defeatText = sessionStorage.getItem('tactics-guru:defeat-summary'); sessionStorage.removeItem('tactics-guru:defeat-summary'); } catch { /* Storage is optional. */ }
+  if (defeatText) {
+    let record: ReturnType<typeof readRunRecord> = null;
+    try { record = readRunRecord(JSON.parse(defeatText)); } catch { /* Ignore malformed handoffs. */ }
+    if (record?.mode === 'dungeon' && record.outcome === 'defeat') {
+      show('Dungeon defeat', () => {
+        body.append(element('p', 'Your party has fallen. Here is how far you made it.'));
+        const stats = element('dl'); stats.className = 'run-statistics';
+        const rows: [string, string][] = [
+          ['Deepest floor', String(record.deepestFloor ?? '—')],
+          ['Floors cleared', String(record.floorsCleared ?? '—')],
+          ['Battles won', String(record.battlesWon)],
+          ['Enemies killed', record.stats ? `${record.stats.enemiesKilled}${record.stats.coverage === 'since-upgrade' ? ' (since upgrade)' : ''}` : 'Unavailable'],
+          ['Moves taken', record.stats ? `${record.stats.movesTaken}${record.stats.coverage === 'since-upgrade' ? ' (since upgrade)' : ''}` : 'Unavailable'],
+          ['Active playtime', record.stats ? `${Math.floor(record.stats.activeMs / 60000)} min${record.stats.timeCoverage === 'since-upgrade' ? ' (since upgrade)' : ''}` : 'Unavailable'],
+        ];
+        for (const [name,value] of rows) { const cell=element('div'),dt=element('dt',name),dd=element('dd',value);cell.append(dt,dd);stats.append(cell); }
+        body.append(stats);
+        const actions=element('div'); actions.className='run-records-actions';
+        const newGame=element('button','New Game');newGame.type='button';newGame.onclick=()=>{dialog.close();actionsMenu.new();};
+        const records=element('button','Hall of Records');records.type='button';records.onclick=()=>{dialog.close();actionsMenu.records();};
+        actions.append(newGame,records);body.append(actions);
+      });
+    }
+  }
   for (const event of ['focus', 'pageshow', 'storage']) window.addEventListener(event, refresh);
   document.addEventListener('keydown', event => {
     if (event.repeat && (event.key === 'Enter' || event.key === ' ')) event.preventDefault();
