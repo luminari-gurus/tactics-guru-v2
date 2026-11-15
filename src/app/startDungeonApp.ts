@@ -8,6 +8,8 @@ import { mountTelemetryPreferences } from '../telemetry/preferences';
 import { DungeonSession } from './DungeonSession';
 import { DelayedDungeonStep } from './DelayedDungeonStep';
 import { RunHistory } from './RunHistory';
+import { dungeonRunRecord } from '../domain/runRecords';
+import { routeHref } from './routes';
 import { freshDungeon, FloorCache, newDungeonSeed, type DungeonState } from '../domain/dungeon';
 import type { DungeonAutoCollectIntent } from '../domain/dungeonAutoCollect';
 import { bothDungeonSlotsMissing, createDungeonStorage, serializeBrowserDungeonWrite } from '../persistence/dungeonStorage';
@@ -205,6 +207,12 @@ async function start(){
      // This callback follows encounter-return presentation (including #397's
      // cutscene completion). Capture once before stop invalidates old work.
      const intent=pendingVictory;
+     if(session.phase==='defeat') {
+      const record=dungeonRunRecord(session.snapshot,Date.now());
+      if(record) try { sessionStorage.setItem('tactics-guru:defeat-summary',JSON.stringify(record)); } catch { /* The menu remains accessible without temporary storage. */ }
+      location.assign(routeHref('menu',import.meta.env.BASE_URL));
+      return;
+     }
      stop();render();screen.querySelector<HTMLElement>('h1')?.focus();
      const returnedGeneration=loadGeneration;
      if(intent&&activeExploration())automaticStep.schedule(isCurrent=>
