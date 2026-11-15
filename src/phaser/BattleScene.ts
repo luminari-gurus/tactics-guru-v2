@@ -25,9 +25,11 @@ import { BoardRenderer, type BoardStyle } from './BoardRenderer';
 import { bindBoardInput } from './BoardInput';
 import { contentLoadPlan, loadContentAssets } from './contentLoading';
 import { BattleAudio } from './BattleAudio';
+import type { ClassGuidanceRun } from '../ui/classGuidance';
 
 export interface RunBattleHost {
   catalog: ContentCatalog; session: BattleSession; dialogs: BattleDialogs;
+  guidance?: ClassGuidanceRun;
   sound: { enabled: boolean }; modalTransition: () => void;
   ended: () => void; restart: () => void;
 }
@@ -321,7 +323,7 @@ export class BattleScene extends Phaser.Scene {
       wait:()=>{if(session.phase==='player' && !dialogs.open){session.prepare({type:'endTurn',unitId:session.active.id});void present(session.confirm());}},
       sound:()=>{this.soundEnabled=!this.soundEnabled;if(this.host)this.host.sound.enabled=this.soundEnabled;audio.setEnabled(this.soundEnabled);},
       retrySound:()=>audio.unlock(),
-    });
+    },this.host?.guidance);
     const audio=new BattleAudio(this,catalog,this.soundEnabled,snapshot=>hud.renderSound(snapshot));
     setBattleAudioDiagnostics(()=>audio.snapshot());
     applySkin();

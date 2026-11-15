@@ -1,7 +1,7 @@
 import type { BattleSession } from '../app/BattleSession';
 import type { CombatSkin } from './combatControls';
-import { classTipForTurn, previewLesson, type ClassTip } from './classGuidance';
-import { markClassGuidanceSeen, readClassGuidancePreferences, watchClassGuidancePreferences } from './classGuidancePreferences';
+import { classTipForTurn, previewLesson, type ClassTip, type ClassGuidanceRun } from './classGuidance';
+import { dismissClassGuidanceTip, markClassGuidanceSeen, readClassGuidanceDismissed, readClassGuidancePreferences, watchClassGuidancePreferences } from './classGuidancePreferences';
 
 /** Presentation-only help. Showing or skipping a tip never acknowledges a lesson. */
 export class BattleClassGuidance {
@@ -18,7 +18,8 @@ export class BattleClassGuidance {
   private dismissedTurn = '';
   private tip: ClassTip | null = null;
 
-  constructor(parent: HTMLElement, private readonly session: BattleSession, private readonly focusAction: () => void) {
+  constructor(parent: HTMLElement, private readonly session: BattleSession, private readonly focusAction: () => void,
+    private readonly run: ClassGuidanceRun = { dismissed: new Set() }) {
     this.root.id = 'battle-class-guidance';
     this.root.hidden = true;
     this.root.setAttribute('aria-labelledby', 'battle-class-tip-title');
@@ -29,7 +30,7 @@ export class BattleClassGuidance {
     this.dismiss.type = 'button';
     this.dismiss.textContent = '×';
     this.dismiss.setAttribute('aria-label', 'Dismiss tip');
-    this.dismiss.title = 'Dismiss tip for this turn';
+    this.dismiss.title = 'Dismiss tip for this run';
     this.feedback.id = 'battle-guidance-feedback';
     this.feedback.setAttribute('role', 'status');
     this.feedback.hidden = true;
@@ -43,7 +44,8 @@ export class BattleClassGuidance {
       // Preference notifications are synchronous: establish dismissal first so
       // acknowledging the lesson cannot reveal a different tip in this turn.
       this.dismissedTurn = this.turn;
-      const saved = markClassGuidanceSeen(ids);
+      this.run.dismissed.add(this.tip.id);
+      const saved = this.run.runId ? dismissClassGuidanceTip(this.run.runId, ids) : markClassGuidanceSeen(ids);
       this.feedback.textContent = saved ? '' : 'This browser could not save tutorial progress. It applies until you leave this page.';
       this.feedback.hidden = saved;
       this.render(this.skin);
@@ -53,6 +55,7 @@ export class BattleClassGuidance {
       if (reset) {
         this.turn = '';
         this.dismissedTurn = '';
+        this.run.dismissed.clear();
         this.tip = null;
         this.feedback.hidden = true;
       }
@@ -70,12 +73,13 @@ export class BattleClassGuidance {
     if (this.session.phase !== 'player' || this.session.state.outcome !== 'ongoing') { this.hide(); return; }
     const { state, active } = this.session;
     const turn = `${state.seed}:${state.mapId}:${state.round}:${active.id}`;
+    const dismissed = [...this.run.dismissed, ...(this.run.runId ? readClassGuidanceDismissed(this.run.runId) : [])];
     if (turn !== this.turn) {
       this.turn = turn;
-      this.tip = classTipForTurn(this.session, preferences.seen);
+      this.tip = classTipForTurn(this.session, preferences.seen, dismissed);
       this.feedback.hidden = true;
     }
-    if (this.dismissedTurn === turn || !this.tip) { this.hide(); return; }
+    if (this.dismissedTurn === turn || !this.tip || dismissed.includes(this.tip.id)) { this.hide(); return; }
     const lesson = previewLesson(skin);
     this.root.dataset.unitId = String(active.id);
     this.root.dataset.round = String(state.round);

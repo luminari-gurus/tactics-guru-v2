@@ -10,6 +10,12 @@ export interface ClassTip {
   readonly abilityId?: AbilityId;
 }
 
+/** A saved dungeon supplies its ID; transient runs share only the in-memory set. */
+export interface ClassGuidanceRun {
+  readonly runId?: string;
+  readonly dismissed: Set<string>;
+}
+
 const name = (id: string) => id.replace(/^ability:/, '').replaceAll('_', ' ').replace(/\b\w/g, letter => letter.toUpperCase());
 
 function skillTip(ability: Ability, hero: HeroId, catalog: ContentCatalog): ClassTip | null {
@@ -50,11 +56,11 @@ function skillTip(ability: Ability, hero: HeroId, catalog: ContentCatalog): Clas
 }
 
 /** Read learned skills from the current projected catalog without preparing an intent. */
-export function classTipForTurn(session: BattleSession, seen: readonly string[]): ClassTip | null {
+export function classTipForTurn(session: BattleSession, seen: readonly string[], dismissed: readonly string[] = []): ClassTip | null {
   if (session.phase !== 'player' || session.state.outcome !== 'ongoing' || session.active.side !== 'player') return null;
   const hero = session.active.defId;
   const tips = ownedAbilities(session).map(ability => skillTip(ability, hero, session.catalog))
-    .filter((tip): tip is ClassTip => tip !== null);
+    .filter((tip): tip is ClassTip => tip !== null && !dismissed.includes(tip.id));
   if (!tips.length) return null;
   const known = new Set(seen);
   return tips.find(tip => !known.has(tip.id)) ?? tips[(session.state.round - 1) % tips.length];

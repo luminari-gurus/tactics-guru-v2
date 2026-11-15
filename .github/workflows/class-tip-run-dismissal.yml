@@ -1,0 +1,100 @@
+name: Class tip dismissal verification
+on:
+  pull_request:
+    paths: ['src/**', 'tests/**', 'scripts/**', '*config*', 'package*.json', '.github/workflows/class-tip-run-dismissal.yml']
+permissions:
+  contents: read
+concurrency:
+  group: tactics-browser-tactics-browser-02
+  queue: max
+  cancel-in-progress: false
+jobs:
+  dismissal:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'fix/class-tip-run-dismissal'
+    runs-on: [self-hosted, tactics-browser, tactics-browser-02]
+    timeout-minutes: 20
+    steps:
+      - name: Check host disposition
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run setup:browsers && npm run check:browsers
+      - name: Check unchanged passing coverage before the fixture assertion repairs
+        id: reuse
+        run: |
+          node --input-type=module <<'JS'
+          import { appendFileSync, readFileSync } from 'node:fs';
+          import { execFileSync } from 'node:child_process';
+          const base = 'e0d0b1956d8e99164de4800b78a5e5e9d5a8bc7e';
+          const file = 'tests/dungeon-exploration.spec.ts';
+          const workflow = '.github/workflows/class-tip-run-dismissal.yml';
+          const git = args => execFileSync('git', args, { encoding: 'utf8' });
+          const changed = git(['diff', '--name-only', base, 'HEAD']).trim().split('\n').filter(Boolean);
+          const before = git(['show', `${base}:${file}`]);
+          const after = readFileSync(file, 'utf8');
+          const oldAssertion = " if(isMobile)await dismiss.tap();else {await dismiss.focus();await page.keyboard.press('Enter');}\n await expect(guidance).toBeHidden();await expect(page.locator('#battle-move')).toBeFocused();";
+          const repairedAssertion = " if(isMobile)await dismiss.tap();else {await dismiss.focus();await page.keyboard.press('Enter');}\n // This legal victory boundary has already used movement; focus returns to\n // the enabled End turn control, not the unavailable Move control.\n expect(dismissedActor.hasMoved).toBe(true);\n await expect(guidance).toBeHidden();await expect(page.locator('#battle-move')).toBeDisabled();\n await expect(page.locator('#battle-next')).toBeFocused();";
+          const oldSaveAssertion = ' expect(JSON.parse((await dungeonSlots(page)).primary!).payload).toEqual(saved);';
+          const repairedSaveAssertion = ' const persisted=JSON.parse((await dungeonSlots(page)).primary!).payload as DungeonState;\n // Playtime checkpoints can run between the persisted and rendered snapshots.\n expect({...persisted,stats:{...persisted.stats!,activeMs:saved.stats!.activeMs}}).toEqual(saved);';
+          const unchanged = changed.every(path => path === file || path === workflow)
+            && before.split(oldAssertion).length === 2
+            && before.split(oldSaveAssertion).length === 2
+            && before.replace(oldAssertion, repairedAssertion).replace(oldSaveAssertion, repairedSaveAssertion) === after;
+          // Run 43742436140 retains 23 passing cases. Its five failures all
+          // stopped at the fixture's incorrect Move-focus assertion. The repair
+          // run 43744350468 then passed four profiles; desktop exposed a save
+          // comparison race with the monotonic elapsed-time checkpoint. Reuse
+          // nothing if runtime, fixtures, helpers, dependencies or other tests differ.
+          appendFileSync(process.env.GITHUB_OUTPUT, `unchanged=${unchanged}\n`);
+          console.log(JSON.stringify({ unchanged, comparison: base, retainedRun: 43742436140, changed }));
+          JS
+      - name: Record tested source
+        run: |
+          mkdir -p verification-receipts/class-tip-dismissal
+          node --input-type=module <<'JS'
+          import { writeFileSync } from 'node:fs';
+          import { sourceIdentity } from './scripts/verification-report.mjs';
+          writeFileSync('verification-receipts/class-tip-dismissal/source.json', JSON.stringify({
+            source: sourceIdentity(process.cwd()), node: process.version, runner: process.env.RUNNER_NAME,
+            conditions: 'Production preview; desktop and touch-device emulation; one worker, zero retries. No physical-device or performance claim.',
+            reusedEvidence: '${{ steps.reuse.outputs.unchanged }}' === 'true'
+              ? { run: 43742436140, source: 'e0d0b1956d8e99164de4800b78a5e5e9d5a8bc7e', passingChecks: 23,
+                  scope: 'All previously passing cases have unchanged runtime, dependencies, assets, configs, helpers and test bodies; rerun the repaired dungeon witness on five profiles.' }
+              : null
+          }, null, 2));
+          JS
+      - name: Build the application
+        id: build
+        run: npm run build
+      - name: Verify turns, settings, run encounters and saved dungeon resume on Chromium
+        if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.reuse.outputs.unchanged != 'true' }}
+        run: |
+          npm run test:browser -- -c playwright.regression.config.ts tests/battle-loop.spec.ts tests/battle-animations.spec.ts tests/main-menu.spec.ts tests/run-progression.spec.ts tests/dungeon-exploration.spec.ts -g 'player HUD class guidance|class guidance retains|main menu: class guidance|class guidance: unsaved dungeon|a second dungeon encounter|legal run outcomes' --diagnostics
+      - name: Verify the repaired dungeon encounter witness on Chromium
+        if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.reuse.outputs.unchanged == 'true' }}
+        run: npm run test:browser -- -c playwright.regression.config.ts tests/dungeon-exploration.spec.ts -g 'a second dungeon encounter' --diagnostics
+      - name: Verify battle and run guidance on iPhone WebKit
+        if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.reuse.outputs.unchanged != 'true' }}
+        run: |
+          npm run test:browser -- -c playwright.device-acceptance.config.ts tests/battle-loop.spec.ts tests/main-menu.spec.ts tests/run-progression.spec.ts -g 'player HUD class guidance|main menu: class guidance|legal run outcomes' --diagnostics
+      - name: Verify saved dungeon dismissal on iPhone WebKit
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          selected='class guidance: unsaved dungeon|a second dungeon encounter'
+          if [ '${{ steps.reuse.outputs.unchanged }}' = 'true' ]; then selected='a second dungeon encounter'; fi
+          npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts --project=portrait-webkit --project=landscape-webkit -g "$selected" --diagnostics
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: class-tip-dismissal-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/
+          retention-days: 14
+          if-no-files-found: warn

@@ -18,10 +18,27 @@ import { mountBattleLayout } from '../ui/battleLayout';
 import { diagnosticsSnapshot } from '../diagnostics/browser';
 import { observeActivePlaytime } from './ActivePlaytime';
 import { readAutoCollectLootPreference } from '../ui/autoCollectLootPreference';
+import { dismissClassGuidanceTip, watchClassGuidancePreferences } from '../ui/classGuidancePreferences';
+import type { ClassGuidanceRun } from '../ui/classGuidance';
 function newSeed(previous?: number) {
  return newDungeonSeed(()=>crypto.getRandomValues(new Uint32Array(1))[0],previous);
 }
 const storage=appEntry.persistent?createDungeonStorage():null,session=new DungeonSession(freshDungeon(crypto.randomUUID(),newSeed(),undefined,appEntry.persistent),storage,storage?new RunHistory('dungeon'):null,undefined,serializeBrowserDungeonWrite),cache=new FloorCache();
+let guidanceScope: { id: string; run: ClassGuidanceRun; persistent: boolean } | null = null;
+const stopGuidanceWatch = watchClassGuidancePreferences(reset => { if (reset) guidanceScope?.run.dismissed.clear(); });
+function guidanceForRun(id: string): ClassGuidanceRun {
+ if(guidanceScope?.id!==id)guidanceScope={id,persistent:session.savesProgress,run:{
+  get runId(){return session.savesProgress?`dungeon:${id}`:undefined;},dismissed:new Set(),
+ }};
+ const scope=guidanceScope,persistent=session.savesProgress;
+ // Explicitly saving an unsaved attempt also retains tips dismissed earlier
+ // in that same attempt. Rendering a saved run with no new choices is read-only.
+ if(persistent&&!scope.persistent&&scope.run.dismissed.size) {
+  dismissClassGuidanceTip(`dungeon:${id}`,[...scope.run.dismissed]);
+ }
+ scope.persistent=persistent;
+ return scope.run;
+}
 const screen=el('main');screen.id='dungeon-screen';screen.dataset.boot='loading';document.body.append(screen);
 const shell=document.querySelector<HTMLElement>('#battle-shell')!,panel=document.querySelector<HTMLElement>('#fit-panel')!,container=document.querySelector<HTMLElement>('#game')!,status=document.querySelector<HTMLElement>('#fit-status')!,controls=document.querySelector<HTMLElement>('#battle-controls')!,restart=document.querySelector<HTMLButtonElement>('#fit-restart')!,persistence=document.querySelector<HTMLElement>('#battle-persistence')!;
 let live=true,playing=false,startup=true,reviewing=false,loading=false,loadError=false,loadGeneration=0,host:RunBattleHost|null=null;
@@ -66,7 +83,7 @@ if (sandboxNotice) explorationTools.append(sandboxNotice);
 explorationTools.append(returnLink());
 mountTelemetryPreferences(explorationTools);
 function render(){
- if(!live)return;const state=session.snapshot;evidence(state);
+ if(!live)return;const state=session.snapshot;guidanceForRun(state.id);evidence(state);
  if(playing){persistence.querySelector('span')!.textContent=session.status;playtime?.sync();return;}
  shell.hidden=true;panel.hidden=true;screen.hidden=false;
  if(replacing){
@@ -183,7 +200,7 @@ async function start(){
     document.querySelector<HTMLElement>('#battle-heading h1')!.textContent=title;
     document.querySelector<HTMLElement>('#board-caption')!.textContent='Tap to select · Drag to pan · Wheel/pinch to zoom · Arrows and Enter to select';
     restart.textContent='Start new dungeon';persistence.hidden=false;persistence.replaceChildren(...(storage?[button('Save recovery',recovery)]:[]),el('span',session.status), returnLink());
-    host={catalog:battle.catalog,session:battle,dialogs,sound,modalTransition:()=>{},ended:()=>{
+    host={catalog:battle.catalog,session:battle,dialogs,sound,guidance:guidanceForRun(state.id),modalTransition:()=>{},ended:()=>{
      if(!live||!playing||generation!==loadGeneration)return;
      // This callback follows encounter-return presentation (including #397's
      // cutscene completion). Capture once before stop invalidates old work.
@@ -224,7 +241,7 @@ document.addEventListener('click',event=>{
  if(!playing||event.target instanceof Element&&event.target.closest('a[href]'))cancelAutomaticStep();
 },{capture:true,signal:automaticStepEvents.signal});
 document.addEventListener('keydown',e=>{if(e.repeat&&(e.key==='Enter'||e.key===' ')){e.preventDefault();e.stopImmediatePropagation();}},true);
-window.addEventListener('pagehide',()=>{cancelAutomaticStep();automaticStep.dispose();automaticStepEvents.abort();playtime?.dispose();live=false;session.dispose();mapView.dispose();stop();engine?.destroy(true);dialogs.dispose();},{once:true});
+window.addEventListener('pagehide',()=>{cancelAutomaticStep();automaticStep.dispose();automaticStepEvents.abort();playtime?.dispose();live=false;stopGuidanceWatch();session.dispose();mapView.dispose();stop();engine?.destroy(true);dialogs.dispose();},{once:true});
 window.addEventListener('pageshow',e=>{if(e.persisted)location.reload();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelAutomaticStep();else deferredStart?.();});
 render();

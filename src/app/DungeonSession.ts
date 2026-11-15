@@ -60,6 +60,8 @@ export class DungeonSession {
   get phase() { return this.current.phase; }
   /** Durable progress is independent of transient command/recovery feedback. */
   get hasUnsavedProgress() { return this.storage !== null && (this.unsaved || !this.progressSaved); }
+  /** Saving mode stays enabled while ordinary writes are pending or need recovery. */
+  get savesProgress() { return this.storage !== null && !this.unsaved; }
   private write(state: DungeonState) {
     if (!this.storage) throw Error('Testing dungeons have no save storage');
     const result = this.storage.save(state, this.expectedPrimary);

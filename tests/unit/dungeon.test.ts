@@ -79,6 +79,7 @@ it('clears an unsaved status when a later clock checkpoint recovers storage', as
   assert((await owner.save()));assert(owner.continue(owner.inspect()));owner.setPlaytimeActive(true);
   const write=m.setItem;m.setItem=()=>{throw Error('denied');};now=500;owner.setPlaytimeActive(true);
   expect(owner.hasUnsavedProgress).toBe(true);expect(owner.status).toContain('Progress unsaved');
+  expect(owner.savesProgress).toBe(true);
   m.setItem=write;now=1000;owner.setPlaytimeActive(true);
   expect(owner.hasUnsavedProgress).toBe(false);expect(owner.status).toBe('Dungeon saved on this device');
 });
@@ -417,6 +418,7 @@ describe('dungeon run history boundaries', () => {
     expect(f.m.getItem(RUN_RECORD_KEYS.primary)).toBeNull();
     const testing = new DungeonSession(fresh(), null, new RunHistory('dungeon', createRunRecordsStorage(() => { throw Error('History acquired'); })));
     expect(testing.history).toBeNull(); expect(testing.restart('temporary', 14)).toBe(true);
+    expect(testing.savesProgress).toBe(false); testing.playUnsaved(); expect(testing.savesProgress).toBe(false);
   });
   it('records replacement of an explicitly started unsaved dungeon before its first move', async () => {
     const f = fixture(), initial = fresh(), session = new DungeonSession(initial, f.storage, f.history);
@@ -1063,13 +1065,17 @@ describe('unordered encounters and moving dungeon enemies', () => {
 describe('authoritative unsaved departure state', () => {
   it('survives rejected commands and clears only after successful recovery saving', async () => {
     const m=memory(),store=createDungeonStorage(()=>m),session=new DungeonSession(fresh(),store);
+    expect(session.savesProgress).toBe(true);expect(session.hasUnsavedProgress).toBe(true);
     session.playUnsaved();
+    expect(session.savesProgress).toBe(false);
     const before=session.snapshot;
     expect((await session.step({id:before.id,depth:before.depth,revision:before.revision,destination:-1}))).toBe(false);
     expect(session.status).toContain('Movement refused');
     expect(session.hasUnsavedProgress).toBe(true);
+    expect(session.savesProgress).toBe(false);
     expect((await session.retry(session.inspect()))).toBe(true);
     expect(session.hasUnsavedProgress).toBe(false);
+    expect(session.savesProgress).toBe(true);
     const saved=session.snapshot;
     (await session.step({id:saved.id,depth:saved.depth,revision:saved.revision,destination:-1}));
     expect(session.hasUnsavedProgress).toBe(false);
@@ -1095,8 +1101,10 @@ describe('authoritative unsaved departure state', () => {
   it('adopts a valid saved dungeon without an unsaved warning', async () => {
     const m=memory(),store=createDungeonStorage(()=>m);expect(store.save(fresh()).ok).toBe(true);
     const session=new DungeonSession(fresh(),store);
+    session.playUnsaved();expect(session.savesProgress).toBe(false);
     expect(session.continue(session.inspect())).toBe(true);
     expect(session.hasUnsavedProgress).toBe(false);
+    expect(session.savesProgress).toBe(true);
   });
 });
 

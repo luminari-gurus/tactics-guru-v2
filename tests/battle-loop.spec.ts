@@ -1016,7 +1016,7 @@ test('player HUD turn queue preserves initiative, keyboard and touch browsing ac
   expect(errors).toEqual([]);
 });
 
-test('player HUD class guidance is read-only, acknowledges dismissal and returns on later turns and restart',async({page},info)=>{
+test('player HUD class guidance is read-only, keeps dismissed tips hidden for the battle and resets on a new attempt',async({page},info)=>{
   test.setTimeout(90000);
   const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
   const key='tactics-guru:class-guidance';
@@ -1076,21 +1076,41 @@ test('player HUD class guidance is read-only, acknowledges dismissal and returns
   expect(moved.state.units.find(unit=>unit.id===prepared.pending!.unitId)!.cell).toEqual(prepared.pending.to);
   expect(moved.replay.commands).toEqual([...prepared.replay.commands,prepared.pending]);
   await expect(guidance).toBeHidden();expect(JSON.parse((await saved())!)).toEqual(acknowledged);
-  const beforeWait=await session(page);
-  await activate(page.locator('#battle-next'));
-  await expect.poll(async()=>(await session(page)).state.commandCount).toBeGreaterThan(beforeWait.state.commandCount);
-  await ready();await expect(guidance).toBeVisible();await expect(teaching).toBeHidden();
+  // Other classes retain their tips, but the dismissed level-one skill must
+  // stay hidden when its actor returns on a later round.
+  let later=moved,sawOtherTip=false;
+  for(let turns=0;turns<moved.state.initiative.length;turns++){
+    const commands=later.state.commandCount;
+    await activate(page.locator('#battle-next'));
+    await expect.poll(async()=>(await session(page)).state.commandCount).toBeGreaterThan(commands);
+    await ready();later=await session(page);
+    const actor=later.state.initiative[later.state.activeIndex];
+    if(actor===firstActor){await expect(guidance).toBeHidden();break;}
+    await expect(guidance).toBeVisible();await expect(tip).not.toHaveAttribute('data-tutorial-id',lessons[0]!);
+    await expect(teaching).toBeHidden();sawOtherTip=true;
+    expect(JSON.parse((await saved())!)).toEqual(acknowledged);
+  }
+  expect(later.state.initiative[later.state.activeIndex]).toBe(firstActor);
+  expect(later.state.round).toBeGreaterThan(moved.state.round);expect(sawOtherTip).toBe(true);
   expect(JSON.parse((await saved())!)).toEqual(acknowledged);
-  // Reload repeats the already-acknowledged class's per-turn tip, but not its
-  // first-time preview lesson; tutorial history is separate from battle state.
+  // Standalone reload starts a fresh attempt, so class tips return while the
+  // acknowledged preview lesson remains learned across attempts.
   await page.reload();await ready();
   await expect(guidance).toHaveAttribute('data-unit-id',String(firstActor));
   await expect(tip).toHaveText(tipText!);await expect(teaching).toBeHidden();
   expect(JSON.parse((await saved())!)).toEqual(acknowledged);
   await activate(dismiss);await expect(guidance).toBeHidden();
   await activate(page.locator('#fit-restart'));await confirmRestart(page);await ready();
-  expect((await session(page)).state.seed).toBe(first.state.seed+1);
+  let restarted=await session(page);expect(restarted.state.seed).toBe(first.state.seed+1);
+  for(let turns=0;turns<restarted.state.initiative.length&&restarted.state.initiative[restarted.state.activeIndex]!==firstActor;turns++){
+    const commands=restarted.state.commandCount;
+    await activate(page.locator('#battle-next'));
+    await expect.poll(async()=>(await session(page)).state.commandCount).toBeGreaterThan(commands);
+    await ready();restarted=await session(page);
+  }
+  expect(restarted.state.initiative[restarted.state.activeIndex]).toBe(firstActor);
   await expect(guidance).toBeVisible();await expect(teaching).toBeHidden();
+  await expect(tip).toHaveAttribute('data-tutorial-id',lessons[0]!);
   expect(JSON.parse((await saved())!)).toEqual(acknowledged);
   expect(errors).toEqual([]);
 });

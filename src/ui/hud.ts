@@ -16,6 +16,7 @@ import { mountCombatControlsPreference, type CombatSkin } from './combatControls
 import { draughtsSpent } from '../domain/draughts';
 import { BattleTurnQueue } from './battleTurnQueue';
 import { BattleClassGuidance } from './battleClassGuidance';
+import type { ClassGuidanceRun } from './classGuidance';
 import { mountClassGuidancePreferences } from './classGuidancePreferences';
 import { mountCombatPacePreference } from './combatPacePreference';
 export const displayName = (id: string) => id.replace(/^ability:/,'').replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase());
@@ -108,7 +109,7 @@ export class BattleHud {
   private readonly disposePacePreference: () => void;
   private readonly abort=new AbortController();
   private readonly log:string[]=[];
-  constructor(private readonly session:BattleSession, private readonly callbacks:{action:(a:Action)=>void;target:(c:CellPosition|null)=>void;confirm:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void;inspect:()=>void;inspectTarget:(id:number)=>void;danger:()=>void;plan:()=>void;undo:()=>void;draught:()=>void;log:(lines:readonly string[])=>void}) {
+  constructor(private readonly session:BattleSession, private readonly callbacks:{action:(a:Action)=>void;target:(c:CellPosition|null)=>void;confirm:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void;inspect:()=>void;inspectTarget:(id:number)=>void;danger:()=>void;plan:()=>void;undo:()=>void;draught:()=>void;log:(lines:readonly string[])=>void}, guidance?:ClassGuidanceRun) {
     this.turnQueue = new BattleTurnQueue(this.actorRoot, session.catalog);
     this.openingEnemyTurn = !session.resumed && session.phase === 'enemy';
     // Snapshot construction has no command events. Establish the current turn
@@ -164,7 +165,7 @@ export class BattleHud {
     mountCombatControlsPreference(this.root.querySelector('#battle-overflow')!);
     this.disposePacePreference = mountCombatPacePreference(this.root.querySelector('#battle-overflow')!);
     this.disposeGuidancePreferences = mountClassGuidancePreferences(this.root.querySelector('#battle-overflow')!);
-    this.classGuidance = new BattleClassGuidance(this.root, session, () => this.focusAction());
+    this.classGuidance = new BattleClassGuidance(this.root, session, () => this.focusAction(), guidance);
   }
   shortcut(key:string):boolean {
     if(/^[1-9]$/.test(key)) {

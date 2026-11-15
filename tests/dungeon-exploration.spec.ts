@@ -1,7 +1,7 @@
 import { dungeonOffer } from '../src/domain/dungeon';
 import { checkedDungeon } from './helpers/dungeonFixtures';
 import { expect,test } from './helpers/startupDiagnostics';
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { dungeonSnapshot, walkDungeon, continueSavedDungeon, openDungeonInventory, reenterDungeonStair } from './helpers/dungeonTraversal';
@@ -1299,7 +1299,54 @@ test('adopting a recovered dungeon invalidates the pending encounter load',async
  }finally {release();}
 });
 
+fixedSeedTest('class guidance: unsaved dungeon keeps dismissals in memory until saving and resuming the same run',async({page,isMobile})=>{
+ test.setTimeout(90000);
+ const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+ const key='tactics-guru:class-guidance';
+ const sentinel={runId:'dungeon:saved-guidance-sentinel',ids:['skill:ability:taunt:v1']};
+ await page.addInitScript(({key,sentinel})=>{
+  if(localStorage.getItem(key)===null)localStorage.setItem(key,JSON.stringify({version:1,enabled:true,seen:[],dismissedRuns:[sentinel],resetRevision:0}));
+ },{key,sentinel});
+ const preferences=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)!),key);
+ const activate=async(control:Locator)=>{
+  if(isMobile)await control.tap();else {await control.focus();await page.keyboard.press('Enter');}
+ };
+ await page.goto('./?game=dungeon');
+ await activate(page.getByRole('button',{name:'Play unsaved dungeon',exact:true}));
+ await expect(page.locator('#dungeon-map')).toBeVisible();
+ const runId=(await dungeonSnapshot(page)).id;
+ await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ const guidance=page.locator('#battle-class-guidance'),tip=page.locator('#battle-class-tip');
+ await expect(guidance).toBeVisible();
+ const tipId=await tip.getAttribute('data-tutorial-id');expect(tipId).toBeTruthy();
+ const before=await readSession(page),dungeonBefore=await dungeonSnapshot(page);
+ expect(dungeonBefore.id).toBe(runId);expect(await dungeonSlots(page)).toEqual({primary:null,backup:null});
+ await activate(page.locator('#battle-guidance-dismiss'));
+ await expect(guidance).toBeHidden();await expect(page.locator('#battle-move')).toBeFocused();
+ expect(await readSession(page)).toEqual(before);expectSameProgress(await dungeonSnapshot(page),dungeonBefore);
+ // A throwaway attempt may acknowledge lessons without consuming a durable
+ // dismissal-history slot belonging to a saved dungeon.
+ expect((await preferences()).seen).toContain(tipId);
+ expect((await preferences()).dismissedRuns).toEqual([sentinel]);
+ expect(await dungeonSlots(page)).toEqual({primary:null,backup:null});
+ await activate(page.getByRole('button',{name:'Save recovery',exact:true}));
+ await activate(page.locator('#dungeon-retry-save'));
+ await expect(page.locator('#battle-dialog')).toBeHidden();
+ await expect.poll(async()=>JSON.parse((await dungeonSlots(page)).primary??'null')?.payload?.id).toBe(runId);
+ const expectedDismissals=[sentinel,{runId:`dungeon:${runId}`,ids:[tipId]}];
+ await expect.poll(async()=>(await preferences()).dismissedRuns).toEqual(expectedDismissals);
+ expect((await readSession(page)).state).toEqual(before.state);await expect(guidance).toBeHidden();
+ expectSameProgress(JSON.parse((await dungeonSlots(page)).primary!).payload,dungeonBefore);
+ await page.reload();await continueSavedDungeon(page);
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ expect((await dungeonSnapshot(page)).id).toBe(runId);expect((await readSession(page)).state).toEqual(before.state);
+ await expect(guidance).toBeHidden();expect((await preferences()).dismissedRuns).toEqual(expectedDismissals);
+ expect(errors).toEqual([]);
+});
+
 test('a second dungeon encounter reuses the engine after a legal victory without reloading',async({page,isMobile})=>{
+ test.setTimeout(90000);
  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
  // The fixture reaches this ongoing battle through legal domain commands; the browser enacts its final attack.
  const witness=dungeonVictoryBoundary(1,0);if(!witness)throw Error('Missing legal victory boundary');
@@ -1309,6 +1356,30 @@ test('a second dungeon encounter reuses the engine after a legal victory without
  await page.reload();await continueSavedDungeon(page);
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  expect((await readSession(page)).state).toEqual(witness.snapshot.activeBattle);
+ const guidance=page.locator('#battle-class-guidance'),tip=page.locator('#battle-class-tip');
+ await expect(guidance).toBeVisible();
+ const beforeDismiss=await readSession(page),beforeDungeon=await dungeonSnapshot(page);
+ const dismissedActor=beforeDismiss.state.units.find(unit=>unit.id===beforeDismiss.state.initiative[beforeDismiss.state.activeIndex])!;
+ const dismissedTip=await tip.getAttribute('data-tutorial-id');expect(dismissedTip).toBeTruthy();
+ const dismiss=page.locator('#battle-guidance-dismiss');
+ if(isMobile)await dismiss.tap();else {await dismiss.focus();await page.keyboard.press('Enter');}
+ // This legal victory boundary has already used movement; focus returns to
+ // the enabled End turn control, not the unavailable Move control.
+ expect(dismissedActor.hasMoved).toBe(true);
+ await expect(guidance).toBeHidden();await expect(page.locator('#battle-move')).toBeDisabled();
+ await expect(page.locator('#battle-next')).toBeFocused();
+ expect(await readSession(page)).toEqual(beforeDismiss);expectSameProgress(await dungeonSnapshot(page),beforeDungeon);
+ const acknowledged=await page.evaluate(()=>localStorage.getItem('tactics-guru:class-guidance'));
+ expect(JSON.parse(acknowledged!).seen).toContain(dismissedTip);
+ // Continuing the same saved dungeon must retain this run's dismissal, even
+ // though it reconstructs the battle HUD. Both encounters below then reuse
+ // the resumed engine without another page load.
+ await page.reload();await continueSavedDungeon(page);
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ expect((await dungeonSnapshot(page)).id).toBe(witness.snapshot.id);
+ expect((await readSession(page)).state).toEqual(beforeDismiss.state);
+ await expect(guidance).toBeHidden();
+ expect(await page.evaluate(()=>localStorage.getItem('tactics-guru:class-guidance'))).toBe(acknowledged);
  await expect(page.locator('canvas')).toHaveCount(1);
  const canvas=await page.locator('#game canvas').elementHandle();if(!canvas)throw Error('Missing initial battle canvas');
  await playCommand(page,witness.command);
@@ -1341,7 +1412,25 @@ test('a second dungeon encounter reuses the engine after a legal victory without
   ?{...command,target:{unitId:command.target.missileTargets[0]}}:command;
  expect((after.replay?.commands??after.continuation!.commands)[beforeCommands.length]).toEqual(accepted);
  expect(after.state).toEqual(saved.activeBattle);
- expect(JSON.parse((await dungeonSlots(page)).primary!).payload).toEqual(saved);
+ const persisted=JSON.parse((await dungeonSlots(page)).primary!).payload as DungeonState;
+ // Playtime checkpoints can run between the persisted and rendered snapshots.
+ expect({...persisted,stats:{...persisted.stats!,activeMs:saved.stats!.activeMs}}).toEqual(saved);
+ // The normal first encounter leaves this class at level one. Its only tip
+ // remains dismissed in the next encounter, while other classes still teach.
+ expect(second.party.find(hero=>hero.heroId===dismissedActor.defId)!.level).toBe(1);
+ let current=after;
+ for(let turns=0;turns<second.activeBattle!.initiative.length;turns++){
+  const actor=current.state.units.find(unit=>unit.id===current.state.initiative[current.state.activeIndex])!;
+  if(actor.defId===dismissedActor.defId)break;
+  await expect(guidance).toBeVisible();await expect(tip).not.toHaveAttribute('data-tutorial-id',dismissedTip!);
+  const commands=current.state.commandCount,wait=page.locator('#battle-next');
+  if(isMobile)await wait.tap();else {await wait.focus();await page.keyboard.press('Enter');}
+  await expect.poll(async()=>(await readSession(page)).state.commandCount).toBeGreaterThan(commands);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');current=await readSession(page);
+ }
+ expect(current.state.units.find(unit=>unit.id===current.state.initiative[current.state.activeIndex])!.defId).toBe(dismissedActor.defId);
+ await expect(guidance).toBeHidden();
+ expect(await page.evaluate(()=>localStorage.getItem('tactics-guru:class-guidance'))).toBe(acknowledged);
  await expect(page.locator('canvas')).toHaveCount(1);
  expect(await canvas.evaluate(node=>node.isConnected&&node===document.querySelector('#game canvas'))).toBe(true);
  expect(errors).toEqual([]);

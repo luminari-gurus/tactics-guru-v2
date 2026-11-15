@@ -93,6 +93,23 @@ describe('contextual class tips', () => {
     expect(classTipForTurn(sessionFor('fighter', 180, 2), ['skill:ability:guarded_strike:v0', 'skill:ability:unknown:v1'])?.id).toBe(seen[0]);
   });
 
+  it('never selects run-dismissed tips, including after all remaining lessons are seen', () => {
+    const guarded = tipId('ability:guarded_strike'), wind = tipId('ability:second_wind'), taunt = tipId('ability:taunt');
+    const seen = [guarded, wind, taunt];
+    const dismissed = Object.freeze([guarded, taunt]);
+    for (const round of [1, 2, 3, 4]) {
+      expect(classTipForTurn(sessionFor('fighter', 180, round), [], dismissed)?.id).toBe(wind);
+      expect(classTipForTurn(sessionFor('fighter', 180, round), seen, dismissed)?.id).toBe(wind);
+      expect(classTipForTurn(sessionFor('fighter', 180, round), seen, seen)).toBeNull();
+    }
+    expect(classTipForTurn(sessionFor('fighter', 0), [], [guarded])).toBeNull();
+    expect(classTipForTurn(sessionFor('fighter', 60), [guarded], [guarded])?.id).toBe(wind);
+    expect(classTipForTurn(sessionFor('mage', 0), [], dismissed)?.id).toBe(tipId('ability:magic_missile'));
+    // A fresh run can teach an acknowledged skill again.
+    expect(classTipForTurn(sessionFor('fighter', 0), [guarded], [])?.id).toBe(guarded);
+    expect(dismissed).toEqual([guarded, taunt]);
+  });
+
   it('does not prepare, cancel, resolve, consume entropy, or change an existing preview', () => {
     const catalog = freeze(structuredClone(battleCatalog)), session = abilitySession('mage', catalog);
     session.prepare({ type: 'endTurn', unitId: session.active.id });
