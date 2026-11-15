@@ -1,4 +1,4 @@
-name: Verify save-note footer and movement layout
+name: Compare save-note movement timing
 on:
   push:
     branches: [verify/issue-415-map-edge-controls]
@@ -28,42 +28,65 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run setup:browsers && npm run check:browsers
-      - name: Record source identity
+      - name: Fetch the two implementation commits
+        run: git fetch origin 147d931fb5830c28eee0886e37808aefc566e611 7447992e87665ea12b5def246b5508168164e94a
+      - name: Compare accepted header, footer, and restored map geometry
         run: |
-          mkdir -p verification-receipts/issue-415
-          node --input-type=module <<'JS'
-          import { writeFileSync } from 'node:fs';
-          import { sourceIdentity } from './scripts/verification-report.mjs';
-          writeFileSync('verification-receipts/issue-415/source.json', JSON.stringify({
-            source: sourceIdentity(process.cwd()), node: process.version, runner: process.env.RUNNER_NAME,
-            conditions: 'No concurrent repository Actions observed before queueing this run. Focused warm timing runs before the follow-up is published to PR419 and before its core suite starts. Other host workloads and caches are not independently controlled. Qualified runner; browser/device emulation.',
-            purpose: 'Issue415 follow-up: move routine save confirmations to the page bottom while retaining prominent actionable feedback. Verification-only workflow; runtime and tests compared to the implementation PR.'
-          }, null, 2));
-          JS
-      - name: Build and check affected presentation units
-        id: build
-        run: |
-          npm run test:unit -- tests/unit/dungeonLootPresentation.test.ts
-          npm run build
-      - name: Check warm large-floor responsiveness on WebKit
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'warm.*maximum-size.*floor' --max-failures=3
-      - name: Verify save-note layout and actionable feedback on Chromium
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: |
-          selection=(-c playwright.regression.config.ts tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts -g 'movement controls stay visible|fresh dungeon keeps the map|ground loot: legal victory|dungeon recovery separates status')
-          npx --no-install playwright test "${selection[@]}" --list > verification-receipts/issue-415/chromium-selection.txt
-          npm run test:browser -- "${selection[@]}" --diagnostics
-      - name: Verify save-note layout and actionable feedback on WebKit
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: |
-          selection=(-c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts -g 'movement controls stay visible|fresh dungeon keeps the map|ground loot: legal victory|dungeon recovery separates status')
-          npx --no-install playwright test "${selection[@]}" --list > verification-receipts/issue-415/webkit-selection.txt
-          npm run test:browser -- "${selection[@]}" --diagnostics
+          python3 - <<'PY'
+          import json, pathlib, subprocess, sys
+          receipts=pathlib.Path('verification-receipts/issue-415')
+          receipts.mkdir(parents=True,exist_ok=True)
+          samples=pathlib.Path('verification-receipts/browser-runs')
+          variants=[('accepted','147d931fb5830c28eee0886e37808aefc566e611'),('footer','7447992e87665ea12b5def246b5508168164e94a'),('geometry-control','7447992e87665ea12b5def246b5508168164e94a')]
+          results=[]; targets={}
+          for label,ref in variants:
+              print('VARIANT '+label,flush=True)
+              subprocess.run(['git','checkout','--detach',ref],check=True)
+              if label=='geometry-control':
+                  if len(targets)!=2: raise RuntimeError('Missing accepted geometry')
+                  path=pathlib.Path('tests/dungeon-exploration.spec.ts')
+                  source=path.read_text()
+                  marker=' const before={canvas:await canvasIdentity(),grid:await visibleGrid()};'
+                  injection="""
+           // Diagnostic only: retain the footer/clipped live region and match the accepted map position.
+           await page.evaluate(async targets=>{
+            const header=document.querySelector<HTMLElement>('.dungeon-header')!;
+            const region=document.querySelector<HTMLElement>('.dungeon-map-viewport')!;
+            const target=targets[String(innerWidth)];
+            if(target===undefined)throw Error('Missing reference viewport');
+            for(let i=0;i<4;i++){
+             const delta=target-region.getBoundingClientRect().top;
+             if(Math.abs(delta)<.1)break;
+             header.style.minHeight=(header.getBoundingClientRect().height+delta)+'px';
+             await new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve())));
+            }
+            if(Math.abs(target-region.getBoundingClientRect().top)>.1)throw Error('Diagnostic geometry did not match');
+           }, TARGETS);
+          """.replace('TARGETS',json.dumps(targets))
+                  if source.count(marker)!=1: raise RuntimeError('Ambiguous warm-test marker')
+                  path.write_text(source.replace(marker,injection+marker))
+              else:
+                  built=subprocess.run(['npm','run','build:bundle'])
+                  if built.returncode: raise RuntimeError('Variant build failed: '+label)
+              identity="import { writeFileSync } from 'node:fs'; import { sourceIdentity } from './scripts/verification-report.mjs'; writeFileSync("+json.dumps(str(receipts/(label+'-source.json')))+", JSON.stringify({source:sourceIdentity(process.cwd()),node:process.version,runner:process.env.RUNNER_NAME,conditions:'Fixed accepted-to-footer-to-geometry-control comparison. No repository Actions active when queued; PR core not published. Other host workloads not independently controlled. Browser emulation.'},null,2));"
+              subprocess.run(['node','--input-type=module','-e',identity],check=True)
+              previous=set(samples.rglob('warm-maximum-floor-step-performance.json'))
+              result=subprocess.run(['npm','run','test:browser','--','-c','playwright.exploration.config.ts','tests/dungeon-exploration.spec.ts','-g','warm.*maximum-size.*floor','--project=desktop-webkit','--project=landscape-webkit','--max-failures=2'])
+              current=sorted(set(samples.rglob('warm-maximum-floor-step-performance.json'))-previous)
+              row={'variant':label,'ref':ref,'exitCode':result.returncode,'samples':[]}
+              for path in current:
+                  d=json.loads(path.read_text()); g=d['before']['grid']
+                  row['samples'].append({'path':str(path),'viewport':g['viewport'],'clip':g['clip'],'p95':d['p95'],'frameP95':d['frameP95'],'revision':d['revision']})
+                  if label=='accepted': targets[str(g['viewport']['width'])]=g['clip']['top']
+              results.append(row)
+              (receipts/'comparison.json').write_text(json.dumps(results,indent=2))
+              print(json.dumps(row),flush=True)
+          sys.exit(1 if any(row['exitCode'] for row in results) else 0)
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: issue-415-save-note-${{ github.run_id }}-${{ github.run_attempt }}
+          name: issue-415-save-note-comparison-${{ github.run_id }}-${{ github.run_attempt }}
           path: verification-receipts/
           retention-days: 14
           if-no-files-found: warn
