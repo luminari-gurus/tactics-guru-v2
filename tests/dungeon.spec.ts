@@ -876,6 +876,13 @@ test('fresh dungeon keeps the map and party in view and opens the selected chara
  await expect(map).toBeInViewport();
  await expect(party).toBeInViewport();
  expect(await page.locator('#dungeon-screen').evaluate(node => node.scrollWidth <= node.clientWidth)).toBe(true);
+ const saveNote=page.locator('.dungeon-save-note');
+ await expect(saveNote).toHaveText('Dungeon saved on this device');
+ const header=(await page.locator('.dungeon-header').boundingBox())!;
+ const title=(await page.locator('.dungeon-header h1').boundingBox())!;
+ expect(header.height,'Routine save feedback must not take space above the map').toBe(title.height);
+ const privacy=(await page.locator('#dungeon-screen .telemetry-preferences').boundingBox())!;
+ expect((await saveNote.boundingBox())!.y,'Save feedback belongs after the last page tool').toBeGreaterThanOrEqual(privacy.y+privacy.height);
  const fighter = party.getByRole('button',{name:'Fighter',exact:true});
  const mage = party.getByRole('button',{name:'Mage',exact:true});
  await expect(fighter.locator('img')).toHaveJSProperty('naturalWidth',96);

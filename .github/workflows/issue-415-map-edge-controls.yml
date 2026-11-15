@@ -1,4 +1,4 @@
-name: Verify map-edge controls and stable header
+name: Verify save-note footer and movement layout
 on:
   push:
     branches: [verify/issue-415-map-edge-controls]
@@ -36,8 +36,8 @@ jobs:
           import { sourceIdentity } from './scripts/verification-report.mjs';
           writeFileSync('verification-receipts/issue-415/source.json', JSON.stringify({
             source: sourceIdentity(process.cwd()), node: process.version, runner: process.env.RUNNER_NAME,
-            conditions: 'PR verification for569 completed before this run was queued. Stable-header comparison43672580562 completed; no concurrent repository Actions at queue time. Selected timing checks run before the candidate is published to the PR and before its new core suite starts. Other host workloads and caches are not independently controlled. Qualified runner; browser/device emulation.',
-            purpose: 'Issue 415 map-edge controls. Verification-only workflow; runtime and tests are compared to the implementation PR.'
+            conditions: 'No concurrent repository Actions observed before queueing this run. Focused warm timing runs before the follow-up is published to PR419 and before its core suite starts. Other host workloads and caches are not independently controlled. Qualified runner; browser/device emulation.',
+            purpose: 'Issue415 follow-up: move routine save confirmations to the page bottom while retaining prominent actionable feedback. Verification-only workflow; runtime and tests compared to the implementation PR.'
           }, null, 2));
           JS
       - name: Build and check affected presentation units
@@ -45,36 +45,25 @@ jobs:
         run: |
           npm run test:unit -- tests/unit/dungeonLootPresentation.test.ts
           npm run build
-      - name: Qualify stable-header warm WebKit desktop and landscape three times
-        id: warm_gate
+      - name: Check warm large-floor responsiveness on WebKit
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'warm.*maximum-size.*floor' --project=desktop-webkit --project=landscape-webkit --repeat-each=3 --max-failures=6
-      - name: Check large-floor movement responsiveness on Chromium
-        id: chromium_timing
-        if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.warm_gate.outcome == 'success' }}
-        run: npm run test:browser -- -c playwright.regression.config.ts tests/dungeon-exploration.spec.ts -g 'maximum-size floor step responsiveness|warm.*maximum-size.*floor' --max-failures=3
-      - name: Check large-floor movement responsiveness on WebKit
-        id: webkit_timing
-        if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.warm_gate.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'warm.*maximum-size.*floor' --max-failures=3
+      - name: Verify save-note layout and actionable feedback on Chromium
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: |
-          npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'maximum-size floor step responsiveness' --grep-invert 'warm' --max-failures=3
-          npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'warm.*maximum-size.*floor' --project=portrait-webkit --max-failures=1
-      - name: Verify movement layout on Chromium
-        if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.warm_gate.outcome == 'success' && steps.chromium_timing.outcome == 'success' && steps.webkit_timing.outcome == 'success' }}
-        run: |
-          selection=(-c playwright.regression.config.ts tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts -g 'map-edge direction controls|movement controls stay visible|maximum-size saved floor|fresh dungeon keeps the map|ground loot: legal victory|compass keeps keyboard focus|map shortcuts work|real traversal, art independence|map input stays inert|exploration keeps the map first|dungeon recovery separates status|stairs travel once per entry with compass')
+          selection=(-c playwright.regression.config.ts tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts -g 'movement controls stay visible|fresh dungeon keeps the map|ground loot: legal victory|dungeon recovery separates status')
           npx --no-install playwright test "${selection[@]}" --list > verification-receipts/issue-415/chromium-selection.txt
-          npm run test:browser -- "${selection[@]}" --max-failures=5 --diagnostics
-      - name: Verify movement layout on WebKit
-        if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.warm_gate.outcome == 'success' && steps.chromium_timing.outcome == 'success' && steps.webkit_timing.outcome == 'success' }}
+          npm run test:browser -- "${selection[@]}" --diagnostics
+      - name: Verify save-note layout and actionable feedback on WebKit
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: |
-          selection=(-c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts -g 'map-edge direction controls|movement controls stay visible|maximum-size saved floor|fresh dungeon keeps the map|ground loot: legal victory|compass keeps keyboard focus|map shortcuts work|real traversal, art independence|map input stays inert|exploration keeps the map first|dungeon recovery separates status|stairs travel once per entry with compass')
+          selection=(-c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts -g 'movement controls stay visible|fresh dungeon keeps the map|ground loot: legal victory|dungeon recovery separates status')
           npx --no-install playwright test "${selection[@]}" --list > verification-receipts/issue-415/webkit-selection.txt
-          npm run test:browser -- "${selection[@]}" --max-failures=5 --diagnostics
+          npm run test:browser -- "${selection[@]}" --diagnostics
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: issue-415-final-movement-${{ github.run_id }}-${{ github.run_attempt }}
+          name: issue-415-save-note-${{ github.run_id }}-${{ github.run_attempt }}
           path: verification-receipts/
           retention-days: 14
           if-no-files-found: warn
