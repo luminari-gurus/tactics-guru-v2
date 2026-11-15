@@ -1391,6 +1391,12 @@ test('warm maximum-size floor step responsiveness meets the established budget a
  for(const cell of before.grid.cells){expect(cell.intersection.width).toBeGreaterThanOrEqual(cell.bounds.width-.1);expect(cell.intersection.height).toBeGreaterThanOrEqual(cell.bounds.height-.1);expect(cell.unoccluded).toBe(true);}
  expect(before.grid.cells.find(cell=>cell.player)?.index).toBe(first);
 
+ // Verification-only snapshots; no measured operation or assertion depends on probe data.
+ const layoutProbeSnapshot=()=>page.evaluate(()=>({
+  at:performance.now(),
+  counters:JSON.parse(JSON.stringify((window as Window & {__issue415LayoutProbe?:unknown}).__issue415LayoutProbe??null)),
+ }));
+ const layoutProbeBefore=await layoutProbeSnapshot();
  // Measure dispatch separately from async save publication. Every sampled click must commit.
  // Retain 40 idle intervals, 20 dispatch samples and every frame across 40 accepted moves.
  const idleFrames=await page.evaluate(async()=>{const samples:number[]=[];let previous=await new Promise<number>(resolve=>requestAnimationFrame(resolve));for(let i=0;i<40;i++){const now=await new Promise<number>(resolve=>requestAnimationFrame(resolve));samples.push((Math.round(now*1000)-Math.round(previous*1000))/1000);previous=now;}return samples;});
@@ -1402,6 +1408,7 @@ test('warm maximum-size floor step responsiveness meets the established budget a
   await expect.poll(async()=>{const current=await dungeonSnapshot(page);return {id:current.id,depth:current.depth,phase:current.phase,revision:current.revision,position:current.floors[4].position};})
    .toEqual({id:adopted.id,depth:5,phase:'ready',revision:adopted.revision+i+1,position:destination});
  }
+ const layoutProbeBeforeFrames=await layoutProbeSnapshot();
  const acceptanceTimeoutMs=5000;
  const frames=await page.evaluate(async({a,b,id,initialRevision,acceptanceTimeoutMs})=>{
   const samples:number[]=[];
@@ -1427,10 +1434,11 @@ test('warm maximum-size floor step responsiveness meets the established budget a
   }
   return samples;
  },{a:first,b:second,id:adopted.id,initialRevision:adopted.revision+20,acceptanceTimeoutMs});
+ const layoutProbeAfter=await layoutProbeSnapshot();
  const percentile=(values:number[],q:number)=>[...values].sort((a,b)=>a-b)[Math.ceil(values.length*q)-1];
  const p95=percentile(times,.95),frameP95=percentile(frames,.95),stepped=await dungeonSnapshot(page);
  const after={canvas:await canvasIdentity(),grid:await visibleGrid()};
- writeFileSync(test.info().outputPath('warm-maximum-floor-step-performance.json'),JSON.stringify({fixture:'structural five-floor history adopted through recovery; not earned floor-five progression',warmup:{seed:witness.snapshot.seed,depth:witness.snapshot.depth,command:witness.command,completed:won.floors[0].completed},measurement:{times:'20 synchronous click-dispatch costs; async revision and position confirmation occurs outside each sample',frames:'Every animation-frame interval across 40 sequential accepted moves, including all intervals waiting for async publication',acceptanceTimeoutMs},dimension:map.width,first,second,before,after,idleFrames,times,p95,frames,frameP95,budgetMs:33.4,revision:{before:adopted.revision,after:stepped.revision}},null,2));
+ writeFileSync(test.info().outputPath('warm-maximum-floor-step-performance.json'),JSON.stringify({layoutProbe:{before:layoutProbeBefore,beforeFrames:layoutProbeBeforeFrames,after:layoutProbeAfter},fixture:'structural five-floor history adopted through recovery; not earned floor-five progression',warmup:{seed:witness.snapshot.seed,depth:witness.snapshot.depth,command:witness.command,completed:won.floors[0].completed},measurement:{times:'20 synchronous click-dispatch costs; async revision and position confirmation occurs outside each sample',frames:'Every animation-frame interval across 40 sequential accepted moves, including all intervals waiting for async publication',acceptanceTimeoutMs},dimension:map.width,first,second,before,after,idleFrames,times,p95,frames,frameP95,budgetMs:33.4,revision:{before:adopted.revision,after:stepped.revision}},null,2));
  expect(after.canvas).toEqual(originalCanvas);
  expect(after.grid.visibility).toBe('visible');expect(after.grid.focused).toBe(true);expect(after.grid.focusVisible).toBe(true);
  for(const cell of after.grid.cells){expect(cell.intersection.width).toBeGreaterThanOrEqual(cell.bounds.width-.1);expect(cell.intersection.height).toBeGreaterThanOrEqual(cell.bounds.height-.1);expect(cell.unoccluded).toBe(true);}
