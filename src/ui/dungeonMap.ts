@@ -62,10 +62,20 @@ export class DungeonMap {
   private readonly fallbackCells = new Set<HTMLElement>();
   private visual: { map: GeneratedMap; biome: string; revealed: Set<number>; sight: Set<number>; markers: number[] } | null = null;
   private readonly abort = new AbortController();
-  private readonly resize = new ResizeObserver(() => this.scheduleLayout(false));
+  private readonly resize = new ResizeObserver(() => this.scheduleLayout(false, true));
   private layoutFrame = 0;
+  private layoutDirty = true;
   private revealPlayer = false;
   private layoutSize = { width: 0, height: 0 };
+  private layoutParent: HTMLElement | null = null;
+  private layoutScreen: HTMLElement | null = null;
+  private layoutHeader: HTMLElement | null = null;
+  private viewportScroll = { left: 0, top: 0 };
+  private layoutGeometry: {
+    width: number; height: number; left: number; top: number;
+    cellWidth: number; cellHeight: number; columnStride: number; rowStride: number;
+    maxLeft: number; maxTop: number;
+  } | null = null;
   private readonly treatment = createMapArt(() => { if (this.live) this.paintArt(); });
   constructor(private readonly move: (destination: number) => void, private readonly locked: () => boolean) {
     const el = <K extends keyof HTMLElementTagNameMap>(tag:K,text='') => { const n=document.createElement(tag);n.textContent=text;return n; };
@@ -124,8 +134,13 @@ export class DungeonMap {
     this.controlsRoot.className = 'dungeon-map-controls';
     this.controlsRoot.append(this.feedback,label,keyboardPreference);
     this.resize.observe(this.viewport);
-    window.addEventListener('resize', () => this.scheduleLayout(false), {signal});
-    window.visualViewport?.addEventListener('resize', () => this.scheduleLayout(false), {signal});
+    this.resize.observe(this.grid);
+    this.resize.observe(this.heading);
+    this.viewport.addEventListener('scroll', () => {
+      this.viewportScroll = { left: this.viewport.scrollLeft, top: this.viewport.scrollTop };
+    }, {signal, passive: true});
+    window.addEventListener('resize', () => this.scheduleLayout(false, true), {signal});
+    window.visualViewport?.addEventListener('resize', () => this.scheduleLayout(false, true), {signal});
     document.addEventListener('keydown',e => {
       if (this.state?.phase !== 'ready' || !this.root.isConnected || this.root.closest('[hidden]') ||
         this.locked() || document.hidden || e.defaultPrevented || e.isComposing ||
@@ -145,52 +160,94 @@ export class DungeonMap {
   dispose() { this.live = false; this.abort.abort(); this.resize.disconnect(); cancelAnimationFrame(this.layoutFrame); }
   render(state: DungeonState, map: GeneratedMap) {
     const moved = !this.state || this.map !== map || currentFloor(this.state).position !== currentFloor(state).position;
-    this.state = state; this.map = map; this.draw(); this.scheduleLayout(moved);
+    const refit = !this.state || this.map !== map || this.state.phase !== state.phase || this.layoutParent !== this.root.parentElement;
+    this.layoutParent = this.root.parentElement;
+    this.state = state; this.map = map; this.draw(); this.scheduleLayout(moved, refit);
   }
   /** Fit controls to the visible screen; scroll only the map window when following movement. */
-  private scheduleLayout(reveal: boolean) {
+  private scheduleLayout(reveal: boolean, refit = false) {
     this.revealPlayer ||= reveal;
+    this.layoutDirty ||= refit;
     if (!this.live || this.layoutFrame) return;
     this.layoutFrame = requestAnimationFrame(() => {
       this.layoutFrame = 0;
       if (!this.live) return;
       if (!this.root.isConnected || this.root.closest('[hidden]')) {
         this.layoutSize = { width: 0, height: 0 };
+        this.layoutGeometry = null;
+        this.layoutDirty = true;
         return;
       }
-      const screen = this.root.closest<HTMLElement>('#dungeon-screen');
-      if (!screen) return;
-      const frame = this.directions.getBoundingClientRect(), screenBounds = screen.getBoundingClientRect();
-      const visible = window.visualViewport;
-      const bottom = Math.min(screenBounds.bottom, visible ? visible.offsetTop + visible.height : innerHeight);
-      const padding = parseFloat(getComputedStyle(screen).paddingBottom);
-      const gap = parseFloat(getComputedStyle(this.directions).rowGap);
-      const rails = this.controls[0].button.offsetHeight + this.controls[2].button.offsetHeight + 2 * gap;
-      // Including outer scroll keeps the size stable while inspecting secondary panels.
-      const available = Math.max(64, Math.floor(bottom - frame.top - screen.scrollTop - padding - rails));
-      const height = `${available}px`;
-      if (this.viewport.style.getPropertyValue('--dungeon-map-max-height') !== height) {
-        this.viewport.style.setProperty('--dungeon-map-max-height', height);
+      if (this.layoutDirty || !this.layoutGeometry) {
+        this.layoutDirty = false;
+        this.fitViewport();
       }
-      const size = { width: this.viewport.clientWidth, height: this.viewport.clientHeight };
-      // Resize notifications can arrive after a player has started inspecting the map.
-      // Follow once for an actual size change, not again for a delayed duplicate event.
-      this.revealPlayer ||= size.width !== this.layoutSize.width || size.height !== this.layoutSize.height;
-      this.layoutSize = size;
-      if (!this.revealPlayer || !this.state) return;
+      if (!this.revealPlayer || !this.state || !this.map || !this.layoutGeometry) return;
       this.revealPlayer = false;
-      const player = this.cells[currentFloor(this.state).position];
-      if (!player) return;
-      const cell = player.getBoundingClientRect(), view = this.viewport.getBoundingClientRect();
-      const left = view.left + this.viewport.clientLeft, top = view.top + this.viewport.clientTop;
-      const right = left + this.viewport.clientWidth, bottomEdge = top + this.viewport.clientHeight;
-      // Retain nearby terrain as context, without recentering an already-visible player.
-      const margin = Math.max(cell.width, cell.height);
-      if (cell.left - margin < left) this.viewport.scrollLeft += cell.left - margin - left;
-      else if (cell.right + margin > right) this.viewport.scrollLeft += cell.right + margin - right;
-      if (cell.top - margin < top) this.viewport.scrollTop += cell.top - margin - top;
-      else if (cell.bottom + margin > bottomEdge) this.viewport.scrollTop += cell.bottom + margin - bottomEdge;
+      const position = currentFloor(this.state).position, geometry = this.layoutGeometry;
+      const left = geometry.left + position % this.map.width * geometry.columnStride;
+      const top = geometry.top + Math.floor(position / this.map.width) * geometry.rowStride;
+      const margin = Math.max(geometry.cellWidth, geometry.cellHeight);
+      let { left: scrollLeft, top: scrollTop } = this.viewportScroll;
+      // Ordinary visible steps use cached geometry instead of flushing the freshly updated HUD layout.
+      if (left - margin < scrollLeft) scrollLeft = left - margin;
+      else if (left + geometry.cellWidth + margin > scrollLeft + geometry.width) scrollLeft = left + geometry.cellWidth + margin - geometry.width;
+      if (top - margin < scrollTop) scrollTop = top - margin;
+      else if (top + geometry.cellHeight + margin > scrollTop + geometry.height) scrollTop = top + geometry.cellHeight + margin - geometry.height;
+      scrollLeft = Math.max(0, Math.min(geometry.maxLeft, scrollLeft));
+      scrollTop = Math.max(0, Math.min(geometry.maxTop, scrollTop));
+      if (scrollLeft !== this.viewportScroll.left || scrollTop !== this.viewportScroll.top) {
+        this.viewportScroll = { left: scrollLeft, top: scrollTop };
+        this.viewport.scrollTo({ left: scrollLeft, top: scrollTop, behavior: 'instant' });
+      }
     });
+  }
+  /** Geometry changes are observed separately from movement; duplicate notifications preserve manual panning. */
+  private fitViewport() {
+    if (!this.map) return;
+    const screen = this.root.closest<HTMLElement>('#dungeon-screen');
+    if (!screen) return;
+    if (screen !== this.layoutScreen) {
+      if (this.layoutScreen) this.resize.unobserve(this.layoutScreen);
+      this.layoutScreen = screen; this.resize.observe(screen);
+    }
+    const header = screen.querySelector<HTMLElement>(':scope > .dungeon-header');
+    if (header !== this.layoutHeader) {
+      if (this.layoutHeader) this.resize.unobserve(this.layoutHeader);
+      this.layoutHeader = header;
+      if (header) this.resize.observe(header);
+    }
+    const frame = this.directions.getBoundingClientRect(), screenBounds = screen.getBoundingClientRect();
+    const visible = window.visualViewport;
+    const bottom = Math.min(screenBounds.bottom, visible ? visible.offsetTop + visible.height : innerHeight);
+    const padding = parseFloat(getComputedStyle(screen).paddingBottom);
+    const gap = parseFloat(getComputedStyle(this.directions).rowGap);
+    const rails = this.controls[0].button.offsetHeight + this.controls[2].button.offsetHeight + 2 * gap;
+    // Including outer scroll keeps the size stable while inspecting secondary panels.
+    const available = Math.max(64, Math.floor(bottom - frame.top - screen.scrollTop - padding - rails));
+    const height = `${available}px`;
+    if (this.viewport.style.getPropertyValue('--dungeon-map-max-height') !== height) {
+      this.viewport.style.setProperty('--dungeon-map-max-height', height);
+    }
+    const size = { width: this.viewport.clientWidth, height: this.viewport.clientHeight };
+    // Resize notifications can arrive after a player has started inspecting the map.
+    // Follow once for an actual size change, not again for a delayed duplicate event.
+    this.revealPlayer ||= size.width !== this.layoutSize.width || size.height !== this.layoutSize.height;
+    this.layoutSize = size;
+    const grid = this.grid.getBoundingClientRect(), view = this.viewport.getBoundingClientRect();
+    const style = getComputedStyle(this.grid);
+    const borderLeft = parseFloat(style.borderLeftWidth), borderTop = parseFloat(style.borderTopWidth);
+    const columnGap = parseFloat(style.columnGap), rowGap = parseFloat(style.rowGap);
+    const columnStride = (grid.width - borderLeft - parseFloat(style.borderRightWidth) + columnGap) / this.map.width;
+    const rowStride = (grid.height - borderTop - parseFloat(style.borderBottomWidth) + rowGap) / this.map.height;
+    this.viewportScroll = { left: this.viewport.scrollLeft, top: this.viewport.scrollTop };
+    this.layoutGeometry = {
+      ...size,
+      left: grid.left - view.left - this.viewport.clientLeft + this.viewportScroll.left + borderLeft,
+      top: grid.top - view.top - this.viewport.clientTop + this.viewportScroll.top + borderTop,
+      cellWidth: columnStride - columnGap, cellHeight: rowStride - rowGap, columnStride, rowStride,
+      maxLeft: this.viewport.scrollWidth - size.width, maxTop: this.viewport.scrollHeight - size.height,
+    };
   }
   private step(delta: number) {
     if (!this.live || !this.state || this.locked() || document.hidden) return;
