@@ -68,7 +68,6 @@ export class DungeonMap {
   private revealPlayer = false;
   private layoutSize = { width: 0, height: 0 };
   private layoutParent: HTMLElement | null = null;
-  private layoutScreen: HTMLElement | null = null;
   private layoutHeader: HTMLElement | null = null;
   private viewportScroll = { left: 0, top: 0 };
   private layoutGeometry: {
@@ -134,8 +133,6 @@ export class DungeonMap {
     this.controlsRoot.className = 'dungeon-map-controls';
     this.controlsRoot.append(this.feedback,label,keyboardPreference);
     this.resize.observe(this.viewport);
-    this.resize.observe(this.grid);
-    this.resize.observe(this.heading);
     this.viewport.addEventListener('scroll', () => {
       this.viewportScroll = { left: this.viewport.scrollLeft, top: this.viewport.scrollTop };
     }, {signal, passive: true});
@@ -207,10 +204,6 @@ export class DungeonMap {
     if (!this.map) return;
     const screen = this.root.closest<HTMLElement>('#dungeon-screen');
     if (!screen) return;
-    if (screen !== this.layoutScreen) {
-      if (this.layoutScreen) this.resize.unobserve(this.layoutScreen);
-      this.layoutScreen = screen; this.resize.observe(screen);
-    }
     const header = screen.querySelector<HTMLElement>(':scope > .dungeon-header');
     if (header !== this.layoutHeader) {
       if (this.layoutHeader) this.resize.unobserve(this.layoutHeader);

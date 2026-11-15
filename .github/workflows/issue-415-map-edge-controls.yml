@@ -1,4 +1,4 @@
-name: Verify mobile movement after core checks
+name: Qualify movement timing before mobile regression
 on:
   push:
     branches: [verify/issue-415-map-edge-controls]
@@ -36,7 +36,7 @@ jobs:
           import { sourceIdentity } from './scripts/verification-report.mjs';
           writeFileSync('verification-receipts/issue-415/source.json', JSON.stringify({
             source: sourceIdentity(process.cwd()), node: process.version, runner: process.env.RUNNER_NAME,
-            conditions: 'Our PR verification run 43669892682 completed before this run was queued. One of our browser jobs is active; other host workloads and caches are not independently controlled. Qualified runner; browser/device emulation.',
+            conditions: 'Our PR verification run 43669892682 completed before this run was queued. Selected timing checks run before the candidate is published to the PR and before its new core suite starts. Other host workloads and caches are not independently controlled. Qualified runner; browser/device emulation.',
             purpose: 'Issue 415 map-edge controls. Verification-only workflow; runtime and tests are compared to the implementation PR.'
           }, null, 2));
           JS
@@ -49,30 +49,32 @@ jobs:
         id: warm_gate
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'warm.*maximum-size.*floor' --project=desktop-webkit --project=landscape-webkit --repeat-each=3 --max-failures=6
-      - name: Verify movement layout on Chromium
+      - name: Check large-floor movement responsiveness on Chromium
+        id: chromium_timing
         if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.warm_gate.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.regression.config.ts tests/dungeon-exploration.spec.ts -g 'maximum-size floor step responsiveness|warm.*maximum-size.*floor' --max-failures=3
+      - name: Check large-floor movement responsiveness on WebKit
+        id: webkit_timing
+        if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.warm_gate.outcome == 'success' }}
+        run: |
+          npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'maximum-size floor step responsiveness' --grep-invert 'warm' --max-failures=3
+          npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'warm.*maximum-size.*floor' --project=portrait-webkit --max-failures=1
+      - name: Verify movement layout on Chromium
+        if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.warm_gate.outcome == 'success' && steps.chromium_timing.outcome == 'success' && steps.webkit_timing.outcome == 'success' }}
         run: |
           selection=(-c playwright.regression.config.ts tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts -g 'map-edge direction controls|movement controls stay visible|maximum-size saved floor|fresh dungeon keeps the map|ground loot: legal victory|compass keeps keyboard focus|map shortcuts work|real traversal, art independence|map input stays inert|exploration keeps the map first|dungeon recovery separates status|stairs travel once per entry with compass')
           npx --no-install playwright test "${selection[@]}" --list > verification-receipts/issue-415/chromium-selection.txt
           npm run test:browser -- "${selection[@]}" --max-failures=5 --diagnostics
       - name: Verify movement layout on WebKit
-        if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.warm_gate.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.warm_gate.outcome == 'success' && steps.chromium_timing.outcome == 'success' && steps.webkit_timing.outcome == 'success' }}
         run: |
           selection=(-c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts -g 'map-edge direction controls|movement controls stay visible|maximum-size saved floor|fresh dungeon keeps the map|ground loot: legal victory|compass keeps keyboard focus|map shortcuts work|real traversal, art independence|map input stays inert|exploration keeps the map first|dungeon recovery separates status|stairs travel once per entry with compass')
           npx --no-install playwright test "${selection[@]}" --list > verification-receipts/issue-415/webkit-selection.txt
           npm run test:browser -- "${selection[@]}" --max-failures=5 --diagnostics
-      - name: Check large-floor movement responsiveness on Chromium
-        if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.warm_gate.outcome == 'success' }}
-        run: npm run test:browser -- -c playwright.regression.config.ts tests/dungeon-exploration.spec.ts -g 'maximum-size floor step responsiveness|warm.*maximum-size.*floor' --max-failures=3
-      - name: Check large-floor movement responsiveness on WebKit
-        if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.warm_gate.outcome == 'success' }}
-        run: |
-          npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'maximum-size floor step responsiveness' --grep-invert 'warm' --max-failures=3
-          npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'warm.*maximum-size.*floor' --project=portrait-webkit --max-failures=1
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: issue-415-coordinated-movement-${{ github.run_id }}-${{ github.run_attempt }}
+          name: issue-415-final-movement-${{ github.run_id }}-${{ github.run_attempt }}
           path: verification-receipts/
           retention-days: 14
           if-no-files-found: warn
