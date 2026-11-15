@@ -7,12 +7,16 @@ export type DungeonSlot = keyof typeof DUNGEON_KEYS;
 type Slot = { status: 'missing'; text: null } | { status: 'valid'; text: string; state: DungeonState; checkpoint?: string }
   | { status: 'invalid'; text: string; reason: string } | { status: 'unavailable'; text: null };
 export interface DungeonInspection { readonly primary: Slot; readonly backup: Slot }
-export function isResumableDungeonSlot(slot: Slot): slot is Extract<Slot, { status: 'valid' }> {
-  return slot.status === 'valid' && slot.state.phase !== 'defeat';
+export function resumableDungeonSave(review: DungeonInspection, name: DungeonSlot) {
+  const slot = review[name];
+  if (slot.status !== 'valid' || slot.state.phase === 'defeat') return null;
+  const other = review[name === 'primary' ? 'backup' : 'primary'];
+  // A checkpoint for the defeated journey is still available for export.
+  return other.status === 'valid' && other.state.phase === 'defeat' && other.state.id === slot.state.id ? null : slot;
 }
 export function resumableDungeonSlot(review: DungeonInspection): DungeonSlot | null {
-  if (isResumableDungeonSlot(review.primary)) return 'primary';
-  return isResumableDungeonSlot(review.backup) ? 'backup' : null;
+  if (resumableDungeonSave(review, 'primary')) return 'primary';
+  return resumableDungeonSave(review, 'backup') ? 'backup' : null;
 }
 export type DungeonWrite = { ok: true } | { ok: false; reason: string };
 /** True only when both slots are missing. Unavailable, backup-only, and unreadable saves are not empty. */

@@ -81,7 +81,7 @@ test('restart during accepted presentation discards old callbacks and history',a
  expect({...checkpoint,stats:{...checkpoint.stats,activeMs:fresh.stats!.activeMs}}).toEqual(fresh);
  await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(checkpoint);
 });
-test('legal enemy defeat waits for its save before showing the main menu summary',async({page})=>{
+test('legal enemy defeat waits for its save and returns to the menu during a pending history write',async({page})=>{
  const made=startDungeonBattle(atEncounter(freshDungeon('dungeon-defeat-fixture',1)));if(!made.ok)throw Error(made.reason);const entry=made.state,built=dungeonBattle(entry)!;
  const session=new BattleSession(built.catalog,entry.activeBattle!,entry.activeBattle!.seed,undefined,true,built.battlefield);let before=entry.activeBattle!;
  for(let i=0;i<400&&session.state.outcome==='ongoing';i++){
@@ -104,31 +104,45 @@ test('legal enemy defeat waits for its save before showing the main menu summary
    return Reflect.apply(target,locks,args);
   }});
  },DUNGEON_KEYS.primary);
- await load(page,{...entry,activeBattle:before});
- await expect(page.locator('#game')).toHaveAttribute('data-phase','ended');
- const defeat=await snapshot(page);
- expect(defeat.phase).toBe('defeat');
- await expect(page.locator('#main-menu')).toHaveCount(0);
- await page.evaluate(()=>window.dispatchEvent(new Event('test-release-defeat-write')));
- const summary=page.getByRole('dialog',{name:'Dungeon defeat',exact:true});
- await expect(summary).toBeVisible();
- await expect(summary).toContainText('Deepest floor');
- expect(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!).payload.phase,DUNGEON_KEYS.primary)).toBe('defeat');
- await summary.getByRole('button',{name:'New Game',exact:true}).click();
- const confirmation=page.getByRole('dialog',{name:'Start new dungeon?',exact:true});
- await confirmation.getByRole('button',{name:'Close',exact:true}).click();
- await expect(page.locator('#main-menu')).toBeVisible();
+ const lockOwner=await page.context().newPage();
+ try {
+  await lockOwner.goto('./');
+  await lockOwner.evaluate(key=>new Promise<void>(acquired=>{
+   void navigator.locks.request(key,()=>new Promise<void>(release=>{
+    window.addEventListener('test-release-defeat-history',()=>release(),{once:true});
+    acquired();
+   }));
+  }),RUN_RECORD_KEYS.primary);
+  await page.bringToFront();
+  await load(page,{...entry,activeBattle:before});
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','ended');
+  expect((await snapshot(page)).phase).toBe('defeat');
+  await expect(page.locator('#main-menu')).toHaveCount(0);
+  await page.evaluate(()=>window.dispatchEvent(new Event('test-release-defeat-write')));
+  const summary=page.getByRole('dialog',{name:'Dungeon defeat',exact:true});
+  await expect(summary).toBeVisible();
+  await expect(summary).toContainText('Deepest floor');
+  expect(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!).payload.phase,DUNGEON_KEYS.primary)).toBe('defeat');
+  await summary.getByRole('button',{name:'Hall of Records',exact:true}).click();
+  const records=page.getByRole('dialog',{name:'Hall of Records',exact:true});
+  await expect(records).toContainText('No finished journeys recorded yet.');
+  await lockOwner.evaluate(()=>window.dispatchEvent(new Event('test-release-defeat-history')));
+  await expect(records).toContainText('Dungeon · Defeat');
+  await records.getByRole('button',{name:'Close',exact:true}).click();
+ }finally{await lockOwner.close();}
+ await expect(page.getByRole('button',{name:'Continue',exact:true})).toBeDisabled();
  await page.getByRole('button',{name:'Save recovery',exact:true}).click();
  await page.getByRole('link',{name:/^Dungeon/}).click();
  const recovery=page.getByRole('dialog',{name:'Dungeon save recovery',exact:true});
  await expect(recovery.getByRole('button',{name:'Export primary save',exact:true})).toBeVisible();
  await expect(recovery.getByRole('button',{name:'Continue primary dungeon',exact:true})).toHaveCount(0);
- await expect(recovery.getByRole('button',{name:'Continue backup dungeon',exact:true})).toBeVisible();
+ await expect(recovery.getByRole('button',{name:'Export backup save',exact:true})).toBeVisible();
+ await expect(recovery.getByRole('button',{name:'Continue backup dungeon',exact:true})).toHaveCount(0);
  await page.goto('./');
  await page.getByRole('button',{name:'New Game',exact:true}).click();
- await confirmation.getByRole('button',{name:'Start new dungeon',exact:true}).click();
+ await page.getByRole('dialog',{name:'Start new dungeon?',exact:true}).getByRole('button',{name:'Start new dungeon',exact:true}).click();
  await expect(page.locator('#dungeon-map')).toBeVisible();
- expect((await snapshot(page)).id).not.toBe(defeat.id);
+ expect((await snapshot(page)).id).not.toBe(entry.id);
  expect((await snapshot(page)).party.every(h=>h.hp>0)).toBe(true);expect((await snapshot(page)).floors).toHaveLength(1);
 });
 test('run navigation reaches the base-aware dungeon entry and returns to existing modes',async({page,baseURL})=>{

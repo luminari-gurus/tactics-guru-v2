@@ -69,6 +69,7 @@ export function startMainMenu() {
       body.append(link);
     });
   }
+  const runHistory = new RunHistory('dungeon');
   const actionsMenu: Record<string, () => void> = {
     continue: () => {
       if (refresh().resumable) location.assign(menuGameHref('dungeon', import.meta.env.BASE_URL, 'continue'));
@@ -95,7 +96,7 @@ export function startMainMenu() {
         body.append(confirm);
       });
     },
-    records: () => show('Hall of Records', () => { disposeContent = mountRunRecords(body); }),
+    records: () => show('Hall of Records', () => { disposeContent = mountRunRecords(body, runHistory.store, runHistory.whenIdle()); }),
     settings: () => show('Settings', () => {
       body.append(element('p', 'Use the in-game Sound controls to enable or mute audio. Sound starts after your interaction.'));
       mountCombatControlsPreference(body);
@@ -118,15 +119,21 @@ export function startMainMenu() {
   }
   content.append(title, nav, status, recovery, secondary, element('p', 'Choose your next adventure.'));
   main.append(art, content); document.body.append(main, dialog); refresh();
-  void new RunHistory('dungeon').reconcileDungeonDefeat(createDungeonStorage().inspect());
+  void runHistory.reconcileDungeonDefeat(createDungeonStorage().inspect());
   // The dungeon hands off a single terminal result. Consume before opening so
   // a reload cannot replay an old defeat announcement.
   let defeatText: string | null = null;
   try { defeatText = sessionStorage.getItem('tactics-guru:defeat-summary'); sessionStorage.removeItem('tactics-guru:defeat-summary'); } catch { /* Storage is optional. */ }
   if (defeatText) {
     let record: ReturnType<typeof readRunRecord> = null;
-    try { record = readRunRecord(JSON.parse(defeatText)); } catch { /* Ignore malformed handoffs. */ }
+    let retryHistory = false;
+    try {
+      const handoff = JSON.parse(defeatText);
+      record = readRunRecord(handoff?.record ?? handoff);
+      retryHistory = handoff?.retryHistory === true;
+    } catch { /* Ignore malformed handoffs. */ }
     if (record?.mode === 'dungeon' && record.outcome === 'defeat') {
+      if (retryHistory) void runHistory.record(record);
       show('Dungeon defeat', () => {
         body.append(element('p', 'Your party has fallen. Here is how far you made it.'));
         const stats = element('dl'); stats.className = 'run-statistics';

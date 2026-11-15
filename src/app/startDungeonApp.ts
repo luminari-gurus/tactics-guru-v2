@@ -11,7 +11,7 @@ import { RunHistory } from './RunHistory';
 import { dungeonRunRecord } from '../domain/runRecords';
 import { freshDungeon, FloorCache, newDungeonSeed, type DungeonState } from '../domain/dungeon';
 import type { DungeonAutoCollectIntent } from '../domain/dungeonAutoCollect';
-import { bothDungeonSlotsMissing, createDungeonStorage, isResumableDungeonSlot, resumableDungeonSlot, serializeBrowserDungeonWrite } from '../persistence/dungeonStorage';
+import { bothDungeonSlotsMissing, createDungeonStorage, resumableDungeonSave, resumableDungeonSlot, serializeBrowserDungeonWrite } from '../persistence/dungeonStorage';
 import { dungeonElement as el, renderDungeon } from '../ui/dungeon';
 import { BattleDialogs, type DialogChoice } from '../ui/dialogs';
 import type { RunBattleHost } from '../phaser/BattleScene';
@@ -165,7 +165,7 @@ async function recovery(){
  const close=()=>{if(!playing)render();screen.querySelector<HTMLElement>('h1')?.focus();};
  for(const [i,value] of session.exports(review).entries())choices.push({id:`dungeon-export-${i}`,label:`Export ${value.label}`,run:()=>{const url=URL.createObjectURL(new Blob([value.text],{type:'application/json'}));const a=el('a');a.href=url;a.download=`tactics-guru-dungeon-${i}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);close();}});
  for(const slot of ['primary','backup'] as const){
-  if(isResumableDungeonSlot(review[slot]))choices.push({id:`dungeon-continue-${slot}`,label:`Continue ${slot} dungeon`,run:()=>{if(session.continue(review,slot)){startup=false;stop();render();if(session.snapshot.activeBattle)start();}else recovery();}});
+  if(resumableDungeonSave(review,slot))choices.push({id:`dungeon-continue-${slot}`,label:`Continue ${slot} dungeon`,run:()=>{if(session.continue(review,slot)){startup=false;stop();render();if(session.snapshot.activeBattle)start();}else recovery();}});
   if(review[slot].text!==null)choices.push({id:`dungeon-remove-${slot}`,label:`Remove ${slot} save`,run:()=>dialogs.showChoices('Remove reviewed save?','Export first if needed. Only the reviewed dungeon slot will be removed.',[
    {id:'dungeon-remove-confirm',label:'Remove reviewed save',keepOpen:true,run:async()=>{await session.remove(slot,review);recovery();}},
    {id:'dungeon-remove-cancel',label:'Cancel',run:recovery},
@@ -190,11 +190,13 @@ async function finishDefeat(generation:number){
  if(finishingDefeat)return;
  finishingDefeat=true;
  try {
-  await Promise.all([session.flushPlaytime(),session.history?.whenIdle()]);
+  await session.flushPlaytime();
   if(!live||generation!==loadGeneration||session.phase!=='defeat')return;
   if(!confirmMenuDeparture(()=>session.savesProgress&&session.hasUnsavedProgress,recovery))return;
   const record=dungeonRunRecord(session.snapshot,Date.now());
-  if(record) try { sessionStorage.setItem('tactics-guru:defeat-summary',JSON.stringify(record)); } catch { /* The menu remains accessible without temporary storage. */ }
+  if(record) try {
+   sessionStorage.setItem('tactics-guru:defeat-summary',JSON.stringify({record, retryHistory:!!storage&&session.hasUnsavedProgress}));
+  } catch { /* The menu remains accessible without temporary storage. */ }
   location.assign(routeHref('menu',import.meta.env.BASE_URL));
  }finally{finishingDefeat=false;}
 }

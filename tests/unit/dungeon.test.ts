@@ -354,11 +354,12 @@ describe('dungeon run history boundaries', () => {
     const history = new RunHistory('dungeon', records, () => 200);
     return { m, storage, records, history, rows: () => selectedRunRecords(records.inspect())?.records ?? [] };
   }
-  it.each([false, true])('reconciles a defeated save once without changing active save bytes (playable backup: %s)', async playableBackup => {
+  it.each(['terminal', 'same run', 'different run'])('reconciles defeat and checks the %s backup without changing save bytes', async backupKind => {
     const f = fixture(), entry = good(startDungeonBattle(atEncounter(fresh()))), battle = entry.activeBattle!;
     const terminal = good(acceptDungeonBattle(entry, { ...battle, outcome: 'playerLoss',
       units: battle.units.map(unit => unit.side === 'player' ? { ...unit, hp: 0 } : unit) }));
-    if (playableBackup) assert(f.storage.save(entry).ok);
+    const backup = backupKind === 'different run' ? freshDungeon('different-run', 14) : entry;
+    if (backupKind !== 'terminal') assert(f.storage.save(backup).ok);
     assert(f.storage.save(terminal).ok);
     const bytes = [f.m.getItem(DUNGEON_KEYS.primary), f.m.getItem(DUNGEON_KEYS.backup)];
     const session = new DungeonSession(freshDungeon('placeholder', 14), f.storage, f.history);
@@ -368,8 +369,10 @@ describe('dungeon run history boundaries', () => {
     await f.history.reconcileDungeonDefeat(review);
     expect(f.rows()).toMatchObject([{ id: terminal.id, outcome: 'defeat', recordedAt: 200, battlesWon: 0 }]);
     await f.history.reconcileDungeonDefeat(review);
+    const playableBackup = backupKind === 'different run';
+    if (!playableBackup) expect(session.continue(review, 'backup')).toBe(false);
     expect(session.continue(review)).toBe(playableBackup);
-    if (playableBackup) expect(session.snapshot).toEqual(entry);
+    if (playableBackup) expect(session.snapshot).toEqual(backup);
     else expect(session.snapshot.id).toBe('placeholder');
     await f.history.whenIdle();
     expect(f.rows()).toHaveLength(1);
