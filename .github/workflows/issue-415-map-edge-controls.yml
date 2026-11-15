@@ -1,0 +1,72 @@
+name: Issue 415 map-edge movement verification
+on:
+  push:
+    branches: [verify/issue-415-map-edge-controls]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: tactics-browser-tactics-browser-02
+  queue: max
+  cancel-in-progress: false
+jobs:
+  movement:
+    if: github.repository == 'luminari-gurus/tactics-guru-v2' && github.ref == 'refs/heads/verify/issue-415-map-edge-controls'
+    runs-on: [self-hosted, tactics-browser, tactics-browser-02]
+    timeout-minutes: 20
+    steps:
+      - name: Check host disposition
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run setup:browsers && npm run check:browsers
+      - name: Record source identity
+        run: |
+          mkdir -p verification-receipts/issue-415
+          node --input-type=module <<'JS'
+          import { writeFileSync } from 'node:fs';
+          import { sourceIdentity } from './scripts/verification-report.mjs';
+          writeFileSync('verification-receipts/issue-415/source.json', JSON.stringify({
+            source: sourceIdentity(process.cwd()), node: process.version, runner: process.env.RUNNER_NAME,
+            conditions: 'Qualified persistent runner; browser/device emulation; shared host load and caches not independently controlled',
+            purpose: 'Issue 415 map-edge controls. Verification-only workflow; runtime and tests are compared to the implementation PR.'
+          }, null, 2));
+          JS
+      - name: Build and check affected presentation units
+        id: build
+        run: |
+          npm run test:unit -- tests/unit/dungeonLootPresentation.test.ts
+          npm run build
+      - name: Verify movement layout on Chromium
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          selection=(-c playwright.regression.config.ts tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts -g 'map-edge direction controls|movement controls stay visible|maximum-size saved floor|fresh dungeon keeps the map|ground loot: legal victory|compass keeps keyboard focus|map shortcuts work|real traversal, art independence|map input stays inert|exploration keeps the map first|dungeon recovery separates status')
+          npx --no-install playwright test "${selection[@]}" --list > verification-receipts/issue-415/chromium-selection.txt
+          npm run test:browser -- "${selection[@]}" --max-failures=5 --diagnostics
+      - name: Verify movement layout on WebKit
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          selection=(-c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts tests/dungeon.spec.ts -g 'map-edge direction controls|movement controls stay visible|maximum-size saved floor|fresh dungeon keeps the map|ground loot: legal victory|compass keeps keyboard focus|map shortcuts work|real traversal, art independence|map input stays inert|exploration keeps the map first|dungeon recovery separates status')
+          npx --no-install playwright test "${selection[@]}" --list > verification-receipts/issue-415/webkit-selection.txt
+          npm run test:browser -- "${selection[@]}" --max-failures=5 --diagnostics
+      - name: Check large-floor movement responsiveness on Chromium
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.regression.config.ts tests/dungeon-exploration.spec.ts -g 'maximum-size floor step responsiveness|warm.*maximum-size.*floor' --max-failures=2
+      - name: Check large-floor movement responsiveness on WebKit
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'maximum-size floor step responsiveness|warm.*maximum-size.*floor' --max-failures=2
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-415-movement-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/
+          retention-days: 14
+          if-no-files-found: warn
