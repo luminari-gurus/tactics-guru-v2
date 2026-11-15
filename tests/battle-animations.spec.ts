@@ -1,7 +1,7 @@
 import type { Command } from '../src/domain/types';
 import { expect, test as base, type Page } from './helpers/forceRailControls';
 import { writeFileSync } from 'node:fs';
-import { BattleSession } from '../src/app/BattleSession';
+import { BattleSession, type Presentation } from '../src/app/BattleSession';
 import { standaloneCatalog as catalog } from './helpers/playerPolicy';
 import { dispatch } from '../src/domain/turns';
 import { previewMove, previewMovement } from '../src/domain/grid';
@@ -10,7 +10,7 @@ import { BATTLE_STORAGE_KEYS as keys } from '../src/persistence/battleStorage';
 import { projectTile } from '../src/geometry/iso';
 import { HEALTH_BAR } from '../src/phaser/healthBar';
 import { abilityPresentation, type SignatureKind } from '../src/phaser/abilityPresentation';
-import { playerDecision, readSession, confirmRestart } from './helpers/battlePolicy';
+import { playerDecision, readSession, confirmRestart, playCommand } from './helpers/battlePolicy';
 import { startApplicationLoadDiagnostics, type ApplicationLoadDiagnostics } from './helpers/applicationLoadDiagnostics';
 
 // Add failure evidence without replacing the rail controls or graphics fixtures.
@@ -237,7 +237,8 @@ for(const kind of kinds)test(`${kind}: real controls, travel/impact, transformed
   // A signature aimed at its own actor must remain a rejected preview, with no cue or save.
   await press(page,fixtureAbilitySelector(fixture),keyboard);await page.locator('canvas').focus();await page.keyboard.press('Enter');
   await expect(page.locator('#battle-preview')).toContainText('Unavailable');await expect(page.locator('#battle-review')).toBeDisabled();
-  expect((await report(page)).effect).toBeNull();expect((await readSession(page)).state).toEqual(fixture.before);expect(await stored(page)).toEqual(savedBefore);
+  expect((await report(page)).effect).toBeNull();expect((await report(page)).criticalImpacts).toEqual([]);
+  expect((await readSession(page)).state).toEqual(fixture.before);expect(await stored(page)).toEqual(savedBefore);
   await press(page,'#battle-cancel',keyboard);
   await prepareSignature(page,fixture,keyboard);await page.keyboard.press('Escape');
   expect((await report(page)).effect).toBeNull();expect((await readSession(page)).state).toEqual(fixture.before);expect(await stored(page)).toEqual(savedBefore);
@@ -265,6 +266,7 @@ for(const kind of kinds)test(`${kind}: real controls, travel/impact, transformed
   await page.mouse.wheel(0,-50);await page.clock.runFor(176);
   const impact=await report(page);aligned(impact,fixture);expect(impact.transform).not.toEqual(travel.transform);
   expect(impact.effect.progress).toBeGreaterThanOrEqual(0.45);
+  expect(impact.criticalImpacts).toHaveLength(fixture.events.filter(event=>event.type==='attackRolled' && event.result==='critical').length);
   expect(impact.effect.feedback.filter((f:any)=>f.visible).map((f:any)=>({unitId:f.unitId,text:f.text})))
     .toEqual(abilityPresentation(fixture.events).feedback.map(f=>({unitId:f.unitId,text:f.text})));
   await page.screenshot({path:info.outputPath(`${kind}-impact.png`)});
@@ -287,6 +289,7 @@ test(`${kind}: ${outcome} feedback matches resolved events`,async({page},info)=>
   expect(r.effect.feedback.map((f:any)=>({unitId:f.unitId,text:f.text}))).toEqual(feedback.map(f=>({unitId:f.unitId,text:f.text})));
   expect(r.effect.feedback.every((f:any)=>f.visible)).toBe(true);
   if(outcome==='miss'){expect(feedback.some(f=>f.text==='Miss')).toBe(true);expect(feedback.some(f=>f.text.includes('−'))).toBe(false);}
+  if(outcome!=='critical')expect(r.criticalImpacts).toEqual([]);
   if(kind==='guarded_strike')expect(feedback).toContainEqual({unitId:r.effect.actorId,kind:'guard',text:'Guarded'});
   const positions=r.effect.feedback.map((f:any)=>`${f.x},${f.y}`);expect(new Set(positions).size).toBe(positions.length);
   await page.screenshot({path:info.outputPath(`${kind}-${outcome}.png`)});await page.clock.runFor(500);
@@ -801,4 +804,217 @@ test('combat pace: reduced motion keeps movement at endpoints and result text st
     await page.clock.resume();await ready(page);expect(await stored(page)).toEqual(saved);
   }
   expect(errors).toEqual([]);
+});
+
+/** The same resolved roll owns the burst, target sprite, health bar and result label. */
+function criticalFrame(frame:any,fixture:Presentation,reducedMotion=false) {
+  const attack=fixture.events.find(event=>event.type==='attackRolled' && event.result==='critical');
+  if(!attack || attack.type!=='attackRolled')throw Error('Expected a resolved critical fixture');
+  const target=fixture.before.units.find(unit=>unit.id===attack.targetId)!;
+  const tile=frame.tiles.find((tile:any)=>tile.x===target.cell.x && tile.y===target.cell.y),point=projectTile(tile);
+  expect(frame.criticalImpacts).toHaveLength(1);
+  const impact=frame.criticalImpacts[0],unit=frame.units.find((unit:any)=>unit.id===target.id);
+  expect(impact).toMatchObject({actorId:attack.unitId,targetId:target.id,center:{x:point.x,y:point.y-28},visible:true,reducedMotion,interactive:false});
+  expect(impact.screen.x).toBeCloseTo(frame.transform.x+impact.center.x*frame.transform.scale,3);
+  expect(impact.screen.y).toBeCloseTo(frame.transform.y+impact.center.y*frame.transform.scale,3);
+  expect(impact.depth).toBeGreaterThan(unit.depth);expect(impact.depth).toBeLessThan(unit.health.depth);
+  expect(unit.anchorError).toBeLessThan(0.001);expect(unit.health.visible).toBe(true);
+  expect(frame.feedbackBounds.some((label:any)=>label.text.startsWith('Critical · −'))).toBe(true);
+  for(const label of frame.feedbackBounds){
+    expect(label.x).toBeGreaterThanOrEqual(frame.region.x);expect(label.y).toBeGreaterThanOrEqual(frame.region.y);
+    expect(label.x+label.width).toBeLessThanOrEqual(frame.region.x+frame.region.width);
+    expect(label.y+label.height).toBeLessThanOrEqual(frame.region.y+frame.region.height);
+  }
+  for(let i=0;i<frame.feedbackBounds.length;i++)for(let j=i+1;j<frame.feedbackBounds.length;j++){
+    const a=frame.feedbackBounds[i],b=frame.feedbackBounds[j];
+    expect(a.x+a.width<=b.x || b.x+b.width<=a.x || a.y+a.height<=b.y || b.y+b.height<=a.y).toBe(true);
+  }
+  return impact;
+}
+
+async function transformCriticalBoard(page:Page,browserName:string,touch:boolean) {
+  const r=(await report(page)).region,x=r.x+r.width/2,y=r.y+r.height*0.55;
+  if(touch && browserName==='chromium'){
+    const cdp=await page.context().newCDPSession(page);
+    try {
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:x-12,y,id:1},{x:x+12,y,id:2}]});
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x-18,y,id:1},{x:x+18,y,id:2}]});
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y,id:3}]});
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x+18,y:y-12,id:3}]});
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    } finally {await cdp.detach();}
+  }else if(touch){
+    // WebKit exposes native taps but no Playwright pinch API; wheel is camera setup only.
+    await page.locator('canvas').dispatchEvent('wheel',{clientX:x,clientY:y,deltaY:-80,bubbles:true});
+  }else {
+    await page.mouse.move(x,y);await page.mouse.wheel(0,-80);
+    await page.mouse.down();await page.mouse.move(x+18,y-12,{steps:3});await page.mouse.up();
+  }
+}
+
+test('critical impact: normal, fast and reduced motion keep lethal target feedback synchronized and readable',async({page,browserName},info)=>{
+  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+  const fixture=boundary('high_shot','critical',false,11);
+  expect(fixture.before.seed).toBe(11);expect(fixture.before.commandCount).toBe(6);
+  expect(fixture.events.some(event=>event.type==='defeated')).toBe(true);expect(fixture.after.outcome).toBe('ongoing');
+  await boot(page,fixture);
+  const captures:unknown[]=[],results:Awaited<ReturnType<typeof readSession>>[]=[];
+  for(const [index,mode] of [
+    {pace:'normal',reduced:false},{pace:'fast',reduced:false},{pace:'normal',reduced:true},{pace:'fast',reduced:true},
+  ].entries()){
+    if(index){await page.clock.resume();await reachStandaloneBoundary(page,fixture.before);}
+    await page.emulateMedia({reducedMotion:mode.reduced?'reduce':'no-preference'});
+    await chooseCombatPace(page,mode.pace as 'normal'|'fast');
+    const baseline=(await report(page)).objectCount;
+    // Targeting and cancellation never manufacture a critical.
+    await prepareSignature(page,fixture,!info.project.use.hasTouch);
+    expect((await report(page)).criticalImpacts).toEqual([]);
+    await press(page,'#battle-cancel');expect((await report(page)).criticalImpacts).toEqual([]);
+    await prepareSignature(page,fixture,!info.project.use.hasTouch);await confirmFrozen(page);
+    const accepted=await readSession(page),saved=await stored(page),start=await report(page);
+    expect(accepted.state).toEqual(fixture.after);expect(accepted.events.slice(-fixture.events.length)).toEqual(fixture.events);
+    expect(accepted.replay!.commands.slice(-1)).toEqual([fixture.command]);
+    expect(start.criticalImpacts).toHaveLength(1);expect(start.criticalImpacts[0].visible).toBe(mode.reduced);
+    await expect(page.locator('#battle-next')).toBeDisabled();
+    if(mode.reduced){
+      const stationary=criticalFrame(start,fixture,true);expect(stationary.progress).toBe(0);expect(start.effect).toBeNull();
+      await page.clock.runFor(48);
+      const later=await report(page);expect(criticalFrame(later,fixture,true)).toEqual(stationary);
+      expect(later.feedbackBounds).toEqual(start.feedbackBounds);
+    }else {
+      await page.clock.runFor(mode.pace==='normal'?112:48);
+      const travel=await report(page);expect(travel.criticalImpacts[0].visible).toBe(false);
+      await page.clock.runFor(mode.pace==='normal'?208:112);
+      const impact=criticalFrame(await report(page),fixture);expect(impact.progress).toBeGreaterThan(0);expect(impact.progress).toBeLessThan(1);
+      await transformCriticalBoard(page,browserName,!!info.project.use.hasTouch);await page.clock.runFor(32);
+      const transformed=await report(page);criticalFrame(transformed,fixture);expect(transformed.transform).not.toEqual(travel.transform);
+      expect(transformed.criticalImpacts).toHaveLength(1);
+    }
+    const visible=await report(page);criticalFrame(visible,fixture,mode.reduced);
+    captures.push({mode,presentation:visible.presentation,impact:visible.criticalImpacts,feedback:visible.feedbackBounds,transform:visible.transform});
+    await page.screenshot({path:info.outputPath(`critical-${mode.pace}-${mode.reduced?'reduced':'burst'}.png`)});
+    expect((await readSession(page)).state).toEqual(accepted.state);expect(await stored(page)).toEqual(saved);
+    await page.clock.runFor(700);await ready(page);
+    const finished=await report(page);expect(finished.criticalImpacts).toEqual([]);expect(finished.effect).toBeNull();
+    expect(finished.objectCount).toBe(baseline);
+    const defeated=fixture.events.find(event=>event.type==='defeated')!;
+    expect(finished.units.find((unit:any)=>unit.id===defeated.unitId).health.visible).toBe(false);
+    results.push(await readSession(page));
+  }
+  for(const result of results)expect(result).toEqual(results[0]);
+  writeFileSync(info.outputPath('critical-pace-results.json'),JSON.stringify({fixture,captures,accepted:results[0]},null,2));
+  expect(errors).toEqual([]);
+});
+
+test('critical impact: repeated criticals, rerenders, visibility interruption and restart leave no stale burst',async({page},info)=>{
+  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  const first=boundary('high_shot','critical',false,13),second=boundary('guarded_strike','critical',false,13);
+  expect(first.before.seed).toBe(13);expect(second.before.seed).toBe(13);
+  expect(first.before.commandCount).toBe(20);expect(second.before.commandCount).toBe(26);
+  await boot(page,first);await chooseCombatPace(page,'fast');
+  const baseline=(await report(page)).objectCount;
+  await prepareSignature(page,first);await confirmFrozen(page);await page.clock.runFor(160);
+  const impact=criticalFrame(await report(page),first),accepted=await readSession(page),saved=await stored(page);
+  // Modal refresh is a redraw of the same accepted impact, never a new effect.
+  await page.locator('#fit-restart').click({force:true});await page.locator('#battle-cancel-restart').click({force:true});
+  expect(criticalFrame(await report(page),first)).toMatchObject({actorId:impact.actorId,targetId:impact.targetId,center:impact.center,progress:impact.progress});
+  await page.evaluate(()=>{
+    Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});
+    for(let i=0;i<3;i++)document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await ready(page);expect((await report(page)).criticalImpacts).toEqual([]);expect((await report(page)).objectCount).toBe(baseline);
+  await page.clock.runFor(640);
+  await page.evaluate(()=>{delete (document as unknown as {hidden?:boolean}).hidden;document.dispatchEvent(new Event('visibilitychange'));});
+  await page.clock.runFor(640);
+  expect(await readSession(page)).toEqual({...accepted,phase:'player'});expect(await stored(page)).toEqual(saved);
+  expect((await report(page)).criticalImpacts).toEqual([]);
+  // Continue this same legal battle to another critical, without reload or replacement state.
+  await page.clock.resume();
+  while((await readSession(page)).state.commandCount<second.before.commandCount){
+    await playCommand(page,playerDecision((await readSession(page)).state));await ready(page);
+  }
+  expect((await readSession(page)).state).toEqual(second.before);expect((await report(page)).objectCount).toBe(baseline);
+  await prepareSignature(page,second);await confirmFrozen(page);await page.clock.runFor(160);
+  criticalFrame(await report(page),second);expect((await readSession(page)).state).toEqual(second.after);
+  await page.screenshot({path:info.outputPath('critical-repeat-before-restart.png')});
+  await page.locator('#fit-restart').click({force:true});await confirmRestart(page,true);await page.clock.resume();
+  await expect.poll(async()=>JSON.parse((await page.locator('#game').getAttribute('data-session'))??'null')?.state.seed).toBe(14);await ready(page);
+  const fresh=await readSession(page),freshObjects=(await report(page)).objectCount;
+  await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));await page.clock.runFor(700);
+  expect(await readSession(page)).toEqual(fresh);expect((await report(page)).criticalImpacts).toEqual([]);
+  expect((await report(page)).objectCount).toBe(freshObjects);await expect(page.locator('canvas')).toHaveCount(1);expect(errors).toEqual([]);
+});
+
+function enemyCriticalBoundary() {
+  const session=new BattleSession(catalog,'map:forest_ruins',1);
+  let trigger:Boundary|null=null;
+  for(let i=0;i<100 && session.state.outcome==='ongoing';i++){
+    const command=session.phase==='player'?playerDecision(session.state):null;
+    if(command)session.prepare(command);
+    const step=command?session.confirm():session.nextEnemy();if(!step)throw Error('Expected legal policy progress');
+    if(command)trigger={command,...step};
+    if(!command && step.events.some(event=>event.type==='attackRolled' && event.result==='critical')){
+      if(!trigger)throw Error('Expected a player handoff before the enemy critical');
+      return {trigger,impact:step};
+    }
+    session.finishPresentation(step.token);
+  }
+  throw Error('No legal enemy critical');
+}
+
+test('critical impact: enemy basic attack anchors to an elevated player and ordinary follow-up has no burst',async({page,browserName},info)=>{
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  const {trigger,impact}=enemyCriticalBoundary();expect(trigger.command.type).toBe('endTurn');expect(impact.before.commandCount).toBe(15);
+  await boot(page,trigger);await chooseCombatPace(page,'normal');
+  await transformCriticalBoard(page,browserName,!!info.project.use.hasTouch);await page.clock.runFor(32);
+  const baseline=(await report(page)).objectCount;
+  await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
+  await press(page,'#battle-next',!info.project.use.hasTouch);
+  // Step frames through the real handoff and AI move, stopping at its accepted critical.
+  for(let tick=0;tick<80 && (await readSession(page)).state.commandCount<impact.after.commandCount;tick++)await page.clock.runFor(16);
+  const accepted=await readSession(page);expect(accepted.state).toEqual(impact.after);
+  expect(accepted.events.slice(-impact.events.length)).toEqual(impact.events);
+  await page.clock.runFor(48);
+  const frame=await report(page),burst=criticalFrame(frame,impact);
+  expect(frame.units.find((unit:any)=>unit.id===burst.targetId).side).toBe('player');
+  expect(frame.units.find((unit:any)=>unit.id===burst.targetId).tile.elevation).toBeGreaterThan(0);
+  expect(frame.effect).toBeNull();expect(frame.presentation).toMatchObject({pace:'normal',kind:'feedback',durationMs:180});
+  await page.screenshot({path:info.outputPath('critical-enemy-elevated.png')});
+  await page.clock.runFor(500);await ready(page);
+  expect((await report(page)).criticalImpacts).toEqual([]);expect((await report(page)).objectCount).toBe(baseline);
+  // The next real policy attack is a natural-one miss, not a second critical.
+  const before=(await readSession(page)).state,command=playerDecision(before),resolved=dispatch(before,command,catalog);
+  if(!resolved.ok || command.type!=='useAbility' || !('unitId' in command.target))throw Error('Expected legal basic-attack follow-up');
+  expect(resolved.events.some(event=>event.type==='attackRolled' && event.result==='miss')).toBe(true);
+  const targetId=command.target.unitId,target=before.units.find(unit=>unit.id===targetId)!;
+  await press(page,'[data-action="basic"]');await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
+  await confirmFrozen(page);await page.clock.runFor(48);expect((await report(page)).criticalImpacts).toEqual([]);
+  expect((await readSession(page)).state).toEqual(resolved.state);await page.clock.runFor(300);await ready(page);
+});
+
+test('critical impact: final lethal hit finishes its burst before victory and scene departure discards it',async({page},info)=>{
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  const fixture=boundary('high_shot','critical',false,6);expect(fixture.before.seed).toBe(6);expect(fixture.after.outcome).toBe('playerWin');
+  await boot(page,fixture);await chooseCombatPace(page,'fast');
+  const baseline=(await report(page)).objectCount;
+  await prepareSignature(page,fixture);await confirmFrozen(page);await page.clock.runFor(160);
+  criticalFrame(await report(page),fixture);expect((await readSession(page)).state).toEqual(fixture.after);
+  await expect(page.getByRole('dialog')).not.toBeVisible();
+  await page.screenshot({path:info.outputPath('critical-final-hit.png')});
+  await page.clock.runFor(300);await expect(page.locator('#game')).toHaveAttribute('data-phase','ended');
+  await expect(page.locator('#battle-dialog-title')).toHaveText('Victory');
+  expect((await report(page)).criticalImpacts).toEqual([]);expect((await report(page)).objectCount).toBe(baseline);
+  const finished=await readSession(page);await page.clock.runFor(700);expect(await readSession(page)).toEqual(finished);
+  // A second legal critical is interrupted by an actual scene departure while its burst is visible.
+  const departure=boundary('high_shot','critical',false,11);
+  await page.clock.resume();await reachStandaloneBoundary(page,departure.before);
+  await prepareSignature(page,departure);await confirmFrozen(page);await page.clock.runFor(160);
+  criticalFrame(await report(page),departure);expect((await readSession(page)).state).toEqual(departure.after);
+  await page.screenshot({path:info.outputPath('critical-active-scene-departure.png')});
+  await page.goto('./map');await expect(page.locator('#map-grid span')).toHaveCount(400);
+  await page.goto('./?game=battle');await page.clock.resume();await ready(page);
+  expect((await report(page)).criticalImpacts).toEqual([]);expect((await readSession(page)).state.seed).toBe(1);
+  await expect(page.locator('canvas')).toHaveCount(1);
 });
