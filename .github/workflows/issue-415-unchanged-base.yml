@@ -1,0 +1,55 @@
+name: Issue 415 unchanged-base comparison
+on:
+  push:
+    branches: [verify/issue-415-unchanged-base]
+permissions:
+  contents: read
+concurrency:
+  group: tactics-browser-tactics-browser-02
+  queue: max
+  cancel-in-progress: false
+jobs:
+  baseline:
+    if: github.repository == 'luminari-gurus/tactics-guru-v2' && github.ref == 'refs/heads/verify/issue-415-unchanged-base'
+    runs-on: [self-hosted, tactics-browser, tactics-browser-02]
+    timeout-minutes: 15
+    steps:
+      - name: Check host disposition
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: 65211c809e86ecab223c9ae1afef8576aad3179b
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run setup:browsers && npm run check:browsers
+      - name: Record literal unchanged base
+        run: |
+          mkdir -p verification-receipts/issue-415-base
+          test "$(git rev-parse HEAD)" = 65211c809e86ecab223c9ae1afef8576aad3179b
+          git diff --exit-code
+          git rev-parse HEAD > verification-receipts/issue-415-base/commit.txt
+          node --version > verification-receipts/issue-415-base/node.txt
+      - name: Build unchanged base
+        id: build
+        run: npm run build
+      - name: Compare original traversal on Chromium landscape
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.regression.config.ts tests/dungeon-exploration.spec.ts -g 'real traversal, art independence' --project=mobile-landscape --repeat-each=3 --max-failures=3 --diagnostics
+      - name: Compare original warm-floor case on Chromium
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.regression.config.ts tests/dungeon-exploration.spec.ts -g 'warm.*maximum-size.*floor' --max-failures=3
+      - name: Compare original warm-floor case on WebKit
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'warm.*maximum-size.*floor' --max-failures=3
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-415-unchanged-base-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/
+          retention-days: 14
+          if-no-files-found: warn
