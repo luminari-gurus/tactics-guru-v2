@@ -250,7 +250,8 @@ dialog button { touch-action: manipulation; }
   .battle-mode .battle-decision label { margin-bottom:3px; }
   .battle-mode #battle-preview { margin:6px 0; }
   .battle-mode .battle-commit button { padding:6px; font-size:.85rem; }
-  /* Keep a prepared action reachable if the preview runs past the rail. */
+  /* Bound the pinned row to the results area below the target picker. */
+  .battle-mode.battle-skin-rail .battle-review-content { display:flow-root; }
   .battle-mode.battle-skin-rail .battle-commit:has(#battle-review:enabled) {
     position:sticky;
     bottom:0;
@@ -270,7 +271,7 @@ dialog button { touch-action: manipulation; }
   }
   /* An occupied selection is already identified by the target summary. */
   .battle-mode.battle-skin-rail #battle-selection:has(+ #battle-target-info:not(:empty)) { display:none; }
-  .battle-mode .battle-commit + #battle-inspect-target { margin-top:6px; }
+  .battle-mode .battle-decision > #battle-inspect-target { margin-top:6px; }
   .battle-mode #battle-ability-info { font-size:.75rem; margin:4px 0; }
   .battle-mode #battle-controls[data-action-kind=idle] label[for=battle-target],
   .battle-mode #battle-controls[data-action-kind=idle] #battle-target,

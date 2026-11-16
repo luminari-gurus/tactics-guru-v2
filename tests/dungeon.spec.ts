@@ -159,6 +159,28 @@ test('desktop Rail keeps a prepared Frost Snare and its controls in view', async
   expect((await readSession(page)).state).toEqual(fixture.state.activeBattle);
 });
 
+test('desktop Rail keeps target selection clickable with a prepared Frost Snare', async ({page,isMobile}) => {
+  test.skip(isMobile, 'Desktop fine-pointer rail geometry');
+  await page.setViewportSize({width:1280,height:580});
+  const fixture = stagedMageAbility('ability:frost_snare');
+  await seed(page,fixture.state);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const target = fixture.state.activeBattle!.units.find(unit=>unit.id===fixture.command.target.unitId)!;
+  await page.getByRole('button',{name:'Frost Snare',exact:true}).click();
+  const picker = page.locator('#battle-target');
+  const bounds = (await picker.boundingBox())!;
+  const point = {x:bounds.x+40,y:bounds.y+bounds.height-8};
+  await picker.selectOption(`${target.cell.x},${target.cell.y}`);
+  const confirm = page.getByRole('button',{name:'Confirm action',exact:true});
+  await expect(confirm).toBeEnabled();
+
+  const hit = await page.evaluate(({x,y})=>document.elementFromPoint(x,y)?.id,point);
+  expect(hit).toBe('battle-target');
+  await page.mouse.click(point.x,point.y);
+  await expect(picker).toBeFocused();
+  expect((await readSession(page)).state).toEqual(fixture.state.activeBattle);
+});
+
 for(const abilityId of ['ability:frost_snare','ability:magic_missile'] as const)test(`staged Mage ${abilityId} accepts exact effects replay and saved active reload`,async({page})=>{
  // The level/position boundary is deliberately staged. The extended journey alone proves earned XP.
  const fixture=stagedMageAbility(abilityId),catalog=dungeonBattle(fixture.state)!.catalog;

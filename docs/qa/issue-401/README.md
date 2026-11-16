@@ -80,3 +80,13 @@ The desktop Rail now puts the friendly-fire warning directly above Confirm and C
 ```text
 76df6722ddacd095e20cd04d8cc0f7ddee7806749e4bf24b66c373afd1b11b06  dist/assets/battleLayout-CViSXgl8.css
 ```
+
+## Target picker pointer follow-up
+
+At 1280 × 580 on `f656cd4`, preparing Frost Snare in the level-three dungeon fixture moved Confirm over the bottom of the target picker. The pinned row is now bounded by the results area below the picker. At short heights, the rail can scroll to reveal the full action when there is too little room beneath the picker.
+
+The regression uses the same raw pointer coordinate before and after preparation. The old build hit Confirm. The new build hits and focuses the native target picker and preserves the exact combat state.
+
+```text
+d7e36c99b381b151efe2218cbfa6004470c7adbf2744e02cb204ba0f1916e431  dist/assets/battleLayout-C4-VWlF6.css
+```
