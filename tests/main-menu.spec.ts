@@ -542,7 +542,7 @@ test('main menu: New Game starts immediately when no dungeon save exists',async(
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.battle.primary)).toBe('battle sentinel');
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.run.primary)).toBe('run sentinel');
 });
-test('main menu: New Game starts unsaved and preserves unreadable dungeon data',async({page,isMobile})=>{
+test.extend({pinDungeonSeed:13})('main menu: New Game stays playable after retrying an unreadable dungeon save',async({page,isMobile})=>{
  const corrupt='unreadable dungeon save';
  await page.addInitScript(({key,corrupt})=>localStorage.setItem(key,corrupt),{key:keys.dungeon.primary,corrupt});
  await page.goto('./');
@@ -550,8 +550,19 @@ test('main menu: New Game starts unsaved and preserves unreadable dungeon data',
  const newGame=page.getByRole('button',{name:'New Game',exact:true});
  if(isMobile)await newGame.tap();else{await newGame.focus();await page.keyboard.press('Enter');}
  await expect(page.getByRole('heading',{name:/Dungeon · Floor 1/})).toBeFocused();
- await expect(page.locator('#dungeon-screen')).toContainText('Playing unsaved.');
- await expect(page.getByRole('dialog')).toHaveCount(0);
+ const screen=page.locator('#dungeon-screen'),dialog=page.getByRole('dialog');
+ await expect(screen).toContainText('Playing unsaved.');
+ await expect(dialog).toHaveCount(0);
+ const map=page.locator('#dungeon-map');
+ const position=Number(await map.getAttribute('data-position'));
+ const activate=async (target:Locator)=>{if(isMobile)await target.tap();else await target.click();};
+ await activate(page.getByRole('button',{name:'Save recovery',exact:true}));
+ await activate(dialog.getByRole('button',{name:'Retry saving current progress',exact:true}));
+ await expect(dialog).toHaveCount(0);
+ await expect(screen).toContainText('Progress unsaved: recoveryRequired');
+ await activate(page.getByRole('button',{name:'East',exact:true}));
+ await expect(map).toHaveAttribute('data-position',String(position+1));
+ await expect(screen).toContainText('Playing unsaved.');
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.dungeon.primary)).toBe(corrupt);
 });
 test('main menu: New Game starts a fresh dungeon layout',async({page})=>{
