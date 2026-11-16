@@ -794,7 +794,7 @@ test('main menu: class guidance settings persist and reset tutorials without cha
   await expect(guidance).toBeVisible();await expect(page.locator('#battle-guidance-teaching')).toBeVisible();
   const before=await readSession(page);await activate(page.locator('#battle-guidance-dismiss'));
   await expect(guidance).toBeHidden();expect(await readSession(page)).toEqual(before);
-  const more=page.locator('#battle-overflow');await activate(more.locator('summary'));
+  const more=page.locator('#battle-overflow');await activate(more.locator(':scope > summary'));
   const moreEnabled=more.locator('[data-class-guidance-enabled]'),moreReset=more.locator('[data-class-guidance-reset]');
   expect(await moreEnabled.evaluate(input=>input.closest('label')!.getBoundingClientRect().height)).toBeGreaterThanOrEqual(44);
   await expect(moreEnabled).toBeChecked();await activate(moreReset);
@@ -807,7 +807,7 @@ test('main menu: class guidance settings persist and reset tutorials without cha
   expect(await readSession(page)).toEqual(before);
   expect(await preferences()).toMatchObject({version:1,enabled:false,seen:[]});
   await page.reload();await ready();await expect(guidance).toBeHidden();
-  await activate(more.locator('summary'));await expect(moreEnabled).not.toBeChecked();
+  await activate(more.locator(':scope > summary'));await expect(moreEnabled).not.toBeChecked();
   expect(await preferences()).toMatchObject({version:1,enabled:false,seen:[]});
   expect(await otherStorage()).toEqual(untouchedStorage);expect(errors).toEqual([]);
 });
@@ -868,7 +868,7 @@ test('main menu: combat pace persists through Settings and More with native cont
   const ready=()=>expect(page.locator('#game')).toHaveAttribute('data-phase','player');await ready();
   const initial=await readSession(page);await activate(page.locator('#battle-guidance-dismiss'));
   const seen=await guidance();expect(seen.seen.length).toBeGreaterThan(0);expect(await readSession(page)).toEqual(initial);
-  const more=page.locator('#battle-overflow');await activate(more.locator('summary'));
+  const more=page.locator('#battle-overflow');await activate(more.locator(':scope > summary'));
   await expect(more.locator('[data-combat-pace-value="fast"]')).toBeChecked();
   await choose(more,'normal');expect(await readSession(page)).toEqual(initial);expect(await guidance()).toEqual(seen);
   await choose(more,'fast');expect(await readSession(page)).toEqual(initial);expect(await guidance()).toEqual(seen);
@@ -879,7 +879,7 @@ test('main menu: combat pace persists through Settings and More with native cont
   await checkSmallControls(more,'more');
   await choose(more,'normal');expect(await readSession(page)).toEqual(initial);
   expect(await otherStorage()).toEqual(preserved);
-  await page.reload();await ready();await activate(more.locator('summary'));
+  await page.reload();await ready();await activate(more.locator(':scope > summary'));
   await expect(more.locator('[data-combat-pace-value="normal"]')).toBeChecked();
   expect(await preferences()).toEqual({version:1,pace:'normal'});expect(await guidance()).toMatchObject({version:1,enabled:true,seen:[]});
   expect(await readSession(page)).toEqual(initial);expect(await otherStorage()).toEqual(preserved);

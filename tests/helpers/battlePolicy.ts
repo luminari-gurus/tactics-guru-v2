@@ -91,16 +91,20 @@ export async function tapBoard(page:Page, cell:{x:number;y:number}) {
   else await page.mouse.click(point.x, point.y);
 }
 
+/** Reveal a secondary control through the disclosure when its HUD layout uses one. */
+export async function battleTool(page: Page, selector: string) {
+  const tool = page.locator(selector);
+  if (await tool.evaluate(element => Boolean(element.closest('#battle-overflow:not([open])')))) {
+    const summary = page.locator('#battle-overflow > summary');
+    if (test.info().project.use.hasTouch) await summary.tap();
+    else await summary.click();
+  }
+  return tool;
+}
+
 export async function reviewDraught(page: Page) {
   const touch = test.info().project.use.hasTouch;
-  if (await combatSkin(page) === 'radial') {
-    const more = page.locator('#battle-overflow');
-    if (await more.getAttribute('open') === null) {
-      if (touch) await more.locator('summary').tap();
-      else await more.locator('summary').click();
-    }
-  }
-  const button = page.locator('#battle-draught');
+  const button = await battleTool(page, '#battle-draught');
   if (touch) await button.tap();
   else { await button.focus(); await page.keyboard.press('Enter'); }
   await expect(page.getByRole('dialog')).toHaveAccessibleName('Drink Healing Draught?');

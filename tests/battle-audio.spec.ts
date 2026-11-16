@@ -1,4 +1,4 @@
-import { confirmRestart } from './helpers/battlePolicy';
+import { battleTool, confirmRestart } from './helpers/battlePolicy';
 import { expect, test, type Page } from './helpers/forceRailControls';
 import { readSession, session, playCommand, playerDecision } from './helpers/battlePolicy';
 import { standaloneCatalog as catalog } from './helpers/playerPolicy';
@@ -10,7 +10,7 @@ import { BATTLE_STORAGE_KEYS } from '../src/persistence/battleStorage';
 const audio=(page:Page)=>page.evaluate(()=>window.fitDiagnostics().battleAudio!);
 async function ready(page:Page) {await expect(page.locator('#game')).toHaveAttribute('data-phase','player');}
 async function enable(page:Page) {
-  await page.locator('#battle-sound').click();
+  await (await battleTool(page, '#battle-sound')).click();
   await expect.poll(()=>audio(page)).toMatchObject({enabled:true,status:'ready'});
 }
 function errors(page:Page) {
@@ -23,12 +23,12 @@ test('sound control uses real gestures, preserves previews, modal focus and rest
   const found=errors(page);await page.goto('./?game=battle');await ready(page);
   expect(await audio(page)).toMatchObject({enabled:false,started:0,status:'muted'});
   const before=await session(page);
-  await page.locator('#battle-sound').focus();await page.keyboard.press('Enter');
+  await (await battleTool(page, '#battle-sound')).focus();await page.keyboard.press('Enter');
   await expect(page.locator('#battle-sound')).toHaveAttribute('aria-pressed','true');
   await expect.poll(()=>audio(page)).toMatchObject({status:'ready',started:0});
   expect((await session(page)).state).toEqual(before.state);
-  await page.locator('#battle-sound').click();
-  await page.locator('#battle-sound').scrollIntoViewIfNeeded();
+  await (await battleTool(page, '#battle-sound')).click();
+  await (await battleTool(page, '#battle-sound')).scrollIntoViewIfNeeded();
   const box=(await page.locator('#battle-sound').boundingBox())!;
   expect(box.width).toBeGreaterThanOrEqual(44);expect(box.height).toBeGreaterThanOrEqual(44);
   const point={x:box.x+box.width/2,y:box.y+box.height/2};
@@ -42,12 +42,12 @@ test('sound control uses real gestures, preserves previews, modal focus and rest
   await expect.poll(()=>audio(page)).toMatchObject({enabled:true,status:'ready',started:0});
   expect((await session(page)).state).toEqual(before.state);
   await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});
-  await page.locator('#battle-party').click();await page.keyboard.press('Tab');
+  await (await battleTool(page, '#battle-party')).click();await page.keyboard.press('Tab');
   expect(await page.evaluate(()=>!!document.activeElement?.closest('dialog'))).toBe(true);
   await page.keyboard.press('Escape');await page.locator('#battle-cancel').click();expect((await audio(page)).started).toBe(0);
   expect((await session(page)).state).toEqual(before.state);
   for(let run=2;run<=6;run++){
-    if(run===4)await page.locator('#battle-sound').click();
+    if(run===4)await (await battleTool(page, '#battle-sound')).click();
     await page.locator('#fit-restart').click();await confirmRestart(page);await expect(page.locator('#game')).toHaveAttribute('data-run',String(run));
     await ready(page);expect((await audio(page)).enabled).toBe(run<4);
     expect((await audio(page)).ownedSounds).toBeLessThanOrEqual(8);
@@ -63,13 +63,13 @@ for(const pace of ['normal','fast'] as const)test(pace==='normal'
   const start=Date.UTC(2026,0,1),found=errors(page);await page.clock.install({time:start});await page.goto('./?game=battle');await ready(page);
   if(pace==='fast'){
     const more=page.locator('#battle-overflow');
-    await more.locator('summary').focus();await page.keyboard.press('Enter');
+    await more.locator(':scope > summary').focus();await page.keyboard.press('Enter');
     const radio=more.locator('[data-combat-pace-value="fast"]');
     await radio.focus();await page.keyboard.press('Space');await expect(radio).toBeChecked();
-    await more.locator('summary').focus();await page.keyboard.press('Enter');
+    await more.locator(':scope > summary').focus();await page.keyboard.press('Enter');
   }
   // WebKit can omit the synthetic mouse click here; the gesture case owns pointer/touch proof.
-  await page.locator('#battle-sound').focus();await page.keyboard.press('Enter');
+  await (await battleTool(page, '#battle-sound')).focus();await page.keyboard.press('Enter');
   await expect.poll(()=>audio(page)).toMatchObject({enabled:true,status:'ready'});
   await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});
   await page.clock.pauseAt(start+60000);
@@ -77,7 +77,7 @@ for(const pace of ['normal','fast'] as const)test(pace==='normal'
   await page.locator('#battle-review').click({force:true});
   await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
   expect((await audio(page)).recent).toContain('move');
-  await page.locator('#battle-sound').click({force:true});expect((await audio(page)).active).toBeNull();
+  await (await battleTool(page, '#battle-sound')).click({force:true});expect((await audio(page)).active).toBeNull();
   await page.clock.resume();await ready(page);expect((await session(page)).state.commandCount).toBe(before+1);
   await enable(page);
   await page.evaluate(()=>window.dispatchEvent(new Event('blur')));
@@ -89,7 +89,7 @@ for(const pace of ['normal','fast'] as const)test(pace==='normal'
   await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'));});
   expect((await audio(page)).active).toBeNull();
   await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,get:()=>false});document.dispatchEvent(new Event('visibilitychange'));});
-  await ready(page);await page.locator('#battle-sound').click();expect((await audio(page)).enabled).toBe(false);
+  await ready(page);await (await battleTool(page, '#battle-sound')).click();expect((await audio(page)).enabled).toBe(false);
   await enable(page);
   await page.locator('#fit-restart').click();await confirmRestart(page);await ready(page); // Seed 2 begins with a player.
   await page.clock.pauseAt(start+120000);
@@ -102,7 +102,7 @@ for(const pace of ['normal','fast'] as const)test(pace==='normal'
   }
   expect(enemy).toBeDefined();
   await expect(page.locator('#battle-sound')).toBeEnabled();
-  await page.locator('#battle-sound').click({force:true});
+  await (await battleTool(page, '#battle-sound')).click({force:true});
   expect(await audio(page)).toMatchObject({enabled:false,active:null});expect((await session(page)).state).toEqual(enemy!.state);
   await page.clock.resume();await ready(page);
   expect(found).toEqual([]);
@@ -117,10 +117,10 @@ for(const mode of ['reject','pending'] as const) test(`gesture unlock ${mode} re
     Object.defineProperty(AudioContext.prototype,'state',{get(){return window.__allowAudio?state.call(this):'suspended';}});
     AudioContext.prototype.resume=function(){return window.__allowAudio?original.call(this):mode==='reject'?Promise.reject(Error('refused')):new Promise(()=>{});};
   },mode);
-  await page.goto('./battle');await ready(page);await page.locator('#battle-sound').click();
+  await page.goto('./battle');await ready(page);await (await battleTool(page, '#battle-sound')).click();
   await expect.poll(()=>audio(page)).toMatchObject({status:'blocked',started:0});
   await expect(page.locator('#battle-next')).toBeEnabled();
-  await page.evaluate(()=>{window.__allowAudio=true;});await page.locator('#battle-sound-retry').click();
+  await page.evaluate(()=>{window.__allowAudio=true;});await (await battleTool(page, '#battle-sound-retry')).click();
   await expect.poll(()=>audio(page)).toMatchObject({status:'ready',started:0});expect(found).toEqual([]);
 });
 
@@ -143,7 +143,7 @@ for(const mode of ['reject','pending'] as const) test(`automatic recovery ${mode
   await page.goto('./?game=battle');await ready(page);await enable(page);
   await page.evaluate(async()=>{window.__resumeFailure=true;await window.__battleContext!.suspend();window.dispatchEvent(new Event('focus'));});
   await expect.poll(()=>audio(page)).toMatchObject({status:'blocked',active:null});
-  await expect(page.locator('#battle-sound-retry')).toBeVisible();
+  await expect(await battleTool(page, '#battle-sound-retry')).toBeVisible();
   // Exercise the engine's delayed visible handler as well as focused frame recovery.
   await page.evaluate(()=>{
     Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));
@@ -158,7 +158,7 @@ for(const mode of ['reject','pending'] as const) test(`automatic recovery ${mode
   await page.locator('#battle-next').click();await ready(page);
   expect((await session(page)).state.commandCount).toBeGreaterThan(before);
   const started=(await audio(page)).started;
-  await page.evaluate(()=>{window.__resumeFailure=false;});await page.locator('#battle-sound-retry').click();
+  await page.evaluate(()=>{window.__resumeFailure=false;});await (await battleTool(page, '#battle-sound-retry')).click();
   await expect.poll(()=>audio(page)).toMatchObject({status:'ready',started});
   await page.locator('#fit-restart').click();await confirmRestart(page);await expect(page.locator('#game')).toHaveAttribute('data-run','2');await ready(page);
   const afterRestart=await audio(page);
@@ -214,15 +214,15 @@ for(const [early,delayedFrames] of [[true,false],[false,false],[false,true]] as 
   let release!:()=>void;const held=new Promise<void>(resolve=>{release=resolve;});
   if(early)await page.route('**/audio/battle/**',async route=>{await held;await route.continue();});
   await page.goto('./?game=battle');await ready(page);
-  if(early){await page.locator('#battle-sound').click();release();}
+  if(early){await (await battleTool(page, '#battle-sound')).click();release();}
   else {await enable(page);await page.locator('#fit-restart').click();await confirmRestart(page);await ready(page);}
   await expect.poll(()=>audio(page)).toMatchObject({enabled:true,load:'ready',status:'blocked',started:0});
-  await expect(page.locator('#battle-sound-retry')).toBeVisible();
+  await expect(await battleTool(page, '#battle-sound-retry')).toBeVisible();
   const primed=early?0:8;
   expect(await page.evaluate(()=>window.__mediaPolicy)).toEqual({primed,rejected:0});
   await page.locator('#battle-next').click();await ready(page);
   expect((await audio(page)).started).toBe(0);
-  await page.locator('#battle-sound-retry').click();await expect.poll(()=>audio(page)).toMatchObject({status:'ready',started:0});
+  await (await battleTool(page, '#battle-sound-retry')).click();await expect.poll(()=>audio(page)).toMatchObject({status:'ready',started:0});
   expect(await page.evaluate(()=>window.__mediaPolicy)).toEqual({primed:primed+8,rejected:0});
   await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();
   try {await expect.poll(async()=>(await audio(page)).completed).toBeGreaterThan(0);}
@@ -283,7 +283,7 @@ test('HTML5 fallback loads and plays future cues after a gesture',async({page})=
   await expect.poll(()=>audio(page)).toMatchObject({started:1,completed:1,active:null});
   await page.locator('#fit-restart').click();await confirmRestart(page);await ready(page);expect((await audio(page)).enabled).toBe(true);
   await expect.poll(()=>audio(page)).toMatchObject({load:'ready',status:'blocked'});
-  await page.locator('#battle-sound-retry').click();await expect.poll(()=>audio(page)).toMatchObject({status:'ready'});
+  await (await battleTool(page, '#battle-sound-retry')).click();await expect.poll(()=>audio(page)).toMatchObject({status:'ready'});
   // Blur in the same event after the real Confirm handler starts the cue, before it can finish.
   await page.evaluate(()=>document.addEventListener('click',e=>{if((e.target as HTMLElement).id==='battle-review')window.dispatchEvent(new Event('blur'));}));
   await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});await page.locator('#battle-review').click();

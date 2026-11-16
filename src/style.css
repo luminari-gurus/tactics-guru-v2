@@ -259,4 +259,26 @@ dialog button { touch-action: manipulation; }
   .battle-mode.battle-skin-radial #battle-shell { grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(0,1fr) min(28%,220px); }
   .battle-mode.battle-skin-radial #battle-turn-order { grid-column:1; }
   .battle-mode.battle-skin-radial #fit-panel:has(#battle-turn-order:not([hidden])) #battle-scroll { grid-area:1 / 2 / span 2; }
+
+  .battle-mode .battle-tools { margin-top:8px; padding-top:6px; }
+  .battle-mode #battle-overflow { flex:1 0 100%; }
+  .battle-mode #battle-overflow > summary {
+    box-sizing:border-box;
+    padding:11px 12px;
+    border:1px solid var(--edge);
+    border-radius:5px;
+    background:var(--button);
+    font-size:.85rem;
+    cursor:pointer;
+  }
+  .battle-mode .battle-secondary-controls {
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:6px;
+    padding-top:8px;
+  }
+  .battle-mode .battle-secondary-controls p { flex-basis:100%; margin:0; }
+  .battle-mode .battle-secondary-controls #battle-shortcuts p { margin:0 0 8px; }
+  .battle-mode #battle-danger-results:empty { display:none; }
 }
