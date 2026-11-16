@@ -111,7 +111,7 @@ function render(){
   const review=session.inspect(),valid=resumableDungeonSlot(review)!==null;
   const resume=button('Continue saved dungeon',()=>{if(session.continue(review)){startup=false;render();if(session.snapshot.activeBattle)start();}});resume.disabled=!valid;
   screen.append(resume,button('Start new dungeon',requestNew),button('Save recovery',recovery));
-  const unsaved=button('Play unsaved dungeon',()=>{startup=false;session.playUnsaved();render();});
+  const unsaved=button('Play unsaved dungeon',playUnsavedDungeon);
   screen.append(el('p','Unsaved play permits battles; floor travel is blocked until progress can be saved.'),unsaved);
   }else screen.append(testingProgress('dungeon'),button('Start new dungeon',requestNew));
   const link=el('a','Three-battle scenario');link.href=`${import.meta.env.BASE_URL}run`;screen.append(link);
@@ -129,6 +129,9 @@ function render(){
   explorationTools.before(el('p',storage&&!session.hasUnsavedProgress?'The encounter is saved on this device.':'Reloading will discard unsaved progress.'),button('Reload page',()=>location.reload()));
  }
  playtime?.sync();
+}
+function playUnsavedDungeon(){
+ startup=false;session.playUnsaved();render();screen.querySelector<HTMLElement>('h1')?.focus();
 }
 async function requestNew(){
  cancelAutomaticStep();
@@ -292,12 +295,14 @@ if(entryIntent==='new'){
   const text=sessionStorage.getItem('tactics-guru:menu-new-dungeon-review');
   sessionStorage.removeItem('tactics-guru:menu-new-dungeon-review');
   if(text)approved=JSON.parse(text);
- } catch { /* A missing or unreadable handoff requires a new confirmation. */ }
+ } catch { /* Inspect the current saves when the menu handoff is unavailable. */ }
  const review=session.inspect();
  const matches=(['primary','backup'] as const).every(slot=>review[slot].status!=='unavailable' && approved?.[slot]?.status===review[slot].status && approved?.[slot]?.text===review[slot].text);
- const empty=bothDungeonSlotsMissing(review);
- if(matches || empty)void replace(review);
- else requestNew();
+ if(matches || bothDungeonSlotsMissing(review))void replace(review);
+ else if(approved || resumableDungeonSlot(review))requestNew();
+ // Preserve unreadable saves for recovery when starting without a replacement review.
+ else if(Object.values(review).some(slot=>slot.status==='invalid'||slot.status==='unavailable'))playUnsavedDungeon();
+ else void replace(review);
 }
 else if(entryIntent==='recovery')recovery();
 else if(entryIntent==='continue'){

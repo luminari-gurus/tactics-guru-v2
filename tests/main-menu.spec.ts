@@ -542,6 +542,18 @@ test('main menu: New Game starts immediately when no dungeon save exists',async(
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.battle.primary)).toBe('battle sentinel');
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.run.primary)).toBe('run sentinel');
 });
+test('main menu: New Game starts unsaved and preserves unreadable dungeon data',async({page,isMobile})=>{
+ const corrupt='unreadable dungeon save';
+ await page.addInitScript(({key,corrupt})=>localStorage.setItem(key,corrupt),{key:keys.dungeon.primary,corrupt});
+ await page.goto('./');
+ await expect(page.getByRole('button',{name:'Continue',exact:true})).toBeDisabled();
+ const newGame=page.getByRole('button',{name:'New Game',exact:true});
+ if(isMobile)await newGame.tap();else{await newGame.focus();await page.keyboard.press('Enter');}
+ await expect(page.getByRole('heading',{name:/Dungeon · Floor 1/})).toBeFocused();
+ await expect(page.locator('#dungeon-screen')).toContainText('Playing unsaved.');
+ await expect(page.getByRole('dialog')).toHaveCount(0);
+ expect(await page.evaluate(key=>localStorage.getItem(key),keys.dungeon.primary)).toBe(corrupt);
+});
 test('main menu: New Game starts a fresh dungeon layout',async({page})=>{
  await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();
  await expect(page.locator('#dungeon-screen')).toContainText('Floor 1');
@@ -553,11 +565,14 @@ test('main menu: New Game starts a fresh dungeon layout',async({page})=>{
  expect(second.seed).not.toBe(first.seed);
  expect(generateMap(second.floors[0].descriptor.seed,'rooms').cells).not.toEqual(generateMap(first.floors[0].descriptor.seed,'rooms').cells);
 });
-test('main menu: a dungeon save appearing during navigation requires confirmation',async({page})=>{
- await page.addInitScript(key=>{if(new URLSearchParams(location.search).get('game')==='dungeon')localStorage.setItem(key,'newly arrived save');},keys.dungeon.primary);
+test('main menu: an active dungeon save appearing during navigation requires confirmation',async({page})=>{
+ const text=menuFixture('dungeon');
+ await page.addInitScript(({key,text})=>{
+  if(new URLSearchParams(location.search).get('game')==='dungeon')localStorage.setItem(key,text);
+ },{key:keys.dungeon.primary,text});
  await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();
  await expect(page.getByRole('dialog')).toContainText('Start new dungeon?');
- expect(await page.evaluate(key=>localStorage.getItem(key),keys.dungeon.primary)).toBe('newly arrived save');
+ expect(await page.evaluate(key=>localStorage.getItem(key),keys.dungeon.primary)).toBe(text);
 });
 test('main menu: changed dungeon save requires a fresh confirmation',async({page})=>{
  const text=menuFixture('dungeon');await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:keys.dungeon.primary,text});
@@ -573,13 +588,18 @@ test('main menu: a backup-only dungeon still requires confirmation',async({page}
  await expect(page.getByRole('dialog')).toContainText('Start new dungeon?');
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.dungeon.backup)).toBe(text);
 });
-test('main menu: unavailable storage and failed artwork keep native actions usable',async({page})=>{
+test('main menu: unavailable storage and failed artwork keep native actions usable',async({page,isMobile})=>{
  await page.addInitScript(()=>Object.defineProperty(window,'localStorage',{get(){throw new DOMException('denied','SecurityError');}}));
  await page.route('**/menu/*',route=>route.abort());await page.goto('./');
  await expect(page.getByRole('heading',{name:'Tactics Guru'})).toBeVisible();await expect(page.getByRole('button',{name:'Continue',exact:true})).toBeDisabled();
  await expect(page.getByRole('button',{name:'Save recovery',exact:true})).toBeVisible();
  await page.getByRole('button',{name:'Settings',exact:true}).click();await page.getByText('Privacy & analytics', {exact:true}).click();
- await expect(page.getByRole('dialog').locator('[data-telemetry-status]')).toBeVisible();await page.getByRole('checkbox').uncheck();await expect(page.getByRole('dialog')).toContainText('could not save your preference');
+ await expect(page.getByRole('dialog').locator('[data-telemetry-status]')).toBeVisible();await page.getByRole('checkbox',{name:'Allow anonymous analytics and error reports',exact:true}).click();await expect(page.getByRole('dialog')).toContainText('could not save your preference');
+ await page.getByRole('dialog').getByRole('button',{name:'Close',exact:true}).click();
+ const newGame=page.getByRole('button',{name:'New Game',exact:true});
+ if(isMobile)await newGame.tap();else await newGame.click();
+ await expect(page.locator('#dungeon-screen')).toContainText('Playing unsaved.');
+ await expect(page.getByRole('dialog')).toHaveCount(0);
 });
 test('main menu: portrait composition scrolls at narrow, short and enlarged text sizes',async({page})=>{
  await page.goto('./');
