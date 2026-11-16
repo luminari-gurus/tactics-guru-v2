@@ -177,9 +177,10 @@ async function recovery(){
  dialogs.showChoices('Dungeon save recovery',`primary: ${review.primary.status}. backup: ${review.backup.status}. ${session.status}${removalHint}`,choices,close,{focusTitle:true});
  screen.scrollTop=scrollTop;
 }
+function presentationBlocked(){return document.hidden||dialogs.open||replacing;}
 function whenVisible(generation:number,run:()=>void){
  if(!live||generation!==loadGeneration)return;
- if(document.hidden||dialogs.open||replacing){deferredStart=()=>whenVisible(generation,run);return;}
+ if(presentationBlocked()){deferredStart=()=>whenVisible(generation,run);return;}
  deferredStart=null;
  try {run();}catch {failedLoad(generation);}
 }
@@ -194,6 +195,12 @@ async function finishDefeat(generation:number){
  try {
   await session.flushPlaytime();
   if(!live||generation!==loadGeneration||session.phase!=='defeat')return;
+  if(presentationBlocked()){
+   // Recovery can be opened while the terminal write is waiting for its lock.
+   // Recheck pending writes and run identity after the dialog closes.
+   whenVisible(generation,()=>void finishDefeat(generation));
+   return;
+  }
   if(!confirmMenuDeparture(()=>session.savesProgress&&session.hasUnsavedProgress,recovery))return;
   const record=dungeonRunRecord(session.snapshot,Date.now());
   if(record) try {

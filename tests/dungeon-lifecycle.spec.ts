@@ -118,11 +118,16 @@ test('legal enemy defeat waits for its save and returns to the menu during a pen
   await expect(page.locator('#game')).toHaveAttribute('data-phase','ended');
   expect((await snapshot(page)).phase).toBe('defeat');
   await expect(page.locator('#main-menu')).toHaveCount(0);
+  await page.getByRole('button',{name:'Save recovery',exact:true}).click();
+  await expect(page.getByRole('dialog',{name:'Saving journey',exact:true})).toBeVisible();
   await page.evaluate(()=>window.dispatchEvent(new Event('test-release-defeat-write')));
+  const inBattleRecovery=page.getByRole('dialog',{name:'Dungeon save recovery',exact:true});
+  await expect(inBattleRecovery.getByRole('button',{name:'Export primary save',exact:true})).toBeVisible();
+  expect(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!).payload.phase,DUNGEON_KEYS.primary)).toBe('defeat');
+  await inBattleRecovery.getByRole('button',{name:'Close',exact:true}).click();
   const summary=page.getByRole('dialog',{name:'Dungeon defeat',exact:true});
   await expect(summary).toBeVisible();
   await expect(summary).toContainText('Deepest floor');
-  expect(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!).payload.phase,DUNGEON_KEYS.primary)).toBe('defeat');
   await summary.getByRole('button',{name:'Hall of Records',exact:true}).click();
   const records=page.getByRole('dialog',{name:'Hall of Records',exact:true});
   await expect(records).toContainText('No finished journeys recorded yet.');
