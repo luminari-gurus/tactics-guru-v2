@@ -6,6 +6,7 @@ import { dirname, resolve } from 'node:path';
 import { defineConfig, type Plugin } from 'vite';
 import { battleAssets } from './src/content/assets.ts';
 import { desertAssets } from './src/content/desertAssets.ts';
+import { hobgoblinAssets } from './src/content/hobgoblin.ts';
 import { resolveAppEntry } from './src/app/routes.ts';
 import { APPLICATION_LOAD_FILES_MANIFEST, APPLICATION_LOAD_FILES_META } from './src/diagnostics/applicationLoadFailure.ts';
 
@@ -38,7 +39,7 @@ function gamePreloads(): Plugin {
   return {
     name: 'game-startup-preloads',
     config(_config, {command}) {
-      if (command === 'build') for (const asset of Object.values({...battleAssets,...desertAssets})) {
+      if (command === 'build') for (const asset of Object.values({...battleAssets,...desertAssets,...hobgoblinAssets})) {
         const source = readFileSync(resolve('public', asset.runtimePath.slice(1)));
         const hash = createHash('sha256').update(source).digest('hex').slice(0,16);
         const fileName = `assets/${hash}${asset.runtimePath}`;
@@ -87,7 +88,7 @@ function gamePreloads(): Plugin {
         battle: { ...battle, js: battle.js.filter(file => file !== battleEntry) },
         run: dependencies([entry('src/app/startRunApp.ts')]),
         images: Object.values(battleAssets).map(asset => imageUrls[asset.runtimePath].slice(1)),
-        runImages: Object.values(imageUrls).map(path => path.slice(1)),
+        runImages: Object.values({...battleAssets,...desertAssets}).map(asset => imageUrls[asset.runtimePath].slice(1)),
       };
       // JSON is embedded as script text, never as executable content from a path.
       const data = JSON.stringify(plan).replaceAll('<', '\\u003c');

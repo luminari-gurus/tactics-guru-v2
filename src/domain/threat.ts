@@ -29,7 +29,7 @@ export function enemyThreats(input: BattleState, catalog: ContentCatalog): { rea
       const result = moveUnit(hypothetical, {type:'move', unitId:enemy.id, to:cell}, catalog);
       if (result.ok) positions.push(result.state);
     }
-    const abilities = Object.values(catalog.abilities).filter(a => (a.kind === 'attack' || a.kind === 'weakeningHex') && a.owners.includes(enemy.defId));
+    const abilities = Object.values(catalog.abilities).filter(a => (a.kind === 'attack' || a.kind === 'shieldBash' || a.kind === 'weakeningHex') && a.owners.includes(enemy.defId));
     for (const position of positions) for (const hero of state.units) {
       if (hero.side !== 'player' || hero.hp === 0 || byTarget.get(hero.id)?.has(enemy.id)) continue;
       if (abilities.some(ability => previewAbility(position, {type:'useAbility', unitId:enemy.id, abilityId:ability.id, target:{unitId:hero.id}}, catalog).ok)) {

@@ -18,6 +18,7 @@ interface AttackFields {
 }
 export type AttackAbility = AttackFields & (
   | { readonly kind: 'attack' }
+  | { readonly kind: 'shieldBash' }
   | { readonly kind: 'guardedAttack'; readonly attackPenalty: 2; readonly armorClassBonus: 2 }
 );
 export interface MagicMissileAbility {
@@ -138,7 +139,7 @@ export interface ContentCatalog {
   readonly abilities: Readonly<Record<AbilityId, Ability>>;
   readonly maps: Readonly<Record<MapId, MapRecord>>;
   readonly heroes: Readonly<Record<HeroId, HeroRecord>>;
-  readonly enemies: Readonly<Record<EnemyId, EnemyRecord>>;
+  readonly enemies: Readonly<Record<string, EnemyRecord> & Record<Exclude<EnemyId, 'hobgoblin_warrior'>, EnemyRecord>>;
   readonly terrains: Readonly<Record<string, TerrainRecord>>;
   readonly assets: Readonly<Record<AssetId, AssetRecord>>;
 }

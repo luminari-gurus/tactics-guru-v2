@@ -3,6 +3,11 @@ import { GUARDED_STRIKE_TRADEOFF } from './constants';
 
 // Baseline ranges/damage: docs/tech_design.phaser4.draft.md §6.2.
 // Guarded Strike uses a fixed Combat Expertise-inspired tradeoff; Magic Missile uses the 3.5E automatic-hit damage rules.
+export const shieldBash = {
+  id: 'ability:shield_bash', kind: 'shieldBash', owners: ['hobgoblin_warrior'],
+  rangeMin: 1, rangeMax: 1, baseDamage: 2, uphillDamage: 0,
+} as const satisfies Ability;
+
 export const attackAbilities = {
   'ability:basic_attack': { id: 'ability:basic_attack', kind: 'attack', owners: ['fighter', 'ranger', 'mage', 'goblin_grunt', 'goblin_shaman'],
     rangeMin: 1, rangeMax: 1, baseDamage: 2, uphillDamage: 0 },

@@ -26,7 +26,7 @@ const map = {
     { id: 3, side: 'enemies', unitId: 'goblin_grunt', x: 3, y: 2 }, { id: 2, side: 'heroes', unitId: 'ranger', x: 0, y: 1 },
   ],
 } as const satisfies MapRecord;
-const dexterity = { fighter: 2, ranger: 3, mage: 0, goblin_grunt: 0, goblin_archer: 1, goblin_shaman: 0 } as const;
+const dexterity = { fighter: 2, ranger: 3, mage: 0, goblin_grunt: 0, goblin_archer: 1, goblin_shaman: 0, hobgoblin_warrior: 1 } as const;
 const base: ContentCatalog = copy(catalogFixture);
 const catalog: ContentCatalog = { ...base, maps: { [map.id]: map },
   heroes: { ...base.heroes, fighter: { ...base.heroes.fighter, stats: { ...base.heroes.fighter.stats, maxHp: 20, dexterity: dexterity.fighter } },

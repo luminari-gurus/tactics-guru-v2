@@ -21,6 +21,7 @@ const name = (id: string) => id.replace(/^ability:/, '').replaceAll('_', ' ').re
 function skillTip(ability: Ability, hero: HeroId, catalog: ContentCatalog): ClassTip | null {
   let text: string;
   switch (ability.kind) {
+    case 'shieldBash': return null;
     case 'attack':
       text = ability.uphillDamage ? `Hits deal +${ability.uphillDamage} damage when you stand above the target.`
         : 'Attack an enemy with an attack roll; check the hit chance in the preview.';

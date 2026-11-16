@@ -8,7 +8,7 @@ import { cellKey, routeDistances } from './routes';
 import { dispatch } from './turns';
 import type { BattleEvent, BattleState, Command, Rejection, UnitState } from './types';
 import { isDenseArray, isPlainRecord } from './validation';
-import { combatStats, tauntSource, weakenedImmune } from './effects';
+import { combatStats, formationAccuracy, tauntSource, weakenedImmune } from './effects';
 import { HEAL_GOBLIN_IDS } from '../content/constants';
 
 export type EnemyRejection = Rejection | { readonly ok: false; readonly reason: 'notEnemyUnit' };
@@ -37,11 +37,13 @@ type AttackCandidate = Position & { readonly command: Extract<Command, { type: '
 const lexical = (a: string, b: string) => a < b ? -1 : a > b ? 1 : 0;
 const cellOrder = (a: Position, b: Position) => a.cell.y - b.cell.y || a.cell.x - b.cell.x;
 /** Sum damage across all equally likely d20 faces. Previews supply every combat modifier; no RNG is drawn. */
-function damageScore(preview: AttackPreview): number {
+function damageScore(preview: AttackPreview, targetHp: number): number {
   let score = 0;
   for (let natural = 1; natural <= D20_SIDES; natural++) {
-    if (natural === NATURAL_CRITICAL) score += preview.criticalDamage;
-    else if (natural !== NATURAL_AUTO_MISS && natural + preview.bonus >= preview.armorClass) score += preview.damage;
+    const damage = natural === NATURAL_CRITICAL ? preview.criticalDamage :
+      natural !== NATURAL_AUTO_MISS && natural + preview.bonus >= preview.armorClass ? preview.damage : 0;
+    score += damage;
+    if (damage > 0 && damage < targetHp && preview.push?.ok) score++;
   }
   return score;
 }
@@ -70,7 +72,7 @@ export function planEnemyTurn(input: unknown, unitId: number, catalog: ContentCa
   }
   const source=tauntSource(actor,state.units);
   const targets = state.units.filter(u => u.side === 'player' && u.hp > 0 && (!source || u.id===source.id)).sort((a, b) => a.id - b.id);
-  const abilities = Object.values(catalog.abilities).filter(a => ['attack','weakeningHex','healGoblin'].includes(a.kind) && a.owners.includes(actor.defId))
+  const abilities = Object.values(catalog.abilities).filter(a => ['attack','shieldBash','weakeningHex','healGoblin'].includes(a.kind) && a.owners.includes(actor.defId))
     .sort((a, b) => lexical(a.id, b.id));
   const abilityTargets = (ability: Ability) => ability.kind === 'healGoblin' ? state.units.filter(u =>
     u.id !== actor.id && u.side === actor.side && u.side === 'enemy' && u.hp > 0 && u.hp < catalog.enemies[u.defId].stats.maxHp &&
@@ -86,9 +88,9 @@ export function planEnemyTurn(input: unknown, unitId: number, catalog: ContentCa
   const attacks: AttackCandidate[] = [];
   for (const position of positions) for (const ability of abilities) for (const target of abilityTargets(ability)) {
     const command = { type: 'useAbility', unitId, abilityId: ability.id, target: { unitId: target.id } } as const;
-    if (ability.kind === 'attack') {
+    if (ability.kind === 'attack' || ability.kind === 'shieldBash') {
       const preview = previewAttack(position.state, command, catalog);
-      if (preview.ok) attacks.push({ ...position, command, score: damageScore(preview), targetId: target.id });
+      if (preview.ok) attacks.push({ ...position, command, score: damageScore(preview, target.hp), targetId: target.id });
     } else {
       const score = supportScore(position.state, command, target);
       if (score > 0) attacks.push({ ...position, command, score, targetId: target.id });
@@ -105,7 +107,7 @@ export function planEnemyTurn(input: unknown, unitId: number, catalog: ContentCa
     const distance = manhattanDistance(cell, target.cell);
     if (occupied.has(cellKey(cell)) || !catalog.terrains[cell.terrainId].walkable || distance < ability.rangeMin ||
       distance > ability.rangeMax || lineOfSightBlocked(catalog, map.id, cell, target.cell)) continue;
-    if (ability.kind !== 'attack' && supportScore({ ...state, units: state.units.map(u => u.id === unitId ? { ...u, cell: { x: cell.x, y: cell.y } } : u) },
+    if (ability.kind !== 'attack' && ability.kind !== 'shieldBash' && supportScore({ ...state, units: state.units.map(u => u.id === unitId ? { ...u, cell: { x: cell.x, y: cell.y } } : u) },
       { type: 'useAbility', unitId, abilityId: ability.id, target: { unitId: target.id } }, target) <= 0) continue;
     const cost = fromOrigin.get(cellKey(cell));
     if (cost !== undefined) goals.push({cell, cost, targetId: target.id, abilityId: ability.id});
@@ -114,8 +116,10 @@ export function planEnemyTurn(input: unknown, unitId: number, catalog: ContentCa
   const goal = goals[0];
   if (goal) {
     const remaining = routeDistances(map, catalog, stats, goal.cell, occupied, true);
+    const formationAt = (p: Position) => formationAccuracy(p.state.units.find(u => u.id === unitId)!, p.state.units);
     const closer = positions.filter(p => p.move && (remaining.get(cellKey(p.cell)) ?? Infinity) < goal.cost)
-      .sort((a,b) => remaining.get(cellKey(a.cell))! - remaining.get(cellKey(b.cell))! || a.cost-b.cost || cellOrder(a,b))[0];
+      .sort((a,b) => remaining.get(cellKey(a.cell))! - remaining.get(cellKey(b.cell))! ||
+        formationAt(b) - formationAt(a) || a.cost-b.cost || cellOrder(a,b))[0];
     if (closer) return { ok: true, commands: [closer.move!, wait] };
   }
   return { ok: true, commands: [wait] };

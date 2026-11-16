@@ -5,6 +5,7 @@ import { BattleSession } from '../../src/app/BattleSession';
 import { playerDecision, fighterDecision, rangerDecision, mageDecision } from './playerPolicy';
 import type { Command, ReplayCommand } from '../../src/domain/types';
 import { dispatch } from '../../src/domain/turns';
+import { rollDie } from '../../src/domain/rng';
 import { previewAbility } from '../../src/domain/combat';
 import { progressHero } from '../../src/domain/progression';
 import type { ContentCatalog } from '../../src/content/types';
@@ -450,4 +451,24 @@ export function dungeonContactApproach(slot: number, seed = 13) {
     if (from !== undefined) return { state: atCell(base, from), approach, target };
   }
   throw Error('No two-step contact approach');
+}
+
+/** Saved production roster at a staged player turn beside the two Warriors. */
+export function hobgoblinDungeonBoundary() {
+  for (let seed = 0; seed < 128; seed++) {
+    const descriptor = floorDescriptor(seed, 2);
+    const selection = descriptor.encounters[1].selection;
+    if (selection.encounter.id !== 'encounter:hobgoblin_formation') continue;
+    const base = freshDungeon('hobgoblin-browser-boundary', seed);
+    const floor = { descriptor, position: descriptor.upstairs, completed: 1,
+      exploration: freshExploration(descriptor.seed, descriptor.upstairs, floorMap(descriptor)) };
+    const staged = atEncounter({ ...base, depth: 2, floors: [{ ...base.floors[0], completed: 3 }, floor] });
+    const entry = checkedDungeon(startDungeonBattle(staged));
+    const battle = entry.activeBattle!;
+    if (rollDie(battle.rng, 20).value < 10) continue;
+    const initial = { ...battle, initiative: [1, 4, 2, 3, 5], activeIndex: 0,
+      units: battle.units.map(unit => unit.id === 1 ? { ...unit, cell: { x: 3, y: 4 } } : unit) };
+    return { entry: checkedDungeon(readDungeon({ ...entry, activeBattle: initial })), initial };
+  }
+  throw Error('No deterministic Hobgoblin boundary');
 }

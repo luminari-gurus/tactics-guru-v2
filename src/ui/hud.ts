@@ -1,5 +1,5 @@
 import type { Threat } from '../domain/threat';
-import { combatStats, guardedEffect, markSource, movementBlockSource, tauntSource, weakenedSource, weakenedImmune } from '../domain/effects';
+import { combatStats, formationAccuracy, guardedEffect, markSource, movementBlockSource, tauntSource, weakenedSource, weakenedImmune } from '../domain/effects';
 import { saveFaceCounts } from '../domain/combat';
 import type { AbilityId, CellPosition } from '../content/types';
 import type { BattleEvent, BattleState, UnitState, Command } from '../domain/types';
@@ -30,7 +30,10 @@ export function previewText(preview: ActionPreview): string {
   if ('path' in preview) return `Move ${preview.path.length-1} steps · cost ${preview.cost} · uses movement`;
   if ('bonus' in preview) {
     const hits = Array.from({length:D20_SIDES},(_,i)=>i+1).filter(n=>n===NATURAL_CRITICAL || n!==NATURAL_AUTO_MISS && n+preview.bonus>=preview.armorClass).length;
-    return `Hit ${hits*100/D20_SIDES}% · attack ${preview.bonus>=0?'+':''}${preview.bonus} vs AC ${preview.armorClass}${preview.markBonus?` · Mark +${preview.markBonus} (consumed on roll)`:''} · damage ${preview.damage} (${preview.criticalDamage} critical) · uses action`;
+    const formation = preview.formationBonus ? ' · Formation +1' : '';
+    const push = preview.push?.ok ? ` · pushes surviving target to (${preview.push.to.x}, ${preview.push.to.y}) on hit` :
+      preview.push ? ` · push blocked (${preview.push.reason})` : '';
+    return `Hit ${hits*100/D20_SIDES}% · attack ${preview.bonus>=0?'+':''}${preview.bonus} vs AC ${preview.armorClass}${preview.markBonus?` · Mark +${preview.markBonus} (consumed on roll)`:''} · damage ${preview.damage} (${preview.criticalDamage} critical)${formation}${push} · uses action`;
   }
   if ('missileCount' in preview) return `Automatic hit · ${preview.missileCount} ${preview.missileCount===1?'missile':'missiles'} · ${preview.minDamage}–${preview.maxDamage} force damage each · uses action`;
   if ('healing' in preview) return `Heal ${preview.healing} HP · ${preview.hp} HP after healing · uses action${preview.kind === 'secondWind' ? ' and 1 battle use' : ''} · no roll`;
@@ -47,6 +50,7 @@ export function eventText(event: BattleEvent, name: (id:number)=>string): string
     case 'turnEnded': return `${name(event.unitId)} waits`;
     case 'moveUndone': { const cell=event.path.at(-1)!; return `${name(event.unitId)} undoes movement to (${cell.x}, ${cell.y})`; }
     case 'moved': { const cell=event.path.at(-1)!; return `${name(event.unitId)} moves to (${cell.x}, ${cell.y})`; }
+    case 'pushed': return `${name(event.unitId)} is pushed to (${event.path[1].x}, ${event.path[1].y})`;
     case 'abilityUsed': return `${name(event.unitId)} uses ${displayName(event.abilityId)}`;
     case 'attackRolled': return `${name(event.unitId)}: ${event.result} (${event.natural} + ${event.bonus} vs AC ${event.armorClass})`;
     case 'saveRolled': return `${name(event.unitId)} Will save ${event.saved ? 'succeeds' : 'fails'} (${event.natural} + ${event.modifier} = ${event.total} vs DC ${event.dc} · ${saveFaceCounts(event.modifier,event.dc).savedFaces*5}% save chance)`;
@@ -76,7 +80,8 @@ export function unitFeedback(session:BattleSession, unit:UnitState) {
   const source=tauntSource(unit,session.state.units);
   const marker=markSource(unit,session.state.units), pinner=movementBlockSource(unit,session.state.units);
   const weakener=weakenedSource(unit,session.state.units);
-  const statuses=[...(guard?[`Guarded (+${guard.armorClassBonus} AC, −${guard.attackPenalty} attack rolls; expires immediately before this unit’s next turn)`]:[]),
+  const formation=formationAccuracy(unit,session.state.units);
+  const statuses=[...(formation?['Formation Fighting (+1 accuracy)']:[]),...(guard?[`Guarded (+${guard.armorClassBonus} AC, −${guard.attackPenalty} attack rolls; expires immediately before this unit’s next turn)`]:[]),
     ...(source?[`Taunted by ${displayName(source.defId)} #${source.id} (only offensive target; expires after this unit’s next turn ends)`]:[]),
     ...(marker?[`Marked by Ranger #${marker.id} (+2 on next player attack roll; consumed even on miss; expires on source/target defeat)`]:[]),
     ...(pinner?[`${unit.movementBlock!.abilityId === 'ability:frost_snare' ? 'Snared by Mage' : 'Pinned by Ranger'} #${pinner.id} (movement blocked; no damage or roll; expires after this unit’s next turn ends or source/target defeat)`]:[]),
@@ -85,8 +90,10 @@ export function unitFeedback(session:BattleSession, unit:UnitState) {
   const support = unit.defId === 'goblin_shaman' ? `Basic Attack range 1. Weakening Hex range 2–4, clear LOS: d20 + target Will vs DC ${10+def.stats.power}; −2 accuracy on failure until target turn end or source/target defeat. Will save chances: ${session.state.units.filter(u=>u.side!==unit.side&&u.hp>0).map(u=>{
     const target=u.side==='player'?session.catalog.heroes[u.defId]:session.catalog.enemies[u.defId];
     return `${displayName(u.defId)} #${u.id} ${weakenedImmune(u,session.catalog)?'immune to Weakened':`${saveFaceCounts(target.stats.will,10+def.stats.power).savedFaces*5}%`}`;
-  }).join(', ')}. Heal Goblin range 1–4, clear LOS: injured living allied grunt, archer or Shaman, heal up to 4 HP, no revival/self heal, no roll. Each ability uses one action.` : '';
-  return {def,name:displayName(unit.defId),...combatStats(unit,session.catalog),support,
+  }).join(', ')}. Heal Goblin range 1–4, clear LOS: injured living allied grunt, archer or Shaman, heal up to 4 HP, no revival/self heal, no roll. Each ability uses one action.` :
+    unit.defId === 'hobgoblin_warrior' ? 'Shield Bash pushes a surviving target one tile directly away on a hit if the destination is clear. Formation Fighting grants +1 accuracy beside a living Hobgoblin.' : '';
+  const stats=combatStats(unit,session.catalog);
+  return {def,name:displayName(unit.defId),...stats,accuracy:stats.accuracy+formation,support,
     status:unit.hp===0?'Defeated':statuses.join(' · ')||'No status effects'};
 }
 export function unitLabel(session:BattleSession, unit:UnitState) {

@@ -246,7 +246,7 @@ export class BattleScene extends Phaser.Scene {
       if(followPlan){planInFlight=true;planInterrupted=false;}
       clear(followPlan);selection.selectedCell=null;removeInput.reset();hud.append(step.events);audio.present(step.token,step.events);
       refresh();animation=board.animate(step.before,step.after,step.events);
-      const moving=step.events.some(event=>event.type==='moved');movingPresentation=moving;
+      const moving=step.events.some(event=>event.type==='moved' || event.type==='pushed');movingPresentation=moving;
       if(moving)measurements.workload('move',performance.now());
       // Suspension may finish presentation early, but never resolve the command again.
       await animation.done;if(!live)return;animation=null;

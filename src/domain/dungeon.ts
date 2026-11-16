@@ -17,11 +17,10 @@ import { createBattle } from './turns';
 import { readBattleState } from './battle';
 import type { BattleState } from './types';
 import { DUNGEON_ENCOUNTER_POLICY, LEGACY_ENCOUNTER_POLICY, dungeonBiome, legacyDungeonEncounter, selectDungeonEncounter, readDungeonEncounterSelection,
-  projectDungeonEnemies, type EncounterSelection, type DungeonEncounterPolicy } from './dungeonEncounters';
+  encounterBattleCatalog, projectDungeonEnemies, type EncounterSelection, type DungeonEncounterPolicy } from './dungeonEncounters';
 import { readBattlefieldDescriptor } from './battlefield';
 import { encounterHpLimit } from './effects';
 import { draughtHealing, enterWithDraughts, matchesDraughtStock } from './draughts';
-import { dungeonBattleCatalog } from '../content/dungeonEncounters';
 import { boundedStat, freshRunStats, readRunStats, type RunStats } from './runStats';
 import { nextUint32, seedRng } from './rng';
 import { UINT32_RANGE } from './constants';
@@ -126,7 +125,7 @@ export function floorDescriptor(seed: number, depth: number, cache = new FloorCa
   const legacy = policy === LEGACY_ENCOUNTER_POLICY;
   const encounters = legacy ? legacyEncounterPlans(depth) : [0, 1, 2].map(slot => {
     const selection = selectDungeonEncounter(seed, depth, slot);
-    const resolved = resolveBattlefield(selection.encounter, dungeonSeed(seed, depth, 'battle', slot), dungeonBattleCatalog);
+    const resolved = resolveBattlefield(selection.encounter, dungeonSeed(seed, depth, 'battle', slot), encounterBattleCatalog(selection));
     if (!resolved.ok) throw Error('Invalid dungeon encounter pairing');
     rememberAdmission(admissionKey(dungeonSeed(seed, depth, 'battle', slot), selection, resolved.descriptor));
     return { selection, battlefield: resolved.descriptor };
@@ -195,7 +194,7 @@ export function dungeonBattle(s: DungeonState) {
   const slot = activeDungeonSlot(s);
   if (slot >= 3) return null;
   const plan = currentFloor(s).descriptor.encounters[slot];
-  const baseline = plan.selection.policy === LEGACY_ENCOUNTER_POLICY ? dungeonContent.catalog : projectDungeonEnemies(s.depth, plan.selection.kind);
+  const baseline = plan.selection.policy === LEGACY_ENCOUNTER_POLICY ? dungeonContent.catalog : projectDungeonEnemies(s.depth, plan.selection.kind, encounterBattleCatalog(plan.selection));
   const resolved = resolveBattlefield(plan.selection.encounter, dungeonSeed(s.seed, s.depth, 'battle', slot), baseline);
   if (!resolved.ok || (plan.battlefield === null ? plan.selection.policy !== LEGACY_ENCOUNTER_POLICY : !sameBattlefield(plan.battlefield, resolved.descriptor))) return null;
   const projected = projectOwnedCatalog(s.ownership, s.party, baseline, dungeonContent.items);
@@ -256,7 +255,7 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
           if(i+1===input.depth) {
             const key=admissionKey(seed,selection,plan.battlefield);
             if (!admittedEncounters.has(key)) {
-              const resolved = resolveBattlefield(selection.encounter, seed, policy === LEGACY_ENCOUNTER_POLICY ? dungeonContent.catalog : dungeonBattleCatalog);
+              const resolved = resolveBattlefield(selection.encounter, seed, policy === LEGACY_ENCOUNTER_POLICY ? dungeonContent.catalog : encounterBattleCatalog(selection));
               if (!resolved.ok || !sameBattlefield(plan.battlefield, resolved.descriptor)) return fail('invalidSelection');
             }
             rememberAdmission(key);

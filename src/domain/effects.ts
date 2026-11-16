@@ -1,11 +1,19 @@
 import { GUARDED_STRIKE_TRADEOFF } from '../content/constants';
 import type { ContentCatalog, HeroId } from '../content/types';
+import { manhattanDistance } from './targeting';
 import type { BattleEvent, UnitState } from './types';
 
 /** Supported runtime case only. Source and target are the same Fighter instance. */
 export function guardedEffect(unit: UnitState): { readonly kind: 'guarded'; readonly sourceId: number; readonly targetId: number } | null {
   return unit.hp > 0 && unit.guarded ? { kind: 'guarded', sourceId: unit.id, targetId: unit.id } : null;
 }
+/** Formation is derived at the point of use, including hypothetical AI movement. */
+export function formationAccuracy(unit: UnitState, units: readonly UnitState[]): 0 | 1 {
+  return unit.hp > 0 && unit.defId === 'hobgoblin_warrior' && units.some(ally =>
+    ally.id !== unit.id && ally.hp > 0 && ally.side === unit.side && ally.defId === 'hobgoblin_warrior' &&
+    manhattanDistance(unit.cell, ally.cell) === 1) ? 1 : 0;
+}
+
 /** Catalog stats already include equipment. Prospective Guarded Strike and active guard apply once. */
 export function combatStats(unit: UnitState, catalog: ContentCatalog, guarding = false) {
   const stats = unit.side === 'player' ? catalog.heroes[unit.defId].stats : catalog.enemies[unit.defId].stats;

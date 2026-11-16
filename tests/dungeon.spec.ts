@@ -1,6 +1,6 @@
 import { dungeonContent } from '../src/content/dungeon';
 import { walkDungeon, reenterDungeonStair, continueSavedDungeon, openDungeonInventory, collectDungeonEncounterLoot } from './helpers/dungeonTraversal';
-import { atEncounter, atStairApproach, checkedDungeon, stagedMageAbility, snaredDefeatBoundary } from './helpers/dungeonFixtures';
+import { atEncounter, atStairApproach, checkedDungeon, hobgoblinDungeonBoundary, stagedMageAbility, snaredDefeatBoundary } from './helpers/dungeonFixtures';
 import { expect,railTest as test,type Page } from './helpers/dungeonEntropy';
 import { readFileSync, writeFileSync } from 'node:fs';
 import type { Locator } from '@playwright/test';
@@ -657,6 +657,33 @@ test('Shaman production journey uses Hex and ally healing, reloads Weakened and 
  expect(errors).toEqual([]);
  writeFileSync(info.outputPath('shaman-production-journey.json'),JSON.stringify({seed:189,entry:witness.entry,commands,events,state:record.state,reloaded,final:await snapshot(page)},null,2));
  await page.screenshot({path:info.outputPath('shaman-terminal.png'),fullPage:true});
+});
+
+test('Hobgoblin formation affects Shield Bash, displaces the hero and survives Continue', async ({ page }) => {
+  const fixture = hobgoblinDungeonBoundary();
+  await seed(page, fixture.entry);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  await (await battleTool(page, '#battle-party')).click();
+  await page.locator('#inspect-unit-4').click();
+  await expect(page.getByRole('dialog')).toContainText('Formation Fighting (+1 accuracy)');
+  await page.locator('#inspection-close').click();
+
+  await playCommand(page, { type: 'endTurn', unitId: 1 });
+  await expect.poll(async () => (await readSession(page)).state.commandCount).toBe(3);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  const session = await readSession(page);
+  expect(session.events).toContainEqual({ type: 'pushed', unitId: 1, path: [{ x: 3, y: 4 }, { x: 3, y: 5 }] });
+  expect(session.events).toContainEqual(expect.objectContaining({ type: 'attackRolled', unitId: 4,
+    bonus: dungeonBattle(fixture.entry)!.catalog.enemies.hobgoblin_warrior.stats.accuracy + 1 }));
+  expect(session.state.units[0].cell).toEqual({ x: 3, y: 5 });
+  const saved = await snapshot(page);
+  expect(saved.activeBattle).toEqual(session.state);
+
+  await page.reload();
+  await continueSavedDungeon(page);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  expect((await snapshot(page)).activeBattle).toEqual(saved.activeBattle);
+  expect((await readSession(page)).events).toEqual([]);
 });
 
 test('automatic stairs preserve healed Fighter carry and fresh battle resources',async({page,isMobile})=>{

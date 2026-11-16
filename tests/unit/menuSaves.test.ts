@@ -2,7 +2,7 @@ import { expect, it, vi } from 'vitest';
 import { inspectMenuSave } from '../../src/app/menuSaves';
 import { BATTLE_STORAGE_KEYS } from '../../src/persistence/battleStorage';
 import { RUN_STORAGE_KEYS } from '../../src/persistence/runStorage';
-import { DUNGEON_KEYS, DUNGEON_BACKUP_CHECKPOINT_KEY } from '../../src/persistence/dungeonStorage';
+import { DUNGEON_KEYS, DUNGEON_BACKUP_CHECKPOINT_KEY, DUNGEON_RECENT_BACKUP_KEY } from '../../src/persistence/dungeonStorage';
 import { menuFixture } from '../helpers/menuFixtures';
 
 it('inspects only dungeon slots even with legacy battle and run saves', () => {
@@ -18,7 +18,7 @@ it('inspects only dungeon slots even with legacy battle and run saves', () => {
     expect(inspectMenuSave(() => ({ getItem, setItem, removeItem }))).toMatchObject({
       primary: 'missing', backup: 'valid', resumable: true, fromBackup: true, needsRecovery: false,
     });
-    expect(getItem.mock.calls.flat()).toEqual([...Object.values(DUNGEON_KEYS), DUNGEON_BACKUP_CHECKPOINT_KEY]);
+    expect(getItem.mock.calls.flat()).toEqual([...Object.values(DUNGEON_KEYS), DUNGEON_BACKUP_CHECKPOINT_KEY, DUNGEON_RECENT_BACKUP_KEY]);
     expect(setItem).not.toHaveBeenCalled();
     expect(removeItem).not.toHaveBeenCalled();
   } finally { random.mockRestore(); }

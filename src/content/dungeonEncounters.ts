@@ -1,4 +1,5 @@
 import { battlefieldEncounters, authoredEncounters, runCatalog } from './encounters';
+import { hobgoblinBattleContent, hobgoblinComposition, hobgoblinMap } from './hobgoblin';
 import { desertRunCatalog } from './desertCatalog';
 import { isBattlefieldSource, readBattlefieldEncounter, type BattlefieldSource } from './battlefieldTypes';
 import type { ContentCatalog, SpawnRecord } from './types';
@@ -111,3 +112,17 @@ export function dungeonEncounterCatalogIdentity(catalog = dungeonEncounterCatalo
     pools: sorted(catalog.pools).map(p => ({ ...p, maps: sorted(p.maps).map(m => ({ ...m, compositionIds: [...m.compositionIds].sort() })) })) });
 }
 export const dungeonEncounterIdentity = dungeonEncounterCatalogIdentity();
+
+export const hobgoblinDungeonBattleCatalog = hobgoblinBattleContent({
+  ...dungeonBattleCatalog, maps: { ...dungeonBattleCatalog.maps, [hobgoblinMap.id]: hobgoblinMap },
+});
+export const hobgoblinDungeonEncounterCatalog: DungeonEncounterCatalog = {
+  ...dungeonEncounterCatalog,
+  compositions: [...dungeonEncounterCatalog.compositions, hobgoblinComposition],
+  pools: dungeonEncounterCatalog.pools.map(pool => pool.id === 'forest' ? {
+    ...pool,
+    maps: [...pool.maps, { id: 'hobgoblin_formation', source: { kind: 'authored', mapId: hobgoblinMap.id },
+      compositionIds: [hobgoblinComposition.id] }],
+  } : pool),
+};
+export const hobgoblinEncounterIdentity = dungeonEncounterCatalogIdentity(hobgoblinDungeonEncounterCatalog);

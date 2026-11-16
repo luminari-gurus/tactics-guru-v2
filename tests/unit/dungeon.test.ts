@@ -10,13 +10,13 @@ import { dungeonCapacityFixture, dungeonVictoryBoundary } from '../helpers/dunge
 import { dungeonStairStatus, clearedDungeonSlots, freshDungeon, newDungeonSeed, stepDungeon, dungeonBattle, dungeonOffer, floorDescriptor, floorMap, FloorCache, dungeonSeed, readDungeon, travelDungeon, startDungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
 import { encodeDungeon, decodeDungeon, encodeDungeonRollback, utf8Bytes } from '../../src/domain/dungeonSaveEnvelope';
 import { dungeonContent, dungeonIdentity, previousDungeonIdentity } from '../../src/content/dungeon';
-import { bothDungeonSlotsMissing, createDungeonStorage, serializeBrowserDungeonWrite, DUNGEON_BACKUP_CHECKPOINT_KEY, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
+import { bothDungeonSlotsMissing, createDungeonStorage, resumableDungeonSlot, serializeBrowserDungeonWrite, DUNGEON_BACKUP_CHECKPOINT_KEY, DUNGEON_KEYS, DUNGEON_RECENT_BACKUP_KEY } from '../../src/persistence/dungeonStorage';
 import { DungeonSession } from '../../src/app/DungeonSession';
-import { LEGACY_ENCOUNTER_POLICY, selectDungeonEncounter } from '../../src/domain/dungeonEncounters';
+import { LEGACY_ENCOUNTER_POLICY, encounterBattleCatalog, selectDungeonEncounter } from '../../src/domain/dungeonEncounters';
 import { priorDungeonEnvelope } from '../helpers/dungeonFixtures';
 import { dispatch } from '../../src/domain/turns';
 import { canonical, hashJson } from '../../src/domain/contentIdentity';
-import { dungeonEncounterCatalog, dungeonBattleCatalog } from '../../src/content/dungeonEncounters';
+import { dungeonEncounterCatalog } from '../../src/content/dungeonEncounters';
 import { resolveBattlefield } from '../../src/domain/battlefield';
 import { RunHistory } from '../../src/app/RunHistory';
 import { createRunRecordsStorage, RUN_RECORD_KEYS, selectedRunRecords } from '../../src/persistence/runRecordsStorage';
@@ -331,6 +331,67 @@ it.each([false, true])('versions final reward saves and keeps a rollback checkpo
   expect(reopened.backup).toEqual(checkpoint);
 });
 
+it.each([false, true])('keeps rolling recovery and a pre-Hobgoblin rollback checkpoint (tracked: %s)', tracked => {
+  const seed = Array.from({ length: 64 }, (_, index) => index)
+    .find(index => selectDungeonEncounter(index, 2, 1).mapId === 'hobgoblin_formation');
+  assert(seed !== undefined);
+  const before = good(readDungeon(atDownstairs(clearFloor(freshDungeon('hobgoblin-rollback', seed, undefined, tracked)))));
+  const data = memory(), store = createDungeonStorage(() => data);
+  expect(store.save(before)).toEqual({ ok: true });
+
+  const entered = good(travelDungeon(before, 'descend', before.revision));
+  expect(store.save(entered)).toEqual({ ok: true });
+  const checkpoint = store.inspect().backup;
+  assert(checkpoint.status === 'valid');
+  expect(checkpoint.state).toEqual(before);
+
+  const finishedSecond = good(readDungeon(clearFloor(entered)));
+  expect(store.save(finishedSecond)).toEqual({ ok: true });
+  const third = good(travelDungeon(finishedSecond, 'descend', finishedSecond.revision));
+  const reopened = createDungeonStorage(() => data);
+  expect(reopened.save(third)).toEqual({ ok: true });
+  expect(reopened.inspect()).toMatchObject({
+    primary: { status: 'valid', state: third },
+    backup: { status: 'valid', state: finishedSecond },
+  });
+  expect(data.getItem(DUNGEON_KEYS.backup)).toBe(checkpoint.text);
+
+  // The previous build can save from the rollback checkpoint while leaving the newer key alone.
+  const rolledBack = memory();
+  for (const [key, text] of data.values) rolledBack.setItem(key, text);
+  const previousBuildSave = encodeDungeon({ ...before, revision: before.revision + 1 });
+  assert(previousBuildSave.ok);
+  rolledBack.setItem(DUNGEON_KEYS.primary, previousBuildSave.text);
+  const upgradedAgain = createDungeonStorage(() => rolledBack);
+  expect(upgradedAgain.inspect().backup).toEqual(checkpoint);
+  expect(upgradedAgain.remove('primary', previousBuildSave.text)).toEqual({ ok: true });
+  expect(upgradedAgain.inspect().backup).toEqual(checkpoint);
+  expect(rolledBack.getItem(DUNGEON_RECENT_BACKUP_KEY)).toBeNull();
+
+  data.setItem(DUNGEON_KEYS.primary, 'corrupt');
+  const recovery = createDungeonStorage(() => data);
+  const recent = data.getItem(DUNGEON_RECENT_BACKUP_KEY);
+  assert(recent);
+  data.setItem(DUNGEON_RECENT_BACKUP_KEY, recent + '!');
+  expect(recovery.inspect().backup).toEqual(checkpoint);
+  data.setItem(DUNGEON_RECENT_BACKUP_KEY, recent);
+  const session = new DungeonSession(before, recovery);
+  const review = session.inspect();
+  expect(resumableDungeonSlot(review)).toBe('backup');
+  expect(session.continue(review)).toBe(true);
+  expect(session.snapshot).toEqual(finishedSecond);
+  expect(recovery.remove('primary', 'corrupt')).toEqual({ ok: true });
+  expect(recovery.save(finishedSecond, null)).toEqual({ ok: true });
+  const resumed = recovery.inspect().backup;
+  assert(resumed.status === 'valid');
+  expect(resumed.state).toEqual(finishedSecond);
+  expect(data.getItem(DUNGEON_KEYS.backup)).toBe(checkpoint.text);
+  expect(recovery.remove('backup', resumed.text, null)).toEqual({ ok: true });
+  expect(data.getItem(DUNGEON_KEYS.backup)).toBeNull();
+  expect(data.getItem(DUNGEON_RECENT_BACKUP_KEY)).toBeNull();
+  session.dispose();
+});
+
 export function clearFloor(s: DungeonState) {
   for (let i = 0; i < 3; i++) {
     s = win(s);
@@ -498,7 +559,7 @@ describe('dungeon floors', () => {
           const selection = selectDungeonEncounter(seed, depth, slot);
           const pairing = canonical(selection.encounter);
           if (resolvedPairings.has(pairing)) continue;
-          const resolved = resolveBattlefield(selection.encounter, dungeonSeed(seed, depth, 'battle', slot), dungeonBattleCatalog);
+          const resolved = resolveBattlefield(selection.encounter, dungeonSeed(seed, depth, 'battle', slot), encounterBattleCatalog(selection));
           if (!resolved.ok) throw Error('Invalid dungeon encounter pairing');
           resolvedPairings.add(pairing);
         }
@@ -797,7 +858,7 @@ describe('durable encounter policies', () => {
     const map = dungeonEncounterCatalog.pools.find(p => p.id === 'forest')!.maps.find(m => m.id !== original.mapId)!;
     const composition = dungeonEncounterCatalog.compositions.find(c => c.id === map.compositionIds[0])!;
     const selection = { ...original, mapId: map.id, compositionId: composition.id, encounter: { id:`encounter:${map.id}` as const,source:map.source,roster:composition.roster } };
-    const resolved = resolveBattlefield(selection.encounter,dungeonSeed(base.seed,1,'battle',0),dungeonBattleCatalog);if(!resolved.ok)throw Error('Pairing invalid');
+    const resolved = resolveBattlefield(selection.encounter,dungeonSeed(base.seed,1,'battle',0),encounterBattleCatalog(selection));if(!resolved.ok)throw Error('Pairing invalid');
     const saved = { ...base, floors:[{...base.floors[0],descriptor:{...descriptor,encounters:[{selection,battlefield:resolved.descriptor},...descriptor.encounters.slice(1)]}}] };
     const read = good(readDungeon(saved)); expect(read.floors[0].descriptor.encounters[0].selection).toEqual(selection);
     expect(dungeonBattle(read)!.state.mapId).toBe(resolved.map.id);

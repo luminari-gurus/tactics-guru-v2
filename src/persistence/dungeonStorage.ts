@@ -1,8 +1,11 @@
 import { DUNGEON_SAVE_MAX_BYTES, decodeDungeon, encodeDungeonRollback, encodeDungeonWithState, hasGroundLoot, hasWallSight, requiresFinalRewardSupport, restoreDungeonRollback } from '../domain/dungeonSaveEnvelope';
 import type { DungeonState } from '../domain/dungeon';
+import { hobgoblinEncounterIdentity } from '../content/dungeonEncounters';
+import { hashJson } from '../domain/contentIdentity';
 import type { RunStorageProvider } from './runStorage';
 export const DUNGEON_KEYS = { primary: 'tactics-guru:phaser:dungeon:primary:v1', backup: 'tactics-guru:phaser:dungeon:backup:v1' } as const;
 export const DUNGEON_BACKUP_CHECKPOINT_KEY = 'tactics-guru:phaser:dungeon:backup-sight:v1';
+export const DUNGEON_RECENT_BACKUP_KEY = 'tactics-guru:phaser:dungeon:backup-recent:v1';
 export type DungeonSlot = keyof typeof DUNGEON_KEYS;
 type Slot = { status: 'missing'; text: null } | { status: 'valid'; text: string; state: DungeonState; checkpoint?: string }
   | { status: 'invalid'; text: string; reason: string } | { status: 'unavailable'; text: null };
@@ -30,6 +33,13 @@ export type DungeonWrite = { ok: true } | { ok: false; reason: string };
 export function bothDungeonSlotsMissing(review: DungeonInspection): boolean {
   return review.primary.status === 'missing' && review.backup.status === 'missing';
 }
+function hasHobgoblinFloor(state: DungeonState): boolean {
+  return state.floors.some(floor => floor.descriptor.encounters.some(({ selection }) =>
+    'catalogIdentity' in selection && selection.catalogIdentity === hobgoblinEncounterIdentity));
+}
+function primaryHidesRecentBackup(primary: Slot, rollback: DungeonState): boolean {
+  return primary.status === 'valid' && (primary.state.id !== rollback.id || !hasHobgoblinFloor(primary.state));
+}
 export function createDungeonStorage(provider: RunStorageProvider = () => window.localStorage) {
   let uncertain = false;
   let lastWritten: string | undefined;
@@ -37,6 +47,11 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
   // and clone on return so callers can never mutate a future inspection result.
   const decoded = new Map<string, DungeonState>();
   let restoredBackup: { text: string; record: string; restored: { checkpoint: string; state: DungeonState } | null } | undefined;
+  let rollbackBinding: { text: string; prefix: string } | undefined;
+  function recentBackupPrefix(text: string) {
+    if (rollbackBinding?.text !== text) rollbackBinding = { text, prefix: hashJson(text) + '\n' };
+    return rollbackBinding.prefix;
+  }
   function read(text: string) {
     let state = decoded.get(text);
     if (!state) {
@@ -44,7 +59,7 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
       if (!result.ok) return result;
       state = result.state;
       decoded.set(text, state);
-      if (decoded.size > 2) decoded.delete(decoded.keys().next().value!);
+      if (decoded.size > 3) decoded.delete(decoded.keys().next().value!);
     }
     return {ok: true as const, state: structuredClone(state)};
   }
@@ -52,7 +67,7 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
     try { return (e as { name?: string })?.name === 'QuotaExceededError' ? 'quota' : (e as { name?: string })?.name === 'SecurityError' ? 'security' : 'unavailable'; }
     catch { return 'unavailable'; }
   };
-  function inspect(): DungeonInspection {
+  function inspectSlots(): DungeonInspection {
     const slot = (key: DungeonSlot): Slot => {
       try {
         const storage = provider(); if (!storage) return { status: 'unavailable', text: null };
@@ -84,12 +99,29 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
     };
     return { primary: slot('primary'), backup: slot('backup') };
   }
+  function inspect(): DungeonInspection {
+    const review = inspectSlots();
+    const { primary, backup } = review;
+    if (backup.status !== 'valid' || hasHobgoblinFloor(backup.state) ||
+        primaryHidesRecentBackup(primary, backup.state)) return review;
+    try {
+      const record = provider()?.getItem(DUNGEON_RECENT_BACKUP_KEY);
+      if (!record) return review;
+      const prefix = recentBackupPrefix(backup.text);
+      if (record.length > DUNGEON_SAVE_MAX_BYTES + prefix.length || !record.startsWith(prefix)) return review;
+      const text = record.slice(prefix.length);
+      const recent = read(text);
+      if (recent.ok && recent.state.id === backup.state.id && recent.state.seed === backup.state.seed && hasHobgoblinFloor(recent.state))
+        return { primary, backup: { status: 'valid', text, state: recent.state } };
+    } catch { /* The rollback backup remains independently readable. */ }
+    return review;
+  }
   function save(state: DungeonState, expectedPrimary?: string | null): DungeonWrite {
     if (uncertain) return { ok: false, reason: 'uncertainWrite' };
     const encoded = encodeDungeonWithState(state); if (!encoded.ok) return encoded;
     try {
       const storage = provider(); if (!storage) return { ok: false, reason: 'unavailable' };
-      const old = inspect();
+      const old = inspectSlots();
       if (Object.values(old).some(s => s.status === 'unavailable')) return { ok: false, reason: 'unavailable' };
       if (Object.values(old).some(s => s.status === 'invalid')) return { ok: false, reason: 'recoveryRequired' };
       if (expectedPrimary !== undefined && old.primary.text !== expectedPrimary) return { ok: false, reason: 'changed' };
@@ -133,6 +165,20 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
         backup = null;
         backupState = undefined;
       }
+      // The old key stays readable on rollback. Current clients recover the previous primary.
+      const oldRecent = storage.getItem(DUNGEON_RECENT_BACKUP_KEY);
+      let recentRecord: string | null = null;
+      if (old.backup.status === 'valid' && old.backup.state.id === state.id && !hasHobgoblinFloor(old.backup.state) &&
+          hasHobgoblinFloor(encoded.state)) {
+        const priorHobgoblin = old.primary.status === 'valid' && old.primary.state.id === state.id && hasHobgoblinFloor(old.primary.state)
+          ? old.primary.text : null;
+        if (priorHobgoblin !== null) recentRecord = recentBackupPrefix(old.backup.text) + priorHobgoblin;
+        else if (old.primary.status === 'missing') recentRecord = oldRecent;
+        if (priorHobgoblin !== null || backupState && hasHobgoblinFloor(backupState)) {
+          backup = null;
+          backupState = undefined;
+        }
+      }
       let checkpoint: string | null = null;
       // Inspection caches the exact record that restored the reviewed backup.
       const retainedRecord = old.backup.status === 'valid' && old.backup.checkpoint ? restoredBackup?.record : undefined;
@@ -165,11 +211,20 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
         if (!backupMatches()) { uncertain = true; return { ok: false, reason: 'uncertainWrite' }; }
         if (checkpoint === null && storage.getItem(DUNGEON_BACKUP_CHECKPOINT_KEY) !== null) storage.removeItem(DUNGEON_BACKUP_CHECKPOINT_KEY);
       }
+      if (recentRecord !== oldRecent) {
+        if (recentRecord === null) storage.removeItem(DUNGEON_RECENT_BACKUP_KEY);
+        else storage.setItem(DUNGEON_RECENT_BACKUP_KEY, recentRecord);
+        if (storage.getItem(DUNGEON_RECENT_BACKUP_KEY) !== recentRecord || !backupMatches()) {
+          uncertain = true;
+          return { ok: false, reason: 'uncertainWrite' };
+        }
+      }
       // Any exception after the write attempt can have an uncertain outcome.
       uncertain = true;
       storage.setItem(DUNGEON_KEYS.primary, encoded.text);
       // A concurrent removal can invalidate the backup while the primary is being written.
-      if (storage.getItem(DUNGEON_KEYS.primary) !== encoded.text || !backupMatches()) return { ok: false, reason: 'uncertainWrite' };
+      if (storage.getItem(DUNGEON_KEYS.primary) !== encoded.text || !backupMatches() ||
+          storage.getItem(DUNGEON_RECENT_BACKUP_KEY) !== recentRecord) return { ok: false, reason: 'uncertainWrite' };
       uncertain = false; lastWritten = encoded.text;
       try {
         decoded.clear();
@@ -187,14 +242,30 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
     if (slot !== 'primary' && slot !== 'backup') return { ok: false, reason: 'invalidSlot' };
     try {
       const storage = provider(); if (!storage) return { ok: false, reason: 'unavailable' };
-      if (storage.getItem(DUNGEON_KEYS[slot]) !== expected) return { ok: false, reason: 'changed' };
-      if (slot === 'backup' && expectedCheckpoint !== undefined) {
+      if (slot === 'backup') {
         const reviewed = inspect().backup;
-        if ((reviewed.status === 'valid' ? reviewed.checkpoint ?? null : null) !== expectedCheckpoint) return { ok: false, reason: 'changed' };
+        if (reviewed.status === 'unavailable') return { ok: false, reason: 'unavailable' };
+        if (reviewed.text !== expected || expectedCheckpoint !== undefined &&
+            (reviewed.status === 'valid' ? reviewed.checkpoint ?? null : null) !== expectedCheckpoint) return { ok: false, reason: 'changed' };
+      } else {
+        if (storage.getItem(DUNGEON_KEYS.primary) !== expected) return { ok: false, reason: 'changed' };
+        if (expected !== null && storage.getItem(DUNGEON_RECENT_BACKUP_KEY) !== null) {
+          const { primary, backup } = inspectSlots();
+          if (primary.status === 'unavailable' || backup.status === 'unavailable') return { ok: false, reason: 'unavailable' };
+          if (primary.text !== expected) return { ok: false, reason: 'changed' };
+          if (backup.status === 'valid' && primaryHidesRecentBackup(primary, backup.state)) {
+            // Removing the primary must not reveal a backup from the abandoned branch.
+            storage.removeItem(DUNGEON_RECENT_BACKUP_KEY);
+            if (storage.getItem(DUNGEON_RECENT_BACKUP_KEY) !== null) return { ok: false, reason: 'uncertainWrite' };
+          }
+        }
       }
       storage.removeItem(DUNGEON_KEYS[slot]);
       if (storage.getItem(DUNGEON_KEYS[slot]) !== null) return { ok: false, reason: 'uncertainWrite' };
-      if (slot === 'backup') storage.removeItem(DUNGEON_BACKUP_CHECKPOINT_KEY);
+      if (slot === 'backup') {
+        storage.removeItem(DUNGEON_BACKUP_CHECKPOINT_KEY);
+        storage.removeItem(DUNGEON_RECENT_BACKUP_KEY);
+      }
       return { ok: true };
     } catch (e) { return { ok: false, reason: error(e) }; }
   }
