@@ -88,7 +88,7 @@ function gamePreloads(): Plugin {
         battle: { ...battle, js: battle.js.filter(file => file !== battleEntry) },
         run: dependencies([entry('src/app/startRunApp.ts')]),
         images: Object.values(battleAssets).map(asset => imageUrls[asset.runtimePath].slice(1)),
-        runImages: Object.values(imageUrls).map(path => path.slice(1)),
+        runImages: Object.values({...battleAssets,...desertAssets}).map(asset => imageUrls[asset.runtimePath].slice(1)),
       };
       // JSON is embedded as script text, never as executable content from a path.
       const data = JSON.stringify(plan).replaceAll('<', '\\u003c');

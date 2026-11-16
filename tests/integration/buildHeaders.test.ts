@@ -60,6 +60,9 @@ for (const base of ['/', '/tactics/']) {
       const direct = preloads(`${base}${mode}`);
       expect(direct.length).toBeGreaterThan(0);
       expect(direct.every(link => link.href.startsWith(base))).toBe(true);
+      for (const asset of Object.values(hobgoblinAssets)) {
+        expect(direct.some(link => link.href.endsWith(asset.runtimePath))).toBe(false);
+      }
       expect(preloads(base, `?game=${mode}&entry=continue`)).toEqual(direct);
       expect(preloads(base, `?game=${mode}&scene=unknown&scene=proof`)).toEqual(direct);
       expect(preloads(base.replace(/\/$/, ''), `?game=${mode}`)).toEqual(direct);

@@ -1,5 +1,6 @@
 import { DUNGEON_SAVE_MAX_BYTES, decodeDungeon, encodeDungeonRollback, encodeDungeonWithState, hasGroundLoot, hasWallSight, requiresFinalRewardSupport, restoreDungeonRollback } from '../domain/dungeonSaveEnvelope';
 import type { DungeonState } from '../domain/dungeon';
+import { hobgoblinEncounterIdentity } from '../content/dungeonEncounters';
 import type { RunStorageProvider } from './runStorage';
 export const DUNGEON_KEYS = { primary: 'tactics-guru:phaser:dungeon:primary:v1', backup: 'tactics-guru:phaser:dungeon:backup:v1' } as const;
 export const DUNGEON_BACKUP_CHECKPOINT_KEY = 'tactics-guru:phaser:dungeon:backup-sight:v1';
@@ -29,6 +30,10 @@ export type DungeonWrite = { ok: true } | { ok: false; reason: string };
 /** True only when both slots are missing. Unavailable, backup-only, and unreadable saves are not empty. */
 export function bothDungeonSlotsMissing(review: DungeonInspection): boolean {
   return review.primary.status === 'missing' && review.backup.status === 'missing';
+}
+function hasHobgoblinFloor(state: DungeonState): boolean {
+  return state.floors.some(floor => floor.descriptor.encounters.some(({ selection }) =>
+    'catalogIdentity' in selection && selection.catalogIdentity === hobgoblinEncounterIdentity));
 }
 export function createDungeonStorage(provider: RunStorageProvider = () => window.localStorage) {
   let uncertain = false;
@@ -130,6 +135,12 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
       // read the current origin/contact contract. Never manufacture an origin.
       if (backupState?.encounterEntry && old.backup.status === 'valid' &&
           old.backup.state.id === state.id && !old.backup.state.encounterEntry) {
+        backup = null;
+        backupState = undefined;
+      }
+      // Even an unvisited Hobgoblin encounter makes its saved floor unreadable to the prior build.
+      if (backupState && hasHobgoblinFloor(backupState) && old.backup.status === 'valid' &&
+          old.backup.state.id === state.id && !hasHobgoblinFloor(old.backup.state)) {
         backup = null;
         backupState = undefined;
       }

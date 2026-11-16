@@ -331,6 +331,31 @@ it.each([false, true])('versions final reward saves and keeps a rollback checkpo
   expect(reopened.backup).toEqual(checkpoint);
 });
 
+it.each([false, true])('keeps the pre-Hobgoblin checkpoint through later saves (tracked: %s)', tracked => {
+  const seed = Array.from({ length: 64 }, (_, index) => index)
+    .find(index => selectDungeonEncounter(index, 2, 1).mapId === 'hobgoblin_formation');
+  assert(seed !== undefined);
+  const before = good(readDungeon(atDownstairs(clearFloor(freshDungeon('hobgoblin-rollback', seed, undefined, tracked)))));
+  const data = memory(), store = createDungeonStorage(() => data);
+  expect(store.save(before)).toEqual({ ok: true });
+
+  const entered = good(travelDungeon(before, 'descend', before.revision));
+  expect(store.save(entered)).toEqual({ ok: true });
+  const checkpoint = store.inspect().backup;
+  assert(checkpoint.status === 'valid');
+  expect(checkpoint.state).toEqual(before);
+
+  const ascended = good(travelDungeon(entered, 'ascend', entered.revision));
+  expect(store.save(ascended)).toEqual({ ok: true });
+  const reentered = good(travelDungeon(ascended, 'descend', ascended.revision));
+  const reopened = createDungeonStorage(() => data);
+  expect(reopened.save(reentered)).toEqual({ ok: true });
+  expect(reopened.inspect()).toMatchObject({
+    primary: { status: 'valid', state: reentered },
+    backup: checkpoint,
+  });
+});
+
 export function clearFloor(s: DungeonState) {
   for (let i = 0; i < 3; i++) {
     s = win(s);
