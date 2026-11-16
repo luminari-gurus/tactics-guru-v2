@@ -12,7 +12,7 @@ import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { RUN_RECORD_KEYS } from '../src/persistence/runRecordsStorage';
 import { COMBAT_CONTROLS_KEY } from '../src/ui/combatControls';
 import { AUTO_COLLECT_LOOT_KEY } from '../src/ui/autoCollectLootPreference';
-import { readSession,playCommand,playUndo,checkActivePlaytime,checkBackgroundPlaytime } from './helpers/battlePolicy';
+import { battleTool, readSession,playCommand,playUndo,checkActivePlaytime,checkBackgroundPlaytime } from './helpers/battlePolicy';
 import { playerDecision, fighterDecision } from './helpers/playerPolicy';
 import { journeyPreparation, healedFighterBoundary, shamanJourney } from './helpers/dungeonFixtures';
 import { dispatch, replayCommandSequence } from '../src/domain/turns';
@@ -102,19 +102,83 @@ async function historyRows(page:Page){return page.evaluate(keys=>{
 // forged save rejection live in dungeonProgressionBoundary.test.ts.
 for(const [xp,level,maxHp]of [[0,1,11],[180,3,19]])test(`menu dungeon restores Mage XP ${xp}, caster level and exact active boundary`,async({page})=>{
  // Explicit boundary fixture; earned progression is covered by the extended journeys.
- const fresh=freshDungeon(`menu-caster-${xp}`,190);
+ const fresh=freshDungeon(`menu-caster-${xp}`,190,undefined,true);
  const progressed={...fresh,party:fresh.party.map(hero=>progressHero(hero.heroId,xp,1,dungeonContent.catalog))};
  const started=startDungeonBattle(atEncounter(progressed));if(!started.ok)throw Error(started.reason);
  const battle=started.state.activeBattle!,mage=battle.units.find(unit=>unit.defId==='mage')!;
  const boundary={...started.state,activeBattle:{...battle,activeIndex:battle.initiative.indexOf(mage.id)}};
  await seed(page,boundary);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const before=await snapshot(page);expect(before.party.find(hero=>hero.heroId==='mage')).toMatchObject({xp,level,maxHp});
- await page.locator('#battle-party').click();await expect(page.locator('#battle-dialog-message')).toContainText(`Level ${level}`);await page.locator('#inspection-close').click();
+ await (await battleTool(page, '#battle-party')).click();await expect(page.locator('#battle-dialog-message')).toContainText(`Level ${level}`);await page.locator('#inspection-close').click();
  await page.reload();await continueSavedDungeon(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- expect(await snapshot(page)).toEqual(before);expect((await readSession(page)).state).toEqual(before.activeBattle);expect((await readSession(page)).events).toEqual([]);
+ const resumed=await snapshot(page);
+ // Reload can flush elapsed playtime independently of gameplay or progression.
+ expect(resumed.stats!.activeMs).toBeGreaterThanOrEqual(before.stats!.activeMs);
+ expect(resumed).toEqual({...before,stats:{...before.stats,activeMs:resumed.stats!.activeMs}});
+ expect((await readSession(page)).state).toEqual(before.activeBattle);expect((await readSession(page)).events).toEqual([]);
  await expect(page.locator('#battle-ability option[value="ability:frost_snare"]')).toHaveCount(level>=3?1:0);
  const catalog=dungeonBattle(await snapshot(page))!.catalog,missile=catalog.abilities['ability:magic_missile'];expect(missile.kind).toBe('magicMissile');
  if(missile.kind==='magicMissile')expect(missile.casterLevel).toBe(level);
+});
+
+test('desktop Rail keeps a prepared Frost Snare and its controls in view', async ({page,isMobile}) => {
+  test.skip(isMobile, 'Desktop fine-pointer rail geometry');
+  await page.setViewportSize({width:1280,height:720});
+  const fixture = stagedMageAbility('ability:frost_snare');
+  await seed(page,fixture.state);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const target = fixture.state.activeBattle!.units.find(unit=>unit.id===fixture.command.target.unitId)!;
+  await page.getByRole('button',{name:'Frost Snare',exact:true}).click();
+  await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
+
+  const preview = page.locator('#battle-preview');
+  const confirm = page.getByRole('button',{name:'Confirm action',exact:true});
+  const cancel = page.getByRole('button',{name:'Cancel action',exact:true});
+  await expect(confirm).toBeEnabled();
+  await expect(preview).toContainText('prevents movement');
+  await expect(confirm).toBeInViewport({ratio:1});
+  await expect(cancel).toBeInViewport({ratio:1});
+  await expect(preview).toBeInViewport({ratio:1});
+  const previewBounds = (await preview.boundingBox())!;
+  const confirmBounds = (await confirm.boundingBox())!;
+  expect(previewBounds.y + previewBounds.height).toBeLessThanOrEqual(confirmBounds.y);
+  expect(await page.locator('#battle-scroll').evaluate(rail=>rail.scrollTop)).toBe(0);
+
+  // The confirmation row stays reachable when this same content exceeds the rail.
+  await page.setViewportSize({width:1280,height:660});
+  await expect(confirm).toBeInViewport({ratio:1});
+  await expect(cancel).toBeInViewport({ratio:1});
+  expect(await page.locator('#battle-scroll').evaluate(rail=>rail.scrollTop)).toBe(0);
+  await preview.evaluate(element=>element.scrollIntoView({block:'nearest'}));
+  const scrolledPreview = (await preview.boundingBox())!;
+  const pinnedConfirm = (await confirm.boundingBox())!;
+  expect(scrolledPreview.y + scrolledPreview.height).toBeLessThanOrEqual(pinnedConfirm.y);
+  await expect(preview).toBeInViewport({ratio:1});
+  await cancel.click();
+  await expect(page.locator('#battle-move')).toBeFocused();
+  expect((await readSession(page)).state).toEqual(fixture.state.activeBattle);
+});
+
+test('desktop Rail keeps target selection clickable with a prepared Frost Snare', async ({page,isMobile}) => {
+  test.skip(isMobile, 'Desktop fine-pointer rail geometry');
+  await page.setViewportSize({width:1280,height:580});
+  const fixture = stagedMageAbility('ability:frost_snare');
+  await seed(page,fixture.state);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const target = fixture.state.activeBattle!.units.find(unit=>unit.id===fixture.command.target.unitId)!;
+  await page.getByRole('button',{name:'Frost Snare',exact:true}).click();
+  const picker = page.locator('#battle-target');
+  const bounds = (await picker.boundingBox())!;
+  const point = {x:bounds.x+40,y:bounds.y+bounds.height-8};
+  await picker.selectOption(`${target.cell.x},${target.cell.y}`);
+  const confirm = page.getByRole('button',{name:'Confirm action',exact:true});
+  await expect(confirm).toBeEnabled();
+
+  const hit = await page.evaluate(({x,y})=>document.elementFromPoint(x,y)?.id,point);
+  expect(hit).toBe('battle-target');
+  await page.mouse.click(point.x,point.y);
+  await expect(picker).toBeFocused();
+  expect((await readSession(page)).state).toEqual(fixture.state.activeBattle);
 });
 
 for(const abilityId of ['ability:frost_snare','ability:magic_missile'] as const)test(`staged Mage ${abilityId} accepts exact effects replay and saved active reload`,async({page})=>{
@@ -286,7 +350,7 @@ for(const {saved,autoCollect,title} of [
   await expect(page.getByText('Measurements',{exact:true})).not.toBeVisible();
   await expect(page.getByRole('button',{name:'Play test sound',exact:true})).not.toBeVisible();
   await expect(page.locator('#fit-restart')).toBeEnabled();
-  await expect(page.locator('#battle-sound')).toBeVisible();
+  await expect(await battleTool(page, '#battle-sound')).toBeVisible();
   if(saved&&slot===0){
    await page.getByRole('button',{name:'Save recovery',exact:true}).click();await page.locator('#dungeon-close-recovery').click();
    await page.locator('#fit-restart').click();await page.locator('#dungeon-cancel-new').click();
@@ -545,7 +609,7 @@ test('Shaman production journey uses Hex and ally healing, reloads Weakened and 
  const shaman=board.units.find((u:any)=>u.unitId==='goblin_shaman');
  expect(shaman).toMatchObject({assetId:'asset:goblin_shaman_sprite'});expect(shaman.anchorError).toBeLessThan(0.001);
  await page.screenshot({path:info.outputPath('shaman-production-board.png')});
- await page.locator('#battle-party').click();await page.locator('#inspect-unit-6').click();
+ await (await battleTool(page, '#battle-party')).click();await page.locator('#inspect-unit-6').click();
  await expect(page.getByRole('dialog')).toContainText('Weakening Hex range 2–4');
  await expect(page.getByRole('dialog')).toContainText('Heal Goblin range 1–4');
  await expect(page.getByRole('dialog')).toContainText('Fighter #1 50%');
@@ -559,10 +623,10 @@ test('Shaman production journey uses Hex and ally healing, reloads Weakened and 
   const before=await readSession(page),weak=before.state.units.find(u=>u.weakenedBy!==undefined);
   if(weak&&!reloaded) {
    const saved=await snapshot(page);
-   await page.locator('#battle-log-open').click();await expect(page.getByRole('dialog')).toContainText('Will save fails');
+   await (await battleTool(page, '#battle-log-open')).click();await expect(page.getByRole('dialog')).toContainText('Will save fails');
    await expect(page.getByRole('dialog')).toContainText('50% save chance');
    await page.screenshot({path:info.outputPath('shaman-will-save-log.png')});await page.locator('#log-close').click();
-   await page.locator('#battle-party').click();await page.locator(`#inspect-unit-${weak.id}`).click();
+   await (await battleTool(page, '#battle-party')).click();await page.locator(`#inspect-unit-${weak.id}`).click();
    await expect(page.getByRole('dialog')).toContainText('Weakened by Goblin Shaman #6');
    await expect(page.getByRole('dialog')).toContainText('−2 accuracy');
    await page.screenshot({path:info.outputPath('shaman-weakened-inspection.png')});await page.locator('#inspection-close').click();
@@ -610,7 +674,7 @@ test('automatic stairs preserve healed Fighter carry and fresh battle resources'
  await walkDungeon(page,undefined,isMobile?'touch':'keyboard');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const entry=await snapshot(page),built=dungeonBattle(entry)!;expect(built.state.units.find(u=>u.defId==='fighter')!.hp).toBe(party.find(h=>h.heroId==='fighter')!.hp);
  expect((await readSession(page)).state.units.every(u=>!u.secondWindUsed&&u.tauntedBy===undefined)).toBe(true);
- await page.locator('#battle-party').click();await page.locator('#inspect-unit-1').click();await expect(page.getByRole('dialog')).toContainText('Second Wind 1/1');
+ await (await battleTool(page, '#battle-party')).click();await page.locator('#inspect-unit-1').click();await expect(page.getByRole('dialog')).toContainText('Second Wind 1/1');
  await page.screenshot({path:test.info().outputPath('fresh-resource-after-automatic-stairs.png')});
 });
 async function seed(page:Page,s:DungeonState){const encoded=encodeDungeon(s);if(!encoded.ok)throw Error(encoded.reason);await page.goto('./?game=dungeon');await page.evaluate(({key,text})=>{localStorage.setItem(key,text);}, {key:DUNGEON_KEYS.primary,text:encoded.text});await page.reload();await continueSavedDungeon(page);}
@@ -676,7 +740,7 @@ fixedSeedTest('read-only entry, keyboard new dungeon, real action and active res
  await expect(page.locator('[data-action=basic]')).toHaveAttribute('aria-pressed','true');
  await page.keyboard.press('m');await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');
  expect(await snapshot(page)).toEqual(shortcutEntry);
- await page.locator('#battle-party').focus();
+ await (await battleTool(page, '#battle-party')).focus();
  if(isMobile)await page.locator('#fit-restart').tap();else await page.locator('#fit-restart').click();
  await page.locator('#dungeon-cancel-new').click();await expect(page.locator('#fit-restart')).toBeFocused();
  const before=await snapshot(page),cmd=playerDecision((await readSession(page)).state,dungeonBattle(before)!.catalog);
@@ -967,7 +1031,7 @@ test('hero progression commits once, heals at a threshold and survives inspectio
  const leveled=completed.state.party.filter((h,i)=>h.level>f.snapshot.party[i].level);
  expect(leveled.length).toBeGreaterThan(0);for(const h of leveled)expect(h.hp).toBe(h.maxHp);
  await seed(page,f.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- await page.locator('#battle-party').click();await expect(page.getByRole('dialog')).toContainText('Level 1');await page.locator('#inspection-close').click();
+ await (await battleTool(page, '#battle-party')).click();await expect(page.getByRole('dialog')).toContainText('Level 1');await page.locator('#inspection-close').click();
  await playCommand(page,f.command);
  await expect(page.locator('#dungeon-screen')).toBeVisible();
  expect((await snapshot(page)).party).toEqual(completed.state.party);

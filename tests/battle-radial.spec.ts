@@ -345,7 +345,7 @@ test('undo and danger remain reachable beside the radial End turn control', asyn
   await expect(danger).toHaveAttribute('aria-pressed', 'true');
   await danger.click();
   await expect(danger).toHaveAttribute('aria-pressed', 'false');
-  await page.locator('#battle-overflow summary').click();
+  await page.locator('#battle-overflow > summary').click();
   await expect(page.locator('#battle-party')).toBeVisible();
   await expect(page.locator('#battle-log-open')).toBeVisible();
   await expect(page.getByRole('radio', { name: 'Auto', exact: true })).toBeVisible();
@@ -498,7 +498,7 @@ test('combat controls persist Radial across a reload', async ({ page }) => {
   await ready(page);
   const fresh=(await session(page)).state;
   expect(await page.evaluate(key => localStorage.getItem(key), COMBAT_CONTROLS_KEY)).toBe('radial');
-  await page.locator('#battle-overflow summary').click();
+  await page.locator('#battle-overflow > summary').click();
   await page.getByRole('radio', { name: 'Auto', exact: true }).click();
   expect(await page.evaluate(key => localStorage.getItem(key), COMBAT_CONTROLS_KEY)).toBe('auto');
   await page.reload();
@@ -591,7 +591,7 @@ test('radial invalid reselection clears the previous command before switching to
   await expect(page.locator('#battle-radial-attack')).toBeDisabled();
   expect((await session(page)).pending).toBeNull();
   await page.evaluate(()=>{delete (globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls;});
-  await page.locator('#battle-overflow summary').click();
+  await page.locator('#battle-overflow > summary').click();
   await page.getByRole('radio',{name:'Rail',exact:true}).click();
   await expect(page.locator('#battle-review')).toBeDisabled();
   expect((await session(page)).state).toEqual(current.state);
@@ -605,23 +605,37 @@ test('radial switching to rail preserves a valid unchanged selection', async ({p
   const prepared=(await session(page)).pending;
   expect(prepared).toMatchObject({type:'move',to:cell});
   await page.evaluate(()=>{delete (globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls;});
-  await page.locator('#battle-overflow summary').click();
+  await page.locator('#battle-overflow > summary').click();
   await page.getByRole('radio',{name:'Rail',exact:true}).click();
   await expect(page.locator('#battle-review')).toBeEnabled();
   expect((await session(page)).pending).toEqual(prepared);
 });
 
-test('radial tap fallback dialog dismissal clears the prepared action', async ({page}) => {
+test('radial tap fallback read-only dialog dismissal follows the HUD layout', async ({page}) => {
   await ready(page);
   const {cell,current}=await reachableEmpty(page);
   await tapBoard(page,cell);
   expect((await session(page)).pending).toMatchObject({type:'move',to:cell});
-  await page.locator('#battle-overflow summary').click();
-  await page.locator('#battle-log-open').click();
-  await expect(page.locator('#battle-radial')).toBeHidden();
+  await page.locator('#battle-overflow > summary').click();
+  const desktop = await page.locator('#battle-overflow > summary').textContent() === 'Battle tools';
+  const log = page.locator('#battle-log-open');
+  await log.click();
+  await expect(page.getByRole('dialog', {name:'Battle log'})).toBeVisible();
   await page.locator('#log-close').click();
+  await expect(log).toBeFocused();
+  if (desktop) {
+    await expect(page.locator('#battle-radial')).toBeVisible();
+    expect((await session(page)).pending).toMatchObject({type:'move',to:cell});
+    await log.press('Escape');
+    await expect(page.locator('#battle-overflow > summary')).toBeFocused();
+    expect((await session(page)).pending).toMatchObject({type:'move',to:cell});
+    await page.locator('canvas').press('Escape');
+  } else {
+    await expect(page.locator('#battle-radial')).toBeHidden();
+  }
   expect((await session(page)).pending).toBeNull();
   await page.evaluate(()=>{delete (globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls;});
+  if (desktop) await page.locator('#battle-overflow > summary').click();
   await page.getByRole('radio',{name:'Rail',exact:true}).click();
   await expect(page.locator('#battle-review')).toBeDisabled();
   await page.locator('#battle-move').click();
@@ -656,7 +670,7 @@ test('radial switching to rail applies for the page when saving fails', async ({
     const original=Storage.prototype.setItem;
     Storage.prototype.setItem=function(name,value){if(name===key)throw new Error('storage unavailable');original.call(this,name,value);};
   },COMBAT_CONTROLS_KEY);
-  await page.locator('#battle-overflow summary').click();
+  await page.locator('#battle-overflow > summary').click();
   await page.getByRole('radio',{name:'Rail',exact:true}).click();
   await expect.poll(()=>combatSkin(page)).toBe('rail');
   await expect(page.getByRole('radio',{name:'Rail',exact:true})).toBeChecked();
@@ -892,7 +906,9 @@ test('radial preference replaces the side rail with a bottom dock at 1280x720', 
   expect(Math.abs(dock.width - board.width)).toBeLessThan(2);
   await expect(page.locator('[data-action="move"]')).toBeHidden();
   await expect(page.locator('#battle-target')).toBeHidden();
-  await expect(page.locator('#battle-next')).toBeVisible();
+  await expect(page.locator('#battle-next')).toBeInViewport({ ratio: 1 });
+  const tools = page.locator('#battle-overflow > summary');
+  if (await tools.textContent() === 'Battle tools') await expect(tools).toBeInViewport({ratio:1});
   const { cell } = await reachableEmpty(page);
   await tapBoard(page, cell);
   await expect(page.locator('#battle-radial-move')).toBeVisible();

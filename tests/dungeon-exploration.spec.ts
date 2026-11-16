@@ -11,7 +11,7 @@ import { freshDungeon, floorDescriptor, floorMap, readDungeon, dungeonSeed, dung
 import { dungeonContent, legacyDungeonIdentity } from '../src/content/dungeon';
 import { canonical, hashJson } from '../src/domain/contentIdentity';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
-import { readSession,playCommand } from './helpers/battlePolicy';
+import { battleTool, readSession,playCommand } from './helpers/battlePolicy';
 import { installRailControls } from './helpers/forceRailControls';
 import { playerDecision } from './helpers/playerPolicy';
 import { dungeonBattle } from '../src/domain/dungeon';
@@ -830,7 +830,7 @@ for(const biome of ['forest','desert'] as const)test(`${biome} saved kinds, scal
   expect(await page.locator('#battle-shell').evaluate(n=>n.scrollWidth<=n.clientWidth)).toBe(true);
   const before=await dungeonSnapshot(page),session=await readSession(page),built=dungeonBattle(before)!,enemy=session.state.units.find(u=>u.side==='enemy')!;
   const stats=built.catalog.enemies[enemy.defId as 'goblin_grunt'|'goblin_archer'].stats;
-  await page.locator('#battle-party').click();await page.locator(`#inspect-unit-${enemy.id}`).click();
+  await (await battleTool(page, '#battle-party')).click();await page.locator(`#inspect-unit-${enemy.id}`).click();
   await expect(page.locator('#battle-dialog-message')).toContainText(`HP ${enemy.hp}/${stats.maxHp}`);await expect(page.locator('#battle-dialog-message')).toContainText(`AC ${stats.armorClass}`);
   await page.locator('#battle-dialog-title').scrollIntoViewIfNeeded();await page.screenshot({path:test.info().outputPath(`${biome}-${kind}-scaled-inspection.png`)});await page.locator('#inspection-close').click();
   expectSameProgress(await dungeonSnapshot(page), before);
@@ -1107,11 +1107,11 @@ test('closing on each wandering encounter holds contact and saves the matching b
   // Automatic enemy opening turns can add revisions after the atomic entry.
   expect(entered.revision).toBeGreaterThanOrEqual(state.revision+2);
   expect(entered.floors[0].exploration.movement!.step).toBe(1);
-  await expect(page.locator('#battle-party')).toBeVisible();
+  await expect(await battleTool(page, '#battle-party')).toBeVisible();
   await page.reload();await continueSavedDungeon(page);
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   expect(await dungeonSnapshot(page)).toEqual(entered);
-  await expect(page.locator('#battle-party')).toBeVisible();
+  await expect(await battleTool(page, '#battle-party')).toBeVisible();
  }
 
 });

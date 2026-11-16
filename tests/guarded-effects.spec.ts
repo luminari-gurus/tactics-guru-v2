@@ -16,7 +16,7 @@ import { reachStandaloneBoundary } from './helpers/standaloneBoundary';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { guardedBoundary } from './helpers/guardedBoundary';
 import { runContext } from './helpers/runItemFixtures';
-import { readSession, playCommand, confirmRestart, playerDecision } from './helpers/battlePolicy';
+import { battleTool, readSession, playCommand, confirmRestart, playerDecision } from './helpers/battlePolicy';
 
 const boardReport=async(page:Page)=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
 async function checkBadges(page:Page) {
@@ -137,7 +137,7 @@ for (const mode of ['standalone', 'run', 'dungeon'] as const) for (const miss of
   await expect(page.locator('#battle-status')).toContainText('Guarded');
   const stats = combatStats(fighter, f.catalog);
   await expect(page.locator('#battle-stats')).toContainText(`AC ${stats.armorClass}`);
-  await page.locator('#battle-party').click();
+  await (await battleTool(page, '#battle-party')).click();
   await expect(page.getByRole('dialog')).toContainText('Guarded (+2 AC, −2 attack rolls; expires immediately before this unit’s next turn)');
   await page.screenshot({ path: test.info().outputPath(`${mode}-guarded-inspection.png`) });
   await page.keyboard.press('Escape');

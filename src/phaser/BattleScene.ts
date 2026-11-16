@@ -94,6 +94,7 @@ export class BattleScene extends Phaser.Scene {
   private begin(catalog:ContentCatalog,session:BattleSession,dialogs:BattleDialogs,setModalTransition:(fn:()=>void)=>void,returnToMenu?:()=>void):void {
     const selection=new BattleSelection(session);
     let live=true,ready=false,outcomeShown=false,initialFit=true,skin:CombatSkin=resolveCombatControlsSkin();
+    let keepRadialDuringDialog=false;
     let movingPresentation=false,planInFlight=false,planInterrupted=false;
     let presentationStart:Presentation['before']|null=null;
     let threatState: typeof session.state | null=null, threatIds: readonly number[]=[], threats: readonly Threat[] | null=null;
@@ -142,7 +143,7 @@ export class BattleScene extends Phaser.Scene {
       if(caption.textContent!==captionText)caption.textContent=captionText;
       game.dataset.phase=session.phase;
       game.dataset.session=JSON.stringify({state:session.state,replay:session.replay,continuation:session.continuation,events:session.events,pending:session.pending,phase:session.phase});
-      if(session.phase!=='player' || dialogs.open)radial.hide();
+      if(session.phase!=='player' || (dialogs.open && !keepRadialDuringDialog))radial.hide();
       if(radial.mode!=='hold')restoreCaptionHeight();
       if(ready && !dialogs.open && session.phase==='ended' && !outcomeShown){outcomeShown=true;if(this.host){queueMicrotask(()=>{if(live)this.host?.ended();});return;}dialogs.showChoices(session.state.outcome==='playerWin'?'Victory':'Defeat','Battle complete. Restart for a fresh battle.',[{id:'dialog-restart',label:'Restart battle',run:()=>this.requestRestart()},...(returnToMenu?[{id:'save-main-menu',label:'Main menu',run:returnToMenu}]:[])],()=>{});}
     };
@@ -262,7 +263,7 @@ export class BattleScene extends Phaser.Scene {
       pump();
     };
     const pump=()=>{if(live && ready && !document.hidden && !dialogs.open && session.phase==='enemy')void present(session.nextEnemy());};
-    setModalTransition(()=>{removeInput.reset();if(radial.open){clearRadial();radial.hide();}queueMicrotask(()=>{if(live){refresh();pump();}});});
+    setModalTransition(()=>{removeInput.reset();if(radial.open && !keepRadialDuringDialog){clearRadial();radial.hide();}queueMicrotask(()=>{if(live){refresh();pump();}});});
     const confirm=()=>{
       if(session.phase!=='player' || (!session.pending && !session.pendingPlan) || dialogs.open)return;
       const focused=document.activeElement===hud.root.querySelector('#battle-review');
@@ -283,15 +284,23 @@ export class BattleScene extends Phaser.Scene {
     };
     const cancel=()=>{if(dialogs.open || session.phase!=='player')return;clear();refresh();hud.focusAction();};
     const applySkin=()=>{skin=resolveCombatControlsSkin();hud.applySkin(skin);if(skin!=='radial')radial.hide();refresh();};
-    const inspect=(id?:number)=>{
+    // Keep an aimed desktop Radial action available after a read-only HUD dialog.
+    const closeReadOnlyTool=()=>{keepRadialDuringDialog=false;};
+    const readOnlyTool=(invoker:HTMLElement)=>{
+      keepRadialDuringDialog=hud.desktopLayout && radial.mode==='tap';
+      invoker.focus({preventScroll:true});
+      return {returnFocus:()=>invoker.closest('#battle-overflow:not([open])')
+        ? hud.root.querySelector<HTMLElement>('#battle-overflow > summary') : invoker};
+    };
+    const inspect=(id?:number, invoker?:HTMLElement)=>{
       const inspectedId=id ?? presentationStart?.initiative[presentationStart.activeIndex] ?? session.active.id;
       const unit=session.state.units.find(u=>u.id===inspectedId);if(!unit)return;
       const {def,name,armorClass,accuracy,status,support}=unitFeedback(session,unit);
       dialogs.showChoices(`Inspection only — ${name} #${unit.id}`,
         `HP ${unit.hp}/${def.stats.maxHp} · ${status}${session.progression.find(h => h.heroId === unit.defId) ? ` · ${progressionLabel(session.progression.find(h => h.heroId === unit.defId)!)}` : ''}\nAC ${armorClass} · Accuracy ${accuracy>=0?'+':''}${accuracy} · Power ${def.stats.power}\nMovement allowance ${def.stats.move} · Jump ${def.stats.jump} · Dexterity ${def.stats.dexterity} · Will ${def.stats.will}${support?`\n${support}`:''}\nInspection never changes the turn.`,[
           ...session.state.units.map(u=>({id:`inspect-unit-${u.id}`,label:`Inspect ${unitFeedback(session,u).name} #${u.id}`,run:()=>inspect(u.id),keepOpen:true})),
-          {id:'inspection-close',label:'Close inspection',run:()=>{}},
-        ],()=>{});
+          {id:'inspection-close',label:'Close inspection',run:closeReadOnlyTool},
+        ],closeReadOnlyTool,invoker ? readOnlyTool(invoker) : undefined);
     };
     const hud=new BattleHud(session,{
       action:a=>{board.resetPicking();hovered=null;selection.setAction(a);refresh();},
@@ -313,9 +322,10 @@ export class BattleScene extends Phaser.Scene {
           ],()=>{});
       },
       danger:()=>{if(session.phase==='player' && !dialogs.open){selection.toggleDanger();refresh();}},
-      target:cell=>{board.resetPicking();hovered=null;select(cell);},confirm,cancel,inspect,inspectTarget:inspect,
-      log:lines=>{
-        dialogs.showChoices('Battle log',lines.length?'':'No events yet.',[{id:'log-close',label:'Close log',run:()=>{}}],()=>{});
+      target:cell=>{board.resetPicking();hovered=null;select(cell);},confirm,cancel,inspect:invoker=>inspect(undefined,invoker),inspectTarget:inspect,
+      log:(lines,invoker)=>{
+        dialogs.showChoices('Battle log',lines.length?'':'No events yet.',[{id:'log-close',label:'Close log',run:closeReadOnlyTool}],
+          closeReadOnlyTool, readOnlyTool(invoker));
         const list=document.createElement('ol');list.id='battle-log';list.setAttribute('aria-label','Battle log');
         list.append(...lines.map(text=>{const item=document.createElement('li');item.textContent=text;return item;}));
         dialogs.element.querySelector('#battle-dialog-message')!.append(list);
@@ -330,7 +340,6 @@ export class BattleScene extends Phaser.Scene {
     const stopSkinWatch=watchCombatControls(applySkin);
     const key=(event:KeyboardEvent)=>{
       if(!live || !ready || dialogs.open || session.phase!=='player')return;
-      if(event.key==='Escape'){cancel();event.preventDefault();return;}
       if(radial.open)return;
       if(['Enter',' '].includes(event.key)){event.preventDefault();board.resetPicking();hovered=null;select(cursor);return;}
       const delta:Record<string,[number,number]>={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]};
@@ -341,8 +350,9 @@ export class BattleScene extends Phaser.Scene {
     };
     canvas.addEventListener('keydown',key);
     const shortcut=(event:KeyboardEvent)=>{
-      if(!live || !ready || document.hidden || dialogs.open || document.querySelector('dialog[open]') || session.phase!=='player' || event.defaultPrevented)return;
-      if(event.key==='Escape'){cancel();event.preventDefault();return;}
+      if(!live || !ready || document.hidden || dialogs.open || document.querySelector('dialog[open]') || event.defaultPrevented)return;
+      if(hud.handleSecondaryKey(event) || session.phase!=='player')return;
+      if(event.key==='Escape'){if(!event.repeat)cancel();event.preventDefault();return;}
       if(event.repeat || event.isComposing || event.ctrlKey || event.altKey || event.metaKey || event.shiftKey)return;
       if(event.composedPath().some(target=>target instanceof HTMLElement &&
         (target.isContentEditable || target.matches('input, textarea, select, [role="textbox"]'))))return;

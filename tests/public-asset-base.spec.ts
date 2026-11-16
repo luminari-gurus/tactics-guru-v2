@@ -4,7 +4,7 @@ import { standaloneCatalog } from './helpers/playerPolicy';
 import { BATTLE_CUES } from '../src/audio/battleCues';
 import { PROOF_ASSETS } from '../src/diagnostics/proofAssets';
 import { BattleSession } from '../src/app/BattleSession';
-import { readSession } from './helpers/battlePolicy';
+import { battleTool, readSession } from './helpers/battlePolicy';
 import { walkDungeon } from './helpers/dungeonTraversal';
 import { navigateCapture, battleGesturePoint } from '../scripts/measure-fit-controls';
 import { captureTarget, parseMeasureArgs } from '../scripts/measure-fit-options';
@@ -90,7 +90,7 @@ for (const scene of ['battle', 'proof', 'content-smoke'] as const) {
             expectedSession.finishPresentation(step.token);
           }
           expect((await readSession(page)).state).toEqual(expectedSession.state);
-          const sound = page.locator('#battle-sound');
+          const sound = await battleTool(page, '#battle-sound');
           if (test.info().project.use.hasTouch) await sound.tap();
           else await sound.click();
           await expect.poll(() => page.evaluate(() => window.fitDiagnostics().battleAudio!.status)).toBe('ready');
@@ -123,7 +123,7 @@ for (const route of ['battle', 'run', 'dungeon']) for (const backend of ['Web Au
   }
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   await expect.poll(() => page.evaluate(() => window.fitDiagnostics().battleAudio!.load)).toBe('ready');
-  await page.locator('#battle-sound').click();
+  await (await battleTool(page, '#battle-sound')).click();
   await expect.poll(() => page.evaluate(() => window.fitDiagnostics().battleAudio!.status)).toBe('ready');
   await page.locator('#battle-move').click();
   await page.locator('#battle-target').selectOption({ index: 1 });

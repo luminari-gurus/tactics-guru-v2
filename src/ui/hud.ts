@@ -11,7 +11,7 @@ import type { BattleAudioSnapshot } from '../phaser/BattleAudio';
 import { publicAssetUrl } from './publicAssetUrl';
 import { GUARDED_STRIKE_TRADEOFF } from '../content/constants';
 
-import { BATTLE_KEYS, ownedAbilities, actionCommand, actionTargets, type Action } from './battleActions';
+import { BATTLE_KEYS, ownedAbilities, actionCommand, actionTargets, friendlyFire, type Action } from './battleActions';
 import { mountCombatControlsPreference, type CombatSkin } from './combatControls';
 import { draughtsSpent } from '../domain/draughts';
 import { BattleTurnQueue } from './battleTurnQueue';
@@ -94,6 +94,9 @@ export function unitLabel(session:BattleSession, unit:UnitState) {
   return `${name} #${unit.id} · HP ${unit.hp}/${def.stats.maxHp}${status==='No status effects'?'':` · ${status}`}`;
 }
 export class BattleHud {
+  // Keep the breakpoint aligned with the desktop rules in style.css.
+  private readonly desktop = matchMedia('(min-width:760px) and (min-height:501px) and (orientation:landscape) and (pointer:fine)');
+  get desktopLayout(): boolean { return this.desktop.matches; }
   readonly root=document.querySelector<HTMLElement>('#battle-controls')!;
   readonly target: HTMLSelectElement;
   readonly ability: HTMLSelectElement;
@@ -103,13 +106,14 @@ export class BattleHud {
   private openingEnemyTurn: boolean;
   private skin: CombatSkin = 'rail';
   private readonly actorRoot=document.querySelector<HTMLElement>('#battle-actor')!;
+  private readonly stats: HTMLElement;
   private readonly turnQueue: BattleTurnQueue;
   private readonly classGuidance: BattleClassGuidance;
   private readonly disposeGuidancePreferences: () => void;
   private readonly disposePacePreference: () => void;
   private readonly abort=new AbortController();
   private readonly log:string[]=[];
-  constructor(private readonly session:BattleSession, private readonly callbacks:{action:(a:Action)=>void;target:(c:CellPosition|null)=>void;confirm:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void;inspect:()=>void;inspectTarget:(id:number)=>void;danger:()=>void;plan:()=>void;undo:()=>void;draught:()=>void;log:(lines:readonly string[])=>void}, guidance?:ClassGuidanceRun) {
+  constructor(private readonly session:BattleSession, private readonly callbacks:{action:(a:Action)=>void;target:(c:CellPosition|null)=>void;confirm:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void;inspect:(invoker:HTMLElement)=>void;inspectTarget:(id:number)=>void;danger:()=>void;plan:()=>void;undo:()=>void;draught:()=>void;log:(lines:readonly string[],invoker:HTMLElement)=>void}, guidance?:ClassGuidanceRun) {
     this.turnQueue = new BattleTurnQueue(this.actorRoot, session.catalog);
     this.openingEnemyTurn = !session.resumed && session.phase === 'enemy';
     // Snapshot construction has no command events. Establish the current turn
@@ -117,6 +121,7 @@ export class BattleHud {
     this.append([{ type: 'turnStarted', unitId: session.active.id, round: session.state.round }]);
     this.actorRoot.hidden=false;
     this.actorRoot.innerHTML=`<p id="battle-active" aria-live="polite"></p><div class="battle-identity"><div id="battle-portraits"></div><div><h2 id="battle-actor-name" aria-live="polite"></h2><p id="battle-hp"></p><div class="battle-health" aria-hidden="true"><span></span></div><p id="battle-stats"></p><p id="battle-status"></p></div></div><p id="battle-budgets"></p>`;
+    this.stats = this.actorRoot.querySelector('#battle-stats')!;
     for(const unit of session.state.units.filter((u,i,all)=>all.findIndex(v=>v.defId===u.defId)===i)) {
       const info=unitFeedback(session,unit),img=document.createElement('img');
       img.src=publicAssetUrl(session.catalog.assets[info.def.portraitAssetId].runtimePath);img.alt=info.name+' portrait';
@@ -127,8 +132,8 @@ export class BattleHud {
       <button id="battle-move" data-action="move" aria-label="Move" aria-describedby="battle-availability"><strong>Move</strong><span>Uses movement</span></button>
       <button data-action="basic" aria-label="Basic attack" aria-describedby="battle-availability"><strong>Basic attack</strong><span>Uses action</span></button>
       <button id="battle-next" aria-label="Wait / End turn" aria-describedby="battle-availability"><strong>Wait / End turn</strong><span>Ends turn immediately</span></button><button id="battle-plan-cancel" hidden>Cancel plan</button></div>
-      <label for="battle-ability">Ability</label><select id="battle-ability" aria-describedby="battle-ability-info battle-availability"></select><p id="battle-ability-info"></p><p id="battle-availability"></p><section class="battle-decision" aria-label="Target and action preview"><label for="battle-target">Target / destination</label><select id="battle-target"><option value="">Choose target</option></select><p id="battle-selection">Select a tile</p><p id="battle-target-info"></p><button id="battle-inspect-target" hidden>Inspect target</button><p id="battle-preview" aria-live="polite">Choose an action and target</p><div class="battle-commit"><button id="battle-review" disabled>Confirm action</button><button id="battle-cancel" disabled>Cancel action</button></div></section>
-      <nav class="battle-tools" aria-label="Secondary battle tools"><button id="battle-plan">Plan move + ability</button><button id="battle-undo">Undo move</button><button id="battle-party">Inspect party</button><button id="battle-danger" aria-pressed="false" aria-describedby="battle-danger-info">Show enemy danger</button><button id="battle-log-open">Battle log</button><button id="battle-sound" aria-pressed="false" aria-describedby="battle-sound-status">Enable sound</button><button id="battle-sound-retry" hidden>Retry sound</button><details id="battle-overflow"><summary>More</summary></details></nav><p id="battle-danger-info">Danger shows living heroes reachable by an enemy attack or Weakening Hex on its next turn, assuming current positions and statuses; it does not predict enemy choice.</p><p id="battle-danger-results" aria-live="polite" aria-atomic="true"></p><p id="battle-sound-status" aria-live="polite">Sound off</p>`;
+      <label for="battle-ability">Ability</label><select id="battle-ability" aria-describedby="battle-ability-info battle-availability"></select><p id="battle-ability-info"></p><p id="battle-availability"></p><section class="battle-decision" aria-label="Target and action preview"><label for="battle-target">Target / destination</label><select id="battle-target"><option value="">Choose target</option></select><div class="battle-review-content"><p id="battle-selection">Select a tile</p><p id="battle-target-info"></p><button id="battle-inspect-target" hidden>Inspect target</button><p id="battle-preview" aria-live="polite"><span id="battle-preview-warning"></span><span id="battle-preview-text">Choose an action and target</span></p><div class="battle-commit"><p id="battle-friendly-warning" aria-live="polite"></p><button id="battle-review" aria-describedby="battle-friendly-warning" disabled>Confirm action</button><button id="battle-cancel" disabled>Cancel action</button></div></div></section>
+      <nav class="battle-tools" aria-label="Secondary battle tools"><button id="battle-plan">Plan move + ability</button><button id="battle-undo">Undo move</button><button id="battle-party">Inspect party</button><button id="battle-danger" aria-pressed="false" aria-describedby="battle-danger-info">Show enemy danger</button><button id="battle-log-open">Battle log</button><button id="battle-sound" aria-pressed="false" aria-describedby="battle-sound-status">Enable sound</button><button id="battle-sound-retry" hidden>Retry sound</button><details id="battle-overflow"><summary>More</summary><div class="battle-secondary-controls"></div></details></nav><p id="battle-danger-info">Danger shows living heroes reachable by an enemy attack or Weakening Hex on its next turn, assuming current positions and statuses; it does not predict enemy choice.</p><p id="battle-danger-results" aria-live="polite" aria-atomic="true"></p><p id="battle-sound-status" aria-live="polite">Sound off</p>`;
     const signal=this.abort.signal;
     const help=document.createElement('details');help.id='battle-shortcuts';
     help.innerHTML=`<summary>Keyboard shortcuts</summary><p>${BATTLE_KEYS.move.toUpperCase()}: Move · ${BATTLE_KEYS.basic.toUpperCase()}: Basic attack · ${BATTLE_KEYS.ability.toUpperCase()}: selected ability (rail) or offered Special (radial) · 1–9: learned abilities · ${BATTLE_KEYS.wait.toUpperCase()}: Wait / End turn immediately · ${BATTLE_KEYS.confirm.toUpperCase()}: confirm · ${BATTLE_KEYS.cancel}: cancel.</p><p>Rail: choose an action, then a target. Radial: choose a target with the board cursor first, then aim an action; confirm with C or activate its focused button. Arrow keys navigate the board; Enter/Space select a cell or activate a focused control. Tab moves focus. Shortcuts pause while editing, in dialogs, or while holding modifiers. Held keys never repeat actions.</p><ol aria-label="Learned ability shortcuts"></ol>`;
@@ -147,9 +152,11 @@ export class BattleHud {
     this.root.querySelector('#battle-plan')!.addEventListener('click',callbacks.plan,{signal});
     this.root.querySelector('#battle-undo')!.addEventListener('click',callbacks.undo,{signal});
     this.root.querySelector('#battle-danger')!.addEventListener('click',callbacks.danger,{signal});
-    this.root.querySelector('#battle-party')!.addEventListener('click',()=>callbacks.inspect(),{signal});
+    const party = this.root.querySelector<HTMLButtonElement>('#battle-party')!;
+    party.addEventListener('click',()=>callbacks.inspect(party),{signal});
     this.root.querySelector('#battle-inspect-target')!.addEventListener('click',event=>{const id=(event.currentTarget as HTMLElement).dataset.unitId;if(id)callbacks.inspectTarget(Number(id));},{signal});
-    this.root.querySelector('#battle-log-open')!.addEventListener('click',()=>callbacks.log(this.log),{signal});
+    const log = this.root.querySelector<HTMLButtonElement>('#battle-log-open')!;
+    log.addEventListener('click',()=>callbacks.log(this.log,log),{signal});
     this.ability=this.root.querySelector('#battle-ability')!;
     this.ability.addEventListener('change',()=>{if(this.ability.value)callbacks.action(this.ability.value as Action);},{signal});
     this.root.querySelector('.battle-actions')!.addEventListener('click',event=>{
@@ -166,6 +173,29 @@ export class BattleHud {
     this.disposePacePreference = mountCombatPacePreference(this.root.querySelector('#battle-overflow')!);
     this.disposeGuidancePreferences = mountClassGuidancePreferences(this.root.querySelector('#battle-overflow')!);
     this.classGuidance = new BattleClassGuidance(this.root, session, () => this.focusAction(), guidance);
+    // Keep the action preview and confirmation together before supplemental details on desktop.
+    const actions = this.root.querySelector('.battle-section-label')!;
+    const dangerResults = this.root.querySelector('#battle-danger-results')!;
+    const abilityInfo = this.root.querySelector('#battle-ability-info')!;
+    const availability = this.root.querySelector('#battle-availability')!;
+    const decision = this.root.querySelector('.battle-decision')!;
+    const preview = this.root.querySelector('#battle-preview')!;
+    const inspectTarget = this.root.querySelector<HTMLButtonElement>('#battle-inspect-target')!;
+    const layout = () => {
+      const focused = document.activeElement === inspectTarget;
+      if (this.desktop.matches) {
+        decision.append(inspectTarget);
+        decision.after(abilityInfo);
+      } else {
+        preview.before(inspectTarget);
+        availability.before(abilityInfo);
+      }
+      if (focused) inspectTarget.focus({preventScroll:true});
+      this.classGuidance.place(this.root, this.desktop.matches ? dangerResults : actions);
+      this.placeSecondaryControls();
+    };
+    this.desktop.addEventListener('change', layout, {signal});
+    if (this.desktop.matches) layout();
   }
   shortcut(key:string):boolean {
     if(/^[1-9]$/.test(key)) {
@@ -215,17 +245,70 @@ export class BattleHud {
       if (label) label.textContent = radial ? 'End turn' : 'Wait / End turn';
       next.setAttribute('aria-label', radial ? 'End turn' : 'Wait / End turn');
     }
-    const overflow = this.root.querySelector('#battle-overflow');
-    const tools = this.root.querySelector('.battle-tools');
-    if (overflow && tools) {
-      for (const sel of ['#battle-draught', '#battle-party', '#battle-log-open', '#battle-sound', '#battle-sound-retry']) {
-        const node = this.root.querySelector(sel);
-        if (!(node instanceof HTMLElement)) continue;
-        if (skin === 'radial') overflow.append(node);
-        else if (node.parentElement === overflow) tools.insertBefore(node, overflow);
+    this.placeSecondaryControls();
+  }
+
+  private placeSecondaryControls(): void {
+    const desktop = this.desktop.matches;
+    const overflow = this.root.querySelector<HTMLDetailsElement>('#battle-overflow')!;
+    const summary = overflow.querySelector('summary')!;
+    const group = overflow.querySelector('.battle-secondary-controls')!;
+    const tools = this.root.querySelector('.battle-tools')!;
+    const status = this.actorRoot.querySelector('#battle-status')!;
+    const help = this.root.querySelector('#battle-shortcuts')!;
+    const focused = document.activeElement;
+    const title = desktop ? 'Battle tools' : 'More';
+    if (summary.textContent !== title) summary.textContent = title;
+
+    const move = (node: Element, parent: Element, before: Element | null = null) => {
+      if (node.parentElement === parent) return;
+      parent.insertBefore(node, before);
+      if (focused instanceof HTMLElement && node.contains(focused)) {
+        const focusTarget = parent === group && !overflow.open ? summary : focused;
+        focusTarget.focus({preventScroll: true});
       }
+    };
+    for (const selector of ['#battle-draught', '#battle-party', '#battle-log-open', '#battle-sound', '#battle-sound-retry']) {
+      const node = this.root.querySelector(selector)!;
+      if (desktop || this.skin === 'radial') move(node, group);
+      else move(node, tools, overflow);
+    }
+    if (desktop) {
+      if (tools.firstElementChild !== overflow) tools.prepend(overflow);
+      move(this.stats, group, group.firstElementChild);
+      move(help, group);
+      move(this.root.querySelector('#battle-danger-info')!, group);
+      move(this.root.querySelector('#battle-sound-status')!, group);
+    } else {
+      move(this.stats, status.parentElement!, status);
+      move(help, tools);
+      if (overflow.nextElementSibling !== help) tools.insertBefore(overflow, help);
+      const results = this.root.querySelector('#battle-danger-results')!;
+      move(this.root.querySelector('#battle-danger-info')!, this.root, results);
+      move(this.root.querySelector('#battle-sound-status')!, this.root);
+    }
+    if (focused instanceof HTMLElement && overflow.contains(focused) && document.activeElement !== focused) {
+      focused.focus({preventScroll: true});
     }
   }
+
+  /** Escape dismisses open desktop tools before battle shortcuts can run. */
+  handleSecondaryKey(event: KeyboardEvent): boolean {
+    if (!this.desktop.matches) return false;
+    const overflow = this.root.querySelector<HTMLDetailsElement>('#battle-overflow[open]');
+    if (!overflow) return false;
+    const target = event.target instanceof Element ? event.target : null;
+    const inside = !!target && overflow.contains(target);
+    if (event.key !== 'Escape') return inside;
+    if (!event.repeat) {
+      const details = (inside ? target.closest<HTMLDetailsElement>('details[open]') : null) ?? overflow;
+      details.open = false;
+      details.querySelector<HTMLElement>(':scope > summary')!.focus();
+    }
+    event.preventDefault();
+    return true;
+  }
+
   focusAction(){
     if (this.skin === 'radial') {
       this.root.querySelector<HTMLButtonElement>('#battle-next:not(:disabled)')?.focus();
@@ -250,6 +333,8 @@ export class BattleHud {
     this.classGuidance.render(this.skin);
     const s=this.session, enabled=s.phase==='player', actor=s.active;
     const presenting=s.phase==='presenting';
+    this.root.dataset.playerTurn=String(enabled);
+    this.root.dataset.actionKind=action?.startsWith('ability:') ? 'ability' : action ?? 'idle';
     // The accepted state may already contain the next actor or a defeat. Keep
     // the queue aligned with the board and actor card until presentation finishes.
     this.turnQueue.render(presentationStart ?? s.state);
@@ -293,7 +378,7 @@ export class BattleHud {
     this.actorRoot.querySelector('#battle-hp')!.textContent=`HP ${displayActor.hp}/${displayInfo.def.stats.maxHp}`;
     this.actorRoot.querySelectorAll<HTMLImageElement>('.battle-portrait').forEach(img=>{img.hidden=img.dataset.unitType!==displayActor.defId;});
     (this.actorRoot.querySelector('.battle-health span') as HTMLElement).style.width=`${100*displayActor.hp/displayInfo.def.stats.maxHp}%`;
-    this.actorRoot.querySelector('#battle-stats')!.textContent=`AC ${displayInfo.armorClass} · Accuracy ${displayInfo.accuracy>=0?'+':''}${displayInfo.accuracy}`;
+    this.stats.textContent=`AC ${displayInfo.armorClass} · Accuracy ${displayInfo.accuracy>=0?'+':''}${displayInfo.accuracy}`;
     this.actorRoot.querySelector('#battle-status')!.textContent=displayInfo.status;
     this.actorRoot.querySelector('#battle-budgets')!.textContent=presenting
       ? 'Move locked / Action locked'
@@ -350,15 +435,23 @@ export class BattleHud {
     (this.root.querySelector('#battle-next') as HTMLButtonElement).disabled=!enabled;
     (this.root.querySelector('#battle-review') as HTMLButtonElement).disabled=!enabled || (!s.pending && !s.pendingPlan);
     (this.root.querySelector('#battle-cancel') as HTMLButtonElement).disabled=!enabled || !action;
-    this.root.querySelector('#battle-selection')!.textContent=selected?`Selected (${selected.x}, ${selected.y})`:'Select a tile';
+    const selectionLabel=this.root.querySelector<HTMLElement>('#battle-selection')!;
+    selectionLabel.dataset.selected=String(!!selected);
+    selectionLabel.textContent=selected?`Selected (${selected.x}, ${selected.y})`:'Select a tile';
     const occupants=selected?s.state.units.filter(u=>u.cell.x===selected.x&&u.cell.y===selected.y):[];
     const target=occupants.find(u=>u.hp>0)??occupants[0];
-    this.root.querySelector('#battle-target-info')!.textContent=target?`Target: ${unitLabel(s,target)}`:'';
+    this.root.querySelector('#battle-target-info')!.textContent=target?`${action ? 'Target' : 'Inspecting'}: ${unitLabel(s,target)}`:'';
     const inspect=this.root.querySelector<HTMLButtonElement>('#battle-inspect-target')!;inspect.hidden=this.skin==='radial'||!target;inspect.dataset.unitId=target?String(target.id):'';
     const selectedTile = selected && s.catalog.maps[s.state.mapId].cells.find(cell => cell.x === selected.x && cell.y === selected.y);
     const terrainNote = selectedTile?.terrainId === 'rock' && (!action || action === 'move')
       ? 'Rocky ground blocks movement and line of sight' : message;
-    this.root.querySelector('#battle-preview')!.textContent=s.error?`${s.phase==='error'?'Battle stopped':'Unavailable'}: ${s.error}`:terrainNote;
+    const previewTextContent = s.error ? `${s.phase==='error'?'Battle stopped':'Unavailable'}: ${s.error}` : terrainNote;
+    const prepared = s.pendingPlan?.ability ?? s.pending;
+    const warning = enabled && prepared ? friendlyFire(s, prepared) : '';
+    const inlineWarning = previewTextContent.startsWith(warning) ? warning : '';
+    this.root.querySelector('#battle-preview-warning')!.textContent = inlineWarning;
+    this.root.querySelector('#battle-preview-text')!.textContent = previewTextContent.slice(inlineWarning.length);
+    this.root.querySelector('#battle-friendly-warning')!.textContent = warning.trimEnd();
     const options: {cell:CellPosition;label:string}[]=[];
     if(enabled && action==='move') {if(movement?.ok) for(const c of movement.cells.filter(c=>c.cost>0)) options.push({cell:c.cell,label:`(${c.cell.x}, ${c.cell.y}) · cost ${c.cost}`});}
     else if(enabled && action) for(const u of actionTargets(s,action)) {

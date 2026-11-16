@@ -1,6 +1,6 @@
 import {expect,test,type Page} from './helpers/forceRailControls';
 import {writeFileSync} from 'node:fs';
-import {readSession,playCommand,playUndo} from './helpers/battlePolicy';
+import { battleTool, readSession,playCommand,playUndo } from './helpers/battlePolicy';
 import {playerDecision} from './helpers/playerPolicy';
 import {runContext} from './helpers/runItemFixtures';
 import {runBattleCatalog,type RunSnapshot} from '../src/domain/runSaveEnvelope';
@@ -66,7 +66,7 @@ test('legal run outcomes, earned rewards and fresh restart',async({page})=>{
  await page.addInitScript(dismissedRuns=>{
   localStorage.setItem('tactics-guru:class-guidance',JSON.stringify({version:1,enabled:true,seen:[],dismissedRuns}));
  },savedDungeonTips);
- test.setTimeout(300000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await start(page);await page.locator('#battle-sound').click();const records=[];let usedDraught=false;
+ test.setTimeout(300000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await start(page);await (await battleTool(page, '#battle-sound')).click();const records=[];let usedDraught=false;
  const guidance=page.locator('#battle-class-guidance'),tip=page.locator('#battle-class-tip');
  await expect(guidance).toBeVisible();
  const dismissedTip=(await tip.getAttribute('data-tutorial-id'))!;
@@ -126,7 +126,7 @@ test('legal run outcomes, earned rewards and fresh restart',async({page})=>{
     // The combat inspection reads the live battle catalog, including progression and equipment.
     const withoutEquipment=runBattleCatalog({...prepared.items,ownership:{...prepared.items.ownership,assignments:[]}},runContext)!;
     const accuracy=withoutEquipment.heroes[assignment.heroId].stats.accuracy+1;
-    await page.locator('#battle-party').click();
+    await (await battleTool(page, '#battle-party')).click();
     await page.locator(`#inspect-unit-${equippedHero.id}`).click();
     await expect(page.getByRole('dialog')).toContainText(`Accuracy +${accuracy} · Power`);
     await page.locator('#inspection-close').click();
@@ -189,7 +189,7 @@ test('run preparation and dialogs retain 44px controls, native touch and narrow 
  await expect(dialog).not.toBeVisible();
  await expect(page.locator('#fit-restart')).toBeFocused();
  expect(await snapshot(page)).toEqual(before);
- await activate('#battle-sound');
+ await battleTool(page, '#battle-sound');await activate('#battle-sound');
  await activate('#fit-restart');
  await activate('#run-confirm-restart');
  await activate('#run-start-encounter');
