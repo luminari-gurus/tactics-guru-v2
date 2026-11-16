@@ -340,7 +340,6 @@ export class BattleScene extends Phaser.Scene {
     const stopSkinWatch=watchCombatControls(applySkin);
     const key=(event:KeyboardEvent)=>{
       if(!live || !ready || dialogs.open || session.phase!=='player')return;
-      if(event.key==='Escape'){cancel();event.preventDefault();return;}
       if(radial.open)return;
       if(['Enter',' '].includes(event.key)){event.preventDefault();board.resetPicking();hovered=null;select(cursor);return;}
       const delta:Record<string,[number,number]>={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]};

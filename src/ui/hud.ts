@@ -173,10 +173,24 @@ export class BattleHud {
     this.disposePacePreference = mountCombatPacePreference(this.root.querySelector('#battle-overflow')!);
     this.disposeGuidancePreferences = mountClassGuidancePreferences(this.root.querySelector('#battle-overflow')!);
     this.classGuidance = new BattleClassGuidance(this.root, session, () => this.focusAction(), guidance);
-    // Keep focus order aligned with the desktop layout in style.css.
-    const actions = this.root.querySelector('.battle-section-label');
-    const dangerResults = this.root.querySelector('#battle-danger-results');
+    // Keep the action preview and confirmation together before supplemental details on desktop.
+    const actions = this.root.querySelector('.battle-section-label')!;
+    const dangerResults = this.root.querySelector('#battle-danger-results')!;
+    const abilityInfo = this.root.querySelector('#battle-ability-info')!;
+    const availability = this.root.querySelector('#battle-availability')!;
+    const decision = this.root.querySelector('.battle-decision')!;
+    const preview = this.root.querySelector('#battle-preview')!;
+    const inspectTarget = this.root.querySelector<HTMLButtonElement>('#battle-inspect-target')!;
     const layout = () => {
+      const focused = document.activeElement === inspectTarget;
+      if (this.desktop.matches) {
+        decision.append(inspectTarget);
+        decision.after(abilityInfo);
+      } else {
+        preview.before(inspectTarget);
+        availability.before(abilityInfo);
+      }
+      if (focused) inspectTarget.focus({preventScroll:true});
       this.classGuidance.place(this.root, this.desktop.matches ? dangerResults : actions);
       this.placeSecondaryControls();
     };
@@ -278,17 +292,20 @@ export class BattleHud {
     }
   }
 
-  /** Secondary disclosures own their keyboard input while focus is inside. */
+  /** Escape dismisses open desktop tools before battle shortcuts can run. */
   handleSecondaryKey(event: KeyboardEvent): boolean {
-    if (!this.desktop.matches || !(event.target instanceof Element)) return false;
-    const overflow = event.target.closest<HTMLDetailsElement>('#battle-overflow[open]');
+    if (!this.desktop.matches) return false;
+    const overflow = this.root.querySelector<HTMLDetailsElement>('#battle-overflow[open]');
     if (!overflow) return false;
-    if (event.key === 'Escape' && !event.repeat && !event.defaultPrevented) {
-      const details = event.target.closest<HTMLDetailsElement>('details[open]') ?? overflow;
+    const target = event.target instanceof Element ? event.target : null;
+    const inside = !!target && overflow.contains(target);
+    if (event.key !== 'Escape') return inside;
+    if (!event.repeat) {
+      const details = (inside ? target.closest<HTMLDetailsElement>('details[open]') : null) ?? overflow;
       details.open = false;
       details.querySelector<HTMLElement>(':scope > summary')!.focus();
-      event.preventDefault();
     }
+    event.preventDefault();
     return true;
   }
 

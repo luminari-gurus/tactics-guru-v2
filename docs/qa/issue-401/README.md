@@ -9,7 +9,7 @@ The first increment prioritizes the battlefield and the controls needed to act. 
 | 1440 × 900 | [Comparison](rail-1440x900.webp) | [Comparison](radial-1440x900.webp) |
 | 1280 × 720 | [Comparison](rail-1280x720.webp) | [Comparison](radial-1280x720.webp) |
 
-Both columns of each comparison were captured at the labeled viewport using fresh standalone battles, seed 1, on Chromium with reduced motion. The Rail comparisons select the first legal destination with the native picker and leave the move unconfirmed. Measurements are CSS pixels rounded to the nearest pixel, with zero initial scroll.
+The after column uses the initial layout commit, `5850adb9e05186a825e4a34ab5a3059fb189b801`. Both columns of each comparison were captured at the labeled viewport using fresh standalone battles, seed 1, on Chromium with reduced motion. The Rail comparisons select the first legal destination with the native picker and leave the move unconfirmed. Measurements are CSS pixels rounded to the nearest pixel, with zero initial scroll.
 
 | Viewport | Rail drawable board height | Rail Confirm bottom | Radial drawable board height | Radial End Turn bottom | HUD bottom |
 | --- | --- | --- | --- | --- | --- |
@@ -18,7 +18,7 @@ Both columns of each comparison were captured at the labeled viewport using fres
 
 ## Verification
 
-The baseline was built from `0cc0777fa1a7e7613d43758ad88c270d8b744f26`. The updated build used the runtime sources in this PR, Node 24.22.1, the unchanged lockfile, and Linux x86-64. The root-base production assets were `battleLayout-DD4t112e.css` and `BattleScene-DuYUR2TG.js`. SHA-256 values are listed below.
+The baseline was built from `0cc0777fa1a7e7613d43758ad88c270d8b744f26`. The initial layout build used the runtime sources from `5850adb9e05186a825e4a34ab5a3059fb189b801`, Node 24.22.1, the unchanged lockfile, and Linux x86-64. The root-base production assets were `battleLayout-DD4t112e.css` and `BattleScene-DuYUR2TG.js`. SHA-256 values are listed below.
 
 - `npm run test:verification-batches` passed all 31 tooling checks.
 - `npm run build` passed 226 content tests, both TypeScript scopes, and the production build.
@@ -47,3 +47,16 @@ dd48c77eacf62bc6a79cd5e46b8b405db81c31669e9b2fd3bba2e4de9c90ff44  src/ui/battleC
 9b0d1918936943a52e32d7c52a09bb4001cc0b0991f54fa12757580fd78b949a  dist/assets/battleLayout-DD4t112e.css
 1c309a393d9c7ec232c5d49366c05182976a30291f5a2c7cbeb21a622ebe6748  dist/assets/BattleScene-DuYUR2TG.js
 ```
+
+## Rail confirmation follow-up
+
+The 1280 × 720 Rail test now checks both a prepared move and Magic Missile aimed at an ally. On the initial layout build, Confirm and Cancel were clipped during the spell preview at zero scroll. The follow-up keeps the friendly-fire warning and both controls in view by placing the ability description and Inspect target control after the confirmation row on desktop.
+
+The production build passed 226 content tests and both TypeScript scopes. The follow-up used Node 24.22.1 and Chromium 153.0.8010.0 with the same single-process SwiftShader setup. The root-base production assets were:
+
+```text
+2cc2ba9223112c92172a1b03fe03a7a5d2b7975575f4c7c2e9e20d391117e1  dist/assets/battleLayout-hMrtXW4w.css
+99cb117394219141fae37413934932cb9fc9275777e60117c32ddc86ca8d9f8d  dist/assets/BattleScene-DU9y87xq.js
+```
+
+Nine focused Chromium cases passed on the follow-up build. They covered the Rail viewport regression, keyboard confirmation, inspection and cancellation, responsive geometry, the desktop Radial dock, three-battle run undo and reload, dungeon Frost Snare and reload, and Radial End Turn with adjacent tools in emulated Pixel portrait and landscape. Each case ran separately with one worker and zero retries. Both iPhone WebKit cases stopped at browser launch because the host lacked `libGLESv2.so.2`.
