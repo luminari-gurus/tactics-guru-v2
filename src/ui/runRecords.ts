@@ -56,7 +56,7 @@ function personalBests(history: RunRecords) {
   return disclosure;
 }
 /** Mounted only inside the main-menu records dialog. Never creates or hydrates gameplay. */
-export function mountRunRecords(container: HTMLElement, store: RunRecordsStorage = createRunRecordsStorage()) {
+export function mountRunRecords(container: HTMLElement, store: RunRecordsStorage = createRunRecordsStorage(), pending?: Promise<void>) {
   let live = true, busy = false, message = '';
   function button(label: string, action: () => void) {
     const node = element('button', label); node.type = 'button'; node.disabled = busy; node.onclick = action; return node;
@@ -115,8 +115,8 @@ export function mountRunRecords(container: HTMLElement, store: RunRecordsStorage
     }
     container.append(actions);
   }
-  const changed = (event: StorageEvent) => {
-    if (busy || event.key !== null && !Object.values(RUN_RECORD_KEYS).some(key => key === event.key)) return;
+  const refresh = () => {
+    if (!live || busy) return;
     const key = (details: HTMLDetailsElement) => details.dataset.best ?? 'all';
     const expanded = new Set([...container.querySelectorAll<HTMLDetailsElement>('details[open]')].map(key));
     const focused = container.contains(document.activeElement) ? document.activeElement as HTMLElement : null;
@@ -132,6 +132,10 @@ export function mountRunRecords(container: HTMLElement, store: RunRecordsStorage
       (replacement ?? container.querySelector<HTMLElement>('[role=status]'))?.focus();
     }
   };
+  const changed = (event: StorageEvent) => {
+    if (event.key === null || Object.values(RUN_RECORD_KEYS).some(key => key === event.key)) refresh();
+  };
   render(); window.addEventListener('storage', changed);
+  void pending?.then(refresh);
   return () => { live = false; window.removeEventListener('storage', changed); };
 }

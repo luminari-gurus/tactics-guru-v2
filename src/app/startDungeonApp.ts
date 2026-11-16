@@ -1,5 +1,5 @@
 import { testingProgress } from '../ui/testingProgress';
-import { consumeEntryIntent } from './routes';
+import { consumeEntryIntent, routeHref } from './routes';
 import { appEntry } from './entry';
 import { menuReturnLink, confirmMenuDeparture } from '../ui/menuReturn';
 import { DungeonMap, dungeonBiomeLabel, dungeonEncounterLabel } from '../ui/dungeonMap';
@@ -8,9 +8,10 @@ import { mountTelemetryPreferences } from '../telemetry/preferences';
 import { DungeonSession } from './DungeonSession';
 import { DelayedDungeonStep } from './DelayedDungeonStep';
 import { RunHistory } from './RunHistory';
+import { dungeonRunRecord } from '../domain/runRecords';
 import { freshDungeon, FloorCache, newDungeonSeed, type DungeonState } from '../domain/dungeon';
 import type { DungeonAutoCollectIntent } from '../domain/dungeonAutoCollect';
-import { bothDungeonSlotsMissing, createDungeonStorage, serializeBrowserDungeonWrite } from '../persistence/dungeonStorage';
+import { bothDungeonSlotsMissing, createDungeonStorage, removingDungeonSaveWouldReopenRun, resumableDungeonSave, resumableDungeonSlot, serializeBrowserDungeonWrite } from '../persistence/dungeonStorage';
 import { dungeonElement as el, renderDungeon } from '../ui/dungeon';
 import { BattleDialogs, type DialogChoice } from '../ui/dialogs';
 import type { RunBattleHost } from '../phaser/BattleScene';
@@ -70,7 +71,15 @@ async function pauseForReview() {
  reviewing=false;
  return live && await Promise.race([session.flushPlaytime().then(()=>true),canceled]) && live;
 }
-function returnLink(){return menuReturnLink(()=>!startup&&session.hasUnsavedProgress,recovery,storage?()=>pauseForReview():undefined);}
+function returnLink(){
+ const link=menuReturnLink(()=>!startup&&session.hasUnsavedProgress,recovery,storage?()=>pauseForReview():undefined);
+ link.addEventListener('click',event=>{
+  if(session.phase!=='defeat'||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+  event.preventDefault();event.stopImmediatePropagation();
+  void finishDefeat(loadGeneration);
+ },{capture:true});
+ return link;
+}
 panel.setAttribute('aria-label','Dungeon battle controls');
 mountBattleLayout();window.fitDiagnostics=diagnosticsSnapshot;
 const mapView=new DungeonMap(async destination=>{cancelAutomaticStep();if(!live||playing||loading||loadError||replacing||dialogs.open)return;if(await session.step({...session.spatialBoundary,destination})&&session.phase==='battle')start();},()=>!live||playing||loading||loadError||replacing||dialogs.open);
@@ -99,7 +108,7 @@ function render(){
   const title=el('h1','Dungeon floors');title.tabIndex=-1;
   screen.replaceChildren(title,el('p','Continuing floors with deterministic battles, all encounters required for descent and backtracking.'+(storage?' Saves stay on this device.':'')));
   if(storage){
-  const review=session.inspect(),valid=review.primary.status==='valid'||review.backup.status==='valid';
+  const review=session.inspect(),valid=resumableDungeonSlot(review)!==null;
   const resume=button('Continue saved dungeon',()=>{if(session.continue(review)){startup=false;render();if(session.snapshot.activeBattle)start();}});resume.disabled=!valid;
   screen.append(resume,button('Start new dungeon',requestNew),button('Save recovery',recovery));
   const unsaved=button('Play unsaved dungeon',()=>{startup=false;session.playUnsaved();render();});
@@ -156,19 +165,22 @@ async function recovery(){
  const close=()=>{if(!playing)render();screen.querySelector<HTMLElement>('h1')?.focus();};
  for(const [i,value] of session.exports(review).entries())choices.push({id:`dungeon-export-${i}`,label:`Export ${value.label}`,run:()=>{const url=URL.createObjectURL(new Blob([value.text],{type:'application/json'}));const a=el('a');a.href=url;a.download=`tactics-guru-dungeon-${i}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);close();}});
  for(const slot of ['primary','backup'] as const){
-  if(review[slot].status==='valid')choices.push({id:`dungeon-continue-${slot}`,label:`Continue ${slot} dungeon`,run:()=>{if(session.continue(review,slot)){startup=false;stop();render();if(session.snapshot.activeBattle)start();}else recovery();}});
-  if(review[slot].text!==null)choices.push({id:`dungeon-remove-${slot}`,label:`Remove ${slot} save`,run:()=>dialogs.showChoices('Remove reviewed save?','Export first if needed. Only the reviewed dungeon slot will be removed.',[
+  if(resumableDungeonSave(review,slot))choices.push({id:`dungeon-continue-${slot}`,label:`Continue ${slot} dungeon`,run:()=>{if(session.continue(review,slot)){startup=false;stop();render();if(session.snapshot.activeBattle)start();}else recovery();}});
+  if(review[slot].text!==null&&!removingDungeonSaveWouldReopenRun(review,slot))choices.push({id:`dungeon-remove-${slot}`,label:`Remove ${slot} save`,run:()=>dialogs.showChoices('Remove reviewed save?','Export first if needed. Only the reviewed dungeon slot will be removed.',[
    {id:'dungeon-remove-confirm',label:'Remove reviewed save',keepOpen:true,run:async()=>{await session.remove(slot,review);recovery();}},
    {id:'dungeon-remove-cancel',label:'Cancel',run:recovery},
   ])});
  }
  choices.push({id:'dungeon-retry-save',label:'Retry saving current progress',run:async()=>{if(startup){close();return;}await session.retry(review);close();}}, {id:'dungeon-close-recovery',label:'Close',run:close});
- dialogs.showChoices('Dungeon save recovery',`primary: ${review.primary.status}. backup: ${review.backup.status}. ${session.status}`,choices,close,{focusTitle:true});
+ const removalHint=removingDungeonSaveWouldReopenRun(review,'primary')||removingDungeonSaveWouldReopenRun(review,'backup')
+  ? ' Remove the earlier checkpoint before removing the defeated save.' : '';
+ dialogs.showChoices('Dungeon save recovery',`primary: ${review.primary.status}. backup: ${review.backup.status}. ${session.status}${removalHint}`,choices,close,{focusTitle:true});
  screen.scrollTop=scrollTop;
 }
+function presentationBlocked(){return document.hidden||dialogs.open||replacing;}
 function whenVisible(generation:number,run:()=>void){
  if(!live||generation!==loadGeneration)return;
- if(document.hidden||dialogs.open||replacing){deferredStart=()=>whenVisible(generation,run);return;}
+ if(presentationBlocked()){deferredStart=()=>whenVisible(generation,run);return;}
  deferredStart=null;
  try {run();}catch {failedLoad(generation);}
 }
@@ -176,6 +188,28 @@ function failedLoad(generation:number){
  if(!live||generation!==loadGeneration)return;
  stop();loadError=true;render();screen.querySelector<HTMLElement>('#dungeon-load-error')?.focus();
 }
+let finishingDefeat=false;
+async function finishDefeat(generation:number){
+ if(finishingDefeat)return;
+ finishingDefeat=true;
+ try {
+  await session.flushPlaytime();
+  if(!live||generation!==loadGeneration||session.phase!=='defeat')return;
+  if(presentationBlocked()){
+   // Recovery can be opened while the terminal write is waiting for its lock.
+   // Recheck pending writes and run identity after the dialog closes.
+   whenVisible(generation,()=>void finishDefeat(generation));
+   return;
+  }
+  if(!confirmMenuDeparture(()=>session.savesProgress&&session.hasUnsavedProgress,recovery))return;
+  const record=dungeonRunRecord(session.snapshot,Date.now());
+  if(record) try {
+   sessionStorage.setItem('tactics-guru:defeat-summary',JSON.stringify({record, retryHistory:!!storage&&session.hasUnsavedProgress}));
+  } catch { /* The menu remains accessible without temporary storage. */ }
+  location.assign(routeHref('menu',import.meta.env.BASE_URL));
+ }finally{finishingDefeat=false;}
+}
+
 async function start(){
  if(!live||playing||loading||replacing)return;
  cancelAutomaticStep();
@@ -205,6 +239,10 @@ async function start(){
      // This callback follows encounter-return presentation (including #397's
      // cutscene completion). Capture once before stop invalidates old work.
      const intent=pendingVictory;
+     if(session.phase==='defeat') {
+      void finishDefeat(generation);
+      return;
+     }
      stop();render();screen.querySelector<HTMLElement>('h1')?.focus();
      const returnedGeneration=loadGeneration;
      if(intent&&activeExploration())automaticStep.schedule(isCurrent=>
@@ -247,6 +285,7 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelAutom
 render();
 
 const entryIntent=storage?consumeEntryIntent():null;
+if(storage)void session.history?.reconcileDungeonDefeat(storage.inspect());
 if(entryIntent==='new'){
  let approved: { primary?: { status?: string; text?: string | null }; backup?: { status?: string; text?: string | null } } | null=null;
  try {

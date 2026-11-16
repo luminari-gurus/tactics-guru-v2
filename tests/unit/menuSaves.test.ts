@@ -38,7 +38,7 @@ it('preserves eligibility and warnings for all dungeon slot combinations', () =>
       removeItem() { throw Error('unexpected removal'); },
     }));
     expect(result).toEqual({
-      primary, backup, resumable: primary === 'valid' || backup === 'valid',
+      primary, backup, hasDefeatedSave: false, resumable: primary === 'valid' || backup === 'valid',
       fromBackup: primary !== 'valid' && backup === 'valid',
       needsRecovery: [primary, backup].some(status => status === 'invalid' || status === 'unavailable'),
     });

@@ -354,17 +354,29 @@ describe('dungeon run history boundaries', () => {
     const history = new RunHistory('dungeon', records, () => 200);
     return { m, storage, records, history, rows: () => selectedRunRecords(records.inspect())?.records ?? [] };
   }
-  it('records staged terminal continuation exactly once without changing active save bytes', async () => {
+  it.each(['terminal', 'same run', 'different run'])('reconciles defeat and checks the %s backup without changing save bytes', async backupKind => {
     const f = fixture(), entry = good(startDungeonBattle(atEncounter(fresh()))), battle = entry.activeBattle!;
     const terminal = good(acceptDungeonBattle(entry, { ...battle, outcome: 'playerLoss',
       units: battle.units.map(unit => unit.side === 'player' ? { ...unit, hp: 0 } : unit) }));
-    assert(f.storage.save(terminal).ok); const bytes = [f.m.getItem(DUNGEON_KEYS.primary), f.m.getItem(DUNGEON_KEYS.backup)];
+    const backup = backupKind === 'different run' ? freshDungeon('different-run', 14) : entry;
+    if (backupKind !== 'terminal') assert(f.storage.save(backup).ok);
+    assert(f.storage.save(terminal).ok);
+    const bytes = [f.m.getItem(DUNGEON_KEYS.primary), f.m.getItem(DUNGEON_KEYS.backup)];
     const session = new DungeonSession(freshDungeon('placeholder', 14), f.storage, f.history);
     expect(f.m.getItem(RUN_RECORD_KEYS.primary)).toBeNull();
-    assert(session.continue(session.inspect())); await f.history.whenIdle();
+    const review = session.inspect();
+    expect(session.continue(review, 'primary')).toBe(false);
+    await f.history.reconcileDungeonDefeat(review);
     expect(f.rows()).toMatchObject([{ id: terminal.id, outcome: 'defeat', recordedAt: 200, battlesWon: 0 }]);
-    assert(session.continue(session.inspect())); await f.history.whenIdle(); expect(f.rows()).toHaveLength(1);
-    expect(session.snapshot).toEqual(terminal);
+    await f.history.reconcileDungeonDefeat(review);
+    if (backupKind === 'same run') expect(await session.remove('primary', review)).toBe(false);
+    const playableBackup = backupKind === 'different run';
+    if (!playableBackup) expect(session.continue(review, 'backup')).toBe(false);
+    expect(session.continue(review)).toBe(playableBackup);
+    if (playableBackup) expect(session.snapshot).toEqual(backup);
+    else expect(session.snapshot.id).toBe('placeholder');
+    await f.history.whenIdle();
+    expect(f.rows()).toHaveLength(1);
     expect([f.m.getItem(DUNGEON_KEYS.primary), f.m.getItem(DUNGEON_KEYS.backup)]).toEqual(bytes);
   });
   it.each(['unsaved', 'changed', 'lock-denied'] as const)('records a legally accepted defeat independently of active saves %s', async mode => {
