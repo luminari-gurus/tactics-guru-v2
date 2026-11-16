@@ -234,7 +234,7 @@ async function start(){
     document.querySelector<HTMLElement>('#battle-heading h1')!.textContent=title;
     document.querySelector<HTMLElement>('#board-caption')!.textContent='Tap to select · Drag to pan · Wheel/pinch to zoom · Arrows and Enter to select';
     restart.textContent='Start new dungeon';persistence.hidden=false;persistence.replaceChildren(...(storage?[button('Save recovery',recovery)]:[]),el('span',session.status), returnLink());
-    host={catalog:battle.catalog,session:battle,dialogs,sound,guidance:guidanceForRun(state.id),modalTransition:()=>{},ended:()=>{
+    host={catalog:battle.catalog,session:battle,dialogs,sound,showOutcomeCutscenes:true,guidance:guidanceForRun(state.id),modalTransition:()=>{},ended:()=>{
      if(!live||!playing||generation!==loadGeneration)return;
      // This callback follows encounter-return presentation (including #397's
      // cutscene completion). Capture once before stop invalidates old work.

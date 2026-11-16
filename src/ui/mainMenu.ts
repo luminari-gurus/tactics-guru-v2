@@ -5,6 +5,7 @@ import { menuGameHref, routeHref } from '../app/routes';
 import { bothDungeonSlotsMissing, createDungeonStorage } from '../persistence/dungeonStorage';
 import { mountTelemetryPreferences } from '../telemetry/preferences';
 import { mountCombatControlsPreference } from './combatControls';
+import { mountCutscenePreference } from './cutscenePreference';
 import { mountAutoCollectLootPreference } from './autoCollectLootPreference';
 import { mountClassGuidancePreferences } from './classGuidancePreferences';
 import { mountCombatPacePreference } from './combatPacePreference';
@@ -124,6 +125,7 @@ export function startMainMenu() {
     settings: () => show('Settings', () => {
       body.append(element('p', 'Use the in-game Sound controls to enable or mute audio. Sound starts after your interaction.'));
       mountCombatControlsPreference(body);
+      mountCutscenePreference(body);
       const disposePace = mountCombatPacePreference(body);
       mountAutoCollectLootPreference(body);
       const disposeGuidance = mountClassGuidancePreferences(body);

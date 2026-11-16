@@ -1,6 +1,6 @@
 import { dungeonContent } from '../src/content/dungeon';
 import { walkDungeon, reenterDungeonStair, continueSavedDungeon, openDungeonInventory, collectDungeonEncounterLoot } from './helpers/dungeonTraversal';
-import { atEncounter, atStairApproach, checkedDungeon, stagedMageAbility, snaredDefeatBoundary } from './helpers/dungeonFixtures';
+import { atEncounter, atStairApproach, checkedDungeon, dungeonDefeatBoundary, stagedMageAbility, snaredDefeatBoundary } from './helpers/dungeonFixtures';
 import { expect,railTest as test,type Page } from './helpers/dungeonEntropy';
 import { readFileSync, writeFileSync } from 'node:fs';
 import type { Locator } from '@playwright/test';
@@ -12,6 +12,7 @@ import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { RUN_RECORD_KEYS } from '../src/persistence/runRecordsStorage';
 import { COMBAT_CONTROLS_KEY } from '../src/ui/combatControls';
 import { AUTO_COLLECT_LOOT_KEY } from '../src/ui/autoCollectLootPreference';
+import { ROUTINE_CUTSCENES_KEY } from '../src/ui/cutscenePreference';
 import { readSession,playCommand,playUndo,checkActivePlaytime,checkBackgroundPlaytime } from './helpers/battlePolicy';
 import { playerDecision, fighterDecision } from './helpers/playerPolicy';
 import { journeyPreparation, healedFighterBoundary, shamanJourney } from './helpers/dungeonFixtures';
@@ -614,7 +615,7 @@ test('automatic stairs preserve healed Fighter carry and fresh battle resources'
  await page.screenshot({path:test.info().outputPath('fresh-resource-after-automatic-stairs.png')});
 });
 async function seed(page:Page,s:DungeonState){const encoded=encodeDungeon(s);if(!encoded.ok)throw Error(encoded.reason);await page.goto('./?game=dungeon');await page.evaluate(({key,text})=>{localStorage.setItem(key,text);}, {key:DUNGEON_KEYS.primary,text:encoded.text});await page.reload();await continueSavedDungeon(page);}
-function fixture(slot:number){for(let seed=1;seed<=50;seed++){const f=dungeonVictoryBoundary(seed,slot);if(f)return f;}throw Error('No legal fixture');}
+function fixture(slot:number, groundLoot = false){for(let seed=1;seed<=50;seed++){const f=dungeonVictoryBoundary(seed,slot,groundLoot);if(f)return f;}throw Error('No legal fixture');}
 function declineReward(state: DungeonState) {
  return checkedDungeon(dungeonItem(state, { ...dungeonBoundary(state), type: 'declineReward', offerId: state.offer!.id }));
 }
@@ -685,6 +686,96 @@ fixedSeedTest('read-only entry, keyboard new dungeon, real action and active res
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect((await readSession(page)).state).toEqual(saved.activeBattle);expect((await readSession(page)).events).toEqual([]);
  await page.screenshot({path:test.info().outputPath('battle-resumed.png')});expect(errors).toEqual([]);
 });
+function watchCutsceneRequests(page: Page) {
+ const requests = new Set<string>();
+ page.on('request', request => {
+  const path = new URL(request.url()).pathname;
+  if (path.includes('/cutscenes/')) requests.add(path.split('/').at(-1)!);
+ });
+ return requests;
+}
+
+for (const mode of ['skip', 'complete', 'disabled', 'reduced', 'missing'] as const) {
+ test(`dungeon victory cutscene: ${mode} preserves the earned loot`, async ({page,isMobile}) => {
+  test.setTimeout(45000);
+  const battle = fixture(0, true);
+  const requests = watchCutsceneRequests(page);
+  const clip = page.locator('video.cutscene-video');
+  const skip = page.getByRole('button', {name:'Skip cutscene'});
+  if (mode === 'missing') await page.route('**/cutscenes/*.mp4', route => route.fulfill({status:404}));
+  await page.emulateMedia({reducedMotion:mode === 'reduced' ? 'reduce' : 'no-preference'});
+  await seed(page,battle.snapshot);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const autoCollect = mode === 'skip';
+  await page.evaluate(({cutsceneKey,lootKey,enabled,autoCollect}) => {
+   localStorage.setItem(cutsceneKey,enabled ? 'on' : 'off');
+   localStorage.setItem(lootKey,autoCollect ? 'on' : 'off');
+   document.addEventListener('ended', event => {
+    if (event.target instanceof HTMLVideoElement && event.target.matches('.cutscene-video')) {
+     document.documentElement.dataset.cutsceneEnded = 'true';
+    }
+   },true);
+  },{cutsceneKey:ROUTINE_CUTSCENES_KEY,lootKey:AUTO_COLLECT_LOOT_KEY,enabled:mode !== 'disabled',autoCollect});
+  await playCommand(page,battle.command);
+  if (mode === 'skip' || mode === 'complete') {
+   await expect(skip).toBeFocused();
+   await expect.poll(() => clip.evaluate(video => (video as HTMLVideoElement).currentTime)).toBeGreaterThan(0);
+   await expect(page.locator('#dungeon-map')).toBeHidden();
+   if (mode === 'skip') {
+    if (isMobile) await skip.tap();
+    else await page.keyboard.press('Enter');
+   } else {
+    await expect(page.locator('html')).toHaveAttribute('data-cutscene-ended','true');
+   }
+  }
+  await expect(page.locator('#dungeon-map')).toBeVisible();
+  await expect(clip).toHaveCount(0);
+  expect([...requests]).toEqual(mode === 'disabled' || mode === 'reduced' ? [] : ['victory.mp4']);
+  const entry = battle.snapshot.encounterEntry!;
+  await expect.poll(async () => (await snapshot(page)).floors[0]).toMatchObject({
+   completed:1,position:autoCollect ? entry.contact : entry.origin,
+   loot:[{slot:entry.slot,cell:entry.contact,remaining:autoCollect ? 0 : 1}],
+  });
+  const settled = (await snapshot(page)).floors[0];
+  requests.clear();
+  await page.reload();
+  await continueSavedDungeon(page);
+  await expect(page.locator('#dungeon-map')).toBeVisible();
+  await expect(clip).toHaveCount(0);
+  expect((await snapshot(page)).floors[0]).toEqual(settled);
+  expect(requests.size).toBe(0);
+ });
+}
+
+for (const enabled of [true,false]) {
+ test(`dungeon defeat cutscene: ${enabled ? 'skip' : 'disabled'} reaches the main menu summary`, async ({page,isMobile}) => {
+  test.setTimeout(45000);
+  const battle = dungeonDefeatBoundary(28);
+  const requests = watchCutsceneRequests(page);
+  const clip = page.locator('video.cutscene-video');
+  const skip = page.getByRole('button',{name:'Skip cutscene'});
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await seed(page,battle.snapshot);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await page.evaluate(({key,enabled}) => localStorage.setItem(key,enabled ? 'on' : 'off'),
+   {key:ROUTINE_CUTSCENES_KEY,enabled});
+  await playCommand(page,battle.command);
+  if (enabled) {
+   await expect(page.getByRole('dialog',{name:'Defeat',exact:true})).toBeVisible();
+   await expect(skip).toBeFocused();
+   await expect.poll(() => clip.evaluate(video => (video as HTMLVideoElement).currentTime)).toBeGreaterThan(0);
+   if (isMobile) await skip.tap();
+   else await page.keyboard.press('Enter');
+  }
+  const summary = page.getByRole('dialog',{name:'Dungeon defeat',exact:true});
+  await expect(summary).toBeVisible();
+  await expect(summary).toContainText('Active playtime');
+  await expect(clip).toHaveCount(0);
+  expect([...requests]).toEqual(enabled ? ['defeat.mp4'] : []);
+  await expect.poll(() => historyRows(page)).toMatchObject([{id:battle.snapshot.id,outcome:'defeat'}]);
+ });
+}
+
 test('legal reward and guardian boundaries, travel reload, backtracking and isolated saves',async({page,isMobile})=>{
  test.setTimeout(180000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  for(const slot of [0,1,2]){

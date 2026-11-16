@@ -277,6 +277,27 @@ export function dungeonContactDetour(initial: DungeonState): number[] {
   throw Error('No bounded encounter interception');
 }
 
+/** A legal checkpoint at the last player decision before the party is defeated. */
+export function dungeonDefeatBoundary(seed: number) {
+  const entry = walkWitness(freshDungeon('dungeon-defeat-cutscene-fixture', seed));
+  const built = dungeonBattle(entry)!;
+  const initial = entry.activeBattle!;
+  const battle = new BattleSession(built.catalog, initial, initial.seed, undefined, true, built.battlefield);
+  let boundary: { snapshot: DungeonState; command: Command } | undefined;
+  for (let turn = 0; turn < 500; turn++) {
+    if (battle.phase === 'player') {
+      const command: Command = { type: 'endTurn', unitId: battle.active.id };
+      boundary = { snapshot: { ...entry, activeBattle: battle.state }, command };
+      if (!battle.prepare(command).ok) throw Error('Defeat fixture rejected a wait command');
+    }
+    const step = battle.phase === 'enemy' ? battle.nextEnemy() : battle.confirm();
+    if (!step) throw Error('Defeat fixture stalled');
+    if (step.after.outcome === 'playerLoss' && boundary) return boundary;
+    battle.finishPresentation(step.token);
+  }
+  throw Error('Defeat fixture did not reach a loss');
+}
+
 /** A witness explicitly walks to its newly earned item; this is not a grant or an automatic transition. */
 function collectEncounterLoot(state: DungeonState, entry: DungeonState): DungeonState {
   const contact = entry.encounterEntry?.contact, floor = state.floors[state.depth - 1];
