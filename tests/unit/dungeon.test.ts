@@ -10,7 +10,7 @@ import { dungeonCapacityFixture, dungeonVictoryBoundary } from '../helpers/dunge
 import { dungeonStairStatus, clearedDungeonSlots, freshDungeon, newDungeonSeed, stepDungeon, dungeonBattle, dungeonOffer, floorDescriptor, floorMap, FloorCache, dungeonSeed, readDungeon, travelDungeon, startDungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
 import { encodeDungeon, decodeDungeon, encodeDungeonRollback, utf8Bytes } from '../../src/domain/dungeonSaveEnvelope';
 import { dungeonContent, dungeonIdentity, previousDungeonIdentity } from '../../src/content/dungeon';
-import { bothDungeonSlotsMissing, createDungeonStorage, serializeBrowserDungeonWrite, DUNGEON_BACKUP_CHECKPOINT_KEY, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
+import { bothDungeonSlotsMissing, createDungeonStorage, resumableDungeonSlot, serializeBrowserDungeonWrite, DUNGEON_BACKUP_CHECKPOINT_KEY, DUNGEON_KEYS, DUNGEON_RECENT_BACKUP_KEY } from '../../src/persistence/dungeonStorage';
 import { DungeonSession } from '../../src/app/DungeonSession';
 import { LEGACY_ENCOUNTER_POLICY, encounterBattleCatalog, selectDungeonEncounter } from '../../src/domain/dungeonEncounters';
 import { priorDungeonEnvelope } from '../helpers/dungeonFixtures';
@@ -331,7 +331,7 @@ it.each([false, true])('versions final reward saves and keeps a rollback checkpo
   expect(reopened.backup).toEqual(checkpoint);
 });
 
-it.each([false, true])('keeps the pre-Hobgoblin checkpoint through later saves (tracked: %s)', tracked => {
+it.each([false, true])('keeps rolling recovery and a pre-Hobgoblin rollback checkpoint (tracked: %s)', tracked => {
   const seed = Array.from({ length: 64 }, (_, index) => index)
     .find(index => selectDungeonEncounter(index, 2, 1).mapId === 'hobgoblin_formation');
   assert(seed !== undefined);
@@ -345,15 +345,39 @@ it.each([false, true])('keeps the pre-Hobgoblin checkpoint through later saves (
   assert(checkpoint.status === 'valid');
   expect(checkpoint.state).toEqual(before);
 
-  const ascended = good(travelDungeon(entered, 'ascend', entered.revision));
-  expect(store.save(ascended)).toEqual({ ok: true });
-  const reentered = good(travelDungeon(ascended, 'descend', ascended.revision));
+  const finishedSecond = good(readDungeon(clearFloor(entered)));
+  expect(store.save(finishedSecond)).toEqual({ ok: true });
+  const third = good(travelDungeon(finishedSecond, 'descend', finishedSecond.revision));
   const reopened = createDungeonStorage(() => data);
-  expect(reopened.save(reentered)).toEqual({ ok: true });
+  expect(reopened.save(third)).toEqual({ ok: true });
   expect(reopened.inspect()).toMatchObject({
-    primary: { status: 'valid', state: reentered },
-    backup: checkpoint,
+    primary: { status: 'valid', state: third },
+    backup: { status: 'valid', state: finishedSecond },
   });
+  expect(data.getItem(DUNGEON_KEYS.backup)).toBe(checkpoint.text);
+
+  data.setItem(DUNGEON_KEYS.primary, 'corrupt');
+  const recovery = createDungeonStorage(() => data);
+  const recent = data.getItem(DUNGEON_RECENT_BACKUP_KEY);
+  assert(recent);
+  data.setItem(DUNGEON_RECENT_BACKUP_KEY, recent + '!');
+  expect(recovery.inspect().backup).toEqual(checkpoint);
+  data.setItem(DUNGEON_RECENT_BACKUP_KEY, recent);
+  const session = new DungeonSession(before, recovery);
+  const review = session.inspect();
+  expect(resumableDungeonSlot(review)).toBe('backup');
+  expect(session.continue(review)).toBe(true);
+  expect(session.snapshot).toEqual(finishedSecond);
+  expect(recovery.remove('primary', 'corrupt')).toEqual({ ok: true });
+  expect(recovery.save(finishedSecond, null)).toEqual({ ok: true });
+  const resumed = recovery.inspect().backup;
+  assert(resumed.status === 'valid');
+  expect(resumed.state).toEqual(finishedSecond);
+  expect(data.getItem(DUNGEON_KEYS.backup)).toBe(checkpoint.text);
+  expect(recovery.remove('backup', resumed.text, null)).toEqual({ ok: true });
+  expect(data.getItem(DUNGEON_KEYS.backup)).toBeNull();
+  expect(data.getItem(DUNGEON_RECENT_BACKUP_KEY)).toBeNull();
+  session.dispose();
 });
 
 export function clearFloor(s: DungeonState) {
