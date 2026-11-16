@@ -11,7 +11,7 @@ import type { BattleAudioSnapshot } from '../phaser/BattleAudio';
 import { publicAssetUrl } from './publicAssetUrl';
 import { GUARDED_STRIKE_TRADEOFF } from '../content/constants';
 
-import { BATTLE_KEYS, ownedAbilities, actionCommand, actionTargets, type Action } from './battleActions';
+import { BATTLE_KEYS, ownedAbilities, actionCommand, actionTargets, friendlyFire, type Action } from './battleActions';
 import { mountCombatControlsPreference, type CombatSkin } from './combatControls';
 import { draughtsSpent } from '../domain/draughts';
 import { BattleTurnQueue } from './battleTurnQueue';
@@ -132,7 +132,7 @@ export class BattleHud {
       <button id="battle-move" data-action="move" aria-label="Move" aria-describedby="battle-availability"><strong>Move</strong><span>Uses movement</span></button>
       <button data-action="basic" aria-label="Basic attack" aria-describedby="battle-availability"><strong>Basic attack</strong><span>Uses action</span></button>
       <button id="battle-next" aria-label="Wait / End turn" aria-describedby="battle-availability"><strong>Wait / End turn</strong><span>Ends turn immediately</span></button><button id="battle-plan-cancel" hidden>Cancel plan</button></div>
-      <label for="battle-ability">Ability</label><select id="battle-ability" aria-describedby="battle-ability-info battle-availability"></select><p id="battle-ability-info"></p><p id="battle-availability"></p><section class="battle-decision" aria-label="Target and action preview"><label for="battle-target">Target / destination</label><select id="battle-target"><option value="">Choose target</option></select><p id="battle-selection">Select a tile</p><p id="battle-target-info"></p><button id="battle-inspect-target" hidden>Inspect target</button><p id="battle-preview" aria-live="polite">Choose an action and target</p><div class="battle-commit"><button id="battle-review" disabled>Confirm action</button><button id="battle-cancel" disabled>Cancel action</button></div></section>
+      <label for="battle-ability">Ability</label><select id="battle-ability" aria-describedby="battle-ability-info battle-availability"></select><p id="battle-ability-info"></p><p id="battle-availability"></p><section class="battle-decision" aria-label="Target and action preview"><label for="battle-target">Target / destination</label><select id="battle-target"><option value="">Choose target</option></select><p id="battle-selection">Select a tile</p><p id="battle-target-info"></p><button id="battle-inspect-target" hidden>Inspect target</button><p id="battle-preview" aria-live="polite"><span id="battle-preview-warning"></span><span id="battle-preview-text">Choose an action and target</span></p><div class="battle-commit"><p id="battle-friendly-warning" aria-live="polite"></p><button id="battle-review" aria-describedby="battle-friendly-warning" disabled>Confirm action</button><button id="battle-cancel" disabled>Cancel action</button></div></section>
       <nav class="battle-tools" aria-label="Secondary battle tools"><button id="battle-plan">Plan move + ability</button><button id="battle-undo">Undo move</button><button id="battle-party">Inspect party</button><button id="battle-danger" aria-pressed="false" aria-describedby="battle-danger-info">Show enemy danger</button><button id="battle-log-open">Battle log</button><button id="battle-sound" aria-pressed="false" aria-describedby="battle-sound-status">Enable sound</button><button id="battle-sound-retry" hidden>Retry sound</button><details id="battle-overflow"><summary>More</summary><div class="battle-secondary-controls"></div></details></nav><p id="battle-danger-info">Danger shows living heroes reachable by an enemy attack or Weakening Hex on its next turn, assuming current positions and statuses; it does not predict enemy choice.</p><p id="battle-danger-results" aria-live="polite" aria-atomic="true"></p><p id="battle-sound-status" aria-live="polite">Sound off</p>`;
     const signal=this.abort.signal;
     const help=document.createElement('details');help.id='battle-shortcuts';
@@ -445,7 +445,13 @@ export class BattleHud {
     const selectedTile = selected && s.catalog.maps[s.state.mapId].cells.find(cell => cell.x === selected.x && cell.y === selected.y);
     const terrainNote = selectedTile?.terrainId === 'rock' && (!action || action === 'move')
       ? 'Rocky ground blocks movement and line of sight' : message;
-    this.root.querySelector('#battle-preview')!.textContent=s.error?`${s.phase==='error'?'Battle stopped':'Unavailable'}: ${s.error}`:terrainNote;
+    const previewTextContent = s.error ? `${s.phase==='error'?'Battle stopped':'Unavailable'}: ${s.error}` : terrainNote;
+    const prepared = s.pendingPlan?.ability ?? s.pending;
+    const warning = enabled && prepared ? friendlyFire(s, prepared) : '';
+    const inlineWarning = previewTextContent.startsWith(warning) ? warning : '';
+    this.root.querySelector('#battle-preview-warning')!.textContent = inlineWarning;
+    this.root.querySelector('#battle-preview-text')!.textContent = previewTextContent.slice(inlineWarning.length);
+    this.root.querySelector('#battle-friendly-warning')!.textContent = warning.trimEnd();
     const options: {cell:CellPosition;label:string}[]=[];
     if(enabled && action==='move') {if(movement?.ok) for(const c of movement.cells.filter(c=>c.cost>0)) options.push({cell:c.cell,label:`(${c.cell.x}, ${c.cell.y}) · cost ${c.cost}`});}
     else if(enabled && action) for(const u of actionTargets(s,action)) {

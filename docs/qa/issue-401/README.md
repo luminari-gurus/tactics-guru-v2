@@ -70,3 +70,13 @@ The Chromium regression verifies the entire Frost Snare preview and both buttons
 ```text
 92cd6d0df99f156553d1b71f06d5764d1964ecee04557915ffc31cf112ad91ca  dist/assets/battleLayout-CiibOQR0.css
 ```
+
+## Friendly-fire warning follow-up
+
+After the Battle tools branch merged into this PR, the Rail warning and Confirm button no longer overlapped at 1280 × 600 in a fresh Chromium battle. At 1280 × 580, preparing Magic Missile against the Fighter still put the pinned Confirm button over the warning at zero scroll.
+
+The desktop Rail now puts the friendly-fire warning directly above Confirm and Cancel inside the pinned row. The warning also describes Confirm for assistive technology. The Chromium regression checks complete visibility and spacing at 1280 × 600 and 1280 × 580, then cancels and verifies that combat state is unchanged.
+
+```text
+76df6722ddacd095e20cd04d8cc0f7ddee7806749e4bf24b66c373afd1b11b06  dist/assets/battleLayout-CViSXgl8.css
+```

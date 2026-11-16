@@ -866,6 +866,27 @@ test('desktop Rail keeps primary and prepared controls inside the initial viewpo
   await expect(preview).toContainText('Friendly fire');
   await expectControlsInViewport();
   await expect(preview).toBeInViewport({ratio:1});
+
+  // The pinned row and the warning must travel together when space runs out.
+  const warning = page.locator('#battle-friendly-warning');
+  const cancel = page.locator('#battle-cancel');
+  await expect(warning).toHaveText('Friendly fire: this damages fighter #1.');
+  await expect(confirm).toHaveAccessibleDescription('Friendly fire: this damages fighter #1.');
+  for (const height of [600,580]) {
+    await page.setViewportSize({width:1280,height});
+    await expect(warning).toBeInViewport({ratio:1});
+    await expect(confirm).toBeInViewport({ratio:1});
+    await expect(cancel).toBeInViewport({ratio:1});
+    const warningBounds = (await warning.boundingBox())!;
+    const confirmBounds = (await confirm.boundingBox())!;
+    expect(warningBounds.y + warningBounds.height).toBeLessThanOrEqual(confirmBounds.y);
+    expect(await page.locator('#battle-scroll').evaluate(rail=>rail.scrollTop)).toBe(0);
+  }
+
+  const before = await session(page);
+  await cancel.click();
+  await expect(warning).toBeHidden();
+  expect((await session(page)).state).toEqual(before.state);
 });
 
 test('accepted rail and dock preserve drawable floors, readable controls and focus at five sizes',async({page},info)=>{

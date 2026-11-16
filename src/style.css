@@ -102,6 +102,7 @@ dialog button { touch-action: manipulation; }
 .battle-mode #battle-target { width:100%; min-width:0; height:44px; font-size:.85rem; }
 .battle-mode #battle-selection, .battle-mode #battle-target-info { font-size:.8rem; margin:6px 0; }
 .battle-mode #battle-preview { font-size:.85rem; margin:12px 0; overflow-wrap:anywhere; }
+.battle-mode #battle-friendly-warning { display:none; }
 .battle-mode .battle-commit { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; }
 .battle-mode #battle-review:not(:disabled) { color:var(--panel); background:var(--gold); border-color:var(--gold); font-weight:650; }
 .battle-mode .battle-tools { display:flex; gap:6px; flex-wrap:wrap; border-top:1px solid #66768d; padding-top:12px; margin-top:16px; }
@@ -257,6 +258,16 @@ dialog button { touch-action: manipulation; }
     background:var(--panel);
   }
   .battle-mode.battle-skin-rail #battle-scroll:has(#battle-review:enabled) { scroll-padding-bottom:60px; }
+  .battle-mode.battle-skin-rail #battle-scroll:has(#battle-friendly-warning:not(:empty)) { scroll-padding-bottom:7rem; }
+  .battle-mode.battle-skin-rail #battle-preview-warning { display:none; }
+  .battle-mode.battle-skin-rail #battle-friendly-warning:not(:empty) {
+    display:block;
+    grid-column:1 / -1;
+    margin:0;
+    color:var(--warning);
+    font-size:.8rem;
+    overflow-wrap:anywhere;
+  }
   /* An occupied selection is already identified by the target summary. */
   .battle-mode.battle-skin-rail #battle-selection:has(+ #battle-target-info:not(:empty)) { display:none; }
   .battle-mode .battle-commit + #battle-inspect-target { margin-top:6px; }
