@@ -81,7 +81,7 @@ test('restart during accepted presentation discards old callbacks and history',a
  expect({...checkpoint,stats:{...checkpoint.stats,activeMs:fresh.stats!.activeMs}}).toEqual(fresh);
  await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(checkpoint);
 });
-test('legal enemy defeat waits for its save and returns to the menu during a pending history write',async({page})=>{
+test('legal enemy defeat waits for its save and returns to the menu during a pending history write',async({page,isMobile})=>{
  const made=startDungeonBattle(atEncounter(freshDungeon('dungeon-defeat-fixture',1)));if(!made.ok)throw Error(made.reason);const entry=made.state,built=dungeonBattle(entry)!;
  const session=new BattleSession(built.catalog,entry.activeBattle!,entry.activeBattle!.seed,undefined,true,built.battlefield);let before=entry.activeBattle!;
  for(let i=0;i<400&&session.state.outcome==='ongoing';i++){
@@ -149,9 +149,11 @@ test('legal enemy defeat waits for its save and returns to the menu during a pen
  await page.getByRole('button',{name:'Remove reviewed save',exact:true}).click();
  await expect(recovery.getByRole('button',{name:'Remove primary save',exact:true})).toBeVisible();
  await page.goto('./');
- await page.getByRole('button',{name:'New Game',exact:true}).click();
- await page.getByRole('dialog',{name:'Start new dungeon?',exact:true}).getByRole('button',{name:'Start new dungeon',exact:true}).click();
+ await expect(page.getByRole('button',{name:'Continue',exact:true})).toBeDisabled();
+ const newGame=page.getByRole('button',{name:'New Game',exact:true});
+ if(isMobile)await newGame.tap();else{await newGame.focus();await page.keyboard.press('Enter');}
  await expect(page.locator('#dungeon-map')).toBeVisible();
+ await expect(page.getByRole('dialog')).toHaveCount(0);
  expect((await snapshot(page)).id).not.toBe(entry.id);
  expect((await snapshot(page)).party.every(h=>h.hp>0)).toBe(true);expect((await snapshot(page)).floors).toHaveLength(1);
 });

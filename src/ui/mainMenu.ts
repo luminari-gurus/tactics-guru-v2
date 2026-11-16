@@ -2,7 +2,7 @@ import { inspectMenuSave } from '../app/menuSaves';
 import { RunHistory } from '../app/RunHistory';
 import { readRunRecord, type RunRecord } from '../domain/runRecords';
 import { menuGameHref, routeHref } from '../app/routes';
-import { bothDungeonSlotsMissing, createDungeonStorage } from '../persistence/dungeonStorage';
+import { createDungeonStorage, resumableDungeonSlot } from '../persistence/dungeonStorage';
 import { mountTelemetryPreferences } from '../telemetry/preferences';
 import { mountCombatControlsPreference } from './combatControls';
 import { mountAutoCollectLootPreference } from './autoCollectLootPreference';
@@ -100,7 +100,7 @@ export function startMainMenu() {
     },
     new: () => {
       const review = createDungeonStorage().inspect();
-      if (bothDungeonSlotsMissing(review)) {
+      if (resumableDungeonSlot(review) === null) {
         try { sessionStorage.removeItem('tactics-guru:menu-new-dungeon-review'); } catch { /* The destination rechecks storage. */ }
         location.assign(menuGameHref('dungeon', import.meta.env.BASE_URL, 'new'));
         return;

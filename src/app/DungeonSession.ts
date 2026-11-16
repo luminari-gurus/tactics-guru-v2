@@ -105,16 +105,17 @@ export class DungeonSession {
     this.recordEnding();
     this.progressSaved = false;
     if (!quiet) this.report(feedback ? `Saving dungeon… ${feedback}` : 'Saving dungeon…');
-    return this.mutate(() => this.current === snapshot && this.saveNow(quiet, feedback), false, true, quiet);
+    return this.mutate(() => this.current === snapshot && this.saveNow({ quiet, feedback }), false, true, quiet);
   }
-  private saveNow(quiet = false, feedback = '') {
+  private saveNow({ quiet = false, feedback = '', retryUnsaved = false } = {}) {
     if (this.disposed && !quiet) return false;
     const report = (status: string) => this.report(feedback ? `${status.replace(/\.$/, '')}. ${feedback}` : status);
     // Accepted endings survive an independent active-save opt-out or conflict.
     if (!this.storage) { report('Testing dungeon. Progress resets on reload.'); return false; }
-    if (this.unsaved) { report('Playing unsaved. Floor travel requires saving; open Save recovery.'); return false; }
+    if (this.unsaved && !retryUnsaved) { report('Playing unsaved. Floor travel requires saving; open Save recovery.'); return false; }
     const result = this.write(this.current);
     this.progressSaved = result.ok;
+    if (result.ok) this.unsaved = false;
     if (!quiet || !result.ok || this.message.startsWith('Progress unsaved')) report(result.ok ? 'Dungeon saved on this device' : `Progress unsaved: ${result.reason}. Open Save recovery to retry or export.`);
     return result.ok;
   }
@@ -224,7 +225,9 @@ export class DungeonSession {
   retry(review: DungeonInspection) { this.recordEnding(); return this.mutate(() => this.retryNow(review), false); }
   private retryNow(review: DungeonInspection) {
     if (!this.storage || this.disposed || review !== this.review || !this.storage.acknowledge(review)) return false;
-    this.expectedPrimary = review.primary.text; this.unsaved = false; this.review = null; return this.saveNow();
+    this.expectedPrimary = review.primary.text;
+    this.review = null;
+    return this.saveNow({ retryUnsaved: true });
   }
   private liveExports(review: DungeonInspection) {
     const values: { label: string; text: string }[] = [];

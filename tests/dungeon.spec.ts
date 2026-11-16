@@ -718,8 +718,10 @@ fixedSeedTest('dungeon battle undo survives reload and a legal defeat journey',a
  await expect(summary).toHaveCount(0);
  expect(await historyRows(page)).toEqual(recorded);
  expect(await savedSlots()).toEqual(slots);
- await page.getByRole('button',{name:'New Game',exact:true}).click();
- await page.getByRole('dialog',{name:'Start new dungeon?',exact:true}).getByRole('button',{name:'Start new dungeon',exact:true}).click();
+ await expect(page.getByRole('button',{name:'Continue',exact:true})).toBeDisabled();
+ const newGame=page.getByRole('button',{name:'New Game',exact:true});
+ if(isMobile)await newGame.tap();else{await newGame.focus();await page.keyboard.press('Enter');}
+ await expect(page.getByRole('dialog',{name:'Start new dungeon?',exact:true})).toHaveCount(0);
  await expect(page.getByRole('heading',{name:/Dungeon · Floor 1/})).toBeVisible();
  expect(await historyRows(page)).toEqual(recorded);
 });
