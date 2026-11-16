@@ -1,5 +1,7 @@
-import type { DungeonState } from '../domain/dungeon';
-import { currentFloor, clearedDungeonSlots } from '../domain/dungeon';
+import type { DungeonFloor, DungeonState } from '../domain/dungeon';
+import { currentFloor, clearedDungeonSlots, dungeonStairStatus } from '../domain/dungeon';
+import { dungeonContent } from '../content/dungeon';
+import type { ItemId } from '../content/itemTypes';
 import { currentSight, neighbors, poiCell } from '../domain/exploration';
 import type { GeneratedMap } from '../map/generate';
 import { createMapArt, ART_STYLES, type ArtStyle } from '../map/art';
@@ -15,6 +17,27 @@ export function dungeonEncounterLabel(s: DungeonState, slot: number): string {
 
 const WASD_PREFERENCE_KEY = 'tactics-guru:dungeon-wasd';
 
+type LootContent = { readonly cell: number; readonly itemId: ItemId; readonly remaining: 0 | 1 };
+
+/** Presentation groups contents without changing encounter reward identities or pickup order. */
+export function dungeonLootPiles(floor: DungeonFloor & { readonly loot?: readonly LootContent[] }): Map<number, readonly LootContent[]> {
+  const piles = new Map<number, LootContent[]>();
+  for (const loot of floor.loot ?? []) {
+    if (!loot.remaining) continue;
+    const contents = piles.get(loot.cell) ?? [];
+    contents.push(loot);
+    piles.set(loot.cell, contents);
+  }
+  return piles;
+}
+
+export function dungeonLootContents(contents: readonly LootContent[]): string {
+  const quantities = new Map<ItemId, number>();
+  for (const loot of contents) if (loot.remaining) quantities.set(loot.itemId, (quantities.get(loot.itemId) ?? 0) + loot.remaining);
+  return [...quantities].sort(([a], [b]) => a.localeCompare(b))
+    .map(([itemId, quantity]) => `${dungeonContent.items[itemId].label} ×${quantity}`).join(', ');
+}
+
 /** View-local art state and bindings; no simulation timer or authoritative DOM state. */
 export class DungeonMap {
   readonly root = document.createElement('section');
@@ -27,7 +50,11 @@ export class DungeonMap {
   private readonly select = document.createElement('select');
   private readonly wasd: HTMLInputElement;
   private readonly grid = document.createElement('div');
+  private readonly viewport = document.createElement('div');
+  private readonly directions = document.createElement('div');
   private readonly markerDescription = document.createElement('p');
+  private readonly lootGuide = document.createElement('p');
+  private readonly lootHere = document.createElement('p');
   private readonly feedback = document.createElement('p');
   private readonly controls: { button: HTMLButtonElement; dx: number; dy: number }[] = [];
   private readonly cells: HTMLSpanElement[] = [];
@@ -35,6 +62,20 @@ export class DungeonMap {
   private readonly fallbackCells = new Set<HTMLElement>();
   private visual: { map: GeneratedMap; biome: string; revealed: Set<number>; sight: Set<number>; markers: number[] } | null = null;
   private readonly abort = new AbortController();
+  private readonly resize = new ResizeObserver(() => this.scheduleLayout(false, true));
+  private layoutFrame = 0;
+  private layoutDirty = true;
+  private revealPlayer = false;
+  private layoutSize = { width: 0, height: 0 };
+  private layoutParent: HTMLElement | null = null;
+  private layoutScreen: HTMLElement | null = null;
+  private layoutHeader: HTMLElement | null = null;
+  private viewportScroll = { left: 0, top: 0 };
+  private layoutGeometry: {
+    width: number; height: number; left: number; top: number;
+    cellWidth: number; cellHeight: number; columnStride: number; rowStride: number;
+    maxLeft: number; maxTop: number;
+  } | null = null;
   private readonly treatment = createMapArt(() => { if (this.live) this.paintArt(); });
   constructor(private readonly move: (destination: number) => void, private readonly locked: () => boolean) {
     const el = <K extends keyof HTMLElementTagNameMap>(tag:K,text='') => { const n=document.createElement(tag);n.textContent=text;return n; };
@@ -60,9 +101,17 @@ export class DungeonMap {
     this.wasd = wasd;
     keyboardPreference.append(wasd, ' Enable WASD movement');
     this.grid.id='dungeon-map';this.grid.tabIndex=0;this.grid.setAttribute('role','application');
+    this.viewport.className = 'dungeon-map-viewport';
+    this.viewport.append(this.grid);
+    this.grid.addEventListener('focus', () => this.scheduleLayout(true), {signal});
     this.markerDescription.id = 'dungeon-map-markers';
     this.markerDescription.hidden = true;
     this.grid.setAttribute('aria-describedby', this.markerDescription.id);
+    this.lootGuide.className = 'dungeon-loot-guide';
+    this.lootGuide.textContent = '◆ Loot · Step onto it to collect what fits.';
+    this.lootGuide.hidden = true;
+    this.lootHere.className = 'dungeon-loot-here';
+    this.lootHere.hidden = true;
     this.grid.addEventListener('click',e=>{
       if(!this.live||!this.state||!this.map||this.locked()||document.hidden||!(e.target instanceof Element))return;
       const cell=e.target.closest<HTMLElement>('[data-cell]');if(!cell)return;
@@ -71,17 +120,27 @@ export class DungeonMap {
       else this.feedback.textContent='Choose an adjacent cell or use the direction controls.';
     },{signal});
     this.feedback.id='dungeon-map-feedback';this.feedback.setAttribute('role','status');
-    const directions=el('div');directions.className='dungeon-directions';directions.setAttribute('role','group');directions.setAttribute('aria-label','Move player');
-    for(const [name,dx,dy] of [['North',0,-1],['East',1,0],['South',0,1],['West',-1,0]] as const){
+    const directions=this.directions;directions.className='dungeon-directions';directions.setAttribute('role','group');directions.setAttribute('aria-label','Move player');
+    directions.append(this.viewport);
+    for(const [name,dx,dy,arrow] of [['North',0,-1,'↑'],['East',1,0,'→'],['South',0,1,'↓'],['West',-1,0,'←']] as const){
       const button=el('button');button.id=`dungeon-step-${name.toLowerCase()}`;button.type='button';button.setAttribute('aria-label',name);
-      button.append(el('span',name[0]));
+      const icon=el('span',arrow);icon.className='dungeon-direction-arrow';icon.setAttribute('aria-hidden','true');
+      const label=el('span',name[0]);label.setAttribute('aria-hidden','true');
+      button.append(icon,label);
       button.addEventListener('click',()=>this.step(dx+dy*(this.map?.width??20)),{signal});
       this.controls.push({button,dx,dy});directions.append(button);
     }
-    const center=el('span');center.className='dungeon-compass-center';center.setAttribute('aria-hidden','true');directions.append(center);
-    this.root.append(this.heading,this.grid,this.markerDescription);
+    this.root.append(this.heading,directions,this.markerDescription,this.lootGuide,this.lootHere);
     this.controlsRoot.className = 'dungeon-map-controls';
-    this.controlsRoot.append(directions,this.feedback,label,keyboardPreference);
+    this.controlsRoot.append(this.feedback,label,keyboardPreference);
+    this.resize.observe(this.viewport);
+    this.resize.observe(this.grid);
+    this.resize.observe(this.heading);
+    this.viewport.addEventListener('scroll', () => {
+      this.viewportScroll = { left: this.viewport.scrollLeft, top: this.viewport.scrollTop };
+    }, {signal, passive: true});
+    window.addEventListener('resize', () => this.scheduleLayout(false, true), {signal});
+    window.visualViewport?.addEventListener('resize', () => this.scheduleLayout(false, true), {signal});
     document.addEventListener('keydown',e => {
       if (this.state?.phase !== 'ready' || !this.root.isConnected || this.root.closest('[hidden]') ||
         this.locked() || document.hidden || e.defaultPrevented || e.isComposing ||
@@ -98,8 +157,98 @@ export class DungeonMap {
       if (!e.repeat) this.step(delta);
     },{signal});
   }
-  dispose() { this.live = false; this.abort.abort(); }
-  render(state: DungeonState, map: GeneratedMap) { this.state = state; this.map = map; this.draw(); }
+  dispose() { this.live = false; this.abort.abort(); this.resize.disconnect(); cancelAnimationFrame(this.layoutFrame); }
+  render(state: DungeonState, map: GeneratedMap) {
+    const moved = !this.state || this.map !== map || currentFloor(this.state).position !== currentFloor(state).position;
+    const refit = !this.state || this.map !== map || this.state.phase !== state.phase || this.layoutParent !== this.root.parentElement;
+    this.layoutParent = this.root.parentElement;
+    this.state = state; this.map = map; this.draw(); this.scheduleLayout(moved, refit);
+  }
+  /** Fit controls to the visible screen; scroll only the map window when following movement. */
+  private scheduleLayout(reveal: boolean, refit = false) {
+    this.revealPlayer ||= reveal;
+    this.layoutDirty ||= refit;
+    if (!this.live || this.layoutFrame) return;
+    this.layoutFrame = requestAnimationFrame(() => {
+      this.layoutFrame = 0;
+      if (!this.live) return;
+      if (!this.root.isConnected || this.root.closest('[hidden]')) {
+        this.layoutSize = { width: 0, height: 0 };
+        this.layoutGeometry = null;
+        this.layoutDirty = true;
+        return;
+      }
+      if (this.layoutDirty || !this.layoutGeometry) {
+        this.layoutDirty = false;
+        this.fitViewport();
+      }
+      if (!this.revealPlayer || !this.state || !this.map || !this.layoutGeometry) return;
+      this.revealPlayer = false;
+      const position = currentFloor(this.state).position, geometry = this.layoutGeometry;
+      const left = geometry.left + position % this.map.width * geometry.columnStride;
+      const top = geometry.top + Math.floor(position / this.map.width) * geometry.rowStride;
+      const margin = Math.max(geometry.cellWidth, geometry.cellHeight);
+      let { left: scrollLeft, top: scrollTop } = this.viewportScroll;
+      // Ordinary visible steps use cached geometry instead of flushing the freshly updated HUD layout.
+      if (left - margin < scrollLeft) scrollLeft = left - margin;
+      else if (left + geometry.cellWidth + margin > scrollLeft + geometry.width) scrollLeft = left + geometry.cellWidth + margin - geometry.width;
+      if (top - margin < scrollTop) scrollTop = top - margin;
+      else if (top + geometry.cellHeight + margin > scrollTop + geometry.height) scrollTop = top + geometry.cellHeight + margin - geometry.height;
+      scrollLeft = Math.max(0, Math.min(geometry.maxLeft, scrollLeft));
+      scrollTop = Math.max(0, Math.min(geometry.maxTop, scrollTop));
+      if (scrollLeft !== this.viewportScroll.left || scrollTop !== this.viewportScroll.top) {
+        this.viewportScroll = { left: scrollLeft, top: scrollTop };
+        this.viewport.scrollTo({ left: scrollLeft, top: scrollTop, behavior: 'instant' });
+      }
+    });
+  }
+  /** Geometry changes are observed separately from movement; duplicate notifications preserve manual panning. */
+  private fitViewport() {
+    if (!this.map) return;
+    const screen = this.root.closest<HTMLElement>('#dungeon-screen');
+    if (!screen) return;
+    if (screen !== this.layoutScreen) {
+      if (this.layoutScreen) this.resize.unobserve(this.layoutScreen);
+      this.layoutScreen = screen; this.resize.observe(screen);
+    }
+    const header = screen.querySelector<HTMLElement>(':scope > .dungeon-header');
+    if (header !== this.layoutHeader) {
+      if (this.layoutHeader) this.resize.unobserve(this.layoutHeader);
+      this.layoutHeader = header;
+      if (header) this.resize.observe(header);
+    }
+    const frame = this.directions.getBoundingClientRect(), screenBounds = screen.getBoundingClientRect();
+    const visible = window.visualViewport;
+    const bottom = Math.min(screenBounds.bottom, visible ? visible.offsetTop + visible.height : innerHeight);
+    const padding = parseFloat(getComputedStyle(screen).paddingBottom);
+    const gap = parseFloat(getComputedStyle(this.directions).rowGap);
+    const rails = this.controls[0].button.offsetHeight + this.controls[2].button.offsetHeight + 2 * gap;
+    // Including outer scroll keeps the size stable while inspecting secondary panels.
+    const available = Math.max(64, Math.floor(bottom - frame.top - screen.scrollTop - padding - rails));
+    const height = `${available}px`;
+    if (this.viewport.style.getPropertyValue('--dungeon-map-max-height') !== height) {
+      this.viewport.style.setProperty('--dungeon-map-max-height', height);
+    }
+    const size = { width: this.viewport.clientWidth, height: this.viewport.clientHeight };
+    // Resize notifications can arrive after a player has started inspecting the map.
+    // Follow once for an actual size change, not again for a delayed duplicate event.
+    this.revealPlayer ||= size.width !== this.layoutSize.width || size.height !== this.layoutSize.height;
+    this.layoutSize = size;
+    const grid = this.grid.getBoundingClientRect(), view = this.viewport.getBoundingClientRect();
+    const style = getComputedStyle(this.grid);
+    const borderLeft = parseFloat(style.borderLeftWidth), borderTop = parseFloat(style.borderTopWidth);
+    const columnGap = parseFloat(style.columnGap), rowGap = parseFloat(style.rowGap);
+    const columnStride = (grid.width - borderLeft - parseFloat(style.borderRightWidth) + columnGap) / this.map.width;
+    const rowStride = (grid.height - borderTop - parseFloat(style.borderBottomWidth) + rowGap) / this.map.height;
+    this.viewportScroll = { left: this.viewport.scrollLeft, top: this.viewport.scrollTop };
+    this.layoutGeometry = {
+      ...size,
+      left: grid.left - view.left - this.viewport.clientLeft + this.viewportScroll.left + borderLeft,
+      top: grid.top - view.top - this.viewport.clientTop + this.viewportScroll.top + borderTop,
+      cellWidth: columnStride - columnGap, cellHeight: rowStride - rowGap, columnStride, rowStride,
+      maxLeft: this.viewport.scrollWidth - size.width, maxTop: this.viewport.scrollHeight - size.height,
+    };
+  }
   private step(delta: number) {
     if (!this.live || !this.state || this.locked() || document.hidden) return;
     const f = currentFloor(this.state), destination = f.position + delta;
@@ -129,8 +278,10 @@ export class DungeonMap {
     if(grid.dataset.biome!==biome.id)grid.dataset.biome=biome.id;
     const revealed = new Set(f.exploration.revealed);
     const sight = new Set(currentSight(f.position, map));
+    const piles = dungeonLootPiles(f);
+    const shownLoot = new Map([...piles].filter(([cell]) => revealed.has(cell)));
     const showUpstairs = s.depth > 1 && revealed.has(f.descriptor.upstairs);
-    const showDownstairs = s.phase === 'ready' && f.completed === 3 && revealed.has(f.descriptor.downstairs);
+    const showDownstairs = dungeonStairStatus(s, 'descend') === 'available' && revealed.has(f.descriptor.downstairs);
     const cleared=clearedDungeonSlots(f);
     const activeSlot = f.exploration.version === 'exploration-v2' ? f.exploration.active
       : s.phase === 'reward' ? f.completed - 1 : s.phase === 'battle' ? f.completed : null;
@@ -150,9 +301,17 @@ export class DungeonMap {
         : slot === activeSlot && s.phase === 'battle' ? 'In battle' : 'Available';
       markerDescriptions.push(`${dungeonEncounterLabel(s, slot)} at ${location(cell)}. ${status}.`);
     }
+    for (const [cell, contents] of shownLoot) {
+      markerDescriptions.push(`Loot at ${location(cell)}: ${dungeonLootContents(contents)}.${cell === f.position ? ' Beneath the party.' : ''}`);
+    }
     if (showDownstairs) markerDescriptions.push(`Downstairs at ${location(f.descriptor.downstairs)}.`);
-    const description = markerDescriptions.join(' ') || 'No visible encounters or discovered stairs.';
+    const description = markerDescriptions.join(' ') || 'No visible encounters, loot or discovered stairs.';
     if (this.markerDescription.textContent !== description) this.markerDescription.textContent = description;
+    this.lootGuide.hidden = shownLoot.size === 0;
+    const beneathParty = piles.get(f.position);
+    this.lootHere.hidden = !beneathParty;
+    const contentsHere = beneathParty ? `Loot here: ${dungeonLootContents(beneathParty)}. Items stay on the ground until they fit in your inventory.` : '';
+    if (this.lootHere.textContent !== contentsHere) this.lootHere.textContent = contentsHere;
     const pois=new Map([...shownPois].sort((a,b)=>Number(cleared.includes(b.encounterSlot))-Number(cleared.includes(a.encounterSlot))).map(p=>[poiCell(p,map.width),p]));
     const total=map.width*map.height;
     let rebuild=this.cells.length!==total||grid.children.length!==total;
@@ -163,7 +322,7 @@ export class DungeonMap {
     }
     const prior=this.visual;
     rebuild ||= !prior || prior.map!==map || prior.biome!==biome.id;
-    const markers=[f.position,f.descriptor.upstairs,f.descriptor.downstairs,...pois.keys()];
+    const markers=[f.position,f.descriptor.upstairs,f.descriptor.downstairs,...pois.keys(),...shownLoot.keys()];
     const dirty=new Set<number>(),artDirty=new Set<HTMLElement>();
     if(rebuild) {for(let i=0;i<total;i++)dirty.add(i);}
     else if(prior) {
@@ -181,6 +340,7 @@ export class DungeonMap {
       const className = known ? terrainClass + (sight.has(i) ? '' : ' explore-remembered') : 'explore-hidden';
       if(cell.className!==className)cell.className=className;
       let text='', poi: string | undefined;
+      const loot = shownLoot.get(i);
       if(known){
         const terrain=`${biome.id}-${open?'open':'blocked'}`;
         if(cell.dataset.terrain!==terrain){cell.dataset.terrain=terrain;artDirty.add(cell);}
@@ -188,11 +348,21 @@ export class DungeonMap {
         if(showUpstairs&&i===f.descriptor.upstairs)text='↑';
         if(showDownstairs&&i===f.descriptor.downstairs)text='↓';
         const p=pois.get(i);if(p){if(!cleared.includes(p.encounterSlot))text='M';else if(!(showUpstairs&&i===f.descriptor.upstairs)&&!(showDownstairs&&i===f.descriptor.downstairs))text='✓';poi=p.id;}
+        if (loot && (!text || text === '✓')) text = '◆';
       } else if(cell.dataset.terrain!==undefined) {
         delete cell.dataset.terrain;cell.style.backgroundImage='';this.terrainCells.delete(cell);this.fallbackCells.delete(cell);
       }
       if(i===f.position)text='●';
       if(cell.textContent!==text)cell.textContent=text;
+      if (loot) {
+        const count = String(loot.length);
+        if (cell.dataset.loot !== count) cell.dataset.loot = count;
+        if (text !== '◆') cell.dataset.lootOverlay = 'true';
+        else delete cell.dataset.lootOverlay;
+      } else {
+        delete cell.dataset.loot;
+        delete cell.dataset.lootOverlay;
+      }
       if(poi===undefined){if(cell.dataset.poi!==undefined)delete cell.dataset.poi;}else if(cell.dataset.poi!==poi)cell.dataset.poi=poi;
       if(i===f.position){if(cell.dataset.player!=='true')cell.dataset.player='true';}else if(cell.dataset.player!==undefined)delete cell.dataset.player;
     }

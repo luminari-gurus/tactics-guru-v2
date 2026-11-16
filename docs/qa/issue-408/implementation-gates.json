@@ -1,0 +1,58 @@
+{
+  "recordedOn": "2026-11-14",
+  "applicationAssemblyHead": "1b50b4e0459a341153f370512579631f78d09acd",
+  "checks": [
+    {
+      "check": "fastUnits",
+      "command": "npm run test:unit -- --reporter=dot",
+      "result": "passed",
+      "passingChecks": 1417,
+      "files": 83,
+      "log": "issue408-increment3-units.log",
+      "logSha256": "560f409dfdf41c9491c42f2922098fe993405fd171d1880b9bc13dd28b6b4d63"
+    },
+    {
+      "check": "productionBuild",
+      "command": "npm run build",
+      "result": "passed",
+      "passingChecks": 226,
+      "log": "issue408-increment3-build.log",
+      "logSha256": "1ba7dc218432a94e67892b0f1bb462a5a394b91e0e9c145a24ce41f3c7a6f942"
+    },
+    {
+      "check": "deploymentBuilds",
+      "command": "npm run test:build",
+      "result": "passed",
+      "passingChecks": 2,
+      "files": 1,
+      "log": "issue408-increment3-build-integration.log",
+      "logSha256": "63a6e00e3ed87efd1fa1eeb9653e793e66c572e699f01f6b442351078d437463"
+    },
+    {
+      "check": "selectionTooling",
+      "command": "npm run test:verification-batches",
+      "result": "passed",
+      "passingChecks": 31,
+      "log": "issue408-increment3-batches.log",
+      "logSha256": "985a06a2817cc37a25efc08d07d6075de584abdf94f0dd4d407962bbbed99c75"
+    }
+  ],
+  "bothTypeScriptScopes": "Passed in production build; passed again after the natural-journey assertion correction.",
+  "bundleIndexSha256": "c6ae815ca39fd00e6b8c4449ecbcde272cd502ed3889aebd6f56a353618f3a78",
+  "reuse": "Application source and bundle did not change after these gates. Subsequent edits correct a browser-only statistic assertion and add QA text; test titles/configuration and unit inputs remain unchanged.",
+  "applicationFiles": {
+    "src/app/DelayedDungeonStep.ts": "81e033ff894f96301938142953c02838920894dda6fbaef942b8716da12cc281",
+    "src/app/DungeonSession.ts": "bafd91699931fce2b7b9d7244f69a454ad504a3300f15c001f1bc959ce133b80",
+    "src/app/startDungeonApp.ts": "87dd5c5086ff6a0199e8159cf527ad0218ffd48986d37001678f7f5a05927b63",
+    "src/domain/dungeonAutoCollect.ts": "74542d2d706631d7ff310a1b8d052cf58d0c8249854d8fb0530d0c682734d102",
+    "src/domain/dungeon.ts": "58a94f3c10fd5765cb83bc504ba1d09ba2d49e2ffa7c28787ef2082894fb9d83",
+    "src/domain/dungeonSaveEnvelope.ts": "9bbdbab6ae6c1d6439fb3e2d8772ba771dce60b2417f0094dfbabae6bb431b0c",
+    "src/persistence/dungeonStorage.ts": "355938478f275b09712960cbed609198039241ce753592a9ec7d77e79cc41fe4",
+    "src/ui/autoCollectLootPreference.ts": "3ecbace8f9c0f2193ce5dacff4d3f9f2dd54deadeaba0d27da7914fc52dcf90d",
+    "src/ui/mainMenu.ts": "a075ba0e5260fc9a27d3fe4a96a136d7a96a1d152a18bb1a2d61b6483a8051ac",
+    "src/ui/mainMenu.css": "1c394201d5b437b86016bc877ca120c9c54f4aec926cd553b1d31364fc4d6dac",
+    "src/ui/dungeon.ts": "bf8109a6b7fbfa4e1d9c9a4f8658e7029a06093287248ffe879b7459cfc4521b",
+    "src/ui/dungeonMap.ts": "1bff6077c694db71ab3e4dfe22624e62e7f468e824fde3107fcf6c7d3a3fea66",
+    "src/ui/dungeon.css": "483e4fa1719cbb2566542448d8d12b113328d9c825c7c9cdc8ca22a98e1eb5ee"
+  }
+}

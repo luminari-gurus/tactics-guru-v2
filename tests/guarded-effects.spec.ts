@@ -12,10 +12,7 @@ import { emptyItemOwnership } from '../src/domain/items';
 import { createRunBattle } from '../src/domain/runBattle';
 import { freshDungeon, startDungeonBattle, dungeonBattle } from '../src/domain/dungeon';
 import { encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
-import { encodeRunSave } from '../src/domain/runSaveEnvelope';
-import { encodeBattleSave } from '../src/domain/saveEnvelope';
-import { BATTLE_STORAGE_KEYS } from '../src/persistence/battleStorage';
-import { RUN_STORAGE_KEYS } from '../src/persistence/runStorage';
+import { reachStandaloneBoundary } from './helpers/standaloneBoundary';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { guardedBoundary } from './helpers/guardedBoundary';
 import { runContext } from './helpers/runItemFixtures';
@@ -43,7 +40,7 @@ async function checkBadges(page:Page) {
 }
 
 function boundary(mode: 'standalone' | 'run' | 'dungeon', miss: boolean) {
-  for (let seed = 1; seed <= 100; seed++) {
+  for (let seed = mode === 'run' ? 13 : 1; seed <= 100; seed++) {
     const run = createRun('guarded-browser', seed, runContext.definition, runContext.catalog); if (!run.ok) throw Error(run.reason);
     const items = { run: run.state, ownership: emptyItemOwnership(), offer: null, itemRevision: 0 };
     const runBuilt = createRunBattle(items, runContext); if (!runBuilt.ok) throw Error(runBuilt.reason);
@@ -68,24 +65,41 @@ function boundary(mode: 'standalone' | 'run' | 'dungeon', miss: boolean) {
       probe.finishPresentation(step.token);
     }
     if (!incoming || probe.active.id !== 1 || probe.active.hp === 0 || probe.active.guarded) continue;
-    const saved = mode === 'standalone' ? encodeBattleSave(fixture.before, catalog) : mode === 'run'
-      ? encodeRunSave({ items, activeBattle: fixture.before, battlefield: runBuilt.battlefield }, runContext)
-      : encodeDungeon({ ...dungeon.state, activeBattle: fixture.before });
-    if (!saved.ok) throw Error(saved.reason);
-    return { ...fixture, catalog, saved: saved.text, initial, incoming };
+    const saved = mode === 'dungeon' ? encodeDungeon({ ...dungeon.state, activeBattle: fixture.before }) : null;
+    if (saved && !saved.ok) throw Error(saved.reason);
+    return { ...fixture, catalog, saved: saved?.text, initial, seed, incoming };
   }
   throw Error('No Guarded boundary');
 }
-for (const mode of ['standalone', 'run', 'dungeon'] as const) for (const miss of [false, true]) test(`shared Guarded lifecycle and saved feedback: ${mode} ${miss?'miss':'hit'}`, async ({ page }) => {
-  test.setTimeout(90000);
-  const f = boundary(mode, miss), key = mode === 'standalone' ? BATTLE_STORAGE_KEYS.primary : mode === 'run' ? RUN_STORAGE_KEYS.primary : DUNGEON_KEYS.primary;
-  const path = mode === 'standalone' ? './?game=battle' : mode === 'run' ? '/?game=run' : '/?game=dungeon';
-  const resume = mode === 'standalone' ? '#save-continue' : mode === 'run' ? '#run-continue' : '#dungeon-continue';
-  await page.goto(path);
-  await page.evaluate(({ key, text }) => localStorage.setItem(key, text), { key, text: f.saved });
-  await page.reload();
-  if (mode === 'dungeon') await continueSavedDungeon(page);
-  else await page.locator(resume).click();
+for (const mode of ['standalone', 'run', 'dungeon'] as const) for (const miss of [false, true]) test(`shared Guarded lifecycle: ${mode} ${miss?'miss':'hit'}`, async ({ page }) => {
+  test.setTimeout(180000);
+  // The public three-encounter mode starts at seed 13; restarts advance its seed.
+  const f = boundary(mode, miss);
+  const key = DUNGEON_KEYS.primary;
+  if (mode === 'dungeon') {
+    await page.goto('/?game=dungeon');
+    await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key,text:f.saved!});
+    await page.reload();
+    await continueSavedDungeon(page);
+  } else if (mode === 'standalone') {
+    await reachStandaloneBoundary(page,f.before);
+  } else {
+    await page.goto('/?game=run');
+    await page.locator('#run-start').click();
+    await page.locator('#run-start-encounter').click();
+    const game = page.locator('#game');
+    await expect(game).toHaveAttribute('data-phase','player');
+    for(let seed=13;seed<f.seed;seed++) {
+      await page.locator('#fit-restart').click();
+      await page.locator('#run-confirm-restart').click();
+      await page.locator('#run-start-encounter').click();
+      await expect(game).toHaveAttribute('data-phase','player');
+    }
+    while ((await readSession(page)).state.commandCount < f.before.commandCount) {
+      await playCommand(page,playerDecision((await readSession(page)).state,f.catalog));
+      await expect(game).toHaveAttribute('data-phase','player');
+    }
+  }
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   expect((await readSession(page)).state).toEqual(f.before);
   await checkBadges(page);
@@ -112,11 +126,12 @@ for (const mode of ['standalone', 'run', 'dungeon'] as const) for (const miss of
     expect(await page.evaluate(key=>localStorage.getItem(key),key)).toBe(bytes);
     await page.locator('#battle-cancel').click();
   }
+  const eventStart = (await readSession(page)).events.length;
   await playCommand(page, f.command);
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   const cast = await readSession(page), fighter = cast.state.units.find(u => u.id === 1)!;
   expect(fighter.guarded).toBe(true);
-  expect(cast.events.some(e => e.type === 'attackRolled' && e.result === 'miss')).toBe(miss);
+  expect(cast.events.slice(eventStart).some(e => e.type === 'attackRolled' && e.result === 'miss')).toBe(miss);
   await checkBadges(page);
   await page.screenshot({ path: test.info().outputPath(`${mode}-guarded-board.png`) });
   await expect(page.locator('#battle-status')).toContainText('Guarded');
@@ -126,12 +141,13 @@ for (const mode of ['standalone', 'run', 'dungeon'] as const) for (const miss of
   await expect(page.getByRole('dialog')).toContainText('Guarded (+2 AC, −2 attack rolls; expires immediately before this unit’s next turn)');
   await page.screenshot({ path: test.info().outputPath(`${mode}-guarded-inspection.png`) });
   await page.keyboard.press('Escape');
-  await page.reload();
-  if (mode === 'dungeon') await continueSavedDungeon(page);
-  else await page.locator(resume).click();
-  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  if (mode === 'dungeon') {
+    await page.reload();
+    await continueSavedDungeon(page);
+    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    expect((await readSession(page)).events).toEqual([]);
+  }
   expect((await readSession(page)).state).toEqual(cast.state);
-  expect((await readSession(page)).events).toEqual([]);
   await checkBadges(page);
   expect((await boardReport(page)).effect).toBeNull();
   // Narrow and short layouts, camera zoom, and selection must retain the badge.
@@ -150,6 +166,7 @@ for (const mode of ['standalone', 'run', 'dungeon'] as const) for (const miss of
   await checkBadges(page);
   await expect(page.locator('#battle-status')).toContainText('Guarded');
   await page.screenshot({ path: test.info().outputPath(`${mode}-guarded-resumed.png`) });
+  const castEnd = (await readSession(page)).events.length;
   for (let i = 0; i < 15; i++) {
     await page.locator('#battle-next').click();
     await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
@@ -158,7 +175,7 @@ for (const mode of ['standalone', 'run', 'dungeon'] as const) for (const miss of
     if (!now.state.units.find(u => u.id === 1)!.guarded) {
       expect(now.state.units.find(u => u.id === 1)!.hp).toBeGreaterThan(0);
       expect(now.events).toContainEqual({ type: 'guardExpired', unitId: 1 });
-      const incoming = now.events.filter(e => e.type === 'attackRolled' && e.targetId === 1);
+      const incoming = now.events.slice(castEnd).filter(e => e.type === 'attackRolled' && e.targetId === 1);
       expect(incoming.length).toBeGreaterThan(0);
       for (const event of incoming) expect(event).toMatchObject({ armorClass: stats.armorClass });
       await expect(page.locator('#battle-status')).not.toContainText('Guarded');
@@ -179,30 +196,32 @@ for (const mode of ['standalone', 'run', 'dungeon'] as const) for (const miss of
 /** Both witnesses are reached by accepted commands; no synthetic state mutation. */
 function guardedWitness(kind:'move'|'defeat') {
   const session=new BattleSession(battleCatalog,'map:forest_ruins',1);
+  let playerEntry = session.state;
   for(let i=0;i<200 && session.state.outcome==='ongoing';i++) {
     const before=session.state;
+    if(session.phase==='player')playerEntry=before;
     const command=session.phase==='player'?playerDecision(before,battleCatalog):null;
     if(command)session.prepare(command);
     const step=command?session.confirm():session.nextEnemy();
     if(!step)throw Error('No witness progress');
     if(kind==='defeat' && before.units.find(u=>u.id===1)!.guarded && step.events.some(e=>e.type==='defeated' && e.unitId===1))
-      return before;
+      return {state:before, entry:playerEntry};
     if(kind==='move' && command?.type==='useAbility' && command.abilityId==='ability:guarded_strike' && !before.units.find(u=>u.id===1)!.hasMoved)
-      return step.after;
+      return {state:step.after, entry:step.after};
     session.finishPresentation(step.token);
   }
   throw Error(`No legal guarded ${kind} witness`);
 }
 for(const kind of ['move','defeat'] as const)test(`Guarded badge follows legal ${kind} presentation`,async({page,browserName})=>{
-  const state=guardedWitness(kind), encoded=encodeBattleSave(state,battleCatalog);
-  if(!encoded.ok)throw Error(encoded.reason);
-  await page.clock.install();await page.goto('./?game=battle');
-  await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:BATTLE_STORAGE_KEYS.primary,text:encoded.text});
-  await page.reload();
-  await page.locator('#save-continue').waitFor({state:'visible'});
-  await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
-  await page.locator('#save-continue').click({force:true});
-  await page.clock.runFor(64);
+  test.setTimeout(180000);
+  const {state,entry}=guardedWitness(kind);
+  await page.clock.install();
+  await reachStandaloneBoundary(page,entry);
+  if (kind==='defeat') {
+    await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
+    await page.locator('#battle-next').click({force:true});
+    await page.clock.runFor(64);
+  }
   if(kind==='move') {
     await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
     await checkBadges(page);
@@ -261,12 +280,12 @@ for(const kind of ['move','defeat'] as const)test(`Guarded badge follows legal $
 test('Guarded badge stays attached when panning the Fighter offscreen and back',async({page,browserName},info)=>{
   const fixture=boundary('standalone',false), cast=dispatch(fixture.before,fixture.command,fixture.catalog);
   if(!cast.ok)throw Error(cast.reason);
-  const state=cast.state, encoded=encodeBattleSave(state,battleCatalog);
-  if(!encoded.ok)throw Error(encoded.reason);
-  await page.goto('./?game=battle');
-  await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:BATTLE_STORAGE_KEYS.primary,text:encoded.text});
-  await page.reload();await page.locator('#save-continue').click();
+  test.setTimeout(180000);
+  const state=cast.state;
+  await reachStandaloneBoundary(page,fixture.before);
+  await playCommand(page,fixture.command);
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  expect((await readSession(page)).state).toEqual(state);
   let initial=await boardReport(page);const region=initial.region;
   const center={x:initial.units.find((u:any)=>u.id===1).health.screen.x,y:initial.units.find((u:any)=>u.id===1).health.screen.y};
   if(browserName==='chromium') {

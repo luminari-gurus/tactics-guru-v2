@@ -7,7 +7,7 @@ import { HERO_PROGRESSION } from '../../src/content/progression';
 import { assert, describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { dungeonCapacityFixture, dungeonVictoryBoundary } from '../helpers/dungeonFixtures';
-import { clearedDungeonSlots, freshDungeon, newDungeonSeed, stepDungeon, dungeonBattle, dungeonOffer, floorDescriptor, floorMap, FloorCache, dungeonSeed, readDungeon, travelDungeon, startDungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
+import { dungeonStairStatus, clearedDungeonSlots, freshDungeon, newDungeonSeed, stepDungeon, dungeonBattle, dungeonOffer, floorDescriptor, floorMap, FloorCache, dungeonSeed, readDungeon, travelDungeon, startDungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
 import { encodeDungeon, decodeDungeon, encodeDungeonRollback, utf8Bytes } from '../../src/domain/dungeonSaveEnvelope';
 import { dungeonContent, dungeonIdentity, previousDungeonIdentity } from '../../src/content/dungeon';
 import { bothDungeonSlotsMissing, createDungeonStorage, serializeBrowserDungeonWrite, DUNGEON_BACKUP_CHECKPOINT_KEY, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
@@ -22,6 +22,32 @@ import { RunHistory } from '../../src/app/RunHistory';
 import { createRunRecordsStorage, RUN_RECORD_KEYS, selectedRunRecords } from '../../src/persistence/runRecordsStorage';
 import * as battlefields from '../../src/domain/battlefield';
 import { freshRunStats } from '../../src/domain/runStats';
+
+it('projects stair eligibility for both exploration versions without changing state or travel rejections', () => {
+  const base = freshDungeon('stair-status', 1), descriptor = floorDescriptor(base.seed, 2);
+  for (const depth of [1, 2]) for (const completed of [0, 1, 2, 3]) {
+    for (const phase of ['ready', 'reward', 'battle', 'defeat'] as const) {
+      for (const modern of [false, true]) {
+        const floor = depth === 1 ? base.floors[0] : {
+          descriptor, position: descriptor.upstairs,
+          exploration: freshExploration(descriptor.seed, descriptor.upstairs, floorMap(descriptor)), completed: 0,
+        };
+        const exploration = modern ? movableExploration(floor.exploration, floor.descriptor.seed, completed, phase) : floor.exploration;
+        const state: DungeonState = { ...base, depth, phase, floors: depth === 1
+          ? [{ ...floor, completed, exploration }] : [base.floors[0], { ...floor, completed, exploration }] };
+        const before = canonical(state);
+        for (const direction of ['ascend', 'descend'] as const) {
+          const expected = direction === 'ascend' && depth === 1 ? 'floorOne'
+            : phase !== 'ready' ? phase : direction === 'descend' && completed < 3 ? 'encounters' : 'available';
+          expect(dungeonStairStatus(state, direction)).toBe(expected);
+          expect(travelDungeon(state, direction, state.revision - 1)).toEqual({ok:false,reason:'staleBoundary'});
+          if (expected !== 'available') expect(travelDungeon(state, direction, state.revision)).toEqual({ok:false,reason:'lockedStairs'});
+        }
+        expect(canonical(state)).toBe(before);
+      }
+    }
+  }
+});
 
 it('reads literal counter-only format 12 while retaining whole kills/moves and partial time', () => {
   const raw=readFileSync('tests/fixtures/saves/issue-270/counter-dungeon-v1.json','utf8'),old=JSON.parse(raw);
@@ -53,6 +79,7 @@ it('clears an unsaved status when a later clock checkpoint recovers storage', as
   assert((await owner.save()));assert(owner.continue(owner.inspect()));owner.setPlaytimeActive(true);
   const write=m.setItem;m.setItem=()=>{throw Error('denied');};now=500;owner.setPlaytimeActive(true);
   expect(owner.hasUnsavedProgress).toBe(true);expect(owner.status).toContain('Progress unsaved');
+  expect(owner.savesProgress).toBe(true);
   m.setItem=write;now=1000;owner.setPlaytimeActive(true);
   expect(owner.hasUnsavedProgress).toBe(false);expect(owner.status).toBe('Dungeon saved on this device');
 });
@@ -327,17 +354,29 @@ describe('dungeon run history boundaries', () => {
     const history = new RunHistory('dungeon', records, () => 200);
     return { m, storage, records, history, rows: () => selectedRunRecords(records.inspect())?.records ?? [] };
   }
-  it('records staged terminal continuation exactly once without changing active save bytes', async () => {
+  it.each(['terminal', 'same run', 'different run'])('reconciles defeat and checks the %s backup without changing save bytes', async backupKind => {
     const f = fixture(), entry = good(startDungeonBattle(atEncounter(fresh()))), battle = entry.activeBattle!;
     const terminal = good(acceptDungeonBattle(entry, { ...battle, outcome: 'playerLoss',
       units: battle.units.map(unit => unit.side === 'player' ? { ...unit, hp: 0 } : unit) }));
-    assert(f.storage.save(terminal).ok); const bytes = [f.m.getItem(DUNGEON_KEYS.primary), f.m.getItem(DUNGEON_KEYS.backup)];
+    const backup = backupKind === 'different run' ? freshDungeon('different-run', 14) : entry;
+    if (backupKind !== 'terminal') assert(f.storage.save(backup).ok);
+    assert(f.storage.save(terminal).ok);
+    const bytes = [f.m.getItem(DUNGEON_KEYS.primary), f.m.getItem(DUNGEON_KEYS.backup)];
     const session = new DungeonSession(freshDungeon('placeholder', 14), f.storage, f.history);
     expect(f.m.getItem(RUN_RECORD_KEYS.primary)).toBeNull();
-    assert(session.continue(session.inspect())); await f.history.whenIdle();
+    const review = session.inspect();
+    expect(session.continue(review, 'primary')).toBe(false);
+    await f.history.reconcileDungeonDefeat(review);
     expect(f.rows()).toMatchObject([{ id: terminal.id, outcome: 'defeat', recordedAt: 200, battlesWon: 0 }]);
-    assert(session.continue(session.inspect())); await f.history.whenIdle(); expect(f.rows()).toHaveLength(1);
-    expect(session.snapshot).toEqual(terminal);
+    await f.history.reconcileDungeonDefeat(review);
+    if (backupKind === 'same run') expect(await session.remove('primary', review)).toBe(false);
+    const playableBackup = backupKind === 'different run';
+    if (!playableBackup) expect(session.continue(review, 'backup')).toBe(false);
+    expect(session.continue(review)).toBe(playableBackup);
+    if (playableBackup) expect(session.snapshot).toEqual(backup);
+    else expect(session.snapshot.id).toBe('placeholder');
+    await f.history.whenIdle();
+    expect(f.rows()).toHaveLength(1);
     expect([f.m.getItem(DUNGEON_KEYS.primary), f.m.getItem(DUNGEON_KEYS.backup)]).toEqual(bytes);
   });
   it.each(['unsaved', 'changed', 'lock-denied'] as const)('records a legally accepted defeat independently of active saves %s', async mode => {
@@ -391,6 +430,7 @@ describe('dungeon run history boundaries', () => {
     expect(f.m.getItem(RUN_RECORD_KEYS.primary)).toBeNull();
     const testing = new DungeonSession(fresh(), null, new RunHistory('dungeon', createRunRecordsStorage(() => { throw Error('History acquired'); })));
     expect(testing.history).toBeNull(); expect(testing.restart('temporary', 14)).toBe(true);
+    expect(testing.savesProgress).toBe(false); testing.playUnsaved(); expect(testing.savesProgress).toBe(false);
   });
   it('records replacement of an explicitly started unsaved dungeon before its first move', async () => {
     const f = fixture(), initial = fresh(), session = new DungeonSession(initial, f.storage, f.history);
@@ -868,13 +908,13 @@ describe('confirmed dungeon charm disposal', () => {
     const state=battle.activeBattle!,defeated=good(acceptDungeonBattle(battle,{...state,outcome:'playerLoss',units:state.units.map(u=>u.side==='player'?{...u,hp:0}:u)}));
     expect(dungeonItem(defeated,{...command,...dungeonBoundary(defeated)})).toEqual({ok:false,reason:'wrongContext'});
   });
-  it('saves confirmed disposal through the existing session and reports failed saving honestly', async () => {
+  it('publishes confirmed disposal only after saving and retains ownership on failed writes', async () => {
     const m=memory(),store=createDungeonStorage(()=>m),initial=dungeonCapacityFixture();store.save(initial);
     const session=new DungeonSession(initial,store),command={...dungeonBoundary(initial),type:'discardEquipment' as const,instanceId:initial.ownership.equipment[0].instanceId};
-    expect(session.dispatch(command)).toBe(true);const primary=store.inspect().primary;if(primary.status!=='valid')throw Error('Save invalid');expect(primary.state).toEqual(session.snapshot);
+    expect(await session.dispatch(command)).toBe(true);const primary=store.inspect().primary;if(primary.status!=='valid')throw Error('Save invalid');expect(primary.state).toEqual(session.snapshot);
     m.setItem=()=>{throw Object.assign(Error('full'),{name:'QuotaExceededError'});};
-    const current=session.snapshot;expect(session.dispatch({...dungeonBoundary(current),type:'discardEquipment',instanceId:current.ownership.equipment[0].instanceId})).toBe(true);
-    expect(session.snapshot.ownership.equipment).toHaveLength(4);expect(session.status).toContain('unsaved');
+    const current=session.snapshot;expect(await session.dispatch({...dungeonBoundary(current),type:'discardEquipment',instanceId:current.ownership.equipment[0].instanceId})).toBe(false);
+    expect(session.snapshot).toEqual(current);expect(session.status).toContain('Item choice not published: quota');
   });
 });
 
@@ -1037,13 +1077,17 @@ describe('unordered encounters and moving dungeon enemies', () => {
 describe('authoritative unsaved departure state', () => {
   it('survives rejected commands and clears only after successful recovery saving', async () => {
     const m=memory(),store=createDungeonStorage(()=>m),session=new DungeonSession(fresh(),store);
+    expect(session.savesProgress).toBe(true);expect(session.hasUnsavedProgress).toBe(true);
     session.playUnsaved();
+    expect(session.savesProgress).toBe(false);
     const before=session.snapshot;
     expect((await session.step({id:before.id,depth:before.depth,revision:before.revision,destination:-1}))).toBe(false);
     expect(session.status).toContain('Movement refused');
     expect(session.hasUnsavedProgress).toBe(true);
+    expect(session.savesProgress).toBe(false);
     expect((await session.retry(session.inspect()))).toBe(true);
     expect(session.hasUnsavedProgress).toBe(false);
+    expect(session.savesProgress).toBe(true);
     const saved=session.snapshot;
     (await session.step({id:saved.id,depth:saved.depth,revision:saved.revision,destination:-1}));
     expect(session.hasUnsavedProgress).toBe(false);
@@ -1069,8 +1113,10 @@ describe('authoritative unsaved departure state', () => {
   it('adopts a valid saved dungeon without an unsaved warning', async () => {
     const m=memory(),store=createDungeonStorage(()=>m);expect(store.save(fresh()).ok).toBe(true);
     const session=new DungeonSession(fresh(),store);
+    session.playUnsaved();expect(session.savesProgress).toBe(false);
     expect(session.continue(session.inspect())).toBe(true);
     expect(session.hasUnsavedProgress).toBe(false);
+    expect(session.savesProgress).toBe(true);
   });
 });
 

@@ -8,7 +8,10 @@ import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, BASE_THICKNE
 import { constrainView, DRAG_THRESHOLD, MAX_ZOOM, pickTileCandidates, screenToBoard, type View } from '../geometry/picking';
 import { HEALTH_BAR, HEALTH_COLORS, healthArc, healthBarScale, healthColor, healthFraction } from './healthBar';
 import { abilityPresentation, type SignatureKind } from './abilityPresentation';
+import { combatPresentationTiming, type CombatPresentationTiming } from './combatPace';
+import { criticalImpacts, drawCriticalImpact, type CriticalImpact } from './criticalImpact';
 import type { TargetOverlay, HoverPreview } from '../ui/targetPreview';
+import { readCombatPacePreference } from '../ui/combatPacePreference';
 import { drawDesertLandmark } from './desertLandmark';
 
 const REACHABLE_COLOR = 0x46d7c7;
@@ -60,9 +63,12 @@ export class BoardRenderer {
   private selectionEvents = 0;
   private picking: { point: Point; keys: string; index: number } | null = null;
   private animatedSnapshot: BattleState | undefined;
+  private presentation: CombatPresentationTiming | null = null;
   private effect: { kind: SignatureKind; actorId: number; targetId: number; progress: number;
     from: Point; to: Point; feedback: {unitId: number; text: string; x: number; y: number; visible: boolean}[] } | null = null;
   private effectLabels: {text: Phaser.GameObjects.Text; anchor: Point; kind: 'result'|'defeat'|'guard'}[] = [];
+  private criticalGraphics: Phaser.GameObjects.Graphics | null = null;
+  private criticalEffects: (CriticalImpact & {center: Point; progress: number; visible: boolean; reducedMotion: boolean})[] = [];
 
   private idle = false;
   private bobId: number | null = null;
@@ -236,6 +242,7 @@ export class BoardRenderer {
     scene.events.on(Phaser.Scenes.Events.UPDATE, this.updateBob);
     scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.idle = false;
+      this.presentation = null;
       this.bobId = null;
       this.bobOffset = 0;
       scene.events.off(Phaser.Scenes.Events.UPDATE, this.updateBob);
@@ -366,12 +373,18 @@ export class BoardRenderer {
 
   /** Tween view objects only; snapshots and command results remain unchanged. */
   animate(before: BattleState, after: BattleState, events: readonly BattleEvent[]): { done: Promise<void>; cancel: () => void } {
-    this.animatedSnapshot = before;
-    this.present(before, [], null);
     const move = events.find((e): e is Extract<BattleEvent,{type:'moved'}> => e.type==='moved');
     const {signature, feedback} = abilityPresentation(events);
-    const STEP_MS=70, COMBAT_MS=180, TURN_MS=25;
-    const duration=move ? Math.max(1,move.path.length-1)*STEP_MS : signature ? 560 : feedback.length ? COMBAT_MS : TURN_MS;
+    const criticals = criticalImpacts(events);
+    const criticalTargets = new Set(criticals.map(impact => impact.targetId));
+    // Preferences take effect on the next action, never midway through this tween.
+    const timing = combatPresentationTiming(move
+      ? { kind: 'move', steps: move.path.length - 1, hasFeedback: feedback.length > 0 }
+      : { kind: signature ? 'signature' : feedback.length ? 'feedback' : 'turn', hasFeedback: feedback.length > 0 },
+    readCombatPacePreference(), this.reducedMotion.matches);
+    this.presentation = timing;
+    this.animatedSnapshot = before;
+    this.present(before, [], null);
     const marker={progress:0};
     const labels:Phaser.GameObjects.Text[]=[];
     const anchor=(id:number)=>projectTile(this.byCell.get(cellKey(before.units.find(u=>u.id===id)!.cell))!);
@@ -380,17 +393,30 @@ export class BoardRenderer {
       const y=p.y+(item.kind==='guard'?16:item.kind==='defeat'?-88:-64);
       const text=this.scene.add.text(p.x,y,item.text,{fontFamily:'sans-serif',fontSize:'18px',fontStyle:'bold',
         color:item.kind==='guard'?'#a9f3e6':'#ffffff',backgroundColor:'#172033',padding:{x:4,y:2}})
-        .setResolution(2).setOrigin(0.5).setDepth(10001).setVisible(!signature);
+        .setResolution(2).setOrigin(0.5).setDepth(10001).setVisible(!signature || timing.reducedMotion);
       this.root.add(text);labels.push(text);
       this.effectLabels.push({text,anchor:p,kind:item.kind});
     }
-    const graphics=signature ? this.scene.add.graphics().setDepth(10000) : null;
+    const graphics=signature && !timing.reducedMotion ? this.scene.add.graphics().setDepth(10000) : null;
     if(graphics && signature){
       this.root.add(graphics);
       const a=anchor(signature.actorId),b=anchor(signature.targetId);
       this.effect={kind:signature.kind,actorId:signature.actorId,targetId:signature.targetId,progress:0,
         from:{x:a.x,y:a.y-28},to:{x:b.x,y:b.y-28},
         feedback:feedback.map((item,i)=>({unitId:item.unitId,text:item.text,x:labels[i].x,y:labels[i].y,visible:false}))};
+    }
+    // Each accepted critical owns one burst for this presentation. Draw frames on
+    // the existing tween; redraws, camera changes and resume never create impacts.
+    this.criticalEffects = criticals.map(impact => {
+      const point = anchor(impact.targetId);
+      return {...impact, center:{x:point.x,y:point.y-28}, progress:0,
+        visible:!signature || timing.reducedMotion, reducedMotion:timing.reducedMotion};
+    });
+    if(this.criticalEffects.length){
+      // Keep health/status annotations and result labels above the compact burst.
+      this.criticalGraphics = this.scene.add.graphics().setDepth(8999);
+      this.root.add(this.criticalGraphics);
+      this.drawCriticalEffects();
     }
     // New objects need sorting immediately, not only after a later HUD refresh.
     this.root.sort('depth');
@@ -401,15 +427,27 @@ export class BoardRenderer {
     const finish=()=>{
       if(finished)return;finished=true;tween?.stop();
       labels.forEach(l=>{if(l.scene)l.destroy();});if(graphics?.scene)graphics.destroy();
-      this.effectLabels=[];this.animatedSnapshot=undefined;this.effect=null;this.moving=null;
+      if(this.criticalGraphics?.scene)this.criticalGraphics.destroy();
+      this.criticalGraphics=null;this.criticalEffects=[];
+      this.effectLabels=[];this.animatedSnapshot=undefined;this.presentation=null;this.effect=null;this.moving=null;
       // Scene shutdown destroys the display list before canceling this presentation.
       // Resolve cancellation without touching images whose scene/texture binding is gone.
       if(this.root.scene)this.present(after,[],null);
       complete();
     };
-    tween=this.scene.tweens.add({targets:marker,progress:1,duration,onUpdate:()=>{
+    tween=this.scene.tweens.add({targets:marker,progress:1,duration:timing.durationMs,onUpdate:()=>{
       if(finished)return;
       if(!this.root.scene){finish();return;}
+      // Reduced motion holds stationary feedback, then snaps to the accepted state.
+      if(timing.reducedMotion)return;
+      if(this.criticalEffects.length){
+        const start=signature?0.45:0;
+        for(const impact of this.criticalEffects){
+          impact.visible=marker.progress>=start;
+          impact.progress=Math.max(0,Math.min(1,(marker.progress-start)/(1-start)));
+        }
+        this.drawCriticalEffects();
+      }
       if(graphics && signature && this.effect){
         const {from:a,to:b}=this.effect,p=marker.progress;
         const travel=Math.min(1,p/0.45),impact=Math.max(0,(p-0.45)/0.55);
@@ -444,7 +482,7 @@ export class BoardRenderer {
             graphics.fillStyle(0xffffff).fillCircle(x+2*size,y-2*size,3*size);
           }
         }
-        if(p>=0.45 && !signature.missed){
+        if(p>=0.45 && !signature.missed && !criticalTargets.has(signature.targetId)){
           const radius=(8+impact*19)*size;
           graphics.lineStyle(3*size,signature.kind==='magic_missile'?0xc4b9ff:0xffe3a0,1-impact).strokeCircle(b.x,b.y,radius);
           for(let i=0;i<4;i++){
@@ -458,9 +496,12 @@ export class BoardRenderer {
           label.setVisible(visible);this.effect!.feedback[i].visible=visible;
         });
         this.effect.progress=p;
+      }
+      if(graphics || this.criticalGraphics){
         // Update only the transient fields; geometry diagnostics need no per-frame recomputation.
         const game=document.querySelector<HTMLElement>('#game')!;
         const report=JSON.parse(game.dataset.battleReport!);report.effect=this.effect;report.feedbackBounds=this.feedbackBounds();
+        report.criticalImpacts=this.criticalImpactReport();
         game.dataset.battleReport=JSON.stringify(report);
       }
       if(!move)return;
@@ -530,6 +571,7 @@ export class BoardRenderer {
     if (navigation) this.navigationView = constrained;
     this.root.setPosition(this.view.x, this.view.y).setScale(this.view.scale);
     this.layoutFeedback();
+    this.drawCriticalEffects();
     for (const bar of this.healthBars.values()) bar.setScale(healthBarScale(this.view.scale));
     if(this.snapshot) for(const unit of this.snapshot.units) {
       const tile=this.byCell.get(cellKey(unit.cell))!;
@@ -622,6 +664,24 @@ export class BoardRenderer {
   private feedbackBounds(){return this.effectLabels.filter(({text})=>text.visible).map(({text})=>{
     const r=text.getBounds();return {text:text.text,x:r.x,y:r.y,width:r.width,height:r.height};
   });}
+
+  private drawCriticalEffects():void {
+    const graphics=this.criticalGraphics;
+    if(!graphics?.scene)return;
+    graphics.clear();
+    const size=Math.max(1,0.65/this.view.scale);
+    for(const impact of this.criticalEffects)if(impact.visible)
+      drawCriticalImpact(graphics,impact.center,impact.progress,size,impact.reducedMotion);
+  }
+
+  private criticalImpactReport(){
+    const matrix=this.root.getWorldTransformMatrix();
+    return this.criticalEffects.map(impact=>{
+      const point=matrix.transformPoint(impact.center.x,impact.center.y);
+      return {...impact,screen:{x:point.x,y:point.y},scale:Math.max(1,0.65/this.view.scale),
+        depth:this.criticalGraphics?.depth,interactive:!!this.criticalGraphics?.input};
+    });
+  }
 
   pan(dx: number, dy: number): boolean {
     this.resetPicking();
@@ -749,6 +809,8 @@ export class BoardRenderer {
         return {key,width:source.width,height:source.height,rgbaBytes:source.width*source.height*4};
       }),
       effect: this.effect,
+      criticalImpacts: this.criticalImpactReport(),
+      presentation: this.presentation,
       feedbackBounds: this.feedbackBounds(),
       depthOrder: this.root.list.map(object => Number('depth' in object ? object.depth : 0)),
       surfaceCornerError: Math.max(...surfaceErrors),

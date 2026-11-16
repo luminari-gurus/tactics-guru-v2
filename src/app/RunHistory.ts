@@ -1,4 +1,5 @@
-import { appendRunRecord, isRecorded, sealedRecordIds, sealedRecordReceipt,
+import type { DungeonInspection } from '../persistence/dungeonStorage';
+import { appendRunRecord, dungeonRunRecord, isRecorded, sealedRecordIds, sealedRecordReceipt,
   type PendingRecordReceipt, type RecordMode, type RunRecord, type RunRecords } from '../domain/runRecords';
 import { createRunRecordsStorage, type RecordsWrite, type RunRecordsStorage } from '../persistence/runRecordsStorage';
 const pendingRecords = (receipt: PendingRecordReceipt) => receipt.other ? [receipt.record, receipt.other] : [receipt.record];
@@ -23,6 +24,11 @@ export class RunHistory {
   record(record: RunRecord | null) {
     if (record && record.mode === this.mode) return this.commit(history => appendRunRecord(history, record));
     return Promise.resolve<RecordsWrite>({ ok: true });
+  }
+  reconcileDungeonDefeat(review: DungeonInspection) {
+    const selected = review.primary.status === 'valid' ? review.primary : review.backup;
+    if (this.mode !== 'dungeon' || selected.status !== 'valid' || selected.state.phase !== 'defeat') return;
+    return this.resume(selected.state.id, dungeonRunRecord(selected.state, this.now()));
   }
   private closePending(history: RunRecords, receipt: PendingRecordReceipt): RunRecords {
     return { ...history, receipts: { ...history.receipts, [this.mode]: receipt.sealed ?? null } };

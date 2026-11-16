@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { freshDungeon, stepDungeon, readDungeon, startDungeonBattle, acceptDungeonBattle, travelDungeon, currentFloor, floorMap } from '../../src/domain/dungeon';
+import { dungeonStairStatus, freshDungeon, stepDungeon, readDungeon, startDungeonBattle, acceptDungeonBattle, travelDungeon, currentFloor, floorMap } from '../../src/domain/dungeon';
 import { currentSight, encounterPois, freshExploration, neighbors, poiCell, readExploration, reveal } from '../../src/domain/exploration';
 import { generateMap } from '../../src/map/generate';
 import { encodeDungeon, decodeDungeon } from '../../src/domain/dungeonSaveEnvelope';
@@ -101,8 +101,9 @@ describe('accepted steps and battle ownership', () => {
  it('enters next encounter in the same revision and rejects remote stairs', async () => {
   const s=fresh(),f=currentFloor(s),target=poiCell(f.exploration.pois[0]),map=generateMap(f.descriptor.seed,'rooms'),origin=neighbors(target).find(n=>map.cells[n])!;
   const before=atCell(s,origin),entered=stepDungeon(before,command(before,target));expect(entered.ok).toBe(true);if(!entered.ok)return;
-  expect(entered.state.phase).toBe('battle');expect(entered.state.revision).toBe(before.revision+1);expect(currentFloor(entered.state).position).toBe(target);
-  const b=entered.state.activeBattle!,win=acceptDungeonBattle(entered.state,{...b,outcome:'playerWin',units:b.units.map(u=>u.side==='enemy'?{...u,hp:0}:u)});expect(win.ok).toBe(true);if(win.ok){expect(currentFloor(win.state).position).toBe(target);expect(win.state.phase).toBe('reward');expect(acceptDungeonBattle(win.state,b).ok).toBe(false);}
+  expect(entered.state.phase).toBe('battle');expect(entered.state.revision).toBe(before.revision+1);expect(currentFloor(entered.state).position).toBe(origin);
+  expect(entered.state.encounterEntry).toEqual({origin,contact:target,slot:0});expect(currentFloor(entered.state).exploration.visited).toEqual(currentFloor(before).exploration.visited);
+  const b=entered.state.activeBattle!,win=acceptDungeonBattle(entered.state,{...b,outcome:'playerWin',units:b.units.map(u=>u.side==='enemy'?{...u,hp:0}:u)});expect(win.ok).toBe(true);if(win.ok){expect(currentFloor(win.state).position).toBe(origin);expect(win.state.phase).toBe('ready');expect(currentFloor(win.state).loot?.[0].cell).toBe(target);expect(acceptDungeonBattle(win.state,b).ok).toBe(false);}
   expect(travelDungeon({...atCell(s,target),floors:[{...currentFloor(atCell(s,target)),completed:3}]},'descend',0)).toEqual({ok:false,reason:'remoteStairs'});
  });
  it.each(['quota','security','unavailable','uncertain'])('refuses uncommitted spatial entry on %s',async failure=>{
@@ -134,6 +135,8 @@ describe('movement onto stairs', () => {
   const before=atStairApproach(cleared()),original=canonical(before);
   const down=command(before,currentFloor(before).descriptor.downstairs),second=good(stepDungeon(before,down));
   expect(second.depth).toBe(2);expect(second.revision).toBe(before.revision+1);
+  expect(dungeonStairStatus(second,'descend')).toBe('encounters');
+  expect(dungeonStairStatus(second,'ascend')).toBe('available');
   expect(currentFloor(second).position).toBe(currentFloor(second).descriptor.upstairs);
   expect(second.party).toEqual(before.party);expect(second.ownership).toEqual(before.ownership);
   expect(stepDungeon(second,down)).toEqual({ok:false,reason:'staleBoundary'});
@@ -145,6 +148,8 @@ describe('movement onto stairs', () => {
   expect(off.depth).toBe(2);
   const first=good(stepDungeon(off,command(off,currentFloor(off).descriptor.upstairs)));
   expect(first.depth).toBe(1);expect(first.revision).toBe(second.revision+2);
+  expect(dungeonStairStatus(first,'descend')).toBe('available');
+  expect(dungeonStairStatus(first,'ascend')).toBe('floorOne');
   expect(currentFloor(first).position).toBe(currentFloor(first).descriptor.downstairs);
   expect(first.party).toEqual(before.party);expect(first.ownership).toEqual(before.ownership);
   const away=atStairApproach(first),reentered=good(stepDungeon(first,command(first,currentFloor(away).position)));

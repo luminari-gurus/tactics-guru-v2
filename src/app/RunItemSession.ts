@@ -58,7 +58,7 @@ export class RunItemSession {
     if (!storage) { const { stats: _, ...untracked } = this.current; this.current = untracked; }
     this.history = storage ? history : null;
     if (this.history) this.history.onChange = () => { if (!this.disposed) this.report(this.message); };
-    if (!storage) this.message = 'Testing run. Progress resets on reload.';
+    if (!storage) this.message = 'Progress resets on reload or when you leave.';
   }
   get snapshot(): RunSnapshot { return JSON.parse(JSON.stringify(this.current)); }
   get activeSession() { return this.battle; }
@@ -269,7 +269,7 @@ export class RunItemSession {
   private writeCurrent(quiet = false) {
     setTelemetryContext({ phase: this.current.items.run.phase, encounter: this.current.items.run.encounterIndex });
     if (!this.storage) {
-      this.report('Testing run. Progress resets on reload.');
+      this.report('Progress resets on reload or when you leave.');
       return { ok: false, reason: 'transient' } as const;
     }
     if (this.unsavedOnly) {

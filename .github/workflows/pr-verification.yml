@@ -41,6 +41,9 @@ jobs:
       - run: npm ci
       - run: npm run setup:browsers
       - run: npm run verify:pr
+      - name: Verify dungeon cutscenes in Chromium
+        if: github.head_ref == 'codex/issue-287-battle-cutscenes'
+        run: npm run test:regression -- --grep 'dungeon (victory|defeat) cutscene|routine cutscene preference'
       - uses: actions/upload-artifact@v4
         if: always()
         with:

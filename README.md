@@ -105,15 +105,18 @@ Sound starts off; **Enable sound** turns on battle cues.
 
 ### Pick up where you left off
 
-Menu-launched battles, runs and dungeons keep **separate browser-local saves**, with
-primary/backup slots and recovery controls. Accepted progress and active battles
-can survive reload; hovering and unconfirmed actions are not saved. Saves belong
-to this browser and origin, with no account or cloud sync.
+Full dungeon runs launched from the main menu keep a browser-local save with
+primary and backup slots. Continue resumes dungeon progress, including accepted
+battle actions. Saves belong to this browser and origin.
 
-Direct `/battle`, `/run`, `/dungeon`, `/map` and explicit scene diagnostics are
-testing entries. They start fresh without reading or changing game saves, retain
-normal gameplay in memory, and reset on reload. Return to the main menu to Continue
-a saved journey. Audio and privacy preferences remain separate.
+Standalone battles and three-encounter runs keep progress for the current
+session. Leaving or reloading starts a fresh attempt. During a three-encounter
+run, party and item state carry across encounters. Continue ignores old battle
+and three-encounter save slots.
+
+Direct `/battle`, `/run`, `/dungeon`, `/map` and explicit scene diagnostics remain
+testing entries. Audio and privacy preferences are stored separately from
+gameplay progress.
 
 Save readers validate content and rules versions. Incompatible or damaged data
 is retained for recovery/export instead of silently resetting progress. Export an

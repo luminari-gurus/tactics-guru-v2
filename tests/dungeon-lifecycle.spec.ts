@@ -9,13 +9,6 @@ import {encodeDungeon} from '../src/domain/dungeonSaveEnvelope';
 import {DUNGEON_KEYS} from '../src/persistence/dungeonStorage';
 import {playCommand,readSession} from './helpers/battlePolicy';
 import { readFileSync } from 'node:fs';
-import { encodeBattleSave } from '../src/domain/saveEnvelope';
-import { standaloneCatalog } from './helpers/playerPolicy';
-import { BATTLE_STORAGE_KEYS } from '../src/persistence/battleStorage';
-import { RUN_STORAGE_KEYS } from '../src/persistence/runStorage';
-import { encodeRunSave } from '../src/domain/runSaveEnvelope';
-import { freshRunSnapshot } from '../src/domain/runBattle';
-import { runContext } from './helpers/runItemFixtures';
 import { canonical, hashJson } from '../src/domain/contentIdentity';
 import { RUN_RECORD_KEYS } from '../src/persistence/runRecordsStorage';
 
@@ -43,32 +36,27 @@ test('dungeon statistics: confirmed replacement pauses pending enemy turns throu
  }finally{await page.evaluate(()=>(window as any).releaseHistoryBoundary?.());await page.clock.resume();}
 });
 
-for(const route of ['battle','run','dungeon'] as const)test(`${route} previous-format recovery preserves and exports both original slots`,async({page})=>{
- const encoded=route==='battle'?encodeBattleSave(new BattleSession(standaloneCatalog,'map:forest_ruins',2).state,standaloneCatalog):
-  route==='run'?encodeRunSave(freshRunSnapshot('previous-format-run',1,runContext),runContext):encodeDungeon(freshDungeon('previous-format-dungeon',1));
+test('dungeon previous-format recovery preserves and exports both original slots',async({page})=>{
+ const encoded=encodeDungeon(freshDungeon('previous-format-dungeon',1));
  if(!encoded.ok)throw Error(encoded.reason);
  // Explicit version-boundary fixtures, not a claim that a current payload ran in
  // the historical build. Recompute the digest so corruption is not the trigger.
  const {digest,...body}=JSON.parse(encoded.text);
- if(route==='battle'){body.payload.format=2;body.payload.versions.rules=3;}else body.format=route==='run'?4:5;
+ body.format=5;
  const old=canonical({...body,digest:hashJson(body)}),texts={primary:` \n${old}\n `,backup:`\t${old}\n`};
- const keys=route==='battle'?BATTLE_STORAGE_KEYS:route==='run'?RUN_STORAGE_KEYS:DUNGEON_KEYS;
- await page.goto(`./?game=${route}`);
+ const keys=DUNGEON_KEYS;
+ await page.goto('./?game=dungeon');
  await page.evaluate(({keys,texts})=>{localStorage.setItem(keys.primary,texts.primary);localStorage.setItem(keys.backup,texts.backup);localStorage.setItem('issue164-unrelated','retain');},{keys,texts});
  await page.reload();
  const stored=()=>page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup),unrelated:localStorage.getItem('issue164-unrelated')}),keys);
  expect(await stored()).toEqual({...texts,unrelated:'retain'});
- if(route!=='battle')await page.getByRole('button',{name:'Save recovery',exact:true}).click();
- await expect(page.getByRole('dialog')).toContainText(route==='battle'?'incompatible':'primary: invalid. backup: invalid.');
- if(route==='battle') {
-  const pending=page.waitForEvent('download');await page.locator('#save-export').click();const download=await pending,file=await download.path();
-  const exported=JSON.parse(readFileSync(file!,'utf8'));
-  expect(exported.slots).toEqual(expect.arrayContaining([{slot:'primary',text:texts.primary},{slot:'backup',text:texts.backup}]));
- } else for(const slot of ['primary','backup'] as const) {
+ await page.getByRole('button',{name:'Save recovery',exact:true}).click();
+ await expect(page.getByRole('dialog')).toContainText('primary: invalid. backup: invalid.');
+ for(const slot of ['primary','backup'] as const) {
   if(slot==='backup')await page.getByRole('button',{name:'Save recovery',exact:true}).click();
   const pending=page.waitForEvent('download');await page.getByRole('button',{name:`Export ${slot} save`,exact:true}).click();
   const download=await pending,file=await download.path(),raw=readFileSync(file!,'utf8');
-  if(route==='dungeon')expect(raw).toBe(texts[slot]);else expect(JSON.parse(raw)).toEqual({slot,text:texts[slot]});
+  expect(raw).toBe(texts[slot]);
  }
  expect(await stored()).toEqual({...texts,unrelated:'retain'});
  await page.reload();expect(await stored()).toEqual({...texts,unrelated:'retain'});
@@ -93,18 +81,78 @@ test('restart during accepted presentation discards old callbacks and history',a
  expect({...checkpoint,stats:{...checkpoint.stats,activeMs:fresh.stats!.activeMs}}).toEqual(fresh);
  await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(checkpoint);
 });
-test('legal enemy defeat boundary resumes once and a confirmed new dungeon resets it',async({page})=>{
+test('legal enemy defeat waits for its save and returns to the menu during a pending history write',async({page})=>{
  const made=startDungeonBattle(atEncounter(freshDungeon('dungeon-defeat-fixture',1)));if(!made.ok)throw Error(made.reason);const entry=made.state,built=dungeonBattle(entry)!;
  const session=new BattleSession(built.catalog,entry.activeBattle!,entry.activeBattle!.seed,undefined,true,built.battlefield);let before=entry.activeBattle!;
  for(let i=0;i<400&&session.state.outcome==='ongoing';i++){
   before=session.state;const p=session.phase==='enemy'?session.nextEnemy():(session.prepare({type:'endTurn',unitId:session.active.id}),session.confirm());if(!p)throw Error('fixture stalled');session.finishPresentation(p.token);
  }
- expect(session.state.outcome).toBe('playerLoss');await load(page,{...entry,activeBattle:before});await expect(page.getByRole('heading',{name:/^Dungeon defeat/})).toBeVisible();
- const defeat=await snapshot(page);await expect(page.locator('#dungeon-descend')).toHaveCount(0);await expect(page.locator('#dungeon-ascend')).toHaveCount(0);
- await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(defeat);
- await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-cancel-new').click();expect(await snapshot(page)).toEqual(defeat);
- await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();
- await expect.poll(async()=>(await snapshot(page)).id).not.toBe(defeat.id);await expect(page.locator('#dungeon-map')).toBeVisible();
+ expect(session.state.outcome).toBe('playerLoss');
+ await page.addInitScript(key=>{
+  const request=navigator.locks.request;
+  navigator.locks.request=new Proxy(request,{apply(target,locks,args){
+   const state=document.querySelector<HTMLElement>('#game')?.dataset.dungeonSnapshot;
+   if(args[0]===key&&state&&JSON.parse(state).phase==='defeat'){
+    return new Promise(resolve=>{
+     const release=()=>{
+      window.removeEventListener('test-release-defeat-write',release);
+      resolve(Reflect.apply(target,locks,args));
+     };
+     window.addEventListener('test-release-defeat-write',release);
+    });
+   }
+   return Reflect.apply(target,locks,args);
+  }});
+ },DUNGEON_KEYS.primary);
+ const lockOwner=await page.context().newPage();
+ try {
+  await lockOwner.goto('./');
+  await lockOwner.evaluate(key=>new Promise<void>(acquired=>{
+   void navigator.locks.request(key,()=>new Promise<void>(release=>{
+    window.addEventListener('test-release-defeat-history',()=>release(),{once:true});
+    acquired();
+   }));
+  }),RUN_RECORD_KEYS.primary);
+  await page.bringToFront();
+  await load(page,{...entry,activeBattle:before});
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','ended');
+  expect((await snapshot(page)).phase).toBe('defeat');
+  await expect(page.locator('#main-menu')).toHaveCount(0);
+  await page.getByRole('button',{name:'Save recovery',exact:true}).click();
+  await expect(page.getByRole('dialog',{name:'Saving journey',exact:true})).toBeVisible();
+  await page.evaluate(()=>window.dispatchEvent(new Event('test-release-defeat-write')));
+  const inBattleRecovery=page.getByRole('dialog',{name:'Dungeon save recovery',exact:true});
+  await expect(inBattleRecovery.getByRole('button',{name:'Export primary save',exact:true})).toBeVisible();
+  expect(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!).payload.phase,DUNGEON_KEYS.primary)).toBe('defeat');
+  await inBattleRecovery.getByRole('button',{name:'Close',exact:true}).click();
+  const summary=page.getByRole('dialog',{name:'Dungeon defeat',exact:true});
+  await expect(summary).toBeVisible();
+  await expect(summary).toContainText('Deepest floor');
+  await summary.getByRole('button',{name:'Hall of Records',exact:true}).click();
+  const records=page.getByRole('dialog',{name:'Hall of Records',exact:true});
+  await expect(records).toContainText('No finished journeys recorded yet.');
+  await lockOwner.evaluate(()=>window.dispatchEvent(new Event('test-release-defeat-history')));
+  await expect(records).toContainText('Dungeon · Defeat');
+  await records.getByRole('button',{name:'Close',exact:true}).click();
+ }finally{await lockOwner.close();}
+ await expect(page.getByRole('button',{name:'Continue',exact:true})).toBeDisabled();
+ await page.getByRole('button',{name:'Save recovery',exact:true}).click();
+ await page.getByRole('link',{name:/^Dungeon/}).click();
+ const recovery=page.getByRole('dialog',{name:'Dungeon save recovery',exact:true});
+ await expect(recovery.getByRole('button',{name:'Export primary save',exact:true})).toBeVisible();
+ await expect(recovery.getByRole('button',{name:'Continue primary dungeon',exact:true})).toHaveCount(0);
+ await expect(recovery.getByRole('button',{name:'Export backup save',exact:true})).toBeVisible();
+ await expect(recovery.getByRole('button',{name:'Continue backup dungeon',exact:true})).toHaveCount(0);
+ await expect(recovery.getByRole('button',{name:'Remove primary save',exact:true})).toHaveCount(0);
+ await expect(recovery).toContainText('Remove the earlier checkpoint before removing the defeated save.');
+ await recovery.getByRole('button',{name:'Remove backup save',exact:true}).click();
+ await page.getByRole('button',{name:'Remove reviewed save',exact:true}).click();
+ await expect(recovery.getByRole('button',{name:'Remove primary save',exact:true})).toBeVisible();
+ await page.goto('./');
+ await page.getByRole('button',{name:'New Game',exact:true}).click();
+ await page.getByRole('dialog',{name:'Start new dungeon?',exact:true}).getByRole('button',{name:'Start new dungeon',exact:true}).click();
+ await expect(page.locator('#dungeon-map')).toBeVisible();
+ expect((await snapshot(page)).id).not.toBe(entry.id);
  expect((await snapshot(page)).party.every(h=>h.hp>0)).toBe(true);expect((await snapshot(page)).floors).toHaveLength(1);
 });
 test('run navigation reaches the base-aware dungeon entry and returns to existing modes',async({page,baseURL})=>{

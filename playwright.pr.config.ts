@@ -7,7 +7,7 @@ export const desktopJourneys = [
   'main menu: New Game starts immediately when no dungeon save exists',
   'missing engine chunk reports a recoverable startup error on battle',
   'complete legal authored battle seed 2 reaches playerWin through controls and replays',
-  'run battle undo survives reload and a legal terminal journey',
+  'run battle undo and a legal terminal journey reset on reload',
   'read-only entry, keyboard new dungeon, real action and active resume',
 ];
 // Playwright appends tags to the grep title; preserve tagged startup coverage.

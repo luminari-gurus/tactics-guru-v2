@@ -1,4 +1,4 @@
-import { DUNGEON_SAVE_MAX_BYTES, decodeDungeon, encodeDungeonRollback, encodeDungeonWithState, hasWallSight, requiresFinalRewardSupport, restoreDungeonRollback } from '../domain/dungeonSaveEnvelope';
+import { DUNGEON_SAVE_MAX_BYTES, decodeDungeon, encodeDungeonRollback, encodeDungeonWithState, hasGroundLoot, hasWallSight, requiresFinalRewardSupport, restoreDungeonRollback } from '../domain/dungeonSaveEnvelope';
 import type { DungeonState } from '../domain/dungeon';
 import type { RunStorageProvider } from './runStorage';
 export const DUNGEON_KEYS = { primary: 'tactics-guru:phaser:dungeon:primary:v1', backup: 'tactics-guru:phaser:dungeon:backup:v1' } as const;
@@ -7,6 +7,24 @@ export type DungeonSlot = keyof typeof DUNGEON_KEYS;
 type Slot = { status: 'missing'; text: null } | { status: 'valid'; text: string; state: DungeonState; checkpoint?: string }
   | { status: 'invalid'; text: string; reason: string } | { status: 'unavailable'; text: null };
 export interface DungeonInspection { readonly primary: Slot; readonly backup: Slot }
+function otherDungeonSlot(name: DungeonSlot): DungeonSlot {
+  return name === 'primary' ? 'backup' : 'primary';
+}
+export function removingDungeonSaveWouldReopenRun(review: DungeonInspection, name: DungeonSlot) {
+  const terminal = review[name], checkpoint = review[otherDungeonSlot(name)];
+  return terminal.status === 'valid' && terminal.state.phase === 'defeat' &&
+    checkpoint.status === 'valid' && checkpoint.state.phase !== 'defeat' && checkpoint.state.id === terminal.state.id;
+}
+export function resumableDungeonSave(review: DungeonInspection, name: DungeonSlot) {
+  const slot = review[name];
+  // A checkpoint for the defeated journey is still available for export.
+  return slot.status === 'valid' && slot.state.phase !== 'defeat' &&
+    !removingDungeonSaveWouldReopenRun(review, otherDungeonSlot(name)) ? slot : null;
+}
+export function resumableDungeonSlot(review: DungeonInspection): DungeonSlot | null {
+  if (resumableDungeonSave(review, 'primary')) return 'primary';
+  return resumableDungeonSave(review, 'backup') ? 'backup' : null;
+}
 export type DungeonWrite = { ok: true } | { ok: false; reason: string };
 /** True only when both slots are missing. Unavailable, backup-only, and unreadable saves are not empty. */
 export function bothDungeonSlotsMissing(review: DungeonInspection): boolean {
@@ -95,7 +113,8 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
         } else {
           const floors = state.floors.map((floor,index) => index === state.depth-1 && floor.exploration.version === 'exploration-v2'
             ? {...floor, exploration:{...floor.exploration,active:null}} : floor);
-          const checkpoint = encodeDungeonWithState({...state,floors,phase:'ready',activeBattle:null,battlefield:null});
+          const { encounterEntry: _, ...preparation } = state;
+          const checkpoint = encodeDungeonWithState({...preparation,floors,phase:'ready',activeBattle:null,battlefield:null});
           if (!checkpoint.ok) return checkpoint;
           backup = checkpoint.text;
           backupState = checkpoint.state;
@@ -107,10 +126,17 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
         backup = null;
         backupState = undefined;
       }
+      // Keep the last actual pre-contact checkpoint when an older client cannot
+      // read the current origin/contact contract. Never manufacture an origin.
+      if (backupState?.encounterEntry && old.backup.status === 'valid' &&
+          old.backup.state.id === state.id && !old.backup.state.encounterEntry) {
+        backup = null;
+        backupState = undefined;
+      }
       let checkpoint: string | null = null;
       // Inspection caches the exact record that restored the reviewed backup.
       const retainedRecord = old.backup.status === 'valid' && old.backup.checkpoint ? restoredBackup?.record : undefined;
-      if (!(backup === null && retainedRecord !== undefined) && backupState && !backupState.stats && hasWallSight(backupState)) {
+      if (!(backup === null && retainedRecord !== undefined) && backupState && !backupState.stats && !hasGroundLoot(backupState) && hasWallSight(backupState)) {
         const rollback = encodeDungeonRollback(backupState);
         if (rollback.ok) {
           backup = rollback.text;
