@@ -971,9 +971,10 @@ test('an earned Healing Draught survives dungeon Continue and settles once after
  await acceptedDungeonSnapshot(page,victory.state);
  await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
  let used=false;
+ // A legal defeat returns to the menu, leaving no dungeon snapshot; the durable checkpoint covers either outcome.
  for(let i=0;i<500;i++){
-  await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||await page.locator('#game').getAttribute('data-phase')==='player';}).toBe(true);
-  const current=await snapshot(page);if(current.phase!=='battle')break;
+  await expect.poll(async()=>{const s=await snapshot(page);return !s||s.phase!=='battle'||await page.locator('#game').getAttribute('data-phase')==='player';}).toBe(true);
+  const current=await snapshot(page);if(!current||current.phase!=='battle')break;
   const before=(await readSession(page)).state, actor=before.units.find(u=>u.id===before.initiative[before.activeIndex])!;
   const button=page.locator('#battle-draught');
   if(!used&&await button.isEnabled()){
@@ -987,13 +988,13 @@ test('an earned Healing Draught survives dungeon Continue and settles once after
    expect((await readSession(page)).state).toEqual(accepted);used=true;
   } else await playCommand(page,playerDecision(before,dungeonBattle(current)!.catalog));
  }
- await expect(page.locator('#dungeon-screen')).toBeVisible();
  expect(used).toBe(true);
- const final=await snapshot(page);
- expect(final.activeBattle).toBeNull();
+ const stored=async():Promise<DungeonState>=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)!).payload,DUNGEON_KEYS.primary);
+ await expect.poll(async()=>(await stored()).activeBattle).toBeNull();
+ const final=await stored();
  expect(final.ownership.consumables).toEqual([]);
- await page.reload();await continueSavedDungeon(page);
- expectSameProgress(await snapshot(page),final);
+ await page.reload();
+ expectSameProgress(await stored(),final);
 });
 
 test('fresh dungeon keeps the map and party in view and opens the selected character sheet', async ({page,isMobile}) => {
