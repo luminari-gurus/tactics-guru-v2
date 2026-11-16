@@ -7,7 +7,7 @@ approved [#161 staged change](../openspec/changes/issue-161-combat-effects/propo
 The #164 Ranger consumer builds on main `56e2b0d`; it enables the cases below
 without claiming delivery of every downstream effect.
 
-## Enabled runtime: Guarded, Second Wind, Taunt, Mark, Pin, Snare and Shaman support
+## Enabled combat effects
 
 Issue #163 activates the bounded Heal/Uses/Taunt handoffs below. See [the current Fighter rules](signature-abilities.md#fighter-progression-163). `secondWindUsed?: true` stores one spent Fighter use; `tauntedBy?: number` stores one living opposing Fighter source on a living enemy. Exact readers reject malformed values and ineligible profiles/references. Pure previews, dispatch, AI and inspection share these rules; accepted events drive logs and floating feedback. Taunt expires at target endTurn or source/target defeat. No generic status/resource framework is added.
 
@@ -22,7 +22,7 @@ Mark and movement blocks clear on source/target defeat and new-battle constructi
 distinct targets and Mark plus one movement block can coexist. Their
 previews spend nothing and all damage paths perform defeat cleanup. Current
 goblins have no immunity. #166 adds only optional validated `weakened`/`debuff`
-immunity IDs for its real consumer; no general immunity/forced-movement engine.
+immunity IDs for its real consumer.
 
 Issue #166 enables Weakening Hex and Heal Goblin through the existing preview,
 dispatch, AI and event surfaces. Hex has hostile range 2–4 and LOS, draws one d20
@@ -45,6 +45,36 @@ max HP and grants no hero-entry HP or Second Wind allowance.
 
 The optional `guarded: true` field is a stored effect; it is a finite boolean, not a stack. Grant replaces rather than stacks. It expires before the living Fighter's next turn, including initiative wrap. Accepted damage and turn transitions remove it from defeated units; new battle construction starts without it. Defeat carries its own event, not a second guard-expiry event. Previews, cancellation and rejected commands never grant/expire effects, spend budgets, append events or draw RNG. Resolution preflights before drawing locally and adopting a complete result.
 
+### Hobgoblin Warrior (#167)
+
+Formation Fighting adds +1 accuracy once when at least one other living allied
+Hobgoblin Warrior is cardinally adjacent. Elevation does not affect adjacency.
+The check uses the current battle cells at attack preview and roll time, including
+hypothetical AI moves. Separation or defeat removes the bonus immediately. Nothing
+is stored for the passive.
+
+Shield Bash uses one action and the ordinary melee d20, height, damage and
+critical rules. After damage, a surviving target moves one cardinal cell directly
+away from the attacker on a hit. The edge of the board, unwalkable terrain, a
+living occupant, an uphill step or a drop greater than one level stops the
+displacement. A stop still allows the attack to deal damage. Dead occupants do
+not block a push. No chain push, fall damage, movement-point cost or movement
+action applies. A miss or defeat produces no entry.
+
+The accepted event sequence reports damage before displacement. Hazard entry in
+[#171](https://github.com/luminari-gurus/tactics-guru-v2/issues/171) should resolve
+once after the target enters the destination and before final defeat cleanup and
+outcome. Current battle tiles have no entry damage. The AI compares ordinary
+attack scores and adds one point per die face that can displace a surviving
+target. Formation changes the attack score and breaks ties between equally
+close approach steps. All candidates go through ordinary movement and targeting.
+
+A separate seeded draw gives the two-Warrior Woodland Crossing roster a one-in-
+three chance in the second encounter slot of forest floors from depth two. The
+roster and its catalog identity are stored with the encounter selection. Previous
+encounter identities still resolve against their original catalog, and only the
+Hobgoblin battle loads the additional combat content.
+
 ## Closed downstream contract — remaining cases are not enabled gameplay
 
 | Closed case | Enabled semantics / remaining consumer proposal | Owning issue / implementation gate |
@@ -58,8 +88,7 @@ The optional `guarded: true` field is a stored effect; it is a finite boolean, n
 | Finite stack | Explicit identity/source/target and cap; add only on consumer's successful trigger; reject overflow in saved input, saturate legitimate gain | #168 frenzy: cap 3, +1 accuracy per stack; trigger/expiry decided with its real profile |
 | Uses | Per-ability finite nonnegative integer remaining uses; whole-command validation before decrement; fresh-battle reset; save mid-battle | #163 Second Wind; no inert resources map now |
 
-Guarded, Second Wind healing/uses, Taunt, Mark, Pin, Snare, Weakened and Goblin healing are enabled. Other cases
-remain specified handoffs. Unsupported status/resource fields and ability kinds
+The remaining table entries describe downstream handoffs. Unsupported status/resource fields and ability kinds
 reject through exact-shape readers/validators. There is no general effect script,
 unused resource map or test-only action in production. Future profile amounts,
 DCs, immunity and acquisition remain with their owning issues.
@@ -73,8 +102,7 @@ Preflight complete command, targets, uses and immunity policy; project baseline/
 The Shaman consumer now implements Will saves with the exact arithmetic above;
 other save kinds still need their own reviewed consumers. Ordinary attacks remain
 untyped. Magic Missile retains automatic force hits, range 1–5, 1d4+1 per missile
-and existing count/spread. No resistance machinery is added. Forced movement and
-path/hazard trigger order belong to #167/#168/#171.
+and existing count/spread. Resistance and additional movement/hazard triggers belong to downstream consumers #168 and #171.
 
 ## Persistence and acceptance gates
 

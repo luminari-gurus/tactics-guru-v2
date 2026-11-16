@@ -56,6 +56,7 @@ export type BattleEvent =
   | { readonly type: 'turnStarted'; readonly unitId: number; readonly round: number }
   | { readonly type: 'turnEnded'; readonly unitId: number }
   | { readonly type: 'moved'; readonly unitId: number; readonly path: readonly CellPosition[] }
+  | { readonly type: 'pushed'; readonly unitId: number; readonly path: readonly [CellPosition, CellPosition] }
   | { readonly type: 'moveUndone'; readonly unitId: number; readonly path: readonly CellPosition[] }
   | { readonly type: 'abilityUsed'; readonly unitId: number; readonly abilityId: AbilityId; readonly target: Extract<Command, {type:'useAbility'}>['target'] }
   | { readonly type: 'attackRolled'; readonly unitId: number; readonly targetId: number; readonly natural: number; readonly bonus: number; readonly total: number; readonly armorClass: number; readonly result: 'miss' | 'hit' | 'critical' }

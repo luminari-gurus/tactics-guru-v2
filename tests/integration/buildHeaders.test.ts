@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { battleAssets } from '../../src/content/assets';
 import { desertAssets } from '../../src/content/desertAssets';
+import { hobgoblinAssets } from '../../src/content/hobgoblin';
 import { runInNewContext } from 'node:vm';
 import { APPLICATION_LOAD_FILES_MANIFEST, APPLICATION_LOAD_FILES_META } from '../../src/diagnostics/applicationLoadFailure';
 
@@ -23,7 +24,7 @@ for (const base of ['/', '/tactics/']) {
     });
     const code = result.output.filter(file => /\.(js|css)$/.test(file.fileName));
     expect(code.length).toBeGreaterThan(0);
-    const images = Object.values({...battleAssets,...desertAssets}).map(asset => {
+    const images = Object.values({...battleAssets,...desertAssets,...hobgoblinAssets}).map(asset => {
       const bytes = readFileSync(`public${asset.runtimePath}`);
       const hash = createHash('sha256').update(bytes).digest('hex').slice(0,16);
       const path = `assets/${hash}${asset.runtimePath}`;

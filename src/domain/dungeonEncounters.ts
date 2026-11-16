@@ -1,4 +1,5 @@
-import { dungeonBattleCatalog, dungeonEncounterCatalog, dungeonEncounterIdentity, type DungeonBiome, type EncounterKind } from '../content/dungeonEncounters';
+import { dungeonBattleCatalog, dungeonEncounterCatalog, dungeonEncounterIdentity, hobgoblinDungeonBattleCatalog,
+  hobgoblinDungeonEncounterCatalog, hobgoblinEncounterIdentity, type DungeonBiome, type EncounterKind } from '../content/dungeonEncounters';
 import { readBattlefieldEncounter, type BattlefieldEncounter } from '../content/battlefieldTypes';
 import { CONTENT_BOUNDS } from '../content/constants';
 import type { ContentCatalog, EnemyId } from '../content/types';
@@ -22,6 +23,9 @@ export interface LegacyEncounterSelection {
   readonly encounter: BattlefieldEncounter;
 }
 export type EncounterSelection = DungeonEncounterSelection | LegacyEncounterSelection;
+export const encounterBattleCatalog = (selection: EncounterSelection): ContentCatalog =>
+  selection.policy === DUNGEON_ENCOUNTER_POLICY && selection.mapId === 'hobgoblin_formation'
+    ? hobgoblinDungeonBattleCatalog : dungeonBattleCatalog;
 export function legacyDungeonEncounter(depth: number, slot: number): LegacyEncounterSelection {
   if (!depthOk(depth) || !Number.isInteger(slot) || slot < 0 || slot > 2) throw new RangeError('Invalid legacy encounter');
   const e = battlefieldEncounters[slot];
@@ -35,25 +39,29 @@ export function readDungeonEncounterSelection(input: unknown, depth: number, slo
     return hasShape(input, ['policy', 'depth', 'kind', 'encounter']) && readBattlefieldEncounter(input.encounter, dungeonBattleCatalog).ok && canonical(input) === canonical(expected) ? expected : null;
   }
   if (!hasShape(input, ['policy', 'catalogIdentity', 'biome', 'kind', 'depth', 'poolId', 'mapId', 'compositionId', 'bossId', 'scalingPolicy', 'encounter']) ||
-    input.policy !== DUNGEON_ENCOUNTER_POLICY || input.catalogIdentity !== dungeonEncounterIdentity || input.depth !== depth || input.biome !== biome ||
+    input.policy !== DUNGEON_ENCOUNTER_POLICY || input.depth !== depth || input.biome !== biome ||
     input.scalingPolicy !== ENEMY_SCALING_POLICY || (slot === 0 ? input.kind !== 'normal' : slot === 2 ? input.kind !== 'boss' : !['elite', 'vault'].includes(input.kind as string))) return null;
-  if (!readBattlefieldEncounter(input.encounter, dungeonBattleCatalog).ok) return null;
-  const definition = dungeonEncounterCatalog.biomes.find(b => b.id === biome);
+  const hasHobgoblins = input.catalogIdentity === hobgoblinEncounterIdentity;
+  if (hasHobgoblins ? depth < 2 || slot !== 1 || biome !== 'forest' || input.mapId !== 'hobgoblin_formation'
+    : input.catalogIdentity !== dungeonEncounterIdentity) return null;
+  const catalog = hasHobgoblins ? hobgoblinDungeonEncounterCatalog : dungeonEncounterCatalog;
+  if (!readBattlefieldEncounter(input.encounter, hasHobgoblins ? hobgoblinDungeonBattleCatalog : dungeonBattleCatalog).ok) return null;
+  const definition = catalog.biomes.find(b => b.id === biome);
   if (!definition) return null;
-  const boss = slot === 2 ? dungeonEncounterCatalog.bosses.find(b => b.id === definition.bossId)! : null;
-  const pool = dungeonEncounterCatalog.pools.find(p => p.id === (boss?.poolId ?? definition.poolId))!;
+  const boss = slot === 2 ? catalog.bosses.find(b => b.id === definition.bossId)! : null;
+  const pool = catalog.pools.find(p => p.id === (boss?.poolId ?? definition.poolId))!;
   const map = pool.maps.find(m => m.id === input.mapId);
-  const composition = dungeonEncounterCatalog.compositions.find(c => c.id === input.compositionId);
+  const composition = catalog.compositions.find(c => c.id === input.compositionId);
   if (input.poolId !== pool.id || input.bossId !== (boss?.id ?? null) || !map || !composition || !map.compositionIds.includes(composition.id)) return null;
-  const expected: DungeonEncounterSelection = { policy: DUNGEON_ENCOUNTER_POLICY, catalogIdentity: dungeonEncounterIdentity, biome: definition.id,
+  const expected: DungeonEncounterSelection = { policy: DUNGEON_ENCOUNTER_POLICY, catalogIdentity: hasHobgoblins ? hobgoblinEncounterIdentity : dungeonEncounterIdentity, biome: definition.id,
     kind: input.kind as EncounterKind, depth, poolId: pool.id, mapId: map.id, compositionId: composition.id, bossId: boss?.id ?? null,
     scalingPolicy: ENEMY_SCALING_POLICY, encounter: { id: `encounter:${map.id}`, source: { ...map.source }, roster: composition.roster.map(s => ({ ...s })) } };
   return canonical(input) === canonical(expected) ? expected : null;
 }
 const depthOk = (depth: number) => Number.isSafeInteger(depth) && depth >= 1;
-export function encounterSelectionSeed(seed: number, depth: number, slot: number, purpose: 'biome' | 'kind' | 'map' | 'composition'): number {
+export function encounterSelectionSeed(seed: number, depth: number, slot: number, purpose: 'biome' | 'kind' | 'map' | 'composition' | 'hobgoblin'): number {
   if (!Number.isInteger(seed) || seed < 0 || seed > 0xffffffff || !depthOk(depth) || !Number.isInteger(slot) || slot < 0 || slot > 2 ||
-    !['biome', 'kind', 'map', 'composition'].includes(purpose)) throw new RangeError('Invalid encounter seed inputs');
+    !['biome', 'kind', 'map', 'composition', 'hobgoblin'].includes(purpose)) throw new RangeError('Invalid encounter seed inputs');
   return Number.parseInt(hashJson({ policy: DUNGEON_ENCOUNTER_POLICY, seed, depth, slot, purpose }).slice(-8), 16);
 }
 export function dungeonBiome(seed: number, depth: number): DungeonBiome {
@@ -70,11 +78,15 @@ export function selectDungeonEncounter(seed: number, depth: number, slot: number
   encounterSelectionSeed(seed, depth, slot, 'kind');
   const kind: EncounterKind = slot === 0 ? 'normal' : slot === 2 ? 'boss' : choose(['elite', 'vault'] as const, 'kind');
   const boss = kind === 'boss' ? dungeonEncounterCatalog.bosses.find(b => b.id === definition.bossId)! : null;
-  const pool = dungeonEncounterCatalog.pools.find(p => p.id === (boss?.poolId ?? definition.poolId))!;
-  const map = choose([...pool.maps].sort((a,b) => a.id < b.id ? -1 : 1), 'map');
+  const useHobgoblins = biome === 'forest' && depth >= 2 && slot === 1 &&
+    rollDie(seedRng(encounterSelectionSeed(seed, depth, slot, 'hobgoblin')), 3).value === 1;
+  const catalog = useHobgoblins ? hobgoblinDungeonEncounterCatalog : dungeonEncounterCatalog;
+  const pool = catalog.pools.find(p => p.id === (boss?.poolId ?? definition.poolId))!;
+  const map = useHobgoblins ? pool.maps.find(choice => choice.id === 'hobgoblin_formation')! :
+    choose([...pool.maps].sort((a,b) => a.id < b.id ? -1 : 1), 'map');
   const compositionId = choose([...map.compositionIds].sort(), 'composition');
-  const composition = dungeonEncounterCatalog.compositions.find(c => c.id === compositionId)!;
-  return { policy: DUNGEON_ENCOUNTER_POLICY, catalogIdentity: dungeonEncounterIdentity, biome, kind, depth, poolId: pool.id, mapId: map.id,
+  const composition = catalog.compositions.find(c => c.id === compositionId)!;
+  return { policy: DUNGEON_ENCOUNTER_POLICY, catalogIdentity: useHobgoblins ? hobgoblinEncounterIdentity : dungeonEncounterIdentity, biome, kind, depth, poolId: pool.id, mapId: map.id,
     compositionId, bossId: boss?.id ?? null, scalingPolicy: ENEMY_SCALING_POLICY,
     encounter: { id: `encounter:${map.id}`, source: { ...map.source }, roster: composition.roster.map(s => ({ ...s })) } };
 }
@@ -93,12 +105,12 @@ export function scaleEnemyStat(base: number, depth: number, kind: EncounterKind,
   return kind === 'vault' ? clamp(Math.floor((scaled * 12 + 5) / 10)) : scaled;
 }
 /** The baseline is intentionally fixed; callers cannot accidentally scale a prior projection. */
-export function projectDungeonEnemies(depth: number, kind: EncounterKind): ContentCatalog {
-  const enemies = { ...dungeonBattleCatalog.enemies };
+export function projectDungeonEnemies(depth: number, kind: EncounterKind, catalog = dungeonBattleCatalog): ContentCatalog {
+  const enemies = { ...catalog.enemies };
   for (const id of Object.keys(enemies) as EnemyId[]) {
-    const enemy = dungeonBattleCatalog.enemies[id], stats = { ...enemy.stats };
+    const enemy = catalog.enemies[id], stats = { ...enemy.stats };
     for (const field of ['maxHp', 'power', 'accuracy', 'armorClass'] as const) stats[field] = scaleEnemyStat(enemy.stats[field], depth, kind, field);
     enemies[id] = { ...enemy, stats };
   }
-  return { ...dungeonBattleCatalog, enemies };
+  return { ...catalog, enemies };
 }

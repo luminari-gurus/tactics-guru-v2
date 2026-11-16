@@ -1,5 +1,5 @@
 import { assert, expect, it } from 'vitest';
-import { dungeonBattleCatalog, dungeonEncounterCatalog, dungeonEncounterCatalogIdentity, readDungeonEncounterCatalog, ENCOUNTER_KINDS } from '../../src/content/dungeonEncounters';
+import { dungeonBattleCatalog, dungeonEncounterCatalog, dungeonEncounterCatalogIdentity, hobgoblinDungeonBattleCatalog, hobgoblinDungeonEncounterCatalog, readDungeonEncounterCatalog, ENCOUNTER_KINDS } from '../../src/content/dungeonEncounters';
 import { desertRunCatalog } from '../../src/content/desertCatalog';
 import { CONTENT_BOUNDS, HERO_IDS } from '../../src/content/constants';
 import { dungeonBiome, encounterSelectionSeed, projectDungeonEnemies, scaleEnemyStat, selectDungeonEncounter } from '../../src/domain/dungeonEncounters';
@@ -12,17 +12,17 @@ import { battleCatalog } from '../../src/content/catalog';
 import { authoredEncounters, runCatalog } from '../../src/content/encounters';
 
 it('admits every pool pairing, including generated guardian fallback and all survivor subsets', () => {
-  const checked = readDungeonEncounterCatalog(dungeonEncounterCatalog); assert(checked.ok, JSON.stringify(checked));
+  const checked = readDungeonEncounterCatalog(hobgoblinDungeonEncounterCatalog, hobgoblinDungeonBattleCatalog); assert(checked.ok, JSON.stringify(checked));
   for (const pool of checked.catalog.pools) for (const map of pool.maps) for (const id of map.compositionIds) {
     const roster = checked.catalog.compositions.find(c => c.id === id)!.roster;
     const encounter = { id: `encounter:${map.id}` as const, source: map.source, roster };
     for (const fallback of [false, true]) {
-      const resolved = resolveBattlefield(encounter, 13, dungeonBattleCatalog, fallback ? { rejectCandidate: () => true } : {});
+      const resolved = resolveBattlefield(encounter, 13, hobgoblinDungeonBattleCatalog, fallback ? { rejectCandidate: () => true } : {});
       assert(resolved.ok, JSON.stringify(resolved));
       if (map.source.kind === 'generated') expect(resolved.diagnostics.fallback).toBe(fallback);
       for (let mask = 1; mask < 8; mask++) {
         const subset = { ...resolved.map, spawns: resolved.map.spawns.filter(s => s.side === 'enemies' || (mask & (1 << HERO_IDS.indexOf(s.unitId)))) };
-        expect(createBattle(subset.id, 13, { ...dungeonBattleCatalog, maps: { [subset.id]: subset } }).ok).toBe(true);
+        expect(createBattle(subset.id, 13, { ...hobgoblinDungeonBattleCatalog, maps: { [subset.id]: subset } }).ok).toBe(true);
       }
     }
   }

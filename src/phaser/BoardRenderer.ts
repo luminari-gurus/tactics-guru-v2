@@ -373,7 +373,7 @@ export class BoardRenderer {
 
   /** Tween view objects only; snapshots and command results remain unchanged. */
   animate(before: BattleState, after: BattleState, events: readonly BattleEvent[]): { done: Promise<void>; cancel: () => void } {
-    const move = events.find((e): e is Extract<BattleEvent,{type:'moved'}> => e.type==='moved');
+    const move = events.find((e): e is Extract<BattleEvent,{type:'moved' | 'pushed'}> => e.type==='moved' || e.type==='pushed');
     const {signature, feedback} = abilityPresentation(events);
     const criticals = criticalImpacts(events);
     const criticalTargets = new Set(criticals.map(impact => impact.targetId));

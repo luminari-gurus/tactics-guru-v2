@@ -1,6 +1,6 @@
-import { ATTACK_BOUNDS, CONTENT_BOUNDS, ENEMY_IDS, GUARDED_STRIKE_TRADEOFF, FIRST_MAP_TERRAIN_IDS, HERO_IDS, TERRAIN_TEXTURE_SPEC } from './constants';
+import { ATTACK_BOUNDS, CONTENT_BOUNDS, CORE_ENEMY_IDS, ENEMY_IDS, GUARDED_STRIKE_TRADEOFF, FIRST_MAP_TERRAIN_IDS, HERO_IDS, TERRAIN_TEXTURE_SPEC } from './constants';
 import type { ContentCatalog } from './types';
-import { attackAbilities } from './abilities';
+import { attackAbilities, shieldBash } from './abilities';
 import { hasShape, isDenseArray, isPlainRecord, type JsonRecord } from '../domain/validation';
 
 export type ContentErrorCode = 'shape' | 'id' | 'duplicateId' | 'number' | 'reference' | 'cells' | 'duplicateCell' | 'coordinate' | 'walkability' | 'occupiedSpawn';
@@ -36,13 +36,13 @@ export function validateContent(input: unknown): ContentValidation {
     const v = input[group];
     if (!isPlainRecord(v) || !hasShape(v, Object.keys(v))) { fail('shape', group, 'Expected a catalog of plain enumerable data entries.'); continue; }
     catalogs[group] = v;
-    const fixed = group === 'heroes' ? HERO_IDS : group === 'enemies' ? ENEMY_IDS : group === 'terrains' ? FIRST_MAP_TERRAIN_IDS :
+    const fixed = group === 'heroes' ? HERO_IDS : group === 'enemies' ? CORE_ENEMY_IDS : group === 'terrains' ? FIRST_MAP_TERRAIN_IDS :
       group === 'abilities' ? Object.keys(attackAbilities) : undefined;
     if (fixed) for (const id of fixed) if (!Object.hasOwn(v, id)) fail('id', `${group}.${id}`, 'Required definition is missing.');
     const seen = new Set<string>();
     for (const [key, record] of Object.entries(v)) {
       const path = `${group}.${key}`;
-      if (fixed ? !fixed.some(id => id === key) && !(group === 'terrains' && ['sand','rock','void'].includes(key)) && !(group === 'abilities' && prefixedId(key, 'ability')) : !prefixedId(key, group === 'maps' ? 'map' : 'asset')) fail('id', path, 'Unknown or malformed catalog ID.');
+      if (fixed ? !fixed.some(id => id === key) && !(group === 'terrains' && ['sand','rock','void'].includes(key)) && !(group === 'enemies' && key === 'hobgoblin_warrior') && !(group === 'abilities' && prefixedId(key, 'ability')) : !prefixedId(key, group === 'maps' ? 'map' : 'asset')) fail('id', path, 'Unknown or malformed catalog ID.');
       if (!isPlainRecord(record) || !hasShape(record, Object.keys(record))) { fail('shape', path, 'Expected a plain definition without accessors or hidden fields.'); continue; }
       if (record.id !== key) fail('id', `${path}.id`, 'Record ID must equal its catalog key.');
       if (typeof record.id === 'string') {
@@ -76,7 +76,12 @@ export function validateContent(input: unknown): ContentValidation {
     }
     if (ability.kind === 'guardedAttack') keys.push('attackPenalty','armorClassBonus');
     if (!shape(ability, keys, path)) continue;
-    const expected = Object.hasOwn(attackAbilities, id) ? attackAbilities[id as keyof typeof attackAbilities] : undefined;
+    const expected = id === shieldBash.id ? shieldBash :
+      Object.hasOwn(attackAbilities, id) ? attackAbilities[id as keyof typeof attackAbilities] : undefined;
+    if (id === shieldBash.id) {
+      ref('hobgoblin_warrior', 'enemies', `${path}.owners`, 'enemy');
+      if (ability.rangeMin !== 1 || ability.rangeMax !== 1) fail('number', path, 'Shield Bash requires cardinal contact.');
+    }
     if (expected ? ability.kind !== expected.kind : (typeof ability.kind !== 'string' || !['attack','guardedAttack','magicMissile','secondWind','taunt','markTarget','pinningShot','frostSnare','weakeningHex','healGoblin'].includes(ability.kind))) fail('shape', `${path}.kind`, 'Expected the approved ability kind.');
     if (shamanEffect) {
       const approved = ability.kind === 'weakeningHex' ? attackAbilities['ability:weakening_hex'] : attackAbilities['ability:heal_goblin'];
@@ -113,7 +118,9 @@ export function validateContent(input: unknown): ContentValidation {
       if (ability.kind === 'frostSnare' && ability.owners.some(owner=>owner!=='mage'))
         fail('reference', `${path}.owners`, 'Frost Snare requires the Mage source lifecycle.');
       if (expected) {
-        if (ability.owners.length !== expected.owners.length || ability.owners.some((owner, i) => owner !== expected.owners[i]))
+        const owners = id === 'ability:basic_attack' && Object.hasOwn(catalogs.enemies, 'hobgoblin_warrior')
+          ? [...expected.owners, 'hobgoblin_warrior'] : expected.owners;
+        if (ability.owners.length !== owners.length || ability.owners.some((owner, i) => owner !== owners[i]))
           fail('reference', `${path}.owners`, 'Expected the approved ability owners in their defined order.');
       } else if (!ability.owners.length || ability.owners.length > HERO_IDS.length + ENEMY_IDS.length
         || new Set(ability.owners).size !== ability.owners.length
@@ -125,6 +132,7 @@ export function validateContent(input: unknown): ContentValidation {
   for (const group of ['heroes', 'enemies'] as const) for (const [id, unit] of entries(group)) {
     const path = `${group}.${id}`;
     if (!shape(unit, ['id','kind','stats','spriteAssetId','portraitAssetId', ...(Object.hasOwn(unit, 'immunities') ? ['immunities'] : [])], path)) continue;
+    if (id === 'hobgoblin_warrior') ref(shieldBash.id, 'abilities', path, 'shieldBash');
     if (Object.hasOwn(unit, 'immunities') && (!isDenseArray(unit.immunities, 2) || unit.immunities.length === 0 ||
       new Set(unit.immunities).size !== unit.immunities.length || unit.immunities.some(id => id !== 'weakened' && id !== 'debuff')))
       fail('shape', `${path}.immunities`, 'Expected distinct bounded weakened/debuff immunity IDs.');

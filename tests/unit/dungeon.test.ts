@@ -12,11 +12,11 @@ import { encodeDungeon, decodeDungeon, encodeDungeonRollback, utf8Bytes } from '
 import { dungeonContent, dungeonIdentity, previousDungeonIdentity } from '../../src/content/dungeon';
 import { bothDungeonSlotsMissing, createDungeonStorage, serializeBrowserDungeonWrite, DUNGEON_BACKUP_CHECKPOINT_KEY, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
 import { DungeonSession } from '../../src/app/DungeonSession';
-import { LEGACY_ENCOUNTER_POLICY, selectDungeonEncounter } from '../../src/domain/dungeonEncounters';
+import { LEGACY_ENCOUNTER_POLICY, encounterBattleCatalog, selectDungeonEncounter } from '../../src/domain/dungeonEncounters';
 import { priorDungeonEnvelope } from '../helpers/dungeonFixtures';
 import { dispatch } from '../../src/domain/turns';
 import { canonical, hashJson } from '../../src/domain/contentIdentity';
-import { dungeonEncounterCatalog, dungeonBattleCatalog } from '../../src/content/dungeonEncounters';
+import { dungeonEncounterCatalog } from '../../src/content/dungeonEncounters';
 import { resolveBattlefield } from '../../src/domain/battlefield';
 import { RunHistory } from '../../src/app/RunHistory';
 import { createRunRecordsStorage, RUN_RECORD_KEYS, selectedRunRecords } from '../../src/persistence/runRecordsStorage';
@@ -498,7 +498,7 @@ describe('dungeon floors', () => {
           const selection = selectDungeonEncounter(seed, depth, slot);
           const pairing = canonical(selection.encounter);
           if (resolvedPairings.has(pairing)) continue;
-          const resolved = resolveBattlefield(selection.encounter, dungeonSeed(seed, depth, 'battle', slot), dungeonBattleCatalog);
+          const resolved = resolveBattlefield(selection.encounter, dungeonSeed(seed, depth, 'battle', slot), encounterBattleCatalog(selection));
           if (!resolved.ok) throw Error('Invalid dungeon encounter pairing');
           resolvedPairings.add(pairing);
         }
@@ -797,7 +797,7 @@ describe('durable encounter policies', () => {
     const map = dungeonEncounterCatalog.pools.find(p => p.id === 'forest')!.maps.find(m => m.id !== original.mapId)!;
     const composition = dungeonEncounterCatalog.compositions.find(c => c.id === map.compositionIds[0])!;
     const selection = { ...original, mapId: map.id, compositionId: composition.id, encounter: { id:`encounter:${map.id}` as const,source:map.source,roster:composition.roster } };
-    const resolved = resolveBattlefield(selection.encounter,dungeonSeed(base.seed,1,'battle',0),dungeonBattleCatalog);if(!resolved.ok)throw Error('Pairing invalid');
+    const resolved = resolveBattlefield(selection.encounter,dungeonSeed(base.seed,1,'battle',0),encounterBattleCatalog(selection));if(!resolved.ok)throw Error('Pairing invalid');
     const saved = { ...base, floors:[{...base.floors[0],descriptor:{...descriptor,encounters:[{selection,battlefield:resolved.descriptor},...descriptor.encounters.slice(1)]}}] };
     const read = good(readDungeon(saved)); expect(read.floors[0].descriptor.encounters[0].selection).toEqual(selection);
     expect(dungeonBattle(read)!.state.mapId).toBe(resolved.map.id);

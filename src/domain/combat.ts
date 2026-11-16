@@ -1,8 +1,9 @@
-import { clearDefeatedGuard, clearDefeatedTaunts, clearDefeatedControlEffects, combatStats, grantGuard, markSource, removeMark, tauntSource, weakenedImmune } from './effects';
+import { clearDefeatedGuard, clearDefeatedTaunts, clearDefeatedControlEffects, combatStats, formationAccuracy, grantGuard, markSource, removeMark, tauntSource, weakenedImmune } from './effects';
 import type { ContentCatalog } from '../content/types';
 import { HEAL_GOBLIN_IDS, MAGIC_MISSILE } from '../content/constants';
 import { previewCommand, readBattleState } from './battle';
 import { CRITICAL_DAMAGE_MULTIPLIER, D20_SIDES, HEIGHT_ATTACK_MODIFIER, MIN_HIT_DAMAGE, NATURAL_AUTO_MISS, NATURAL_CRITICAL, RULE_BOUNDS } from './constants';
+import { previewPush } from './forcedMovement';
 import { rollDie } from './rng';
 import { lineOfSightBlocked, manhattanDistance } from './targeting';
 import type { BattleEvent, BattleState, Command, CommandResult, Rejection, UnitState } from './types';
@@ -11,7 +12,8 @@ const stats = (catalog: ContentCatalog, u: UnitState) => u.side === 'player' ? c
 const elevation = (catalog: ContentCatalog, state: BattleState, u: UnitState) =>
   catalog.maps[state.mapId].cells.find(c => c.x === u.cell.x && c.y === u.cell.y)!.elevation;
 export type AttackPreview = { readonly ok: true; readonly command: Extract<Command, { type: 'useAbility' }>; readonly targetId: number;
-  readonly bonus: number; readonly armorClass: number; readonly damage: number; readonly criticalDamage: number; readonly markBonus?: number };
+  readonly bonus: number; readonly armorClass: number; readonly damage: number; readonly criticalDamage: number; readonly markBonus?: number;
+  readonly formationBonus?: number; readonly push?: ReturnType<typeof previewPush> };
 /** Legality and every number resolution uses; no RNG access. Target checks follow TargetingService.gd:28-49. */
 export function previewAttack(state: unknown, input: unknown, catalog: ContentCatalog): AttackPreview | Rejection {
   const intent = previewCommand(state, input, catalog); if (!intent.ok) return intent;
@@ -22,7 +24,7 @@ export function previewAttack(state: unknown, input: unknown, catalog: ContentCa
   if (actor.hasActed) return { ok: false, reason: 'alreadyActed' };
   if (!Object.hasOwn(catalog.abilities, command.abilityId)) return { ok: false, reason: 'unknownAbility' };
   const profile = catalog.abilities[command.abilityId];
-  if (profile.kind !== 'attack' && profile.kind !== 'guardedAttack') return { ok: false, reason: 'wrongTargetKind' };
+  if (profile.kind !== 'attack' && profile.kind !== 'guardedAttack' && profile.kind !== 'shieldBash') return { ok: false, reason: 'wrongTargetKind' };
   if (!profile.owners.includes(actor.defId)) return { ok: false, reason: 'abilityNotOwned' };
   if (!('unitId' in command.target)) return { ok: false, reason: 'wrongTargetKind' };
   const targetId = command.target.unitId;
@@ -41,7 +43,10 @@ export function previewAttack(state: unknown, input: unknown, catalog: ContentCa
   const marker = actor.side === 'player' ? markSource(target, snapshot.units) : undefined;
   const markProfile = marker && Object.values(catalog.abilities).find(a => a.kind === 'markTarget' && a.owners.includes(marker.defId));
   const markBonus = markProfile?.kind === 'markTarget' ? markProfile.accuracyBonus : 0;
-  return { ok: true, command, targetId, bonus: combatStats(actor, catalog, profile.kind === 'guardedAttack').accuracy + height + markBonus,
+  const formationBonus = formationAccuracy(actor, snapshot.units);
+  return { ok: true, command, targetId, bonus: combatStats(actor, catalog, profile.kind === 'guardedAttack').accuracy + height + markBonus + formationBonus,
+    ...(formationBonus ? { formationBonus } : {}),
+    ...(profile.kind === 'shieldBash' ? { push: previewPush(snapshot, actor, target, catalog) } : {}),
     ...(markBonus ? { markBonus } : {}),
     armorClass: combatStats(target, catalog).armorClass,
     damage, criticalDamage: damage * CRITICAL_DAMAGE_MULTIPLIER };
@@ -81,6 +86,11 @@ export function resolveAttack(state: unknown, input: unknown, catalog: ContentCa
   }
   if (damage > 0) events.push({ type: 'damaged', unitId: targetId, damage, hp });
   if (hp === 0) events.push({ type: 'defeated', unitId: targetId });
+  const push = preview.push;
+  if (damage > 0 && hp > 0 && push?.ok) {
+    units = units.map(u => u.id === targetId ? { ...u, cell: push.to } : u);
+    events.push({ type: 'pushed', unitId: targetId, path: [push.from, push.to] });
+  }
   if (grantsGuard) events.push({ type: 'guarded', unitId: command.unitId });
   units = clearDefeatedTaunts(units, events);
   units = clearDefeatedControlEffects(units, events);
