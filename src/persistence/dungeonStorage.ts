@@ -7,12 +7,19 @@ export type DungeonSlot = keyof typeof DUNGEON_KEYS;
 type Slot = { status: 'missing'; text: null } | { status: 'valid'; text: string; state: DungeonState; checkpoint?: string }
   | { status: 'invalid'; text: string; reason: string } | { status: 'unavailable'; text: null };
 export interface DungeonInspection { readonly primary: Slot; readonly backup: Slot }
+function otherDungeonSlot(name: DungeonSlot): DungeonSlot {
+  return name === 'primary' ? 'backup' : 'primary';
+}
+export function removingDungeonSaveWouldReopenRun(review: DungeonInspection, name: DungeonSlot) {
+  const terminal = review[name], checkpoint = review[otherDungeonSlot(name)];
+  return terminal.status === 'valid' && terminal.state.phase === 'defeat' &&
+    checkpoint.status === 'valid' && checkpoint.state.phase !== 'defeat' && checkpoint.state.id === terminal.state.id;
+}
 export function resumableDungeonSave(review: DungeonInspection, name: DungeonSlot) {
   const slot = review[name];
-  if (slot.status !== 'valid' || slot.state.phase === 'defeat') return null;
-  const other = review[name === 'primary' ? 'backup' : 'primary'];
   // A checkpoint for the defeated journey is still available for export.
-  return other.status === 'valid' && other.state.phase === 'defeat' && other.state.id === slot.state.id ? null : slot;
+  return slot.status === 'valid' && slot.state.phase !== 'defeat' &&
+    !removingDungeonSaveWouldReopenRun(review, otherDungeonSlot(name)) ? slot : null;
 }
 export function resumableDungeonSlot(review: DungeonInspection): DungeonSlot | null {
   if (resumableDungeonSave(review, 'primary')) return 'primary';

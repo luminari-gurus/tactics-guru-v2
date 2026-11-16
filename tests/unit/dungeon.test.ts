@@ -369,6 +369,7 @@ describe('dungeon run history boundaries', () => {
     await f.history.reconcileDungeonDefeat(review);
     expect(f.rows()).toMatchObject([{ id: terminal.id, outcome: 'defeat', recordedAt: 200, battlesWon: 0 }]);
     await f.history.reconcileDungeonDefeat(review);
+    if (backupKind === 'same run') expect(await session.remove('primary', review)).toBe(false);
     const playableBackup = backupKind === 'different run';
     if (!playableBackup) expect(session.continue(review, 'backup')).toBe(false);
     expect(session.continue(review)).toBe(playableBackup);

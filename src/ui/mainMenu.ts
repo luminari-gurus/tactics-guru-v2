@@ -1,6 +1,6 @@
 import { inspectMenuSave } from '../app/menuSaves';
 import { RunHistory } from '../app/RunHistory';
-import { readRunRecord } from '../domain/runRecords';
+import { readRunRecord, type RunRecord } from '../domain/runRecords';
 import { menuGameHref, routeHref } from '../app/routes';
 import { bothDungeonSlotsMissing, createDungeonStorage } from '../persistence/dungeonStorage';
 import { mountTelemetryPreferences } from '../telemetry/preferences';
@@ -17,6 +17,30 @@ export const menuDefinition = [
 function element<K extends keyof HTMLElementTagNameMap>(tag: K, text?: string) {
   const node = document.createElement(tag); if (text) node.textContent = text; return node;
 }
+const pendingDefeatPrefix = 'tactics-guru:pending-defeat-history:';
+function retryDefeatHistory(history: RunHistory, record: RunRecord | null) {
+  if (record) {
+    try { sessionStorage.setItem(pendingDefeatPrefix + record.id, JSON.stringify(record)); }
+    catch { void history.record(record); }
+  }
+  let keys: string[];
+  try { keys = Object.keys(sessionStorage).filter(key => key.startsWith(pendingDefeatPrefix)); }
+  catch { return; }
+  for (const key of keys) {
+    try {
+      const text = sessionStorage.getItem(key);
+      const queued = text === null ? null : readRunRecord(JSON.parse(text));
+      if (queued?.mode !== 'dungeon' || queued.outcome !== 'defeat' || key !== pendingDefeatPrefix + queued.id) continue;
+      void history.record(queued).then(result => {
+        if (!result.ok) return;
+        try {
+          if (sessionStorage.getItem(key) === text) sessionStorage.removeItem(key);
+        } catch { /* Replaying an already recorded defeat is safe. */ }
+      });
+    } catch { /* Ignore invalid or unavailable retry entries. */ }
+  }
+}
+
 export function startMainMenu() {
   document.title = 'Tactics Guru';
   document.body.classList.add('main-menu-page');
@@ -120,39 +144,40 @@ export function startMainMenu() {
   content.append(title, nav, status, recovery, secondary, element('p', 'Choose your next adventure.'));
   main.append(art, content); document.body.append(main, dialog); refresh();
   void runHistory.reconcileDungeonDefeat(createDungeonStorage().inspect());
-  // The dungeon hands off a single terminal result. Consume before opening so
-  // a reload cannot replay an old defeat announcement.
-  let defeatText: string | null = null;
-  try { defeatText = sessionStorage.getItem('tactics-guru:defeat-summary'); sessionStorage.removeItem('tactics-guru:defeat-summary'); } catch { /* Storage is optional. */ }
-  if (defeatText) {
-    let record: ReturnType<typeof readRunRecord> = null;
-    let retryHistory = false;
-    try {
-      const handoff = JSON.parse(defeatText);
-      record = readRunRecord(handoff?.record ?? handoff);
+  let record: RunRecord | null = null;
+  let retryHistory = false;
+  try {
+    const text = sessionStorage.getItem('tactics-guru:defeat-summary');
+    if (text) {
+      const handoff = JSON.parse(text);
+      const candidate = readRunRecord(handoff?.record ?? handoff);
+      if (candidate?.mode === 'dungeon' && candidate.outcome === 'defeat') record = candidate;
       retryHistory = handoff?.retryHistory === true;
-    } catch { /* Ignore malformed handoffs. */ }
-    if (record?.mode === 'dungeon' && record.outcome === 'defeat') {
-      if (retryHistory) void runHistory.record(record);
-      show('Dungeon defeat', () => {
-        body.append(element('p', 'Your party has fallen. Here is how far you made it.'));
-        const stats = element('dl'); stats.className = 'run-statistics';
-        const rows: [string, string][] = [
-          ['Deepest floor', String(record.deepestFloor ?? '—')],
-          ['Floors cleared', String(record.floorsCleared ?? '—')],
-          ['Battles won', String(record.battlesWon)],
-          ['Enemies killed', record.stats ? `${record.stats.enemiesKilled}${record.stats.coverage === 'since-upgrade' ? ' (since upgrade)' : ''}` : 'Unavailable'],
-          ['Moves taken', record.stats ? `${record.stats.movesTaken}${record.stats.coverage === 'since-upgrade' ? ' (since upgrade)' : ''}` : 'Unavailable'],
-          ['Active playtime', record.stats ? `${Math.floor(record.stats.activeMs / 60000)} min${record.stats.timeCoverage === 'since-upgrade' ? ' (since upgrade)' : ''}` : 'Unavailable'],
-        ];
-        for (const [name,value] of rows) { const cell=element('div'),dt=element('dt',name),dd=element('dd',value);cell.append(dt,dd);stats.append(cell); }
-        body.append(stats);
-        const actions=element('div'); actions.className='run-records-actions';
-        const newGame=element('button','New Game');newGame.type='button';newGame.onclick=()=>{invoker=buttons.get('new')!;actionsMenu.new();};
-        const records=element('button','Hall of Records');records.type='button';records.onclick=()=>{invoker=buttons.get('records')!;actionsMenu.records();};
-        actions.append(newGame,records);body.append(actions);
-      });
     }
+  } catch { /* Ignore malformed or unavailable handoffs. */ }
+  // Retain an unsaved result until history confirms it. The summary is shown once.
+  retryDefeatHistory(runHistory, retryHistory ? record : null);
+  try { sessionStorage.removeItem('tactics-guru:defeat-summary'); } catch { /* Storage is optional. */ }
+  if (record) {
+    const defeat = record;
+    show('Dungeon defeat', () => {
+      body.append(element('p', 'Your party has fallen. Here is how far you made it.'));
+      const stats = element('dl'); stats.className = 'run-statistics';
+      const rows: [string, string][] = [
+        ['Deepest floor', String(defeat.deepestFloor ?? '—')],
+        ['Floors cleared', String(defeat.floorsCleared ?? '—')],
+        ['Battles won', String(defeat.battlesWon)],
+        ['Enemies killed', defeat.stats ? `${defeat.stats.enemiesKilled}${defeat.stats.coverage === 'since-upgrade' ? ' (since upgrade)' : ''}` : 'Unavailable'],
+        ['Moves taken', defeat.stats ? `${defeat.stats.movesTaken}${defeat.stats.coverage === 'since-upgrade' ? ' (since upgrade)' : ''}` : 'Unavailable'],
+        ['Active playtime', defeat.stats ? `${Math.floor(defeat.stats.activeMs / 60000)} min${defeat.stats.timeCoverage === 'since-upgrade' ? ' (since upgrade)' : ''}` : 'Unavailable'],
+      ];
+      for (const [name,value] of rows) { const cell=element('div'),dt=element('dt',name),dd=element('dd',value);cell.append(dt,dd);stats.append(cell); }
+      body.append(stats);
+      const actions=element('div'); actions.className='run-records-actions';
+      const newGame=element('button','New Game');newGame.type='button';newGame.onclick=()=>{invoker=buttons.get('new')!;actionsMenu.new();};
+      const records=element('button','Hall of Records');records.type='button';records.onclick=()=>{invoker=buttons.get('records')!;actionsMenu.records();};
+      actions.append(newGame,records);body.append(actions);
+    });
   }
   for (const event of ['focus', 'pageshow', 'storage']) window.addEventListener(event, refresh);
   document.addEventListener('keydown', event => {

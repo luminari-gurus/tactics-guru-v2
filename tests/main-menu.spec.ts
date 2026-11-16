@@ -39,6 +39,39 @@ test('main menu: records empty state is read-only and keyboard focus returns to 
   await expect(invoker).toBeFocused(); await expect(dialog).not.toBeVisible();
 });
 
+test('main menu: an unsaved defeat retries history after reload without replaying the summary', async ({ page }) => {
+  const lockOwner = await page.context().newPage();
+  try {
+    await lockOwner.goto('./');
+    await lockOwner.evaluate(key => new Promise<void>(acquired => {
+      void navigator.locks.request(key, () => new Promise<void>(release => {
+        window.addEventListener('test-release-unsaved-defeat', () => release(), { once: true });
+        acquired();
+      }));
+    }), RUN_RECORD_KEYS.primary);
+    await page.goto('./');
+    const record = { mode: 'dungeon', id: 'unsaved-defeat', outcome: 'defeat', recordedAt: 100,
+      battlesWon: 0, floorsCleared: 0, deepestFloor: 1 };
+    await page.evaluate(record => sessionStorage.setItem('tactics-guru:defeat-summary',
+      JSON.stringify({ record, retryHistory: true })), record);
+    await page.reload();
+    const summary = page.getByRole('dialog', { name: 'Dungeon defeat', exact: true });
+    await expect(summary).toBeVisible();
+    await page.reload();
+    await expect(page.getByRole('navigation', { name: 'Main menu' })).toBeVisible();
+    await expect(summary).toHaveCount(0);
+    await page.getByRole('button', { name: 'Hall of Records', exact: true }).click();
+    const records = page.getByRole('dialog', { name: 'Hall of Records', exact: true });
+    await expect(records).toContainText('No finished journeys recorded yet.');
+    await lockOwner.evaluate(() => window.dispatchEvent(new Event('test-release-unsaved-defeat')));
+    await expect(records).toContainText('Journey unsaved-defeat');
+    await expect.poll(() => page.evaluate(key => JSON.parse(localStorage.getItem(key)!).records, RUN_RECORD_KEYS.primary))
+      .toEqual([record]);
+    await expect.poll(() => page.evaluate(() => Object.keys(sessionStorage)
+      .filter(key => key.startsWith('tactics-guru:pending-defeat-history:')))).toEqual([]);
+  } finally { await lockOwner.close(); }
+});
+
 test('main menu: records display and reviewed export restore reset preserve active saves', async ({ page, isMobile }, info) => {
   const rows: RunRecord[] = [
     { mode: 'run', id: 'authored-example', outcome: 'defeat', recordedAt: Date.UTC(2026, 10, 10, 12), battlesWon: 1, floorsCleared: null, deepestFloor: null },

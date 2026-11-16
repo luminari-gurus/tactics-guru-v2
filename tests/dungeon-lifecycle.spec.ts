@@ -138,6 +138,11 @@ test('legal enemy defeat waits for its save and returns to the menu during a pen
  await expect(recovery.getByRole('button',{name:'Continue primary dungeon',exact:true})).toHaveCount(0);
  await expect(recovery.getByRole('button',{name:'Export backup save',exact:true})).toBeVisible();
  await expect(recovery.getByRole('button',{name:'Continue backup dungeon',exact:true})).toHaveCount(0);
+ await expect(recovery.getByRole('button',{name:'Remove primary save',exact:true})).toHaveCount(0);
+ await expect(recovery).toContainText('Remove the earlier checkpoint before removing the defeated save.');
+ await recovery.getByRole('button',{name:'Remove backup save',exact:true}).click();
+ await page.getByRole('button',{name:'Remove reviewed save',exact:true}).click();
+ await expect(recovery.getByRole('button',{name:'Remove primary save',exact:true})).toBeVisible();
  await page.goto('./');
  await page.getByRole('button',{name:'New Game',exact:true}).click();
  await page.getByRole('dialog',{name:'Start new dungeon?',exact:true}).getByRole('button',{name:'Start new dungeon',exact:true}).click();

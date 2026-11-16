@@ -11,7 +11,7 @@ import { RunHistory } from './RunHistory';
 import { dungeonRunRecord } from '../domain/runRecords';
 import { freshDungeon, FloorCache, newDungeonSeed, type DungeonState } from '../domain/dungeon';
 import type { DungeonAutoCollectIntent } from '../domain/dungeonAutoCollect';
-import { bothDungeonSlotsMissing, createDungeonStorage, resumableDungeonSave, resumableDungeonSlot, serializeBrowserDungeonWrite } from '../persistence/dungeonStorage';
+import { bothDungeonSlotsMissing, createDungeonStorage, removingDungeonSaveWouldReopenRun, resumableDungeonSave, resumableDungeonSlot, serializeBrowserDungeonWrite } from '../persistence/dungeonStorage';
 import { dungeonElement as el, renderDungeon } from '../ui/dungeon';
 import { BattleDialogs, type DialogChoice } from '../ui/dialogs';
 import type { RunBattleHost } from '../phaser/BattleScene';
@@ -166,13 +166,15 @@ async function recovery(){
  for(const [i,value] of session.exports(review).entries())choices.push({id:`dungeon-export-${i}`,label:`Export ${value.label}`,run:()=>{const url=URL.createObjectURL(new Blob([value.text],{type:'application/json'}));const a=el('a');a.href=url;a.download=`tactics-guru-dungeon-${i}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);close();}});
  for(const slot of ['primary','backup'] as const){
   if(resumableDungeonSave(review,slot))choices.push({id:`dungeon-continue-${slot}`,label:`Continue ${slot} dungeon`,run:()=>{if(session.continue(review,slot)){startup=false;stop();render();if(session.snapshot.activeBattle)start();}else recovery();}});
-  if(review[slot].text!==null)choices.push({id:`dungeon-remove-${slot}`,label:`Remove ${slot} save`,run:()=>dialogs.showChoices('Remove reviewed save?','Export first if needed. Only the reviewed dungeon slot will be removed.',[
+  if(review[slot].text!==null&&!removingDungeonSaveWouldReopenRun(review,slot))choices.push({id:`dungeon-remove-${slot}`,label:`Remove ${slot} save`,run:()=>dialogs.showChoices('Remove reviewed save?','Export first if needed. Only the reviewed dungeon slot will be removed.',[
    {id:'dungeon-remove-confirm',label:'Remove reviewed save',keepOpen:true,run:async()=>{await session.remove(slot,review);recovery();}},
    {id:'dungeon-remove-cancel',label:'Cancel',run:recovery},
   ])});
  }
  choices.push({id:'dungeon-retry-save',label:'Retry saving current progress',run:async()=>{if(startup){close();return;}await session.retry(review);close();}}, {id:'dungeon-close-recovery',label:'Close',run:close});
- dialogs.showChoices('Dungeon save recovery',`primary: ${review.primary.status}. backup: ${review.backup.status}. ${session.status}`,choices,close,{focusTitle:true});
+ const removalHint=removingDungeonSaveWouldReopenRun(review,'primary')||removingDungeonSaveWouldReopenRun(review,'backup')
+  ? ' Remove the earlier checkpoint before removing the defeated save.' : '';
+ dialogs.showChoices('Dungeon save recovery',`primary: ${review.primary.status}. backup: ${review.backup.status}. ${session.status}${removalHint}`,choices,close,{focusTitle:true});
  screen.scrollTop=scrollTop;
 }
 function whenVisible(generation:number,run:()=>void){

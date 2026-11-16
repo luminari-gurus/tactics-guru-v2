@@ -2,7 +2,7 @@ import { levelUpFeedback } from '../domain/progression';
 import { BattleSession } from './BattleSession';
 import { stepDungeon, type ExplorationCommand, acceptDungeonBattle, dungeonBattle, dungeonItem, freshDungeon, readDungeon, startDungeonBattle, type DungeonState, type DungeonItemCommand } from '../domain/dungeon';
 import { encodeDungeon } from '../domain/dungeonSaveEnvelope';
-import { createDungeonStorage, resumableDungeonSave, resumableDungeonSlot, type DungeonInspection, type DungeonSlot } from '../persistence/dungeonStorage';
+import { createDungeonStorage, removingDungeonSaveWouldReopenRun, resumableDungeonSave, resumableDungeonSlot, type DungeonInspection, type DungeonSlot } from '../persistence/dungeonStorage';
 import { dungeonRunRecord } from '../domain/runRecords';
 import type { RunHistory } from './RunHistory';
 import { acceptBattleStats, boundedStat, dungeonProgressStats, freshRunStats, type AcceptedBattle } from '../domain/runStats';
@@ -262,6 +262,10 @@ export class DungeonSession {
   remove(slot: DungeonSlot, review: DungeonInspection) { return this.mutate(() => this.removeNow(slot, review), false); }
   private removeNow(slot: DungeonSlot, review: DungeonInspection) {
     if (!this.storage || this.disposed || review !== this.review) return false;
+    if (removingDungeonSaveWouldReopenRun(this.storage.inspect(), slot)) {
+      this.report('Remove the earlier checkpoint before removing the defeated save.');
+      return false;
+    }
     this.retainExports(review);
     this.progressSaved = false;
     const reviewed = review[slot];
