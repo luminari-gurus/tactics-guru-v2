@@ -1,5 +1,5 @@
 import {expect,test,type Page} from './helpers/forceRailControls';
-import { readSession, playCommand, tapBoard, boardPoint, settledReport } from './helpers/battlePolicy';
+import { battleTool, readSession, playCommand, tapBoard, boardPoint, settledReport } from './helpers/battlePolicy';
 import { abilityCatalog } from './helpers/abilityCatalog';
 import { progressHero, projectProgression } from '../src/domain/progression';
 import { HERO_IDS } from '../src/content/constants';
@@ -87,7 +87,7 @@ test('review356 radial shortcuts use the moved cursor after switching from rail'
   const next=cells.find(n=>Math.abs(n.x-old.x)+Math.abs(n.y-old.y)===1)!;
   await page.locator('#battle-target').selectOption(`${old.x},${old.y}`);
   await page.evaluate(()=>{delete (globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls;});
-  await page.locator('#battle-overflow summary').click();await page.getByRole('radio',{name:'Radial',exact:true}).check();
+  await page.locator('#battle-overflow > summary').click();await page.getByRole('radio',{name:'Radial',exact:true}).check();
   await expect(page.locator('body')).toHaveAttribute('data-combat-skin','radial');
   await page.locator('canvas').focus();
   await page.keyboard.press(next.x!==old.x?(next.x>old.x?'ArrowRight':'ArrowLeft'):(next.y>old.y?'ArrowDown':'ArrowUp'));
@@ -303,8 +303,8 @@ test('direct ability controls fit the desktop rail and compact touch layouts',as
       expect((await readSession(page)).state).toEqual(before.state);
       await page.locator('#battle-target').selectOption(hero==='fighter'?'0,0':'2,0');
       await expect(page.locator('#battle-review')).toBeEnabled();
-      await page.locator('#battle-party').focus();
-      if(hasTouch)await page.locator('#battle-party').tap();else await page.locator('#battle-party').click();
+      await (await battleTool(page, '#battle-party')).focus();
+      if(hasTouch)await (await battleTool(page, '#battle-party')).tap();else await (await battleTool(page, '#battle-party')).click();
       await page.locator('#inspection-close').click();
       await expect(page.locator('#battle-party')).toBeFocused();await expect(page.locator('#battle-review')).toBeEnabled();
       await page.locator('#battle-cancel').click();expect((await readSession(page)).state).toEqual(before.state);
@@ -324,7 +324,7 @@ test('direct ability controls stay hidden across radial turns and restore with t
     await abilityReady(page,`/tests/fixtures/abilities/index.html?hero=${hero}&xp=180&real&injured`);
     const before=await readSession(page),actor=before.state.initiative[before.state.activeIndex];
     await page.evaluate(()=>{delete (globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls;});
-    await page.locator('#battle-overflow summary').click();await page.getByRole('radio',{name:hasTouch?'Auto':'Radial',exact:true}).check();
+    await page.locator('#battle-overflow > summary').click();await page.getByRole('radio',{name:hasTouch?'Auto':'Radial',exact:true}).check();
     await expect(page.locator('body')).toHaveAttribute('data-combat-skin','radial');await settledReport(page);
     const direct=page.locator('.battle-actions [data-action^="ability:"]');
     expect(await direct.count()).toBeGreaterThan(0);
@@ -351,7 +351,7 @@ test('direct ability controls stay hidden across radial turns and restore with t
     const ids=await page.locator('#battle-ability option').evaluateAll(options=>options.map(option=>(option as HTMLOptionElement).value));
     expect(await direct.evaluateAll(buttons=>buttons.map(button=>(button as HTMLElement).dataset.action))).toEqual(ids);
     for(const button of await direct.all())await expect(button).toBeHidden();
-    if(await page.locator('#battle-overflow').getAttribute('open')===null)await activate('#battle-overflow summary');
+    if(await page.locator('#battle-overflow').getAttribute('open')===null)await activate('#battle-overflow > summary');
     await page.getByRole('radio',{name:'Rail',exact:true}).check();
     await expect(page.locator('body')).toHaveAttribute('data-combat-skin','rail');
     for(const button of await direct.all())await expect(button).toBeVisible();
@@ -418,7 +418,7 @@ test('Mage real Frost Snare preserves keyboard touch previews cancellation inspe
   test.setTimeout(90000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
   await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
   const picker=page.locator('#battle-ability'),button=abilityButton(page,'ability:frost_snare'),before=await readSession(page);
-  if(isMobile)await page.locator('#battle-sound').tap();else{await page.locator('#battle-sound').focus();await page.keyboard.press('Enter');}
+  if(isMobile)await (await battleTool(page, '#battle-sound')).tap();else{await (await battleTool(page, '#battle-sound')).focus();await page.keyboard.press('Enter');}
   await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().battleAudio)).toMatchObject({enabled:true,status:'ready',started:0});
   const storage=await page.evaluate(()=>JSON.stringify(localStorage));
   const snares=async()=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).units.filter((u:any)=>u.snare.visible).map((u:any)=>u.id);
@@ -439,9 +439,9 @@ test('Mage real Frost Snare preserves keyboard touch previews cancellation inspe
   expect(await snares()).toEqual([5]);
   await page.screenshot({path:test.info().outputPath('mage-snared-board.png')});
   expect(await page.evaluate(()=>window.fitDiagnostics().battleAudio)).toMatchObject({enabled:true,status:'ready',started:0,completed:0,dropped:0,active:null,recent:[],ownedSounds:0});
-  await page.locator('#battle-party').click();await page.locator('#inspect-unit-5').click();await expect(page.getByRole('dialog')).toContainText('Snared by Mage #3');await expect(page.getByRole('dialog')).toContainText('expires after this unit’s next turn ends or source/target defeat');
+  await (await battleTool(page, '#battle-party')).click();await page.locator('#inspect-unit-5').click();await expect(page.getByRole('dialog')).toContainText('Snared by Mage #3');await expect(page.getByRole('dialog')).toContainText('expires after this unit’s next turn ends or source/target defeat');
   await page.screenshot({path:test.info().outputPath('mage-snare-inspection.png')});await page.locator('#inspection-close').click();
-  await page.locator('#battle-log-open').click();await expect(page.getByRole('dialog')).toContainText('Snared by Mage');await page.locator('#log-close').click();
+  await (await battleTool(page, '#battle-log-open')).click();await expect(page.getByRole('dialog')).toContainText('Snared by Mage');await page.locator('#log-close').click();
   await page.reload();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');const fresh=await readSession(page);expect(fresh.state).toEqual(before.state);expect(fresh.events).toEqual([]);expect(fresh.pending).toBeNull();expect(errors).toEqual([]);
   expect(await snares()).toEqual([]);
 });
@@ -463,7 +463,7 @@ for(const ability of ['mark_target','pinning_shot'] as const)test(`Ranger ${abil
   const before=await readSession(page),storage=await page.evaluate(()=>JSON.stringify(localStorage));
   // Exercise no-roll controls with a real unlocked backend, so muted audio cannot
   // hide an accidental attack/magic cue in the presentation path.
-  if(isMobile)await page.locator('#battle-sound').tap();else {await page.locator('#battle-sound').focus();await page.keyboard.press('Enter');}
+  if(isMobile)await (await battleTool(page, '#battle-sound')).tap();else {await (await battleTool(page, '#battle-sound')).focus();await page.keyboard.press('Enter');}
   await expect.poll(()=>page.evaluate(()=>window.fitDiagnostics().battleAudio)).toMatchObject({enabled:true,status:'ready',started:0});
   expect((await readSession(page)).state).toEqual(before.state);
   await picker.selectOption(abilityId);await expect(picker).toHaveValue(abilityId);await picker.focus();
@@ -488,10 +488,10 @@ for(const ability of ['mark_target','pinning_shot'] as const)test(`Ranger ${abil
   expect(accepted.state.rng).toEqual(before.state.rng);
   expect(accepted.state.units.map(u=>u.hp)).toEqual(before.state.units.map(u=>u.hp));
   expect(accepted.state.commandCount).toBe(before.state.commandCount+1);await expect(picker).toBeDisabled();
-  await page.locator('#battle-party').click();await page.locator('#inspect-unit-5').click();
+  await (await battleTool(page, '#battle-party')).click();await page.locator('#inspect-unit-5').click();
   await expect(page.getByRole('dialog')).toContainText(ability==='mark_target'?'Marked by Ranger #2':'Pinned by Ranger #2');
   await page.screenshot({path:test.info().outputPath(`${ability}-inspection.png`)});await page.locator('#inspection-close').click();
-  await page.locator('#battle-log-open').click();await expect(page.getByRole('dialog')).toContainText(ability==='mark_target'?'marked by Ranger':'Pinned by Ranger');await page.locator('#log-close').click();
+  await (await battleTool(page, '#battle-log-open')).click();await expect(page.getByRole('dialog')).toContainText(ability==='mark_target'?'marked by Ranger':'Pinned by Ranger');await page.locator('#log-close').click();
   await page.reload();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const fresh=await readSession(page);expect(fresh.state).toEqual(before.state);expect(fresh.events).toEqual([]);expect(fresh.pending).toBeNull();
   expect(errors).toEqual([]);
@@ -518,7 +518,7 @@ test('Fighter healing and Taunt preserve keyboard touch cancellation inspection 
   await picker.selectOption('ability:second_wind');if(isMobile)await secondWind.tap();else await secondWind.click();
   await page.locator('#battle-target').selectOption('0,0');await expect(page.locator('#battle-preview')).toContainText('Heal 7 HP');
   await expect(page.locator('#battle-preview')).not.toContainText('Friendly fire');await expect(page.locator('#battle-ability-info')).toContainText('1/1 use');
-  await page.locator('#battle-party').click();await expect(page.getByRole('dialog')).toContainText('Second Wind 1/1');await page.locator('#inspection-close').click();
+  await (await battleTool(page, '#battle-party')).click();await expect(page.getByRole('dialog')).toContainText('Second Wind 1/1');await page.locator('#inspection-close').click();
   const viewport=page.viewportSize()!;await page.setViewportSize({width:320,height:568});await expect(picker).toHaveValue('ability:second_wind');
   expect((await readSession(page)).state).toEqual(initial.state);
   await page.locator('#battle-review').scrollIntoViewIfNeeded();await page.screenshot({path:test.info().outputPath('fighter-heal-preview-narrow.png')});
@@ -527,7 +527,7 @@ test('Fighter healing and Taunt preserve keyboard touch cancellation inspection 
   if(isMobile)await page.locator('#battle-review').tap();else {await page.locator('#battle-review').focus();await page.keyboard.press('Enter');}
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const healed=await readSession(page);expect(healed.state.rng).toEqual(initial.state.rng);expect(healed.state.units.find(u=>u.defId==='fighter')).toMatchObject({hp:27,secondWindUsed:true,hasActed:true});
-  await expect(page.locator('#battle-status')).toContainText('0/1');await page.locator('#battle-log-open').click();await expect(page.getByRole('dialog')).toContainText('heals 7 HP');await page.locator('#log-close').click();
+  await expect(page.locator('#battle-status')).toContainText('0/1');await (await battleTool(page, '#battle-log-open')).click();await expect(page.getByRole('dialog')).toContainText('heals 7 HP');await page.locator('#log-close').click();
   await page.locator('#battle-next').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   for(let i=0;i<8;i++) {const s=await readSession(page);if(s.state.units.find(u=>u.id===s.state.initiative[s.state.activeIndex])!.defId==='fighter')break;await page.locator('#battle-next').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');}
   let next=await readSession(page),fighter=next.state.units.find(u=>u.id===next.state.initiative[next.state.activeIndex])!;expect(fighter.defId).toBe('fighter');
@@ -554,9 +554,9 @@ test('Fighter healing and Taunt preserve keyboard touch cancellation inspection 
   await page.locator('#battle-target').selectOption(`${enemy.cell.x},${enemy.cell.y}`);await expect(page.locator('#battle-preview')).toContainText('no roll');
   await page.locator('#battle-review').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const taunted=await readSession(page);expect(taunted.state.rng).toEqual(next.state.rng);expect(taunted.state.units.find(u=>u.id===enemy.id)?.tauntedBy).toBe(fighter.id);
-  await page.locator('#battle-party').click();await page.locator(`#inspect-unit-${enemy.id}`).click();await expect(page.getByRole('dialog')).toContainText(`Taunted by Fighter #${fighter.id}`);await expect(page.getByRole('dialog')).toContainText('next turn ends');
+  await (await battleTool(page, '#battle-party')).click();await page.locator(`#inspect-unit-${enemy.id}`).click();await expect(page.getByRole('dialog')).toContainText(`Taunted by Fighter #${fighter.id}`);await expect(page.getByRole('dialog')).toContainText('next turn ends');
   await page.screenshot({path:test.info().outputPath('fighter-taunt-inspection.png')});await page.locator('#inspection-close').click();
-  await page.locator('#battle-log-open').click();await expect(page.getByRole('dialog')).toContainText('taunted by Fighter');await page.locator('#log-close').click();
+  await (await battleTool(page, '#battle-log-open')).click();await expect(page.getByRole('dialog')).toContainText('taunted by Fighter');await page.locator('#log-close').click();
   await page.reload();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect((await readSession(page)).state).toEqual(initial.state);expect((await readSession(page)).events).toEqual([]);
   expect(errors).toEqual([]);
 });
@@ -576,7 +576,7 @@ for(const hero of ['fighter','ranger','mage'])test(`${hero} explicit later abili
   await expect(page.locator('#battle-review')).toBeEnabled();
   expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!).pending.abilityId).toBe(`ability:zz_${hero}`);
   const prepared=await page.locator('#game').getAttribute('data-session');
-  await page.locator('#battle-party').click();await page.locator('#inspection-close').click();
+  await (await battleTool(page, '#battle-party')).click();await page.locator('#inspection-close').click();
   await picker.scrollIntoViewIfNeeded();
   await page.screenshot({path:test.info().outputPath(`${hero}-original-viewport.png`)});
   const viewport=page.viewportSize()!;await page.setViewportSize({width:320,height:568});
@@ -634,12 +634,12 @@ for(const [xp,level,missiles,maxHp] of [[0,1,1,11],[60,2,1,15],[180,3,2,19]])tes
  const picker=page.locator('#battle-ability');await expect(picker.locator('option')).toHaveCount(level===1?1:level<3?2:3);
  await expect(picker.locator('option[value="ability:frost_snare"]')).toHaveCount(level>=3?1:0);
  await expect(picker.locator('option[value="ability:zz_mage"]')).toHaveCount(level===1?0:1);
- await page.locator('#battle-party').click();await expect(page.locator('#battle-dialog-message')).toContainText(`Level ${level}`);await page.locator('#inspection-close').click();
+ await (await battleTool(page, '#battle-party')).click();await expect(page.locator('#battle-dialog-message')).toContainText(`Level ${level}`);await page.locator('#inspection-close').click();
  await picker.selectOption('ability:magic_missile');await abilityButton(page,'ability:magic_missile').click();await page.locator('#battle-target').selectOption('1,0');await page.locator('#battle-review').click();
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const before=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);expect(before.events.filter((e:{type:string})=>e.type==='missileRolled')).toHaveLength(missiles);
  await page.reload();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect((await readSession(page)).state).toEqual(initial.state);
- await page.locator('#battle-party').click();await expect(page.locator('#battle-dialog-message')).toContainText(`Level ${level}`);await page.screenshot({path:test.info().outputPath(`progression-level-${level}.png`)});
+ await (await battleTool(page, '#battle-party')).click();await expect(page.locator('#battle-dialog-message')).toContainText(`Level ${level}`);await page.screenshot({path:test.info().outputPath(`progression-level-${level}.png`)});
 });
 
 

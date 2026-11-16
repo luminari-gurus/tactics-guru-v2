@@ -1,4 +1,4 @@
-import { confirmRestart, settledReport } from './helpers/battlePolicy';
+import { battleTool, confirmRestart, settledReport } from './helpers/battlePolicy';
 import { expect, test, type Page } from './helpers/forceRailControls';
 import { standaloneCatalog as battleCatalog } from './helpers/playerPolicy';
 import { buildBoardPresentation } from '../src/geometry/boardPresentation';
@@ -135,7 +135,7 @@ test('repeated map selection reaches a legal ground destination behind the same 
   await page.locator('#battle-target').selectOption('3,5'); // Native control clears overlap history.
   await select();expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
   await select();
-  await page.locator('#battle-party').click();
+  await (await battleTool(page, '#battle-party')).click();
   const locked=await report(page);await select();expect((await report(page)).selectionEvents).toBe(locked.selectionEvents);
   await page.locator('#inspection-close').click();
   await select();expect((await report(page)).selected).toEqual({x:4,y:5,elevation:2});
@@ -209,7 +209,7 @@ test('right-click cancels a prepared move through the existing action path and r
     const r=await settledReport(page);
     await page.mouse.click(r.transform.x+p.x*r.transform.scale,r.transform.y+p.y*r.transform.scale,{button:'right'});
   };
-  await page.locator('#battle-party').click();const locked=await page.locator('#game').getAttribute('data-session');
+  await (await battleTool(page, '#battle-party')).click();const locked=await page.locator('#game').getAttribute('data-session');
   await rightClick();await expect(page.getByRole('dialog')).toBeVisible();
   expect(await page.locator('#game').getAttribute('data-session')).toBe(locked);
   await page.locator('#inspection-close').click();

@@ -10,7 +10,7 @@ import { BATTLE_STORAGE_KEYS as keys } from '../src/persistence/battleStorage';
 import { projectTile } from '../src/geometry/iso';
 import { HEALTH_BAR } from '../src/phaser/healthBar';
 import { abilityPresentation, type SignatureKind } from '../src/phaser/abilityPresentation';
-import { playerDecision, readSession, confirmRestart, playCommand } from './helpers/battlePolicy';
+import { battleTool, playerDecision, readSession, confirmRestart, playCommand } from './helpers/battlePolicy';
 import { startApplicationLoadDiagnostics, type ApplicationLoadDiagnostics } from './helpers/applicationLoadDiagnostics';
 
 // Add failure evidence without replacing the rail controls or graphics fixtures.
@@ -62,12 +62,12 @@ const ready=(page:Page)=>expect(page.locator('#game')).toHaveAttribute('data-pha
 
 async function chooseCombatPace(page:Page,pace:'normal'|'fast',arrow=false) {
   const more=page.locator('#battle-overflow');
-  if(await more.getAttribute('open')===null){await more.locator('summary').focus();await page.keyboard.press('Enter');}
+  if(await more.getAttribute('open')===null){await more.locator(':scope > summary').focus();await page.keyboard.press('Enter');}
   const radio=more.locator(`[data-combat-pace-value="${pace}"]`);
   if(arrow){await more.locator('[data-combat-pace-value]:checked').focus();await page.keyboard.press(pace==='fast'?'ArrowRight':'ArrowLeft');}
   else {await radio.focus();await page.keyboard.press('Space');}
   await expect(radio).toBeChecked();await expect(radio).toBeFocused();
-  await more.locator('summary').focus();await page.keyboard.press('Enter');
+  await more.locator(':scope > summary').focus();await page.keyboard.press('Enter');
   await expect(more).not.toHaveAttribute('open','');
 }
 
@@ -385,7 +385,7 @@ for(const ability of ['ability:basic_attack','ability:guarded_strike'] as const)
   const status=actor.guarded?'Guarded (+2 AC, −2 attack rolls; expires immediately before this unit’s next turn)':'No status effects';
   await expect(page.locator('#battle-status')).toHaveText(status);
   await expect(page.locator('[data-action="basic"]')).toBeDisabled();await expect(page.locator('#battle-availability')).toContainText('Action spent');
-  await page.locator('#battle-party').click();await page.locator(`#inspect-unit-${actor.id}`).click();
+  await (await battleTool(page, '#battle-party')).click();await page.locator(`#inspect-unit-${actor.id}`).click();
   await expect(page.locator('#battle-dialog-message')).toContainText(`AC ${ac}`);
   await expect(page.locator('#battle-dialog-message')).toContainText(status);
   await page.locator('#inspection-close').click();expect((await readSession(page)).state).toEqual(state);

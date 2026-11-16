@@ -1,4 +1,4 @@
-import { confirmRestart } from './helpers/battlePolicy';
+import { battleTool, confirmRestart } from './helpers/battlePolicy';
 import { expect, test, type Locator, type Page } from './helpers/forceRailControls';
 import { writeFileSync } from 'node:fs';
 import { previewMove, previewMovement } from '../src/domain/grid';
@@ -36,7 +36,7 @@ test('QA: hover refresh preserves controls and first-click Confirm and Wait', as
   const moved=await session(page);
   expect(moved.state.commandCount).toBe(before.state.commandCount+1);
   expect(moved.state.units.find(u=>u.id===actor.id)!.cell).toEqual(destination);
-  await activate('#battle-log-open');await activate('#log-close');
+  await battleTool(page, '#battle-log-open');await activate('#battle-log-open');await activate('#log-close');
   await expect(page.locator('#battle-dialog')).not.toBeVisible();
   await activate('#battle-next');
   await expect.poll(async()=> (await session(page)).state.commandCount).toBeGreaterThan(moved.state.commandCount);
@@ -146,7 +146,7 @@ test('undo and compound plan use the live HUD without bypassing review',async({p
   const overlays=report.targets;
   expect(overlays.find((entry:{selected:boolean})=>entry.selected)?.valid).toBe(true);
   expect((await session(page)).state).toEqual(before.state);
-  await activate('#battle-party');await activate('#inspection-close');
+  await battleTool(page, '#battle-party');await activate('#battle-party');await activate('#inspection-close');
   await expect(page.locator('#battle-review')).toBeEnabled();
   if(!touch){
     const viewport=page.viewportSize()!;await page.setViewportSize({width:320,height:700});
@@ -198,8 +198,8 @@ test('default Move initializes once per usable player turn and preserves explici
     await page.locator(`[data-action="${action}"]`).click();await target.selectOption({index:1});
     const selected=await target.inputValue(),before=await page.locator('#game').getAttribute('data-session');
     const overlays=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).targets;
-    await page.locator('#battle-party').click();await page.locator('#inspection-close').click();
-    await page.locator('#battle-log-open').click();await page.locator('#log-close').click();
+    await (await battleTool(page, '#battle-party')).click();await page.locator('#inspection-close').click();
+    await (await battleTool(page, '#battle-log-open')).click();await page.locator('#log-close').click();
     const box=(await page.locator('#battle-board-region').boundingBox())!;
     await page.mouse.move(box.x+box.width/2,box.y+box.height/2);
     const viewport=page.viewportSize()!;await page.setViewportSize({width:viewport.width-1,height:viewport.height});await page.setViewportSize(viewport);
@@ -212,7 +212,7 @@ test('default Move initializes once per usable player turn and preserves explici
   await page.screenshot({path:test.info().outputPath('explicit-override.png')});
   expect((await session(page)).state).toEqual(initial.state);expect((await session(page)).replay).toEqual(initial.replay);
   expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saved);
-  await page.locator('#battle-cancel').click();await page.locator('#battle-party').click();await page.locator('#inspection-close').click();
+  await page.locator('#battle-cancel').click();await (await battleTool(page, '#battle-party')).click();await page.locator('#inspection-close').click();
   await expect(move).toHaveAttribute('aria-pressed','false');await expect(target).toBeDisabled();
   expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!).pending).toBeNull();
   // Leave an explicit action selected, then progress through actual Wait/enemy turns.
@@ -333,7 +333,7 @@ test('player HUD and preview cancellation preserve state and modal capture', asy
   const before = await page.locator('#game').getAttribute('data-session');
   await page.getByRole('button',{name:'Move',exact:true}).click();
   await page.locator('#battle-target').selectOption({index:1});
-  await page.locator('#battle-party').click();
+  await (await battleTool(page, '#battle-party')).click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await page.keyboard.press('Tab');expect(await page.evaluate(()=>!!document.activeElement?.closest('dialog'))).toBe(true);
   await page.keyboard.press('Escape');
@@ -456,7 +456,7 @@ test('battle HUD targets fit portrait and short landscape with a bounded readabl
     });
     for(const b of boxes){expect(b.width,b.text!).toBeGreaterThanOrEqual(44);expect(b.height,b.text!).toBeGreaterThanOrEqual(44);expect(b.left).toBeGreaterThanOrEqual(0);expect(b.right).toBeLessThanOrEqual(viewport.width);expect(b.bottom).toBeLessThanOrEqual(viewport.height);}
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-    await page.locator('#battle-log-open').click();
+    await (await battleTool(page, '#battle-log-open')).click();
     await expect(page.getByRole('dialog')).toContainText('Battle log');
     await page.locator('#log-close').click();
     await page.locator('#battle-scroll').evaluate(e=>{e.scrollTop=0;});
@@ -485,7 +485,7 @@ test('real touch previews a board move, modal backdrop captures it, and suspend 
   const cdp=await page.context().newCDPSession(page);
   const touch=async(p:{x:number;y:number})=>{await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{...p,id:1}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});};
   await touch(point!);await expect(page.getByRole('button',{name:'Confirm action'})).toBeEnabled();
-  await page.locator('#battle-party').click();
+  await (await battleTool(page, '#battle-party')).click();
   await expect(page.getByRole('dialog')).toBeVisible();const before=await session(page);
   await touch({x:5,y:await page.evaluate(()=>innerHeight-5)});
   expect((await session(page)).state).toEqual(before.state);
@@ -511,7 +511,7 @@ test('keyboard-only shortcuts select preview confirm and wait once without repla
   expect((await session(page)).state).toEqual(before.state);
   expect(await page.evaluate(()=>JSON.stringify(localStorage))).toBe(saves);
   await expect(page.locator('#battle-move')).toHaveAttribute('aria-keyshortcuts','M');
-  const help=page.locator('#battle-shortcuts summary');
+  const help=await battleTool(page, '#battle-shortcuts summary');
   await help.focus();await page.keyboard.press('Enter');
   await expect(page.locator('#battle-shortcuts')).toContainText('C');
   await expect(page.locator('#battle-shortcuts')).toContainText('Enter');
@@ -563,7 +563,7 @@ test('keyboard-only shortcuts yield to editing modifiers composition handled eve
   await page.keyboard.press('a');
   await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');
   for(const selector of ['#battle-party','#battle-log-open']){
-    await page.locator(selector).click();await expect(page.locator('#battle-dialog')).toBeVisible();
+    await (await battleTool(page, selector)).click();await expect(page.locator('#battle-dialog')).toBeVisible();
     for(const key of ['m','a','s','1','w','c'])await page.keyboard.press(key);
     expect((await session(page)).state).toEqual(before.state);
     await page.keyboard.press('Escape');await expect(page.locator('#battle-dialog')).not.toBeVisible();
@@ -722,7 +722,7 @@ test('live actor, inspection and cancellation remain independent of pending inte
     await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption({index:1});
     const before=await page.locator('#game').getAttribute('data-session'),preview=await page.locator('#battle-preview').textContent();
     const actorText=await page.locator('#battle-actor').textContent();
-    await page.locator('#battle-party').click();
+    await (await battleTool(page, '#battle-party')).click();
     for(const unit of current.state.units){
       await page.locator(`#inspect-unit-${unit.id}`).click();
       await expect(page.locator('#battle-dialog-title')).toContainText('Inspection only');
@@ -756,6 +756,74 @@ test('live actor, inspection and cancellation remain independent of pending inte
   await page.locator('#battle-cancel').click();await expect(page.locator('#battle-next')).toBeFocused();
   expect((await session(page)).state).toEqual(spent.state);
   await page.locator('[data-action="basic"]').click();await page.keyboard.press('Escape');await expect(page.locator('#battle-next')).toBeFocused();
+});
+
+test('desktop Battle tools close with keyboard focus and preserve a prepared Rail move', async ({page,isMobile}) => {
+  test.skip(isMobile, 'Desktop Battle tools disclosure');
+  await page.setViewportSize({width:1280,height:720});
+  await page.goto('./battle');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await page.locator('#battle-target').selectOption({index:1});
+  const game = page.locator('#game');
+  const prepared = await game.getAttribute('data-session');
+  const picker = await page.locator('#battle-target').inputValue();
+  const preview = await page.locator('#battle-preview').textContent();
+  const tools = page.locator('#battle-overflow > summary');
+  await expect(tools).toHaveAccessibleName('Battle tools');
+  await expect(tools).toBeInViewport({ratio:1});
+  await expect(page.locator('#battle-stats')).toBeHidden();
+  await expect(page.locator('#battle-log-open')).toBeHidden();
+  await tools.press('Enter');
+  await expect(page.locator('#battle-stats')).toBeVisible();
+
+  await page.keyboard.press('Tab');
+  const party = page.locator('#battle-party');
+  await expect(party).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('dialog')).toHaveAccessibleName(/Inspection only/);
+  await page.keyboard.press('Escape');
+  await expect(party).toBeFocused();
+  await page.keyboard.press('Tab');
+  const log = page.locator('#battle-log-open');
+  await expect(log).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('dialog')).toHaveAccessibleName('Battle log');
+  await page.keyboard.press('Escape');
+  await expect(log).toBeFocused();
+
+  const help = page.locator('#battle-shortcuts > summary');
+  await help.press('Enter');
+  await page.keyboard.press('Escape');
+  await expect(help).toBeFocused();
+  await expect(page.locator('#battle-shortcuts')).not.toHaveAttribute('open', '');
+  for (const key of ['a', '1', 'w', 'c']) await page.keyboard.press(key);
+  await page.keyboard.down('Escape');
+  await page.keyboard.down('Escape');
+  await page.keyboard.up('Escape');
+
+  await expect(tools).toBeFocused();
+  await expect(page.locator('#battle-overflow')).not.toHaveAttribute('open', '');
+  await expect(game).toHaveAttribute('data-session', prepared!);
+
+  await tools.press('Enter');
+  await page.keyboard.press('Shift+Tab');
+  await expect(page.locator('#battle-cancel')).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(tools).toBeFocused();
+  await expect(page.locator('#battle-overflow')).not.toHaveAttribute('open', '');
+  await expect(game).toHaveAttribute('data-session', prepared!);
+
+  await tools.press('Enter');
+  await page.locator('canvas').press('Escape');
+  await expect(tools).toBeFocused();
+  await expect(page.locator('#battle-overflow')).not.toHaveAttribute('open', '');
+  await expect(game).toHaveAttribute('data-session', prepared!);
+  await expect(page.locator('#battle-target')).toHaveValue(picker);
+  await expect(page.locator('#battle-preview')).toHaveText(preview!);
+  await expect(page.locator('#battle-review')).toBeEnabled();
+
+  await page.locator('canvas').press('Escape');
+  await expect(page.locator('#battle-review')).toBeDisabled();
 });
 
 test('desktop Rail keeps primary and prepared controls inside the initial viewport', async ({page,isMobile}) => {
@@ -814,7 +882,7 @@ test('accepted rail and dock preserve drawable floors, readable controls and foc
       if(!stress){await page.locator('#fit-restart').click();await confirmRestart(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');}
       // Measure secondary controls only after their disclosure makes them available.
       const more=page.locator('#battle-overflow');
-      await more.locator('summary').click();await expect(more).toHaveAttribute('open','');
+      await more.locator(':scope > summary').click();await expect(more).toHaveAttribute('open','');
       const measurement=await page.evaluate(()=>{
         const rect=(s:string)=>document.querySelector(s)!.getBoundingClientRect().toJSON();
         const controls=[...document.querySelectorAll<HTMLElement>('#fit-panel button:not([hidden]), #battle-target')].filter(e=>e.getClientRects().length).map(e=>{
@@ -833,7 +901,7 @@ test('accepted rail and dock preserve drawable floors, readable controls and foc
       expect(measurement.overflow).toBe(false);expect(measurement.actor.height).toBeLessThanOrEqual(measurement.panel.height*.45+.02);
       for(const control of measurement.controls){expect(control.width,control.name!).toBeGreaterThanOrEqual(44);expect(control.height,control.name!).toBeGreaterThanOrEqual(44);expect(control.left).toBeGreaterThanOrEqual(0);expect(control.right).toBeLessThanOrEqual(width);expect(control.reachable,control.name!).toBe(true);}
       expect(measurement.contrast.text).toBeGreaterThan(4.5);expect(measurement.contrast.hint).toBeGreaterThan(4.5);expect(measurement.contrast.edge).toBeGreaterThan(3);
-      await more.locator('summary').click();await expect(more).not.toHaveAttribute('open','');
+      await more.locator(':scope > summary').click();await expect(more).not.toHaveAttribute('open','');
       await page.locator('#battle-scroll').evaluate(e=>e.scrollTop=0);
       await page.screenshot({path:info.outputPath(`responsive-${width}x${height}${stress?'-stress':''}.png`)});
       await page.locator('#battle-actor').focus();await page.keyboard.press('End');await page.keyboard.press('Tab');
@@ -925,7 +993,7 @@ test('battle log starts with the initial actor before opening enemy actions', as
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   const current = await session(page), initial = current.replay.initial;
   const actor = initial.units.find(unit => unit.id === initial.initiative[initial.activeIndex])!;
-  await page.locator('#battle-log-open').click();
+  await (await battleTool(page, '#battle-log-open')).click();
   const lines = await page.locator('#battle-log li').allTextContents();
   expect(lines[0]).toBe(`Round ${initial.round}: ${displayName(actor.defId)} #${actor.id}'s turn`);
   expect(lines.some(line => /moves to|waits|uses/.test(line))).toBe(true);
