@@ -763,27 +763,41 @@ test('desktop Rail keeps primary and prepared controls inside the initial viewpo
   await page.setViewportSize({width:1280,height:720});
   await page.goto('./battle');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-  await page.locator('#battle-target').selectOption({index:1});
-  await expect(page.locator('#battle-review')).toBeEnabled();
+  const target = page.locator('#battle-target');
+  const confirm = page.locator('#battle-review');
+  const expectControlsInViewport = async () => {
+    const layout = await page.evaluate(() => {
+      const rect = (selector: string) => document.querySelector(selector)!.getBoundingClientRect();
+      const board = rect('#battle-board-region');
+      const rail = rect('#battle-scroll');
+      const controls = ['#battle-move', '[data-action="basic"]', '[data-action^="ability:"]',
+        '#battle-next', '#battle-target', '#battle-review', '#battle-cancel'];
+      return {
+        boardAndRailAreSeparate: board.right <= rail.left,
+        pageHasHorizontalOverflow: document.documentElement.scrollWidth > innerWidth,
+        scrollTop: document.querySelector('#battle-scroll')!.scrollTop,
+        clippedControls: controls.filter(selector => {
+          const control = rect(selector);
+          return control.height < 44 || control.top < rail.top || control.bottom > rail.bottom ||
+            control.left < rail.left || control.right > rail.right;
+        }),
+      };
+    });
+    expect(layout).toEqual({boardAndRailAreSeparate:true,pageHasHorizontalOverflow:false,scrollTop:0,clippedControls:[]});
+  };
 
-  const layout = await page.evaluate(() => {
-    const rect = (selector: string) => document.querySelector(selector)!.getBoundingClientRect();
-    const board = rect('#battle-board-region');
-    const rail = rect('#battle-scroll');
-    const controls = ['#battle-move', '[data-action="basic"]', '[data-action^="ability:"]',
-      '#battle-next', '#battle-target', '#battle-review', '#battle-cancel'];
-    return {
-      boardAndRailAreSeparate: board.right <= rail.left,
-      pageHasHorizontalOverflow: document.documentElement.scrollWidth > innerWidth,
-      scrollTop: document.querySelector('#battle-scroll')!.scrollTop,
-      clippedControls: controls.filter(selector => {
-        const control = rect(selector);
-        return control.height < 44 || control.top < rail.top || control.bottom > rail.bottom ||
-          control.left < rail.left || control.right > rail.right;
-      }),
-    };
-  });
-  expect(layout).toEqual({boardAndRailAreSeparate:true,pageHasHorizontalOverflow:false,scrollTop:0,clippedControls:[]});
+  await target.selectOption({index:1});
+  await expect(confirm).toBeEnabled();
+  await expectControlsInViewport();
+
+  await page.getByRole('button', {name:'Magic Missile', exact:true}).click();
+  const ally = target.locator('option').filter({hasText:/^Fighter #1/});
+  await target.selectOption({value:(await ally.getAttribute('value'))!});
+  await expect(confirm).toBeEnabled();
+  const preview = page.locator('#battle-preview');
+  await expect(preview).toContainText('Friendly fire');
+  await expectControlsInViewport();
+  await expect(preview).toBeInViewport({ratio:1});
 });
 
 test('accepted rail and dock preserve drawable floors, readable controls and focus at five sizes',async({page},info)=>{

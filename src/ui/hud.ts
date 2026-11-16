@@ -166,13 +166,29 @@ export class BattleHud {
     this.disposePacePreference = mountCombatPacePreference(this.root.querySelector('#battle-overflow')!);
     this.disposeGuidancePreferences = mountClassGuidancePreferences(this.root.querySelector('#battle-overflow')!);
     this.classGuidance = new BattleClassGuidance(this.root, session, () => this.focusAction(), guidance);
-    // Keep focus order aligned with the desktop layout in style.css.
+    // Keep the action preview and confirmation together before supplemental details on desktop.
     const desktop = matchMedia('(min-width:760px) and (min-height:501px) and (orientation:landscape) and (pointer:fine)');
-    const actions = this.root.querySelector('.battle-section-label');
-    const tools = this.root.querySelector('.battle-tools');
-    const placeGuidance = () => this.classGuidance.place(this.root, desktop.matches ? tools : actions);
-    desktop.addEventListener('change', placeGuidance, {signal});
-    if (desktop.matches) placeGuidance();
+    const actions = this.root.querySelector('.battle-section-label')!;
+    const tools = this.root.querySelector('.battle-tools')!;
+    const abilityInfo = this.root.querySelector('#battle-ability-info')!;
+    const availability = this.root.querySelector('#battle-availability')!;
+    const decision = this.root.querySelector('.battle-decision')!;
+    const preview = this.root.querySelector('#battle-preview')!;
+    const inspectTarget = this.root.querySelector<HTMLButtonElement>('#battle-inspect-target')!;
+    const placeDetails = () => {
+      const focused = document.activeElement === inspectTarget;
+      if (desktop.matches) {
+        decision.append(inspectTarget);
+        decision.after(abilityInfo);
+      } else {
+        preview.before(inspectTarget);
+        availability.before(abilityInfo);
+      }
+      if (focused) inspectTarget.focus({preventScroll:true});
+      this.classGuidance.place(this.root, desktop.matches ? tools : actions);
+    };
+    desktop.addEventListener('change', placeDetails, {signal});
+    if (desktop.matches) placeDetails();
   }
   shortcut(key:string):boolean {
     if(/^[1-9]$/.test(key)) {

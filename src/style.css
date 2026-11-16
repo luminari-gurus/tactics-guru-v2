@@ -249,6 +249,7 @@ dialog button { touch-action: manipulation; }
   .battle-mode .battle-decision label { margin-bottom:3px; }
   .battle-mode #battle-preview { margin:6px 0; }
   .battle-mode .battle-commit button { padding:6px; font-size:.85rem; }
+  .battle-mode .battle-commit + #battle-inspect-target { margin-top:6px; }
   .battle-mode #battle-ability-info { font-size:.75rem; margin:4px 0; }
   .battle-mode #battle-controls[data-action-kind=idle] label[for=battle-target],
   .battle-mode #battle-controls[data-action-kind=idle] #battle-target,
