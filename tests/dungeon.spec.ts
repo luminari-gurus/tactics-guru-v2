@@ -1,5 +1,5 @@
 import { dungeonContent } from '../src/content/dungeon';
-import { walkDungeon, acceptedDungeonSnapshot, reenterDungeonStair, continueSavedDungeon, openDungeonInventory, collectDungeonEncounterLoot } from './helpers/dungeonTraversal';
+import { walkDungeon, acceptedDungeonSnapshot, settledDungeonSnapshot, expectSameProgress, reenterDungeonStair, continueSavedDungeon, openDungeonInventory, collectDungeonEncounterLoot } from './helpers/dungeonTraversal';
 import { atEncounter, atStairApproach, checkedDungeon, hobgoblinDungeonBoundary, stagedMageAbility, snaredDefeatBoundary } from './helpers/dungeonFixtures';
 import { expect,railTest as test,type Page } from './helpers/dungeonEntropy';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -581,8 +581,7 @@ test('new dungeons use fresh layouts across reloads and saved dungeons retain th
  const startNew=async()=>{await expect(page.locator('#dungeon-screen')).toHaveAttribute('data-boot','ready',{timeout:60_000});const dormant=await snapshot(page);await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();return acceptedDungeonSnapshot(page,dormant);};
  const first=await startNew();
  await page.reload();await continueSavedDungeon(page);
- const resumed=await snapshot(page);expect(resumed.stats!.activeMs).toBeGreaterThanOrEqual(first.stats!.activeMs);
- expect({...resumed,stats:first.stats}).toEqual(first);
+ expectSameProgress(await snapshot(page),first);
  await page.reload();const second=await startNew();
  expect(second.seed).not.toBe(first.seed);
  expect(generateMap(second.floors[0].descriptor.seed,'rooms').cells).not.toEqual(generateMap(first.floors[0].descriptor.seed,'rooms').cells);
@@ -698,7 +697,7 @@ test('automatic stairs preserve healed Fighter carry and fresh battle resources'
  const arrived=await snapshot(page);expect(arrived.depth).toBe(2);expect(arrived.revision).toBe(approach.revision+1);expect(arrived.party).toEqual(party);expect(arrived.ownership).toEqual(ownership);
  expect(arrived.party.every(h=>!Object.hasOwn(h,'secondWindUsed')&&!Object.hasOwn(h,'tauntedBy'))).toBe(true);
  await page.screenshot({path:test.info().outputPath('healed-party-automatic-arrival.png'),fullPage:true});
- await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(arrived);
+ await page.reload();await continueSavedDungeon(page);expectSameProgress(await snapshot(page),arrived);
  await walkDungeon(page,undefined,isMobile?'touch':'keyboard');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const entry=await snapshot(page),built=dungeonBattle(entry)!;expect(built.state.units.find(u=>u.defId==='fighter')!.hp).toBe(party.find(h=>h.heroId==='fighter')!.hp);
  expect((await readSession(page)).state.units.every(u=>!u.secondWindUsed&&u.tauntedBy===undefined)).toBe(true);
@@ -810,17 +809,17 @@ test('legal reward and guardian boundaries, travel reload, backtracking and isol
   const nextStep=slot===2?'unlock descent':'prepare the next encounter';
   const choose=async()=>{if(isMobile)await claim.tap();else await claim.click();};
   await choose();await expect(page.locator('#battle-dialog-message')).toHaveText(`Claim ${item} and ${nextStep}?`);
-  await page.locator('#dungeon-item-cancel').click();expect(await snapshot(page)).toEqual(s);
+  await page.locator('#dungeon-item-cancel').click();expect(await settledDungeonSnapshot(page)).toEqual(s);
   await choose();await page.locator('#dungeon-item-confirm').click();
+  const claimed=await acceptedDungeonSnapshot(page,s);
   await expect(status).toContainText('Dungeon saved on this device');
-  const claimed=await snapshot(page);
   expect(claimed).toMatchObject({phase:'ready',offer:null});
   expect(claimed.ownership).not.toEqual(s.ownership);
   await expect(progress).toHaveText(`Encounters: ${slot+1} / 3 cleared`);
   await expect(stairs).toHaveText(slot===2?'Downstairs: unlocked · walk onto the stairs':`Downstairs: locked · clear ${2-slot} more encounter${slot===0?'s':''}`);
   if(slot===2){
    await expect(stairs).toBeVisible();
-   await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(claimed);
+   await page.reload();await continueSavedDungeon(page);expectSameProgress(await snapshot(page),claimed);
    await expect(rewards).toHaveCount(0);
    await page.evaluate(()=>localStorage.setItem('tactics-guru:phaser:run:primary:v1','preserved-short-run'));
    await walkDungeon(page,s.floors[s.depth-1].descriptor.downstairs,isMobile?'touch':'keyboard');expect((await snapshot(page)).depth).toBe(2);const second=await snapshot(page);
@@ -828,12 +827,12 @@ test('legal reward and guardian boundaries, travel reload, backtracking and isol
    await expect(stairs).toHaveText('Downstairs: locked · clear 3 more encounters');
    await expect(page.locator('#dungeon-stair-ascend')).toContainText('Upstairs: available');
    await page.screenshot({path:test.info().outputPath('automatic-descent.png'),fullPage:true});
-   await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(second);
+   await page.reload();await continueSavedDungeon(page);expectSameProgress(await snapshot(page),second);
    await expect(progress).toHaveText('Encounters: 0 / 3 cleared');
    await reenterDungeonStair(page,'ascend');const returned=await snapshot(page);expect(returned.depth).toBe(1);expect(returned.floors[0].completed).toBe(3);expect(returned.ownership).toEqual(second.ownership);expect(returned.floors[0].position).toBe(returned.floors[0].descriptor.downstairs);
    await expect(progress).toHaveText('Encounters: 3 / 3 cleared');
    await expect(stairs).toHaveText('Downstairs: unlocked · Step off the downstairs and back onto it to descend.');
-   await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(returned);
+   await page.reload();await continueSavedDungeon(page);expectSameProgress(await snapshot(page),returned);
    await expect(progress).toHaveText('Encounters: 3 / 3 cleared');
    await expect(page.locator('#dungeon-start-encounter')).toHaveCount(0);await reenterDungeonStair(page,'descend');const revisited=await snapshot(page);expect(revisited.floors.map(f=>f.descriptor)).toEqual(second.floors.map(f=>f.descriptor));expect(revisited.floors.map(f=>f.completed)).toEqual(second.floors.map(f=>f.completed));
    expect((await snapshot(page)).depth).toBe(2);expect((await snapshot(page)).party).toEqual(second.party);expect((await snapshot(page)).ownership).toEqual(second.ownership);
@@ -878,7 +877,7 @@ test('declining a dungeon reward preserves inventory and allows the next encount
  const decline=page.getByRole('button',{name:'Decline reward',exact:true});
  const activate=async()=>{if(isMobile)await decline.tap();else await decline.press('Enter');};
  await activate();await page.locator('#dungeon-item-cancel').click();
- expect(await snapshot(page)).toEqual(initial);
+ expect(await settledDungeonSnapshot(page)).toEqual(initial);
  await activate();await page.locator('#dungeon-item-confirm').click();
  const next=await acceptedDungeonSnapshot(page,initial);
  expect(next).toMatchObject({phase:'ready',offer:null,ownership:initial.ownership});
@@ -886,7 +885,7 @@ test('declining a dungeon reward preserves inventory and allows the next encount
  await expect(stairs).toHaveText('Downstairs: locked · clear 2 more encounters');
  await expect(rewards).toHaveCount(0);
  await expect(page.locator('.dungeon-status')).toContainText('Dungeon saved on this device');
- await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(next);
+ await page.reload();await continueSavedDungeon(page);expectSameProgress(await snapshot(page),next);
  await expect(progress).toHaveText('Encounters: 1 / 3 cleared');
  await expect(stairs).toHaveText('Downstairs: locked · clear 2 more encounters');
  await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
@@ -915,7 +914,7 @@ test('confirmed charm discard frees full capacity without cancelling or duplicat
   if(isMobile)await discard().tap();else await discard().click();
   await expect(page.getByRole('dialog')).toContainText('unequip it from fighter');await expect(page.locator('#dungeon-discard-cancel')).toBeFocused();
   if(cancellation==='Cancel'){await page.screenshot({path:test.info().outputPath('discard-confirmation.png')});await page.locator('#dungeon-discard-cancel').click();}else await page.keyboard.press('Escape');
-  expect(await snapshot(page)).toEqual(initial);expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe(saved);
+  expect(await settledDungeonSnapshot(page)).toEqual(initial);expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe(saved);
  }
  await discard().click();await page.locator('#dungeon-discard-confirm').click();
  const disposed=await acceptedDungeonSnapshot(page,initial);expect(disposed.ownership.equipment).toHaveLength(5);expect(disposed.ownership.assignments).toEqual([]);expect(disposed.offer).toEqual(initial.offer);expect(disposed.party).toEqual(initial.party);expect(disposed.phase).toBe('reward');
@@ -925,7 +924,7 @@ test('confirmed charm discard frees full capacity without cancelling or duplicat
  await page.getByRole('button',{name:/^Claim /}).first().click();await page.locator('#dungeon-item-confirm').click();
  const claimed=await acceptedDungeonSnapshot(page,disposed);expect(claimed.ownership.equipment).toHaveLength(6);expect(claimed.ownership.equipment.some(e=>e.instanceId===target)).toBe(false);expect(claimed.phase).toBe('ready');expect(claimed.offer).toBeNull();
  await page.screenshot({path:test.info().outputPath('discard-capacity-recovered.png'),fullPage:true});
- await page.reload();await continueSavedDungeon(page);expect(await snapshot(page)).toEqual(claimed);
+ await page.reload();await continueSavedDungeon(page);expectSameProgress(await snapshot(page),claimed);
  await openDungeonInventory(page);
  await page.getByRole('button',{name:/^Discard /}).first().click();await page.locator('#dungeon-discard-confirm').click();
  const prepared=await acceptedDungeonSnapshot(page,claimed);expect(prepared.phase).toBe('ready');expect(prepared.ownership.equipment).toHaveLength(5);
@@ -994,7 +993,7 @@ test('an earned Healing Draught survives dungeon Continue and settles once after
  expect(final.activeBattle).toBeNull();
  expect(final.ownership.consumables).toEqual([]);
  await page.reload();await continueSavedDungeon(page);
- expect(await snapshot(page)).toEqual(final);
+ expectSameProgress(await snapshot(page),final);
 });
 
 test('fresh dungeon keeps the map and party in view and opens the selected character sheet', async ({page,isMobile}) => {

@@ -4,11 +4,33 @@ import { generateMap } from '../../src/map/generate';
 import { neighbors, poiCell } from '../../src/domain/exploration';
 import { clearedDungeonSlots, floorMap } from '../../src/domain/dungeon';
 import { dungeonContactDetour } from './dungeonFixtures';
+import { DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
 export async function dungeonSnapshot(page: Page): Promise<DungeonState> { return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!); }
-/** Steps and confirms apply asynchronously; wait for a new revision (or dungeon) before reading the accepted state. */
-export async function acceptedDungeonSnapshot(page: Page, before: Pick<DungeonState, 'id' | 'revision'> | null): Promise<DungeonState> {
-  await expect.poll(async () => { const s = await dungeonSnapshot(page); return !!s && (!before || s.id !== before.id || s.revision > before.revision); }).toBe(true);
+/** Steps and confirms apply asynchronously; return the first snapshot with a new dungeon or a newer
+ * (or exactly `expected`) revision. */
+export async function acceptedDungeonSnapshot(page: Page, before: Pick<DungeonState, 'id' | 'revision'> | null, expected?: number): Promise<DungeonState> {
+  let accepted: DungeonState | null = null;
+  await expect.poll(async () => {
+    const s = await dungeonSnapshot(page);
+    const ok = !!s && (!before || s.id !== before.id || (expected === undefined ? s.revision > before.revision : s.revision === expected));
+    if (ok) accepted = s;
+    return ok;
+  }).toBe(true);
+  return accepted!;
+}
+/** Drain storage writes queued behind the dungeon save lock before asserting that nothing changed. */
+export async function settledDungeonSnapshot(page: Page): Promise<DungeonState> {
+  await page.evaluate(key => navigator.locks.request(key, () => {}), DUNGEON_KEYS.primary);
   return dungeonSnapshot(page);
+}
+/** Lifecycle checkpoints (reload, blur, the playtime tick) can advance `stats.activeMs` without changing
+ * dungeon progress; every other field, including the rest of the stats receipt, must match. */
+export function expectSameProgress(actual: DungeonState, expected: DungeonState) {
+  expect({
+    ...actual,
+    stats: actual.stats ? { ...actual.stats, activeMs: expected.stats?.activeMs } : undefined,
+  }).toEqual(expected);
+  expect(actual.stats?.activeMs ?? 0).toBeGreaterThanOrEqual(expected.stats?.activeMs ?? 0);
 }
 /** Wait for the dungeon DOM entry (`#dungeon-screen[data-boot=ready]`), then heading and an enabled Continue. */
 export async function continueSavedDungeon(page: Page) {
