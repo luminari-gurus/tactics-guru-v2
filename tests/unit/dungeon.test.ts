@@ -356,6 +356,18 @@ it.each([false, true])('keeps rolling recovery and a pre-Hobgoblin rollback chec
   });
   expect(data.getItem(DUNGEON_KEYS.backup)).toBe(checkpoint.text);
 
+  // The previous build can save from the rollback checkpoint while leaving the newer key alone.
+  const rolledBack = memory();
+  for (const [key, text] of data.values) rolledBack.setItem(key, text);
+  const previousBuildSave = encodeDungeon({ ...before, revision: before.revision + 1 });
+  assert(previousBuildSave.ok);
+  rolledBack.setItem(DUNGEON_KEYS.primary, previousBuildSave.text);
+  const upgradedAgain = createDungeonStorage(() => rolledBack);
+  expect(upgradedAgain.inspect().backup).toEqual(checkpoint);
+  expect(upgradedAgain.remove('primary', previousBuildSave.text)).toEqual({ ok: true });
+  expect(upgradedAgain.inspect().backup).toEqual(checkpoint);
+  expect(rolledBack.getItem(DUNGEON_RECENT_BACKUP_KEY)).toBeNull();
+
   data.setItem(DUNGEON_KEYS.primary, 'corrupt');
   const recovery = createDungeonStorage(() => data);
   const recent = data.getItem(DUNGEON_RECENT_BACKUP_KEY);

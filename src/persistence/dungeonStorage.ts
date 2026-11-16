@@ -37,6 +37,9 @@ function hasHobgoblinFloor(state: DungeonState): boolean {
   return state.floors.some(floor => floor.descriptor.encounters.some(({ selection }) =>
     'catalogIdentity' in selection && selection.catalogIdentity === hobgoblinEncounterIdentity));
 }
+function primaryHidesRecentBackup(primary: Slot, rollback: DungeonState): boolean {
+  return primary.status === 'valid' && (primary.state.id !== rollback.id || !hasHobgoblinFloor(primary.state));
+}
 export function createDungeonStorage(provider: RunStorageProvider = () => window.localStorage) {
   let uncertain = false;
   let lastWritten: string | undefined;
@@ -100,7 +103,7 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
     const review = inspectSlots();
     const { primary, backup } = review;
     if (backup.status !== 'valid' || hasHobgoblinFloor(backup.state) ||
-        (primary.status === 'valid' && (primary.state.id !== backup.state.id || !hasHobgoblinFloor(primary.state)))) return review;
+        primaryHidesRecentBackup(primary, backup.state)) return review;
     try {
       const record = provider()?.getItem(DUNGEON_RECENT_BACKUP_KEY);
       if (!record) return review;
@@ -244,8 +247,18 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
         if (reviewed.status === 'unavailable') return { ok: false, reason: 'unavailable' };
         if (reviewed.text !== expected || expectedCheckpoint !== undefined &&
             (reviewed.status === 'valid' ? reviewed.checkpoint ?? null : null) !== expectedCheckpoint) return { ok: false, reason: 'changed' };
-      } else if (storage.getItem(DUNGEON_KEYS.primary) !== expected) {
-        return { ok: false, reason: 'changed' };
+      } else {
+        if (storage.getItem(DUNGEON_KEYS.primary) !== expected) return { ok: false, reason: 'changed' };
+        if (expected !== null && storage.getItem(DUNGEON_RECENT_BACKUP_KEY) !== null) {
+          const { primary, backup } = inspectSlots();
+          if (primary.status === 'unavailable' || backup.status === 'unavailable') return { ok: false, reason: 'unavailable' };
+          if (primary.text !== expected) return { ok: false, reason: 'changed' };
+          if (backup.status === 'valid' && primaryHidesRecentBackup(primary, backup.state)) {
+            // Removing the primary must not reveal a backup from the abandoned branch.
+            storage.removeItem(DUNGEON_RECENT_BACKUP_KEY);
+            if (storage.getItem(DUNGEON_RECENT_BACKUP_KEY) !== null) return { ok: false, reason: 'uncertainWrite' };
+          }
+        }
       }
       storage.removeItem(DUNGEON_KEYS[slot]);
       if (storage.getItem(DUNGEON_KEYS[slot]) !== null) return { ok: false, reason: 'uncertainWrite' };
