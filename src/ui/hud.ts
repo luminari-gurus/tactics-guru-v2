@@ -166,6 +166,13 @@ export class BattleHud {
     this.disposePacePreference = mountCombatPacePreference(this.root.querySelector('#battle-overflow')!);
     this.disposeGuidancePreferences = mountClassGuidancePreferences(this.root.querySelector('#battle-overflow')!);
     this.classGuidance = new BattleClassGuidance(this.root, session, () => this.focusAction(), guidance);
+    // Keep focus order aligned with the desktop layout in style.css.
+    const desktop = matchMedia('(min-width:760px) and (min-height:501px) and (orientation:landscape) and (pointer:fine)');
+    const actions = this.root.querySelector('.battle-section-label');
+    const tools = this.root.querySelector('.battle-tools');
+    const placeGuidance = () => this.classGuidance.place(this.root, desktop.matches ? tools : actions);
+    desktop.addEventListener('change', placeGuidance, {signal});
+    if (desktop.matches) placeGuidance();
   }
   shortcut(key:string):boolean {
     if(/^[1-9]$/.test(key)) {
@@ -250,6 +257,8 @@ export class BattleHud {
     this.classGuidance.render(this.skin);
     const s=this.session, enabled=s.phase==='player', actor=s.active;
     const presenting=s.phase==='presenting';
+    this.root.dataset.playerTurn=String(enabled);
+    this.root.dataset.actionKind=action?.startsWith('ability:') ? 'ability' : action ?? 'idle';
     // The accepted state may already contain the next actor or a defeat. Keep
     // the queue aligned with the board and actor card until presentation finishes.
     this.turnQueue.render(presentationStart ?? s.state);
@@ -350,10 +359,12 @@ export class BattleHud {
     (this.root.querySelector('#battle-next') as HTMLButtonElement).disabled=!enabled;
     (this.root.querySelector('#battle-review') as HTMLButtonElement).disabled=!enabled || (!s.pending && !s.pendingPlan);
     (this.root.querySelector('#battle-cancel') as HTMLButtonElement).disabled=!enabled || !action;
-    this.root.querySelector('#battle-selection')!.textContent=selected?`Selected (${selected.x}, ${selected.y})`:'Select a tile';
+    const selectionLabel=this.root.querySelector<HTMLElement>('#battle-selection')!;
+    selectionLabel.dataset.selected=String(!!selected);
+    selectionLabel.textContent=selected?`Selected (${selected.x}, ${selected.y})`:'Select a tile';
     const occupants=selected?s.state.units.filter(u=>u.cell.x===selected.x&&u.cell.y===selected.y):[];
     const target=occupants.find(u=>u.hp>0)??occupants[0];
-    this.root.querySelector('#battle-target-info')!.textContent=target?`Target: ${unitLabel(s,target)}`:'';
+    this.root.querySelector('#battle-target-info')!.textContent=target?`${action ? 'Target' : 'Inspecting'}: ${unitLabel(s,target)}`:'';
     const inspect=this.root.querySelector<HTMLButtonElement>('#battle-inspect-target')!;inspect.hidden=this.skin==='radial'||!target;inspect.dataset.unitId=target?String(target.id):'';
     const selectedTile = selected && s.catalog.maps[s.state.mapId].cells.find(cell => cell.x === selected.x && cell.y === selected.y);
     const terrainNote = selectedTile?.terrainId === 'rock' && (!action || action === 'move')

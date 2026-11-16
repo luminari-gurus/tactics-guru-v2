@@ -758,6 +758,34 @@ test('live actor, inspection and cancellation remain independent of pending inte
   await page.locator('[data-action="basic"]').click();await page.keyboard.press('Escape');await expect(page.locator('#battle-next')).toBeFocused();
 });
 
+test('desktop Rail keeps primary and prepared controls inside the initial viewport', async ({page,isMobile}) => {
+  test.skip(isMobile, 'Desktop fine-pointer rail geometry');
+  await page.setViewportSize({width:1280,height:720});
+  await page.goto('./battle');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await page.locator('#battle-target').selectOption({index:1});
+  await expect(page.locator('#battle-review')).toBeEnabled();
+
+  const layout = await page.evaluate(() => {
+    const rect = (selector: string) => document.querySelector(selector)!.getBoundingClientRect();
+    const board = rect('#battle-board-region');
+    const rail = rect('#battle-scroll');
+    const controls = ['#battle-move', '[data-action="basic"]', '[data-action^="ability:"]',
+      '#battle-next', '#battle-target', '#battle-review', '#battle-cancel'];
+    return {
+      boardAndRailAreSeparate: board.right <= rail.left,
+      pageHasHorizontalOverflow: document.documentElement.scrollWidth > innerWidth,
+      scrollTop: document.querySelector('#battle-scroll')!.scrollTop,
+      clippedControls: controls.filter(selector => {
+        const control = rect(selector);
+        return control.height < 44 || control.top < rail.top || control.bottom > rail.bottom ||
+          control.left < rail.left || control.right > rail.right;
+      }),
+    };
+  });
+  expect(layout).toEqual({boardAndRailAreSeparate:true,pageHasHorizontalOverflow:false,scrollTop:0,clippedControls:[]});
+});
+
 test('accepted rail and dock preserve drawable floors, readable controls and focus at five sizes',async({page},info)=>{
   test.setTimeout(90000);
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});

@@ -63,6 +63,13 @@ export class BattleClassGuidance {
     });
   }
 
+  place(parent: HTMLElement, before: Element | null): void {
+    const focused = this.root.contains(document.activeElement);
+    parent.insertBefore(this.root, before);
+    parent.insertBefore(this.feedback, before);
+    if (focused) this.dismiss.focus({ preventScroll: true });
+  }
+
   render(skin: CombatSkin): void {
     this.skin = skin;
     const preferences = readClassGuidancePreferences();

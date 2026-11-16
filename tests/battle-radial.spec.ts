@@ -892,7 +892,7 @@ test('radial preference replaces the side rail with a bottom dock at 1280x720', 
   expect(Math.abs(dock.width - board.width)).toBeLessThan(2);
   await expect(page.locator('[data-action="move"]')).toBeHidden();
   await expect(page.locator('#battle-target')).toBeHidden();
-  await expect(page.locator('#battle-next')).toBeVisible();
+  await expect(page.locator('#battle-next')).toBeInViewport({ ratio: 1 });
   const { cell } = await reachableEmpty(page);
   await tapBoard(page, cell);
   await expect(page.locator('#battle-radial-move')).toBeVisible();
