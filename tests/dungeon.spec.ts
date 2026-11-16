@@ -117,6 +117,44 @@ for(const [xp,level,maxHp]of [[0,1,11],[180,3,19]])test(`menu dungeon restores M
  if(missile.kind==='magicMissile')expect(missile.casterLevel).toBe(level);
 });
 
+test('desktop Rail keeps a prepared Frost Snare and its controls in view', async ({page,isMobile}) => {
+  test.skip(isMobile, 'Desktop fine-pointer rail geometry');
+  await page.setViewportSize({width:1280,height:720});
+  const fixture = stagedMageAbility('ability:frost_snare');
+  await seed(page,fixture.state);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const target = fixture.state.activeBattle!.units.find(unit=>unit.id===fixture.command.target.unitId)!;
+  await page.getByRole('button',{name:'Frost Snare',exact:true}).click();
+  await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
+
+  const preview = page.locator('#battle-preview');
+  const confirm = page.getByRole('button',{name:'Confirm action',exact:true});
+  const cancel = page.getByRole('button',{name:'Cancel action',exact:true});
+  await expect(confirm).toBeEnabled();
+  await expect(preview).toContainText('prevents movement');
+  await expect(confirm).toBeInViewport({ratio:1});
+  await expect(cancel).toBeInViewport({ratio:1});
+  await expect(preview).toBeInViewport({ratio:1});
+  const previewBounds = (await preview.boundingBox())!;
+  const confirmBounds = (await confirm.boundingBox())!;
+  expect(previewBounds.y + previewBounds.height).toBeLessThanOrEqual(confirmBounds.y);
+  expect(await page.locator('#battle-scroll').evaluate(rail=>rail.scrollTop)).toBe(0);
+
+  // The confirmation row stays reachable when this same content exceeds the rail.
+  await page.setViewportSize({width:1280,height:660});
+  await expect(confirm).toBeInViewport({ratio:1});
+  await expect(cancel).toBeInViewport({ratio:1});
+  expect(await page.locator('#battle-scroll').evaluate(rail=>rail.scrollTop)).toBe(0);
+  await preview.evaluate(element=>element.scrollIntoView({block:'nearest'}));
+  const scrolledPreview = (await preview.boundingBox())!;
+  const pinnedConfirm = (await confirm.boundingBox())!;
+  expect(scrolledPreview.y + scrolledPreview.height).toBeLessThanOrEqual(pinnedConfirm.y);
+  await expect(preview).toBeInViewport({ratio:1});
+  await cancel.click();
+  await expect(page.locator('#battle-move')).toBeFocused();
+  expect((await readSession(page)).state).toEqual(fixture.state.activeBattle);
+});
+
 for(const abilityId of ['ability:frost_snare','ability:magic_missile'] as const)test(`staged Mage ${abilityId} accepts exact effects replay and saved active reload`,async({page})=>{
  // The level/position boundary is deliberately staged. The extended journey alone proves earned XP.
  const fixture=stagedMageAbility(abilityId),catalog=dungeonBattle(fixture.state)!.catalog;

@@ -60,3 +60,13 @@ The production build passed 226 content tests and both TypeScript scopes. The fo
 ```
 
 Nine focused Chromium cases passed on the follow-up build. They covered the Rail viewport regression, keyboard confirmation, inspection and cancellation, responsive geometry, the desktop Radial dock, three-battle run undo and reload, dungeon Frost Snare and reload, and Radial End Turn with adjacent tools in emulated Pixel portrait and landscape. Each case ran separately with one worker and zero retries. Both iPhone WebKit cases stopped at browser launch because the host lacked `libGLESv2.so.2`.
+
+## Dungeon Rail confirmation follow-up
+
+The level-three Mage dungeon fixture exposed another short-window case. At zero scroll and 1280 × 720, the prepared Frost Snare preview left the bottom 16 pixels of Confirm and Cancel outside the rail. The desktop Rail now uses the target summary for occupied cells and keeps the confirmation row in view when a prepared action exceeds the rail.
+
+The Chromium regression verifies the entire Frost Snare preview and both buttons at 1280 × 720. At 1280 × 660 it verifies that both buttons stay in view, that scrolling reveals the full preview, and that Cancel restores focus without committing the action. The test failed on `3b52ac9` and passed with this follow-up's root-base stylesheet.
+
+```text
+92cd6d0df99f156553d1b71f06d5764d1964ecee04557915ffc31cf112ad91ca  dist/assets/battleLayout-CiibOQR0.css
+```
