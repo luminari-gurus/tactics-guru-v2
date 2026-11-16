@@ -50,6 +50,7 @@ test('main menu: an unsaved defeat retries history after reload without replayin
       }));
     }), RUN_RECORD_KEYS.primary);
     await page.goto('./');
+    await expect(page.getByRole('navigation', { name: 'Main menu' })).toBeVisible();
     const record = { mode: 'dungeon', id: 'unsaved-defeat', outcome: 'defeat', recordedAt: 100,
       battlesWon: 0, floorsCleared: 0, deepestFloor: 1 };
     await page.evaluate(record => sessionStorage.setItem('tactics-guru:defeat-summary',
