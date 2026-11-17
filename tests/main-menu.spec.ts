@@ -644,6 +644,32 @@ test('main menu: stale Continue and unknown intents preserve dungeon saves',asyn
   expect(await page.evaluate(()=>Object.keys(localStorage).filter(key=>key.includes(':dungeon:')))).toEqual([]);
  }
 });
+test('main menu: Continue opens recovery when a valid primary is paired with an unreadable backup',async({page})=>{
+ const primary=menuFixture('dungeon');
+ await page.goto('./');
+ await page.evaluate(({key,primary})=>localStorage.setItem(key,primary),{key:keys.dungeon.primary,primary});
+ await page.addInitScript(backup=>{
+  const read=Storage.prototype.getItem;
+  Storage.prototype.getItem=function(key){
+   if(key===backup)throw new DOMException('Backup unavailable','SecurityError');
+   return read.call(this,key);
+  };
+ },keys.dungeon.backup);
+ await page.goto('./?game=dungeon');
+ await expect(page.locator('#main-menu')).toBeVisible();
+ const resume=page.getByRole('button',{name:'Continue',exact:true});
+ await expect(resume).toBeEnabled();
+ await resume.click();
+ const recovery=page.getByRole('dialog',{name:'Dungeon save recovery',exact:true});
+ await expect(recovery).toContainText('primary: valid. backup: unavailable.');
+ const download=page.waitForEvent('download');
+ await recovery.getByRole('button',{name:'Export primary save',exact:true}).click();
+ expect(readFileSync((await (await download).path())!,'utf8')).toBe(primary);
+ await expect(recovery).toBeVisible();
+ await recovery.getByRole('button',{name:'Close',exact:true}).click();
+ await expect(page.locator('#main-menu')).toBeVisible();
+ expect(await page.evaluate(key=>localStorage.getItem(key),keys.dungeon.primary)).toBe(primary);
+});
 test('main menu: failed new-game write retains exportable recovery copies',async({page})=>{
  const text=menuFixture('dungeon');
  await page.addInitScript(({key,text})=>{

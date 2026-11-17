@@ -310,7 +310,10 @@ if(!storage){
   else if(Object.values(review).some(slot=>slot.status==='invalid'||slot.status==='unavailable'))playUnsavedDungeon();
   else void replace(review);
  }else if(entryIntent==='recovery')void recovery();
- else if(!resumeDungeon(review))goToMenu();
+ else if(!resumeDungeon(review)){
+  if(entryIntent==='continue'&&resumableDungeonSlot(review))void recovery();
+  else goToMenu();
+ }
 }
 // Exploration and recovery are DOM routes; the battle runtime is not a startup prerequisite.
 screen.dataset.boot='ready';
