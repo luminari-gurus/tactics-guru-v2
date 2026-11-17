@@ -1,4 +1,4 @@
-import { continueSavedDungeon } from './helpers/dungeonTraversal';
+import { expectDungeonResumed } from './helpers/dungeonTraversal';
 import { atEncounter } from './helpers/dungeonFixtures';
 import { expect, railTest as test, type Page } from './helpers/dungeonEntropy';
 import { writeFileSync } from 'node:fs';
@@ -77,10 +77,10 @@ for (const mode of ['standalone', 'run', 'dungeon'] as const) for (const miss of
   const f = boundary(mode, miss);
   const key = DUNGEON_KEYS.primary;
   if (mode === 'dungeon') {
-    await page.goto('/?game=dungeon');
+    await page.goto('./');
     await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key,text:f.saved!});
-    await page.reload();
-    await continueSavedDungeon(page);
+    await page.goto('./?game=dungeon');
+    await expectDungeonResumed(page);
   } else if (mode === 'standalone') {
     await reachStandaloneBoundary(page,f.before);
   } else {
@@ -143,7 +143,7 @@ for (const mode of ['standalone', 'run', 'dungeon'] as const) for (const miss of
   await page.keyboard.press('Escape');
   if (mode === 'dungeon') {
     await page.reload();
-    await continueSavedDungeon(page);
+    await expectDungeonResumed(page);
     await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
     expect((await readSession(page)).events).toEqual([]);
   }

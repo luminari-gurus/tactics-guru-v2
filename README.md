@@ -27,7 +27,7 @@ carry your surviving party into the next encounter.
 This repository is the playable **v2 prototype**. The header is promotional art;
 the game uses illustrated portraits, compact sprites and isometric tile boards.
 
-**[Play a battle](https://tactics-guru-v2.pages.dev/?game=battle) · [Enter the dungeon](https://tactics-guru-v2.pages.dev/?game=dungeon) · [Run locally](#run-locally) · [Explore the architecture](#how-it-fits-together) · [Browse the docs](#project-guide)**
+**[Play a battle](https://tactics-guru-v2.pages.dev/?game=battle) · [Resume a dungeon](https://tactics-guru-v2.pages.dev/?game=dungeon) · [Run locally](#run-locally) · [Explore the architecture](#how-it-fits-together) · [Browse the docs](#project-guide)**
 
 ## Choose your adventure
 
@@ -42,7 +42,9 @@ the game uses illustrated portraits, compact sprites and isometric tile boards.
   Carry HP, XP and equipment between encounters; choose an item after each of the
   first two victories. The third victory completes the run.
 - **[Dungeon floors](https://tactics-guru-v2.pages.dev/?game=dungeon) — `/?game=dungeon`**<br>
-  Explore Rooms layouts with fog of discovery, encounter markers and stairs.
+  Resume a saved dungeon or its active battle. If no run can be resumed, the link
+  opens the main menu. Explore Rooms layouts with fog of discovery, encounter
+  markers and stairs.
   Floors alternate Forest and Desert after a seeded first biome. Each has a normal
   encounter, an elite or vault encounter, and a goblin guardian encounter. Clear the
   guardian to unlock descent; revisit discovered floors with their progress intact.

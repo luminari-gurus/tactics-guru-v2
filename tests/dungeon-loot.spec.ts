@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test';
 import { expect, railTest as test } from './helpers/startupDiagnostics';
 import { playCommand, readSession } from './helpers/battlePolicy';
 import { checkedDungeon, dungeonGroundVictoryBoundary } from './helpers/dungeonFixtures';
-import { continueSavedDungeon, dungeonSnapshot, openDungeonInventory, walkDungeon } from './helpers/dungeonTraversal';
+import { expectDungeonResumed, dungeonSnapshot, openDungeonInventory, walkDungeon } from './helpers/dungeonTraversal';
 import { currentFloor, floorMap, readDungeon, stepDungeon, type DungeonState } from '../src/domain/dungeon';
 import { neighbors, poiCell } from '../src/domain/exploration';
 import { encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
@@ -88,7 +88,7 @@ async function loadBoundary(page: Page, seed = 28, reviveStock?: number) {
   await page.evaluate(({ keys, text }) => {
     localStorage.setItem(keys.primary, text); localStorage.removeItem(keys.backup);
   }, { keys: DUNGEON_KEYS, text: encoded.text });
-  await page.goto('./?game=dungeon'); await continueSavedDungeon(page);
+  await page.goto('./?game=dungeon'); await expectDungeonResumed(page);
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   expect((await readSession(page)).state).toEqual(snapshot.activeBattle);
   return { ...witness, snapshot };
@@ -128,7 +128,7 @@ test('auto loot defaults on: one delayed ordinary step, pickup, enemy tick and d
   await expect(page.locator('.dungeon-status')).toContainText('Picked up Aiming Charm.');
   await expectSavedProgress(page, collected);
   await releaseAutomaticStep(page); await expectProgress(page, collected);
-  await page.reload(); await continueSavedDungeon(page); await settleBrowser(page);
+  await page.reload(); await expectDungeonResumed(page); await settleBrowser(page);
   await expectProgress(page, collected); expect(await heldCount(page)).toBe(0);
   await expectSavedProgress(page, collected);
   await info.attach('one-automatic-step', { body: JSON.stringify({ evidence: 'real final HUD command with only the post-victory 400 ms callback held', entry, won, collected }), contentType: 'application/json' });
@@ -231,10 +231,10 @@ test('visibility interruption and explicit recovery each cancel the pending auto
 
 test('reload before the pending step restores the ground pile without surprise movement or collection', async ({ page }) => {
   const witness = await loadBoundary(page), won = await finishVictory(page, witness);
-  await page.reload(); await continueSavedDungeon(page); await settleBrowser(page);
+  await page.reload(); await expectDungeonResumed(page); await settleBrowser(page);
   await expectProgress(page, won); await expectSavedProgress(page, won);
   expect(await heldCount(page)).toBe(0);
   expect(currentFloor(await dungeonSnapshot(page)).loot![0].remaining).toBe(1);
-  await page.reload(); await continueSavedDungeon(page); await settleBrowser(page);
+  await page.reload(); await expectDungeonResumed(page); await settleBrowser(page);
   await expectProgress(page, won); expect(await heldCount(page)).toBe(0);
 });

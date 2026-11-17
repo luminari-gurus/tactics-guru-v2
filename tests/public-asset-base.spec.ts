@@ -118,7 +118,6 @@ for (const route of ['battle', 'run', 'dungeon']) for (const backend of ['Web Au
   await page.goto(route === 'battle' ? './battle' : `./${route}`);
   if (route === 'run') { await page.locator('#run-start').click(); await page.locator('#run-start-encounter').click(); }
   if (route === 'dungeon') {
-    await page.getByRole('button', { name: 'Start new dungeon', exact: true }).click();
     await walkDungeon(page, undefined, test.info().project.use.hasTouch ? 'touch' : 'keyboard');
   }
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');

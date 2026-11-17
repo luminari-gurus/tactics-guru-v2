@@ -1,6 +1,6 @@
 import { neighbors, poiCell } from '../src/domain/exploration';
 import { atEncounter } from './helpers/dungeonFixtures';
-import {continueSavedDungeon,expectSameProgress} from './helpers/dungeonTraversal';
+import {expectDungeonResumed,expectSameProgress} from './helpers/dungeonTraversal';
 import {expect,railTest as test,type Page} from './helpers/dungeonEntropy';
 import {dungeonVictoryBoundary} from './helpers/dungeonFixtures';
 import {freshDungeon,startDungeonBattle,dungeonBattle,floorMap,type DungeonState} from '../src/domain/dungeon';
@@ -45,24 +45,25 @@ test('dungeon previous-format recovery preserves and exports both original slots
  body.format=5;
  const old=canonical({...body,digest:hashJson(body)}),texts={primary:` \n${old}\n `,backup:`\t${old}\n`};
  const keys=DUNGEON_KEYS;
- await page.goto('./?game=dungeon');
+ await page.goto('./');
  await page.evaluate(({keys,texts})=>{localStorage.setItem(keys.primary,texts.primary);localStorage.setItem(keys.backup,texts.backup);localStorage.setItem('issue164-unrelated','retain');},{keys,texts});
- await page.reload();
+ await page.goto('./?game=dungeon');
  const stored=()=>page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup),unrelated:localStorage.getItem('issue164-unrelated')}),keys);
+ await expect(page.locator('#main-menu')).toBeVisible();
  expect(await stored()).toEqual({...texts,unrelated:'retain'});
  await page.getByRole('button',{name:'Save recovery',exact:true}).click();
+ await page.getByRole('dialog').getByRole('link',{name:/Dungeon/}).click();
  await expect(page.getByRole('dialog')).toContainText('primary: invalid. backup: invalid.');
  for(const slot of ['primary','backup'] as const) {
-  if(slot==='backup')await page.getByRole('button',{name:'Save recovery',exact:true}).click();
   const pending=page.waitForEvent('download');await page.getByRole('button',{name:`Export ${slot} save`,exact:true}).click();
   const download=await pending,file=await download.path(),raw=readFileSync(file!,'utf8');
   expect(raw).toBe(texts[slot]);
  }
  expect(await stored()).toEqual({...texts,unrelated:'retain'});
- await page.reload();expect(await stored()).toEqual({...texts,unrelated:'retain'});
+ await page.reload();await expect(page.locator('#main-menu')).toBeVisible();expect(await stored()).toEqual({...texts,unrelated:'retain'});
 });
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
-async function load(page:Page,s:DungeonState){const saved=encodeDungeon(s);if(!saved.ok)throw Error(saved.reason);await page.goto('./?game=dungeon');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:saved.text});await page.reload();await continueSavedDungeon(page);}
+async function load(page:Page,s:DungeonState){const saved=encodeDungeon(s);if(!saved.ok)throw Error(saved.reason);await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:saved.text});await page.goto('./?game=dungeon');await expectDungeonResumed(page);}
 test('restart during accepted presentation discards old callbacks and history',async({page})=>{
  const f=dungeonVictoryBoundary(1,0);if(!f)throw Error('legal victory fixture changed');await load(page,f.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const cmd=f.command,state=(await readSession(page)).state;if(cmd.type!=='useAbility')throw Error('expected finishing attack');
@@ -79,7 +80,7 @@ test('restart during accepted presentation discards old callbacks and history',a
  const checkpoint=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!).payload,DUNGEON_KEYS.primary);
  expect(checkpoint.stats.activeMs).toBeGreaterThanOrEqual(fresh.stats!.activeMs);
  expect({...checkpoint,stats:{...checkpoint.stats,activeMs:fresh.stats!.activeMs}}).toEqual(fresh);
- await page.reload();await continueSavedDungeon(page);expectSameProgress(await snapshot(page),checkpoint);
+ await page.reload();await expectDungeonResumed(page);expectSameProgress(await snapshot(page),checkpoint);
 });
 test('legal enemy defeat waits for its save and returns to the menu during a pending history write',async({page,isMobile})=>{
  const made=startDungeonBattle(atEncounter(freshDungeon('dungeon-defeat-fixture',1)));if(!made.ok)throw Error(made.reason);const entry=made.state,built=dungeonBattle(entry)!;
@@ -135,6 +136,8 @@ test('legal enemy defeat waits for its save and returns to the menu during a pen
   await expect(records).toContainText('Dungeon · Defeat');
   await records.getByRole('button',{name:'Close',exact:true}).click();
  }finally{await lockOwner.close();}
+ await page.goto('./?game=dungeon');
+ await expect(page.locator('#main-menu')).toBeVisible();
  await expect(page.getByRole('button',{name:'Continue',exact:true})).toBeDisabled();
  await page.getByRole('button',{name:'Save recovery',exact:true}).click();
  await page.getByRole('link',{name:/^Dungeon/}).click();
@@ -159,7 +162,7 @@ test('legal enemy defeat waits for its save and returns to the menu during a pen
 });
 test('run navigation reaches the base-aware dungeon entry and returns to existing modes',async({page,baseURL})=>{
  await page.goto('./?game=run');await page.getByRole('link',{name:'Dungeon floors',exact:true}).click();expect(page.url()).toBe(new URL('dungeon',baseURL).href);
- await expect(page.getByRole('heading',{name:'Dungeon floors',exact:true})).toBeVisible();await page.getByRole('link',{name:'Three-battle scenario',exact:true}).click();
+ await expect(page.locator('#dungeon-map')).toBeVisible();await page.getByRole('link',{name:'Three-battle scenario',exact:true}).click();
  await expect(page.locator('#run-start')).toBeVisible();
 });
 
@@ -179,7 +182,7 @@ test('visibility interruption finishes an accepted terminal presentation exactly
   await context.addInitScript(()=>Object.defineProperty(performance,'now',{value:()=>0}));
   const initial = freshDungeon('exclusive-spatial-tabs',13,undefined,true);
   await load(page,initial);
-  const other = await context.newPage();await other.goto('./?game=dungeon'); await continueSavedDungeon(other);
+  const other = await context.newPage();await other.goto('./?game=dungeon'); await expectDungeonResumed(other);
   const floor = initial.floors[0], map = floorMap(floor.descriptor);
   const destination = neighbors(floor.position,map.width,map.height).find(n => map.cells[n] && !floor.exploration.pois.some(p => poiCell(p,map.width) === n))!;
   const delta = destination-floor.position, direction = delta === -map.width ? 'north' : delta === map.width ? 'south' : delta === 1 ? 'east' : 'west';
