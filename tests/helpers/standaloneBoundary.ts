@@ -5,7 +5,7 @@ import { playerDecision } from './playerPolicy';
 
 /** Reach a legal boundary through the live UI now that public battles start fresh. */
 export async function reachStandaloneBoundary(page: Page, target: BattleState) {
-  await page.goto('./?game=battle');
+  await page.goto('./?game=battle&entry=new');
   const game = page.locator('#game');
   await expect(game).toHaveAttribute('data-phase', 'player');
   for (let seed = 1; seed < target.seed; seed++) {

@@ -66,7 +66,7 @@ for(const condition of ['missing','valid','corrupt','backup-only','unavailable']
     await expect(page.getByRole('button',{name:/Continue saved|Save recovery|Play unsaved/})).toHaveCount(0);
   };
   const entries={journeys:[
-    ['battle','./?game=battle&entry=continue'],['run','./?game=run&entry=recovery'],
+    ['battle','./?game=battle&entry=new'],['run','./?game=run&entry=new'],
     ['battle','./battle/?game=dungeon&entry=continue'],['run','./run?game=battle&entry=recovery'],
     ['dungeon','./dungeon?game=run&entry=new'],['map','./map?game=dungeon&entry=new'],
   ],diagnostics:[

@@ -62,7 +62,7 @@ export async function startBattleModuleFaultServer(target: 'battle-entry' | 'dun
     if (!address || typeof address === 'string') throw new Error('Preview server did not bind a loopback port');
     const origin = `http://127.0.0.1:${address.port}`;
     return {
-      battleURL: `${origin}${base}?game=battle`,
+      battleURL: `${origin}${base}?game=battle&entry=new`,
       dungeonURL: `${origin}${base}?game=dungeon`,
       allowImport() { unavailable = false; },
       isModuleURL(raw: string) {

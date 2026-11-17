@@ -251,7 +251,7 @@ test('layout clamping resets overlap history when the actual camera changes',asy
 });
 
 test('hovered origins show only ability reach without changing selection, pending commands or saves',async({page},info)=>{
-  await page.goto('./?game=battle');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await page.goto('./?game=battle&entry=new');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const initial=await settledReport(page),before=await page.locator('#game').getAttribute('data-session');
   const state=JSON.parse(before!).state,origin={x:11,y:11};
   expect(initial.reachable).not.toContainEqual(origin);
@@ -318,7 +318,7 @@ test('hovered origins show only ability reach without changing selection, pendin
 });
 
 test('selection labels retain the zoomed and panned camera without gameplay commands', async ({ page }) => {
-  await page.goto('./?game=battle');
+  await page.goto('./?game=battle&entry=new');
   await expect(page.getByRole('status')).toHaveText('Battle ready');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const initial = await settledReport(page);
@@ -401,7 +401,7 @@ test('selection labels retain the zoomed and panned camera without gameplay comm
 });
 
 test('authored camera keeps zoom bounds and refits on real orientation changes', async ({ page }) => {
-  await page.goto('./?game=battle');
+  await page.goto('./?game=battle&entry=new');
   await expect(page.getByRole('status')).toHaveText('Battle ready');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   for (const viewport of [{ width: 412, height: 839 }, { width: 915, height: 412 }]) {
@@ -457,7 +457,7 @@ test('default authored board renders canonical units, highlights and stable rest
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
   const assetPaths = new Set(Object.values(battleCatalog.assets).map(asset => asset.runtimePath));
   page.on('request', request => { const path = new URL(request.url()).pathname.replace(/^\/assets\/[a-f0-9]{16}(?=\/(?:battle|proof)\/)/, ''); if (assetPaths.has(path)) assetRequests.push(path); });
-  await page.goto('./?game=battle');
+  await page.goto('./?game=battle&entry=new');
   await expect(page.getByRole('status')).toHaveText('Battle ready');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const initial = await report(page);
@@ -558,7 +558,7 @@ test('picks authored elevated tops and visible side faces outside living unit ar
 });
 
 test('authored visible picking survives resize, pan, zoom, DPR and drag completion', async ({ page }) => {
-  await page.goto('./?game=battle');
+  await page.goto('./?game=battle&entry=new');
   await expect(page.getByRole('status')).toHaveText('Battle ready');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const tiles = buildBoardPresentation(battleCatalog, 'map:forest_ruins').tiles;

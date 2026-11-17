@@ -3,9 +3,6 @@ import '../style.css';
 import { diagnosticsSnapshot, measurements } from '../diagnostics/browser';
 import { mountBattleLayout } from '../ui/battleLayout';
 import { appEntry } from './entry';
-import { consumeEntryIntent } from './routes';
-
-consumeEntryIntent();
 
 const container = document.querySelector<HTMLElement>('#game')!;
 const statusLabel = document.querySelector<HTMLElement>('#fit-status')!;

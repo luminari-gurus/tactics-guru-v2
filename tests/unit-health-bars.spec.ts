@@ -109,7 +109,7 @@ test('health bars are visible, attached and informational through mobile navigat
 });
 
 test('elevated movement keeps bars attached through refresh, rotation and restart',async({page},info)=>{
-  await page.clock.install();await page.goto('./?game=battle');await ready(page);const initial=await settled(page),objects=initial.objectCount;
+  await page.clock.install();await page.goto('./?game=battle&entry=new');await ready(page);const initial=await settled(page),objects=initial.objectCount;
   const to=initial.reachable.find((c:any)=>initial.tiles.find((t:any)=>t.x===c.x && t.y===c.y).elevation===1);expect(to).toBeDefined();
   await page.locator('#battle-move').click();await page.locator('#battle-target').selectOption(`${to.x},${to.y}`);await confirmFrozen(page);
   await page.clock.runFor(48);const moving=await report(page);check(moving);

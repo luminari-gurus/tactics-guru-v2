@@ -267,7 +267,7 @@ test('main menu: failed gameplay imports retain visible recovery without proof t
  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
  await page.route(/\/start(?:Battle|Run|Dungeon)App(?:-[^/]+\.js|\.ts)(?:\?|$)/,route=>route.abort());
  for(const mode of ['battle','run','dungeon']){
-  await page.goto('./?game='+mode);
+  await page.goto(mode==='dungeon'?'./?game=dungeon':`./?game=${mode}&entry=new`);
   await expect(page.getByRole('alert')).toHaveText('Error: Could not load the application. Reload the page to retry.');
   await expect(page.getByRole('alert')).toBeVisible();
   await expect(page.getByText('Board controls',{exact:true})).not.toBeVisible();
@@ -360,7 +360,7 @@ for(const mode of ['run','dungeon'] as const)test(`main menu: post-mount ${mode}
   const response=await route.fetch();
   await route.fulfill({response,body:(await response.text())+'\nthrow new Error("review: post-mount initialization failed");\n'});
  });
- await page.goto('./?game='+mode);
+ await page.goto(mode==='dungeon'?'./?game=dungeon':`./?game=${mode}&entry=new`);
  await expect(page.getByRole('alert')).toHaveText('Error: Could not load the application. Reload the page to retry.');
  await expect(page.getByRole('alert')).toBeInViewport();
  await expect(page.locator('#fit-board-controls')).not.toBeVisible();
@@ -373,7 +373,7 @@ test('main menu: run preparation runtime errors use one visible alert and preser
  const saved=menuFixture('run');
  const backup='preserved recovery bytes';
  await page.addInitScript(({slots,saved,backup})=>{localStorage.setItem(slots.primary,saved);localStorage.setItem(slots.backup,backup);},{slots:keys.run,saved,backup});
- await page.goto('./?game=run');await expect(page.locator('#run-start')).toBeVisible();
+ await page.goto('./?game=run&entry=new');await expect(page.locator('#run-start')).toBeVisible();
  for(let i=0;i<2;i++){
   await page.evaluate(()=>window.dispatchEvent(new ErrorEvent('error',{message:'review: renderer initialization failed'})));
   await expect(page.getByRole('alert')).toHaveCount(1);
@@ -390,7 +390,7 @@ test('main menu: repeated scene selectors use the first value throughout startup
  await page.goto('./?scene=unknown&scene=proof');
  await expect(page.locator('[data-menu-action]')).toHaveCount(4);
  await expect(page.locator('canvas')).toHaveCount(0);
- await page.goto('./?game=run&scene=unknown&scene=proof');
+ await page.goto('./?game=run&entry=new&scene=unknown&scene=proof');
  await expect(page.locator('#run-start')).toBeVisible();
  for(const scene of ['proof','content-smoke']){
   await page.goto(`./?game=run&scene=${scene}&scene=unknown`);
@@ -409,8 +409,8 @@ test('main menu: read-only root, separate artwork and isolated loading',async({p
  const image=page.getByRole('img',{name:'Tactics Guru'});await expect(image).toBeVisible();
  expect(await image.evaluate(n=>(n as HTMLImageElement).naturalWidth/(n as HTMLImageElement).naturalHeight)).toBe(3);
  await expect(page.locator('canvas')).toHaveCount(0);
- await expect(page.getByRole('link',{name:'Standalone battle',exact:true})).toHaveAttribute('href',/\?game=battle$/);
- await expect(page.getByRole('link',{name:'Three-encounter run',exact:true})).toHaveAttribute('href',/\?game=run$/);
+ await expect(page.getByRole('link',{name:'Standalone battle',exact:true})).toHaveAttribute('href',/\?game=battle&entry=new$/);
+ await expect(page.getByRole('link',{name:'Three-encounter run',exact:true})).toHaveAttribute('href',/\?game=run&entry=new$/);
  await expect(page.getByRole('link',{name:'Map inspection',exact:true})).toHaveAttribute('href',/\/map$/);
  expect(requests.some(url=>/\/start-[^/]+\.js|\.mp3|\.ogg|\/battle\/audio/.test(url))).toBe(false);
  await page.getByRole('button',{name:'Hall of Records'}).click();await expect(page.getByRole('dialog')).toContainText('No finished journeys recorded yet');
@@ -452,7 +452,7 @@ test('main menu: legacy battle and run slots are ignored through launch and dung
 
   for (const [name,mode] of [['Standalone battle','battle'],['Three-encounter run','run']] as const) {
     await page.getByRole('link',{name,exact:true}).click();
-    await expect(page).toHaveURL(new RegExp('[?]game='+mode+'$'));
+    await expect(page).toHaveURL(new RegExp('[?]game='+mode+'&entry=new$'));
     if(mode==='run'){
       await page.locator('#run-start').click();
       await page.locator('#run-start-encounter').click();
@@ -697,7 +697,7 @@ for(const path of ['unsaved play','failed replacement'] as const)test(`main menu
  const accept=page.waitForEvent('dialog');const leave=page.getByRole('link',{name:'Main menu',exact:true}).click();
  await (await accept).accept();await leave;await expect(page.locator('#main-menu')).toBeVisible();
 });
-for (const route of ['nonexistent', '?game=zzz', '?game=run&game=battle']) test(`main menu: invalid entry ${route} returns to the root`, async ({ page }) => {
+for (const route of ['nonexistent', '?game=zzz', '?game=run&game=battle', '?game=battle', '?game=run']) test(`main menu: invalid entry ${route} returns to the root`, async ({ page }) => {
  await page.goto('./'+route);
  await expect(page).toHaveURL(new URL('./', test.info().project.use.baseURL!).href);
  await expect(page.locator('[data-menu-action]')).toHaveCount(4);
@@ -801,7 +801,7 @@ test('main menu: class guidance settings persist and reset tutorials without cha
   };
   const ready=()=>expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const guidance=page.locator('#battle-class-guidance');
-  await page.goto('./?game=battle');await ready();
+  await page.goto('./?game=battle&entry=new');await ready();
   const skin=await page.evaluate(()=>document.body.dataset.combatSkin);
   await expect(page.locator('#battle-guidance-teaching')).toHaveAttribute('data-tutorial-id',`preview:${skin}:v1`);
   await expect(page.locator('#battle-guidance-teaching')).toContainText(skin==='radial'?'Tapping an action':'Confirm action');

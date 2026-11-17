@@ -161,7 +161,7 @@ test('legal enemy defeat waits for its save and returns to the menu during a pen
  expect((await snapshot(page)).party.every(h=>h.hp>0)).toBe(true);expect((await snapshot(page)).floors).toHaveLength(1);
 });
 test('run navigation reaches the base-aware dungeon entry and returns to existing modes',async({page,baseURL})=>{
- await page.goto('./?game=run');await page.getByRole('link',{name:'Dungeon floors',exact:true}).click();expect(page.url()).toBe(new URL('dungeon',baseURL).href);
+ await page.goto('./?game=run&entry=new');await page.getByRole('link',{name:'Dungeon floors',exact:true}).click();expect(page.url()).toBe(new URL('dungeon',baseURL).href);
  await expect(page.locator('#dungeon-map')).toBeVisible();await page.getByRole('link',{name:'Three-battle scenario',exact:true}).click();
  await expect(page.locator('#run-start')).toBeVisible();
 });

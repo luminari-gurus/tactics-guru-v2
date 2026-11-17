@@ -84,7 +84,7 @@ for (const mode of ['standalone', 'run', 'dungeon'] as const) for (const miss of
   } else if (mode === 'standalone') {
     await reachStandaloneBoundary(page,f.before);
   } else {
-    await page.goto('/?game=run');
+    await page.goto('/?game=run&entry=new');
     await page.locator('#run-start').click();
     await page.locator('#run-start-encounter').click();
     const game = page.locator('#game');
