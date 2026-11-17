@@ -599,7 +599,7 @@ test('class guidance retains the presented player and never acknowledges interru
   const key='tactics-guru:class-guidance';
   const preferences=()=>page.evaluate(key=>localStorage.getItem(key),key);
   await page.emulateMedia({reducedMotion:'no-preference'});
-  await page.clock.install();await page.goto('./?game=battle');await ready(page);
+  await page.clock.install();await page.goto('./?game=battle&entry=new');await ready(page);
   const guidance=page.locator('#battle-class-guidance'),tip=page.locator('#battle-class-tip');
   const dismiss=page.locator('#battle-guidance-dismiss'),before=await readSession(page);
   const actor=before.state.initiative[before.state.activeIndex],text=await tip.textContent();
@@ -757,7 +757,7 @@ test('combat pace: reduced motion keeps movement at endpoints and result text st
   test.setTimeout(180000);
   for(const pace of ['normal','fast'] as const){
     await page.emulateMedia({reducedMotion:'reduce'});await page.clock.resume();
-    await page.goto('./?game=battle');await ready(page);await chooseCombatPace(page,pace);
+    await page.goto('./?game=battle&entry=new');await ready(page);await chooseCombatPace(page,pace);
     const before=await readSession(page),actor=before.state.initiative[before.state.activeIndex],saved=await stored(page);
     const reachable=previewMovement(before.state,actor,catalog);if(!reachable.ok)throw Error('Expected legal player movement');
     const move=[...reachable.cells].reverse().map(({cell})=>previewMove(before.state,{type:'move',unitId:actor,to:cell},catalog))
@@ -1014,7 +1014,7 @@ test('critical impact: final lethal hit finishes its burst before victory and sc
   criticalFrame(await report(page),departure);expect((await readSession(page)).state).toEqual(departure.after);
   await page.screenshot({path:info.outputPath('critical-active-scene-departure.png')});
   await page.goto('./map');await expect(page.locator('#map-grid span')).toHaveCount(400);
-  await page.goto('./?game=battle');await page.clock.resume();await ready(page);
+  await page.goto('./?game=battle&entry=new');await page.clock.resume();await ready(page);
   expect((await report(page)).criticalImpacts).toEqual([]);expect((await readSession(page)).state.seed).toBe(1);
   await expect(page.locator('canvas')).toHaveCount(1);
 });

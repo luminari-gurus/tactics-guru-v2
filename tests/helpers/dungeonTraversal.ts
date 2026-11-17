@@ -32,14 +32,9 @@ export function expectSameProgress(actual: DungeonState, expected: DungeonState)
   }).toEqual(expected);
   expect(actual.stats?.activeMs ?? 0).toBeGreaterThanOrEqual(expected.stats?.activeMs ?? 0);
 }
-/** Wait for the dungeon DOM entry (`#dungeon-screen[data-boot=ready]`), then heading and an enabled Continue. */
-export async function continueSavedDungeon(page: Page) {
-  const boot = { timeout: 60_000 };
-  await expect(page.locator('#dungeon-screen')).toHaveAttribute('data-boot', 'ready', boot);
-  await expect(page.getByRole('heading', { name: 'Dungeon floors', exact: true })).toBeVisible();
-  const resume = page.getByRole('button', { name: 'Continue saved dungeon', exact: true });
-  await expect(resume).toBeEnabled();
-  await resume.click();
+export async function expectDungeonResumed(page: Page) {
+  await expect(page.locator('#dungeon-screen')).toHaveAttribute('data-boot', 'ready', { timeout: 60_000 });
+  await expect(page.locator('#game')).toHaveAttribute('data-dungeon-snapshot', /"id":/);
 }
 export async function openDungeonInventory(page: Page) {
   const summary = page.locator('#dungeon-inventory-summary');

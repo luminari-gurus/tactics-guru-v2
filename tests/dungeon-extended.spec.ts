@@ -6,7 +6,7 @@ import { encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { AUTO_COLLECT_LOOT_KEY } from '../src/ui/autoCollectLootPreference';
 import { dispatch } from '../src/domain/turns';
-import { walkDungeon, continueSavedDungeon, openDungeonInventory, collectDungeonEncounterLoot } from './helpers/dungeonTraversal';
+import { walkDungeon, expectDungeonResumed, openDungeonInventory, collectDungeonEncounterLoot } from './helpers/dungeonTraversal';
 import { battleTool, readSession, playCommand } from './helpers/battlePolicy';
 import { fighterDecision, rangerDecision, mageDecision } from './helpers/playerPolicy';
 import { journeyPreparation, rangerJourney, selectMageJourney, fighterJourney, FIGHTER_JOURNEY_SEED } from './helpers/dungeonFixtures';
@@ -24,7 +24,7 @@ async function seed(page:Page,s:DungeonState){
   const record=game?.getAttribute('data-dungeon-battle-record');
   if(record)sessionStorage.setItem('data-dungeon-battle-record',record);
  },{once:true}));
- const encoded=encodeDungeon(s);if(!encoded.ok)throw Error(encoded.reason);await page.goto('./?game=dungeon');await page.evaluate(({key,text,preferenceKey})=>{localStorage.setItem(preferenceKey,'off');localStorage.setItem(key,text);}, {key:DUNGEON_KEYS.primary,text:encoded.text,preferenceKey:AUTO_COLLECT_LOOT_KEY});await page.reload();await continueSavedDungeon(page);}
+ const encoded=encodeDungeon(s);if(!encoded.ok)throw Error(encoded.reason);await page.goto('./');await page.evaluate(({key,text,preferenceKey})=>{localStorage.setItem(preferenceKey,'off');localStorage.setItem(key,text);}, {key:DUNGEON_KEYS.primary,text:encoded.text,preferenceKey:AUTO_COLLECT_LOOT_KEY});await page.goto('./?game=dungeon');await expectDungeonResumed(page);}
 
 /** Read fresh progress from the same public DOM records without transferring full histories for polling. */
 async function mageProgress(page:Page) {
@@ -65,7 +65,7 @@ test('Mage legal progression journey earns level three uses Frost Snare and mult
     expect(after.state.units.find(u=>u.id===targetId)?.movementBlock).toEqual({sourceId:command.unitId,abilityId:command.abilityId});
     await (await battleTool(page, '#battle-party')).click();await page.locator(`#inspect-unit-${targetId}`).click();await expect(page.getByRole('dialog')).toContainText('Snared by Mage');
     await page.screenshot({path:test.info().outputPath('production-mage-snare-inspection.png')});await page.locator('#inspection-close').click();
-    const saved=await snapshot(page);await page.reload();await continueSavedDungeon(page);
+    const saved=await snapshot(page);await page.reload();await expectDungeonResumed(page);
     await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect((await snapshot(page)).activeBattle).toEqual(saved.activeBattle);expect((await readSession(page)).events).toEqual([]);
    }
   }
@@ -125,7 +125,7 @@ test('Ranger legal progression journey earns level three uses Mark and Pin and r
     await (await battleTool(page, '#battle-party')).click();await page.locator(`#inspect-unit-${targetId}`).click();
     await expect(page.getByRole('dialog')).toContainText(kind==='mark'?'Marked by Ranger':'Pinned by Ranger');
     await page.screenshot({path:test.info().outputPath(`production-ranger-${kind}-inspection.png`)});await page.locator('#inspection-close').click();
-    const saved=await snapshot(page);await page.reload();await continueSavedDungeon(page);
+    const saved=await snapshot(page);await page.reload();await expectDungeonResumed(page);
     await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect((await snapshot(page)).activeBattle).toEqual(saved.activeBattle);expect((await readSession(page)).events).toEqual([]);
    }
   }
@@ -177,7 +177,7 @@ test('Fighter legal progression journey earns level three uses both abilities an
      else {taunted=true;expect(after.state.units.some(u=>u.tauntedBy===fighter.id)).toBe(true);}
      await (await battleTool(page, '#battle-log-open')).click();await expect(page.getByRole('dialog')).toContainText(command.abilityId==='ability:second_wind'?'heals':'taunted by');
      await page.screenshot({path:test.info().outputPath(command.abilityId==='ability:second_wind'?'production-heal-log.png':'production-taunt-log.png')});await page.locator('#log-close').click();
-     const saved=await snapshot(page);await page.reload();await continueSavedDungeon(page);
+     const saved=await snapshot(page);await page.reload();await expectDungeonResumed(page);
      await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect((await snapshot(page)).activeBattle).toEqual(saved.activeBattle);expect((await readSession(page)).events).toEqual([]);
      await (await battleTool(page, '#battle-party')).click();await expect(page.getByRole('dialog')).toContainText('Second Wind');await page.screenshot({path:test.info().outputPath(command.abilityId==='ability:second_wind'?'production-heal-resumed.png':'production-taunt-resumed.png')});await page.locator('#inspection-close').click();
     }

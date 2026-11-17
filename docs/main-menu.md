@@ -21,13 +21,14 @@ engine chunks. Menu inspection imports validators/content through `menuSaves.ts`
 and a side-effect-free run context, without importing app hosts. It creates no
 sessions, RNG or writes and never exposes save bytes in DOM.
 
-Menu actions use full-page navigation to the configured base root with a closed
-`game=battle|run|dungeon` selector, for example `/?game=dungeon&entry=new` or
-`/prototype/?game=run&entry=continue`. The closed-set `entry` parameter is removed
-from history before use and consumed once; `game` remains so reload retains the
-saved-game owner. Battle/run/dungeon destinations inspect again and use existing
-Continue/recovery owners. New Game starts immediately when
-both dungeon save slots are empty. Otherwise it asks for confirmation over the
+Menu actions use full-page navigation to the configured base root. A bare
+`?game=dungeon` resumes the saved map or encounter and falls back to the menu
+when no run is eligible. Dungeon actions such as `?game=dungeon&entry=new` consume
+the `entry` request once and keep `game=dungeon` for reload.
+Standalone battle and three-encounter run launch links include `entry=new`,
+for example `/prototype/?game=run&entry=new`. Reloading those links starts a
+fresh session. Their bare `?game=` URLs open the main menu.
+New Game starts immediately when both dungeon save slots are empty. Otherwise it asks for confirmation over the
 menu. The dungeon rechecks the reviewed saves before replacement and requests
 confirmation again if they changed. If a confirmed replacement clears slots but
 cannot publish its new save, existing recovery exports retain reviewed old bytes

@@ -139,7 +139,7 @@ export function startMainMenu() {
   recovery.onclick = () => { recovery.focus(); showRecovery(); };
   const secondary = element('nav'); secondary.className = 'menu-secondary'; secondary.setAttribute('aria-label', 'Other modes');
   for (const [route, label] of [['battle', 'Standalone battle'], ['run', 'Three-encounter run'], ['map', 'Map inspection']] as const) {
-    const link = element('a', label); link.href = route === 'map' ? routeHref(route, import.meta.env.BASE_URL) : menuGameHref(route, import.meta.env.BASE_URL); secondary.append(link);
+    const link = element('a', label); link.href = route === 'map' ? routeHref(route, import.meta.env.BASE_URL) : menuGameHref(route, import.meta.env.BASE_URL, 'new'); secondary.append(link);
   }
   content.append(title, nav, status, recovery, secondary, element('p', 'Choose your next adventure.'));
   main.append(art, content); document.body.append(main, dialog); refresh();

@@ -27,22 +27,24 @@ carry your surviving party into the next encounter.
 This repository is the playable **v2 prototype**. The header is promotional art;
 the game uses illustrated portraits, compact sprites and isometric tile boards.
 
-**[Play a battle](https://tactics-guru-v2.pages.dev/?game=battle) · [Enter the dungeon](https://tactics-guru-v2.pages.dev/?game=dungeon) · [Run locally](#run-locally) · [Explore the architecture](#how-it-fits-together) · [Browse the docs](#project-guide)**
+**[Play a battle](https://tactics-guru-v2.pages.dev/?game=battle&entry=new) · [Resume a dungeon](https://tactics-guru-v2.pages.dev/?game=dungeon) · [Run locally](#run-locally) · [Explore the architecture](#how-it-fits-together) · [Browse the docs](#project-guide)**
 
 ## Choose your adventure
 
 - **[Main menu](https://tactics-guru-v2.pages.dev/) — `/`**<br>
   Continue a saved journey, start a new dungeon, or open Records and Settings.
   Continue offers a mode choice when several saves exist; recovery never removes saves.
-- **[Standalone battle](https://tactics-guru-v2.pages.dev/?game=battle) — `/?game=battle`**<br>
+- **[Standalone battle](https://tactics-guru-v2.pages.dev/?game=battle&entry=new) — `/?game=battle&entry=new`**<br>
   Fight the authored 12×12 Forest Ruins encounter with a level-1 party, enemy AI,
   attack previews, combat feedback and a saved battle you can continue.
-- **[Three-encounter run](https://tactics-guru-v2.pages.dev/?game=run) — `/?game=run`**<br>
+- **[Three-encounter run](https://tactics-guru-v2.pages.dev/?game=run&entry=new) — `/?game=run&entry=new`**<br>
   Play two seeded Desert battles followed by the authored Ruined Approach finale.
   Carry HP, XP and equipment between encounters; choose an item after each of the
   first two victories. The third victory completes the run.
 - **[Dungeon floors](https://tactics-guru-v2.pages.dev/?game=dungeon) — `/?game=dungeon`**<br>
-  Explore Rooms layouts with fog of discovery, encounter markers and stairs.
+  Resume a saved dungeon or its active battle. If no run can be resumed, the link
+  opens the main menu. Explore Rooms layouts with fog of discovery, encounter
+  markers and stairs.
   Floors alternate Forest and Desert after a seeded first biome. Each has a normal
   encounter, an elite or vault encounter, and a goblin guardian encounter. Clear the
   guardian to unlock descent; revisit discovered floors with their progress intact.

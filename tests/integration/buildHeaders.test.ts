@@ -63,9 +63,10 @@ for (const base of ['/', '/tactics/']) {
       for (const asset of Object.values(hobgoblinAssets)) {
         expect(direct.some(link => link.href.endsWith(asset.runtimePath))).toBe(false);
       }
-      expect(preloads(base, `?game=${mode}&entry=continue`)).toEqual(direct);
-      expect(preloads(base, `?game=${mode}&scene=unknown&scene=proof`)).toEqual(direct);
-      expect(preloads(base.replace(/\/$/, ''), `?game=${mode}`)).toEqual(direct);
+      expect(preloads(base, `?game=${mode}`)).toEqual([]);
+      expect(preloads(base, `?game=${mode}&entry=continue`)).toEqual([]);
+      expect(preloads(base, `?game=${mode}&entry=new&scene=unknown&scene=proof`)).toEqual(direct);
+      expect(preloads(base.replace(/\/$/, ''), `?game=${mode}&entry=new`)).toEqual(direct);
     }
     const battleEntry = code.find(file => file.type === 'chunk' &&
       file.facadeModuleId?.replaceAll('\\', '/').endsWith('/src/app/startBattleApp.ts'));

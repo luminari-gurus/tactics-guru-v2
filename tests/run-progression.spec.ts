@@ -11,7 +11,7 @@ import {RUN_RECORD_KEYS} from '../src/persistence/runRecordsStorage';
 
 async function snapshot(page:Page):Promise<RunSnapshot>{return JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!);}
 async function start(page:Page){
- await page.goto('/?game=run');await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ await page.goto('/?game=run&entry=new');await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  await expect(page.locator('#battle-actor')).toBeVisible();
  const drawable=await page.locator('#battle-board-region').boundingBox();
  expect(drawable!.width).toBeGreaterThan(0);
@@ -154,7 +154,7 @@ test('run preparation and dialogs retain 44px controls, native touch and narrow 
   if(isMobile) await page.locator(selector).tap();
   else await page.locator(selector).click();
  };
- await page.goto('./?game=run');
+ await page.goto('./?game=run&entry=new');
  await activate('#run-start');
  await expect(page.locator('#run-start-encounter')).toBeVisible();
  const original = page.viewportSize()!;

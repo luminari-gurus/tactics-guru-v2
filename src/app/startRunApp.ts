@@ -1,5 +1,5 @@
 import { testingProgress } from '../ui/testingProgress';
-import { consumeEntryIntent, resolveAppEntry, routeHref } from './routes';
+import { resolveAppEntry, routeHref } from './routes';
 import { menuReturnLink } from '../ui/menuReturn';
 import { mountTelemetryPreferences } from '../telemetry/preferences';
 import { reportFailure } from '../telemetry/telemetry';
@@ -19,7 +19,6 @@ import { watchClassGuidancePreferences } from '../ui/classGuidancePreferences';
 
 const menuRun = new URLSearchParams(location.search).get('game') === 'run' &&
   resolveAppEntry(location.pathname, '', import.meta.env.BASE_URL).route === 'menu';
-consumeEntryIntent();
 const controller = new RunItemSession(freshRunSnapshot(crypto.randomUUID(), 13, context), context, null);
 const guidance = { dismissed: new Set<string>() };
 // The controller outlives its battle HUDs, including the reward/preparation screens.

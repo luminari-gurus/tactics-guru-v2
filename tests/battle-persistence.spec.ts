@@ -66,7 +66,7 @@ for(const condition of ['missing','valid','corrupt','backup-only','unavailable']
     await expect(page.getByRole('button',{name:/Continue saved|Save recovery|Play unsaved/})).toHaveCount(0);
   };
   const entries={journeys:[
-    ['battle','./?game=battle&entry=continue'],['run','./?game=run&entry=recovery'],
+    ['battle','./?game=battle&entry=new'],['run','./?game=run&entry=new'],
     ['battle','./battle/?game=dungeon&entry=continue'],['run','./run?game=battle&entry=recovery'],
     ['dungeon','./dungeon?game=run&entry=new'],['map','./map?game=dungeon&entry=new'],
   ],diagnostics:[
@@ -78,7 +78,7 @@ for(const condition of ['missing','valid','corrupt','backup-only','unavailable']
     const ready=async()=>{
       if(mode==='battle'||mode==='qbert')await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
       else if(mode==='run')await expect(page.locator('#run-start')).toBeVisible();
-      else if(mode==='dungeon')await expect(page.getByRole('button',{name:'Start new dungeon',exact:true})).toBeVisible();
+      else if(mode==='dungeon')await expect(page.locator('#dungeon-map')).toBeVisible();
       else if(mode==='map')await expect(page.locator('#map-grid span')).toHaveCount(400);
       else await expect(page.locator('#fit-status')).toHaveText(mode==='proof'?'Ready':'Content ready');
     };
@@ -100,8 +100,6 @@ for(const condition of ['missing','valid','corrupt','backup-only','unavailable']
       if(new URL(page.url()).searchParams.get('game')==='run')await page.locator('#run-confirm-restart').click();
       await expect(page.locator('#run-start-encounter')).toBeVisible();
     }else if(mode==='dungeon'){
-      await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();
-      await expect(page.locator('#dungeon-map')).toBeVisible();
       await page.locator('.dungeon-directions button:not(:disabled)').first().click();
       // A legal exploration step can enter an encounter. Wait for its actual
       // screen rather than clicking the loading screen's transient restart.
@@ -188,11 +186,8 @@ test('cached dungeon record history preserves the replacement and one old result
   const first=new URL(`./?game=${mode}&history=records-first`,baseURL).href,map=new URL('map',baseURL).href;
   await page.goto('./');await page.evaluate(({slots,text})=>{localStorage.setItem(slots.primary,text);localStorage.setItem(slots.backup,text);},{slots,text});
   await page.goto(first);
-  const continueJourney=async()=>{
-    await page.getByRole('button',{name:`Continue saved ${mode}`,exact:true}).click();
-    await expect(page.locator('#dungeon-map')).toBeVisible();
-  };
-  await continueJourney();await page.goto(map);await expect(page.locator('#map-grid span')).toHaveCount(400);
+  const expectCurrentMap=()=>expect(page.locator('#dungeon-map')).toBeVisible();
+  await expectCurrentMap();await page.goto(map);await expect(page.locator('#map-grid span')).toHaveCount(400);
   await page.goto(new URL(`./?game=${mode}`,baseURL).href);
   await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();
   await page.locator('#dungeon-confirm-new').click();
@@ -201,13 +196,15 @@ test('cached dungeon record history preserves the replacement and one old result
     await page.getByRole('button',{name:'Save recovery',exact:true}).click();
     await expect(page.getByRole('heading',{name:'Dungeon save recovery',exact:true})).toBeVisible();
   const saved=await page.evaluate(slots=>[localStorage.getItem(slots.primary),localStorage.getItem(slots.backup)],slots);
+  const newId=JSON.parse(saved[0]!).payload.id;
+  expect(newId).not.toBe(oldId);
   const history=await page.evaluate(key=>localStorage.getItem(key),RUN_RECORD_KEYS.primary);
   expect(JSON.parse(history!).records).toMatchObject([{id:oldId,outcome:'abandoned'}]);
   await page.goBack({waitUntil:'commit'});await expect(page).toHaveURL(map);await page.goBack({waitUntil:'commit'});
-  await expect(page.getByRole('button',{name:`Continue saved ${mode}`,exact:true})).toBeVisible();
-  expect(await page.evaluate(()=>sessionStorage.getItem('test:bfcache-return'))).toBe(first);
-  expect(await page.evaluate(key=>localStorage.getItem(key),RUN_RECORD_KEYS.primary)).toBe(history);
-  await continueJourney();
+  // A restored document can still contain the previous map until pageshow reloads it.
+  await expect.poll(()=>page.evaluate(()=>sessionStorage.getItem('test:bfcache-return'))).toBe(first);
+  await expect(page.locator('#game')).toHaveAttribute('data-dungeon-snapshot', new RegExp(`"id":"${newId}"`));
+  await expectCurrentMap();
   expect(await page.evaluate(slots=>[localStorage.getItem(slots.primary),localStorage.getItem(slots.backup)],slots)).toEqual(saved);
   expect(await page.evaluate(key=>localStorage.getItem(key),RUN_RECORD_KEYS.primary)).toBe(history);
 });
@@ -248,7 +245,7 @@ radialTest('radial testing routes preserve saved games through actions restart r
     for(const mode of ['battle','run','dungeon'] as const){
       await page.goto(`./${mode}`);
       if(mode==='run'){await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();}
-      if(mode==='dungeon'){await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await walkDungeon(page,undefined,isMobile?'touch':'keyboard');}
+      if(mode==='dungeon')await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
       await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await expect.poll(()=>combatSkin(page)).toBe('radial');
       const fresh=(await readSession(page)).state;
       await page.getByRole('button',{name:'End turn',exact:true}).click();
@@ -263,7 +260,7 @@ radialTest('radial testing routes preserve saved games through actions restart r
       else await expect(page.locator(mode==='run'?'#run-start-encounter':'#dungeon-map')).toBeVisible();
       await audit();await page.reload();
       if(mode==='battle'){await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect((await readSession(page)).state).toEqual(fresh);}
-      else await expect(mode==='run'?page.locator('#run-start'):page.getByRole('button',{name:'Start new dungeon',exact:true})).toBeVisible();
+      else await expect(page.locator(mode==='run'?'#run-start':'#dungeon-map')).toBeVisible();
       await audit();
     }
     await page.getByRole('link',{name:'Main menu',exact:true}).click();

@@ -10,7 +10,7 @@ import { projectTile, type Tile } from '../src/geometry/iso';
 
 test('generated production board picks, moves and starts a fresh session after camera changes',async({page})=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
- await page.goto('/?game=run');await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();
+ await page.goto('/?game=run&entry=new');await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const snapshot=JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!);
  expect(snapshot.battlefield.kind).toBe('generated');
@@ -55,7 +55,7 @@ test('generated production board picks, moves and starts a fresh session after c
 });
 
 standardTest('desert landmarks distinguish blocked ground in the battle view', async ({ page }) => {
-  await page.goto('/?game=run');
+  await page.goto('/?game=run&entry=new');
   await page.locator('#run-start').click();
   await page.locator('#run-start-encounter').click();
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
@@ -84,7 +84,7 @@ standardTest('desert landmarks distinguish blocked ground in the battle view', a
 
 
 test('repeated generated restarts keep the static shape cache bounded',async({page})=>{
- await page.goto('/?game=run');await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();
+ await page.goto('/?game=run&entry=new');await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const captures=[];
  for(let restart=0;restart<4;restart++){
@@ -105,7 +105,7 @@ test('repeated generated restarts keep the static shape cache bounded',async({pa
 test('missing desert surface fails through the controlled asset error',async({page})=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  await page.route('**/battle/terrain/sand.png',route=>route.abort());
- await page.goto('/?game=run');await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();
+ await page.goto('/?game=run&entry=new');await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();
  await expect(page.locator('#fit-status')).toContainText('Error: Asset load failed');
  await expect(page.locator('#game')).toHaveAttribute('data-ready','false');
  expect(errors).toEqual([]);
