@@ -317,6 +317,11 @@ test('workflow defaults to serial and pins the manual pilot to distinct per-VM l
   assert.match(workflow, /fail-fast: false/); assert.match(workflow, /ref: \$\{\{ github.sha \}\}/);
   assert.match(workflow, /65m npm run verify:batches/); assert.doesNotMatch(workflow, /100m/);
   assert.match(workflow, /github.run_attempt/); assert.match(workflow, /name: Serial verification aggregate/);
+  const preflight = workflow.indexOf('npm run verify:batches -- ready');
+  const publishReadiness = workflow.indexOf('name: issue208-ready-${{ github.run_id }}');
+  const rendezvous = workflow.indexOf('npm run verify:batches -- await-pilot');
+  const execute = workflow.indexOf('65m npm run verify:batches -- run');
+  assert.ok(preflight > 0 && preflight < publishReadiness && publishReadiness < rendezvous && rendezvous < execute);
   const jobs = ['qualify', 'prepare', 'batch'].map(id => workflow.split(`\n  ${id}:\n`)[1].split(/\n  [a-z]+:\n/)[0]);
   jobs.push(...['browser-setup.yml', 'issue-219-process-cleanup.yml'].map(file =>
     readFileSync(new URL('../../.github/workflows/' + file, import.meta.url), 'utf8')));

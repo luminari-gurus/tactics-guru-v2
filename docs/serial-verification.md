@@ -52,13 +52,15 @@ Dispatch `parallel-pilot` with an empty batch filter. The runner choice is
 ignored in this mode. VM 01 prepares the build, runs Chromium and aggregates
 results. VM 02 runs WebKit. Both browser jobs take the normal per-VM reservation
 and use one worker. Each job first validates its source, build, browser versions
-and discovery, then uploads a readiness artifact scoped to the current run and
-attempt. Both jobs wait up to four minutes for both artifacts and use a common
-release time ten seconds after the later upload. Receipts retain VM identity,
+and discovery, samples its clock against the Actions API, then uploads a
+readiness artifact scoped to the current run and attempt. Both jobs wait up to
+four minutes for both artifacts and use a common release time ten seconds after
+the later upload. Receipts retain VM identity,
 browser executable paths, source/build hashes, coverage, failures and cleanup
 diagnostics. Each parallel batch records local request timestamps and the
-Actions API's HTTP Date before and after browser execution. Both pilot modes pin
-the same Node patch and use matching packaged browsers and dependency versions.
+Actions API's HTTP Date from preflight and takes a second sample after browser
+execution. Both pilot modes pin the same Node patch and use matching packaged
+browsers and dependency versions.
 
 Run `pilot` on VM 01 at the same commit for a serial reference. Compare
 job wall span, completed Actions compute, individual stage wall and scheduler

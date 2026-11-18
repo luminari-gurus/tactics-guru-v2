@@ -281,11 +281,12 @@ async function runReceipt(plan, id, rows, prerequisites, out, buildHash, sampleC
         JSON.stringify(ready.environment) === JSON.stringify(report.environment), 'Readiness receipt differs from the current batch');
       report.browsers = ready.browsers;
       report.readyAt = ready.readyAt;
+      invariant(ready.clock?.before, 'Parallel pilot readiness is missing its clock sample');
+      report.clock = { before: ready.clock.before };
     } else {
       report.browsers = await browserMetadata(stages);
     }
     verifyBrowsers(plan, report);
-    if (parallel) report.clock = { before: await sampleClock() };
     report.setupMs = Date.parse(report.executionStartedAt) - Date.parse(report.startedAt);
     await runRows(rows, prerequisites, async stage => {
       if (stage.browser && !parallel) exactCoverage(stage.expected, discover(stage));
@@ -517,6 +518,7 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
     invariant(plan.planHash === digest(JSON.stringify({ ...plan, planHash: undefined })), 'Invalid plan hash');
     invariant(source.commit === plan.source.commit && source.inputHash === plan.source.inputHash, 'Source differs from preparation');
     if (build) verifyBuild(plan, build, join(bundle, 'dist'), source);
+    const sampleClock = plan.mode === 'parallel-pilot' ? pilotClockSampler() : undefined;
     if (command === 'ready') {
       const ready = receipt(plan, batchId);
       invariant(parallelRunner(plan, ready) && build && process.env.GITHUB_RUN_ID, 'Readiness requires a prepared parallel pilot batch in Actions');
@@ -525,6 +527,7 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
       ready.browsers = await browserMetadata(stages);
       verifyBrowsers(plan, ready);
       for (const stage of job.stages) exactCoverage(stage.expected, discover(stage));
+      ready.clock = { before: await sampleClock() };
       ready.readyAt = new Date().toISOString();
       const out = resolve(outputArgument);
       mkdirSync(out, { recursive: true });
@@ -533,7 +536,6 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
     }
     invariant(!existsSync(join(root, 'dist')), 'Checkout must be clean before restoring the build');
     if (build) cpSync(join(bundle, 'dist'), join(root, 'dist'), { recursive: true });
-    const sampleClock = plan.mode === 'parallel-pilot' ? pilotClockSampler() : undefined;
     const report = await runReceipt(plan, batchId, job.stages, read(join(bundle, 'preparation/receipt.json')).stages,
       resolve(outputArgument), build?.hash ?? null, sampleClock);
     return report.passed ? 0 : 1;

@@ -187,8 +187,10 @@ jobs:
         with:
           name: ${{ needs.prepare.outputs.bundle }}
           path: verification-receipts/serial/bundle/
-      - name: Verify parallel pilot source, build, browsers and case selection
+      - name: Verify parallel pilot inputs and sample the runner clock
         if: inputs.mode == 'parallel-pilot'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           npm run verify:batches -- ready verification-receipts/serial/bundle \
             "$SERIAL_BATCH_ID" "verification-receipts/serial/jobs/$SERIAL_BATCH_ID"
