@@ -51,8 +51,9 @@ Dispatch `parallel-pilot` with an empty batch filter. The runner choice is
 ignored in this mode. VM 01 prepares the build, runs Chromium and aggregates
 results. VM 02 runs WebKit. Both browser jobs take the normal per-VM reservation
 and use one worker. Their receipts retain VM identity, browser executable paths,
-source/build hashes, coverage, failures and cleanup diagnostics. Node, dependency
-versions and packaged browser versions must match. Custom browser overrides
+source/build hashes, coverage, failures and cleanup diagnostics. Both pilot modes pin the same
+Node patch in the workflow so separate runner caches resolve the same runtime.
+Dependency and packaged browser versions must also match. Custom browser overrides
 are excluded from this comparison.
 
 Run `pilot` on VM 01 at the same commit for a serial smoke reference. Compare
