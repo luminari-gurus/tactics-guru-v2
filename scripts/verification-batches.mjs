@@ -13,6 +13,8 @@ const save = (path, value) => writeFileSync(path, JSON.stringify(value, null, 2)
 const invariant = (condition, message) => { if (!condition) throw Error(message); };
 export const preparationIds = ['tooling', 'units', 'typecheck-app', 'typecheck-domain', 'build-integration', 'build-root'];
 const prefixIds = ['build-prefix', 'assets-prefix-preview', 'assets-prefix-dev', 'restore-root'];
+const pilotRunners = { 'pilot-chromium': 'unraid-tactics-01', 'pilot-webkit': 'unraid-tactics-02' };
+
 const key = test => JSON.stringify([test.project, test.id]);
 
 export function exactCoverage(expected, actual) {
@@ -22,9 +24,9 @@ export function exactCoverage(expected, actual) {
 }
 
 export function definitions(mode = 'capture') {
-  invariant(['pilot', 'capture'].includes(mode), 'Expected pilot or capture mode');
+  invariant(['pilot', 'parallel-pilot', 'capture'].includes(mode), 'Expected pilot, parallel-pilot or capture mode');
   const chromium = stages.find(stage => stage.id === 'chromium');
-  if (mode === 'pilot') return [
+  if (mode !== 'capture') return [
     { id: 'pilot-chromium', stages: [{ ...chromium, id: 'pilot-chromium', args: [...chromium.args,
       'tests/boot.spec.ts', '-g', 'boots a Phaser scene and fits the viewport after resize$'] }] },
     { id: 'pilot-webkit', stages: [{ ...chromium, id: 'pilot-webkit', args: [...chromium.args,
@@ -64,6 +66,7 @@ export function createPlan(mode, discoverCases = discover, filter = '') {
     const selected = jobs.flatMap(job => job.stages.filter(row => row.sourceStage === stage.id).flatMap(row => row.expected ?? []));
     exactCoverage(stage.tests, selected);
   }
+  invariant(mode !== 'parallel-pilot' || !filter, 'Parallel pilot requires both browser batches');
   const requested = filter ? filter.split(',') : jobs.map(job => job.id);
   invariant(requested.length === new Set(requested).size && requested.every(id => jobs.some(job => job.id === id)), 'Unknown or duplicate batch selection');
   return { schemaVersion: 1, mode, scope: mode === 'capture' && requested.length === jobs.length ? 'full' : 'partial',
@@ -91,6 +94,48 @@ function environment() {
   return { node: process.version, platform: process.platform, arch: process.arch, release: os.release(),
     cpuModel: os.cpus()[0]?.model, cpus: os.cpus().length, memoryBytes: os.totalmem(),
     runner: process.env.RUNNER_NAME ?? os.hostname(), versions: Object.fromEntries(['@playwright/test', 'vite', 'vitest', 'typescript'].map(name => [name, version(name)])) };
+}
+
+function parallelRunner(plan, report) {
+  return plan.mode === 'parallel-pilot' ? pilotRunners[report.batchId] : undefined;
+}
+
+function verifyRuntime(plan, report) {
+  const runner = parallelRunner(plan, report);
+  if (!runner) {
+    invariant(JSON.stringify(report.environment) === JSON.stringify(plan.environment), 'Runner/runtime differs from preparation');
+    return;
+  }
+
+  // A different VM can have a different kernel, RAM allocation and cache path.
+  invariant(report.environment.runner === runner, `Expected the batch to run on ${runner}`);
+  for (const field of ['node', 'platform', 'arch', 'versions']) {
+    invariant(JSON.stringify(report.environment[field]) === JSON.stringify(plan.environment[field]), `Parallel pilot ${field} differs from preparation`);
+  }
+}
+
+function verifyBrowsers(plan, report) {
+  if (!parallelRunner(plan, report)) {
+    invariant(JSON.stringify(report.browsers) === JSON.stringify(plan.browsers), 'Browser environment differs from preparation');
+    return;
+  }
+
+  invariant(JSON.stringify(Object.keys(report.browsers)) === JSON.stringify(Object.keys(plan.browsers)), 'Parallel pilot browser inventory differs');
+  for (const [engine, actual] of Object.entries(report.browsers)) {
+    const expected = plan.browsers[engine];
+    invariant(actual.version && actual.version === expected.version && actual.channel === expected.channel &&
+      !actual.executableOverride && !expected.executableOverride, `Parallel pilot requires matching packaged ${engine} builds`);
+  }
+}
+
+export function pilotOverlap(receipts) {
+  const intervals = id => (receipts.find(report => report.batchId === id)?.stages ?? [])
+    .flatMap(stage => (stage.summary?.tests ?? []).flatMap(test => test.attempts ?? []))
+    .filter(attempt => attempt.status === 'passed' && Number.isFinite(Date.parse(attempt.startTime)) &&
+      Number.isFinite(attempt.durationMs) && attempt.durationMs > 0)
+    .map(attempt => [Date.parse(attempt.startTime), Date.parse(attempt.startTime) + attempt.durationMs]);
+  return Math.max(0, ...intervals('pilot-chromium').flatMap(([leftStart, leftEnd]) =>
+    intervals('pilot-webkit').map(([rightStart, rightEnd]) => Math.min(leftEnd, rightEnd) - Math.max(leftStart, rightStart))));
 }
 
 function receipt(plan, id) {
@@ -174,9 +219,9 @@ async function runReceipt(plan, id, rows, prerequisites, out, buildHash) {
   process.once('SIGINT', stop); process.once('SIGTERM', stop);
   try {
     if (process.env.RUNNER_TOOL_CACHE) invariant(!existsSync(join(process.env.RUNNER_TOOL_CACHE, 'issue208-unsafe-host')), 'Runner cleanup requires inspection');
-    invariant(JSON.stringify(environment()) === JSON.stringify(plan.environment), 'Runner/runtime differs from preparation');
+    verifyRuntime(plan, report);
     report.browsers = await browserMetadata(stages);
-    invariant(JSON.stringify(report.browsers) === JSON.stringify(plan.browsers), 'Browser environment differs from preparation');
+    verifyBrowsers(plan, report);
     report.setupMs = Date.parse(report.executionStartedAt) - Date.parse(report.startedAt);
     await runRows(rows, prerequisites, async stage => {
       if (stage.browser) exactCoverage(stage.expected, discover(stage));
@@ -212,8 +257,9 @@ export function aggregate(plan, build, preparation, receipts) {
     latest.push(report);
     if (report.schemaVersion !== 1 || !Number.isSafeInteger(report.attempt) || report.attempt < 1) { errors.push(`${id}: invalid receipt schema/attempt`); complete = false; }
     if (report.planHash !== plan.planHash || report.source?.inputHash !== plan.source.inputHash || report.source?.commit !== plan.source.commit || report.runId !== preparation.runId ||
-        JSON.stringify(report.environment) !== JSON.stringify(plan.environment) || JSON.stringify(report.browsers) !== JSON.stringify(plan.browsers) ||
         (id !== 'prepare' && report.buildHash !== (build?.hash ?? null))) { errors.push(`${id}: provenance mismatch`); complete = false; }
+    try { verifyRuntime(plan, report); verifyBrowsers(plan, report); }
+    catch (error) { errors.push(`${id}: ${error.message}`); complete = false; }
     if (!report.complete || !report.inputsUnchanged) { errors.push(`${id}: incomplete/changed inputs`); complete = false; }
     if (!report.passed || report.stages.some(stage => stage.status !== 'passed')) errors.push(`${id}: failed`);
     const expectedStages = id === 'prepare' ? preparationIds : plan.jobs.find(job => job.id === id).stages.map(stage => stage.id);
@@ -232,11 +278,13 @@ export function aggregate(plan, build, preparation, receipts) {
   }
   const unexpected = receipts.filter(report => !plan.requested.includes(report.batchId));
   if (unexpected.length) { errors.push('Unexpected batch receipts'); complete = false; }
+  const overlapMs = plan.mode === 'parallel-pilot' ? pilotOverlap(latest) : null;
+  if (overlapMs === 0) errors.push('Parallel pilot did not observe overlapping passing browser cases');
   const starts = latest.map(report => Date.parse(report.startedAt)), ends = latest.map(report => Date.parse(report.finishedAt));
   return { schemaVersion: 1, source: plan.source, planHash: plan.planHash, scope: plan.scope,
     complete, passed: errors.length === 0,
     baselineEligible: errors.length === 0 && plan.scope === 'full' && !plan.source.dirty,
-    errors, history, latest, wallMs: latest.length ? Math.max(...ends) - Math.min(...starts) : null,
+    errors, history, latest, ...(overlapMs === null ? {} : { overlapMs }), wallMs: latest.length ? Math.max(...ends) - Math.min(...starts) : null,
     totalJobMs: latest.reduce((total, report) => total + report.wallMs, 0),
     totalAttemptMs: [preparation, ...receipts].filter(Boolean).reduce((total, report) => total + report.wallMs, 0),
     historicalFailures: ['Hosted baseline 39700595665 failed/incomplete', 'Self-hosted 39767156870 attempts 1 and 2 failed/incomplete',
@@ -279,7 +327,7 @@ export function schedulingCompute(jobs) {
 export function timingReport(plan, summary) {
   const actual = (summary.latest ?? []).flatMap(receipt => receipt.stages);
   const jobs = plan.jobs.filter(job => plan.requested.includes(job.id));
-  const selected = plan.mode === 'pilot' ? [...stages.filter(stage => preparationIds.includes(stage.id)), ...jobs.flatMap(job => job.stages)]
+  const selected = plan.mode !== 'capture' ? [...stages.filter(stage => preparationIds.includes(stage.id)), ...jobs.flatMap(job => job.stages)]
     : stages.filter(stage => preparationIds.includes(stage.id) || jobs.some(job => job.stages.some(row => row.sourceStage === stage.id)));
   const rows = selected.map(stage => {
     const parts = stage.id === 'chromium'
@@ -339,7 +387,8 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
     plan.planHash = digest(JSON.stringify(plan));
     save(join(bundle, 'plan.json'), plan);
     if (command === 'discover') return 0;
-    if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `matrix=${JSON.stringify({ include: plan.requested.map(id => ({ id })) })}\n`);
+    if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `matrix=${JSON.stringify({ include: plan.requested.map(id => ({ id,
+      ...(plan.mode === 'parallel-pilot' ? { runner: id === 'pilot-chromium' ? 'tactics-browser-01' : 'tactics-browser-02' } : {}) })) })}\n`);
     const report = await runReceipt(plan, 'prepare', stages.filter(stage => preparationIds.includes(stage.id)), [], join(bundle, 'preparation'));
     if (!report.passed) return 1;
     cpSync(join(root, 'dist'), join(bundle, 'dist'), { recursive: true });
@@ -399,6 +448,7 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
       `| ${receipt.batchId} / ${stage.id} | ${stage.status} | ${((stage.wallMs ?? 0) / 1000).toFixed(2)} | ${JSON.stringify(stage.summary?.counts ?? stage.performance ?? {})} |`));
     const summary = `# Serial verification\n\nScope: ${plan.scope}; complete: ${result.complete}; passed: ${result.passed}; baseline eligible: ${result.baselineEligible}\n\n` +
       `Job wall span: ${result.wallMs ?? 'unknown'} ms; total job time: ${result.totalJobMs ?? 'unknown'} ms; completed Actions compute: ${result.scheduling?.completedJobComputeMs ?? 'unknown'} ms.\n\n` +
+      (result.overlapMs == null ? '' : `Longest overlapping passing browser cases: ${result.overlapMs} ms.\n\n`) +
       `| Batch / stage | Result | Stage seconds | Counts |\n| --- | --- | ---: | --- |\n${table.join('\n')}\n\n${(result.errors ?? []).map(error => '- ' + error).join('\n')}\n\n${result.comparison ?? ''}\n`;
     writeFileSync(join(out, 'summary.md'), summary);
     if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);

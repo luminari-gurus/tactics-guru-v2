@@ -8,9 +8,9 @@ on:
         options: [tactics-browser-01, tactics-browser-02]
         default: tactics-browser-01
       mode:
-        description: Bounded qualification, partial artifact pilot, or serial capture
+        description: Qualification, serial pilot, two-runner pilot, or serial capture
         type: choice
-        options: [qualify, pilot, capture]
+        options: [qualify, pilot, parallel-pilot, capture]
         default: qualify
       batches:
         description: Optional comma-separated batch IDs; empty capture selects the full plan
@@ -39,7 +39,7 @@ permissions:
 concurrency:
   # Reserve one VM across job boundaries; the other VM remains available.
   # Push-triggered full verification has no inputs and uses VM 01.
-  group: tactics-browser-${{ inputs.runner || 'tactics-browser-01' }}
+  group: ${{ inputs.mode == 'parallel-pilot' && inputs.extra_job == 'none' && 'tactics-browser-parallel-pilot' || format('tactics-browser-{0}', inputs.runner || 'tactics-browser-01') }}
   queue: max
   cancel-in-progress: false
 env:
@@ -86,8 +86,12 @@ jobs:
           retention-days: 30
           if-no-files-found: warn
   prepare:
-    if: github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches')
-    runs-on: [self-hosted, tactics-browser, "${{ inputs.runner || 'tactics-browser-01' }}"]
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches' || (inputs.mode == 'parallel-pilot' && github.ref == 'refs/heads/work/issue-208-parallel-pilot'))
+    runs-on: [self-hosted, tactics-browser, "${{ inputs.mode == 'parallel-pilot' && 'tactics-browser-01' || inputs.runner || 'tactics-browser-01' }}"]
+    concurrency:
+      group: ${{ inputs.mode == 'parallel-pilot' && format('tactics-browser-{0}', 'tactics-browser-01') || format('issue208-prepare-{0}', github.run_id) }}
+      queue: max
+      cancel-in-progress: false
     timeout-minutes: 35
     outputs:
       matrix: ${{ steps.prepare.outputs.matrix }}
@@ -127,11 +131,15 @@ jobs:
   batch:
     needs: prepare
     if: always() && !cancelled() && needs.prepare.outputs.matrix != ''
-    runs-on: [self-hosted, tactics-browser, "${{ inputs.runner || 'tactics-browser-01' }}"]
+    runs-on: [self-hosted, tactics-browser, "${{ inputs.mode == 'parallel-pilot' && matrix.runner || inputs.runner || 'tactics-browser-01' }}"]
+    concurrency:
+      group: ${{ inputs.mode == 'parallel-pilot' && format('tactics-browser-{0}', matrix.runner) || format('issue208-batch-{0}-{1}', github.run_id, matrix.id) }}
+      queue: max
+      cancel-in-progress: false
     timeout-minutes: 85
     strategy:
       fail-fast: false
-      max-parallel: 1
+      max-parallel: ${{ inputs.mode == 'parallel-pilot' && 2 || 1 }}
       matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
     name: batch (${{ matrix.id }})
     env:
@@ -174,8 +182,12 @@ jobs:
   aggregate:
     name: Serial verification aggregate
     needs: [prepare, batch]
-    if: always() && github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches')
-    runs-on: [self-hosted, tactics-browser, "${{ inputs.runner || 'tactics-browser-01' }}"]
+    if: always() && github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches' || (inputs.mode == 'parallel-pilot' && github.ref == 'refs/heads/work/issue-208-parallel-pilot'))
+    runs-on: [self-hosted, tactics-browser, "${{ inputs.mode == 'parallel-pilot' && 'tactics-browser-01' || inputs.runner || 'tactics-browser-01' }}"]
+    concurrency:
+      group: ${{ inputs.mode == 'parallel-pilot' && format('tactics-browser-{0}', 'tactics-browser-01') || format('issue208-aggregate-{0}', github.run_id) }}
+      queue: max
+      cancel-in-progress: false
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4

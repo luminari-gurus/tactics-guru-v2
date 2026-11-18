@@ -1,12 +1,15 @@
 # Resumable serial verification (#208 phase A)
 
-The manual `issue-200-baseline.yml` workflow now has three modes:
+The manual `issue-200-baseline.yml` workflow has four modes:
 
 - `qualify` (default): bounded tooling, diagnostics, build, two-engine smoke and
   timeout-recovery checks. It does not launch a baseline.
 - `pilot`: prepare the real root artifact and exercise its download/verification
   in two separate serial browser jobs: the default three-profile boot/resize case
   and the setup WebKit boot/resize case. The aggregate is explicitly partial.
+- `parallel-pilot`: run the same two smoke batches on separate VMs using one
+  verified build. The aggregate requires measured overlap between passing browser
+  cases. See [Two-runner pilot](#two-runner-pilot).
 - `capture`: prepare once, then run all 19 serial jobs, or a deliberately selected
   comma-separated `batches` subset. A subset cannot qualify the full baseline.
 
@@ -35,6 +38,33 @@ qualify each VM. These custom labels are not inferred from runner names. A missi
 label leaves jobs queued; do not add it to another VM to unblock an existing
 baseline. Keep one runner service per VM, with separate workspaces and browser/
 tool caches. Existing receipt checks still reject runner/runtime/browser drift.
+
+## Two-runner pilot
+
+Run `qualify` on both labeled VMs first. Confirm the labels map one-to-one to
+`unraid-tactics-01` and `unraid-tactics-02`, the VM clocks are synchronized, and
+their CPU/RAM assignments and GPU or software rendering arrangements are known.
+Keep unrelated load steady and run the pilot outside performance-collection
+windows. Record the actual conditions in the workflow input.
+
+Dispatch `parallel-pilot` with an empty batch filter. The runner choice is
+ignored in this mode. VM 01 prepares the build, runs Chromium and aggregates
+results. VM 02 runs WebKit. Both browser jobs take the normal per-VM reservation
+and use one worker. Their receipts retain VM identity, browser executable paths,
+source/build hashes, coverage, failures and cleanup diagnostics. Node, dependency
+versions and packaged browser versions must match. Custom browser overrides
+are excluded from this comparison.
+
+Run `pilot` on VM 01 at the same commit for a serial smoke reference. Compare
+job wall span, completed Actions compute, individual stage wall and scheduler
+timestamps. A successful parallel pilot records overlapping passing cases;
+scheduler overlap during setup alone is insufficient. Queue contention or a
+targeted rerun may eliminate browser overlap. If so, retain the receipts and
+dispatch a fresh pilot to observe both batches in the same execution.
+
+Smoke results qualify the shared artifact and scheduler path. A representative
+contention comparison with broader batches, production capture isolation and a
+full-suite measurement against #200 remain part of #208.
 
 ## Coverage and build provenance
 

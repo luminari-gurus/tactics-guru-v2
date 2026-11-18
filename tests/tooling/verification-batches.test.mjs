@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { definitions, createPlan, discover, exactCoverage, inventory, verifyBuild, runRows, aggregate, preparationIds, validateBrowserResult, validatePerformanceResult, validateScheduling, schedulingCompute, timingReport, quarantineCleanup } from '../../scripts/verification-batches.mjs';
+import { definitions, createPlan, discover, exactCoverage, inventory, verifyBuild, runRows, aggregate, preparationIds, validateBrowserResult, validatePerformanceResult, validateScheduling, schedulingCompute, timingReport, quarantineCleanup, pilotOverlap } from '../../scripts/verification-batches.mjs';
 import { digest, compareReports } from '../../scripts/verification-report.mjs';
 import { stages } from '../../scripts/verification-timings.mjs';
 
@@ -246,10 +246,27 @@ test('browser acceptance rejects missing final reports, narrowed coverage, skips
   }
 });
 
-test('workflow stays manual, serial, failure-preserving and pinned to the dispatched SHA', () => {
+test('parallel pilot preserves smoke selection and requires both batches', () => {
+  assert.deepEqual(definitions('parallel-pilot'), definitions('pilot'));
+  assert.throws(() => createPlan('parallel-pilot', () => [], 'pilot-chromium'), /requires both/);
+});
+
+test('parallel pilot requires actual passing case overlap, not just overlapping jobs', () => {
+  const receipt = (batchId, startTime, status = 'passed') => ({ batchId, stages: [
+    { summary: { tests: [{ attempts: [{ startTime, status, durationMs: 2000 }] }] } },
+  ] });
+  const chromium = receipt('pilot-chromium', '2026-11-18T12:00:00Z');
+  assert.equal(pilotOverlap([chromium, receipt('pilot-webkit', '2026-11-18T12:00:01Z')]), 1000);
+  assert.equal(pilotOverlap([chromium, receipt('pilot-webkit', '2026-11-18T12:00:02Z')]), 0);
+  assert.equal(pilotOverlap([chromium, receipt('pilot-webkit', '2026-11-18T12:00:01Z', 'failed')]), 0);
+});
+
+test('workflow defaults to serial and pins the manual pilot to distinct per-VM locks', () => {
   const workflow = readFileSync(new URL('../../.github/workflows/issue-200-baseline.yml', import.meta.url), 'utf8').replaceAll('\r\n', '\n');
   assert.match(workflow, /workflow_dispatch:/); assert.doesNotMatch(workflow, /pull_request:|ubuntu-latest|ubuntu-24/);
-  assert.match(workflow, /max-parallel: 1/);
+  assert.ok(workflow.includes("max-parallel: ${{ inputs.mode == 'parallel-pilot' && 2 || 1 }}"));
+  assert.ok(workflow.includes("format('tactics-browser-{0}', matrix.runner)"));
+  assert.ok(workflow.includes("inputs.mode == 'parallel-pilot' && matrix.runner"));
   assert.match(workflow, /fail-fast: false/); assert.match(workflow, /ref: \$\{\{ github.sha \}\}/);
   assert.match(workflow, /65m npm run verify:batches/); assert.doesNotMatch(workflow, /100m/);
   assert.match(workflow, /github.run_attempt/); assert.match(workflow, /name: Serial verification aggregate/);
@@ -272,27 +289,36 @@ test('workflow stays manual, serial, failure-preserving and pinned to the dispat
 
 test('browser workflows share a non-cancelling lock for the selected VM', () => {
   const runner = "${{ inputs.runner || 'tactics-browser-01' }}";
-  const validate = workflow => {
+  const validate = (workflow, group, expectedTargets) => {
     assert.match(workflow, /options: \[tactics-browser-01, tactics-browser-02\]/);
     assert.match(workflow, /default: tactics-browser-01/);
     const concurrency = workflow.split('\nconcurrency:\n')[1]?.split(/\n\S/)[0];
     assert.ok(concurrency, 'workflow-level concurrency is required');
-    assert.ok(concurrency.includes('  group: tactics-browser-' + runner));
+    assert.ok(concurrency.includes('  group: ' + group));
     assert.match(concurrency, /cancel-in-progress: false/);
     assert.match(concurrency, /queue: max/);
     const targets = [...workflow.matchAll(/^    runs-on: (.+)$/gm)].map(match => match[1]);
     assert.ok(targets.length > 0, 'at least one runner target is required');
-    for (const target of targets) assert.equal(target, '[self-hosted, tactics-browser, "' + runner + '"]');
+    assert.deepEqual(new Set(targets), new Set(expectedTargets));
   };
   for (const file of ['browser-setup.yml', 'issue-200-baseline.yml', 'issue-219-process-cleanup.yml']) {
     const workflow = readFileSync(new URL('../../.github/workflows/' + file, import.meta.url), 'utf8').replaceAll('\r\n', '\n');
-    validate(workflow);
-    assert.throws(() => validate(workflow.replace('group: tactics-browser-' + runner, 'group: tactics-browser-exclusive')));
-    assert.throws(() => validate(workflow.replace('cancel-in-progress: false', 'cancel-in-progress: true')));
-    assert.throws(() => validate(workflow.replace('queue: max', 'queue: single')));
-    assert.throws(() => validate(workflow.replace('  queue: max\n', '')));
-    assert.throws(() => validate(workflow.replace('[self-hosted, tactics-browser, "' + runner + '"]', '[self-hosted, tactics-browser]')));
-    assert.throws(() => validate(workflow.replace('group: tactics-browser-' + runner, "group: tactics-browser-${{ inputs.runner || 'tactics-browser-02' }}")));
+    const serialTarget = '[self-hosted, tactics-browser, "' + runner + '"]';
+    const targets = [serialTarget];
+    let group = 'tactics-browser-' + runner;
+    if (file === 'issue-200-baseline.yml') {
+      group = "${{ inputs.mode == 'parallel-pilot' && inputs.extra_job == 'none' && 'tactics-browser-parallel-pilot' || format('tactics-browser-{0}', inputs.runner || 'tactics-browser-01') }}";
+      for (const pilotRunner of ["'tactics-browser-01'", 'matrix.runner']) {
+        targets.push(`[self-hosted, tactics-browser, "\${{ inputs.mode == 'parallel-pilot' && ${pilotRunner} || inputs.runner || 'tactics-browser-01' }}"]`);
+      }
+    }
+    validate(workflow, group, targets);
+    assert.throws(() => validate(workflow.replace(group, 'tactics-browser-exclusive'), group, targets));
+    assert.throws(() => validate(workflow.replace('cancel-in-progress: false', 'cancel-in-progress: true'), group, targets));
+    assert.throws(() => validate(workflow.replace('queue: max', 'queue: single'), group, targets));
+    assert.throws(() => validate(workflow.replace('  queue: max\n', ''), group, targets));
+    assert.throws(() => validate(workflow.replace(serialTarget, '[self-hosted, tactics-browser]'), group, targets));
+
   }
 });
 
