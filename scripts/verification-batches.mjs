@@ -3,6 +3,7 @@ import { appendFileSync, closeSync, cpSync, existsSync, mkdirSync, openSync, rea
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import os from 'node:os';
+import { setTimeout as delay } from 'node:timers/promises';
 import { stages, executeTimingStage, browserMetadata, runCommand } from './verification-timings.mjs';
 import { stageEnvironment } from './verify-full.mjs';
 import { digest, sourceIdentity, summarizePlaywright } from './verification-report.mjs';
@@ -26,11 +27,12 @@ export function exactCoverage(expected, actual) {
 export function definitions(mode = 'capture') {
   invariant(['pilot', 'parallel-pilot', 'capture'].includes(mode), 'Expected pilot, parallel-pilot or capture mode');
   const chromium = stages.find(stage => stage.id === 'chromium');
+  const webkit = stages.find(stage => stage.id === 'webkit-acceptance');
   if (mode !== 'capture') return [
     { id: 'pilot-chromium', stages: [{ ...chromium, id: 'pilot-chromium', args: [...chromium.args,
       'tests/boot.spec.ts', '-g', 'boots a Phaser scene and fits the viewport after resize$'] }] },
-    { id: 'pilot-webkit', stages: [{ ...chromium, id: 'pilot-webkit', args: [...chromium.args,
-      '-c', 'playwright.setup-smoke.config.ts', '--project=setup-webkit'] }] },
+    { id: 'pilot-webkit', stages: [{ ...webkit, id: 'pilot-webkit', args: [...webkit.args,
+      '--project=acceptance-webkit-portrait', 'tests/battle-loop.spec.ts', '-g', 'complete legal authored battle seed'] }] },
   ];
   const batches = read(join(root, 'scripts/verification-batches.json'));
   const chromiumJobs = batches.map(batch => ({ id: 'chromium-' + batch.id,
@@ -209,6 +211,31 @@ async function execute(stage, out, browsers, signal) {
   return row;
 }
 
+function checkHostDisposition() {
+  if (process.env.RUNNER_TOOL_CACHE) invariant(!existsSync(join(process.env.RUNNER_TOOL_CACHE, 'issue208-unsafe-host')), 'Runner cleanup requires inspection');
+}
+
+export async function awaitPilotRunners(runId, attempt, getArtifacts, {
+  now = Date.now, wait = delay, timeoutMs = 240000,
+} = {}) {
+  const names = Object.keys(pilotRunners).map(id => `issue208-ready-${runId}-${attempt}-${id}`);
+  const deadline = now() + timeoutMs;
+  while (now() < deadline) {
+    const timestamps = await Promise.all(names.map(async name => {
+      const list = await getArtifacts(name);
+      return Date.parse(list.find(artifact => artifact.name === name && !artifact.expired)?.created_at);
+    }));
+    if (timestamps.every(Number.isFinite)) {
+      const release = Math.max(...timestamps) + 10000;
+      invariant(Math.max(now(), release) < deadline, 'Parallel pilot readiness arrived too late');
+      await wait(Math.max(0, release - now()));
+      return new Date(release).toISOString();
+    }
+    await wait(Math.min(3000, Math.max(0, deadline - now())));
+  }
+  throw Error('Both parallel pilot runners must publish readiness in the same workflow attempt');
+}
+
 async function runReceipt(plan, id, rows, prerequisites, out, buildHash) {
   mkdirSync(out, { recursive: true });
   invariant(!existsSync(join(out, 'receipt.json')), 'Refusing to overwrite receipts');
@@ -218,13 +245,23 @@ async function runReceipt(plan, id, rows, prerequisites, out, buildHash) {
   const abort = new AbortController(), stop = () => abort.abort();
   process.once('SIGINT', stop); process.once('SIGTERM', stop);
   try {
-    if (process.env.RUNNER_TOOL_CACHE) invariant(!existsSync(join(process.env.RUNNER_TOOL_CACHE, 'issue208-unsafe-host')), 'Runner cleanup requires inspection');
+    checkHostDisposition();
     verifyRuntime(plan, report);
-    report.browsers = await browserMetadata(stages);
+    const parallel = Boolean(parallelRunner(plan, report));
+    if (parallel) {
+      const ready = read(join(out, 'ready.json'));
+      invariant(ready.runId === report.runId && ready.attempt === report.attempt && ready.batchId === id &&
+        ready.planHash === report.planHash && ready.buildHash === buildHash &&
+        JSON.stringify(ready.environment) === JSON.stringify(report.environment), 'Readiness receipt differs from the current batch');
+      report.browsers = ready.browsers;
+      report.readyAt = ready.readyAt;
+    } else {
+      report.browsers = await browserMetadata(stages);
+    }
     verifyBrowsers(plan, report);
     report.setupMs = Date.parse(report.executionStartedAt) - Date.parse(report.startedAt);
     await runRows(rows, prerequisites, async stage => {
-      if (stage.browser) exactCoverage(stage.expected, discover(stage));
+      if (stage.browser && !parallel) exactCoverage(stage.expected, discover(stage));
       const result = await execute(stage, out, report.browsers, abort.signal);
       quarantineCleanup(result, abort);
       return result;
@@ -377,6 +414,22 @@ async function scheduling() {
 }
 
 export async function main([command, bundleArgument, batchId, outputArgument]) {
+  if (command === 'await-pilot') {
+    const { GITHUB_API_URL, GITHUB_REPOSITORY, GITHUB_RUN_ID, GITHUB_RUN_ATTEMPT, GITHUB_TOKEN } = process.env;
+    invariant(GITHUB_API_URL && GITHUB_REPOSITORY && GITHUB_RUN_ID && GITHUB_RUN_ATTEMPT && GITHUB_TOKEN, 'Parallel pilot requires Actions run identity and artifact read access');
+    const release = await awaitPilotRunners(GITHUB_RUN_ID, GITHUB_RUN_ATTEMPT, async name => {
+      const url = new URL(`${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts`);
+      url.searchParams.set('name', name);
+      const response = await fetch(url, {
+        headers: { Authorization: `Bearer ${GITHUB_TOKEN}`, Accept: 'application/vnd.github+json' },
+        signal: AbortSignal.timeout(10000),
+      });
+      invariant(response.ok, `Actions artifact listing failed: HTTP ${response.status}`);
+      return (await response.json()).artifacts;
+    });
+    console.log(`Both pilot runners ready. Scheduled browser launch: ${release}`);
+    return 0;
+  }
   const bundle = resolve(bundleArgument ?? 'verification-receipts/serial/bundle');
   if (command === 'discover' || command === 'prepare') {
     invariant(!existsSync(join(bundle, 'plan.json')) && !existsSync(join(bundle, 'dist')), 'Refusing to overwrite a prior plan/build');
@@ -410,7 +463,7 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
     if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
     return 1;
   }
-  if (command === 'run') {
+  if (command === 'run' || command === 'ready') {
     const job = plan.jobs.find(job => job.id === batchId);
     invariant(job && plan.requested.includes(batchId), 'Batch not in requested plan');
     const build = existsSync(join(bundle, 'build.json')) ? read(join(bundle, 'build.json')) : null;
@@ -418,6 +471,20 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
     invariant(plan.planHash === digest(JSON.stringify({ ...plan, planHash: undefined })), 'Invalid plan hash');
     invariant(source.commit === plan.source.commit && source.inputHash === plan.source.inputHash, 'Source differs from preparation');
     if (build) verifyBuild(plan, build, join(bundle, 'dist'), source);
+    if (command === 'ready') {
+      const ready = receipt(plan, batchId);
+      invariant(parallelRunner(plan, ready) && build && process.env.GITHUB_RUN_ID, 'Readiness requires a prepared parallel pilot batch in Actions');
+      checkHostDisposition();
+      verifyRuntime(plan, ready);
+      ready.browsers = await browserMetadata(stages);
+      verifyBrowsers(plan, ready);
+      for (const stage of job.stages) exactCoverage(stage.expected, discover(stage));
+      ready.readyAt = new Date().toISOString();
+      const out = resolve(outputArgument);
+      mkdirSync(out, { recursive: true });
+      save(join(out, 'ready.json'), { ...ready, buildHash: build.hash });
+      return 0;
+    }
     invariant(!existsSync(join(root, 'dist')), 'Checkout must be clean before restoring the build');
     if (build) cpSync(join(bundle, 'dist'), join(root, 'dist'), { recursive: true });
     const report = await runReceipt(plan, batchId, job.stages, read(join(bundle, 'preparation/receipt.json')).stages,
@@ -454,7 +521,7 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
     if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
     return result.passed ? 0 : 1;
   }
-  throw Error('Usage: verify:batches discover|prepare <bundle> | run <bundle> <batch> <out> | aggregate <bundle> <receipts> <out>');
+  throw Error('Usage: verify:batches discover|prepare <bundle> | ready|run <bundle> <batch> <out> | await-pilot | aggregate <bundle> <receipts> <out>');
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

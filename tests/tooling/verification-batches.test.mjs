@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { definitions, createPlan, discover, exactCoverage, inventory, verifyBuild, runRows, aggregate, preparationIds, validateBrowserResult, validatePerformanceResult, validateScheduling, schedulingCompute, timingReport, quarantineCleanup, pilotOverlap } from '../../scripts/verification-batches.mjs';
+import { definitions, createPlan, discover, exactCoverage, inventory, verifyBuild, runRows, aggregate, preparationIds, validateBrowserResult, validatePerformanceResult, validateScheduling, schedulingCompute, timingReport, quarantineCleanup, pilotOverlap, awaitPilotRunners } from '../../scripts/verification-batches.mjs';
 import { digest, compareReports } from '../../scripts/verification-report.mjs';
 import { stages } from '../../scripts/verification-timings.mjs';
 
@@ -63,10 +63,14 @@ test('targeted runs and pilot cannot claim full coverage; unknown batch filters 
 test('real Playwright pilot discovery matches full titles in all intended projects', () => {
   const jobs = definitions('pilot');
   const chromium = discover(jobs[0].stages[0]), webkit = discover(jobs[1].stages[0]);
-  assert.equal(chromium.length, 3); assert.equal(webkit.length, 1);
+  assert.equal(chromium.length, 3); assert.equal(webkit.length, 2);
   assert.deepEqual(chromium.map(row => row.project).sort(), ['desktop', 'mobile-landscape', 'mobile-portrait']);
-  assert.equal(webkit[0].project, 'setup-webkit');
-  assert.ok([...chromium, ...webkit].every(row => row.title === 'boots a Phaser scene and fits the viewport after resize'));
+  assert.ok(chromium.every(row => row.title === 'boots a Phaser scene and fits the viewport after resize'));
+  assert.ok(webkit.every(row => row.project === 'acceptance-webkit-portrait'));
+  assert.deepEqual(webkit.map(row => row.title).sort(), [
+    'complete legal authored battle seed 1 reaches playerLoss through controls and replays',
+    'complete legal authored battle seed 2 reaches playerWin through controls and replays',
+  ]);
 });
 
 test('performance acceptance requires complete source-bound samples and successful evaluation', () => {
@@ -246,9 +250,25 @@ test('browser acceptance rejects missing final reports, narrowed coverage, skips
   }
 });
 
-test('parallel pilot preserves smoke selection and requires both batches', () => {
+test('parallel pilot matches serial pilot selection and requires both batches', () => {
   assert.deepEqual(definitions('parallel-pilot'), definitions('pilot'));
   assert.throws(() => createPlan('parallel-pilot', () => [], 'pilot-chromium'), /requires both/);
+});
+
+test('parallel pilot waits for both active-attempt artifacts and schedules a common release', async () => {
+  const start = Date.parse('2026-11-18T12:00:00Z');
+  let current = start;
+  const clock = { now: () => current, wait: async ms => { current += ms; } };
+  const artifact = (name, at) => ({ name, created_at: new Date(start + at).toISOString() });
+  const release = await awaitPilotRunners('42', '2', async name => {
+    if (name.endsWith('chromium')) return [artifact(name, 0)];
+    if (current >= start + 3000) return [artifact(name, 3000)];
+    return [artifact('issue208-ready-42-1-pilot-webkit', 0), { ...artifact(name, 0), expired: true }];
+  }, clock);
+  assert.equal(release, new Date(start + 13000).toISOString());
+  assert.equal(current, start + 13000);
+  await assert.rejects(awaitPilotRunners('42', '3', async () => [], { ...clock, timeoutMs: 4000 }),
+    /same workflow attempt/);
 });
 
 test('parallel pilot requires actual passing case overlap, not just overlapping jobs', () => {

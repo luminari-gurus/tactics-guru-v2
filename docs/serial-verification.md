@@ -5,9 +5,9 @@ The manual `issue-200-baseline.yml` workflow has four modes:
 - `qualify` (default): bounded tooling, diagnostics, build, two-engine smoke and
   timeout-recovery checks. It does not launch a baseline.
 - `pilot`: prepare the real root artifact and exercise its download/verification
-  in two separate serial browser jobs: the default three-profile boot/resize case
-  and the setup WebKit boot/resize case. The aggregate is explicitly partial.
-- `parallel-pilot`: run the same two smoke batches on separate VMs using one
+  in two serial browser jobs, with three Chromium boot/resize cases and two
+  portrait WebKit battle journeys. The aggregate is explicitly partial.
+- `parallel-pilot`: run the same two browser batches on separate VMs using one
   verified build. The aggregate requires measured overlap between passing browser
   cases. See [Two-runner pilot](#two-runner-pilot).
 - `capture`: prepare once, then run all 19 serial jobs, or a deliberately selected
@@ -50,20 +50,22 @@ windows. Record the actual conditions in the workflow input.
 Dispatch `parallel-pilot` with an empty batch filter. The runner choice is
 ignored in this mode. VM 01 prepares the build, runs Chromium and aggregates
 results. VM 02 runs WebKit. Both browser jobs take the normal per-VM reservation
-and use one worker. Their receipts retain VM identity, browser executable paths,
-source/build hashes, coverage, failures and cleanup diagnostics. Both pilot modes pin the same
-Node patch in the workflow so separate runner caches resolve the same runtime.
-Dependency and packaged browser versions must also match. Custom browser overrides
-are excluded from this comparison.
+and use one worker. Each job first validates its source, build, browser versions
+and discovery, then uploads a readiness artifact scoped to the current run and
+attempt. Both jobs wait up to four minutes for both artifacts and use a common
+release time ten seconds after the later upload. Receipts retain VM identity,
+browser executable paths, source/build hashes, coverage, failures and cleanup
+diagnostics. Both pilot modes pin the same Node patch. Dependency and packaged
+browser versions must also match. Use the packaged browsers for this comparison.
 
-Run `pilot` on VM 01 at the same commit for a serial smoke reference. Compare
+Run `pilot` on VM 01 at the same commit for a serial reference. Compare
 job wall span, completed Actions compute, individual stage wall and scheduler
 timestamps. A successful parallel pilot records overlapping passing cases;
-scheduler overlap during setup alone is insufficient. Queue contention or a
-targeted rerun may eliminate browser overlap. If so, retain the receipts and
-dispatch a fresh pilot to observe both batches in the same execution.
+scheduler overlap during setup alone is insufficient. Dispatch a fresh pilot
+if one runner misses the rendezvous. Both jobs must publish readiness in the
+same attempt.
 
-Smoke results qualify the shared artifact and scheduler path. A representative
+These bounded results qualify the shared artifact and scheduler path. A representative
 contention comparison with broader batches, production capture isolation and a
 full-suite measurement against #200 remain part of #208.
 

@@ -168,6 +168,25 @@ jobs:
         with:
           name: ${{ needs.prepare.outputs.bundle }}
           path: verification-receipts/serial/bundle/
+      - name: Verify parallel pilot source, build, browsers and case selection
+        if: inputs.mode == 'parallel-pilot'
+        run: |
+          npm run verify:batches -- ready verification-receipts/serial/bundle \
+            "$SERIAL_BATCH_ID" "verification-receipts/serial/jobs/$SERIAL_BATCH_ID"
+        timeout-minutes: 5
+      - uses: actions/upload-artifact@v4
+        if: inputs.mode == 'parallel-pilot'
+        with:
+          name: issue208-ready-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.id }}
+          path: verification-receipts/serial/jobs/${{ matrix.id }}/ready.json
+          retention-days: 30
+          if-no-files-found: error
+      - name: Wait for both parallel pilot runners
+        if: inputs.mode == 'parallel-pilot'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: npm run verify:batches -- await-pilot
+        timeout-minutes: 5
       - name: Verify and execute this batch with its independent budget
         run: |
           timeout --signal=TERM --kill-after=15s 65m npm run verify:batches -- run \
