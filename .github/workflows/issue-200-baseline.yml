@@ -39,7 +39,7 @@ permissions:
 concurrency:
   # Reserve one VM across job boundaries; the other VM remains available.
   # Push-triggered full verification has no inputs and uses VM 01.
-  group: ${{ inputs.mode == 'parallel-pilot' && inputs.extra_job == 'none' && 'tactics-browser-parallel-pilot' || format('tactics-browser-{0}', inputs.runner || 'tactics-browser-01') }}
+  group: tactics-browser-${{ inputs.mode == 'parallel-pilot' && inputs.extra_job == 'none' && 'parallel-pilot' || inputs.runner || 'tactics-browser-01' }}
   queue: max
   cancel-in-progress: false
 env:

@@ -307,7 +307,7 @@ test('browser workflows share a non-cancelling lock for the selected VM', () => 
     const targets = [serialTarget];
     let group = 'tactics-browser-' + runner;
     if (file === 'issue-200-baseline.yml') {
-      group = "${{ inputs.mode == 'parallel-pilot' && inputs.extra_job == 'none' && 'tactics-browser-parallel-pilot' || format('tactics-browser-{0}', inputs.runner || 'tactics-browser-01') }}";
+      group = "tactics-browser-${{ inputs.mode == 'parallel-pilot' && inputs.extra_job == 'none' && 'parallel-pilot' || inputs.runner || 'tactics-browser-01' }}";
       for (const pilotRunner of ["'tactics-browser-01'", 'matrix.runner']) {
         targets.push(`[self-hosted, tactics-browser, "\${{ inputs.mode == 'parallel-pilot' && ${pilotRunner} || inputs.runner || 'tactics-browser-01' }}"]`);
       }
