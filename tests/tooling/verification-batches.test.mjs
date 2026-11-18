@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { definitions, createPlan, discover, exactCoverage, inventory, verifyBuild, runRows, aggregate, preparationIds, validateBrowserResult, validatePerformanceResult, validateScheduling, schedulingCompute, timingReport, quarantineCleanup, pilotOverlap, awaitPilotRunners } from '../../scripts/verification-batches.mjs';
+import { definitions, createPlan, discover, exactCoverage, inventory, verifyBuild, runRows, aggregate, preparationIds, validateBrowserResult, validatePerformanceResult, validateScheduling, schedulingCompute, timingReport, quarantineCleanup, pilotOverlap, samplePilotClock, awaitPilotRunners } from '../../scripts/verification-batches.mjs';
 import { digest, compareReports } from '../../scripts/verification-report.mjs';
 import { stages } from '../../scripts/verification-timings.mjs';
 
@@ -271,19 +271,46 @@ test('parallel pilot waits for both active-attempt artifacts and schedules a com
     /same workflow attempt/);
 });
 
-test('parallel pilot requires actual passing case overlap, not just overlapping jobs', () => {
-  const receipt = (batchId, startTime, status = 'passed') => ({ batchId, stages: [
-    { summary: { tests: [{ attempts: [{ startTime, status, durationMs: 2000 }] }] } },
-  ] });
-  const chromium = receipt('pilot-chromium', '2026-11-18T12:00:00Z');
-  assert.equal(pilotOverlap([chromium, receipt('pilot-webkit', '2026-11-18T12:00:01Z')]), 1000);
-  assert.equal(pilotOverlap([chromium, receipt('pilot-webkit', '2026-11-18T12:00:02Z')]), 0);
-  assert.equal(pilotOverlap([chromium, receipt('pilot-webkit', '2026-11-18T12:00:01Z', 'failed')]), 0);
+test('pilot clock sampling includes the request round trip and HTTP Date precision', async () => {
+  const serverAt = Date.parse('2026-11-18T12:00:00Z');
+  const times = [serverAt - 50, serverAt + 50];
+  const sample = await samplePilotClock(async () => new Date(serverAt).toUTCString(), () => times.shift());
+  assert.deepEqual(sample, { sentAt: serverAt - 50, receivedAt: serverAt + 50, serverAt,
+    minOffsetMs: -1050, maxOffsetMs: 1050 });
+  await assert.rejects(samplePilotClock(async () => null), /Cannot measure pilot clock offset/);
+});
+
+test('parallel pilot requires passing case overlap beyond the measured clock uncertainty', () => {
+  const start = Date.parse('2026-11-18T12:00:00Z');
+  const receipt = (batchId, offset, { skew = 0, status = 'passed' } = {}) => ({
+    batchId, attempt: 1,
+    clock: {
+      before: { receivedAt: start - 5000, minOffsetMs: skew - 1000, maxOffsetMs: skew + 1000 },
+      after: { sentAt: start + 15000, minOffsetMs: skew - 1000, maxOffsetMs: skew + 1000 },
+    },
+    stages: [{ summary: { tests: [{ attempts: [{
+      startTime: new Date(start + offset).toISOString(), status, durationMs: 5000,
+    }] }] } }],
+  });
+  const chromium = receipt('pilot-chromium', 0);
+  assert.equal(pilotOverlap([chromium, receipt('pilot-webkit', 1000)]), 2000);
+  assert.equal(pilotOverlap([chromium, receipt('pilot-webkit', 3000)]), 0);
+  assert.equal(pilotOverlap([chromium, receipt('pilot-webkit', 2000, { skew: 4000 })]), 0);
+  assert.equal(pilotOverlap([chromium, receipt('pilot-webkit', -3000, { skew: 4000 })]), 2000);
+  assert.equal(pilotOverlap([chromium, receipt('pilot-webkit', 1000, { status: 'failed' })]), 0);
+  const webkit = receipt('pilot-webkit', 1000);
+  assert.equal(pilotOverlap([chromium, { ...webkit, attempt: 2 }]), 0);
+  assert.equal(pilotOverlap([chromium, { ...webkit, clock: {} }]), 0);
 });
 
 test('workflow defaults to serial and pins the manual pilot to distinct per-VM locks', () => {
   const workflow = readFileSync(new URL('../../.github/workflows/issue-200-baseline.yml', import.meta.url), 'utf8').replaceAll('\r\n', '\n');
-  assert.match(workflow, /workflow_dispatch:/); assert.doesNotMatch(workflow, /pull_request:|ubuntu-latest|ubuntu-24/);
+  assert.match(workflow, /workflow_dispatch:/); assert.doesNotMatch(workflow, /pull_request:/);
+  const rejection = workflow.split('\n  reject-dispatch:\n')[1].split('\n  qualify:\n')[0];
+  assert.match(rejection, /runs-on: ubuntu-latest/);
+  assert.match(rejection, /permissions: \{\}/);
+  assert.doesNotMatch(rejection, /uses:/);
+  assert.match(rejection, /exit 1/);
   assert.ok(workflow.includes("max-parallel: ${{ inputs.mode == 'parallel-pilot' && 2 || 1 }}"));
   assert.ok(workflow.includes("format('tactics-browser-{0}', matrix.runner)"));
   assert.ok(workflow.includes("inputs.mode == 'parallel-pilot' && matrix.runner"));
@@ -327,6 +354,7 @@ test('browser workflows share a non-cancelling lock for the selected VM', () => 
     const targets = [serialTarget];
     let group = 'tactics-browser-' + runner;
     if (file === 'issue-200-baseline.yml') {
+      targets.push('ubuntu-latest');
       group = "tactics-browser-${{ inputs.mode == 'parallel-pilot' && inputs.extra_job == 'none' && 'parallel-pilot' || inputs.runner || 'tactics-browser-01' }}";
       for (const pilotRunner of ["'tactics-browser-01'", 'matrix.runner']) {
         targets.push(`[self-hosted, tactics-browser, "\${{ inputs.mode == 'parallel-pilot' && ${pilotRunner} || inputs.runner || 'tactics-browser-01' }}"]`);

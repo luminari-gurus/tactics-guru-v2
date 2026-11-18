@@ -49,6 +49,25 @@ env:
   SERIAL_BATCHES: ${{ inputs.batches }}
   SERIAL_CONDITIONS: ${{ inputs.conditions }}
 jobs:
+  reject-dispatch:
+    name: Reject unsupported verification dispatch
+    if: >-
+      github.event_name == 'workflow_dispatch' &&
+      (github.repository != 'luminari-gurus/tactics-guru-v2' ||
+      (inputs.extra_job != 'full-verify' &&
+      !(github.ref == 'refs/heads/main' ||
+      github.ref == 'refs/heads/work/issue-208-serial-batches' ||
+      (inputs.mode == 'qualify' && github.ref == 'refs/heads/work/issue-200-verification-timings') ||
+      ((inputs.mode == 'pilot' || inputs.mode == 'parallel-pilot') &&
+      github.ref == 'refs/heads/work/issue-208-parallel-pilot'))))
+    runs-on: ubuntu-latest
+    permissions: {}
+    timeout-minutes: 1
+    steps:
+      - name: Explain the supported refs
+        run: |
+          echo "::error::This ref does not support the selected verification mode. Dispatch from main, or see docs/serial-verification.md for supported branch and mode combinations."
+          exit 1
   qualify:
     if: github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode == 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-200-verification-timings' || github.ref == 'refs/heads/work/issue-208-serial-batches')
     runs-on: [self-hosted, tactics-browser, "${{ inputs.runner || 'tactics-browser-01' }}"]
@@ -188,6 +207,8 @@ jobs:
         run: npm run verify:batches -- await-pilot
         timeout-minutes: 5
       - name: Verify and execute this batch with its independent budget
+        env:
+          GITHUB_TOKEN: ${{ inputs.mode == 'parallel-pilot' && github.token || '' }}
         run: |
           timeout --signal=TERM --kill-after=15s 65m npm run verify:batches -- run \
             verification-receipts/serial/bundle "$SERIAL_BATCH_ID" "verification-receipts/serial/jobs/$SERIAL_BATCH_ID"

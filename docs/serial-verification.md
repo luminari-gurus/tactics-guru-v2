@@ -13,12 +13,13 @@ The manual `issue-200-baseline.yml` workflow has four modes:
 - `capture`: prepare once, then run all 19 serial jobs, or a deliberately selected
   comma-separated `batches` subset. A subset cannot qualify the full baseline.
 
-Only trusted manual dispatch on `main` or `work/issue-208-serial-batches` can run
-the serial pipeline. No PR/fork trigger, privileged OS install, hosted fallback,
-release publication or deployment is introduced. The old qualification branch is
-also allowed for `qualify`. Select `runner` as `tactics-browser-01` or
-`tactics-browser-02` (default `tactics-browser-01`). Every job also requires
-`self-hosted` and `tactics-browser`. The selected unique label pins preparation,
+The four modes are available on `main` and `work/issue-208-serial-batches`.
+`work/issue-200-verification-timings` also supports `qualify`, and
+`work/issue-208-parallel-pilot` supports both pilot modes. Unsupported manual
+dispatches fail in a hosted job that reports the ref error without checking out
+repository code. Browser jobs require `self-hosted` and `tactics-browser`, with
+`runner` set to `tactics-browser-01` or `tactics-browser-02` (default
+`tactics-browser-01`). In serial mode the selected unique label pins preparation,
 batches and aggregation to one VM; do not give both VMs the same unique label.
 The shared per-runner concurrency group reserves that VM across job boundaries,
 while an independent run selecting the other VM can execute concurrently.
@@ -41,7 +42,7 @@ tool caches. Existing receipt checks still reject runner/runtime/browser drift.
 
 ## Two-runner pilot
 
-Run `qualify` on both labeled VMs first. Confirm the labels map one-to-one to
+Run `qualify` from `main` on both labeled VMs first. Confirm the labels map one-to-one to
 `unraid-tactics-01` and `unraid-tactics-02`, the VM clocks are synchronized, and
 their CPU/RAM assignments and GPU or software rendering arrangements are known.
 Keep unrelated load steady and run the pilot outside performance-collection
@@ -55,15 +56,17 @@ and discovery, then uploads a readiness artifact scoped to the current run and
 attempt. Both jobs wait up to four minutes for both artifacts and use a common
 release time ten seconds after the later upload. Receipts retain VM identity,
 browser executable paths, source/build hashes, coverage, failures and cleanup
-diagnostics. Both pilot modes pin the same Node patch. Dependency and packaged
-browser versions must also match. Use the packaged browsers for this comparison.
+diagnostics. Each parallel batch records local request timestamps and the
+Actions API's HTTP Date before and after browser execution. Both pilot modes pin
+the same Node patch and use matching packaged browsers and dependency versions.
 
 Run `pilot` on VM 01 at the same commit for a serial reference. Compare
 job wall span, completed Actions compute, individual stage wall and scheduler
-timestamps. A successful parallel pilot records overlapping passing cases;
-scheduler overlap during setup alone is insufficient. Dispatch a fresh pilot
-if one runner misses the rendezvous. Both jobs must publish readiness in the
-same attempt.
+timestamps. The parallel aggregate reports the largest lower bound on overlap
+between two passing cases in the same attempt. It accounts for HTTP Date
+precision, round-trip time and the range of offsets measured before and after
+each batch. Keep the VM clocks synchronized throughout the pilot. Dispatch a
+fresh pilot if one runner misses the rendezvous.
 
 These bounded results qualify the shared artifact and scheduler path. A representative
 contention comparison with broader batches, production capture isolation and a

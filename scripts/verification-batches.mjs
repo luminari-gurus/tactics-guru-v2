@@ -130,14 +130,40 @@ function verifyBrowsers(plan, report) {
   }
 }
 
+export async function samplePilotClock(readDate, now = Date.now) {
+  const sentAt = now();
+  const serverAt = Date.parse(await readDate());
+  const receivedAt = now();
+  invariant(Number.isFinite(serverAt) && receivedAt >= sentAt, 'Cannot measure pilot clock offset from the Actions API');
+  // The server generated its second-resolution Date somewhere inside the request round trip.
+  return { sentAt, receivedAt, serverAt,
+    minOffsetMs: serverAt - 1000 - receivedAt, maxOffsetMs: serverAt + 1000 - sentAt };
+}
+
+function pilotIntervals(report) {
+  const { before, after } = report?.clock ?? {};
+  if (![before, after].every(sample => sample && Number.isFinite(sample.minOffsetMs) &&
+      Number.isFinite(sample.maxOffsetMs) && sample.minOffsetMs <= sample.maxOffsetMs)) return [];
+  const minOffset = Math.min(before.minOffsetMs, after.minOffsetMs);
+  const maxOffset = Math.max(before.maxOffsetMs, after.maxOffsetMs);
+  return report.stages.flatMap(stage => (stage.summary?.tests ?? []).flatMap(test => test.attempts ?? []))
+    .flatMap(attempt => {
+      const start = Date.parse(attempt.startTime), end = start + attempt.durationMs;
+      return attempt.status === 'passed' && Number.isFinite(end) && end > start &&
+        start >= before.receivedAt && end <= after.sentAt ? [{ start, end, minOffset, maxOffset }] : [];
+    });
+}
+
 export function pilotOverlap(receipts) {
-  const intervals = id => (receipts.find(report => report.batchId === id)?.stages ?? [])
-    .flatMap(stage => (stage.summary?.tests ?? []).flatMap(test => test.attempts ?? []))
-    .filter(attempt => attempt.status === 'passed' && Number.isFinite(Date.parse(attempt.startTime)) &&
-      Number.isFinite(attempt.durationMs) && attempt.durationMs > 0)
-    .map(attempt => [Date.parse(attempt.startTime), Date.parse(attempt.startTime) + attempt.durationMs]);
-  return Math.max(0, ...intervals('pilot-chromium').flatMap(([leftStart, leftEnd]) =>
-    intervals('pilot-webkit').map(([rightStart, rightEnd]) => Math.min(leftEnd, rightEnd) - Math.max(leftStart, rightStart))));
+  const chromium = receipts.find(report => report.batchId === 'pilot-chromium');
+  const webkit = receipts.find(report => report.batchId === 'pilot-webkit');
+  if (chromium?.attempt !== webkit?.attempt) return 0;
+  const webkitCases = pilotIntervals(webkit);
+  return Math.max(0, ...pilotIntervals(chromium).flatMap(left => webkitCases.map(right => Math.min(
+    left.end - left.start, right.end - right.start,
+    left.end + left.minOffset - (right.start + right.maxOffset),
+    right.end + right.minOffset - (left.start + left.maxOffset),
+  ))));
 }
 
 function receipt(plan, id) {
@@ -236,7 +262,7 @@ export async function awaitPilotRunners(runId, attempt, getArtifacts, {
   throw Error('Both parallel pilot runners must publish readiness in the same workflow attempt');
 }
 
-async function runReceipt(plan, id, rows, prerequisites, out, buildHash) {
+async function runReceipt(plan, id, rows, prerequisites, out, buildHash, sampleClock) {
   mkdirSync(out, { recursive: true });
   invariant(!existsSync(join(out, 'receipt.json')), 'Refusing to overwrite receipts');
   const report = { ...receipt(plan, id), buildHash };
@@ -259,6 +285,7 @@ async function runReceipt(plan, id, rows, prerequisites, out, buildHash) {
       report.browsers = await browserMetadata(stages);
     }
     verifyBrowsers(plan, report);
+    if (parallel) report.clock = { before: await sampleClock() };
     report.setupMs = Date.parse(report.executionStartedAt) - Date.parse(report.startedAt);
     await runRows(rows, prerequisites, async stage => {
       if (stage.browser && !parallel) exactCoverage(stage.expected, discover(stage));
@@ -266,6 +293,7 @@ async function runReceipt(plan, id, rows, prerequisites, out, buildHash) {
       quarantineCleanup(result, abort);
       return result;
     }, results => { report.stages = results; checkpoint(); }, abort.signal);
+    if (parallel && !abort.signal.aborted) report.clock.after = await sampleClock();
     report.inputsUnchanged = sourceIdentity(root).inputHash === plan.source.inputHash;
     report.complete = !abort.signal.aborted && report.stages.length === rows.length && report.stages.every(row => row.status !== 'blocked');
     report.passed = report.complete && report.inputsUnchanged && report.stages.every(row => row.status === 'passed');
@@ -316,7 +344,7 @@ export function aggregate(plan, build, preparation, receipts) {
   const unexpected = receipts.filter(report => !plan.requested.includes(report.batchId));
   if (unexpected.length) { errors.push('Unexpected batch receipts'); complete = false; }
   const overlapMs = plan.mode === 'parallel-pilot' ? pilotOverlap(latest) : null;
-  if (overlapMs === 0) errors.push('Parallel pilot did not observe overlapping passing browser cases');
+  if (overlapMs === 0) errors.push('Parallel pilot could not establish overlapping passing browser cases within the clock offset bounds');
   const starts = latest.map(report => Date.parse(report.startedAt)), ends = latest.map(report => Date.parse(report.finishedAt));
   return { schemaVersion: 1, source: plan.source, planHash: plan.planHash, scope: plan.scope,
     complete, passed: errors.length === 0,
@@ -413,6 +441,24 @@ async function scheduling() {
     note: 'Actions copies successful job snapshots into rerun attempts; execution timestamps identify receipt freshness and deduplicate compute. Creation-to-start includes scheduling/dependencies; unavailable copied-snapshot queue times stay null. Running aggregate job is excluded.' };
 }
 
+function pilotClockSampler() {
+  const { GITHUB_API_URL, GITHUB_REPOSITORY, GITHUB_RUN_ID, GITHUB_TOKEN } = process.env;
+  invariant(GITHUB_API_URL && GITHUB_REPOSITORY && GITHUB_RUN_ID && GITHUB_TOKEN, 'Clock sampling requires Actions run identity and read access');
+  // The token is only needed for the clock requests, not by the browser subprocesses.
+  delete process.env.GITHUB_TOKEN;
+  const url = `${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}`;
+  return () => samplePilotClock(async () => {
+    const response = await fetch(url, {
+      headers: { Authorization: `Bearer ${GITHUB_TOKEN}`, Accept: 'application/vnd.github+json' },
+      cache: 'no-store',
+      signal: AbortSignal.timeout(10000),
+    });
+    await response.body?.cancel();
+    invariant(response.ok && Number(response.headers.get('age') ?? 0) === 0, 'Cannot sample pilot clock from an unsuccessful or cached Actions API response');
+    return response.headers.get('date');
+  });
+}
+
 export async function main([command, bundleArgument, batchId, outputArgument]) {
   if (command === 'await-pilot') {
     const { GITHUB_API_URL, GITHUB_REPOSITORY, GITHUB_RUN_ID, GITHUB_RUN_ATTEMPT, GITHUB_TOKEN } = process.env;
@@ -487,8 +533,9 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
     }
     invariant(!existsSync(join(root, 'dist')), 'Checkout must be clean before restoring the build');
     if (build) cpSync(join(bundle, 'dist'), join(root, 'dist'), { recursive: true });
+    const sampleClock = plan.mode === 'parallel-pilot' ? pilotClockSampler() : undefined;
     const report = await runReceipt(plan, batchId, job.stages, read(join(bundle, 'preparation/receipt.json')).stages,
-      resolve(outputArgument), build?.hash ?? null);
+      resolve(outputArgument), build?.hash ?? null, sampleClock);
     return report.passed ? 0 : 1;
   }
   if (command === 'aggregate') {
@@ -515,7 +562,7 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
       `| ${receipt.batchId} / ${stage.id} | ${stage.status} | ${((stage.wallMs ?? 0) / 1000).toFixed(2)} | ${JSON.stringify(stage.summary?.counts ?? stage.performance ?? {})} |`));
     const summary = `# Serial verification\n\nScope: ${plan.scope}; complete: ${result.complete}; passed: ${result.passed}; baseline eligible: ${result.baselineEligible}\n\n` +
       `Job wall span: ${result.wallMs ?? 'unknown'} ms; total job time: ${result.totalJobMs ?? 'unknown'} ms; completed Actions compute: ${result.scheduling?.completedJobComputeMs ?? 'unknown'} ms.\n\n` +
-      (result.overlapMs == null ? '' : `Longest overlapping passing browser cases: ${result.overlapMs} ms.\n\n`) +
+      (result.overlapMs == null ? '' : `Minimum verified overlap between passing browser cases: ${result.overlapMs} ms.\n\n`) +
       `| Batch / stage | Result | Stage seconds | Counts |\n| --- | --- | ---: | --- |\n${table.join('\n')}\n\n${(result.errors ?? []).map(error => '- ' + error).join('\n')}\n\n${result.comparison ?? ''}\n`;
     writeFileSync(join(out, 'summary.md'), summary);
     if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
