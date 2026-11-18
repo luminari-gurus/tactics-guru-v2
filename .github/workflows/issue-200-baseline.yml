@@ -86,7 +86,7 @@ jobs:
           retention-days: 30
           if-no-files-found: warn
   prepare:
-    if: github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches' || (inputs.mode == 'parallel-pilot' && github.ref == 'refs/heads/work/issue-208-parallel-pilot'))
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches' || ((inputs.mode == 'pilot' || inputs.mode == 'parallel-pilot') && github.ref == 'refs/heads/work/issue-208-parallel-pilot'))
     runs-on: [self-hosted, tactics-browser, "${{ inputs.mode == 'parallel-pilot' && 'tactics-browser-01' || inputs.runner || 'tactics-browser-01' }}"]
     concurrency:
       group: ${{ inputs.mode == 'parallel-pilot' && format('tactics-browser-{0}', 'tactics-browser-01') || format('issue208-prepare-{0}', github.run_id) }}
@@ -182,7 +182,7 @@ jobs:
   aggregate:
     name: Serial verification aggregate
     needs: [prepare, batch]
-    if: always() && github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches' || (inputs.mode == 'parallel-pilot' && github.ref == 'refs/heads/work/issue-208-parallel-pilot'))
+    if: always() && github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/issue-208-serial-batches' || ((inputs.mode == 'pilot' || inputs.mode == 'parallel-pilot') && github.ref == 'refs/heads/work/issue-208-parallel-pilot'))
     runs-on: [self-hosted, tactics-browser, "${{ inputs.mode == 'parallel-pilot' && 'tactics-browser-01' || inputs.runner || 'tactics-browser-01' }}"]
     concurrency:
       group: ${{ inputs.mode == 'parallel-pilot' && format('tactics-browser-{0}', 'tactics-browser-01') || format('issue208-aggregate-{0}', github.run_id) }}
