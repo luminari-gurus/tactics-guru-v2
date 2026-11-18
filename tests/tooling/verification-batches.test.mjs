@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { definitions, createPlan, discover, exactCoverage, inventory, verifyBuild, runRows, aggregate, preparationIds, validateBrowserResult, validatePerformanceResult, validateScheduling, schedulingCompute, timingReport, quarantineCleanup } from '../../scripts/verification-batches.mjs';
+import { definitions, createPlan, discover, exactCoverage, inventory, verifyBuild, runRows, aggregate, preparationIds, validateBrowserResult, validatePerformanceResult, validateScheduling, schedulingCompute, timingReport, quarantineCleanup, pilotOverlap, samplePilotClock, awaitPilotRunners } from '../../scripts/verification-batches.mjs';
 import { digest, compareReports } from '../../scripts/verification-report.mjs';
 import { stages } from '../../scripts/verification-timings.mjs';
 
@@ -63,10 +63,14 @@ test('targeted runs and pilot cannot claim full coverage; unknown batch filters 
 test('real Playwright pilot discovery matches full titles in all intended projects', () => {
   const jobs = definitions('pilot');
   const chromium = discover(jobs[0].stages[0]), webkit = discover(jobs[1].stages[0]);
-  assert.equal(chromium.length, 3); assert.equal(webkit.length, 1);
+  assert.equal(chromium.length, 3); assert.equal(webkit.length, 2);
   assert.deepEqual(chromium.map(row => row.project).sort(), ['desktop', 'mobile-landscape', 'mobile-portrait']);
-  assert.equal(webkit[0].project, 'setup-webkit');
-  assert.ok([...chromium, ...webkit].every(row => row.title === 'boots a Phaser scene and fits the viewport after resize'));
+  assert.ok(chromium.every(row => row.title === 'boots a Phaser scene and fits the viewport after resize'));
+  assert.ok(webkit.every(row => row.project === 'acceptance-webkit-portrait'));
+  assert.deepEqual(webkit.map(row => row.title).sort(), [
+    'complete legal authored battle seed 1 reaches playerLoss through controls and replays',
+    'complete legal authored battle seed 2 reaches playerWin through controls and replays',
+  ]);
 });
 
 test('performance acceptance requires complete source-bound samples and successful evaluation', () => {
@@ -246,13 +250,78 @@ test('browser acceptance rejects missing final reports, narrowed coverage, skips
   }
 });
 
-test('workflow stays manual, serial, failure-preserving and pinned to the dispatched SHA', () => {
+test('parallel pilot matches serial pilot selection and requires both batches', () => {
+  assert.deepEqual(definitions('parallel-pilot'), definitions('pilot'));
+  assert.throws(() => createPlan('parallel-pilot', () => [], 'pilot-chromium'), /requires both/);
+});
+
+test('parallel pilot waits for both active-attempt artifacts and schedules a common release', async () => {
+  const start = Date.parse('2026-11-18T12:00:00Z');
+  let current = start;
+  const clock = { now: () => current, wait: async ms => { current += ms; } };
+  const artifact = (name, at) => ({ name, created_at: new Date(start + at).toISOString() });
+  const release = await awaitPilotRunners('42', '2', async name => {
+    if (name.endsWith('chromium')) return [artifact(name, 0)];
+    if (current >= start + 3000) return [artifact(name, 3000)];
+    return [artifact('issue208-ready-42-1-pilot-webkit', 0), { ...artifact(name, 0), expired: true }];
+  }, clock);
+  assert.equal(release, new Date(start + 13000).toISOString());
+  assert.equal(current, start + 13000);
+  await assert.rejects(awaitPilotRunners('42', '3', async () => [], { ...clock, timeoutMs: 4000 }),
+    /same workflow attempt/);
+});
+
+test('pilot clock sampling includes the request round trip and HTTP Date precision', async () => {
+  const serverAt = Date.parse('2026-11-18T12:00:00Z');
+  const times = [serverAt - 50, serverAt + 50];
+  const sample = await samplePilotClock(async () => new Date(serverAt).toUTCString(), () => times.shift());
+  assert.deepEqual(sample, { sentAt: serverAt - 50, receivedAt: serverAt + 50, serverAt,
+    minOffsetMs: -1050, maxOffsetMs: 1050 });
+  await assert.rejects(samplePilotClock(async () => null), /Cannot measure pilot clock offset/);
+});
+
+test('parallel pilot requires passing case overlap beyond the measured clock uncertainty', () => {
+  const start = Date.parse('2026-11-18T12:00:00Z');
+  const receipt = (batchId, offset, { skew = 0, status = 'passed' } = {}) => ({
+    batchId, attempt: 1,
+    clock: {
+      before: { receivedAt: start - 5000, minOffsetMs: skew - 1000, maxOffsetMs: skew + 1000 },
+      after: { sentAt: start + 15000, minOffsetMs: skew - 1000, maxOffsetMs: skew + 1000 },
+    },
+    stages: [{ summary: { tests: [{ attempts: [{
+      startTime: new Date(start + offset).toISOString(), status, durationMs: 5000,
+    }] }] } }],
+  });
+  const chromium = receipt('pilot-chromium', 0);
+  assert.equal(pilotOverlap([chromium, receipt('pilot-webkit', 1000)]), 2000);
+  assert.equal(pilotOverlap([chromium, receipt('pilot-webkit', 3000)]), 0);
+  assert.equal(pilotOverlap([chromium, receipt('pilot-webkit', 2000, { skew: 4000 })]), 0);
+  assert.equal(pilotOverlap([chromium, receipt('pilot-webkit', -3000, { skew: 4000 })]), 2000);
+  assert.equal(pilotOverlap([chromium, receipt('pilot-webkit', 1000, { status: 'failed' })]), 0);
+  const webkit = receipt('pilot-webkit', 1000);
+  assert.equal(pilotOverlap([chromium, { ...webkit, attempt: 2 }]), 0);
+  assert.equal(pilotOverlap([chromium, { ...webkit, clock: {} }]), 0);
+});
+
+test('workflow defaults to serial and pins the manual pilot to distinct per-VM locks', () => {
   const workflow = readFileSync(new URL('../../.github/workflows/issue-200-baseline.yml', import.meta.url), 'utf8').replaceAll('\r\n', '\n');
-  assert.match(workflow, /workflow_dispatch:/); assert.doesNotMatch(workflow, /pull_request:|ubuntu-latest|ubuntu-24/);
-  assert.match(workflow, /max-parallel: 1/);
+  assert.match(workflow, /workflow_dispatch:/); assert.doesNotMatch(workflow, /pull_request:/);
+  const rejection = workflow.split('\n  reject-dispatch:\n')[1].split('\n  qualify:\n')[0];
+  assert.match(rejection, /runs-on: ubuntu-latest/);
+  assert.match(rejection, /permissions: \{\}/);
+  assert.doesNotMatch(rejection, /uses:/);
+  assert.match(rejection, /exit 1/);
+  assert.ok(workflow.includes("max-parallel: ${{ inputs.mode == 'parallel-pilot' && 2 || 1 }}"));
+  assert.ok(workflow.includes("format('tactics-browser-{0}', matrix.runner)"));
+  assert.ok(workflow.includes("inputs.mode == 'parallel-pilot' && matrix.runner"));
   assert.match(workflow, /fail-fast: false/); assert.match(workflow, /ref: \$\{\{ github.sha \}\}/);
   assert.match(workflow, /65m npm run verify:batches/); assert.doesNotMatch(workflow, /100m/);
   assert.match(workflow, /github.run_attempt/); assert.match(workflow, /name: Serial verification aggregate/);
+  const preflight = workflow.indexOf('npm run verify:batches -- ready');
+  const publishReadiness = workflow.indexOf('name: issue208-ready-${{ github.run_id }}');
+  const rendezvous = workflow.indexOf('npm run verify:batches -- await-pilot');
+  const execute = workflow.indexOf('65m npm run verify:batches -- run');
+  assert.ok(preflight > 0 && preflight < publishReadiness && publishReadiness < rendezvous && rendezvous < execute);
   const jobs = ['qualify', 'prepare', 'batch'].map(id => workflow.split(`\n  ${id}:\n`)[1].split(/\n  [a-z]+:\n/)[0]);
   jobs.push(...['browser-setup.yml', 'issue-219-process-cleanup.yml'].map(file =>
     readFileSync(new URL('../../.github/workflows/' + file, import.meta.url), 'utf8')));
@@ -272,27 +341,37 @@ test('workflow stays manual, serial, failure-preserving and pinned to the dispat
 
 test('browser workflows share a non-cancelling lock for the selected VM', () => {
   const runner = "${{ inputs.runner || 'tactics-browser-01' }}";
-  const validate = workflow => {
+  const validate = (workflow, group, expectedTargets) => {
     assert.match(workflow, /options: \[tactics-browser-01, tactics-browser-02\]/);
     assert.match(workflow, /default: tactics-browser-01/);
     const concurrency = workflow.split('\nconcurrency:\n')[1]?.split(/\n\S/)[0];
     assert.ok(concurrency, 'workflow-level concurrency is required');
-    assert.ok(concurrency.includes('  group: tactics-browser-' + runner));
+    assert.ok(concurrency.includes('  group: ' + group));
     assert.match(concurrency, /cancel-in-progress: false/);
     assert.match(concurrency, /queue: max/);
     const targets = [...workflow.matchAll(/^    runs-on: (.+)$/gm)].map(match => match[1]);
     assert.ok(targets.length > 0, 'at least one runner target is required');
-    for (const target of targets) assert.equal(target, '[self-hosted, tactics-browser, "' + runner + '"]');
+    assert.deepEqual(new Set(targets), new Set(expectedTargets));
   };
   for (const file of ['browser-setup.yml', 'issue-200-baseline.yml', 'issue-219-process-cleanup.yml']) {
     const workflow = readFileSync(new URL('../../.github/workflows/' + file, import.meta.url), 'utf8').replaceAll('\r\n', '\n');
-    validate(workflow);
-    assert.throws(() => validate(workflow.replace('group: tactics-browser-' + runner, 'group: tactics-browser-exclusive')));
-    assert.throws(() => validate(workflow.replace('cancel-in-progress: false', 'cancel-in-progress: true')));
-    assert.throws(() => validate(workflow.replace('queue: max', 'queue: single')));
-    assert.throws(() => validate(workflow.replace('  queue: max\n', '')));
-    assert.throws(() => validate(workflow.replace('[self-hosted, tactics-browser, "' + runner + '"]', '[self-hosted, tactics-browser]')));
-    assert.throws(() => validate(workflow.replace('group: tactics-browser-' + runner, "group: tactics-browser-${{ inputs.runner || 'tactics-browser-02' }}")));
+    const serialTarget = '[self-hosted, tactics-browser, "' + runner + '"]';
+    const targets = [serialTarget];
+    let group = 'tactics-browser-' + runner;
+    if (file === 'issue-200-baseline.yml') {
+      targets.push('ubuntu-latest');
+      group = "tactics-browser-${{ inputs.mode == 'parallel-pilot' && inputs.extra_job == 'none' && 'parallel-pilot' || inputs.runner || 'tactics-browser-01' }}";
+      for (const pilotRunner of ["'tactics-browser-01'", 'matrix.runner']) {
+        targets.push(`[self-hosted, tactics-browser, "\${{ inputs.mode == 'parallel-pilot' && ${pilotRunner} || inputs.runner || 'tactics-browser-01' }}"]`);
+      }
+    }
+    validate(workflow, group, targets);
+    assert.throws(() => validate(workflow.replace(group, 'tactics-browser-exclusive'), group, targets));
+    assert.throws(() => validate(workflow.replace('cancel-in-progress: false', 'cancel-in-progress: true'), group, targets));
+    assert.throws(() => validate(workflow.replace('queue: max', 'queue: single'), group, targets));
+    assert.throws(() => validate(workflow.replace('  queue: max\n', ''), group, targets));
+    assert.throws(() => validate(workflow.replace(serialTarget, '[self-hosted, tactics-browser]'), group, targets));
+
   }
 });
 
