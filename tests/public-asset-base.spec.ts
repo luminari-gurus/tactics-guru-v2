@@ -219,6 +219,7 @@ test('menu public artwork and navigation respect the configured base',async({pag
  page.once('dialog',dialog=>dialog.accept());
  await page.getByRole('link',{name:'Main menu',exact:true}).click();
  await expect(page.locator('#main-menu')).toBeVisible();
- await expect(page.getByRole('button',{name:'Continue',exact:true})).toBeEnabled();
+ await expect(page).toHaveURL(new URL('./',baseURL!).href);
+ await expect(page.getByRole('button',{name:'Continue',exact:true})).toBeDisabled();
  expect(errors).toEqual([]);
 });
