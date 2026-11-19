@@ -5,7 +5,7 @@ import { guardedEffect, movementBlockSource } from '../domain/effects';
 import { buildBoardPresentation, OCCUPANT_LAYER } from '../geometry/boardPresentation';
 import { CANOPY_ART, UNIT_ART, canopyBounds, canopyOccludes, unitBounds } from '../geometry/canopy';
 import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, BASE_THICKNESS, ELEVATION_STEP, MAX_BOARD_SCALE, TILE_HEIGHT, TILE_WIDTH, type BoardRegion, type Bounds, type Point, type Tile } from '../geometry/iso';
-import { constrainView, DRAG_THRESHOLD, MAX_ZOOM, pickTileCandidates, screenToBoard, type View } from '../geometry/picking';
+import { constrainView, DRAG_THRESHOLD, faceContainsPoint, MAX_ZOOM, pickTileCandidates, screenToBoard, type View } from '../geometry/picking';
 import { HEALTH_BAR, HEALTH_COLORS, healthArc, healthBarScale, healthColor, healthFraction } from './healthBar';
 import { abilityPresentation, type SignatureKind } from './abilityPresentation';
 import { combatPresentationTiming, type CombatPresentationTiming } from './combatPace';
@@ -19,6 +19,7 @@ const ACTIVE_COLOR = 0xffd36a;
 const SELECTED_COLOR = 0xffffff;
 const BOB_HEIGHT = 2;
 const BOB_CYCLE_MS = 1200;
+const OCCLUDING_TERRAIN_ALPHA = 0.3;
 const cellKey = (cell: CellPosition): string => `${cell.x},${cell.y}`;
 const DEFAULT_COLUMN_COLORS = { left: 0x354538, right: 0x4c6050, top: 0x5b7157 } as const;
 const DESERT_LANDMARK_BOUNDS = { left: -27, top: -31, right: 27, bottom: 15 } as const;
@@ -48,6 +49,12 @@ export class BoardRenderer {
   private readonly canopies: { tile: Tile; graphics: Phaser.GameObjects.Graphics }[] = [];
   private readonly landmarks: { tile: Tile & { depth: number }; image: Phaser.GameObjects.Image }[] = [];
   private readonly surfaces: { tile: Tile; image: Phaser.GameObjects.Image }[] = [];
+  private readonly raisedTerrain: {
+    tile: Tile & { depth: number };
+    faces: readonly (readonly Point[])[];
+    column: Phaser.GameObjects.Image;
+    surface: Phaser.GameObjects.Container;
+  }[] = [];
   private view: View = { x: 0, y: 0, scale: 1 };
   // Layout constraints may temporarily clamp the camera; retain the last navigation intent.
   private navigationView: View = { x: 0, y: 0, scale: 1 };
@@ -177,6 +184,7 @@ export class BoardRenderer {
         .setOrigin(0).setDisplaySize(88,48).setDepth(tile.depth + 2);
       this.highlights.set(cellKey(tile), highlight);
       this.root.add([column, surface, highlight]);
+      if (tile.elevation > 0) this.raisedTerrain.push({ tile, faces: Object.values(tileFaces(tile)), column, surface });
       if (tile.desertLandmark) {
         const { left, top, right, bottom } = DESERT_LANDMARK_BOUNDS;
         const variant = tile.desertLandmark;
@@ -366,9 +374,38 @@ export class BoardRenderer {
       });
       canopy.graphics.setAlpha(overlaps ? CANOPY_ART.fadedAlpha : 1);
     }
+    this.updateTerrainOcclusion(snapshot);
     this.syncBob();
     this.root.sort('depth');
     this.publish();
+  }
+
+  private updateTerrainOcclusion(snapshot: BattleState): void {
+    if (!this.raisedTerrain.length) return;
+    const living = snapshot.units.filter(unit => unit.hp > 0).map(unit => {
+      const tile = this.byCell.get(cellKey(unit.cell))!;
+      const moving = this.moving?.unitId === unit.id ? this.moving : null;
+      const anchor = moving?.point ?? projectTile(tile);
+      const image = this.images.get(unit.id)!;
+      return {
+        depth: moving?.depth ?? tile.depth,
+        center: {
+          x: anchor.x + (0.5 - image.originX) * UNIT_ART.width,
+          y: anchor.y + (0.5 - image.originY) * UNIT_ART.height,
+        },
+      };
+    });
+    // Keep the painter order and tile hit testing intact. An elevated foreground
+    // face can cover a unit's body even though its cell and target are still live.
+    for (const { tile, faces, column, surface } of this.raisedTerrain) {
+      const occludes = living.some(({ depth, center }) => tile.depth > depth
+        && center.x >= column.x && center.x <= column.x + column.displayWidth
+        && center.y >= column.y && center.y <= column.y + column.displayHeight
+        && faces.some(face => faceContainsPoint(face, center)));
+      const alpha = occludes ? OCCLUDING_TERRAIN_ALPHA : 1;
+      column.setAlpha(alpha);
+      surface.setAlpha(alpha);
+    }
   }
 
   /** Tween view objects only; snapshots and command results remain unchanged. */
@@ -524,6 +561,7 @@ export class BoardRenderer {
         });
         canopy.graphics.setAlpha(overlaps?CANOPY_ART.fadedAlpha:1);
       }
+      this.updateTerrainOcclusion(before);
       this.root.sort('depth');
       const game=document.querySelector<HTMLElement>('#game')!;
       const report=JSON.parse(game.dataset.battleReport!);
@@ -535,6 +573,7 @@ export class BoardRenderer {
       unit.health.screen={x:screen.x,y:screen.y};
       unit.guard=this.badgeReport(this.guardBadges.get(move.unitId)!);
       unit.snare=this.badgeReport(this.snareBadges.get(move.unitId)!);
+      report.fadedTerrain = this.fadedTerrainReport();
       game.dataset.battleReport=JSON.stringify(report);
     },onComplete:finish});
     return {done,cancel:finish};
@@ -763,6 +802,11 @@ export class BoardRenderer {
     return artTile ? [artTile,...candidates.filter(candidate=>cellKey(candidate)!==cellKey(artTile))] : candidates;
   }
 
+  private fadedTerrainReport() {
+    return this.raisedTerrain.filter(({ column }) => column.alpha < 1)
+      .map(({ tile, column, surface }) => ({ x: tile.x, y: tile.y, columnAlpha: column.alpha, surfaceAlpha: surface.alpha }));
+  }
+
   private publish(): void {
     if (!this.snapshot) return;
     const matrix = this.root.getWorldTransformMatrix();
@@ -815,6 +859,7 @@ export class BoardRenderer {
       depthOrder: this.root.list.map(object => Number('depth' in object ? object.depth : 0)),
       surfaceCornerError: Math.max(...surfaceErrors),
       canopies: this.canopies.map(({ tile, graphics }) => ({ tile, depth: graphics.depth, alpha: graphics.alpha })),
+      fadedTerrain: this.fadedTerrainReport(),
       bounds: { left: x + this.bounds.left * scale, right: x + this.bounds.right * scale,
         top: y + this.bounds.top * scale, bottom: y + this.bounds.bottom * scale },
     });

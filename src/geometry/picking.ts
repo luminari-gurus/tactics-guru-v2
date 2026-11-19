@@ -10,7 +10,7 @@ export function dragThresholdFor(pointerType: string | undefined): number {
 export function screenToBoard(point: Point, view: View): Point {
   return { x: (point.x - view.x) / view.scale, y: (point.y - view.y) / view.scale };
 }
-function contains(vertices: readonly Point[], point: Point): boolean {
+export function faceContainsPoint(vertices: readonly Point[], point: Point): boolean {
   const crosses = vertices.map((a, i) => {
     const b = vertices[(i + 1) % vertices.length]!;
     return (b.x - a.x) * (point.y - a.y) - (b.y - a.y) * (point.x - a.x);
@@ -19,13 +19,13 @@ function contains(vertices: readonly Point[], point: Point): boolean {
 }
 /** Reverse painter order, including solid side faces. Occupant art passes through. */
 export function pickTile(tiles: readonly Tile[], point: Point): Tile | null {
-  return orderTiles(tiles).reverse().find(tile => Object.values(tileFaces(tile)).some(face => contains(face, point))) ?? null;
+  return orderTiles(tiles).reverse().find(tile => Object.values(tileFaces(tile)).some(face => faceContainsPoint(face, point))) ?? null;
 }
 /** Preserve the visible solid first; only intersecting top surfaces can be selected behind it. */
 export function pickTileCandidates<T extends Tile>(tiles: readonly T[], point: Point): T[] {
   const ordered = orderTiles(tiles).reverse();
-  const front = ordered.find(tile => Object.values(tileFaces(tile)).some(face => contains(face, point)));
-  return front ? [front, ...ordered.filter(tile => tile !== front && contains(tileFaces(tile).top, point))] : [];
+  const front = ordered.find(tile => Object.values(tileFaces(tile)).some(face => faceContainsPoint(face, point)));
+  return front ? [front, ...ordered.filter(tile => tile !== front && faceContainsPoint(tileFaces(tile).top, point))] : [];
 }
 /** Keep every board edge reachable at the center of the same region used to fit. */
 export function constrainView(view: View, bounds: Bounds, region: BoardRegion, fitScale: number): View {
