@@ -78,6 +78,18 @@ Bestiary batch 5 adds the first larger forest-boss pairs. They occupy a single t
 
 Measured half-open sprite alpha bounds: Hollow Root Matriarch (9,8,87,120); Ironmaw Furnace Beast (6,14,91,120); Green Warden (11,10,86,120). All three keep feet on the bottom edge.
 
+Bestiary batch 6 adds five illustrated wetlands-family pairs with the ordinary 64×80 convention and foot anchor (32,76). They are registered as optional enemy units and packaged as ordinary Git blobs; they are not on the five-pair annotated sheet and are not placed into existing battles or dungeon encounter rosters. Mire Goblin is also a Wetlands unit, but remains in the goblin-family catalog from batch 1.
+
+| Pair / asset IDs (`asset:` prefix) | Sprite | Portrait source | Runtime portrait |
+| --- | --- | --- | --- |
+| Lantern Imp: `lantern_imp_sprite`, `lantern_imp_portrait` | [64×80](../../public/battle/source/lantern_imp_sprite.png) | [1254×1254](../../public/battle/source/lantern_imp_portrait.png) | [96×96](../../public/battle/portraits/lantern_imp.png) |
+| Bog Gnawer: `bog_gnawer_sprite`, `bog_gnawer_portrait` | [64×80](../../public/battle/source/bog_gnawer_sprite.png) | [1254×1254](../../public/battle/source/bog_gnawer_portrait.png) | [96×96](../../public/battle/portraits/bog_gnawer.png) |
+| Fenstalker: `fenstalker_sprite`, `fenstalker_portrait` | [64×80](../../public/battle/source/fenstalker_sprite.png) | [1254×1254](../../public/battle/source/fenstalker_portrait.png) | [96×96](../../public/battle/portraits/fenstalker.png) |
+| Mire Hexer: `mire_hexer_sprite`, `mire_hexer_portrait` | [64×80](../../public/battle/source/mire_hexer_sprite.png) | [1254×1254](../../public/battle/source/mire_hexer_portrait.png) | [96×96](../../public/battle/portraits/mire_hexer.png) |
+| Bog Leech Swarm: `bog_leech_swarm_sprite`, `bog_leech_swarm_portrait` | [64×80](../../public/battle/source/bog_leech_swarm_sprite.png) | [1254×1254](../../public/battle/source/bog_leech_swarm_portrait.png) | [96×96](../../public/battle/portraits/bog_leech_swarm.png) |
+
+Measured half-open sprite alpha bounds: Lantern Imp (11,14,53,80); Bog Gnawer (9,18,55,80); Fenstalker (12,10,52,80); Mire Hexer (7,10,58,80); Bog Leech Swarm (2,33,62,80). All five keep feet on the bottom edge. No `pixelArt` / nearest-neighbor Phaser special case is recorded or added.
+
 Canonical sources are owner-repository project artwork. No per-file third-party license, original prompt, model or generation method is recorded. Retain that uncertainty; these briefs are new production instructions, not reconstructed original prompts or a rights clearance.
 
 ## Observed visual language

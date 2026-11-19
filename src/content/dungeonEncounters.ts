@@ -2,6 +2,7 @@ import { battlefieldEncounters, authoredEncounters, runCatalog } from './encount
 import { forestBossBattleContent } from './forestBosses';
 import { forestFamilyBattleContent } from './forestFamily';
 import { goblinFamilyBattleContent } from './goblinFamily';
+import { wetlandsFamilyBattleContent } from './wetlandsFamily';
 import { hobgoblinBattleContent, hobgoblinComposition, hobgoblinMap } from './hobgoblin';
 import { desertRunCatalog } from './desertCatalog';
 import { isBattlefieldSource, readBattlefieldEncounter, type BattlefieldSource } from './battlefieldTypes';
@@ -125,6 +126,8 @@ export const goblinFamilyDungeonBattleCatalog = goblinFamilyBattleContent(dungeo
 export const forestFamilyDungeonBattleCatalog = forestFamilyBattleContent(dungeonBattleCatalog);
 /** Registered forest-boss units and art; not placed into existing encounter rosters. */
 export const forestBossDungeonBattleCatalog = forestBossBattleContent(dungeonBattleCatalog);
+/** Registered wetlands-family units and art; not placed into existing encounter rosters. */
+export const wetlandsFamilyDungeonBattleCatalog = wetlandsFamilyBattleContent(dungeonBattleCatalog);
 export const hobgoblinDungeonEncounterCatalog: DungeonEncounterCatalog = {
   ...dungeonEncounterCatalog,
   compositions: [...dungeonEncounterCatalog.compositions, hobgoblinComposition],
