@@ -16,8 +16,7 @@ import './dungeon.css';
 export const dungeonElement = <K extends keyof HTMLElementTagNameMap>(tag: K, text = '') => { const n = document.createElement(tag); n.textContent = text; return n; };
 
 const sheetPortraits: Record<HeroId, string> = { fighter: fighterSheet, ranger: rangerSheet, mage: mageSheet };
-// Only complete routine messages belong at the bottom; appended loot, progression,
-// and history feedback must remain prominent beside the map.
+// Keep recovery and progression feedback prominent beside the map.
 const routineSaveStatuses = new Set([
   'Saving dungeon…', 'Dungeon saved on this device', 'Exploration saved on this device',
   'Travel saved on this device', 'Continued saved dungeon',
@@ -62,8 +61,7 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
   }
   // Keep the map and host tools mounted to retain their state and focus.
   for (const child of [...root.children]) if (child !== header && child !== play && child !== after && child !== tools && child !== saveNote) child.remove();
-  // Keep the live region connected while its text changes. Replacing it with a
-  // populated node can leave pickup and capacity feedback unannounced.
+  // Keep the live region connected while its text changes.
   let status = header.querySelector<HTMLElement>(':scope > .dungeon-status');
   if (!status) {
     status=el('p');status.className='dungeon-status';status.setAttribute('role','status');
@@ -79,9 +77,8 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
   }
   const previousProgress=header.querySelector<HTMLUListElement>(':scope > #dungeon-progress');
   for(const child of [...header.children])if(child!==title&&child!==status&&child!==previousProgress)child.remove();
-  const statusText=session.status,quietSave=routineSaveStatuses.has(statusText);
-  // Preserve one connected live region while the routine visual copy sits after the tools.
-  status.classList.toggle('dungeon-status-quiet',quietSave);
+  const statusText=session.explorationStatus,quietSave=routineSaveStatuses.has(statusText);
+  status.classList.toggle('dungeon-status-quiet',quietSave||!statusText);
   if(status.textContent!==statusText)status.textContent=statusText;
   if(saveNote.hidden===quietSave)saveNote.hidden=!quietSave;
   if(quietSave&&saveNote.textContent!==statusText)saveNote.textContent=statusText;
@@ -138,7 +135,7 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
     {id:'dungeon-item-cancel',label:'Cancel',run:()=>root.querySelector<HTMLElement>('h1')?.focus()},
   ]);
 
-  mapView.render(s,cache.resolve(floor.descriptor.seed, floor.descriptor.generator, floor.descriptor.size ?? 20));
+  mapView.render(s,cache.resolve(floor.descriptor.seed, floor.descriptor.generator, floor.descriptor.size ?? 20),session.lootStatus);
   const canEnter=s.phase==='ready'&&floor.completed<3&&floor.exploration.pois.some(p=>!clearedDungeonSlots(floor).includes(p.encounterSlot)&&floor.position===poiCell(p, floor.descriptor.size ?? 20));
   if(canEnter)sidebar.prepend(button('Enter encounter',actions.start,false,'dungeon-start-encounter'));
   const travel=disclosure('dungeon-travel','Travel and map guide');
