@@ -285,7 +285,7 @@ export class BattleScene extends Phaser.Scene {
     const cancel=()=>{if(dialogs.open || session.phase!=='player')return;clear();refresh();hud.focusAction();};
     const applySkin=()=>{skin=resolveCombatControlsSkin();hud.applySkin(skin);if(skin!=='radial')radial.hide();refresh();};
     // Keep an aimed desktop Radial action available after a read-only HUD dialog.
-    const closeReadOnlyTool=()=>{keepRadialDuringDialog=false;};
+    const releaseRadial=()=>{keepRadialDuringDialog=false;};
     const readOnlyTool=(invoker:HTMLElement)=>{
       keepRadialDuringDialog=hud.desktopLayout && radial.mode==='tap';
       invoker.focus({preventScroll:true});
@@ -299,8 +299,8 @@ export class BattleScene extends Phaser.Scene {
       dialogs.showChoices(`Inspection only — ${name} #${unit.id}`,
         `HP ${unit.hp}/${def.stats.maxHp} · ${status}${session.progression.find(h => h.heroId === unit.defId) ? ` · ${progressionLabel(session.progression.find(h => h.heroId === unit.defId)!)}` : ''}\nAC ${armorClass} · Accuracy ${accuracy>=0?'+':''}${accuracy} · Power ${def.stats.power}\nMovement allowance ${def.stats.move} · Jump ${def.stats.jump} · Dexterity ${def.stats.dexterity} · Will ${def.stats.will}${support?`\n${support}`:''}\nInspection never changes the turn.`,[
           ...session.state.units.map(u=>({id:`inspect-unit-${u.id}`,label:`Inspect ${unitFeedback(session,u).name} #${u.id}`,run:()=>inspect(u.id),keepOpen:true})),
-          {id:'inspection-close',label:'Close inspection',run:closeReadOnlyTool},
-        ],closeReadOnlyTool,invoker ? readOnlyTool(invoker) : undefined);
+          {id:'inspection-close',label:'Close inspection',run:releaseRadial},
+        ],releaseRadial,invoker ? readOnlyTool(invoker) : undefined);
     };
     const hud=new BattleHud(session,{
       action:a=>{board.resetPicking();hovered=null;selection.setAction(a);refresh();},
@@ -324,13 +324,29 @@ export class BattleScene extends Phaser.Scene {
       danger:()=>{if(session.phase==='player' && !dialogs.open){selection.toggleDanger();refresh();}},
       target:cell=>{board.resetPicking();hovered=null;select(cell);},confirm,cancel,inspect:invoker=>inspect(undefined,invoker),inspectTarget:inspect,
       log:(lines,invoker)=>{
-        dialogs.showChoices('Battle log',lines.length?'':'No events yet.',[{id:'log-close',label:'Close log',run:closeReadOnlyTool}],
-          closeReadOnlyTool, readOnlyTool(invoker));
+        dialogs.showChoices('Battle log',lines.length?'':'No events yet.',[{id:'log-close',label:'Close log',run:releaseRadial}],
+          releaseRadial, readOnlyTool(invoker));
         const list=document.createElement('ol');list.id='battle-log';list.setAttribute('aria-label','Battle log');
         list.append(...lines.map(text=>{const item=document.createElement('li');item.textContent=text;return item;}));
         dialogs.element.querySelector('#battle-dialog-message')!.append(list);
       },
-      wait:()=>{if(session.phase==='player' && !dialogs.open){session.prepare({type:'endTurn',unitId:session.active.id});void present(session.confirm());}},
+      wait:()=>{
+        if(!live || !ready || document.hidden || dialogs.open || session.phase!=='player')return;
+        const reviewed=session.state;
+        const {id,hasMoved,hasActed}=session.active;
+        const accept=()=>{
+          releaseRadial();
+          if(live && !document.hidden && session.state===reviewed && session.prepare({type:'endTurn',unitId:id}).ok)
+            void present(session.confirm());
+        };
+        if(hasMoved && hasActed){accept();return;}
+        const remaining = hasMoved ? 'has not acted' : hasActed ? 'still has movement' : 'still has movement and has not acted';
+        keepRadialDuringDialog=radial.mode==='tap';
+        dialogs.showChoices('End Turn?', `This unit ${remaining}. End turn anyway?`, [
+          {id:'battle-end-turn-cancel',label:'Cancel',run:releaseRadial},
+          {id:'battle-end-turn-confirm',label:'End Turn',run:accept},
+        ],releaseRadial);
+      },
       sound:()=>{this.soundEnabled=!this.soundEnabled;if(this.host)this.host.sound.enabled=this.soundEnabled;audio.setEnabled(this.soundEnabled);},
       retrySound:()=>audio.unlock(),
     },this.host?.guidance);

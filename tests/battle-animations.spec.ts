@@ -10,7 +10,7 @@ import { BATTLE_STORAGE_KEYS as keys } from '../src/persistence/battleStorage';
 import { projectTile } from '../src/geometry/iso';
 import { HEALTH_BAR } from '../src/phaser/healthBar';
 import { abilityPresentation, type SignatureKind } from '../src/phaser/abilityPresentation';
-import { battleTool, playerDecision, readSession, confirmRestart, playCommand } from './helpers/battlePolicy';
+import { endTurn, battleTool, playerDecision, readSession, confirmRestart, playCommand } from './helpers/battlePolicy';
 import { startApplicationLoadDiagnostics, type ApplicationLoadDiagnostics } from './helpers/applicationLoadDiagnostics';
 
 // Add failure evidence without replacing the rail controls or graphics fixtures.
@@ -493,7 +493,7 @@ test('active bob: presentation, actor change, hidden page and restart restore an
   const previousId = (await report(page)).activeId;
   const previousRound = (await readSession(page)).state.round;
   const previousName = await page.locator('#battle-actor-name').textContent();
-  await press(page, '#battle-next');
+  await endTurn(page, selector=>press(page, selector));
   const handoff = await readSession(page);
   expect(handoff.phase).toBe('presenting');
   expect(handoff.state.initiative[handoff.state.activeIndex]).not.toBe(previousId);
@@ -556,7 +556,7 @@ test('turn queue holds the presented actor until handoff and survives repeated v
   const queue=page.locator('#battle-turn-queue'),before=await readSession(page);
   const beforeQueue=await queue.innerHTML(),previousId=before.state.initiative[before.state.activeIndex];
   await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
-  await page.locator('#battle-next').focus();await page.keyboard.press('Enter');
+  await endTurn(page, selector=>page.locator(selector).press('Enter'));
   await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
   const accepted=await readSession(page),nextId=accepted.state.initiative[accepted.state.activeIndex];
   expect(nextId).not.toBe(previousId);
@@ -606,7 +606,7 @@ test('class guidance retains the presented player and never acknowledges interru
   await expect(guidance).toHaveAttribute('data-unit-id',String(actor));
   await expect(dismiss).toBeEnabled();expect(await preferences()).toBeNull();
   await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
-  await page.locator('#battle-next').focus();await page.keyboard.press('Enter');
+  await endTurn(page, selector=>page.locator(selector).press('Enter'));
   await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
   const accepted=await readSession(page);
   expect(accepted.state.initiative[accepted.state.activeIndex]).not.toBe(actor);
@@ -694,7 +694,7 @@ test('combat pace: normal and fast preserve accepted results and enemy continuat
         enemyCommands++;expected.finishPresentation(step.token);
       }
       await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
-      await page.locator('#battle-next').focus();await page.keyboard.press('Enter');
+      await endTurn(page, selector=>page.locator(selector).press('Enter'));
       await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
       expect((await report(page)).presentation).toEqual({pace:nextPace,reducedMotion:false,durationMs:nextPace==='normal'?25:12.5,kind:'turn'});
       expect((await readSession(page)).state).toEqual(end.after);
@@ -798,7 +798,7 @@ test('combat pace: reduced motion keeps movement at endpoints and result text st
     }
     await ready(page);expect((await report(page)).presentation).toBeNull();expect((await report(page)).feedbackBounds).toEqual([]);
     expect((await readSession(page)).state).toEqual(fixture.after);
-    await page.locator('#battle-next').focus();await page.keyboard.press('Enter');
+    await endTurn(page, selector=>page.locator(selector).press('Enter'));
     await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
     expect((await report(page)).presentation).toEqual({pace,reducedMotion:false,durationMs:pace==='normal'?25:12.5,kind:'turn'});
     await page.clock.resume();await ready(page);expect(await stored(page)).toEqual(saved);
@@ -971,7 +971,7 @@ test('critical impact: enemy basic attack anchors to an elevated player and ordi
   await transformCriticalBoard(page,browserName,!!info.project.use.hasTouch);await page.clock.runFor(32);
   const baseline=(await report(page)).objectCount;
   await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
-  await press(page,'#battle-next',!info.project.use.hasTouch);
+  await endTurn(page, selector=>press(page,selector,!info.project.use.hasTouch));
   // Step frames through the real handoff and AI move, stopping at its accepted critical.
   for(let tick=0;tick<80 && (await readSession(page)).state.commandCount<impact.after.commandCount;tick++)await page.clock.runFor(16);
   const accepted=await readSession(page);expect(accepted.state).toEqual(impact.after);

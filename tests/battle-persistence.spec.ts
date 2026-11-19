@@ -2,7 +2,7 @@ import { test as baseTest } from '@playwright/test';
 import { walkDungeon } from './helpers/dungeonTraversal';
 import { expect, test,  } from './helpers/forceRailControls';
 import { BATTLE_STORAGE_KEYS as keys } from '../src/persistence/battleStorage';
-import { confirmRestart, readSession, combatSkin } from './helpers/battlePolicy';
+import { endTurn, confirmRestart, readSession, combatSkin } from './helpers/battlePolicy';
 import { menuFixture } from './helpers/menuFixtures';
 import { RUN_STORAGE_KEYS } from '../src/persistence/runStorage';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
@@ -84,18 +84,18 @@ for(const condition of ['missing','valid','corrupt','backup-only','unavailable']
     };
     await ready();await audit();
     if(mode==='battle'){
-      const before=await readSession(page);await page.locator('#battle-next').click();
+      const before=await readSession(page);await endTurn(page);
       await expect.poll(async()=>(await readSession(page)).state.commandCount).toBeGreaterThan(before.state.commandCount);
       await page.locator('#fit-restart').click();
       if(new URL(page.url()).searchParams.get('game')==='battle')await confirmRestart(page);
       await expect.poll(async()=>JSON.parse(await page.locator('#game').getAttribute('data-session')??'null')?.state.seed).toBe(2);
     }else if(mode==='qbert'){
-      const before=await readSession(page);await page.locator('#battle-next').click();
+      const before=await readSession(page);await endTurn(page);
       await expect.poll(async()=>(await readSession(page)).state.commandCount).toBeGreaterThan(before.state.commandCount);
       await page.locator('#fit-restart').click();await ready();
     }else if(mode==='run'){
       await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();
-      await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await page.locator('#battle-next').click();
+      await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await endTurn(page);
       await page.locator('#fit-restart').click();
       if(new URL(page.url()).searchParams.get('game')==='run')await page.locator('#run-confirm-restart').click();
       await expect(page.locator('#run-start-encounter')).toBeVisible();
@@ -120,7 +120,7 @@ for(const condition of ['missing','valid','corrupt','backup-only','unavailable']
     await audit();await page.reload();await ready();await audit();
     if(mode==='battle'){
       const fresh=(await readSession(page)).state;expect(fresh.seed).toBe(1);
-      await page.locator('#battle-next').click();
+      await endTurn(page);
       await expect.poll(async()=>(await readSession(page)).state.commandCount).toBeGreaterThan(fresh.commandCount);await audit();
       await page.goto('./map');await expect(page.locator('#map-grid span')).toHaveCount(400);await audit();
       await page.goBack({waitUntil:'commit'});await ready();await audit();
@@ -154,7 +154,7 @@ test('testing routes: browser Back resets the three-encounter run', async ({ pag
   await page.locator('#run-start-encounter').click();
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   const before = await readSession(page);
-  await page.locator('#battle-next').click();
+  await endTurn(page);
   await expect.poll(async () => (await readSession(page)).state.commandCount).toBeGreaterThan(before.state.commandCount);
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   const oldId = (await snapshot()).items.run.id;
@@ -260,7 +260,7 @@ radialTest('radial testing routes preserve saved games through actions restart r
       if(mode==='dungeon')await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
       await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await expect.poll(()=>combatSkin(page)).toBe('radial');
       const fresh=(await readSession(page)).state;
-      await page.getByRole('button',{name:'End turn',exact:true}).click();
+      await endTurn(page);
       await expect.poll(async()=>(await readSession(page)).state.commandCount).toBeGreaterThan(fresh.commandCount);
       await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await audit();
       if(mode==='battle'){

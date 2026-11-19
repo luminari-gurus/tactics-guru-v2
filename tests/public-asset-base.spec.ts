@@ -4,7 +4,7 @@ import { standaloneCatalog } from './helpers/playerPolicy';
 import { BATTLE_CUES } from '../src/audio/battleCues';
 import { PROOF_ASSETS } from '../src/diagnostics/proofAssets';
 import { BattleSession } from '../src/app/BattleSession';
-import { battleTool, readSession } from './helpers/battlePolicy';
+import { endTurn, battleTool, readSession } from './helpers/battlePolicy';
 import { walkDungeon } from './helpers/dungeonTraversal';
 import { navigateCapture, battleGesturePoint } from '../scripts/measure-fit-controls';
 import { captureTarget, parseMeasureArgs } from '../scripts/measure-fit-options';
@@ -198,7 +198,7 @@ for (const failure of ['missing', 'corrupt', 'stalled'] as const) {
     await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
     await expect.poll(() => page.evaluate(() => window.fitDiagnostics().battleAudio!.load), { timeout: 10000 }).toBe('unavailable');
     await expect(page.locator('#battle-next')).toBeEnabled();
-    await page.locator('#battle-next').click();
+    await endTurn(page);
     await expect.poll(async () => (await readSession(page)).state.commandCount).toBeGreaterThan(0);
     expect(errors).toEqual([]);
   });

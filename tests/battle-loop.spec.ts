@@ -1,4 +1,4 @@
-import { battleTool, confirmRestart } from './helpers/battlePolicy';
+import { confirmEndTurn, endTurn, battleTool, confirmRestart } from './helpers/battlePolicy';
 import { expect, test, type Locator, type Page } from './helpers/forceRailControls';
 import { writeFileSync } from 'node:fs';
 import { previewMove, previewMovement } from '../src/domain/grid';
@@ -38,7 +38,7 @@ test('QA: hover refresh preserves controls and first-click Confirm and Wait', as
   expect(moved.state.units.find(u=>u.id===actor.id)!.cell).toEqual(destination);
   await battleTool(page, '#battle-log-open');await activate('#battle-log-open');await activate('#log-close');
   await expect(page.locator('#battle-dialog')).not.toBeVisible();
-  await activate('#battle-next');
+  await endTurn(page, activate);
   await expect.poll(async()=> (await session(page)).state.commandCount).toBeGreaterThan(moved.state.commandCount);
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const waited=await session(page);
@@ -86,7 +86,7 @@ test('enemy danger inspection toggles without changing battle state or saves', a
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   let current=await session(page), assessment=enemyThreats(current.state,catalog);
   for(let i=0;i<12 && assessment.ok && assessment.threats.length===0;i++){
-    await page.locator('#battle-next').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    await endTurn(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
     current=await session(page);assessment=enemyThreats(current.state,catalog);
   }
   expect(assessment.ok && assessment.threats.length>0).toBe(true);if(!assessment.ok)return;
@@ -122,7 +122,7 @@ test('undo and compound plan use the live HUD without bypassing review',async({p
   const undone=await session(page);expect(undone.state.units.find(u=>u.id===actor.id)!.cell).toEqual(actor.cell);
   expect(undone.state.rng).toEqual(initial.state.rng);expect(undone.replay.commands.at(-1)?.type).toBe('undoMove');
   const replay=replayBattle(undone.replay,catalog);expect(replay.ok).toBe(true);if(replay.ok)expect(replay.state).toEqual(undone.state);
-  await activate('#battle-next');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await endTurn(page, activate);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   let plan:{move:Extract<Command,{type:'move'}>;target:number}|null=null;
   for(let i=0;i<12&&!plan;i++){
     const current=await session(page),active=current.state.units.find(u=>u.id===current.state.initiative[current.state.activeIndex])!;
@@ -132,7 +132,7 @@ test('undo and compound plan use the live HUD without bypassing review',async({p
       const ability={type:'useAbility' as const,unitId:active.id,abilityId:'ability:basic_attack' as const,target:{unitId:target.id}};
       if(previewTacticalPlan(current.state,move,ability,catalog).ok){plan={move,target:target.id};break;}
     }
-    if(!plan){await activate('#battle-next');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');}
+    if(!plan){await endTurn(page, activate);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');}
   }
   expect(plan).not.toBeNull();if(!plan)return;
   const before=await session(page),target=before.state.units.find(u=>u.id===plan!.target)!;
@@ -219,7 +219,7 @@ test('default Move initializes once per usable player turn and preserves explici
   await page.locator('[data-action=basic]').click();
   let otherActor=false,wrapped=false;
   for(let i=0;i<12 && !wrapped;i++){
-    await page.locator('#battle-next').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    await endTurn(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
     const current=await session(page),id=current.state.initiative[current.state.activeIndex];
     await expect(move).toHaveAttribute('aria-pressed','true');await expect(target).toHaveValue('');await expect(page.locator('#battle-review')).toBeDisabled();
     if(id!==actor.id)otherActor=true;if(id===actor.id && current.state.round>initial.state.round)wrapped=true;
@@ -531,6 +531,16 @@ test('keyboard-only shortcuts select preview confirm and wait once without repla
   await page.keyboard.press('m');await page.keyboard.press('c');
   expect((await session(page)).state).toEqual(moved.state);
   await page.keyboard.down('w');
+  const dialog=page.getByRole('dialog',{name:'End Turn?'});
+  await expect(dialog).toContainText('This unit has not acted. End turn anyway?');
+  await expect(dialog.getByRole('button',{name:'Cancel'})).toBeFocused();
+  await page.keyboard.down('w');await page.keyboard.press('c');
+  expect(await session(page)).toEqual(moved);
+  await page.keyboard.press('Escape');
+  await expect(dialog).not.toBeVisible();
+  await expect(page.locator('canvas')).toBeFocused();
+  await page.keyboard.up('w');await page.keyboard.down('w');
+  await confirmEndTurn(page, selector=>page.locator(selector).press('Enter'));
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const waited=await session(page);
   expect(waited.replay.commands.slice(moved.replay.commands.length).filter(c=>c.type==='endTurn'&&c.unitId===actor.id)).toHaveLength(1);
@@ -609,6 +619,7 @@ test('keyboard-only shortcuts respect presentation visibility and repeated scene
   expect((await session(page)).state.commandCount).toBe(current.state.commandCount+1);
   await page.reload();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const resumed=await readSession(page);await page.locator('canvas').focus();await page.keyboard.press('w');
+  await confirmEndTurn(page, selector=>page.locator(selector).press('Enter'));
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const after=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
   expect(after.state.commandCount).toBeGreaterThan(resumed.state.commandCount);
@@ -622,7 +633,11 @@ test('keyboard-only movement, attack confirmation and Wait use the shared decisi
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const enact=async(command:Command)=>{
     const s=await session(page);
-    if(command.type==='endTurn'){await page.locator('#battle-next').focus();await page.keyboard.press('Enter');return;}
+    if(command.type==='endTurn'){
+      await page.locator('#battle-next').press('Enter');
+      await expect(page.getByRole('dialog',{name:'End Turn?'})).not.toBeVisible();
+      return;
+    }
     if(command.type==='drinkDraught')throw Error('Standalone battle does not supply draughts');
     const action=command.type==='move'?'move':command.abilityId==='ability:basic_attack'?'basic':command.abilityId;
     await page.locator(`[data-action="${action}"]`).focus();await page.keyboard.press('Enter');
@@ -639,6 +654,12 @@ test('keyboard-only movement, attack confirmation and Wait use the shared decisi
   const attack=playerDecision((await session(page)).state);expect(attack.type).toBe('useAbility');await enact(attack);
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const current=(await session(page)).state,actorId=current.initiative[current.activeIndex];
+  await page.locator('#battle-next').press('Enter');
+  const waitDialog=page.getByRole('dialog',{name:'End Turn?'});
+  await expect(waitDialog).toContainText('This unit still has movement. End turn anyway?');
+  await page.keyboard.press('Escape');
+  await expect(waitDialog).not.toBeVisible();
+  expect((await session(page)).state).toEqual(current);
   const {previewMovement}=await import('../src/domain/grid');
   const reach=previewMovement(current,actorId,catalog);expect(reach.ok).toBe(true);
   if(!reach.ok)throw Error(reach.reason);
@@ -743,7 +764,7 @@ test('live actor, inspection and cancellation remain independent of pending inte
       await expect(page.locator('#battle-move')).toBeFocused();
       const cancelled=await session(page);expect(JSON.parse((await page.locator('#game').getAttribute('data-session'))!).pending).toBeNull();expect(cancelled.state).toEqual(current.state);
     }
-    await page.locator('#battle-next').click();
+    await endTurn(page);
     await expect.poll(async()=>(await session(page)).state.commandCount).toBeGreaterThan(current.state.commandCount);
     await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   }
@@ -1130,8 +1151,7 @@ test('player HUD turn queue preserves initiative, keyboard and touch browsing ac
   let currentState=initial.state;
   for(let turns=0;turns<initial.state.initiative.length&&currentState.round===initial.state.round;turns++){
     const commandCount=currentState.commandCount;
-    if(info.project.use.hasTouch)await page.locator('#battle-next').tap();
-    else {await page.locator('#battle-next').focus();await page.keyboard.press('Enter');}
+    await endTurn(page, selector=>info.project.use.hasTouch?page.locator(selector).tap():page.locator(selector).press('Enter'));
     await expect.poll(async()=>(await session(page)).state.commandCount).toBeGreaterThan(commandCount);
     await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
     currentState=(await session(page)).state;
@@ -1167,7 +1187,7 @@ test('player HUD class guidance is read-only, keeps dismissed tips hidden for th
   expect(await guidance.evaluate(element=>element.contains(document.activeElement))).toBe(false);
   await page.screenshot({path:info.outputPath('class-guidance-standard.png')});
   // Merely seeing or skipping a tip must not acknowledge it.
-  await activate(page.locator('#battle-next'));
+  await endTurn(page, selector=>activate(page.locator(selector)));
   await expect.poll(async()=>(await session(page)).state.commandCount).toBeGreaterThan(first.state.commandCount);
   await ready();await expect(guidance).toBeVisible();expect(await saved()).toBeNull();
   expect(await guidance.evaluate(element=>element.contains(document.activeElement))).toBe(false);
@@ -1212,7 +1232,7 @@ test('player HUD class guidance is read-only, keeps dismissed tips hidden for th
   let later=moved,sawOtherTip=false;
   for(let turns=0;turns<moved.state.initiative.length;turns++){
     const commands=later.state.commandCount;
-    await activate(page.locator('#battle-next'));
+    await endTurn(page, selector=>activate(page.locator(selector)));
     await expect.poll(async()=>(await session(page)).state.commandCount).toBeGreaterThan(commands);
     await ready();later=await session(page);
     const actor=later.state.initiative[later.state.activeIndex];
@@ -1235,7 +1255,7 @@ test('player HUD class guidance is read-only, keeps dismissed tips hidden for th
   let restarted=await session(page);expect(restarted.state.seed).toBe(first.state.seed+1);
   for(let turns=0;turns<restarted.state.initiative.length&&restarted.state.initiative[restarted.state.activeIndex]!==firstActor;turns++){
     const commands=restarted.state.commandCount;
-    await activate(page.locator('#battle-next'));
+    await endTurn(page, selector=>activate(page.locator(selector)));
     await expect.poll(async()=>(await session(page)).state.commandCount).toBeGreaterThan(commands);
     await ready();restarted=await session(page);
   }

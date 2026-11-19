@@ -7,7 +7,7 @@ import {freshDungeon,startDungeonBattle,dungeonBattle,floorMap,type DungeonState
 import {BattleSession} from '../src/app/BattleSession';
 import {encodeDungeon} from '../src/domain/dungeonSaveEnvelope';
 import {DUNGEON_KEYS} from '../src/persistence/dungeonStorage';
-import {playCommand,readSession} from './helpers/battlePolicy';
+import {endTurn, playCommand,readSession} from './helpers/battlePolicy';
 import { readFileSync } from 'node:fs';
 import { canonical, hashJson } from '../src/domain/contentIdentity';
 import { RUN_RECORD_KEYS } from '../src/persistence/runRecordsStorage';
@@ -21,7 +21,7 @@ test('dungeon statistics: confirmed replacement pauses pending enemy turns throu
  await load(page,{...made.state,activeBattle:{...battle,activeIndex}});await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  await page.evaluate(key=>new Promise<void>(granted=>{void navigator.locks.request(key,()=>new Promise<void>(release=>{(window as any).releaseHistoryBoundary=release;granted();}));}),RUN_RECORD_KEYS.primary);
  try {
-  const oldId=(await snapshot(page)).id;await page.getByRole('button',{name:'Wait / End turn',exact:true}).click();
+  const oldId=(await snapshot(page)).id;await endTurn(page);
   await page.locator('#fit-restart').click();await page.locator('#dungeon-confirm-new').click();
   await expect(page.getByRole('heading',{name:'Preparing new dungeon',exact:true})).toBeVisible();
   const before=await page.evaluate(key=>localStorage.getItem(key)!,DUNGEON_KEYS.primary),frozen=JSON.parse(before).payload;
