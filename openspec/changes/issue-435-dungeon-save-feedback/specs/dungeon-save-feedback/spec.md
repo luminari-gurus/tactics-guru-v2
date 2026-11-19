@@ -21,3 +21,15 @@ message SHALL show the actual result and its action feedback when it settles.
 #### Scenario: A different snapshot replaces the pending progress
 - **WHEN** Continue, reset, or a newer accepted action replaces the snapshot before the callback runs
 - **THEN** the stale callback cannot publish the old progress or its feedback
+
+#### Scenario: A newer accepted action supersedes the pending save
+- **WHEN** another accepted battle action saves before the pending save can write
+- **THEN** the newer save settles with the pending save's feedback, and Continue or reset discard it
+
+#### Scenario: A later battle boundary is rejected
+- **WHEN** a battle command samples playtime and its boundary is then rejected
+- **THEN** the pending save still writes the previously accepted progress with the sampled playtime
+
+#### Scenario: The session is disposed before the lock is granted
+- **WHEN** teardown precedes the grant, with or without a playtime sample
+- **THEN** the pending save still writes the accepted progress if the callback runs

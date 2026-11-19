@@ -56,8 +56,9 @@ it in the exploration and battle views.
    from that request's snapshot, advance its snapshot to include the sampled time
    and let the same locked write settle the original promise and feedback. With
    no matching request, retain the existing quiet-checkpoint path. Clear the
-   request on grant or refusal before notifying observers, and retain the existing
-   admitted-clock-checkpoint behavior when teardown precedes a lock grant.
+   request on grant or refusal before notifying observers. After review, the
+   latest request finishes when teardown precedes a lock grant, whether or not a
+   clock sample happened.
 3. Keep the snapshot guard for genuine state changes. A later battle action,
    Continue, reset, or a different save owner must still invalidate stale work
    where it does today. Route both successful writes and failures through the
@@ -147,6 +148,25 @@ tracks the implementation and acceptance checks.
   Runtime is Node 24.15.0 with Playwright 1.64.1, Chromium 156.0.8078.4 and
   WebKit 27.2. The focused runs used the root production preview and one worker.
   [Current PR checks](https://github.com/luminari-gurus/tactics-guru-v2/pull/445/checks).
+
+## Review follow-up
+
+The [adversarial review](https://github.com/luminari-gurus/tactics-guru-v2/pull/445#issuecomment-7013057696)
+at `3b30d270` reported five findings. All five were reproduced by reading the code.
+Items 2–5 are in this PR's scope:
+
+- **Disposal durability (2):** the clock-dependent `finishesAfterDispose` flag is
+  removed. The latest request finishes after disposal, still guarded by the snapshot
+  reference and the storage compare-and-swap.
+- **Superseded feedback (3):** a newer save inherits a pending request's feedback and
+  visible status. Continue and reset clear the request.
+- **Boundary rejection (4):** the fold moved into `capturePlaytime`, so the sample an
+  accepted battle command takes before a rejected boundary advances the pending save.
+- **Stale Continue coverage (5):** the case runs granted and refused locks for both slots.
+
+New unit cases for items 2–4 failed against `3b30d270` and pass with the change.
+Item 1 is the same symptom in `RunItemSession`, outside #435's dungeon scope, and
+is tracked separately.
 
 ## Estimate and open questions
 

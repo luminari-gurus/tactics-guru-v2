@@ -38,7 +38,8 @@ export class DungeonSession {
   private retained: { label: string; text: string }[] = [];
   private started = false;
   private readonly playtime: ActivePlaytime | null;
-  private queuedSave: { snapshot: DungeonState; finishesAfterDispose: boolean } | null = null;
+  /** The latest autosave waiting for exclusive access, if its lineage is still current. */
+  private queuedSave: { snapshot: DungeonState; quiet: boolean; feedback: string } | null = null;
   readonly history: RunHistory | null;
   private message = 'Progress has not been saved';
   get status() { return this.history?.status ? `${this.message}. ${this.history.status}` : this.message; }
@@ -78,21 +79,15 @@ export class DungeonSession {
     if (!this.started || !this.playtime) return false;
     const elapsed = this.playtime.sample(active);
     if (!elapsed) return false;
-    const stats = this.current.stats ?? freshRunStats('since-upgrade');
-    this.current = { ...this.current, stats: { ...stats, activeMs: boundedStat(stats.activeMs + elapsed) } };
+    const before = this.current, stats = before.stats ?? freshRunStats('since-upgrade');
+    this.current = { ...before, stats: { ...stats, activeMs: boundedStat(stats.activeMs + elapsed) } };
     this.progressSaved = false;
+    // Only a clock update can advance a queued autosave's snapshot.
+    if (this.queuedSave?.snapshot === before) this.queuedSave.snapshot = this.current;
     return true;
   }
   private checkpointPlaytime(active: boolean) {
-    const snapshot = this.current;
-    if (!this.capturePlaytime(active)) return;
-    if (this.queuedSave?.snapshot === snapshot) {
-      // Only a clock update can advance a queued autosave's snapshot.
-      this.queuedSave.snapshot = this.current;
-      this.queuedSave.finishesAfterDispose = true;
-    } else {
-      void this.save(true);
-    }
+    if (this.capturePlaytime(active) && this.queuedSave?.snapshot !== this.current) void this.save(true);
   }
   setPlaytimeActive(active: boolean) {
     if (this.disposed) return;
@@ -120,18 +115,22 @@ export class DungeonSession {
   }
   private recordEnding() { if (!this.disposed && this.history) void this.history.record(dungeonRunRecord(this.current, this.history.now())); }
   save(quiet = false, feedback = '') {
-    const request = { snapshot: this.current, finishesAfterDispose: quiet };
+    // A newer save of the same lineage settles its pending predecessor's status and feedback.
+    const previous = this.queuedSave;
+    const request = { snapshot: this.current, quiet: quiet && (previous?.quiet ?? true),
+      feedback: [previous?.feedback, feedback].filter(Boolean).join(' ') };
     this.queuedSave = request;
     this.recordEnding();
     this.progressSaved = false;
-    if (!quiet) this.report(feedback ? `Saving dungeon… ${feedback}` : 'Saving dungeon…');
+    if (!request.quiet) this.report(request.feedback ? `Saving dungeon… ${request.feedback}` : 'Saving dungeon…');
     const settle = () => {
       if (this.queuedSave === request) this.queuedSave = null;
-      return this.current === request.snapshot && (!this.disposed || request.finishesAfterDispose);
+      return this.current === request.snapshot;
     };
-    return this.mutate(() => settle() && this.saveNow({ quiet: quiet || this.disposed, feedback }), false, true, {
+    // Accepted progress stays durable after disposal; the storage compare-and-swap guards the write.
+    return this.mutate(() => settle() && this.saveNow({ quiet: request.quiet || this.disposed, feedback: request.feedback }), false, true, {
       finishAfterDispose: true,
-      reportUnavailable: message => { if (settle()) this.report(message, feedback); },
+      reportUnavailable: message => { if (settle()) this.report(message, request.feedback); },
     });
   }
   private saveNow({ quiet = false, feedback = '', retryUnsaved = false } = {}) {
@@ -244,6 +243,7 @@ export class DungeonSession {
     const selected = resumableDungeonSave(review, slot);
     if (!selected || !this.storage.acknowledge(review)) return false;
     this.battle?.dispose(); this.battle = null; this.current = structuredClone(selected.state); this.expectedPrimary = review.primary.text; this.unsaved = false; this.progressSaved = true; this.review = null;
+    this.queuedSave = null;
     this.started = true;
     this.report(slot === 'backup' ? 'Continued backup; some progress may be lost.' : 'Continued saved dungeon');
     if (this.history) void this.history.resume(this.current.id, dungeonRunRecord(this.current, this.history.now()));
@@ -341,7 +341,7 @@ export class DungeonSession {
   }
   private reset(next: DungeonState) {
     this.battle?.dispose(); this.battle = null; this.current = next; this.expectedPrimary = null; this.completedBattle = null; this.review = null; this.unsaved = false;
-    this.started = true;
+    this.queuedSave = null; this.started = true;
     this.saveNow();
   }
 }

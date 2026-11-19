@@ -1403,6 +1403,65 @@ it.each(['blur', 'tick', 'storage refusal', 'lock refusal', 'dispose'] as const)
   },
 );
 
+it('finishes accepted dungeon progress after disposal without a playtime sample', async () => {
+ const m=memory(),storage=createDungeonStorage(()=>m),pending:(()=>void)[]=[];
+ const initial=freshDungeon('paused-dispose',13,undefined,true);assert(storage.save(initial).ok);
+ const owner=new DungeonSession(initial,storage,null,()=>0,task=>pending.push(task));
+ assert(owner.continue(owner.inspect()));
+ let writes=0;const set=m.setItem.bind(m);m.setItem=(key,value)=>{writes++;set(key,value);};
+ const saving=owner.save(false,'Fighter reached level 2.');owner.dispose();
+ while(pending.length)pending.shift()!();
+ expect(await saving).toBe(true);expect(writes).toBeGreaterThan(0);expect(owner.hasUnsavedProgress).toBe(false);
+});
+
+describe('dungeon autosaves pending during battle commands', () => {
+ const battleOwner = async (revision: number) => {
+  const m = memory(), storage = createDungeonStorage(() => m), pending: (() => void)[] = [];
+  const initial = atEncounter({ ...freshDungeon('pending-battle', 13, undefined, true), revision });
+  assert(storage.save(initial).ok);
+  let now = 0;
+  const owner = new DungeonSession(initial, storage, null, () => now, task => pending.push(task));
+  assert(owner.continue(owner.inspect()));
+  const starting = owner.startEncounter(); pending.shift()!();
+  const battle = await starting; assert(battle);
+  owner.setPlaytimeActive(true);
+  // One accepted command: the enemy acts on its turn, otherwise the active hero ends its turn.
+  const act = () => {
+   const step = battle.phase === 'enemy' ? battle.nextEnemy()
+    : (battle.prepare({ type: 'endTurn', unitId: battle.active.id }), battle.confirm());
+   assert(step); battle.finishPresentation(step.token);
+  };
+  return { storage, pending, owner, act, advance: (ms: number) => { now += ms; } };
+ };
+
+ it('carries a superseded autosave feedback into the next accepted save', async () => {
+  const { pending, owner, act } = await battleOwner(0);
+  const feedback = 'Fighter reached level 2.';
+  const first = owner.save(false, feedback);
+  act();
+  expect(owner.status).toBe(`Saving dungeon… ${feedback}`);
+  while (pending.length) pending.shift()!();
+  expect(await first).toBe(false);
+  expect(owner.status).toBe(`Dungeon saved on this device. ${feedback}`);
+  expect(owner.hasUnsavedProgress).toBe(false);
+ });
+
+ it('keeps a pending autosave when a later battle boundary is rejected after a playtime sample', async () => {
+  // The first command reaches the final revision; the next one is rejected after sampling playtime.
+  const { storage, pending, owner, act, advance } = await battleOwner(Number.MAX_SAFE_INTEGER - 2);
+  act();
+  const accepted = owner.snapshot;
+  expect(accepted.revision).toBe(Number.MAX_SAFE_INTEGER);
+  advance(750);
+  act();
+  expect(owner.status).toContain('Dungeon boundary rejected');
+  while (pending.length) pending.shift()!();
+  const durable = storage.inspect().primary; assert(durable.status === 'valid');
+  expect(durable.state).toEqual({ ...accepted, stats: { ...accepted.stats!, activeMs: 750 } });
+  expect(owner.hasUnsavedProgress).toBe(false);
+ });
+});
+
 it('finishes the admitted dungeon clock checkpoint under its lock after disposal', async () => {
  const m=memory(),storage=createDungeonStorage(()=>m),pending:(()=>void)[]=[];let now=0;
  const initial=freshDungeon('closing-clock',13,undefined,true);assert(storage.save(initial).ok);
@@ -1439,11 +1498,11 @@ it('flushes dungeon writes queued by an earlier checkpoint observer before revie
  pending.shift()!();await flush;expect(done).toBe(true);expect(owner.hasUnsavedProgress).toBe(false);
 });
 
-it.each(['primary','backup'] as const)('does not publish an old queued autosave after continuing %s', async slot => {
+it.each([['primary','granted'],['primary','refused'],['backup','granted'],['backup','refused']] as const)('does not publish an old queued autosave after continuing %s when the lock is %s', async (slot,lock) => {
  const m=memory(),storage=createDungeonStorage(()=>m),pending:(()=>void)[]=[];let now=0;
  const initial=freshDungeon('queued-continue',13,undefined,true);assert(storage.save(initial).ok);
  const primary={...initial,stats:{...initial.stats!,movesTaken:2}};assert(storage.save(primary).ok);
- const owner=new DungeonSession(primary,storage,null,()=>now,(grant,refuse)=>pending.push(slot==='primary'?grant:refuse));
+ const owner=new DungeonSession(primary,storage,null,()=>now,(grant,refuse)=>pending.push(lock==='granted'?grant:refuse));
  assert(owner.continue(owner.inspect()));owner.setPlaytimeActive(true);
  const save=owner.save(false,'Older action.');now=200;owner.setPlaytimeActive(false);
  const review=owner.inspect();assert(owner.continue(review,slot));
