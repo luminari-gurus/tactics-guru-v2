@@ -55,6 +55,7 @@ export class DungeonMap {
   private readonly markerDescription = document.createElement('p');
   private readonly lootGuide = document.createElement('p');
   private readonly lootHere = document.createElement('p');
+  private readonly lootStatus = document.createElement('p');
   private readonly feedback = document.createElement('p');
   private readonly controls: { button: HTMLButtonElement; dx: number; dy: number }[] = [];
   private readonly cells: HTMLSpanElement[] = [];
@@ -112,6 +113,9 @@ export class DungeonMap {
     this.lootGuide.hidden = true;
     this.lootHere.className = 'dungeon-loot-here';
     this.lootHere.hidden = true;
+    this.lootStatus.className = 'dungeon-loot-status';
+    this.lootStatus.setAttribute('role', 'status');
+    this.lootStatus.setAttribute('aria-atomic', 'true');
     this.grid.addEventListener('click',e=>{
       if(!this.live||!this.state||!this.map||this.locked()||document.hidden||!(e.target instanceof Element))return;
       const cell=e.target.closest<HTMLElement>('[data-cell]');if(!cell)return;
@@ -121,7 +125,10 @@ export class DungeonMap {
     },{signal});
     this.feedback.id='dungeon-map-feedback';this.feedback.setAttribute('role','status');
     const directions=this.directions;directions.className='dungeon-directions';directions.setAttribute('role','group');directions.setAttribute('aria-label','Move player');
-    directions.append(this.viewport);
+    const lootOverlay = el('div');
+    lootOverlay.className = 'dungeon-loot-messages';
+    lootOverlay.append(this.lootStatus, this.lootHere, this.lootGuide);
+    directions.append(this.viewport, lootOverlay);
     for(const [name,dx,dy,arrow] of [['North',0,-1,'↑'],['East',1,0,'→'],['South',0,1,'↓'],['West',-1,0,'←']] as const){
       const button=el('button');button.id=`dungeon-step-${name.toLowerCase()}`;button.type='button';button.setAttribute('aria-label',name);
       const icon=el('span',arrow);icon.className='dungeon-direction-arrow';icon.setAttribute('aria-hidden','true');
@@ -130,7 +137,7 @@ export class DungeonMap {
       button.addEventListener('click',()=>this.step(dx+dy*(this.map?.width??20)),{signal});
       this.controls.push({button,dx,dy});directions.append(button);
     }
-    this.root.append(this.heading,directions,this.markerDescription,this.lootGuide,this.lootHere);
+    this.root.append(this.heading,directions,this.markerDescription);
     this.controlsRoot.className = 'dungeon-map-controls';
     this.controlsRoot.append(this.feedback,label,keyboardPreference);
     this.resize.observe(this.viewport);
@@ -158,10 +165,11 @@ export class DungeonMap {
     },{signal});
   }
   dispose() { this.live = false; this.abort.abort(); this.resize.disconnect(); cancelAnimationFrame(this.layoutFrame); }
-  render(state: DungeonState, map: GeneratedMap) {
+  render(state: DungeonState, map: GeneratedMap, lootStatus: string) {
     const moved = !this.state || this.map !== map || currentFloor(this.state).position !== currentFloor(state).position;
     const refit = !this.state || this.map !== map || this.state.phase !== state.phase || this.layoutParent !== this.root.parentElement;
     this.layoutParent = this.root.parentElement;
+    if (this.lootStatus.textContent !== lootStatus) this.lootStatus.textContent = lootStatus;
     this.state = state; this.map = map; this.draw(); this.scheduleLayout(moved, refit);
   }
   /** Fit controls to the visible screen; scroll only the map window when following movement. */
@@ -307,8 +315,8 @@ export class DungeonMap {
     if (showDownstairs) markerDescriptions.push(`Downstairs at ${location(f.descriptor.downstairs)}.`);
     const description = markerDescriptions.join(' ') || 'No visible encounters, loot or discovered stairs.';
     if (this.markerDescription.textContent !== description) this.markerDescription.textContent = description;
-    this.lootGuide.hidden = shownLoot.size === 0;
     const beneathParty = piles.get(f.position);
+    this.lootGuide.hidden = shownLoot.size === 0 || !!beneathParty || !!this.lootStatus.textContent;
     this.lootHere.hidden = !beneathParty;
     const contentsHere = beneathParty ? `Loot here: ${dungeonLootContents(beneathParty)}. Items stay on the ground until they fit in your inventory.` : '';
     if (this.lootHere.textContent !== contentsHere) this.lootHere.textContent = contentsHere;

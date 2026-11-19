@@ -125,7 +125,7 @@ test('auto loot defaults on: one delayed ordinary step, pickup, enemy tick and d
   expect(collected.ownership.equipment).toEqual([{ instanceId: currentFloor(won).loot![0].id, itemId: 'item:aiming_charm' }]);
   expect(collected.ownership.assignments).toEqual(won.ownership.assignments);
   expect(collected.party).toEqual(won.party);
-  await expect(page.locator('.dungeon-status')).toContainText('Picked up Aiming Charm.');
+  await expect(page.locator('.dungeon-loot-status')).toContainText('Picked up Aiming Charm.');
   await expectSavedProgress(page, collected);
   await releaseAutomaticStep(page); await expectProgress(page, collected);
   await page.reload(); await expectDungeonResumed(page); await settleBrowser(page);
@@ -199,7 +199,7 @@ test('fresh preparation cancels a pending step, and a full inventory refuses aut
   await test.step('an uncollectable new reward keeps the origin and takes no enemy turn', async () => {
     const witness = await loadBoundary(page, 13, ITEM_BOUNDS.stack.max), won = await finishVictory(page, witness);
     await releaseAutomaticStep(page);
-    await expect(page.locator('.dungeon-status')).toHaveText('Inventory full. Loot remains on the ground; the party has not moved.');
+    await expect(page.locator('.dungeon-loot-status')).toHaveText('Inventory full. Loot remains on the ground; the party has not moved.');
     await expectProgress(page, won); await expectSavedProgress(page, won);
     expect(currentFloor(won).loot![0].itemId).toBe('item:revive_kit');
     await releaseAutomaticStep(page); await expectProgress(page, won);

@@ -46,7 +46,17 @@ export class DungeonSession {
   private queuedSave: { snapshot: DungeonState; quiet: boolean; feedback: string } | null = null;
   readonly history: RunHistory | null;
   private message = 'Progress has not been saved';
-  get status() { return [this.boundaryError, this.message, this.history?.status].filter(Boolean).join('. '); }
+  private lootMessage = '';
+  get lootStatus() { return this.lootMessage; }
+  get explorationStatus() { return this.withHistory(this.message); }
+  get status() {
+    const message = this.lootMessage && this.message
+      ? `${this.message.replace(/\.$/, '')}. ${this.lootMessage}` : this.message || this.lootMessage;
+    return this.withHistory(message);
+  }
+  private withHistory(message: string) {
+    return [this.boundaryError, message, this.history?.status].filter(Boolean).join('. ');
+  }
   onChange: (() => void) | null = null;
   onVictory: ((intent: DungeonAutoCollectIntent) => void) | null = null;
   completedBattle: unknown = null;
@@ -57,7 +67,7 @@ export class DungeonSession {
     this.playtime = storage ? new ActivePlaytime(now) : null;
     if (!storage) { const { stats: _, ...untracked } = this.current; this.current = untracked; }
     this.history = storage ? history : null;
-    if (this.history) this.history.onChange = () => { if (!this.disposed) this.report(this.message); };
+    if (this.history) this.history.onChange = () => { if (!this.disposed) this.report(this.message, this.lootMessage); };
     if (!storage) this.message = 'Testing dungeon. Progress resets on reload.';
   }
   get snapshot() { return structuredClone(this.current); }
@@ -79,9 +89,13 @@ export class DungeonSession {
     }
     return result;
   }
-  private report(text: string, feedback = '') {
-    this.message = feedback ? `${text.replace(/\.$/, '')}. ${feedback}` : text;
+  private report(text: string, loot = '') {
+    this.message = text;
+    this.lootMessage = loot;
     try { this.onChange?.(); } catch { /* Observers cannot undo state. */ }
+  }
+  private reportSave(text: string, feedback: string) {
+    this.report(feedback ? `${text.replace(/\.$/, '')}. ${feedback}` : text);
   }
   dispose() {
     if (this.disposed) return;
@@ -152,19 +166,19 @@ export class DungeonSession {
     // Accepted progress stays durable after disposal; the storage compare-and-swap guards the write.
     return this.mutate(() => settle() && this.saveNow({ quiet: request.quiet || this.disposed, feedback: request.feedback }), false, !this.unsaved, {
       finishAfterDispose: true,
-      reportUnavailable: message => { if (settle()) this.report(message, request.feedback); },
+      reportUnavailable: message => { if (settle()) this.reportSave(message, request.feedback); },
     });
   }
   private saveNow({ quiet = false, feedback = '', retryUnsaved = false } = {}) {
     if (this.disposed && !quiet) return false;
     // Accepted endings survive an independent active-save opt-out or conflict.
-    if (!this.storage) { this.report('Testing dungeon. Progress resets on reload.', feedback); return false; }
-    if (this.unsaved && !retryUnsaved) { this.report('Playing unsaved. Floor travel requires saving; open Save recovery.', feedback); return false; }
+    if (!this.storage) { this.reportSave('Testing dungeon. Progress resets on reload.', feedback); return false; }
+    if (this.unsaved && !retryUnsaved) { this.reportSave('Playing unsaved. Floor travel requires saving; open Save recovery.', feedback); return false; }
     const result = this.write(this.current);
     this.progressSaved = result.ok;
     if (result.ok) this.unsaved = false;
     if (!quiet || !result.ok || this.message.startsWith('Progress unsaved'))
-      this.report(result.ok ? 'Dungeon saved on this device' : `Progress unsaved: ${result.reason}. Open Save recovery to retry or export.`, feedback);
+      this.reportSave(result.ok ? 'Dungeon saved on this device' : `Progress unsaved: ${result.reason}. Open Save recovery to retry or export.`, feedback);
     return result.ok;
   }
   playUnsaved() { if (!this.storage) return; this.unsaved = true; this.started = true; this.report('Playing unsaved. Floor travel requires saving; open Save recovery.'); }
@@ -182,7 +196,7 @@ export class DungeonSession {
     this.progressSaved = this.storage !== null && !this.unsaved;
     const status = !this.storage ? 'Testing dungeon. Progress resets on reload.' : this.unsaved ? 'Playing unsaved. Floor travel requires saving; open Save recovery.' :
       preparation ? 'Dungeon saved on this device' : traveling ? 'Travel saved on this device' : 'Exploration saved on this device';
-    this.report(feedback ? `${status.replace(/\.$/, '')}. ${feedback}` : status);
+    this.report(status, feedback);
     return true;
   }
   step(command: ExplorationCommand) { return this.mutate(() => this.stepNow(command), false, !this.unsaved); }
@@ -200,13 +214,13 @@ export class DungeonSession {
       // A user interaction while waiting for the lock must win the race.
       if (this.disposed || !isCurrent() || this.battle && !['ended', 'disposed'].includes(this.battle.phase)) return false;
       if (this.storage && !this.unsaved && this.savedRevision !== this.current.revision) {
-        this.report('Loot remains on the ground. Open Save recovery before automatic collection.');
+        this.report('', 'Loot remains on the ground. Open Save recovery before automatic collection.');
         return false;
       }
       const source = this.storage && !this.current.stats ? { ...this.current, stats: freshRunStats('since-upgrade') } : this.current;
       const candidate = autoCollectDungeon(source, intent);
       if (!candidate.ok) {
-        this.report(candidate.reason === 'capacity'
+        this.report('', candidate.reason === 'capacity'
           ? 'Inventory full. Loot remains on the ground; the party has not moved.'
           : 'Loot remains on the ground. Automatic movement was canceled.');
         return false;

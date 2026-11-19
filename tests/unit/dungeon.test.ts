@@ -1477,6 +1477,8 @@ describe('dungeon autosaves pending during battle commands', () => {
   while (pending.length) pending.shift()!();
   expect(await first).toBe(false);
   expect(owner.status).toBe(`Dungeon saved on this device. ${feedback}`);
+  expect(owner.explorationStatus).toBe(owner.status);
+  expect(owner.lootStatus).toBe('');
   expect(owner.hasUnsavedProgress).toBe(false);
  });
 
