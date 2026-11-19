@@ -145,11 +145,20 @@ Follow-up validation: focused run/domain-boundary suite 70 passed; full unit sui
 
 ## Live integration (#80)
 
-Saved runs launch from the main menu at `/?game=run`, respecting the configured
-base prefix. Direct `/run` is a fresh testing entry with no save storage, hydration
-or recovery UI. Both use the same run/item/battle owner; testing accepted actions
-remain in memory, and reload discards them. The initial run starts with seed 13;
-Start new run increments the previous run seed modulo uint32 and supplies a fresh UUID.
+The main menu's three-encounter run and direct `/run` both start a fresh,
+in-memory run. Reload discards that attempt. The initial seed is 13. **Start new
+run** creates a fresh identity and increments the previous seed modulo uint32.
+A double-click on the outcome screen leaves the new party in preparation.
+**Start encounter** takes a separate activation.
+
+The storage-backed run session retains its recovery contract for saved snapshots.
+A queued action carries earned level-up feedback through a reward claim or a
+playtime sample until its write succeeds or fails. Continue starts a fresh clock
+interval. The first write after continuing a backup checks the reviewed backup
+bytes, and removing a slot cancels older queued saves. Replacing a run preserves
+a recovery point until both new slots are verified. History records abandonment
+after the replacement succeeds.
+
 `createRunBattle` reconstructs initiative and local state from the projected catalog,
 then applies only the canonical living entry HP. `BattleSession.fromRun` records that
 fresh carried boundary; `replayRunBattle` reconstructs the same entry before accepting
