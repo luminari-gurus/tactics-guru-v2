@@ -4,10 +4,12 @@ import type { AssetId, AssetRecord, ContentCatalog, EnemyRecord, UnitStats } fro
 export const FOREST_FAMILY_IDS = [
   'briar_thrall', 'rotcap_sprout', 'spore_acolyte', 'thornback_beetle', 'blob',
   'cinder_archer', 'ash_hound', 'bellows_imp', 'mossback_boar', 'rootling_skirmisher',
+  'thornhide_warg', 'grove_hexer', 'ancient_treantling', 'owlbear_forager', 'ivybound_knight',
 ] as const;
 export const FOREST_FAMILY_MELEE_IDS = [
   'briar_thrall', 'rotcap_sprout', 'spore_acolyte', 'thornback_beetle', 'blob',
   'ash_hound', 'bellows_imp', 'mossback_boar', 'rootling_skirmisher',
+  'thornhide_warg', 'grove_hexer', 'ancient_treantling', 'owlbear_forager', 'ivybound_knight',
 ] as const;
 type FamilyId = typeof FOREST_FAMILY_IDS[number];
 type Illustrated = { readonly origin: 'canonical'; readonly repository: string; readonly revision: string; readonly rightsNote: string };
@@ -20,6 +22,10 @@ const illustrated = {
 const illustratedBatch3 = {
   origin: 'canonical', repository: 'https://github.com/luminari-gurus/tactics-guru-v2',
   revision: '1fc10bb6c96caa511107b3102b61c101f3daf4cf', rightsNote,
+} as const;
+const illustratedBatch4 = {
+  origin: 'canonical', repository: 'https://github.com/luminari-gurus/tactics-guru-v2',
+  revision: '21b1bcd0c6b036798a75b46a20c7255b08259bab', rightsNote,
 } as const;
 
 const enemy = <Id extends FamilyId>(id: Id, stats: UnitStats) => ({
@@ -41,6 +47,11 @@ export const forestFamilyEnemies = {
   bellows_imp: enemy('bellows_imp', { maxHp: 8, move: 5, jump: 1, accuracy: 5, armorClass: 11, power: 2, dexterity: 2, will: 1 }),
   mossback_boar: enemy('mossback_boar', { maxHp: 14, move: 3, jump: 1, accuracy: 3, armorClass: 13, power: 2, dexterity: 0, will: 0 }),
   rootling_skirmisher: enemy('rootling_skirmisher', { maxHp: 10, move: 5, jump: 1, accuracy: 4, armorClass: 11, power: 4, dexterity: 0, will: 1 }),
+  thornhide_warg: enemy('thornhide_warg', { maxHp: 17, move: 4, jump: 1, accuracy: 4, armorClass: 14, power: 5, dexterity: 0, will: 2 }),
+  grove_hexer: enemy('grove_hexer', { maxHp: 12, move: 3, jump: 1, accuracy: 5, armorClass: 11, power: 3, dexterity: 1, will: 2 }),
+  ancient_treantling: enemy('ancient_treantling', { maxHp: 20, move: 3, jump: 1, accuracy: 3, armorClass: 15, power: 3, dexterity: 0, will: 3 }),
+  owlbear_forager: enemy('owlbear_forager', { maxHp: 13, move: 4, jump: 1, accuracy: 4, armorClass: 12, power: 3, dexterity: 1, will: 0 }),
+  ivybound_knight: enemy('ivybound_knight', { maxHp: 18, move: 3, jump: 1, accuracy: 4, armorClass: 14, power: 4, dexterity: 0, will: 1 }),
 } as const satisfies Record<FamilyId, EnemyRecord>;
 
 const sprite = (id: FamilyId, sourceSha256: string, alphaBounds: string, art: Illustrated = illustrated) => {
@@ -88,6 +99,16 @@ export const forestFamilyAssets = {
   'asset:mossback_boar_portrait': portrait('mossback_boar', '58ebe2b4b067499e2222aa63bfd1b9ceb9ca1ff1c0a167ab8bd135962f64edd2', '3670834bcae5937f03162bc65c9f844acc2d76493b885af856b81ea9df5b3803', illustratedBatch3),
   'asset:rootling_skirmisher_sprite': sprite('rootling_skirmisher', 'fa7d75f63723ff4bf358b2e2c58a3f65e16cf6e602fc168465b10afb403ea186', '(6,12)-(59,80)', illustratedBatch3),
   'asset:rootling_skirmisher_portrait': portrait('rootling_skirmisher', '0b5ea12d8a93aa103736a344fa4d124062467ca1a5b94b8ebaf77b560ec9301f', 'ad2898d83e526744e764e09e068fb3272a511b8e7471f19a743d25ddba784ef2', illustratedBatch3),
+  'asset:thornhide_warg_sprite': sprite('thornhide_warg', 'acfe8db25fbe42bdd72b256ec1aeeaf7f8dc53f3be77d0f4916189fb29e1fb8f', '(5,16)-(59,80)', illustratedBatch4),
+  'asset:thornhide_warg_portrait': portrait('thornhide_warg', '48b7cef6dbd667af551c86db2913bf554594b74f582a02725a0cee697971566d', 'daaea2709662d41f540e37aa17c452c18c1dd42dffe6d7994925bd614e4f3e27', illustratedBatch4),
+  'asset:grove_hexer_sprite': sprite('grove_hexer', '1fc1a82c0d09ef38ca314159b2ef8f6d1cbff2b051f2c209d4ff840b6bd8b6b5', '(9,12)-(55,80)', illustratedBatch4),
+  'asset:grove_hexer_portrait': portrait('grove_hexer', '437ec4ef9b4baa9af0f8c69cb25d6868c20e1232ea73cb2d8759b821e65da7c0', 'b8eb1729534a62eee2c58c08988e0a2087fd97a664e0b85bc7f092eb325b625b', illustratedBatch4),
+  'asset:ancient_treantling_sprite': sprite('ancient_treantling', 'e92d7ee425c26c394936a46e23cf216b229a5ef5a9a3b478a351f4f737364de2', '(10,6)-(54,80)', illustratedBatch4),
+  'asset:ancient_treantling_portrait': portrait('ancient_treantling', 'd11e06f40ca718ca04306607f1df01c311cdbe3bfd63a79bc7b4570e59dec014', '91f0853f70e28b2f53782ecf86b3b8191c3630fa59c68cd492fb57b5b698f1b6', illustratedBatch4),
+  'asset:owlbear_forager_sprite': sprite('owlbear_forager', '2f8906a2c1476c2eb3dbadd792da5cfeb9b5707c780ed779384f8d35c3170461', '(5,14)-(60,80)', illustratedBatch4),
+  'asset:owlbear_forager_portrait': portrait('owlbear_forager', 'dccf5baee11fc61d50f48fde8152d9c97180db14d7147b5dd03dfba6efdb647f', 'ead8ba2d28e6bafa790e020b1ea0aa291024a8ef96f7fe2a5475477e5483414a', illustratedBatch4),
+  'asset:ivybound_knight_sprite': sprite('ivybound_knight', '72b2343e62414849d7d16f211509e36616d3ceecff82ca678c96577b72d0f2f0', '(7,8)-(57,80)', illustratedBatch4),
+  'asset:ivybound_knight_portrait': portrait('ivybound_knight', '687289bba6650e7fc86cb20717a383a2a3dc4db5e73a46671afa27fc77bca39f', 'ab51ee8947b402daf5f561dfd13be88321cb8fe34747e8d6836a185beb5a3521', illustratedBatch4),
 } satisfies Record<AssetId, AssetRecord>;
 
 export function forestFamilyBattleContent(baseline: ContentCatalog): ContentCatalog {

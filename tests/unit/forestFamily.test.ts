@@ -27,7 +27,7 @@ it('packages illustrated forest-family sprites and portraits like the other gobl
       runtimeBytes += runtime.length;
     }
   }
-  expect(runtimeBytes).toBe(280058);
+  expect(runtimeBytes).toBe(424622);
 });
 
 it('registers bestiary stats and abilities without joining existing encounter catalogs', () => {
@@ -41,6 +41,7 @@ it('registers bestiary stats and abilities without joining existing encounter ca
   expect(hobgoblinDungeonBattleCatalog.enemies).not.toHaveProperty('briar_thrall');
   expect(goblinFamilyDungeonBattleCatalog.enemies).not.toHaveProperty('briar_thrall');
   expect(goblinFamilyDungeonBattleCatalog.enemies).not.toHaveProperty('cinder_archer');
+  expect(goblinFamilyDungeonBattleCatalog.enemies).not.toHaveProperty('grove_hexer');
   for (const change of [
     (c: typeof forestFamilyDungeonBattleCatalog) => {
       const { briar_thrall: _, ...enemies } = c.enemies;
@@ -63,8 +64,8 @@ it('can create a battle that uses the registered units without changing producti
     ...FOREST_FAMILY_IDS.map((unitId, i): SpawnRecord => ({ id: i + 4, side: 'enemies', unitId, x: i, y: 2 })),
   ] satisfies readonly SpawnRecord[];
   const map: MapRecord = {
-    id: 'map:forest_family_roster', width: 10, height: 3,
-    cells: Array.from({ length: 30 }, (_, i) => ({ x: i % 10, y: Math.floor(i / 10), elevation: 0, terrainId: 'grass' })),
+    id: 'map:forest_family_roster', width: 15, height: 3,
+    cells: Array.from({ length: 45 }, (_, i) => ({ x: i % 15, y: Math.floor(i / 15), elevation: 0, terrainId: 'grass' })),
     spawns,
   };
   const catalog = forestFamilyBattleContent({ ...battleCatalog, maps: { ...battleCatalog.maps, [map.id]: map } });

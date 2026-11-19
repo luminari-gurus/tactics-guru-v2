@@ -31,6 +31,7 @@ const dexterity = {
   bramble_goblin: 0, goblin_snarehand: 0, mire_goblin: 1, coal_goblin: 1, ruin_lookout: 2,
   briar_thrall: 1, rotcap_sprout: 0, spore_acolyte: 2, thornback_beetle: 0, blob: -1,
   cinder_archer: 2, ash_hound: 2, bellows_imp: 2, mossback_boar: 0, rootling_skirmisher: 0,
+  thornhide_warg: 0, grove_hexer: 1, ancient_treantling: 0, owlbear_forager: 1, ivybound_knight: 0,
 } as const;
 const base: ContentCatalog = copy(catalogFixture);
 const catalog: ContentCatalog = { ...base, maps: { [map.id]: map },

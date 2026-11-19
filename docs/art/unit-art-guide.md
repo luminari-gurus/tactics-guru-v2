@@ -56,6 +56,18 @@ Bestiary batch 3 adds five more illustrated forest-family pairs with the same co
 
 Measured half-open sprite alpha bounds: Cinder Archer (8,12,56,80); Ash Hound (3,20,61,80); Bellows Imp (8,16,56,80); Mossback Boar (5,16,60,80); Rootling Skirmisher (6,12,59,80). All five keep feet on the bottom edge. No `pixelArt` / nearest-neighbor Phaser special case is recorded or added.
 
+Bestiary batch 4 adds the last five non-boss illustrated forest-family pairs with the same convention and foot anchor (32,76). They are registered as optional enemy units and packaged as ordinary Git blobs; they are not on the five-pair annotated sheet and are not placed into existing battles or dungeon encounter rosters.
+
+| Pair / asset IDs (`asset:` prefix) | Sprite | Portrait source | Runtime portrait |
+| --- | --- | --- | --- |
+| Thornhide Warg: `thornhide_warg_sprite`, `thornhide_warg_portrait` | [64×80](../../public/battle/source/thornhide_warg_sprite.png) | [1254×1254](../../public/battle/source/thornhide_warg_portrait.png) | [96×96](../../public/battle/portraits/thornhide_warg.png) |
+| Grove Hexer: `grove_hexer_sprite`, `grove_hexer_portrait` | [64×80](../../public/battle/source/grove_hexer_sprite.png) | [1254×1254](../../public/battle/source/grove_hexer_portrait.png) | [96×96](../../public/battle/portraits/grove_hexer.png) |
+| Ancient Treantling: `ancient_treantling_sprite`, `ancient_treantling_portrait` | [64×80](../../public/battle/source/ancient_treantling_sprite.png) | [1254×1254](../../public/battle/source/ancient_treantling_portrait.png) | [96×96](../../public/battle/portraits/ancient_treantling.png) |
+| Owlbear Forager: `owlbear_forager_sprite`, `owlbear_forager_portrait` | [64×80](../../public/battle/source/owlbear_forager_sprite.png) | [1254×1254](../../public/battle/source/owlbear_forager_portrait.png) | [96×96](../../public/battle/portraits/owlbear_forager.png) |
+| Ivybound Knight: `ivybound_knight_sprite`, `ivybound_knight_portrait` | [64×80](../../public/battle/source/ivybound_knight_sprite.png) | [1254×1254](../../public/battle/source/ivybound_knight_portrait.png) | [96×96](../../public/battle/portraits/ivybound_knight.png) |
+
+Measured half-open sprite alpha bounds: Thornhide Warg (5,16,59,80); Grove Hexer (9,12,55,80); Ancient Treantling (10,6,54,80); Owlbear Forager (5,14,60,80); Ivybound Knight (7,8,57,80). All five keep feet on the bottom edge. No `pixelArt` / nearest-neighbor Phaser special case is recorded or added.
+
 Canonical sources are owner-repository project artwork. No per-file third-party license, original prompt, model or generation method is recorded. Retain that uncertainty; these briefs are new production instructions, not reconstructed original prompts or a rights clearance.
 
 ## Observed visual language
