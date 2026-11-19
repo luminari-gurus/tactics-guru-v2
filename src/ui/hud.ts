@@ -438,7 +438,7 @@ export class BattleHud {
       b.setAttribute('aria-pressed',String(b.dataset.action===action));
       b.querySelector('span')!.textContent=reason || (b.dataset.action==='move'?'Uses movement':'Uses action');
     });
-    this.root.querySelector('#battle-availability')!.textContent=locked || `${actor.hasMoved?'Movement spent. ':''}${actor.hasActed?'Action spent. ':''}Choose an action, then a target. Wait asks for confirmation if movement or action is unspent.`;
+    this.root.querySelector('#battle-availability')!.textContent=locked || `${actor.hasMoved?'Movement spent. ':''}${actor.hasActed?'Action spent. ':''}Choose an action, then a target. Wait asks for confirmation if you can still move or have an unspent action.`;
     (this.root.querySelector('#battle-next') as HTMLButtonElement).disabled=!enabled;
     (this.root.querySelector('#battle-review') as HTMLButtonElement).disabled=!enabled || (!s.pending && !s.pendingPlan);
     (this.root.querySelector('#battle-cancel') as HTMLButtonElement).disabled=!enabled || !action;

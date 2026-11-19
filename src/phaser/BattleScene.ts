@@ -339,8 +339,10 @@ export class BattleScene extends Phaser.Scene {
           if(live && !document.hidden && session.state===reviewed && session.prepare({type:'endTurn',unitId:id}).ok)
             void present(session.confirm());
         };
-        if(hasMoved && hasActed){accept();return;}
-        const remaining = hasMoved ? 'has not acted' : hasActed ? 'still has movement' : 'still has movement and has not acted';
+        const movement = hasMoved ? null : previewMovement(reviewed, id, catalog);
+        const canMove = movement?.ok && movement.cells.some(cell => cell.cost > 0);
+        if(!canMove && hasActed){accept();return;}
+        const remaining = !canMove ? 'has not acted' : hasActed ? 'still has movement' : 'still has movement and has not acted';
         keepRadialDuringDialog=radial.mode==='tap';
         dialogs.showChoices('End Turn?', `This unit ${remaining}. End turn anyway?`, [
           {id:'battle-end-turn-cancel',label:'Cancel',run:releaseRadial},
