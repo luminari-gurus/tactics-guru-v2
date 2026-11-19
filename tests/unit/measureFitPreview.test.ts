@@ -58,14 +58,16 @@ afterEach(async () => {
 });
 
 describe('collector-owned preview', () => {
-  it.each(['silent', 'color', 'split', 'slow'])('accepts owned HTTP with %s output/startup and releases the port for reuse', async mode => {
+  // Allow scheduling headroom for two real child startups alongside the CI unit workers.
+  it.each(['silent', 'color', 'split', 'slow'])('accepts owned HTTP with %s output/startup and releases the port for reuse', { timeout: 12_000 }, async mode => {
+    const startupMs = 4000;
     const url = await freeUrl();
-    const preview = fixture(url, mode);
+    const preview = fixture(url, mode, startupMs);
     await preview.ready(signal());
     expect((await fetch(url)).status).toBe(200);
     await preview.close();
     expect(preview.child.exitCode).toBe(0);
-    const next = fixture(url);
+    const next = fixture(url, 'silent', startupMs);
     await next.ready(signal());
   });
 
