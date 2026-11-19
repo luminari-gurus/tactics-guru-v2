@@ -1,5 +1,5 @@
 import { test, expect, type Page } from './helpers/forceRailControls';
-import { readSession, playCommand } from './helpers/battlePolicy';
+import { endTurn, readSession, playCommand } from './helpers/battlePolicy';
 import { playerDecision } from './helpers/playerPolicy';
 import { runContext } from './helpers/runItemFixtures';
 import { runBattleCatalog } from '../src/domain/runSaveEnvelope';
@@ -85,7 +85,7 @@ test('mocked ingestion sees accepted run, rewards, completion within one session
 test('blocked ingestion leaves battle play and fresh reload working', async ({ page }) => {
   await ingest(page, true); await page.goto('./?game=battle&entry=new'); await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   const before = (await readSession(page)).state;
-  await page.locator('#battle-next').click(); await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  await endTurn(page); await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   const after = (await readSession(page)).state; expect(after.commandCount).toBeGreaterThan(before.commandCount);
   await page.reload();
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player'); expect((await readSession(page)).state).toEqual(before);
@@ -101,7 +101,7 @@ test('fresh testing battles each report their outcome across reload', async ({ p
     for (let turn = 0; turn < 100; turn++) {
       await expect(page.locator('#game')).toHaveAttribute('data-phase', /^(player|ended)$/);
       if ((await readSession(page)).phase === 'ended') break;
-      await page.locator('#battle-next').click();
+      await endTurn(page);
     }
     await expect(page.locator('#game')).toHaveAttribute('data-phase', 'ended');
     const { seed, commandCount, outcome } = (await readSession(page)).state;
@@ -142,7 +142,7 @@ test('failed parser loading preserves gameplay without a reporting loop', async 
   const events = await ingest(page);
   await page.route(process.env.PLAYWRIGHT_TELEMETRY_DEV === 'true' ? '**/src/telemetry/transport.ts' : '**/assets/transport-*.js', route => route.abort());
   await page.goto('./?game=battle&entry=new'); await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
-  await page.locator('#battle-next').click(); await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  await endTurn(page); await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   await expect(page.locator('#battle-persistence')).toContainText('Progress resets on reload'); expect(events).toEqual([]);
 });
 test('legacy run saves are ignored without reporting contents or recovery failures', async ({ page }) => {
@@ -169,7 +169,7 @@ test('privacy controls stop collection immediately, persist across routes, and a
   await choice.uncheck(); await expect(privacy.getByRole('status')).toContainText('off');
   expect((await readSession(page)).state).toEqual(before);
   const count = events.length;
-  await page.locator('#battle-next').click(); await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  await endTurn(page); await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   await page.goto('/run'); const runPrivacy = page.locator('#run-screen .telemetry-preferences');
   await runPrivacy.locator('summary').click();
   await expect(runPrivacy.getByRole('checkbox')).not.toBeChecked(); expect(events).toHaveLength(count);

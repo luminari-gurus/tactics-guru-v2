@@ -16,7 +16,7 @@ import { reachStandaloneBoundary } from './helpers/standaloneBoundary';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { guardedBoundary } from './helpers/guardedBoundary';
 import { runContext } from './helpers/runItemFixtures';
-import { battleTool, readSession, playCommand, confirmRestart, playerDecision } from './helpers/battlePolicy';
+import { endTurn, battleTool, readSession, playCommand, confirmRestart, playerDecision } from './helpers/battlePolicy';
 
 const boardReport=async(page:Page)=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
 async function checkBadges(page:Page) {
@@ -168,7 +168,7 @@ for (const mode of ['standalone', 'run', 'dungeon'] as const) for (const miss of
   await page.screenshot({ path: test.info().outputPath(`${mode}-guarded-resumed.png`) });
   const castEnd = (await readSession(page)).events.length;
   for (let i = 0; i < 15; i++) {
-    await page.locator('#battle-next').click();
+    await endTurn(page);
     await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
     const now = await readSession(page);
     await checkBadges(page);
@@ -219,7 +219,7 @@ for(const kind of ['move','defeat'] as const)test(`Guarded badge follows legal $
   await reachStandaloneBoundary(page,entry);
   if (kind==='defeat') {
     await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
-    await page.locator('#battle-next').click({force:true});
+    await endTurn(page, selector=>page.locator(selector).click({force:true}));
     await page.clock.runFor(64);
   }
   if(kind==='move') {

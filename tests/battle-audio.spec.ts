@@ -1,4 +1,4 @@
-import { battleTool, confirmRestart } from './helpers/battlePolicy';
+import { endTurn, battleTool, confirmRestart } from './helpers/battlePolicy';
 import { expect, test, type Page } from './helpers/forceRailControls';
 import { readSession, session, playCommand, playerDecision } from './helpers/battlePolicy';
 import { standaloneCatalog as catalog } from './helpers/playerPolicy';
@@ -85,7 +85,7 @@ for(const pace of ['normal','fast'] as const)test(pace==='normal'
   const count=(await audio(page)).started;
   await page.evaluate(()=>window.dispatchEvent(new Event('focus')));
   await expect.poll(()=>audio(page)).toMatchObject({status:'ready',started:count});
-  await page.locator('#battle-next').click();
+  await endTurn(page);
   await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'));});
   expect((await audio(page)).active).toBeNull();
   await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,get:()=>false});document.dispatchEvent(new Event('visibilitychange'));});
@@ -97,7 +97,7 @@ for(const pace of ['normal','fast'] as const)test(pace==='normal'
   for(let i=0;i<12;i++) {
     const current=await session(page),command=current.replay.commands.at(-1);
     if(current.phase==='presenting' && command && current.state.units.find(u=>u.id===command.unitId)!.side==='enemy') {enemy=current;break;}
-    if(current.phase==='player')await page.locator('#battle-next').click({force:true});
+    if(current.phase==='player')await endTurn(page, selector=>page.locator(selector).click({force:true}));
     await page.clock.runFor(48);
   }
   expect(enemy).toBeDefined();
@@ -155,7 +155,7 @@ for(const mode of ['reject','pending'] as const) test(`automatic recovery ${mode
   await expect(page.locator('#fit-status')).toHaveText('Battle ready');
   await expect(page.locator('#battle-next')).toBeEnabled();await expect(page.locator('#fit-restart')).toBeEnabled();
   const before=(await session(page)).state.commandCount;
-  await page.locator('#battle-next').click();await ready(page);
+  await endTurn(page);await ready(page);
   expect((await session(page)).state.commandCount).toBeGreaterThan(before);
   const started=(await audio(page)).started;
   await page.evaluate(()=>{window.__resumeFailure=false;});await (await battleTool(page, '#battle-sound-retry')).click();
@@ -220,7 +220,7 @@ for(const [early,delayedFrames] of [[true,false],[false,false],[false,true]] as 
   await expect(await battleTool(page, '#battle-sound-retry')).toBeVisible();
   const primed=early?0:8;
   expect(await page.evaluate(()=>window.__mediaPolicy)).toEqual({primed,rejected:0});
-  await page.locator('#battle-next').click();await ready(page);
+  await endTurn(page);await ready(page);
   expect((await audio(page)).started).toBe(0);
   await (await battleTool(page, '#battle-sound-retry')).click();await expect.poll(()=>audio(page)).toMatchObject({status:'ready',started:0});
   expect(await page.evaluate(()=>window.__mediaPolicy)).toEqual({primed:primed+8,rejected:0});

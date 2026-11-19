@@ -1,5 +1,5 @@
 import {expect,test,type Page} from './helpers/forceRailControls';
-import { battleTool, readSession, playCommand, tapBoard, boardPoint, settledReport } from './helpers/battlePolicy';
+import { endTurn, battleTool, readSession, playCommand, tapBoard, boardPoint, settledReport } from './helpers/battlePolicy';
 import { abilityCatalog } from './helpers/abilityCatalog';
 import { progressHero, projectProgression } from '../src/domain/progression';
 import { HERO_IDS } from '../src/content/constants';
@@ -345,7 +345,7 @@ test('direct ability controls stay hidden across radial turns and restore with t
     const accepted=await readSession(page);
     expect(accepted.state.commandCount).toBe(before.state.commandCount+1);
     expect(accepted.events.some(event=>event.type==='abilityUsed'&&event.abilityId===`ability:${hero==='fighter'?'second_wind':'mark_target'}`)).toBe(true);
-    await activate('#battle-next');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+    await endTurn(page, activate);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
     const next=await readSession(page);expect(next.state.initiative[next.state.activeIndex]).not.toBe(actor);
     // A different actor creates a different button set after applySkin ran.
     const ids=await page.locator('#battle-ability option').evaluateAll(options=>options.map(option=>(option as HTMLOptionElement).value));
@@ -528,8 +528,8 @@ test('Fighter healing and Taunt preserve keyboard touch cancellation inspection 
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const healed=await readSession(page);expect(healed.state.rng).toEqual(initial.state.rng);expect(healed.state.units.find(u=>u.defId==='fighter')).toMatchObject({hp:27,secondWindUsed:true,hasActed:true});
   await expect(page.locator('#battle-status')).toContainText('0/1');await (await battleTool(page, '#battle-log-open')).click();await expect(page.getByRole('dialog')).toContainText('heals 7 HP');await page.locator('#log-close').click();
-  await page.locator('#battle-next').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-  for(let i=0;i<8;i++) {const s=await readSession(page);if(s.state.units.find(u=>u.id===s.state.initiative[s.state.activeIndex])!.defId==='fighter')break;await page.locator('#battle-next').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');}
+  await endTurn(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  for(let i=0;i<8;i++) {const s=await readSession(page);if(s.state.units.find(u=>u.id===s.state.initiative[s.state.activeIndex])!.defId==='fighter')break;await endTurn(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');}
   let next=await readSession(page),fighter=next.state.units.find(u=>u.id===next.state.initiative[next.state.activeIndex])!;expect(fighter.defId).toBe('fighter');
   await picker.selectOption('ability:second_wind');await expect(secondWind).toBeDisabled();await expect(secondWind).toContainText('Use exhausted');await expect(page.locator('#battle-ability-info')).toContainText('Use exhausted');
   let enemy=next.state.units.find(u=>u.side==='enemy' && u.hp>0 && Math.abs(u.cell.x-fighter.cell.x)+Math.abs(u.cell.y-fighter.cell.y)===1);

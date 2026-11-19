@@ -70,6 +70,6 @@ export function classTipForTurn(session: BattleSession, seen: readonly string[],
 /** The radial commits by action activation/hold release; it has no universal second confirmation step. */
 export function previewLesson(skin: 'rail' | 'radial'): { readonly id: string; readonly text: string } {
   return skin === 'rail'
-    ? { id: 'preview:rail:v1', text: `Choose an action and target, review the preview, then Confirm action (${BATTLE_KEYS.confirm.toUpperCase()}). ${BATTLE_KEYS.cancel} cancels. Wait / End turn ends your turn immediately.` }
-    : { id: 'preview:radial:v1', text: `Choose a tile and review an action. Tapping an action or releasing a hold can execute it; Special may open skill choices. ${BATTLE_KEYS.cancel} cancels. End turn is immediate.` };
+    ? { id: 'preview:rail:v1', text: `Choose an action and target, review the preview, then Confirm action (${BATTLE_KEYS.confirm.toUpperCase()}). ${BATTLE_KEYS.cancel} cancels. Wait / End turn asks for confirmation if you can still move or have an unspent action.` }
+    : { id: 'preview:radial:v1', text: `Choose a tile and review an action. Tapping an action or releasing a hold can execute it; Special may open skill choices. ${BATTLE_KEYS.cancel} cancels. End turn asks for confirmation if you can still move or have an unspent action.` };
 }

@@ -1,4 +1,7 @@
+import type { ContentCatalog } from '../src/content/types';
 import { neighbors, poiCell } from '../src/domain/exploration';
+import { MOVEMENT_DIRECTIONS } from '../src/domain/constants';
+import { previewMovement } from '../src/domain/grid';
 import { atEncounter } from './helpers/dungeonFixtures';
 import {expectDungeonResumed,expectSameProgress} from './helpers/dungeonTraversal';
 import {expect,railTest as test,type Page} from './helpers/dungeonEntropy';
@@ -7,10 +10,46 @@ import {freshDungeon,startDungeonBattle,dungeonBattle,floorMap,type DungeonState
 import {BattleSession} from '../src/app/BattleSession';
 import {encodeDungeon} from '../src/domain/dungeonSaveEnvelope';
 import {DUNGEON_KEYS} from '../src/persistence/dungeonStorage';
-import {playCommand,readSession} from './helpers/battlePolicy';
+import {endTurn, playCommand,readSession} from './helpers/battlePolicy';
 import { readFileSync } from 'node:fs';
 import { canonical, hashJson } from '../src/domain/contentIdentity';
 import { RUN_RECORD_KEYS } from '../src/persistence/runRecordsStorage';
+
+for (const hasActed of [true, false]) test(`boxed-in hero ${hasActed ? 'ends immediately after acting' : 'only warns about an unspent action'}`, async ({page, isMobile}) => {
+ const made = startDungeonBattle(atEncounter(freshDungeon('boxed-in-wait', 1)));
+ if (!made.ok) throw Error(made.reason);
+ const battle = made.state.activeBattle!;
+ const catalog: ContentCatalog = dungeonBattle(made.state)!.catalog;
+ const map = catalog.maps[battle.mapId];
+ const walkable = map.cells.filter(cell => catalog.terrains[cell.terrainId].walkable);
+ const origin = walkable.find(cell => cell.x === 0 && cell.y === 0) ?? walkable[0];
+ const adjacent = walkable.filter(cell => MOVEMENT_DIRECTIONS.some(delta =>
+  cell.x === origin.x + delta.x && cell.y === origin.y + delta.y));
+ const placements = [origin, ...adjacent, ...walkable.filter(cell => cell !== origin && !adjacent.includes(cell))];
+ const actor = battle.units.find(unit => unit.side === 'player')!;
+ const units = [actor, ...battle.units.filter(unit => unit.id !== actor.id)].map((unit, index) => ({
+  ...unit, cell: {x: placements[index].x, y: placements[index].y}, hasActed: unit.id === actor.id && hasActed,
+ })).sort((a, b) => a.id - b.id);
+ const activeBattle = {...battle, units, activeIndex: battle.initiative.indexOf(actor.id), commandCount: hasActed ? 1 : 0};
+ const movement = previewMovement(activeBattle, actor.id, catalog);
+ expect(movement.ok && movement.cells.map(cell => cell.cost)).toEqual([0]);
+ await load(page, {...made.state, activeBattle});
+ await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+ const before = await readSession(page);
+ const wait = page.getByRole('button', {name: 'Wait / End turn', exact: true});
+ if (isMobile) await wait.tap(); else await wait.click();
+ const dialog = page.getByRole('dialog', {name: 'End Turn?'});
+ if (hasActed) {
+  await expect(dialog).toBeHidden();
+  await expect.poll(async () => (await readSession(page)).state.commandCount).toBeGreaterThan(before.state.commandCount);
+ } else {
+  await expect(dialog).toHaveAccessibleDescription('This unit has not acted. End turn anyway?');
+  const cancel = dialog.getByRole('button', {name: 'Cancel', exact: true});
+  if (isMobile) await cancel.tap(); else await cancel.click();
+  await expect(dialog).toBeHidden();
+  expect(await readSession(page)).toEqual(before);
+ }
+});
 
 test('dungeon statistics: confirmed replacement pauses pending enemy turns through history',async({page},info)=>{
  test.setTimeout(60000);
@@ -21,7 +60,7 @@ test('dungeon statistics: confirmed replacement pauses pending enemy turns throu
  await load(page,{...made.state,activeBattle:{...battle,activeIndex}});await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  await page.evaluate(key=>new Promise<void>(granted=>{void navigator.locks.request(key,()=>new Promise<void>(release=>{(window as any).releaseHistoryBoundary=release;granted();}));}),RUN_RECORD_KEYS.primary);
  try {
-  const oldId=(await snapshot(page)).id;await page.getByRole('button',{name:'Wait / End turn',exact:true}).click();
+  const oldId=(await snapshot(page)).id;await endTurn(page);
   await page.locator('#fit-restart').click();await page.locator('#dungeon-confirm-new').click();
   await expect(page.getByRole('heading',{name:'Preparing new dungeon',exact:true})).toBeVisible();
   const before=await page.evaluate(key=>localStorage.getItem(key)!,DUNGEON_KEYS.primary),frozen=JSON.parse(before).payload;

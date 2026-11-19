@@ -11,7 +11,7 @@ import { freshDungeon, floorDescriptor, floorMap, readDungeon, dungeonSeed, dung
 import { dungeonContent, legacyDungeonIdentity } from '../src/content/dungeon';
 import { canonical, hashJson } from '../src/domain/contentIdentity';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
-import { battleTool, readSession,playCommand } from './helpers/battlePolicy';
+import { endTurn, battleTool, readSession,playCommand } from './helpers/battlePolicy';
 import { installRailControls } from './helpers/forceRailControls';
 import { playerDecision } from './helpers/playerPolicy';
 import { dungeonBattle } from '../src/domain/dungeon';
@@ -1420,8 +1420,8 @@ test('a second dungeon encounter reuses the engine after a legal victory without
   const actor=current.state.units.find(unit=>unit.id===current.state.initiative[current.state.activeIndex])!;
   if(actor.defId===dismissedActor.defId)break;
   await expect(guidance).toBeVisible();await expect(tip).not.toHaveAttribute('data-tutorial-id',dismissedTip!);
-  const commands=current.state.commandCount,wait=page.locator('#battle-next');
-  if(isMobile)await wait.tap();else {await wait.focus();await page.keyboard.press('Enter');}
+  const commands=current.state.commandCount;
+  await endTurn(page, selector=>isMobile?page.locator(selector).tap():page.locator(selector).press('Enter'));
   await expect.poll(async()=>(await readSession(page)).state.commandCount).toBeGreaterThan(commands);
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');current=await readSession(page);
  }

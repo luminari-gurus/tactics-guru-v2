@@ -1,6 +1,6 @@
 import {expect,test,type Page} from './helpers/forceRailControls';
 import {writeFileSync} from 'node:fs';
-import { battleTool, readSession,playCommand,playUndo } from './helpers/battlePolicy';
+import { endTurn, battleTool, readSession,playCommand,playUndo } from './helpers/battlePolicy';
 import {playerDecision} from './helpers/playerPolicy';
 import {runContext} from './helpers/runItemFixtures';
 import {runBattleCatalog,type RunSnapshot} from '../src/domain/runSaveEnvelope';
@@ -176,7 +176,7 @@ test('run preparation and dialogs retain 44px controls, native touch and narrow 
  await page.setViewportSize(original);
  await activate('#run-start-encounter');
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- await activate('#battle-next');
+ await endTurn(page, activate);
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const before=await snapshot(page);
  await activate('#fit-restart');

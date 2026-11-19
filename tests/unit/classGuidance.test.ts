@@ -150,9 +150,9 @@ it('teaches rail confirmation and the radial direct-activation contract with sep
   const rail = previewLesson('rail'), radial = previewLesson('radial');
   expect(rail.id).toBe('preview:rail:v1'); expect(radial.id).toBe('preview:radial:v1');
   expect(rail.text).toContain('review the preview, then Confirm action (C)');
-  expect(rail.text).toContain('Wait / End turn ends your turn immediately');
+  expect(rail.text).toContain('Wait / End turn asks for confirmation');
   expect(radial.text).toContain('Tapping an action or releasing a hold can execute it');
   expect(radial.text).toContain('Special may open skill choices');
-  expect(radial.text).toContain('End turn is immediate');
+  expect(radial.text).toContain('End turn asks for confirmation');
   expect(radial.text).not.toContain('then Confirm action');
 });

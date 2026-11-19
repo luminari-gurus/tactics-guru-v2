@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { session, readSession, tapBoard, boardPoint, combatSkin } from './helpers/battlePolicy';
+import { endTurn, session, readSession, tapBoard, boardPoint, combatSkin } from './helpers/battlePolicy';
 import { BATTLE_STORAGE_KEYS } from '../src/persistence/battleStorage';
 import { standaloneCatalog as catalog } from './helpers/playerPolicy';
 import { previewMovement } from '../src/domain/grid';
@@ -182,7 +182,7 @@ test('radial hub cancel records no command after leaving a slice', async ({ page
   expect(after.pending).toBeNull();
 });
 
-test('radial End turn is docked at 48 px and commits immediately', async ({ page }) => {
+test('radial End turn is docked at 48 px and confirms before committing', async ({ page, isMobile }) => {
   await ready(page);
   const next = page.locator('#battle-next');
   await expect(next).toHaveText(/End turn/);
@@ -190,11 +190,25 @@ test('radial End turn is docked at 48 px and commits immediately', async ({ page
   const box = (await next.boundingBox())!;
   expect(box.height).toBeGreaterThanOrEqual(48);
   const before = await session(page);
-  await next.click();
+  const saved = await page.evaluate(() => JSON.stringify(localStorage));
+  const activate = (button: typeof next) => isMobile ? button.tap() : button.click();
+  await activate(next);
+  const dialog = page.getByRole('dialog', { name: 'End Turn?' });
+  await expect(dialog).toHaveAccessibleDescription('This unit still has movement and has not acted. End turn anyway?');
+  expect(await session(page)).toEqual(before);
+  expect(await page.evaluate(() => JSON.stringify(localStorage))).toBe(saved);
+  await activate(dialog.getByRole('button', { name: 'Cancel', exact: true }));
+  await expect(dialog).not.toBeVisible();
+  if (!isMobile) await expect(next).toBeFocused();
+  expect(await session(page)).toEqual(before);
+  expect(await page.evaluate(() => JSON.stringify(localStorage))).toBe(saved);
+  await activate(next);
+  await activate(dialog.getByRole('button', { name: 'End Turn', exact: true }));
+  await expect(dialog).not.toBeVisible();
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   const after = await session(page);
-  expect(after.replay.commands.length).toBeGreaterThan(before.replay.commands.length);
-  expect(after.replay.commands.some(command => command.type === 'endTurn')).toBe(true);
+  expect(after.replay.commands.slice(before.replay.commands.length)
+    .filter(command => command.type === 'endTurn' && command.unitId === before.state.initiative[before.state.activeIndex])).toHaveLength(1);
 });
 
 test('pan vs hold: a 20 px drag before 300 ms pans and never opens the radial', async ({ page }) => {
@@ -513,7 +527,7 @@ test.describe('radial session boundary',()=>{
     await page.goto('./');await page.getByRole('link',{name:'Standalone battle',exact:true}).click();
     await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await expect.poll(()=>combatSkin(page)).toBe('radial');
     const initial=(await readSession(page)).state;
-    await page.getByRole('button',{name:'End turn',exact:true}).click();
+    await endTurn(page);
     await expect.poll(async()=>(await readSession(page)).state.commandCount).toBeGreaterThan(initial.commandCount);
     await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
     const primary=await page.evaluate(key=>localStorage.getItem(key),BATTLE_STORAGE_KEYS.primary);expect(primary).toBeNull();

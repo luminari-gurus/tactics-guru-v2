@@ -12,7 +12,7 @@ import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { RUN_RECORD_KEYS } from '../src/persistence/runRecordsStorage';
 import { COMBAT_CONTROLS_KEY } from '../src/ui/combatControls';
 import { AUTO_COLLECT_LOOT_KEY } from '../src/ui/autoCollectLootPreference';
-import { battleTool, readSession,playCommand,playUndo,checkActivePlaytime,checkBackgroundPlaytime } from './helpers/battlePolicy';
+import { endTurn, battleTool, readSession,playCommand,playUndo,checkActivePlaytime,checkBackgroundPlaytime } from './helpers/battlePolicy';
 import { playerDecision, fighterDecision } from './helpers/playerPolicy';
 import { journeyPreparation, healedFighterBoundary, shamanJourney } from './helpers/dungeonFixtures';
 import { dispatch, replayCommandSequence } from '../src/domain/turns';
@@ -478,7 +478,7 @@ test.extend({pinDungeonSeed:27})('saved dungeon downloads only after explicit re
   let enemyTurn=false;
   for(let turn=0;turn<before.state.initiative.length&&!enemyTurn;turn++){
    const previous=await readSession(page);
-   await activate(page.getByRole('button',{name:'Wait / End turn',exact:true}));
+   await endTurn(page, selector=>activate(page.locator(selector)));
    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
    const current=await readSession(page);
    expect(current.state.commandCount).toBeGreaterThan(previous.state.commandCount);
@@ -754,7 +754,7 @@ fixedSeedTest('dungeon battle undo survives reload and a legal defeat journey',a
  for(let i=0;i<100;i++){
   if(!await inBattle())break;
   await expect(game).toHaveAttribute('data-phase','player');
-  if(isMobile)await page.locator('#battle-next').tap();else await page.locator('#battle-next').click();
+  await endTurn(page, selector=>isMobile?page.locator(selector).tap():page.locator(selector).click());
   await expect.poll(async()=>!await inBattle()||(await game.getAttribute('data-phase'))==='player').toBe(true);
  }
  const summary=page.getByRole('dialog',{name:'Dungeon defeat',exact:true});

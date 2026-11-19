@@ -110,12 +110,21 @@ export async function reviewDraught(page: Page) {
   await expect(page.getByRole('dialog')).toHaveAccessibleName('Drink Healing Draught?');
 }
 
+type ActivateBattleControl = (selector: string) => Promise<void>;
+
+export async function confirmEndTurn(page: Page, activate: ActivateBattleControl = selector => page.locator(selector).click()) {
+  const confirm = '#battle-end-turn-confirm';
+  if (await page.locator(confirm).isVisible()) await activate(confirm);
+}
+
+export async function endTurn(page: Page, activate: ActivateBattleControl = selector => page.locator(selector).click()) {
+  await activate('#battle-next');
+  await confirmEndTurn(page, activate);
+}
+
 export async function playCommand(page:Page,command:Command){
+  if(command.type==='endTurn')return endTurn(page);
   const skin=await combatSkin(page);
-  if(command.type==='endTurn') {
-    await page.getByRole('button',{name:skin==='radial'?'End turn':'Wait / End turn',exact:true}).click();
-    return;
-  }
   if(command.type==='drinkDraught') {
     await reviewDraught(page);
     const confirm = page.locator('#battle-draught-confirm');

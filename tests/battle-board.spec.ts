@@ -1,4 +1,4 @@
-import { battleTool, confirmRestart, settledReport } from './helpers/battlePolicy';
+import { endTurn, battleTool, confirmRestart, settledReport } from './helpers/battlePolicy';
 import { expect, test, type Page } from './helpers/forceRailControls';
 import { standaloneCatalog as battleCatalog } from './helpers/playerPolicy';
 import { buildBoardPresentation } from '../src/geometry/boardPresentation';
@@ -359,7 +359,7 @@ test('selection labels retain the zoomed and panned camera without gameplay comm
   const activeLabels = new Set<string>();
   for (let turn = 0; turn < initial.units.length; turn++) {
     const beforeCount = (await report(page)).commandCount;
-    await page.getByRole('button', { name: 'Wait / End turn' }).click();
+    await endTurn(page);
     // The renderer reports the pre-tween snapshot during animation. Wait for the
     // accepted command and settled player phase before asserting rendered state.
     await expect.poll(async () => JSON.parse((await page.locator('#game').getAttribute('data-session'))!).state.commandCount).toBeGreaterThan(beforeCount);
@@ -493,7 +493,7 @@ test('default authored board renders canonical units, highlights and stable rest
     const fresh=JSON.parse((await page.locator('#game').getAttribute('data-session'))!);
     expect(fresh.replay.initial.seed).toBe(run+2);
     expect(fresh.replay.initial.commandCount).toBe(0);
-    await page.getByRole('button', { name: 'Wait / End turn' }).click();
+    await endTurn(page);
     await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
     expect((await report(page)).commandCount).toBeGreaterThan(value.commandCount);
     const view = (await report(page)).transform;
