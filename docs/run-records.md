@@ -65,11 +65,12 @@ cannot change a paused review token. Normal same-origin links checkpoint before
 navigation. Confirmed replacement keeps its modal open through history staging;
 the old scene stops before that modal closes. Thus a pending enemy turn cannot
 change the frozen journey while the accepted replacement is being prepared.
-Hide/blur/pagehide close the active interval, and an already queued
-final write can finish after owner disposal. Browser/process termination or storage
-refusal can still lose uncommitted intervals; no second journal or closed-time
-compensation is used. Successful clock writes preserve current focus/scroll rather
-than rebuilding the game view.
+Hide, blur and pagehide close the active interval. When a sample cannot yet
+reach the dungeon save, the session stores its active milliseconds separately.
+Continuing the same saved bytes reapplies that total under the dungeon write lock.
+A changed save invalidates the sample. Storage refusal or termination before
+the next sample can still lose uncommitted time. Successful clock writes preserve focus
+and scroll.
 
 Version-two history retains the same primary/backup keys, newest 100 summaries and
 single/paired replacement receipts. Each new ending freezes its versioned stats
@@ -156,7 +157,10 @@ extension uses the same bounded history namespace; active saves are unchanged.
 ## Save review and departure safety
 
 Dungeon saves, spatial publication, retries, removal and replacement share the
-origin lock named by the dungeon primary key. Reviews await queued clock writes
+origin lock named by the dungeon primary key. Each document queues its own writes.
+If two dungeon tabs try to write concurrently, the first keeps its place and the
+other reports contention so the player can review the latest durable progress.
+Reviews await queued clock writes
 before inspecting bytes; a no-op flush is a queue fence and does not retry or
 recreate a deliberately removed save. Removal stays paused while its lock is pending.
 Fresh elapsed playtime and explicit Retry saving can still create a new checkpoint.

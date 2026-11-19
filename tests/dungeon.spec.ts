@@ -743,6 +743,9 @@ fixedSeedTest('dungeon battle undo survives reload and a legal defeat journey',a
  await page.goto('./?game=dungeon&entry=new');
  await walkDungeon(page,undefined,isMobile?'touch':'keyboard');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const entry=await snapshot(page);const restored=await playUndo(page,dungeonBattle(entry)!.catalog,isMobile);
+ // Returning to player input completes the animation. The save confirmation is the durable boundary.
+ await expect(page.locator('#battle-persistence span')).toContainText('Dungeon saved on this device');
+ expect(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!).payload.activeBattle,DUNGEON_KEYS.primary)).toEqual(restored);
  await page.reload();await expectDungeonResumed(page);
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect((await readSession(page)).state).toEqual(restored);
  await expect(page.locator('#battle-undo')).toBeDisabled();
