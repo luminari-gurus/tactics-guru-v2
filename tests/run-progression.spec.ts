@@ -5,6 +5,7 @@ import {playerDecision} from './helpers/playerPolicy';
 import {runContext} from './helpers/runItemFixtures';
 import {runBattleCatalog,type RunSnapshot} from '../src/domain/runSaveEnvelope';
 import {replayRunBattle} from '../src/domain/runBattle';
+import {levelUpFeedback} from '../src/domain/progression';
 import type {ItemId} from '../src/content/itemTypes';
 import {RUN_STORAGE_KEYS} from '../src/persistence/runStorage';
 import {RUN_RECORD_KEYS} from '../src/persistence/runRecordsStorage';
@@ -19,6 +20,7 @@ async function start(page:Page){
 }
 async function ready(page:Page){await expect.poll(async()=>await page.locator('#game').getAttribute('data-phase')??'boundary',{timeout:15000}).toMatch(/player|ended|boundary/);}
 async function fight(page:Page,wait=false,useDraught=false,dismissedTip?:string){
+ const partyBefore = (await snapshot(page)).items.run.party;
  let drank=false;
  for(let i=0;i<500;i++){
   await ready(page);const current=await snapshot(page);if(current.items.run.phase!=='battle')break;
@@ -30,7 +32,12 @@ async function fight(page:Page,wait=false,useDraught=false,dismissedTip?:string)
   } else await playCommand(page,wait?{type:'endTurn',unitId}:playerDecision(battle.state,catalog));
  }
  await expect(page.locator('#run-screen')).toBeVisible();
- await expect(page.locator('#run-item-status')).not.toHaveText('Saving run…');
+ const settled = await snapshot(page);
+ expect(settled.activeBattle).toBeNull();
+ const feedback = levelUpFeedback(partyBefore, settled.items.run.party);
+ await expect(page.locator('#run-item-status')).toHaveText(
+  feedback ? `Progress resets on reload or when you leave. ${feedback}` : 'Progress resets on reload or when you leave.'
+ );
  return drank;
 }
 async function prepare(page:Page, itemId:ItemId='item:healing_draught'){
@@ -41,7 +48,8 @@ async function prepare(page:Page, itemId:ItemId='item:healing_draught'){
   const def=runContext.items[equipment.itemId];const hero=now.items.run.party.find(h=>h.hp>0 && def.eligibleHeroes.includes(h.heroId));
   if(hero){await page.locator(`[id="target-${equipment.instanceId}"]`).selectOption(hero.heroId);await page.getByRole('button',{name:`Equip ${def.label}`,exact:true}).click();await page.locator('#item-confirm').click();}
  }
- await expect(page.locator('#run-item-status')).not.toHaveText('Saving run…');
+ expect((await snapshot(page)).items.offer).toBeNull();
+ await expect(page.locator('#run-item-status')).toHaveText('Progress resets on reload or when you leave.');
 }
 test('run battle undo and a legal terminal journey reset on reload',async({page,isMobile})=>{
  test.setTimeout(300000);await start(page);const entry=await snapshot(page);
