@@ -48,6 +48,44 @@ it('clears pending save feedback when a clock checkpoint coalesces the accepted 
   expect(owner.hasUnsavedProgress).toBe(false);expect(owner.status).toBe('Run saved on this device');
 });
 
+it.each(['granted', 'superseded by a reward claim', 'sampled after the next encounter starts', 'refused'] as const)('keeps run level-up feedback when its waiting save is %s', scenario => {
+  const f = historyFixture(), pending: { grant: () => void; refuse: () => void }[] = []; let now = 0;
+  const fresh = freshRunSnapshot('level-feedback', 13, runContext, true);
+  // One normal victory (30 XP) crosses the 60 XP threshold.
+  const initial = { ...fresh, items: { ...fresh.items, run: { ...fresh.items.run, party: fresh.items.run.party.map(hero => ({ ...hero, xp: 59 })) } } };
+  const owner = new RunItemSession(initial, runContext, f.storage, (grant, refuse) => pending.push({ grant, refuse }), null, () => now);
+  const grant = () => { while (pending.length) pending.shift()!.grant(); };
+  owner.startNew(); const battle = owner.startEncounter()!;
+  for (let i = 0; i < 500 && battle.state.outcome === 'ongoing'; i++) {
+    grant();
+    const step = battle.phase === 'enemy' ? battle.nextEnemy()
+      : (battle.prepare(playerDecision(battle.state, battle.catalog)), battle.confirm());
+    assert(step); battle.finishPresentation(step.token);
+  }
+  expect(battle.state.outcome).toBe('playerWin');
+  const feedback = owner.status.match(/\w+ reached level 2.*$/)?.[0];
+  assert(feedback);
+  if (scenario !== 'granted' && scenario !== 'refused') {
+    const offer = owner.snapshot.items.offer!;
+    assert(owner.dispatch({ ...owner.boundary(), type: 'claimReward', offerId: offer.id, itemId: offer.options[0].itemId }).ok);
+    expect(owner.status).toBe(`Saving run… ${feedback}`);
+  }
+  if (scenario === 'sampled after the next encounter starts') {
+    assert(owner.startEncounter()); owner.setPlaytimeActive(true);
+    now = 1234; owner.setPlaytimeActive(false);
+  }
+  if (scenario === 'refused') while (pending.length) pending.shift()!.refuse();
+  else grant();
+  expect(owner.status).toBe(scenario === 'refused'
+    ? `Progress unsaved: exclusive save access unavailable. Open Save recovery to export. ${feedback}`
+    : `Run saved on this device. ${feedback}`);
+  expect(owner.hasUnsavedProgress).toBe(scenario === 'refused');
+  if (scenario === 'sampled after the next encounter starts') {
+    const saved = f.storage.load(); assert(saved.ok && saved.selected);
+    expect(saved.selected.state.stats?.activeMs).toBe(1234);
+  }
+}, 30000); // Plays a complete legal battle.
+
 it('excludes preparation, paused dialogs and closed time across owner reconstruction', async () => {
   const f = historyFixture(), initial = freshRunSnapshot('clock-resume', 13, runContext, true); let now = 0;
   let owner = new RunItemSession(initial, runContext, f.storage, undefined, null, () => now);
