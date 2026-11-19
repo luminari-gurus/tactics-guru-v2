@@ -126,19 +126,7 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
       if (Object.values(old).some(s => s.status === 'unavailable')) return { ok: false, reason: 'unavailable' };
       if (Object.values(old).some(s => s.status === 'invalid')) return { ok: false, reason: 'recoveryRequired' };
       if (expectedPrimary !== undefined && old.primary.text !== expectedPrimary) return { ok: false, reason: 'changed' };
-      if (expectedBackup) {
-        // The selected recovery point stays intact until its first new primary is durable.
-        const matches = () => sameSlot(inspect().backup, expectedBackup);
-        if (!matches()) return { ok: false, reason: 'changed' };
-        uncertain = true;
-        storage.setItem(DUNGEON_KEYS.primary, encoded.text);
-        if (storage.getItem(DUNGEON_KEYS.primary) !== encoded.text) return { ok: false, reason: 'uncertainWrite' };
-        if (old.backup.status === 'valid' && primaryHidesRecentBackup(old.primary, old.backup.state) &&
-            storage.getItem(DUNGEON_RECENT_BACKUP_KEY) !== null) storage.removeItem(DUNGEON_RECENT_BACKUP_KEY);
-        if (!matches()) return { ok: false, reason: 'uncertainWrite' };
-        uncertain = false; lastWritten = encoded.text;
-        return { ok: true };
-      }
+      if (expectedBackup && !sameSlot(inspect().backup, expectedBackup)) return { ok: false, reason: 'changed' };
       let backup = old.primary.status === 'valid' ? old.primary.text : old.backup.status === 'missing' ? encoded.text : null;
       let backupState: DungeonState | undefined = old.primary.status === 'valid' ? old.primary.state
         : old.backup.status === 'valid' ? old.backup.state : encoded.state;
@@ -210,6 +198,13 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
         return storage.getItem(DUNGEON_KEYS.backup) === (backup ?? old.backup.text) &&
           (expectedRecord == null || storage.getItem(DUNGEON_BACKUP_CHECKPOINT_KEY) === expectedRecord);
       };
+      // A player who continued the backup depends on those exact bytes and sidecars.
+      // Verify their new primary before rotating the preceding primary into backup.
+      if (expectedBackup) {
+        uncertain = true;
+        storage.setItem(DUNGEON_KEYS.primary, encoded.text);
+        if (storage.getItem(DUNGEON_KEYS.primary) !== encoded.text) return { ok: false, reason: 'uncertainWrite' };
+      }
       if (backup !== null) {
         if (checkpoint !== null) {
           // Keep the old checkpoint readable until the new rollback bytes land.
@@ -235,7 +230,7 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
       }
       // Any exception after the write attempt can have an uncertain outcome.
       uncertain = true;
-      storage.setItem(DUNGEON_KEYS.primary, encoded.text);
+      if (!expectedBackup) storage.setItem(DUNGEON_KEYS.primary, encoded.text);
       // A concurrent removal can invalidate the backup while the primary is being written.
       if (storage.getItem(DUNGEON_KEYS.primary) !== encoded.text || !backupMatches() ||
           storage.getItem(DUNGEON_RECENT_BACKUP_KEY) !== recentRecord) return { ok: false, reason: 'uncertainWrite' };
@@ -296,7 +291,7 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
       const original = storage.getItem(first), other = storage.getItem(second);
       uncertain = true;
       storage.setItem(first, encoded.text);
-      if (storage.getItem(first) !== encoded.text) return { ok: false, reason: 'uncertainWrite' };
+      if (storage.getItem(first) !== encoded.text || storage.getItem(second) !== other) return { ok: false, reason: 'uncertainWrite' };
       try {
         storage.setItem(second, encoded.text);
       } catch (cause) {

@@ -65,11 +65,12 @@ cannot change a paused review token. Normal same-origin links checkpoint before
 navigation. Confirmed replacement keeps its modal open through history staging;
 the old scene stops before that modal closes. Thus a pending enemy turn cannot
 change the frozen journey while the accepted replacement is being prepared.
-Hide/blur/pagehide close the active interval, and an already queued
-final write can finish after owner disposal. Browser/process termination or storage
-refusal can still lose uncommitted intervals; no second journal or closed-time
-compensation is used. Successful clock writes preserve current focus/scroll rather
-than rebuilding the game view.
+Hide, blur and pagehide close the active interval. If a dungeon write is still
+waiting on pagehide, the session stores the sampled active milliseconds separately.
+Continuing the same saved bytes reapplies that total under the dungeon write lock.
+A changed save invalidates the sample. Storage refusal or termination before
+pagehide can still lose uncommitted time. Successful clock writes preserve focus
+and scroll.
 
 Version-two history retains the same primary/backup keys, newest 100 summaries and
 single/paired replacement receipts. Each new ending freezes its versioned stats

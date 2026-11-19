@@ -1504,6 +1504,12 @@ it('keeps the continued backup and its sidecars intact when the primary write fa
  expect(await owner.save()).toBe(false);
  expect(owner.status).toContain('quota');
  expect(data.values).toEqual(before);
+ data.setItem = write;
+ assert(await owner.retry(owner.inspect()));
+ expect(store.inspect()).toMatchObject({
+   primary: { state: { revision: initial.revision } },
+   backup: { state: { revision: 1 } },
+ });
 });
 
 it('refuses the first write from a backup that another tab removed', async () => {
