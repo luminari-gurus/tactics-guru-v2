@@ -152,8 +152,8 @@ tracks the implementation and acceptance checks.
 ## Review follow-up
 
 The [adversarial review](https://github.com/luminari-gurus/tactics-guru-v2/pull/445#issuecomment-7013057696)
-at `3b30d270` reported five findings. All five were reproduced by reading the code.
-Items 2–5 are in this PR's scope:
+at `3b30d270` reported five findings. Each was checked against the code; items
+2–5 are in this PR's scope:
 
 - **Disposal durability (2):** the clock-dependent `finishesAfterDispose` flag is
   removed. The latest request finishes after disposal, still guarded by the snapshot
@@ -165,8 +165,10 @@ Items 2–5 are in this PR's scope:
 - **Stale Continue coverage (5):** the case runs granted and refused locks for both slots.
 
 New unit cases for items 2–4 failed against `3b30d270` and pass with the change.
-Item 1 is the same symptom in `RunItemSession`, outside #435's dungeon scope, and
-is tracked separately.
+Item 1 concerns `RunItemSession`, outside #435's dungeon scope. Its exact sequence
+cannot occur because a run level-up happens only on the terminal command, which
+pauses the clock first. The related loss of run level-up feedback under the async
+lock is tracked in [#446](https://github.com/luminari-gurus/tactics-guru-v2/issues/446).
 
 ## Estimate and open questions
 
