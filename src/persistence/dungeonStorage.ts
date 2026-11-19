@@ -363,11 +363,17 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
   return { inspect, save, replace, remove, acknowledge, clockCheckpoint, clearClockCheckpoint, lastSavedText: () => lastWritten };
 }
 
-/** All browser dungeon mutations, including multi-slot recovery, share this lock. */
-export function serializeBrowserDungeonWrite(task: () => void, unavailable: () => void) {
-  try {
+// Keep requests from one document in order. A second document must not join the
+// same batch of waiting writers: its localStorage replica can still show the old
+// primary immediately after the first document releases the Web Lock.
+let localWrites = Promise.resolve();
+export function serializeBrowserDungeonWrite(task: () => void, unavailable: (contended?: boolean) => void) {
+  localWrites = localWrites.then(async () => {
     const locks = navigator.locks;
     if (!locks) { unavailable(); return; }
-    void locks.request(DUNGEON_KEYS.primary, task).catch(unavailable);
-  } catch { unavailable(); }
+    await locks.request(DUNGEON_KEYS.primary + ':writer', { ifAvailable: true }, async admission => {
+      if (!admission) { unavailable(true); return; }
+      await locks.request(DUNGEON_KEYS.primary, task);
+    });
+  }).catch(() => unavailable());
 }

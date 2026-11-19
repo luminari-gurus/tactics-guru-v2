@@ -157,7 +157,10 @@ extension uses the same bounded history namespace; active saves are unchanged.
 ## Save review and departure safety
 
 Dungeon saves, spatial publication, retries, removal and replacement share the
-origin lock named by the dungeon primary key. Reviews await queued clock writes
+origin lock named by the dungeon primary key. Each document queues its own writes.
+If two dungeon tabs try to write concurrently, the first keeps its place and the
+other reports contention so the player can review the latest durable progress.
+Reviews await queued clock writes
 before inspecting bytes; a no-op flush is a queue fence and does not retry or
 recreate a deliberately removed save. Removal stays paused while its lock is pending.
 Fresh elapsed playtime and explicit Retry saving can still create a new checkpoint.

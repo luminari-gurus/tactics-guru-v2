@@ -266,10 +266,16 @@ test('reload recovers the last four seconds exactly once across a held dungeon l
   },DUNGEON_KEYS.primary);
   await expect.poll(() => page.evaluate(() => (window as unknown as {dungeonLockHeld:boolean}).dungeonLockHeld)).toBe(true);
   await page.locator('#dungeon-step-'+direction).click();
+  await expect.poll(() => page.evaluate(async key =>
+    (await navigator.locks.query()).pending?.filter(lock => lock.name === key).length, DUNGEON_KEYS.primary)).toBe(1);
   await other.locator('#dungeon-step-'+direction).click();
+  await expect(other.locator('.dungeon-status')).toContainText('another tab is saving');
   expect(await snapshot(page)).toEqual(initial); expect(await snapshot(other)).toEqual(initial);
   await page.evaluate(() => (window as unknown as {releaseDungeonLock:()=>void}).releaseDungeonLock());
   await expect.poll(async () => (await snapshot(page)).stats?.movesTaken).toBe(1);
+  // Another attempt after the write is visible must also refuse the stale owner via CAS.
+  await expect.poll(() => other.evaluate(key => JSON.parse(localStorage.getItem(key)!).payload.stats.movesTaken, DUNGEON_KEYS.primary)).toBe(1);
+  await other.locator('#dungeon-step-'+direction).click();
   await expect(other.locator('.dungeon-status')).toContainText('changed');
   expect(await snapshot(other)).toEqual(initial);
   const durable = await page.evaluate(keys => ({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),DUNGEON_KEYS);

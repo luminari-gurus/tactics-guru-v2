@@ -171,7 +171,8 @@ test('main menu: records dungeon replacement withholds exploration until final h
   await expect(page.getByRole('heading', { name: 'Starting new dungeon', exact: true })).toHaveCount(0);
   await expect(page.locator('.dungeon-directions button:enabled').first()).toBeEnabled();
   await page.locator('.dungeon-directions button:enabled').first().click();
-  expect(await page.locator('#game').getAttribute('data-dungeon-snapshot')).not.toBe(before);
+  const revision = JSON.parse(before!).revision;
+  await expect.poll(async () => JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!).revision).toBe(revision + 1);
 });
 
 for (const completion of ['finished', 'interrupted'] as const)

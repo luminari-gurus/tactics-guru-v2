@@ -1343,7 +1343,11 @@ describe('versioned floor dimensions', () => {
 
  it('serializes an interleaved dungeon writer before checking either durable slot', async () => {
   let queue = Promise.resolve();
-  vi.stubGlobal('navigator', {locks: {request: (key: string, task: () => void) => {
+  vi.stubGlobal('navigator', {locks: {request: (key: string, task: () => void, admit?: (lock: object) => Promise<void>) => {
+    if (admit) {
+      expect(key).toBe(DUNGEON_KEYS.primary + ':writer');
+      return admit({});
+    }
     expect(key).toBe(DUNGEON_KEYS.primary);
     const pending = queue.then(task); queue = pending.catch(() => {}); return pending;
   }}});

@@ -52,7 +52,7 @@ export class DungeonSession {
   completedBattle: unknown = null;
   constructor(initial: unknown, readonly storage: ReturnType<typeof createDungeonStorage> | null = createDungeonStorage(), history: RunHistory | null = null,
     now: () => number = () => performance.now(),
-    private readonly serializeWrite?: (task: () => void, unavailable: () => void) => void) {
+    private readonly serializeWrite?: (task: () => void, unavailable: (contended?: boolean) => void) => void) {
     const checked = readDungeon(initial); if (!checked.ok) throw Error('Invalid dungeon'); this.current = checked.state;
     this.playtime = storage ? new ActivePlaytime(now) : null;
     if (!storage) { const { stats: _, ...untracked } = this.current; this.current = untracked; }
@@ -122,8 +122,10 @@ export class DungeonSession {
     finishAfterDispose = false, reportUnavailable = (message: string) => this.report(message),
   } = {}): Promise<T> {
     const pending = new Promise<T>(resolve => {
-      const unavailable = () => {
-        reportUnavailable('Progress unsaved: exclusive save access unavailable. Open Save recovery to retry or export.');
+      const unavailable = (contended = false) => {
+        reportUnavailable(contended
+          ? 'Progress unsaved: another tab is saving. Open Save recovery to review the latest progress.'
+          : 'Progress unsaved: exclusive save access unavailable. Open Save recovery to retry or export.');
         resolve(failure);
       };
       const run = () => { if (this.disposed && !finishAfterDispose) resolve(failure); else resolve(task()); };
