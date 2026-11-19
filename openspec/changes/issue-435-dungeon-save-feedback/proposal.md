@@ -21,5 +21,5 @@ None.
 
 ## Impact
 
-The fix is in `DungeonSession` and its existing tests. It uses the current storage
-lock and compare-and-swap. See the [implementation handoff](../../../docs/ongoing-projects/plan.md).
+The fix uses the existing dungeon write lock. Review follow-up also covers backup
+continuation, replacement, defeat history and save recovery. See the [implementation handoff](../../../docs/ongoing-projects/plan.md).

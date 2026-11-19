@@ -93,6 +93,7 @@ test('dungeon previous-format recovery preserves and exports both original slots
  await page.getByRole('button',{name:'Save recovery',exact:true}).click();
  await page.getByRole('dialog').getByRole('link',{name:/Dungeon/}).click();
  await expect(page.getByRole('dialog')).toContainText('primary: invalid. backup: invalid.');
+ await expect(page.getByRole('button',{name:'Export current progress',exact:true})).toHaveCount(0);
  for(const slot of ['primary','backup'] as const) {
   const pending=page.waitForEvent('download');await page.getByRole('button',{name:`Export ${slot} save`,exact:true}).click();
   const download=await pending,file=await download.path(),raw=readFileSync(file!,'utf8');

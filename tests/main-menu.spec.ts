@@ -678,9 +678,10 @@ test('main menu: failed new-game write retains exportable recovery copies',async
  },{key:keys.dungeon.primary,text});
  await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();await page.getByRole('dialog').getByRole('button',{name:'Start new dungeon',exact:true}).click();
  await expect(page.getByRole('dialog')).toContainText('Dungeon save recovery');
- const download=page.waitForEvent('download');await page.getByRole('button',{name:/^Export retained primary save/}).click();
+ const download=page.waitForEvent('download');await page.getByRole('button',{name:'Export primary save',exact:true}).click();
  const file=await (await download).path();expect(readFileSync(file!,'utf8')).toBe(text);
- await expect(page.locator('#dungeon-screen')).toContainText('Progress unsaved');
+ await expect(page.getByRole('dialog')).toContainText('Reset refused: quota');
+ expect(await page.evaluate(key=>localStorage.getItem(key),keys.dungeon.primary)).toBe(text);
 });
 
 for(const path of ['unsaved play','failed replacement'] as const)test(`main menu: dungeon departure after rejected movement retains ${path} warning`,async({page})=>{
@@ -704,8 +705,8 @@ for(const path of ['unsaved play','failed replacement'] as const)test(`main menu
   await page.getByRole('button',{name:'East',exact:true}).click();
   await expect(map).toBeVisible();await expect(map).toHaveAttribute('data-position',String(position+1));
  }else{
-  await expect(page.getByRole('dialog')).toContainText('Dungeon save recovery');
-  await page.locator('#dungeon-close-recovery').click();
+  await expect(page.getByRole('dialog')).toContainText('Reset refused: quota');
+  await page.getByRole('button',{name:'Play unsaved dungeon',exact:true}).click();
  }
  const before=await page.locator('#game').getAttribute('data-dungeon-snapshot');
  expect(JSON.parse(before!).phase).toBe('ready');await expect(page.locator('#dungeon-map')).toBeVisible();

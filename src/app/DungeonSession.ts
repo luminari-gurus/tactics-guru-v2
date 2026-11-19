@@ -34,7 +34,10 @@ export class DungeonSession {
   private review: DungeonInspection | null = null;
   private unsaved = false;
   private progressSaved = false;
+  private savedRevision: number | null = null;
+  private boundaryError = '';
   private expectedPrimary: string | null | undefined;
+  private expectedBackup?: DungeonInspection['backup'];
   private retained: { label: string; text: string }[] = [];
   private started = false;
   private readonly playtime: ActivePlaytime | null;
@@ -42,7 +45,7 @@ export class DungeonSession {
   private queuedSave: { snapshot: DungeonState; quiet: boolean; feedback: string } | null = null;
   readonly history: RunHistory | null;
   private message = 'Progress has not been saved';
-  get status() { return this.history?.status ? `${this.message}. ${this.history.status}` : this.message; }
+  get status() { return [this.boundaryError, this.message, this.history?.status].filter(Boolean).join('. '); }
   onChange: (() => void) | null = null;
   onVictory: ((intent: DungeonAutoCollectIntent) => void) | null = null;
   completedBattle: unknown = null;
@@ -66,15 +69,25 @@ export class DungeonSession {
   get savesProgress() { return this.storage !== null && !this.unsaved; }
   private write(state: DungeonState) {
     if (!this.storage) throw Error('Testing dungeons have no save storage');
-    const result = this.storage.save(state, this.expectedPrimary);
-    if (result.ok) this.expectedPrimary = this.storage.lastSavedText();
+    const result = this.storage.save(state, this.expectedPrimary, this.expectedBackup);
+    if (result.ok) {
+      this.expectedPrimary = this.storage.lastSavedText();
+      this.expectedBackup = undefined;
+      this.savedRevision = state.revision;
+    }
     return result;
   }
   private report(text: string, feedback = '') {
     this.message = feedback ? `${text.replace(/\.$/, '')}. ${feedback}` : text;
     try { this.onChange?.(); } catch { /* Observers cannot undo state. */ }
   }
-  dispose() { this.flushPlaytime(); this.disposed = true; this.battle?.dispose(); this.battle = null; this.onChange = null; this.onVictory = null; if (this.history) this.history.onChange = null; }
+  dispose() {
+    if (this.disposed) return;
+    void this.flushPlaytime();
+    this.disposed = true; this.battle?.dispose(); this.battle = null;
+    this.onChange = null; this.onVictory = null;
+    if (this.history) this.history.onChange = null;
+  }
   private capturePlaytime(active?: boolean) {
     if (!this.started || !this.playtime) return false;
     const elapsed = this.playtime.sample(active);
@@ -91,7 +104,7 @@ export class DungeonSession {
   }
   setPlaytimeActive(active: boolean) {
     if (this.disposed) return;
-    this.checkpointPlaytime(active && (this.current.phase === 'ready' || this.current.phase === 'battle' && this.battle?.state.outcome === 'ongoing'));
+    this.checkpointPlaytime(active && (this.current.phase === 'ready' || this.current.phase === 'battle' && !this.boundaryError && this.battle?.state.outcome === 'ongoing'));
   }
   async flushPlaytime() {
     if (this.disposed) return;
@@ -124,11 +137,12 @@ export class DungeonSession {
     this.progressSaved = false;
     if (!request.quiet) this.report(request.feedback ? `Saving dungeon… ${request.feedback}` : 'Saving dungeon…');
     const settle = () => {
-      if (this.queuedSave === request) this.queuedSave = null;
+      if (this.queuedSave !== request) return false;
+      this.queuedSave = null;
       return this.current === request.snapshot;
     };
     // Accepted progress stays durable after disposal; the storage compare-and-swap guards the write.
-    return this.mutate(() => settle() && this.saveNow({ quiet: request.quiet || this.disposed, feedback: request.feedback }), false, true, {
+    return this.mutate(() => settle() && this.saveNow({ quiet: request.quiet || this.disposed, feedback: request.feedback }), false, !this.unsaved, {
       finishAfterDispose: true,
       reportUnavailable: message => { if (settle()) this.report(message, request.feedback); },
     });
@@ -177,7 +191,7 @@ export class DungeonSession {
       // This runs inside the same exclusive write boundary as manual movement.
       // A user interaction while waiting for the lock must win the race.
       if (this.disposed || !isCurrent() || this.battle && !['ended', 'disposed'].includes(this.battle.phase)) return false;
-      if (this.storage && !this.unsaved && this.hasUnsavedProgress) {
+      if (this.storage && !this.unsaved && this.savedRevision !== this.current.revision) {
         this.report('Loot remains on the ground. Open Save recovery before automatic collection.');
         return false;
       }
@@ -208,7 +222,12 @@ export class DungeonSession {
       if (this.disposed || this.battle !== session || this.current.phase !== 'battle') return;
       this.capturePlaytime(session.state.outcome === 'ongoing' ? undefined : false);
       const next = acceptDungeonBattle(this.current, session.state);
-      if (!next.ok) { this.report(`Dungeon boundary rejected: ${next.reason}`); return; }
+      if (!next.ok) {
+        session.dispose();
+        this.boundaryError = `Dungeon boundary rejected: ${next.reason}. Open Save recovery to continue`;
+        this.report(this.message);
+        return;
+      }
       const feedback = levelUpFeedback(this.current.party, next.state.party);
       const previous = this.current;
       this.current = this.storage && batch ? { ...next.state, stats: acceptBattleStats(
@@ -244,7 +263,8 @@ export class DungeonSession {
     if (!selected || !this.storage.acknowledge(review)) return false;
     this.battle?.dispose(); this.battle = null; this.current = structuredClone(selected.state); this.expectedPrimary = review.primary.text; this.unsaved = false; this.progressSaved = true; this.review = null;
     this.queuedSave = null;
-    this.started = true;
+    this.expectedBackup = slot === 'backup' ? selected : undefined;
+    this.started = true; this.boundaryError = ''; this.savedRevision = this.current.revision;
     this.report(slot === 'backup' ? 'Continued backup; some progress may be lost.' : 'Continued saved dungeon');
     if (this.history) void this.history.resume(this.current.id, dungeonRunRecord(this.current, this.history.now()));
     return true;
@@ -252,14 +272,23 @@ export class DungeonSession {
   retry(review: DungeonInspection) { this.recordEnding(); return this.mutate(() => this.retryNow(review), false); }
   private retryNow(review: DungeonInspection) {
     if (!this.storage || this.disposed || review !== this.review || !this.storage.acknowledge(review)) return false;
+    if (this.current.phase !== 'defeat' && [review.primary, review.backup].some(slot =>
+      slot.status === 'valid' && slot.state.id === this.current.id && slot.state.phase === 'defeat')) {
+      this.report('Retry refused: this dungeon has ended in defeat. Export progress or start a new dungeon.');
+      return false;
+    }
     this.expectedPrimary = review.primary.text;
+    // An explicit retry acknowledges the newly reviewed storage boundary.
+    if (this.expectedBackup) this.expectedBackup = review.backup.status === 'valid' ? review.backup : undefined;
     this.review = null;
     return this.saveNow({ retryUnsaved: true });
   }
   private liveExports(review: DungeonInspection) {
     const values: { label: string; text: string }[] = [];
-    const current = encodeDungeon(this.current);
-    if (current.ok) values.push({ label: 'current progress', text: current.text });
+    if (this.started) {
+      const current = encodeDungeon(this.current);
+      if (current.ok) values.push({ label: 'current progress', text: current.text });
+    }
     for (const slot of ['primary','backup'] as const) {
       const reviewed = review[slot];
       if (reviewed.text === null) continue;
@@ -284,8 +313,6 @@ export class DungeonSession {
   }
   private retainExports(review: DungeonInspection) {
     for (const value of this.liveExports(review)) {
-      // Startup holds a placeholder until a dungeon starts or resumes.
-      if (!this.started && value.label === 'current progress') continue;
       if (!this.retained.some(copy => copy.label === value.label && copy.text === value.text)) this.retained.push(value);
     }
   }
@@ -298,6 +325,7 @@ export class DungeonSession {
     }
     this.retainExports(review);
     this.progressSaved = false;
+    this.savedRevision = null;
     const reviewed = review[slot];
     const result = this.storage.remove(slot, reviewed.text, reviewed.status === 'valid' ? reviewed.checkpoint ?? null : null);
     this.review = null;
@@ -320,28 +348,28 @@ export class DungeonSession {
   }
   private replaceNow(review: DungeonInspection, id: string, seed: number) {
     if (!this.storage || this.disposed || review !== this.review || id === this.current.id || seed === this.current.seed) return false;
-    if (!this.storage.acknowledge(review)) { this.review = null; this.report('Reset refused: saved dungeon data changed. Review again.'); return false; }
     const next = freshDungeon(id, seed, undefined, true);
     this.retainExports(review);
-    this.progressSaved = false;
-    for (const slot of ['backup','primary'] as const) {
-      const reviewed = review[slot];
-      if (!this.storage.remove(slot, reviewed.text, reviewed.status === 'valid' ? reviewed.checkpoint ?? null : null).ok) {
-        this.review = null; this.report('Reset incomplete. Current dungeon retained; export recovery copies and review again.'); return false;
-      }
+    const result = this.storage.replace(review, next);
+    this.review = null;
+    if (!result.ok) {
+      this.report(`Reset refused: ${result.reason}. Review saved progress before retrying.`);
+      return false;
     }
-    const after = this.storage.inspect();
-    if (Object.values(after).some(s => s.status !== 'missing') || !this.storage.acknowledge(after)) return false;
-    this.reset(next); return true;
+    this.reset(next);
+    this.expectedPrimary = this.storage.lastSavedText();
+    this.progressSaved = true; this.savedRevision = next.revision;
+    this.report('Dungeon saved on this device');
+    return true;
   }
   /** Testing restart has no durable replacement or recovery step. */
   restart(id: string, seed: number) {
     if (this.storage || this.disposed) return false;
-    this.reset(freshDungeon(id, seed)); return true;
+    this.reset(freshDungeon(id, seed)); this.report('Testing dungeon. Progress resets on reload.'); return true;
   }
   private reset(next: DungeonState) {
     this.battle?.dispose(); this.battle = null; this.current = next; this.expectedPrimary = null; this.completedBattle = null; this.review = null; this.unsaved = false;
-    this.queuedSave = null; this.started = true;
-    this.saveNow();
+    this.queuedSave = null; this.started = true; this.boundaryError = '';
+    this.expectedBackup = undefined;
   }
 }

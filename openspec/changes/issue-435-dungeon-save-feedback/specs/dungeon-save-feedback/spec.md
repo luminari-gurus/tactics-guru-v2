@@ -28,7 +28,7 @@ message SHALL show the actual result and its action feedback when it settles.
 
 #### Scenario: A later battle boundary is rejected
 - **WHEN** a battle command samples playtime and its boundary is then rejected
-- **THEN** the pending save still writes the previously accepted progress with the sampled playtime
+- **THEN** the pending save still writes the previously accepted progress with the sampled playtime, the rejection remains visible, and battle input stops until recovery
 
 #### Scenario: The session is disposed before the lock is granted
 - **WHEN** teardown precedes the grant, with or without a playtime sample

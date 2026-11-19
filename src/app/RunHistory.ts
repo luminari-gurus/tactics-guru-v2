@@ -27,23 +27,34 @@ export class RunHistory {
   }
   reconcileDungeonDefeat(review: DungeonInspection) {
     const selected = review.primary.status === 'valid' ? review.primary : review.backup;
-    if (this.mode !== 'dungeon' || selected.status !== 'valid' || selected.state.phase !== 'defeat') return;
-    return this.resume(selected.state.id, dungeonRunRecord(selected.state, this.now()));
+    if (this.mode !== 'dungeon' || selected.status !== 'valid') return;
+    const defeats: RunRecord[] = [];
+    for (const slot of [review.primary, review.backup]) {
+      if (slot.status !== 'valid' || slot.state.phase !== 'defeat' || defeats.some(row => row.id === slot.state.id)) continue;
+      const record = dungeonRunRecord(slot.state, this.now());
+      if (record) defeats.push(record);
+    }
+    if (defeats.length) return this.reconcile(selected.state.id, defeats);
   }
   private closePending(history: RunRecords, receipt: PendingRecordReceipt): RunRecords {
     return { ...history, receipts: { ...history.receipts, [this.mode]: receipt.sealed ?? null } };
   }
   resume(currentId: string, terminal: RunRecord | null) {
+    return this.reconcile(currentId, terminal ? [terminal] : []);
+  }
+  private reconcile(currentId: string, terminals: RunRecord[]) {
     let unresolved = false;
     const work = this.commit(history => {
       const receipt = history.receipts[this.mode];
       if (receipt?.kind === 'pending') {
         if (receipt.newId === currentId || pendingRecords(receipt).some(record => record.id === currentId)) {
           history = this.closePending(history, receipt);
-          if (receipt.newId === currentId) for (const record of pendingRecords(receipt)) history = appendRunRecord(history, record);
+          if (receipt.newId === currentId) {
+            for (const record of pendingRecords(receipt)) history = appendRunRecord(history, terminals.find(row => row.id === record.id) ?? record);
+          }
         } else unresolved = true;
       }
-      return terminal ? appendRunRecord(history, terminal) : history;
+      return terminals.reduce(appendRunRecord, history);
     });
     void work.then(result => { if (result.ok && unresolved) { this.status = 'A previous replacement has unresolved run history. Review Hall of Records.'; this.notify(); } });
     return work;
