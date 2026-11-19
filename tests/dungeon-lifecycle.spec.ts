@@ -129,8 +129,9 @@ test('legal enemy defeat waits for its save and returns to the menu during a pen
  }
  expect(session.state.outcome).toBe('playerLoss');
  await page.addInitScript(key=>{
-  const request=navigator.locks.request;
-  navigator.locks.request=new Proxy(request,{apply(target,locks,args){
+  // Install on the prototype so the hold survives WebKit's LockManager wrapper lifecycle.
+  const prototype=Object.getPrototypeOf(navigator.locks) as LockManager;
+  prototype.request=new Proxy(prototype.request,{apply(target,locks,args){
    const state=document.querySelector<HTMLElement>('#game')?.dataset.dungeonSnapshot;
    if(args[0]===key&&state&&JSON.parse(state).phase==='defeat'){
     return new Promise(resolve=>{

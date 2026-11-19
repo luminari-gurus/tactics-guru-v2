@@ -5,4 +5,4 @@
 
 ## 2. Integration
 
-- [ ] 2.1 Run the PR verification suite and the affected persistence and lifecycle browser cases listed in the handoff. Record results and source identity.
+- [x] 2.1 Run the PR verification suite and the affected persistence and lifecycle browser cases listed in the handoff. Record results and source identity.

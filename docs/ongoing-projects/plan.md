@@ -5,7 +5,7 @@
 - Assignee: [@moshehbenavraham](https://github.com/moshehbenavraham)
 - Branch: [work/issue-435-dungeon-save-feedback](https://github.com/luminari-gurus/tactics-guru-v2/tree/work/issue-435-dungeon-save-feedback)
 - Base: `origin/main` at `0e29532dc3920b420bcb27453d26443c608a0997`
-- Status: fix implemented and in integration verification. [OpenSpec tasks](../../openspec/changes/issue-435-dungeon-save-feedback/tasks.md). The previous handoff is preserved in [the #376 plan](issue-376-floor-progress-plan.md).
+- Status: implementation and acceptance checks complete on [PR #445](https://github.com/luminari-gurus/tactics-guru-v2/pull/445). [OpenSpec tasks](../../openspec/changes/issue-435-dungeon-save-feedback/tasks.md) are complete. The previous handoff is preserved in [the #376 plan](issue-376-floor-progress-plan.md).
 
 ## Selection
 
@@ -119,6 +119,34 @@ tracks the implementation and acceptance checks.
 - The five focused unit files passed 150 tests during iteration. A narrower rerun
   after extending the stale-Continue cases passed all nine selected race and flush
   cases. Browser discovery selected 36 Chromium and 30 WebKit executions.
+- The clean WSL Ubuntu x86-64 checkout at
+  `a7e509f5dee5b2100d4b7fcf971f8700079884a2` passed `npm run verify:pr` in
+  143 seconds, including 1,509 units, both TypeScript scopes, two build
+  integrations, a production bundle and seven core browser journeys. The
+  [self-hosted PR run](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/44533036892)
+  passed on the same head.
+- Focused Chromium passed all 36 executions against the same root-path build.
+  Focused WebKit passed 27 of 30. The existing held-defeat-save case failed at
+  the `data-phase="ended"` assertion on desktop, portrait and landscape.
+  The same three failures reproduced on the clean pinned base. Changing only
+  that test's hook to install on the `LockManager` prototype yielded three
+  passing WebKit results on the base. The repair is local to the failing test.
+  Its assertions, browser profiles, and timeout are retained.
+- The repaired held-defeat-save test passed all six Chromium and WebKit profiles
+  against the same `a7e509f5` production build, with zero skips or retries. The
+  rerun used the final test blob `fce581f15cbb876c759a80e984783b3e5296d479`.
+  The other focused cases retain their original results because their page
+  fixtures and runtime inputs are identical. The initial WebKit run remains
+  recorded as 27 passed and 3 failed.
+- Local receipts are under `/tmp/tactics-435-kziYC0` in WSL Ubuntu. The PR
+  receipt is `verification-receipts/pr/1795094602942-3709386/summary.json`.
+  Exact focus selections, reports and source/bundle checksums are under
+  `tmp/issue-435/`. See `webkit-base.json` for the three matching failures,
+  and `webkit-base-harness-verified.json`, `chromium-harness-verified.json`,
+  and `webkit-harness-verified.json` for the corrected cases.
+  Runtime is Node 24.15.0 with Playwright 1.64.1, Chromium 156.0.8078.4 and
+  WebKit 27.2. The focused runs used the root production preview and one worker.
+  [Current PR checks](https://github.com/luminari-gurus/tactics-guru-v2/pull/445/checks).
 
 ## Estimate and open questions
 
