@@ -338,11 +338,11 @@ export const battleAssets = {
     sourceWidth: 64, sourceHeight: 80, runtimeWidth: 64, runtimeHeight: 80, format: 'png',
     anchor: { x: 32, y: 76 },
     provenance: {
-      origin: 'canonical', repository: 'https://github.com/luminari-gurus/tactics-guru',
-      revision: 'e9433f6b608ae6b2d95418615cce9cf17dadcf74', originalPath: 'art/units/goblin_shaman.png',
-      sourceSha256: '43d287a0d5e801bb4fdcfe007e94aae424472ccdb01619eb02d35906753a9d3f',
+      origin: 'canonical', repository: 'https://github.com/luminari-gurus/tactics-guru-v2',
+      revision: 'bb9a581f4b6a0a9130af42f301e9f726ad29c5c8', originalPath: 'public/battle/source/goblin_shaman_sprite.png',
+      sourceSha256: '0083076d49489bb5d3614b9905fbfc63df2fd20ecd7b7ce79d8b56f7b0bb5d89',
       rightsNote: 'Canonical project artwork from owner repository. No per-file third-party license or generation method recorded; no third-party license asserted.',
-      productionNotes: 'Unchanged 64x80 RGBA canonical PNG; alpha bounds (4,13)-(60,80), source-pixel foot anchor (32,76). Original lower-edge foliage retained.',
+      productionNotes: 'Illustrated 64x80 RGBA PNG matching existing goblin unit sprites; alpha bounds (7,12)-(57,80), source-pixel foot anchor (32,76). Feet on the bottom edge. Replaces the previous noisy raster sprite.',
     },
   },
   'asset:goblin_shaman_portrait': {

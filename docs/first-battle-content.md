@@ -24,16 +24,19 @@ six original spawns and the authored-run/desert rosters remain unchanged. Suppor
 rules and dungeon placement are tracked in [the Shaman plan](ongoing-projects/issue-166-goblin-shaman-plan.md)
 and are not enabled by the content foundation alone.
 
-The [sprite](../public/battle/source/goblin_shaman_sprite.png) and
-[full portrait source](../public/battle/source/goblin_shaman_portrait.png) are
-unchanged Git blobs from legacy revision `e9433f6b608ae6b2d95418615cce9cf17dadcf74`.
-The registry records exact paths/hashes and the same rights uncertainty as the
-existing artwork. Sprite dimensions are 64×80 RGBA, alpha bounds (4,13)–(60,80),
-foot anchor (32,76); original lower-edge foliage is retained. The full-frame
-portrait export uses Pillow 10.2.0 Lanczos, optimized RGB PNG, 96×96 without cropping.
-The eager loader adds **28,208 runtime image bytes** (7,817 sprite + 20,391 portrait);
-the retained 3,245,364-byte portrait source is packaged but is not requested by
-the runtime loader. See [#166 QA](qa/issue-166/README.md) for actual checks.
+The [sprite](../public/battle/source/goblin_shaman_sprite.png) is the illustrated
+64×80 RGBA replacement packaged in this repository (revision
+`bb9a581f4b6a0a9130af42f301e9f726ad29c5c8`), matching the existing goblin unit
+style. Alpha bounds are (7,12)–(57,80) with foot anchor (32,76) and feet on the
+bottom edge. The [full portrait source](../public/battle/source/goblin_shaman_portrait.png)
+remains the unchanged Git blob from legacy revision
+`e9433f6b608ae6b2d95418615cce9cf17dadcf74`. The registry records exact
+paths/hashes and the same rights uncertainty as the existing artwork. The
+full-frame portrait export uses Pillow 10.2.0 Lanczos, optimized RGB PNG, 96×96
+without cropping. The eager loader adds **28,691 runtime image bytes** (8,300
+sprite + 20,391 portrait); the retained 3,245,364-byte portrait source is
+packaged but is not requested by the runtime loader. See [#166 QA](qa/issue-166/README.md)
+for the original foundation checks.
 
 ## Run battlefield sources (procedural follow-up to PR #147)
 
