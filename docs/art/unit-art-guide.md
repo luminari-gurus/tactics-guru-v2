@@ -102,6 +102,16 @@ Bestiary batch 7 adds five more illustrated wetlands-family pairs with the same 
 
 Measured half-open sprite alpha bounds: Marsh Croaker (2,27,62,80); Siltback Turtle (2,31,62,80); Fen Strider (11,4,54,80); Reed Whisperer (16,10,48,80); Swamp Stalker (7,14,58,80). All five keep feet on the bottom edge. No `pixelArt` / nearest-neighbor Phaser special case is recorded or added.
 
+Bestiary batch 8 adds three more illustrated wetlands-family pairs with the same convention and foot anchor (32,76), including Fen Hag, Rotbloom Tendril, and Drowned Warden, which the supplement labels Elite. They stay on the ordinary 64×80 canvas rather than the forest-boss 96×120 size. They are registered as optional enemy units and packaged as ordinary Git blobs; they are not on the five-pair annotated sheet and are not placed into existing battles or dungeon encounter rosters.
+
+| Pair / asset IDs (`asset:` prefix) | Sprite | Portrait source | Runtime portrait |
+| --- | --- | --- | --- |
+| Fen Hag: `fen_hag_sprite`, `fen_hag_portrait` | [64×80](../../public/battle/source/fen_hag_sprite.png) | [1254×1254](../../public/battle/source/fen_hag_portrait.png) | [96×96](../../public/battle/portraits/fen_hag.png) |
+| Rotbloom Tendril: `rotbloom_tendril_sprite`, `rotbloom_tendril_portrait` | [64×80](../../public/battle/source/rotbloom_tendril_sprite.png) | [1254×1254](../../public/battle/source/rotbloom_tendril_portrait.png) | [96×96](../../public/battle/portraits/rotbloom_tendril.png) |
+| Drowned Warden: `drowned_warden_sprite`, `drowned_warden_portrait` | [64×80](../../public/battle/source/drowned_warden_sprite.png) | [1254×1254](../../public/battle/source/drowned_warden_portrait.png) | [96×96](../../public/battle/portraits/drowned_warden.png) |
+
+Measured half-open sprite alpha bounds: Fen Hag (10,4,55,80); Rotbloom Tendril (2,14,62,80); Drowned Warden (15,10,50,80). All three keep feet on the bottom edge. No `pixelArt` / nearest-neighbor Phaser special case is recorded or added.
+
 Canonical sources are owner-repository project artwork. No per-file third-party license, original prompt, model or generation method is recorded. Retain that uncertainty; these briefs are new production instructions, not reconstructed original prompts or a rights clearance.
 
 ## Observed visual language

@@ -30,7 +30,7 @@ it('packages illustrated wetlands-family sprites and portraits like the other go
       runtimeBytes += runtime.length;
     }
   }
-  expect(runtimeBytes).toBe(270109);
+  expect(runtimeBytes).toBe(355418);
 });
 
 it('registers bestiary stats and abilities without joining existing encounter catalogs', () => {
@@ -44,6 +44,7 @@ it('registers bestiary stats and abilities without joining existing encounter ca
   expect(forestFamilyDungeonBattleCatalog.enemies).not.toHaveProperty('lantern_imp');
   expect(forestBossDungeonBattleCatalog.enemies).not.toHaveProperty('lantern_imp');
   expect(goblinFamilyDungeonBattleCatalog.enemies).not.toHaveProperty('marsh_croaker');
+  expect(goblinFamilyDungeonBattleCatalog.enemies).not.toHaveProperty('fen_hag');
   expect(goblinFamilyDungeonBattleCatalog.enemies).toHaveProperty('mire_goblin');
   expect(wetlandsFamilyDungeonBattleCatalog.enemies).not.toHaveProperty('mire_goblin');
   for (const change of [
@@ -68,8 +69,8 @@ it('can create a battle that uses the registered units without changing producti
     ...WETLANDS_FAMILY_IDS.map((unitId, i): SpawnRecord => ({ id: i + 4, side: 'enemies', unitId, x: i, y: 2 })),
   ] satisfies readonly SpawnRecord[];
   const map: MapRecord = {
-    id: 'map:wetlands_family_roster', width: 10, height: 3,
-    cells: Array.from({ length: 30 }, (_, i) => ({ x: i % 10, y: Math.floor(i / 10), elevation: 0, terrainId: 'grass' })),
+    id: 'map:wetlands_family_roster', width: 13, height: 3,
+    cells: Array.from({ length: 39 }, (_, i) => ({ x: i % 13, y: Math.floor(i / 13), elevation: 0, terrainId: 'grass' })),
     spawns,
   };
   const catalog = wetlandsFamilyBattleContent({ ...battleCatalog, maps: { ...battleCatalog.maps, [map.id]: map } });

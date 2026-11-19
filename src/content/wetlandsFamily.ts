@@ -3,6 +3,7 @@ import type { AssetId, AssetRecord, ContentCatalog, EnemyRecord, UnitStats } fro
 export const WETLANDS_FAMILY_IDS = [
   'lantern_imp', 'bog_gnawer', 'fenstalker', 'mire_hexer', 'bog_leech_swarm',
   'marsh_croaker', 'siltback_turtle', 'fen_strider', 'reed_whisperer', 'swamp_stalker',
+  'fen_hag', 'rotbloom_tendril', 'drowned_warden',
 ] as const;
 type FamilyId = typeof WETLANDS_FAMILY_IDS[number];
 type Illustrated = { readonly origin: 'canonical'; readonly repository: string; readonly revision: string; readonly rightsNote: string };
@@ -15,6 +16,10 @@ const illustrated = {
 const illustratedBatch7 = {
   origin: 'canonical', repository: 'https://github.com/luminari-gurus/tactics-guru-v2',
   revision: '51e56fe5596116038d59f9b8c3d5bcd5cc28c03b', rightsNote,
+} as const;
+const illustratedBatch8 = {
+  origin: 'canonical', repository: 'https://github.com/luminari-gurus/tactics-guru-v2',
+  revision: '21f02e5389820f36482c7c0a0a5483f91aa0508c', rightsNote,
 } as const;
 
 const enemy = <Id extends FamilyId>(id: Id, stats: UnitStats) => ({
@@ -36,6 +41,9 @@ export const wetlandsFamilyEnemies = {
   fen_strider: enemy('fen_strider', { maxHp: 13, move: 4, jump: 1, accuracy: 4, armorClass: 12, power: 2, dexterity: 1, will: 1 }),
   reed_whisperer: enemy('reed_whisperer', { maxHp: 10, move: 4, jump: 1, accuracy: 5, armorClass: 11, power: 2, dexterity: 2, will: 1 }),
   swamp_stalker: enemy('swamp_stalker', { maxHp: 12, move: 5, jump: 1, accuracy: 5, armorClass: 12, power: 3, dexterity: 2, will: 1 }),
+  fen_hag: enemy('fen_hag', { maxHp: 13, move: 3, jump: 1, accuracy: 5, armorClass: 12, power: 2, dexterity: 2, will: 2 }),
+  rotbloom_tendril: enemy('rotbloom_tendril', { maxHp: 15, move: 3, jump: 1, accuracy: 4, armorClass: 13, power: 2, dexterity: 1, will: 1 }),
+  drowned_warden: enemy('drowned_warden', { maxHp: 18, move: 3, jump: 1, accuracy: 4, armorClass: 14, power: 1, dexterity: 0, will: 3 }),
 } as const satisfies Record<FamilyId, EnemyRecord>;
 
 const sprite = (id: FamilyId, sourceSha256: string, alphaBounds: string, art: Illustrated = illustrated) => {
@@ -83,6 +91,12 @@ export const wetlandsFamilyAssets = {
   'asset:reed_whisperer_portrait': portrait('reed_whisperer', '6acb3829ba2dba194c92ebf4ef26bfb579e4764e0a9559324bb3c7b6c5027e23', '2c1e6a894cdb11ea6f6e12b58187dda39aed17c5359a1ae025814de06c805f08', illustratedBatch7),
   'asset:swamp_stalker_sprite': sprite('swamp_stalker', '92f59b516888ca88983073e40f10b7d180c0f588b3ad2885cf4f92f85f5d34cd', '(7,14)-(58,80)', illustratedBatch7),
   'asset:swamp_stalker_portrait': portrait('swamp_stalker', 'a40cddfca45949a9ee94a47a5c8439899aeebd2cab0a083d7025f786af729bbe', '31ede37affa51e5f57cd3adf6771391d47c1236a6337cd38a0c5018c493c91e4', illustratedBatch7),
+  'asset:fen_hag_sprite': sprite('fen_hag', '314295290b10bd4476fe48f8236a967cdaa95c601a14c080fa7c67032ca09260', '(10,4)-(55,80)', illustratedBatch8),
+  'asset:fen_hag_portrait': portrait('fen_hag', '1bf730e371defb68e47b6b19d87ff805014a157e14f812ff2f0d7bba8d67f0f5', '25871eb8e800af56476138a78865db9b7cc113e418a42d0d00ee9ad4b176a4d6', illustratedBatch8),
+  'asset:rotbloom_tendril_sprite': sprite('rotbloom_tendril', '85d3d1932c85886d32495b46db246355a8be2ee62d6ff953c77d4fb85e4bf08f', '(2,14)-(62,80)', illustratedBatch8),
+  'asset:rotbloom_tendril_portrait': portrait('rotbloom_tendril', '8d749b3ecdae2bce72cb8e24d0d959dd2d7a8cd336a8b90f63b3746eb194bae6', '03f12dff8fed2ee825b842dcc0362a96a98bec1d25501f54cdf19ecd638ee15d', illustratedBatch8),
+  'asset:drowned_warden_sprite': sprite('drowned_warden', '6109fd7ff48f36ec5332c826e33d6d53756ca2e8cc82ffa8faf5809b9e85d2b9', '(15,10)-(50,80)', illustratedBatch8),
+  'asset:drowned_warden_portrait': portrait('drowned_warden', 'db9ee7a277f01f72efd28c2cdbd7a466792e0fa82c059904d2fbf540e2e2b8de', 'c37d1f15bc6ecad3b5f9e80cf55ce70ed16279a3244632967e283bad11cb3dac', illustratedBatch8),
 } satisfies Record<AssetId, AssetRecord>;
 
 export function wetlandsFamilyBattleContent(baseline: ContentCatalog): ContentCatalog {
