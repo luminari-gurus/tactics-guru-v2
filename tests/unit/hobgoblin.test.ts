@@ -1,8 +1,10 @@
 import { assert, expect, it } from 'vitest';
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { battleCatalog } from '../../src/content/catalog';
 import { dungeonBattleCatalog, dungeonEncounterCatalog, dungeonEncounterIdentity, hobgoblinDungeonBattleCatalog,
   hobgoblinDungeonEncounterCatalog, readDungeonEncounterCatalog } from '../../src/content/dungeonEncounters';
-import { hobgoblinBattleContent } from '../../src/content/hobgoblin';
+import { hobgoblinAssets, hobgoblinBattleContent } from '../../src/content/hobgoblin';
 import { validateContent } from '../../src/content/validate';
 import type { CellPosition, MapCell, MapRecord } from '../../src/content/types';
 import { hobgoblinDungeonBoundary } from '../helpers/dungeonFixtures';
@@ -42,6 +44,22 @@ function setup({ natural = 15, target = { x: 2, y: 1 }, foe = { x: 1, y: 1 },
   }
   throw Error('No natural roll in fixture corpus');
 }
+
+it('packages illustrated Hobgoblin sprite and portrait exports like the other goblin units', () => {
+  let runtimeBytes = 0;
+  for (const id of ['asset:hobgoblin_warrior_sprite', 'asset:hobgoblin_warrior_portrait'] as const) {
+    const asset = hobgoblinAssets[id], source = readFileSync(asset.sourcePath), runtime = readFileSync(`public${asset.runtimePath}`);
+    expect(createHash('sha256').update(source).digest('hex')).toBe(asset.provenance.sourceSha256);
+    expect([source.readUInt32BE(16), source.readUInt32BE(20)]).toEqual([asset.sourceWidth, asset.sourceHeight]);
+    expect([runtime.readUInt32BE(16), runtime.readUInt32BE(20)]).toEqual([asset.runtimeWidth, asset.runtimeHeight]);
+    if (asset.kind === 'unit-sprite') {
+      expect(runtime).toEqual(source);
+      expect(asset.anchor).toEqual({ x: 32, y: 76 });
+    }
+    runtimeBytes += runtime.length;
+  }
+  expect(runtimeBytes).toBe(26970);
+});
 
 it('validates scoped production content and preserves the saved older forest selection', () => {
   expect(validateContent(hobgoblinDungeonBattleCatalog).ok).toBe(true);
