@@ -1355,6 +1355,54 @@ describe('versioned floor dimensions', () => {
   expect(owner.exports(owner.inspect()).length).toBeGreaterThan(0);
  });
 
+it.each(['blur', 'tick', 'storage refusal', 'lock refusal', 'dispose'] as const)(
+  'settles a dungeon autosave with its playtime sample after %s',
+  async scenario => {
+    const m = memory(), storage = createDungeonStorage(() => m);
+    const initial = freshDungeon('queued-clock', 13, undefined, true);
+    assert(storage.save(initial).ok);
+    const writes: { grant: () => void; refuse: () => void }[] = [];
+    let now = 0;
+    const owner = new DungeonSession(initial, storage, null, () => now, (grant, refuse) => writes.push({ grant, refuse }));
+    assert(owner.continue(owner.inspect()));
+    owner.setPlaytimeActive(true);
+
+    const feedback = 'Fighter reached level 2.';
+    const saving = owner.save(false, feedback);
+    expect(owner.status).toBe(`Saving dungeon… ${feedback}`);
+    now = scenario === 'tick' ? 5000 : 1234;
+    owner.setPlaytimeActive(scenario === 'tick');
+    if (scenario === 'tick') {
+      now += 1000;
+      owner.setPlaytimeActive(false);
+    }
+    if (scenario === 'dispose') owner.dispose();
+    const storedBefore = m.getItem(DUNGEON_KEYS.primary);
+    if (scenario === 'storage refusal') m.setItem = () => { throw Error('denied'); };
+    const queued = writes.splice(0);
+    for (const write of queued) {
+      if (scenario === 'lock refusal') write.refuse();
+      else write.grant();
+    }
+
+    if (scenario === 'storage refusal' || scenario === 'lock refusal') {
+      expect(owner.status).toContain('Progress unsaved:');
+      expect(owner.status).toContain(feedback);
+      expect(await saving).toBe(false);
+      expect(m.getItem(DUNGEON_KEYS.primary)).toBe(storedBefore);
+      expect(owner.hasUnsavedProgress).toBe(true);
+    } else {
+      if (scenario !== 'dispose') expect(owner.status).toBe(`Dungeon saved on this device. ${feedback}`);
+      expect(await saving).toBe(true);
+      const durable = storage.inspect().primary;
+      assert(durable.status === 'valid');
+      expect(durable.state).toEqual({ ...initial, stats: { ...initial.stats!, activeMs: now } });
+      expect(owner.hasUnsavedProgress).toBe(false);
+    }
+    expect(queued).toHaveLength(1);
+  },
+);
+
 it('finishes the admitted dungeon clock checkpoint under its lock after disposal', async () => {
  const m=memory(),storage=createDungeonStorage(()=>m),pending:(()=>void)[]=[];let now=0;
  const initial=freshDungeon('closing-clock',13,undefined,true);assert(storage.save(initial).ok);
@@ -1392,13 +1440,15 @@ it('flushes dungeon writes queued by an earlier checkpoint observer before revie
 });
 
 it.each(['primary','backup'] as const)('does not publish an old queued autosave after continuing %s', async slot => {
- const m=memory(),storage=createDungeonStorage(()=>m),pending:(()=>void)[]=[];
+ const m=memory(),storage=createDungeonStorage(()=>m),pending:(()=>void)[]=[];let now=0;
  const initial=freshDungeon('queued-continue',13,undefined,true);assert(storage.save(initial).ok);
  const primary={...initial,stats:{...initial.stats!,movesTaken:2}};assert(storage.save(primary).ok);
- const owner=new DungeonSession(primary,storage,null,undefined,task=>pending.push(task));assert(owner.continue(owner.inspect()));
- const save=owner.save(),review=owner.inspect();assert(owner.continue(review,slot));
- const bytes=[m.getItem(DUNGEON_KEYS.primary),m.getItem(DUNGEON_KEYS.backup)],continued=owner.snapshot;
- while(pending.length)pending.shift()!();await save;
+ const owner=new DungeonSession(primary,storage,null,()=>now,(grant,refuse)=>pending.push(slot==='primary'?grant:refuse));
+ assert(owner.continue(owner.inspect()));owner.setPlaytimeActive(true);
+ const save=owner.save(false,'Older action.');now=200;owner.setPlaytimeActive(false);
+ const review=owner.inspect();assert(owner.continue(review,slot));
+ const bytes=[m.getItem(DUNGEON_KEYS.primary),m.getItem(DUNGEON_KEYS.backup)],continued=owner.snapshot,status=owner.status;
+ while(pending.length)pending.shift()!();expect(await save).toBe(false);
  expect([m.getItem(DUNGEON_KEYS.primary),m.getItem(DUNGEON_KEYS.backup)]).toEqual(bytes);
- expect(owner.snapshot).toEqual(continued);expect(owner.hasUnsavedProgress).toBe(false);
+ expect(owner.snapshot).toEqual(continued);expect(owner.hasUnsavedProgress).toBe(false);expect(owner.status).toBe(status);
 });

@@ -38,6 +38,7 @@ export class DungeonSession {
   private retained: { label: string; text: string }[] = [];
   private started = false;
   private readonly playtime: ActivePlaytime | null;
+  private queuedSave: { snapshot: DungeonState; finishesAfterDispose: boolean } | null = null;
   readonly history: RunHistory | null;
   private message = 'Progress has not been saved';
   get status() { return this.history?.status ? `${this.message}. ${this.history.status}` : this.message; }
@@ -68,7 +69,10 @@ export class DungeonSession {
     if (result.ok) this.expectedPrimary = this.storage.lastSavedText();
     return result;
   }
-  private report(text: string) { this.message = text; try { this.onChange?.(); } catch { /* Observers cannot undo state. */ } }
+  private report(text: string, feedback = '') {
+    this.message = feedback ? `${text.replace(/\.$/, '')}. ${feedback}` : text;
+    try { this.onChange?.(); } catch { /* Observers cannot undo state. */ }
+  }
   dispose() { this.flushPlaytime(); this.disposed = true; this.battle?.dispose(); this.battle = null; this.onChange = null; this.onVictory = null; if (this.history) this.history.onChange = null; }
   private capturePlaytime(active?: boolean) {
     if (!this.started || !this.playtime) return false;
@@ -79,21 +83,36 @@ export class DungeonSession {
     this.progressSaved = false;
     return true;
   }
+  private checkpointPlaytime(active: boolean) {
+    const snapshot = this.current;
+    if (!this.capturePlaytime(active)) return;
+    if (this.queuedSave?.snapshot === snapshot) {
+      // Only a clock update can advance a queued autosave's snapshot.
+      this.queuedSave.snapshot = this.current;
+      this.queuedSave.finishesAfterDispose = true;
+    } else {
+      void this.save(true);
+    }
+  }
   setPlaytimeActive(active: boolean) {
     if (this.disposed) return;
-    if (this.capturePlaytime(active && (this.current.phase === 'ready' || this.current.phase === 'battle' && this.battle?.state.outcome === 'ongoing')))
-      this.save(true);
+    this.checkpointPlaytime(active && (this.current.phase === 'ready' || this.current.phase === 'battle' && this.battle?.state.outcome === 'ongoing'));
   }
   async flushPlaytime() {
     if (this.disposed) return;
-    if (this.capturePlaytime(false)) void this.save(true);
+    this.checkpointPlaytime(false);
     let pending: Promise<unknown>;
     do { pending = this.pendingWrite; await pending; } while (this.pendingWrite !== pending);
   }
   private pendingWrite: Promise<unknown> = Promise.resolve();
-  private mutate<T>(task: () => T, failure: T, writes = true, finishAfterDispose = false): Promise<T> {
+  private mutate<T>(task: () => T, failure: T, writes = true, {
+    finishAfterDispose = false, reportUnavailable = (message: string) => this.report(message),
+  } = {}): Promise<T> {
     const pending = new Promise<T>(resolve => {
-      const unavailable = () => { this.report('Progress unsaved: exclusive save access unavailable. Open Save recovery to retry or export.'); resolve(failure); };
+      const unavailable = () => {
+        reportUnavailable('Progress unsaved: exclusive save access unavailable. Open Save recovery to retry or export.');
+        resolve(failure);
+      };
       const run = () => { if (this.disposed && !finishAfterDispose) resolve(failure); else resolve(task()); };
       if (writes && this.storage && this.serializeWrite) this.serializeWrite(run, unavailable); else run();
     });
@@ -101,22 +120,30 @@ export class DungeonSession {
   }
   private recordEnding() { if (!this.disposed && this.history) void this.history.record(dungeonRunRecord(this.current, this.history.now())); }
   save(quiet = false, feedback = '') {
-    const snapshot = this.current;
+    const request = { snapshot: this.current, finishesAfterDispose: quiet };
+    this.queuedSave = request;
     this.recordEnding();
     this.progressSaved = false;
     if (!quiet) this.report(feedback ? `Saving dungeon… ${feedback}` : 'Saving dungeon…');
-    return this.mutate(() => this.current === snapshot && this.saveNow({ quiet, feedback }), false, true, quiet);
+    const settle = () => {
+      if (this.queuedSave === request) this.queuedSave = null;
+      return this.current === request.snapshot && (!this.disposed || request.finishesAfterDispose);
+    };
+    return this.mutate(() => settle() && this.saveNow({ quiet: quiet || this.disposed, feedback }), false, true, {
+      finishAfterDispose: true,
+      reportUnavailable: message => { if (settle()) this.report(message, feedback); },
+    });
   }
   private saveNow({ quiet = false, feedback = '', retryUnsaved = false } = {}) {
     if (this.disposed && !quiet) return false;
-    const report = (status: string) => this.report(feedback ? `${status.replace(/\.$/, '')}. ${feedback}` : status);
     // Accepted endings survive an independent active-save opt-out or conflict.
-    if (!this.storage) { report('Testing dungeon. Progress resets on reload.'); return false; }
-    if (this.unsaved && !retryUnsaved) { report('Playing unsaved. Floor travel requires saving; open Save recovery.'); return false; }
+    if (!this.storage) { this.report('Testing dungeon. Progress resets on reload.', feedback); return false; }
+    if (this.unsaved && !retryUnsaved) { this.report('Playing unsaved. Floor travel requires saving; open Save recovery.', feedback); return false; }
     const result = this.write(this.current);
     this.progressSaved = result.ok;
     if (result.ok) this.unsaved = false;
-    if (!quiet || !result.ok || this.message.startsWith('Progress unsaved')) report(result.ok ? 'Dungeon saved on this device' : `Progress unsaved: ${result.reason}. Open Save recovery to retry or export.`);
+    if (!quiet || !result.ok || this.message.startsWith('Progress unsaved'))
+      this.report(result.ok ? 'Dungeon saved on this device' : `Progress unsaved: ${result.reason}. Open Save recovery to retry or export.`, feedback);
     return result.ok;
   }
   playUnsaved() { if (!this.storage) return; this.unsaved = true; this.started = true; this.report('Playing unsaved. Floor travel requires saving; open Save recovery.'); }

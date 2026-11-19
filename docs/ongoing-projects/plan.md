@@ -5,7 +5,7 @@
 - Assignee: [@moshehbenavraham](https://github.com/moshehbenavraham)
 - Branch: [work/issue-435-dungeon-save-feedback](https://github.com/luminari-gurus/tactics-guru-v2/tree/work/issue-435-dungeon-save-feedback)
 - Base: `origin/main` at `0e29532dc3920b420bcb27453d26443c608a0997`
-- Status: planning. The previous handoff is preserved in [the #376 plan](issue-376-floor-progress-plan.md).
+- Status: fix implemented and in integration verification. [OpenSpec tasks](../../openspec/changes/issue-435-dungeon-save-feedback/tasks.md). The previous handoff is preserved in [the #376 plan](issue-376-floor-progress-plan.md).
 
 ## Selection
 
@@ -33,9 +33,8 @@ After an accepted dungeon battle action, `DungeonSession` queues a non-quiet sav
 with any level-up feedback. While the Web Lock is pending, blur, a visibility
 change, or the five-second tick can sample playtime and replace `current` with
 a copy that adds elapsed time. The queued save's reference guard then rejects
-its snapshot. The follow-up quiet write can persist the correct data while leaving
-the pending message in place. This sequence is established by source inspection.
-The deterministic failing test is the first implementation step.
+its snapshot. The follow-up quiet write can persist the data and leave the
+pending message in place. The regression below reproduces that sequence.
 
 An accepted save should finish with its success or failure status and original
 feedback, and the persisted state should include the accepted battle progress and
@@ -73,8 +72,8 @@ save promise and feedback wrong. Removing the reference guard could let a
 superseded save publish over a different continuation. Keep the existing
 [storage lock and compare-and-swap](../../src/persistence/dungeonStorage.ts), save
 format, history and lifecycle wiring. The unload durability work in #434 is
-outside this fix. This change is local to a session race and its regression test.
-A separate OpenSpec change would duplicate this plan.
+outside this fix. The OpenSpec change records the save completion contract and
+tracks the implementation and acceptance checks.
 
 ## Proof before opening the implementation PR
 
@@ -106,8 +105,22 @@ A separate OpenSpec change would duplicate this plan.
   skips. One implementation PR can close #435 once both issue criteria and the
   affected persistence checks are verified.
 
+## Progress and evidence
+
+- On the literal base `0e29532d` with only the new test applied, the targeted
+  `settles a dungeon autosave` run failed all five cases as expected. Blur and
+  tick left the pending status visible. Both refusal cases lost the original
+  feedback, and the disposed session's original save resolved `false`. The
+  Linux test checkout retains the log in `tmp/issue-435/red.log`.
+- The implementation keeps one queued request and preserves the existing Web Lock
+  and storage writer. A clock-only change advances the request's snapshot. A
+  different state invalidates it. Both lock refusal and storage refusal report the
+  action feedback through the normal status renderer.
+- The five focused unit files passed 150 tests during iteration. A narrower rerun
+  after extending the stale-Continue cases passed all nine selected race and flush
+  cases. Browser discovery selected 36 Chromium and 30 WebKit executions.
+
 ## Estimate and open questions
 
 **60–90 minutes of active implementation and verification**, plus any self-hosted
-runner queue time. No open product or rules questions. The first test will confirm
-the precise interleaving and establish the failing baseline.
+runner queue time. No open product or rules questions.
