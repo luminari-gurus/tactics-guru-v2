@@ -15,9 +15,9 @@ import { previousItemCatalog } from '../../src/content/items';
 import { RunHistory } from '../../src/app/RunHistory';
 import { createRunRecordsStorage, selectedRunRecords } from '../../src/persistence/runRecordsStorage';
 
-function memory(fail?: (key:string)=>void) {
+function memory(beforeWrite?: (key: string) => void) {
  const data = new Map<string,string>();
- const storage = createRunStorage(runContext,()=>({getItem:k=>data.get(k)??null,setItem:(k,v)=>{data.set(k,v);},removeItem:k=>{fail?.(k);data.delete(k);}}));
+ const storage = createRunStorage(runContext,()=>({getItem:k=>data.get(k)??null,setItem:(k,v)=>{beforeWrite?.(k);data.set(k,v);},removeItem:k=>{data.delete(k);}}));
  return {data,storage};
 }
 function fight(session:BattleSession, wait=false) {
@@ -167,7 +167,13 @@ it('active restore preserves entry HP and next RNG while partial reset preserves
  const step=battle.phase==='enemy'?battle.nextEnemy():(battle.prepare(playerDecision(battle.state,battle.catalog)),battle.confirm());assert(step);battle.finishPresentation(step.token);
  const saved=controller.snapshot;const restored=new RunItemSession(preparedSnapshot(),runContext,storage);const review=restored.inspect();assert(review.ok);assert(restored.continue(review));const loaded=restored.startEncounter()!;
  expect(loaded.state).toEqual(saved.activeBattle);expect(loaded.replay).toBeNull();expect(loaded.events).toEqual([]);
- const reset=controller.inspect();const bytes=[...data.values()];fail=true;expect(await controller.replace(reset,'replacement',4)).toBe(false);expect(controller.snapshot).toEqual(saved);expect(controller.status).toContain('Reset incomplete');expect(controller.recoveryTexts(controller.inspect()).map(v=>v.text)).toEqual(expect.arrayContaining(bytes));
+ const reset = controller.inspect(), bytes = [...data.values()];
+ fail = true;
+ expect(await controller.replace(reset, 'replacement', 4)).toBe(false);
+ expect(controller.snapshot).toEqual(saved);
+ expect(controller.status).toContain('Reset incomplete');
+ expect([...data.values()]).toEqual(bytes);
+ expect(controller.recoveryTexts(controller.inspect()).map(v => v.text)).toEqual(expect.arrayContaining(bytes));
 });
 it('replays a legal representative run to a reproducible terminal outcome',()=>{
  let completed=false;

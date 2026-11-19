@@ -46,7 +46,10 @@ const sound={enabled:false};
 const dialogs=new BattleDialogs(()=>host?.modalTransition(),()=>requestNew());
 window.fitDiagnostics=diagnosticsSnapshot;
 function button(label:string,run:()=>void,id?:string) {
- const node=document.createElement('button');node.type='button';node.textContent=label;if(id)node.id=id;node.addEventListener('click',run);return node;
+ const node=document.createElement('button');node.type='button';node.textContent=label;if(id)node.id=id;
+ // The next screen can put a different action under the second click of a double-click.
+ node.addEventListener('click', event => { if (event.detail <= 1) run(); });
+ return node;
 }
 function evidence() { container.dataset.runSnapshot=JSON.stringify(controller.snapshot); container.dataset.runBattleRecord=JSON.stringify(controller.completedBattle); }
 function fail(message:string,handled=true) {container.dataset.ready='false';if(handled)reportFailure('scene_load', { route: 'run' });showGameError(`Error: ${message}. Reload to retry.`);restart.disabled=false;}

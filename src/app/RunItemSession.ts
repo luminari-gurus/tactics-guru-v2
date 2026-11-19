@@ -33,9 +33,12 @@ export class RunItemSession {
   private progressSaved = false;
   private saveRemoved = false;
   private expectedPrimary: string | null = null;
+  private expectedBackup?: string;
   private saveConflict = false;
   private started = false;
   private readonly playtime: ActivePlaytime | null;
+  /** The latest save waiting for exclusive access, if its lineage is still current. */
+  private queuedSave: { snapshot: RunSnapshot; feedback: string; quiet: boolean } | null = null;
   readonly history: RunHistory | null;
   get hasSaveConflict() { return this.saveConflict; }
   exportCurrent() { return encodeRunSave(this.current, this.context); }
@@ -67,29 +70,27 @@ export class RunItemSession {
     if (!this.started || !this.playtime) return false;
     const elapsed = this.playtime.sample(active);
     if (!elapsed) return false;
-    const stats = this.current.stats ?? freshRunStats('since-upgrade');
-    this.current = { ...this.current, stats: { ...stats, activeMs: boundedStat(stats.activeMs + elapsed) } };
-    this.progressSaved = false; this.saveRemoved = false;
+    const before = this.current, stats = before.stats ?? freshRunStats('since-upgrade');
+    this.current = { ...before, stats: { ...stats, activeMs: boundedStat(stats.activeMs + elapsed) } };
+    this.progressSaved = false;
+    // Only a clock update can advance a queued save's snapshot.
+    if (this.queuedSave?.snapshot === before) this.queuedSave.snapshot = this.current;
     return true;
   }
   setPlaytimeActive(active: boolean) {
     if (this.disposed) return;
-    if (this.capturePlaytime(active && this.current.items.run.phase === 'battle' && this.battle?.state.outcome === 'ongoing'))
-      void this.persistPlaytime();
+    const elapsed = this.capturePlaytime(active && this.current.items.run.phase === 'battle' && this.battle?.state.outcome === 'ongoing');
+    if (elapsed && !this.unsavedOnly && !this.saveRemoved && this.queuedSave?.snapshot !== this.current)
+      void this.queueSave(true);
   }
-  /** Pause before review/freeze/navigation; the final queued write may finish after disposal. */
+  /** Pause before review/freeze/navigation. A fence must not retry or report on a preceding save. */
   flushPlaytime(waitForQueue = true): Promise<void> {
     if (this.disposed || !this.storage || !this.started) return Promise.resolve();
-    const changed = this.capturePlaytime(false);
-    return changed || !this.progressSaved && !this.saveRemoved ? this.persistPlaytime()
-      : waitForQueue ? new Promise(resolve => this.queueWrite(resolve, resolve, true)) : Promise.resolve();
-  }
-  private persistPlaytime(): Promise<void> {
-    const snapshot = this.current; this.progressSaved = false;
-    return new Promise(resolve => this.queueWrite(() => {
-      if (this.current === snapshot && !this.progressSaved) this.writeCurrent(true);
-      resolve();
-    }, resolve, true));
+    this.capturePlaytime(false);
+    if (this.unsavedOnly) return Promise.resolve();
+    if (!this.progressSaved && !this.saveRemoved && this.queuedSave?.snapshot !== this.current)
+      return this.queueSave(true);
+    return waitForQueue ? new Promise(resolve => this.queueWrite(resolve, resolve, true)) : Promise.resolve();
   }
   startEncounter(): BattleSession | null {
     if (this.disposed || this.current.items.run.phase !== 'battle') return null;
@@ -128,8 +129,7 @@ export class RunItemSession {
         track('encounter_outcome', { route: 'run', encounter: run.encounterIndex, outcome: session.state.outcome === 'playerWin' ? 'victory' : 'defeat' }, `${run.id}:${run.encounterIndex}`);
         if (run.phase === 'victory' || run.phase === 'defeat') track('run_outcome', { route: 'run', phase: run.phase, encounter: run.encounterIndex, outcome: run.phase }, run.id);
       }
-      this.requestSave();
-      if (feedback) this.report(`${this.status}. ${feedback}`);
+      this.requestSave(undefined, feedback);
     };
     const catalog = runBattleCatalog(this.current.items, this.context);
     const created = this.current.activeBattle && catalog
@@ -138,8 +138,12 @@ export class RunItemSession {
     if (!created.ok) { reportFailure('encounter_start', { route: 'run', encounter: this.current.items.run.encounterIndex }); this.report('Could not start this encounter. Progress unchanged.'); return null; }
     session = created.session; this.battle = session; this.started = true; session.progression = structuredClone(this.current.items.run.party);
     if (session.state.outcome !== 'ongoing') { accepted(); return null; }
-    this.current = { ...this.current, activeBattle: session.state, battlefield:battlefield }; this.review = null;
-    if (!restoring) { track('encounter_started', { route: 'run', encounter: this.current.items.run.encounterIndex, phase: 'battle' }, `${this.current.items.run.id}:${this.current.items.run.encounterIndex}`); this.requestSave(); } return session;
+    this.review = null;
+    if (!restoring) {
+      this.current = { ...this.current, activeBattle: session.state, battlefield };
+      track('encounter_started', { route: 'run', encounter: this.current.items.run.encounterIndex, phase: 'battle' }, `${this.current.items.run.id}:${this.current.items.run.encounterIndex}`); this.requestSave();
+    }
+    return session;
   }
   recoveryTexts(load: RunLoadResult) {
     if (!this.storage) return [];
@@ -163,32 +167,27 @@ export class RunItemSession {
       this.queueWrite(() => {
         if (this.current !== expected) { this.report('Reset refused: the run changed while confirming. Review again.'); resolve(false); }
         else resolve(this.replaceNow(review, id, seed));
-      }, () => resolve(false));
+      }, () => {
+        if (!this.disposed && this.current === expected) this.reportWriteRefusal();
+        resolve(false);
+      });
     });
     return this.history ? this.history.replace(record, id, perform, other) : perform();
   }
   private replaceNow(review: RunLoadResult, id: string, seed: number) {
     if (!this.storage || !/^[A-Za-z0-9-]{1,64}$/.test(id) || !isIntegerIn(seed, RULE_BOUNDS.uint32) || this.disposed || review !== this.review || !review.ok || id === this.current.items.run.id || seed === this.current.items.run.seed) return false;
     const next = freshRunSnapshot(id, seed, this.context, true);
-    const latest = this.storage.load();
-    if (!latest.ok || !(['primary','backup'] as const).every(slot => {
-      const before = review.inspection[slot], now = latest.inspection[slot];
-      return 'text' in before && 'text' in now && before.text === now.text;
-    })) {
-      this.review = null; this.report('Reset refused: saved data changed or is unavailable. Review again.'); return false;
-    }
     this.retained = this.recoveryTexts(review);
-    for (const slot of ['backup', 'primary'] as const) {
-      const value = review.inspection[slot];
-      if (!('text' in value) || !this.storage.removeSlot(slot, value.text).ok) {
-        this.review = null; reportFailure('save_reset', { route: 'run' }); this.report('Reset incomplete. Run and seed unchanged. Export recovery copies, review again and retry.'); return false;
+    const replacement = this.storage.replace(review.inspection, next);
+    if (!replacement.ok) {
+      this.review = null;
+      if (replacement.reason === 'changed') this.report('Reset refused: saved data changed or is unavailable. Review again.');
+      else {
+        reportFailure('save_reset', { route: 'run' });
+        this.report('Reset incomplete. Run and seed unchanged. Export recovery copies, review again and retry.');
       }
+      return false;
     }
-    const checked = this.storage.load();
-    if (!checked.ok || Object.values(checked.inspection).some(s => s.status !== 'missing')) {
-      this.review = null; reportFailure('save_reset', { route: 'run' }); this.report('Reset incomplete. Run and seed unchanged. Review saved data again.'); return false;
-    }
-    this.expectedPrimary = null;
     this.reset(next); return true;
   }
   /** Testing restart discards only the in-memory run and its pending callbacks. */
@@ -198,11 +197,15 @@ export class RunItemSession {
   }
   private reset(next: RunSnapshot) {
     this.battle?.dispose(); this.battle = null; this.current = next; this.review = null; this.retained = []; this.lastRecord = null;
-    this.unsavedOnly = false;
-    this.saveConflict = false;
+    this.playtime?.reset(); this.queuedSave = null; this.saveRemoved = false;
+    this.unsavedOnly = false; this.saveConflict = false;
     this.started = true;
-    track('run_started', { route: 'run', phase: this.current.items.run.phase }, this.current.items.run.id);
-    this.save();
+    this.expectedPrimary = this.storage?.lastSavedText() ?? null; this.expectedBackup = undefined;
+    this.progressSaved = this.storage !== null;
+    const run = next.items.run;
+    track('run_started', { route: 'run', phase: run.phase }, run.id);
+    setTelemetryContext({ phase: run.phase, encounter: run.encounterIndex });
+    this.report(this.progressSaved ? 'Run saved on this device' : 'Progress resets on reload or when you leave.');
   }
   startNew() {
     if (this.disposed) return;
@@ -215,8 +218,8 @@ export class RunItemSession {
     return { runId: run.id, revision: run.revision, encounterId: run.encounters[run.encounterIndex],
       boundaryId: runBoundaryId(run), itemRevision };
   }
-  private report(message: string) {
-    this.message = message;
+  private report(message: string, feedback = '') {
+    this.message = feedback ? `${message.replace(/\.$/, '')}. ${feedback}` : message;
     try { this.onChange?.(); } catch { /* Observers cannot undo committed state. */ }
   }
   dispatch(command: ItemCommand) {
@@ -240,52 +243,79 @@ export class RunItemSession {
     if (this.disposed || !this.storage) return;
     this.unsavedOnly = true; this.review = null; this.startNew();
   }
-  queueWrite(task:()=>void, unavailable?:()=>void, finishOnDispose = false) {
-    const guarded = () => { if (!this.disposed || finishOnDispose) task(); else unavailable?.(); };
-    if (!this.storage || !this.serializeWrite) { guarded(); return; }
-    this.serializeWrite(guarded, () => {
-      if (this.disposed && !finishOnDispose) return;
-      this.progressSaved = false;
-      this.report('Progress unsaved: exclusive save access unavailable. Open Save recovery to export.');
-      unavailable?.();
-    });
-  }
-  requestSave(done?:()=>void) {
-    if (this.disposed) return;
-    const snapshot = this.current; this.saveRemoved = false;
-    // An accepted ending belongs to history even when active saving is disabled or denied.
-    if (this.history && this.started) void this.history.record(authoredRunRecord(snapshot.items.run, this.history.now(), false, snapshot.stats));
+  private reportWriteRefusal(feedback = '') {
     this.progressSaved = false;
-    if (this.storage && this.serializeWrite && !this.unsavedOnly) this.report('Saving run…');
-    this.queueWrite(() => {
-      if (this.current === snapshot) this.save();
-      done?.();
+    this.report('Progress unsaved: exclusive save access unavailable. Open Save recovery to export.', feedback);
+  }
+  queueWrite(task: () => void, unavailable?: () => void, finishOnDispose = false) {
+    const refused = unavailable ?? (() => { if (!this.disposed) this.reportWriteRefusal(); });
+    const guarded = () => { if (!this.disposed || finishOnDispose) task(); else refused(); };
+    if (!this.storage || !this.serializeWrite) { guarded(); return; }
+    this.serializeWrite(guarded, refused);
+  }
+  requestSave(done?:()=>void, feedback = '') {
+    if (this.disposed) return;
+    // An accepted ending belongs to history even when active saving is disabled or denied.
+    if (this.history && this.started) void this.history.record(authoredRunRecord(this.current.items.run, this.history.now(), false, this.current.stats));
+    this.saveRemoved = false;
+    void this.queueSave(false, feedback, done);
+  }
+  private queueSave(quiet: boolean, feedback = '', done?: () => void): Promise<void> {
+    const previous = this.queuedSave;
+    const request = {
+      snapshot: this.current,
+      feedback: [previous?.feedback, feedback].filter(Boolean).join(' '),
+      quiet: quiet && (previous?.quiet ?? true),
+    };
+    this.queuedSave = request;
+    this.progressSaved = false;
+    const settle = () => {
+      if (this.queuedSave !== request) return false;
+      this.queuedSave = null;
+      return this.current === request.snapshot;
+    };
+    if (!request.quiet && this.storage && this.serializeWrite && !this.unsavedOnly)
+      this.report(request.feedback ? `Saving run… ${request.feedback}` : 'Saving run…');
+    return new Promise(resolve => {
+      const write = () => {
+        if (settle()) this.writeCurrent(request.quiet, request.feedback);
+        if (!this.disposed) done?.();
+        resolve();
+      };
+      const refused = () => {
+        if (settle()) this.reportWriteRefusal(request.feedback);
+        resolve();
+      };
+      if (this.unsavedOnly) write();
+      else this.queueWrite(write, refused, true);
     });
   }
   save() {
     if (this.disposed) return { ok: false, reason: 'invalidState' } as const;
-    return this.writeCurrent();
+    const feedback = this.queuedSave?.feedback ?? '';
+    this.queuedSave = null; this.saveRemoved = false;
+    return this.writeCurrent(false, feedback);
   }
-  private writeCurrent(quiet = false) {
+  private writeCurrent(quiet = false, feedback = '') {
     setTelemetryContext({ phase: this.current.items.run.phase, encounter: this.current.items.run.encounterIndex });
     if (!this.storage) {
-      this.report('Progress resets on reload or when you leave.');
+      this.report('Progress resets on reload or when you leave.', feedback);
       return { ok: false, reason: 'transient' } as const;
     }
     if (this.unsavedOnly) {
-      this.report('Progress unsaved by choice. Review saved data to Continue or Start new run before saving.');
+      this.report('Progress unsaved by choice. Review saved data to Continue or Start new run before saving.', feedback);
       return { ok: false, reason: 'unsaved' } as const;
     }
-    const result = this.storage.save(this.current, this.expectedPrimary);
-    if (result.ok) this.expectedPrimary = this.storage.lastSavedText()!;
+    const result = this.storage.save(this.current, this.expectedPrimary, this.expectedBackup);
+    if (result.ok) { this.expectedPrimary = this.storage.lastSavedText()!; this.expectedBackup = undefined; }
     if (result.ok || result.reason === 'changed') this.saveConflict = !result.ok;
     this.progressSaved = result.ok;
     if (!result.ok) reportFailure('save_write', { route: 'run', phase: this.current.items.run.phase, encounter: this.current.items.run.encounterIndex });
-    if (!quiet || !result.ok || this.message === 'Saving run…' || this.message.startsWith('Progress unsaved')) this.report(result.ok ? 'Run saved on this device' : result.reason === 'storage'
+    if (!quiet || !result.ok || this.message.startsWith('Progress unsaved')) this.report(result.ok ? 'Run saved on this device' : result.reason === 'storage'
       ? `Progress unsaved: storage ${result.kind}. Open Save recovery to retry.`
       : result.reason === 'recoveryRequired' ? 'Progress unsaved: saved data needs recovery. Open Save recovery.'
       : result.reason === 'changed' ? 'Progress unsaved: another tab changed the run save. Open Save recovery.'
-      : 'Progress unsaved: the run could not be encoded. Open Save recovery.');
+      : 'Progress unsaved: the run could not be encoded. Open Save recovery.', feedback);
     return result;
   }
   inspect() {
@@ -304,9 +334,10 @@ export class RunItemSession {
     const checked = readRunSnapshot(review.selected.state, this.context);
     if (!checked.ok) return false;
     this.battle?.dispose(); this.battle = null;
-    this.current = checked.state;
+    this.playtime?.reset(); this.current = checked.state; this.queuedSave = null; this.saveRemoved = false;
     this.started = true;
-    const primary = review.inspection.primary;
+    const { primary, backup } = review.inspection;
+    this.expectedBackup = review.selected.slot === 'backup' && backup.status === 'valid' ? backup.text : undefined;
     if ('text' in primary) this.expectedPrimary = primary.text;
     this.review = null; this.unsavedOnly = false;
     this.saveConflict = false;
@@ -327,8 +358,9 @@ export class RunItemSession {
     this.review = null;
     if (!removed.ok) reportFailure('save_remove', { route: 'run' });
     else {
-      this.progressSaved = false; this.saveRemoved = true;
+      this.queuedSave = null; this.progressSaved = false; this.saveRemoved = true;
       if (slot === 'primary') this.expectedPrimary = null;
+      else this.expectedBackup = undefined;
     }
     this.report(removed.ok ? 'Save removed. Retry saving when recovery is complete.' : 'Removal refused: saved data changed or storage failed. Review again.');
     return removed.ok;

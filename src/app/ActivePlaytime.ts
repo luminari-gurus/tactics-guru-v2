@@ -4,6 +4,8 @@ export class ActivePlaytime {
   private remainder = 0;
   constructor(private readonly now: () => number = () => performance.now()) {}
 
+  reset() { this.previous = null; this.remainder = 0; }
+
   /** Close the previous interval, then choose whether the next interval is active. */
   sample(active = this.previous !== null): number {
     const current = this.now();
