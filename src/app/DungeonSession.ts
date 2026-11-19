@@ -40,7 +40,18 @@ export class DungeonSession {
   private readonly playtime: ActivePlaytime | null;
   readonly history: RunHistory | null;
   private message = 'Progress has not been saved';
-  get status() { return this.history?.status ? `${this.message}. ${this.history.status}` : this.message; }
+  private lootMessage = '';
+  get lootStatus() { return this.lootMessage; }
+  get explorationStatus() { return this.withHistory(this.message); }
+  get status() {
+    const message = this.lootMessage && this.message
+      ? `${this.message.replace(/\.$/, '')}. ${this.lootMessage}` : this.message || this.lootMessage;
+    return this.withHistory(message);
+  }
+  private withHistory(message: string) {
+    const history = this.history?.status;
+    return message && history ? `${message}. ${history}` : message || history || '';
+  }
   onChange: (() => void) | null = null;
   onVictory: ((intent: DungeonAutoCollectIntent) => void) | null = null;
   completedBattle: unknown = null;
@@ -51,7 +62,7 @@ export class DungeonSession {
     this.playtime = storage ? new ActivePlaytime(now) : null;
     if (!storage) { const { stats: _, ...untracked } = this.current; this.current = untracked; }
     this.history = storage ? history : null;
-    if (this.history) this.history.onChange = () => { if (!this.disposed) this.report(this.message); };
+    if (this.history) this.history.onChange = () => { if (!this.disposed) this.report(this.message, this.lootMessage); };
     if (!storage) this.message = 'Testing dungeon. Progress resets on reload.';
   }
   get snapshot() { return structuredClone(this.current); }
@@ -68,7 +79,11 @@ export class DungeonSession {
     if (result.ok) this.expectedPrimary = this.storage.lastSavedText();
     return result;
   }
-  private report(text: string) { this.message = text; try { this.onChange?.(); } catch { /* Observers cannot undo state. */ } }
+  private report(text: string, loot = '') {
+    this.message = text;
+    this.lootMessage = loot;
+    try { this.onChange?.(); } catch { /* Observers cannot undo state. */ }
+  }
   dispose() { this.flushPlaytime(); this.disposed = true; this.battle?.dispose(); this.battle = null; this.onChange = null; this.onVictory = null; if (this.history) this.history.onChange = null; }
   private capturePlaytime(active?: boolean) {
     if (!this.started || !this.playtime) return false;
@@ -134,7 +149,7 @@ export class DungeonSession {
     this.progressSaved = this.storage !== null && !this.unsaved;
     const status = !this.storage ? 'Testing dungeon. Progress resets on reload.' : this.unsaved ? 'Playing unsaved. Floor travel requires saving; open Save recovery.' :
       preparation ? 'Dungeon saved on this device' : traveling ? 'Travel saved on this device' : 'Exploration saved on this device';
-    this.report(feedback ? `${status.replace(/\.$/, '')}. ${feedback}` : status);
+    this.report(status, feedback);
     return true;
   }
   step(command: ExplorationCommand) { return this.mutate(() => this.stepNow(command), false, !this.unsaved); }
@@ -152,13 +167,13 @@ export class DungeonSession {
       // A user interaction while waiting for the lock must win the race.
       if (this.disposed || !isCurrent() || this.battle && !['ended', 'disposed'].includes(this.battle.phase)) return false;
       if (this.storage && !this.unsaved && this.hasUnsavedProgress) {
-        this.report('Loot remains on the ground. Open Save recovery before automatic collection.');
+        this.report('', 'Loot remains on the ground. Open Save recovery before automatic collection.');
         return false;
       }
       const source = this.storage && !this.current.stats ? { ...this.current, stats: freshRunStats('since-upgrade') } : this.current;
       const candidate = autoCollectDungeon(source, intent);
       if (!candidate.ok) {
-        this.report(candidate.reason === 'capacity'
+        this.report('', candidate.reason === 'capacity'
           ? 'Inventory full. Loot remains on the ground; the party has not moved.'
           : 'Loot remains on the ground. Automatic movement was canceled.');
         return false;
