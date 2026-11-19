@@ -219,7 +219,7 @@ it.each([false, true])('keeps a pre-fog backup after repeated writes (migrated: 
   expect(changed.state.floors[0].exploration.sightVersion).toBeUndefined();
 });
 
-it('keeps the previous exact checkpoint when a backup rotation is interrupted', () => {
+it('keeps the previous exact checkpoint when a backup rotation is interrupted', async () => {
   const initial = fresh(), data = memory(), storage = createDungeonStorage(() => data);
   expect(storage.save(initial).ok).toBe(true);
   const floor = initial.floors[0], map = floorMap(floor.descriptor);
@@ -236,7 +236,11 @@ it('keeps the previous exact checkpoint when a backup rotation is interrupted', 
   const backup = currentStorage.inspect().backup; assert(backup.status === 'valid');
   expect(backup.state).toEqual(initial);
   const session = new DungeonSession(next, currentStorage), reviewed = session.inspect();
+  const continued = new DungeonSession(next, currentStorage);
+  assert(continued.continue(continued.inspect(), 'backup'));
   write(DUNGEON_BACKUP_CHECKPOINT_KEY, 'corrupt');
+  expect(await continued.save()).toBe(false);
+  expect(continued.status).toContain('changed');
   expect(session.continue(reviewed, 'backup')).toBe(false);
   const fallback = currentStorage.inspect().backup; assert(fallback.status === 'valid');
   expect(fallback.state.floors[0].exploration.sightVersion).toBeUndefined();
@@ -440,6 +444,30 @@ describe('dungeon run history boundaries', () => {
     expect(f.rows()).toHaveLength(1);
     expect([f.m.getItem(DUNGEON_KEYS.primary), f.m.getItem(DUNGEON_KEYS.backup)]).toEqual(bytes);
   });
+  it.each(['primary', 'backup'] as const)('refuses stale Retry and records defeat from the %s slot', async slot => {
+    const f = fixture(), entry = good(startDungeonBattle(atEncounter(fresh()))), battle = entry.activeBattle!;
+    const defeated = good(acceptDungeonBattle(entry, { ...battle, outcome: 'playerLoss',
+      units: battle.units.map(unit => unit.side === 'player' ? { ...unit, hp: 0 } : unit) }));
+    assert(f.storage.save(entry).ok);
+    const owner = new DungeonSession(entry, f.storage, f.history);
+    assert(owner.continue(owner.inspect()));
+    assert(f.storage.save(defeated).ok);
+    if (slot === 'backup') {
+      // A previous client may already have rotated the defeat out of primary.
+      f.m.setItem(DUNGEON_KEYS.backup, f.m.getItem(DUNGEON_KEYS.primary)!);
+      const saved = encodeDungeon(entry); assert(saved.ok);
+      f.m.setItem(DUNGEON_KEYS.primary, saved.text);
+    }
+    const review = owner.inspect();
+    expect(await owner.retry(review)).toBe(false);
+    expect(owner.status).toContain('defeat');
+    expect(await owner.save()).toBe(false);
+    expect(f.storage.inspect()).toEqual(review);
+    expect(resumableDungeonSlot(review)).toBeNull();
+    await f.history.reconcileDungeonDefeat(review);
+    await f.history.reconcileDungeonDefeat(review);
+    expect(f.rows()).toMatchObject([{ id: entry.id, outcome: 'defeat' }]);
+  });
   it.each(['unsaved', 'changed', 'lock-denied'] as const)('records a legally accepted defeat independently of active saves %s', async mode => {
     const f = fixture(), initial = fresh(), injured = atEncounter({ ...initial,
       party: initial.party.map(hero => ({ ...hero, hp: hero.heroId === 'fighter' ? 1 : 0 })),
@@ -479,11 +507,11 @@ describe('dungeon run history boundaries', () => {
     const session = new DungeonSession(initial, f.storage, f.history); assert(session.continue(session.inspect())); await f.history.whenIdle();
     const review = session.inspect(), before = [f.m.getItem(DUNGEON_KEYS.primary), f.m.getItem(DUNGEON_KEYS.backup)];
     if (failure === 'stale') f.m.setItem(DUNGEON_KEYS.primary, 'changed while reviewing');
-    else { const remove = f.m.removeItem; f.m.removeItem = key => { if (key === DUNGEON_KEYS.primary) throw Error('denied'); remove(key); }; }
+    else { const write = f.m.setItem; f.m.setItem = (key, text) => { if (key === DUNGEON_KEYS.primary) throw Error('denied'); write(key, text); }; }
     expect(await session.replace(review, 'dungeon-next', 14)).toBe(false); await f.history.whenIdle();
     expect(session.snapshot).toEqual(initial); expect(f.rows()).toEqual([]);
     expect(selectedRunRecords(f.records.inspect())?.receipts.dungeon?.kind).not.toBe('pending');
-    if (failure === 'stale') expect(f.m.getItem(DUNGEON_KEYS.backup)).toBe(before[1]);
+    expect(f.m.getItem(DUNGEON_KEYS.backup)).toBe(before[1]);
   });
   it('does not record the first New Game or acquire history for a testing dungeon', async () => {
     const f = fixture(), session = new DungeonSession(fresh(), f.storage, f.history);
@@ -505,8 +533,8 @@ describe('dungeon run history boundaries', () => {
     const session = new DungeonSession(live, f.storage, f.history);
     session.playUnsaved(); const before = session.snapshot, review = session.inspect();
     if (result === 'stale') f.m.setItem(DUNGEON_KEYS.primary, 'changed while reviewing');
-    if (result === 'partial') { const remove = f.m.removeItem; f.m.removeItem = key => {
-      if (key === DUNGEON_KEYS.primary) throw Error('partial removal'); remove(key);
+    if (result === 'partial') { const write = f.m.setItem; f.m.setItem = (key, text) => {
+      if (key === DUNGEON_KEYS.primary) throw Error('partial write'); write(key, text);
     }; }
     expect(await session.replace(review, 'after-distinct-dungeons', 24)).toBe(result === 'accepted');
     await f.history.whenIdle();
@@ -735,7 +763,7 @@ describe('dungeon persistence', () => {
 });
 
 describe('dungeon recovery limits', () => {
-  it('keeps a removed backup exportable through repeated partial resets and a successful retry', async () => {
+  it('preserves both durable slots through refused replacements and retains their exports after a successful retry', async () => {
     const data = memory(), storage = createDungeonStorage(() => data);
     const initial = freshDungeon('recovery-copies', 13, undefined, true);
     const session = new DungeonSession(initial, storage);
@@ -744,23 +772,23 @@ describe('dungeon recovery limits', () => {
     const before = session.inspect();
     assert(before.primary.status === 'valid' && before.backup.status === 'valid');
 
-    const remove = data.removeItem;
-    data.removeItem = key => {
+    const write = data.setItem;
+    data.setItem = (key, text) => {
       if (key === DUNGEON_KEYS.primary) throw Error('denied');
-      remove(key);
+      write(key, text);
     };
 
     expect(await session.replace(before, 'replacement-dungeon', 14)).toBe(false);
     expect(await session.replace(session.inspect(), 'replacement-dungeon', 14)).toBe(false);
     const after = session.inspect();
-    expect(after.backup.status).toBe('missing');
+    expect(after).toEqual(before);
     expect(session.exports(after)).toEqual([
       { label: 'current progress', text: before.primary.text },
       { label: 'primary save', text: before.primary.text },
-      { label: 'retained backup save (copy 1)', text: before.backup.text },
+      { label: 'backup save', text: before.backup.text },
     ]);
 
-    data.removeItem = remove;
+    data.setItem = write;
     expect(await session.replace(session.inspect(), 'replacement-dungeon', 14)).toBe(true);
     const replaced = session.inspect();
     assert(replaced.primary.status === 'valid' && replaced.backup.status === 'valid');
@@ -1153,18 +1181,20 @@ describe('authoritative unsaved departure state', () => {
     (await session.step({id:saved.id,depth:saved.depth,revision:saved.revision,destination:-1}));
     expect(session.hasUnsavedProgress).toBe(false);
   });
-  it('retains unsaved state after failed replacement saving and unrelated feedback',async()=>{
+  it('retains the saved journey after failed replacement and unrelated feedback',async()=>{
     const m=memory(),store=createDungeonStorage(()=>m),session=new DungeonSession(fresh(),store);
     expect((await session.save())).toBe(true);
     expect(session.hasUnsavedProgress).toBe(false);
     const setItem=m.setItem;
     m.setItem=()=>{throw new DOMException('full','QuotaExceededError');};
     const review=session.inspect();
-    expect(await session.replace(review,'replacement-unsaved',session.snapshot.seed+1)).toBe(true);
+    expect(await session.replace(review,'replacement-unsaved',session.snapshot.seed+1)).toBe(false);
+    expect(session.snapshot.id).not.toBe('replacement-unsaved');
+    expect(store.inspect()).toEqual(review);
     const before=session.snapshot;
     (await session.step({id:before.id,depth:before.depth,revision:before.revision,destination:-1}));
     expect(session.status).toContain('Movement refused');
-    expect(session.hasUnsavedProgress).toBe(true);
+    expect(session.hasUnsavedProgress).toBe(false);
     m.setItem=setItem;
     expect((await session.retry(session.inspect()))).toBe(true);
     expect(session.hasUnsavedProgress).toBe(false);
@@ -1313,7 +1343,11 @@ describe('versioned floor dimensions', () => {
 
  it('serializes an interleaved dungeon writer before checking either durable slot', async () => {
   let queue = Promise.resolve();
-  vi.stubGlobal('navigator', {locks: {request: (key: string, task: () => void) => {
+  vi.stubGlobal('navigator', {locks: {request: (key: string, task: () => void, admit?: (lock: object) => Promise<void>) => {
+    if (admit) {
+      expect(key).toBe(DUNGEON_KEYS.primary + ':writer');
+      return admit({});
+    }
     expect(key).toBe(DUNGEON_KEYS.primary);
     const pending = queue.then(task); queue = pending.catch(() => {}); return pending;
   }}});
@@ -1355,6 +1389,184 @@ describe('versioned floor dimensions', () => {
   expect(owner.exports(owner.inspect()).length).toBeGreaterThan(0);
  });
 
+it.each(['blur', 'tick', 'storage refusal', 'lock refusal', 'dispose'] as const)(
+  'settles a dungeon autosave with its playtime sample after %s',
+  async scenario => {
+    const m = memory(), storage = createDungeonStorage(() => m);
+    const initial = freshDungeon('queued-clock', 13, undefined, true);
+    assert(storage.save(initial).ok);
+    const writes: { grant: () => void; refuse: () => void }[] = [];
+    let now = 0;
+    const owner = new DungeonSession(initial, storage, null, () => now, (grant, refuse) => writes.push({ grant, refuse }));
+    assert(owner.continue(owner.inspect()));
+    owner.setPlaytimeActive(true);
+
+    const feedback = 'Fighter reached level 2.';
+    const saving = owner.save(false, feedback);
+    expect(owner.status).toBe(`Saving dungeon… ${feedback}`);
+    now = scenario === 'tick' ? 5000 : 1234;
+    owner.setPlaytimeActive(scenario === 'tick');
+    if (scenario === 'tick') {
+      now += 1000;
+      owner.setPlaytimeActive(false);
+    }
+    if (scenario === 'dispose') owner.dispose();
+    const storedBefore = m.getItem(DUNGEON_KEYS.primary);
+    if (scenario === 'storage refusal') m.setItem = () => { throw Error('denied'); };
+    const queued = writes.splice(0);
+    for (const write of queued) {
+      if (scenario === 'lock refusal') write.refuse();
+      else write.grant();
+    }
+
+    if (scenario === 'storage refusal' || scenario === 'lock refusal') {
+      expect(owner.status).toContain('Progress unsaved:');
+      expect(owner.status).toContain(feedback);
+      expect(await saving).toBe(false);
+      expect(m.getItem(DUNGEON_KEYS.primary)).toBe(storedBefore);
+      expect(owner.hasUnsavedProgress).toBe(true);
+    } else {
+      if (scenario !== 'dispose') expect(owner.status).toBe(`Dungeon saved on this device. ${feedback}`);
+      expect(await saving).toBe(true);
+      const durable = storage.inspect().primary;
+      assert(durable.status === 'valid');
+      expect(durable.state).toEqual({ ...initial, stats: { ...initial.stats!, activeMs: now } });
+      expect(owner.hasUnsavedProgress).toBe(false);
+    }
+    expect(queued).toHaveLength(1);
+  },
+);
+
+it('finishes accepted dungeon progress after disposal without a playtime sample', async () => {
+ const m=memory(),storage=createDungeonStorage(()=>m),pending:(()=>void)[]=[];
+ const initial=freshDungeon('paused-dispose',13,undefined,true);assert(storage.save(initial).ok);
+ const owner=new DungeonSession(initial,storage,null,()=>0,task=>pending.push(task));
+ assert(owner.continue(owner.inspect()));
+ let writes=0;const set=m.setItem.bind(m);m.setItem=(key,value)=>{writes++;set(key,value);};
+ const saving=owner.save(false,'Fighter reached level 2.');owner.dispose();
+ while(pending.length)pending.shift()!();
+ expect(await saving).toBe(true);expect(writes).toBeGreaterThan(0);expect(owner.hasUnsavedProgress).toBe(false);
+});
+
+describe('dungeon autosaves pending during battle commands', () => {
+ const battleOwner = async (revision: number) => {
+  const m = memory(), storage = createDungeonStorage(() => m), pending: (() => void)[] = [];
+  const initial = atEncounter({ ...freshDungeon('pending-battle', 13, undefined, true), revision });
+  assert(storage.save(initial).ok);
+  let now = 0;
+  const owner = new DungeonSession(initial, storage, null, () => now, task => pending.push(task));
+  assert(owner.continue(owner.inspect()));
+  const starting = owner.startEncounter(); pending.shift()!();
+  const battle = await starting; assert(battle);
+  owner.setPlaytimeActive(true);
+  // One accepted command: the enemy acts on its turn, otherwise the active hero ends its turn.
+  const act = () => {
+   const step = battle.phase === 'enemy' ? battle.nextEnemy()
+    : (battle.prepare({ type: 'endTurn', unitId: battle.active.id }), battle.confirm());
+   assert(step); battle.finishPresentation(step.token);
+  };
+  return { storage, pending, owner, battle, act, advance: (ms: number) => { now += ms; } };
+ };
+
+ it('carries a superseded autosave feedback into the next accepted save', async () => {
+  const { pending, owner, act } = await battleOwner(0);
+  const feedback = 'Fighter reached level 2.';
+  const first = owner.save(false, feedback);
+  act();
+  expect(owner.status).toBe(`Saving dungeon… ${feedback}`);
+  while (pending.length) pending.shift()!();
+  expect(await first).toBe(false);
+  expect(owner.status).toBe(`Dungeon saved on this device. ${feedback}`);
+  expect(owner.explorationStatus).toBe(owner.status);
+  expect(owner.lootStatus).toBe('');
+  expect(owner.hasUnsavedProgress).toBe(false);
+ });
+
+ it('keeps a pending autosave when a later battle boundary is rejected after a playtime sample', async () => {
+  // The first command reaches the final revision; the next one is rejected after sampling playtime.
+  const { storage, pending, owner, battle, act, advance } = await battleOwner(Number.MAX_SAFE_INTEGER - 2);
+  act();
+  const accepted = owner.snapshot;
+  expect(accepted.revision).toBe(Number.MAX_SAFE_INTEGER);
+  advance(750);
+  act();
+  expect(owner.status).toContain('Dungeon boundary rejected');
+  while (pending.length) pending.shift()!();
+  const durable = storage.inspect().primary; assert(durable.status === 'valid');
+  expect(durable.state).toEqual({ ...accepted, stats: { ...accepted.stats!, activeMs: 750 } });
+  expect(owner.status).toContain('Dungeon boundary rejected');
+  expect(battle.phase).toBe('disposed');
+  expect(battle.nextEnemy()).toBeNull();
+  expect(battle.prepare({ type: 'endTurn', unitId: battle.active.id }).ok).toBe(false);
+  expect(owner.hasUnsavedProgress).toBe(false);
+ });
+});
+
+it('keeps the continued backup and its sidecars intact when the primary write fails', async () => {
+ const data = memory(), store = createDungeonStorage(() => data), initial = fresh();
+ assert(store.save(initial).ok);
+ assert(store.save({ ...initial, revision: 1 }).ok);
+ const before = new Map(data.values), owner = new DungeonSession(initial, store);
+ assert(owner.continue(owner.inspect(), 'backup'));
+ const write = data.setItem;
+ data.setItem = (key, text) => {
+   if (key === DUNGEON_KEYS.primary) throw new DOMException('full', 'QuotaExceededError');
+   write(key, text);
+ };
+ expect(await owner.save()).toBe(false);
+ expect(owner.status).toContain('quota');
+ expect(data.values).toEqual(before);
+ data.setItem = write;
+ assert(await owner.retry(owner.inspect()));
+ expect(store.inspect()).toMatchObject({
+   primary: { state: { revision: initial.revision } },
+   backup: { state: { revision: 1 } },
+ });
+});
+
+it('refuses the first write from a backup that another tab removed', async () => {
+ const data = memory(), store = createDungeonStorage(() => data), initial = fresh();
+ assert(store.save(initial).ok);
+ assert(store.remove('primary', store.inspect().primary.text).ok);
+ const owner = new DungeonSession(initial, store);
+ assert(owner.continue(owner.inspect(), 'backup'));
+ const other = createDungeonStorage(() => data);
+ assert(other.remove('backup', other.inspect().backup.text).ok);
+ expect(await owner.save()).toBe(false);
+ expect(owner.status).toContain('changed');
+ expect(bothDungeonSlotsMissing(store.inspect())).toBe(true);
+});
+
+it('flushes explicitly unsaved playtime in memory while the write lock is held', async () => {
+ const pending: (() => void)[] = []; let now = 0;
+ const data = memory(), owner = new DungeonSession(fresh(), createDungeonStorage(() => data), null, () => now, task => pending.push(task));
+ owner.playUnsaved(); owner.setPlaytimeActive(true); now = 4000;
+ const flush = owner.flushPlaytime();
+ expect(pending).toHaveLength(0);
+ await flush;
+ expect(owner.snapshot.stats?.activeMs).toBe(4000);
+ expect(owner.status).toContain('Playing unsaved');
+ const retry = owner.retry(owner.inspect());
+ expect(pending).toHaveLength(1); pending.shift()!();
+ expect(await retry).toBe(true);
+});
+
+it('never applies sampled time to a different save written before resume', async () => {
+ const data = memory(), storage = createDungeonStorage(() => data), initial = freshDungeon('stale-clock', 13, undefined, true);
+ assert(storage.save(initial).ok);
+ let now = 0; const grants: (() => void)[] = [];
+ const owner = new DungeonSession(initial, storage, null, () => now, task => grants.push(task));
+ assert(owner.continue(owner.inspect())); owner.setPlaytimeActive(true); now = 4000; owner.dispose();
+ expect(grants).toHaveLength(1);
+ const next = { ...initial, revision: initial.revision + 1 }, other = createDungeonStorage(() => data);
+ assert(other.save(next).ok);
+ grants.shift()!();
+ const resumed = new DungeonSession(initial, createDungeonStorage(() => data));
+ assert(resumed.continue(resumed.inspect()));
+ expect(resumed.snapshot).toEqual(next);
+ expect(other.inspect().primary).toMatchObject({ state: next });
+});
+
 it('finishes the admitted dungeon clock checkpoint under its lock after disposal', async () => {
  const m=memory(),storage=createDungeonStorage(()=>m),pending:(()=>void)[]=[];let now=0;
  const initial=freshDungeon('closing-clock',13,undefined,true);assert(storage.save(initial).ok);
@@ -1391,14 +1603,16 @@ it('flushes dungeon writes queued by an earlier checkpoint observer before revie
  pending.shift()!();await flush;expect(done).toBe(true);expect(owner.hasUnsavedProgress).toBe(false);
 });
 
-it.each(['primary','backup'] as const)('does not publish an old queued autosave after continuing %s', async slot => {
- const m=memory(),storage=createDungeonStorage(()=>m),pending:(()=>void)[]=[];
+it.each([['primary','granted'],['primary','refused'],['backup','granted'],['backup','refused']] as const)('does not publish an old queued autosave after continuing %s when the lock is %s', async (slot,lock) => {
+ const m=memory(),storage=createDungeonStorage(()=>m),pending:(()=>void)[]=[];let now=0;
  const initial=freshDungeon('queued-continue',13,undefined,true);assert(storage.save(initial).ok);
  const primary={...initial,stats:{...initial.stats!,movesTaken:2}};assert(storage.save(primary).ok);
- const owner=new DungeonSession(primary,storage,null,undefined,task=>pending.push(task));assert(owner.continue(owner.inspect()));
- const save=owner.save(),review=owner.inspect();assert(owner.continue(review,slot));
- const bytes=[m.getItem(DUNGEON_KEYS.primary),m.getItem(DUNGEON_KEYS.backup)],continued=owner.snapshot;
- while(pending.length)pending.shift()!();await save;
+ const owner=new DungeonSession(primary,storage,null,()=>now,(grant,refuse)=>pending.push(lock==='granted'?grant:refuse));
+ assert(owner.continue(owner.inspect()));owner.setPlaytimeActive(true);
+ const save=owner.save(false,'Older action.');now=200;owner.setPlaytimeActive(false);
+ const review=owner.inspect();assert(owner.continue(review,slot));
+ const bytes=[m.getItem(DUNGEON_KEYS.primary),m.getItem(DUNGEON_KEYS.backup)],continued=owner.snapshot,status=owner.status;
+ while(pending.length)pending.shift()!();expect(await save).toBe(false);
  expect([m.getItem(DUNGEON_KEYS.primary),m.getItem(DUNGEON_KEYS.backup)]).toEqual(bytes);
- expect(owner.snapshot).toEqual(continued);expect(owner.hasUnsavedProgress).toBe(false);
+ expect(owner.snapshot).toEqual(continued);expect(owner.hasUnsavedProgress).toBe(false);expect(owner.status).toBe(status);
 });

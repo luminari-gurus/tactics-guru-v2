@@ -151,6 +151,22 @@ it('emits one newly accepted victory event but leaves the party at origin until 
   expect(await owner.startEncounter()).toBeNull(); expect(received).toHaveLength(1);
 });
 
+it('collects from a saved victory while a playtime checkpoint waits behind the pickup', async () => {
+  const { won, intent } = victory(), data = memory(), storage = createDungeonStorage(() => data);
+  assert(storage.save(won).ok);
+  let now = 0;
+  const pending: (() => void)[] = [], owner = new DungeonSession(won, storage, null, () => now, task => pending.push(task));
+  assert(owner.continue(owner.inspect())); owner.setPlaytimeActive(true);
+  const pickup = owner.autoCollect(intent, () => true);
+  now = 5000; owner.setPlaytimeActive(true);
+  expect(pending).toHaveLength(2);
+  for (const grant of pending) grant();
+  expect(await pickup).toBe(true);
+  const saved = storage.inspect().primary; assert(saved.status === 'valid');
+  expect(currentFloor(saved.state).loot![0].remaining).toBe(0);
+  expect(saved.state.stats?.activeMs).toBe(5000);
+});
+
 it('does not move automatically when the victory save failed', async () => {
   const { entry } = victory(), battle = entry.activeBattle!;
   const terminal = { ...entry, activeBattle: { ...battle, outcome: 'playerWin' as const,

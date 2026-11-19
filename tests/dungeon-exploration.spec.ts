@@ -103,13 +103,20 @@ test('ground loot: legal victory saves one item at contact and a manual pickup s
  const refused=await dungeonSnapshot(page);expect(refused.floors).toEqual(resumed.floors);expect(refused.ownership).toEqual(resumed.ownership);
  await page.evaluate(()=>(window as unknown as {restoreLootStorage:()=>void}).restoreLootStorage());
  await page.getByRole('button',{name:'Save recovery',exact:true}).click();await page.locator('#dungeon-retry-save').click();
- const statusNode=await page.locator('.dungeon-status').elementHandle();if(!statusNode)throw Error('Missing acquisition status');
- await enter();await expect(page.locator('.dungeon-status')).toContainText(`Picked up ${label}`);
- await expect(page.locator('.dungeon-header .dungeon-status')).toBeInViewport({ratio:1});
- await expect(page.locator('.dungeon-save-note')).toBeHidden();
- expect(await statusNode.evaluate(node=>node.isConnected&&node===document.querySelector('.dungeon-status'))).toBe(true);
- await expect(page.locator('.dungeon-status')).toHaveAttribute('aria-live','polite');
- await expect(page.locator('.dungeon-status')).toHaveAttribute('aria-atomic','true');
+ const lootStatus=page.locator('.dungeon-loot-status');
+ const statusNode=await lootStatus.elementHandle();if(!statusNode)throw Error('Missing acquisition status');
+ await enter();await expect(lootStatus).toContainText(`Picked up ${label}`);
+ await expect(lootStatus).toBeInViewport({ratio:1});
+ await expect(page.locator('.dungeon-save-note')).toHaveText('Exploration saved on this device');
+ await expect(page.locator('.dungeon-save-note')).toBeInViewport({ratio:1});
+ expect(await statusNode.evaluate(node=>node.isConnected&&node===document.querySelector('.dungeon-loot-status'))).toBe(true);
+ await expect(lootStatus).toHaveAttribute('role','status');
+ await expect(lootStatus).toHaveAttribute('aria-atomic','true');
+ expect(await lootStatus.evaluate(node=>{
+  const message=node.getBoundingClientRect(), map=document.querySelector('.dungeon-map-viewport')!.getBoundingClientRect();
+  const target=document.elementFromPoint(message.x+message.width/2,message.y+message.height/2);
+  return message.top>=map.top&&message.bottom<=map.bottom&&map.bottom-message.bottom<=8&&!!target?.closest('#dungeon-map');
+ })).toBe(true);
  const collected=await dungeonSnapshot(page),afterFloor=collected.floors[collected.depth-1];
  expect(afterFloor.position).toBe(entry.contact);expect(afterFloor.loot).toEqual([{...loot[0],remaining:0}]);
  expect(afterFloor.exploration.movement!.step).toBe(floor.exploration.movement!.step+1);
@@ -130,7 +137,7 @@ for(const ownedCount of [5,6])test(`ground loot: ${ownedCount===5?'partial':'ful
  const entered=await dungeonSnapshot(page),enteredFloor=entered.floors[entered.depth-1];
  expect(enteredFloor.loot!.map(item=>item.remaining)).toEqual(ownedCount===5?[0,1]:[1,1]);
  expect(entered.ownership.equipment).toHaveLength(6);expect(entered.ownership.assignments).toEqual([]);
- await expect(page.locator('.dungeon-status')).toContainText('Inventory full');
+ await expect(page.locator('.dungeon-loot-status')).toContainText('Inventory full');
  await expect(tile).toHaveAttribute('data-loot-overlay','true');
  await expect(page.locator('.dungeon-loot-here')).toBeVisible();
  await expect(page.locator('#dungeon-map')).toHaveAccessibleDescription(/Beneath the party/);
@@ -144,7 +151,7 @@ for(const ownedCount of [5,6])test(`ground loot: ${ownedCount===5?'partial':'ful
   const discard=page.locator(`[data-instance-id="${state.ownership.equipment[original.indexOf(pending)].instanceId}"]`).getByRole('button',{name:'Discard Warding Charm',exact:true});
   if(isMobile)await discard.tap();else await discard.click();
   await page.locator('#dungeon-discard-confirm').click();
-  await expect(page.locator('.dungeon-status')).toContainText(`Picked up ${dungeonContent.items[pending.itemId].label}`);
+  await expect(page.locator('.dungeon-loot-status')).toContainText(`Picked up ${dungeonContent.items[pending.itemId].label}`);
   const after=await acceptedDungeonSnapshot(page,before),afterFloor=after.floors[after.depth-1];
   expect(afterFloor.position).toBe(cell);expect(afterFloor.exploration).toEqual(floor.exploration);
   expect(after.ownership.equipment).toHaveLength(6);expect(after.ownership.equipment.some(item=>item.instanceId===pending.id)).toBe(true);
@@ -566,6 +573,7 @@ test('movement controls stay visible with the player without scrolling on entry 
   const before=await dungeonSnapshot(page),scrollTop=await activate(`dungeon-step-${name}`);
   await expect.poll(async()=>(await dungeonSnapshot(page)).floors[0].position).toBe(destination);
   await expect(page.locator('.dungeon-save-note')).toHaveText('Exploration saved on this device');
+  await expect(page.locator('.dungeon-save-note')).toBeInViewport({ratio:1});
   expect(await party.evaluate(node=>node.isConnected),'Ordinary movement keeps the unchanged party mounted').toBe(true);
   expect((await dungeonSnapshot(page)).revision).toBe(before.revision+1);
   expect((await expectDungeonMovementVisible(page)).scrollTop).toBe(scrollTop);

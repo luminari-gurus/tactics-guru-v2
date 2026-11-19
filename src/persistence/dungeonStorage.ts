@@ -43,6 +43,7 @@ function primaryHidesRecentBackup(primary: Slot, rollback: DungeonState): boolea
 export function createDungeonStorage(provider: RunStorageProvider = () => window.localStorage) {
   let uncertain = false;
   let lastWritten: string | undefined;
+  let pendingClock: { key: string; text: string } | null = null;
   // Exact immutable bytes admit the same deterministic state. Keep private copies
   // and clone on return so callers can never mutate a future inspection result.
   const decoded = new Map<string, DungeonState>();
@@ -99,8 +100,8 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
     };
     return { primary: slot('primary'), backup: slot('backup') };
   }
-  function inspect(): DungeonInspection {
-    const review = inspectSlots();
+  function inspect(): DungeonInspection { return withRecentBackup(inspectSlots()); }
+  function withRecentBackup(review: DungeonInspection): DungeonInspection {
     const { primary, backup } = review;
     if (backup.status !== 'valid' || hasHobgoblinFloor(backup.state) ||
         primaryHidesRecentBackup(primary, backup.state)) return review;
@@ -116,7 +117,7 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
     } catch { /* The rollback backup remains independently readable. */ }
     return review;
   }
-  function save(state: DungeonState, expectedPrimary?: string | null): DungeonWrite {
+  function save(state: DungeonState, expectedPrimary?: string | null, expectedBackup?: Slot): DungeonWrite {
     if (uncertain) return { ok: false, reason: 'uncertainWrite' };
     const encoded = encodeDungeonWithState(state); if (!encoded.ok) return encoded;
     try {
@@ -125,6 +126,11 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
       if (Object.values(old).some(s => s.status === 'unavailable')) return { ok: false, reason: 'unavailable' };
       if (Object.values(old).some(s => s.status === 'invalid')) return { ok: false, reason: 'recoveryRequired' };
       if (expectedPrimary !== undefined && old.primary.text !== expectedPrimary) return { ok: false, reason: 'changed' };
+      const reviewed = withRecentBackup(old);
+      if (expectedBackup && !sameSlot(reviewed.backup, expectedBackup)) return { ok: false, reason: 'changed' };
+      if (state.phase !== 'defeat' && [reviewed.primary, reviewed.backup].some(slot =>
+        slot.status === 'valid' && slot.state.id === state.id && slot.state.phase === 'defeat'))
+        return { ok: false, reason: 'this dungeon has ended in defeat' };
       let backup = old.primary.status === 'valid' ? old.primary.text : old.backup.status === 'missing' ? encoded.text : null;
       let backupState: DungeonState | undefined = old.primary.status === 'valid' ? old.primary.state
         : old.backup.status === 'valid' ? old.backup.state : encoded.state;
@@ -196,6 +202,13 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
         return storage.getItem(DUNGEON_KEYS.backup) === (backup ?? old.backup.text) &&
           (expectedRecord == null || storage.getItem(DUNGEON_BACKUP_CHECKPOINT_KEY) === expectedRecord);
       };
+      // A player who continued the backup depends on those exact bytes and sidecars.
+      // Verify their new primary before rotating the preceding primary into backup.
+      if (expectedBackup) {
+        uncertain = true;
+        storage.setItem(DUNGEON_KEYS.primary, encoded.text);
+        if (storage.getItem(DUNGEON_KEYS.primary) !== encoded.text) return { ok: false, reason: 'uncertainWrite' };
+      }
       if (backup !== null) {
         if (checkpoint !== null) {
           // Keep the old checkpoint readable until the new rollback bytes land.
@@ -221,7 +234,7 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
       }
       // Any exception after the write attempt can have an uncertain outcome.
       uncertain = true;
-      storage.setItem(DUNGEON_KEYS.primary, encoded.text);
+      if (!expectedBackup) storage.setItem(DUNGEON_KEYS.primary, encoded.text);
       // A concurrent removal can invalidate the backup while the primary is being written.
       if (storage.getItem(DUNGEON_KEYS.primary) !== encoded.text || !backupMatches() ||
           storage.getItem(DUNGEON_RECENT_BACKUP_KEY) !== recentRecord) return { ok: false, reason: 'uncertainWrite' };
@@ -269,23 +282,98 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
       return { ok: true };
     } catch (e) { return { ok: false, reason: error(e) }; }
   }
+  /** Replace under the dungeon lock. Keep the last readable slot until its successor is verified. */
+  function replace(review: DungeonInspection, state: DungeonState): DungeonWrite {
+    if (!acknowledge(review)) return { ok: false, reason: 'changed' };
+    const encoded = encodeDungeonWithState(state);
+    if (!encoded.ok) return encoded;
+    try {
+      const storage = provider();
+      if (!storage) return { ok: false, reason: 'unavailable' };
+      const first = review.primary.status === 'valid' ? DUNGEON_KEYS.backup : DUNGEON_KEYS.primary;
+      const second = first === DUNGEON_KEYS.primary ? DUNGEON_KEYS.backup : DUNGEON_KEYS.primary;
+      const original = storage.getItem(first), other = storage.getItem(second);
+      uncertain = true;
+      storage.setItem(first, encoded.text);
+      if (storage.getItem(first) !== encoded.text || storage.getItem(second) !== other) return { ok: false, reason: 'uncertainWrite' };
+      try {
+        storage.setItem(second, encoded.text);
+      } catch (cause) {
+        // A confirmed failure can restore the staged slot without touching its sidecars.
+        if (storage.getItem(second) === other && storage.getItem(first) === encoded.text) {
+          if (original === null) storage.removeItem(first);
+          else storage.setItem(first, original);
+        }
+        throw cause;
+      }
+      if (storage.getItem(second) !== encoded.text || storage.getItem(first) !== encoded.text)
+        return { ok: false, reason: 'uncertainWrite' };
+      uncertain = false; lastWritten = encoded.text;
+      // Both historical sidecars are bound to the superseded backup's exact bytes.
+      try {
+        storage.removeItem(DUNGEON_BACKUP_CHECKPOINT_KEY);
+        storage.removeItem(DUNGEON_RECENT_BACKUP_KEY);
+      } catch { /* Unbound sidecars cannot change the verified new dungeon. */ }
+      return { ok: true };
+    } catch (e) { return { ok: false, reason: error(e) }; }
+  }
+
+  // pagehide cannot await a Web Lock. Only the sampled counter crosses unload;
+  // normal locked writes still own both game slots and validate their exact source.
+  function clockCheckpoint(id: string, primary: string | null, backup?: Slot, activeMs?: number): number {
+    try {
+      const storage = provider();
+      if (!storage) return 0;
+      const key = DUNGEON_KEYS[backup ? 'backup' : 'primary'] + ':pending-playtime';
+      const text = storage.getItem(key);
+      if (text === null && activeMs === undefined) return 0;
+      if (storage.getItem(DUNGEON_KEYS.primary) !== primary || backup && !sameSlot(inspect().backup, backup)) return 0;
+      const source = hashJson([id, primary, backup?.text ?? null, backup?.status === 'valid' ? backup.checkpoint ?? null : null]);
+      const [binding, value] = (text ?? '').split('\n');
+      const previous = binding === source && Number.isSafeInteger(Number(value)) && Number(value) > 0 ? Number(value) : 0;
+      if (activeMs === undefined) {
+        if (previous && text) pendingClock = { key, text };
+        return previous;
+      }
+      const receipt = source + '\n' + Math.max(activeMs, previous);
+      if (text !== receipt) storage.setItem(key, receipt);
+      pendingClock = { key, text: receipt };
+      return Math.max(activeMs, previous);
+    } catch { return 0; } // Storage denial leaves the ordinary checkpoint pending.
+  }
+  function clearClockCheckpoint() {
+    if (!pendingClock) return;
+    try {
+      const storage = provider();
+      if (storage?.getItem(pendingClock.key) === pendingClock.text) storage.removeItem(pendingClock.key);
+    } catch { /* The committed primary no longer matches the receipt. */ }
+    pendingClock = null;
+  }
+  function sameSlot(current: Slot, reviewed: Slot) {
+    return current.status !== 'unavailable' && current.status === reviewed.status && current.text === reviewed.text &&
+      (current.status !== 'valid' || reviewed.status === 'valid' && current.checkpoint === reviewed.checkpoint);
+  }
   /** Explicit recovery choice acknowledges inspected durable bytes, never silently adopts a candidate. */
   function acknowledge(review: DungeonInspection) {
     const now = inspect();
-    const checkpoint = (slot: Slot) => slot.status === 'valid' ? slot.checkpoint : undefined;
-    const equal = (['primary','backup'] as const).every(k => now[k].status !== 'unavailable' && now[k].text === review[k].text) &&
-      checkpoint(now.backup) === checkpoint(review.backup);
+    const equal = sameSlot(now.primary, review.primary) && sameSlot(now.backup, review.backup);
     if (equal) uncertain = false;
     return equal;
   }
-  return { inspect, save, remove, acknowledge, lastSavedText: () => lastWritten };
+  return { inspect, save, replace, remove, acknowledge, clockCheckpoint, clearClockCheckpoint, lastSavedText: () => lastWritten };
 }
 
-/** All browser dungeon mutations, including multi-slot recovery, share this lock. */
-export function serializeBrowserDungeonWrite(task: () => void, unavailable: () => void) {
-  try {
+// Keep requests from one document in order. A second document must not join the
+// same batch of waiting writers: its localStorage replica can still show the old
+// primary immediately after the first document releases the Web Lock.
+let localWrites = Promise.resolve();
+export function serializeBrowserDungeonWrite(task: () => void, unavailable: (contended?: boolean) => void) {
+  localWrites = localWrites.then(async () => {
     const locks = navigator.locks;
     if (!locks) { unavailable(); return; }
-    void locks.request(DUNGEON_KEYS.primary, task).catch(unavailable);
-  } catch { unavailable(); }
+    await locks.request(DUNGEON_KEYS.primary + ':writer', { ifAvailable: true }, async admission => {
+      if (!admission) { unavailable(true); return; }
+      await locks.request(DUNGEON_KEYS.primary, task);
+    });
+  }).catch(() => unavailable());
 }
