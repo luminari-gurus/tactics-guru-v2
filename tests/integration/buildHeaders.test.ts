@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { battleAssets } from '../../src/content/assets';
 import { desertAssets } from '../../src/content/desertAssets';
+import { goblinFamilyAssets } from '../../src/content/goblinFamily';
 import { hobgoblinAssets } from '../../src/content/hobgoblin';
 import { runInNewContext } from 'node:vm';
 import { APPLICATION_LOAD_FILES_MANIFEST, APPLICATION_LOAD_FILES_META } from '../../src/diagnostics/applicationLoadFailure';
@@ -24,7 +25,7 @@ for (const base of ['/', '/tactics/']) {
     });
     const code = result.output.filter(file => /\.(js|css)$/.test(file.fileName));
     expect(code.length).toBeGreaterThan(0);
-    const images = Object.values({...battleAssets,...desertAssets,...hobgoblinAssets}).map(asset => {
+    const images = Object.values({...battleAssets,...desertAssets,...hobgoblinAssets,...goblinFamilyAssets}).map(asset => {
       const bytes = readFileSync(`public${asset.runtimePath}`);
       const hash = createHash('sha256').update(bytes).digest('hex').slice(0,16);
       const path = `assets/${hash}${asset.runtimePath}`;
@@ -60,7 +61,7 @@ for (const base of ['/', '/tactics/']) {
       const direct = preloads(`${base}${mode}`);
       expect(direct.length).toBeGreaterThan(0);
       expect(direct.every(link => link.href.startsWith(base))).toBe(true);
-      for (const asset of Object.values(hobgoblinAssets)) {
+      for (const asset of Object.values({...hobgoblinAssets, ...goblinFamilyAssets})) {
         expect(direct.some(link => link.href.endsWith(asset.runtimePath))).toBe(false);
       }
       expect(preloads(base, `?game=${mode}`)).toEqual([]);

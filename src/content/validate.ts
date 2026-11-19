@@ -1,4 +1,4 @@
-import { ATTACK_BOUNDS, CONTENT_BOUNDS, CORE_ENEMY_IDS, ENEMY_IDS, GUARDED_STRIKE_TRADEOFF, FIRST_MAP_TERRAIN_IDS, HERO_IDS, TERRAIN_TEXTURE_SPEC } from './constants';
+import { ATTACK_BOUNDS, BASIC_ATTACK_OPTIONAL_ENEMY_IDS, CONTENT_BOUNDS, CORE_ENEMY_IDS, ENEMY_IDS, GUARDED_STRIKE_TRADEOFF, FIRST_MAP_TERRAIN_IDS, HERO_IDS, OPTIONAL_ENEMY_IDS, SHORTBOW_OPTIONAL_ENEMY_IDS, TERRAIN_TEXTURE_SPEC } from './constants';
 import type { ContentCatalog } from './types';
 import { attackAbilities, shieldBash } from './abilities';
 import { hasShape, isDenseArray, isPlainRecord, type JsonRecord } from '../domain/validation';
@@ -42,7 +42,7 @@ export function validateContent(input: unknown): ContentValidation {
     const seen = new Set<string>();
     for (const [key, record] of Object.entries(v)) {
       const path = `${group}.${key}`;
-      if (fixed ? !fixed.some(id => id === key) && !(group === 'terrains' && ['sand','rock','void'].includes(key)) && !(group === 'enemies' && key === 'hobgoblin_warrior') && !(group === 'abilities' && prefixedId(key, 'ability')) : !prefixedId(key, group === 'maps' ? 'map' : 'asset')) fail('id', path, 'Unknown or malformed catalog ID.');
+      if (fixed ? !fixed.some(id => id === key) && !(group === 'terrains' && ['sand','rock','void'].includes(key)) && !(group === 'enemies' && (OPTIONAL_ENEMY_IDS as readonly string[]).includes(key)) && !(group === 'abilities' && prefixedId(key, 'ability')) : !prefixedId(key, group === 'maps' ? 'map' : 'asset')) fail('id', path, 'Unknown or malformed catalog ID.');
       if (!isPlainRecord(record) || !hasShape(record, Object.keys(record))) { fail('shape', path, 'Expected a plain definition without accessors or hidden fields.'); continue; }
       if (record.id !== key) fail('id', `${path}.id`, 'Record ID must equal its catalog key.');
       if (typeof record.id === 'string') {
@@ -118,8 +118,10 @@ export function validateContent(input: unknown): ContentValidation {
       if (ability.kind === 'frostSnare' && ability.owners.some(owner=>owner!=='mage'))
         fail('reference', `${path}.owners`, 'Frost Snare requires the Mage source lifecycle.');
       if (expected) {
-        const owners = id === 'ability:basic_attack' && Object.hasOwn(catalogs.enemies, 'hobgoblin_warrior')
-          ? [...expected.owners, 'hobgoblin_warrior'] : expected.owners;
+        const extras = id === 'ability:basic_attack' ? BASIC_ATTACK_OPTIONAL_ENEMY_IDS
+          : id === 'ability:shortbow_shot' ? SHORTBOW_OPTIONAL_ENEMY_IDS : [];
+        const extra = extras.filter(owner => Object.hasOwn(catalogs.enemies, owner));
+        const owners = extra.length ? [...expected.owners, ...extra] : expected.owners;
         if (ability.owners.length !== owners.length || ability.owners.some((owner, i) => owner !== owners[i]))
           fail('reference', `${path}.owners`, 'Expected the approved ability owners in their defined order.');
       } else if (!ability.owners.length || ability.owners.length > HERO_IDS.length + ENEMY_IDS.length

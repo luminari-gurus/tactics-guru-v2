@@ -20,6 +20,18 @@ All ten sources are preserved from `luminari-gurus/tactics-guru` revision `9303d
 
 Hobgoblin Warrior (`hobgoblin_warrior_sprite` / `hobgoblin_warrior_portrait`) and Goblin Shaman (`goblin_shaman_sprite` / `goblin_shaman_portrait`) now follow the same illustrated sprite/portrait convention as the goblin pairs: 64×80 RGBA sprites with foot anchor (32,76), and a 1254×1254 framed portrait source with a 96×96 runtime export. Hobgoblin previously derived its 96×96 portrait from a 48×48 nearest-neighbor crop of a pixel-art sprite; that exception is removed. They are not on the five-pair annotated sheet, which remains the original #88 reference.
 
+Bestiary batch 1 adds five more illustrated goblin-family pairs with the same convention and foot anchor (32,76). They are registered as optional enemy units and packaged as ordinary Git blobs; they are not on the five-pair annotated sheet and are not placed into existing battles or dungeon encounter rosters.
+
+| Pair / asset IDs (`asset:` prefix) | Sprite | Portrait source | Runtime portrait |
+| --- | --- | --- | --- |
+| Bramble Goblin: `bramble_goblin_sprite`, `bramble_goblin_portrait` | [64×80](../../public/battle/source/bramble_goblin_sprite.png) | [1254×1254](../../public/battle/source/bramble_goblin_portrait.png) | [96×96](../../public/battle/portraits/bramble_goblin.png) |
+| Goblin Snarehand: `goblin_snarehand_sprite`, `goblin_snarehand_portrait` | [64×80](../../public/battle/source/goblin_snarehand_sprite.png) | [1254×1254](../../public/battle/source/goblin_snarehand_portrait.png) | [96×96](../../public/battle/portraits/goblin_snarehand.png) |
+| Mire Goblin: `mire_goblin_sprite`, `mire_goblin_portrait` | [64×80](../../public/battle/source/mire_goblin_sprite.png) | [1254×1254](../../public/battle/source/mire_goblin_portrait.png) | [96×96](../../public/battle/portraits/mire_goblin.png) |
+| Coal Goblin: `coal_goblin_sprite`, `coal_goblin_portrait` | [64×80](../../public/battle/source/coal_goblin_sprite.png) | [1254×1254](../../public/battle/source/coal_goblin_portrait.png) | [96×96](../../public/battle/portraits/coal_goblin.png) |
+| Ruin Lookout: `ruin_lookout_sprite`, `ruin_lookout_portrait` | [64×80](../../public/battle/source/ruin_lookout_sprite.png) | [1254×1254](../../public/battle/source/ruin_lookout_portrait.png) | [96×96](../../public/battle/portraits/ruin_lookout.png) |
+
+Measured half-open sprite alpha bounds: Bramble Goblin (8,12,56,80); Goblin Snarehand (7,12,58,80); Mire Goblin (7,8,57,80); Coal Goblin (6,12,59,80); Ruin Lookout (7,12,57,80). All five keep feet on the bottom edge. No `pixelArt` / nearest-neighbor Phaser special case is recorded or added.
+
 Canonical sources are owner-repository project artwork. No per-file third-party license, original prompt, model or generation method is recorded. Retain that uncertainty; these briefs are new production instructions, not reconstructed original prompts or a rights clearance.
 
 ## Observed visual language
