@@ -21,6 +21,7 @@ import { generateMap } from '../src/map/generate';
 import type { Command, BattleEvent } from '../src/domain/types';
 import { movementBlockSource } from '../src/domain/effects';
 import { expectDungeonMovementVisible } from './helpers/dungeonLayout';
+import { BattleSession } from '../src/app/BattleSession';
 
 const fixedSeedTest = test.extend({ pinDungeonSeed: 28 });
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
@@ -597,6 +598,32 @@ test('play unsaved dungeon uses a fresh layout each visit and does not write a s
  expect(second.seed).not.toBe(first.seed);
  expect(generateMap(second.floors[0].descriptor.seed,'rooms').cells).not.toEqual(generateMap(first.floors[0].descriptor.seed,'rooms').cells);
  expect(await page.evaluate(()=>Object.keys(localStorage).filter(key=>key.includes(':dungeon:')))).toEqual([]);
+});
+
+test('Forest Elite keeps a living goblin visible behind raised terrain', async ({ page }, info) => {
+ const dungeon = atEncounter(freshDungeon('forest-elite-visibility', 41), 1);
+ expect(dungeon.floors[0].descriptor.encounters[1].selection.kind).toBe('elite');
+ const entered = checkedDungeon(startDungeonBattle(dungeon));
+ const { catalog, battlefield, state } = dungeonBattle(entered)!;
+ const battle = new BattleSession(catalog, state, state.seed, undefined, true, battlefield);
+ while (battle.state.commandCount < 21) {
+  if (battle.phase === 'player') expect(battle.prepare(playerDecision(battle.state, catalog)).ok).toBe(true);
+  const step = battle.phase === 'player' ? battle.confirm() : battle.nextEnemy();
+  if (!step) throw Error('Forest Elite visibility fixture did not advance');
+  battle.finishPresentation(step.token);
+ }
+ expect(battle.phase).toBe('player');
+ expect(battle.state.round).toBe(2);
+ expect(battle.state.units.filter(unit => unit.side === 'enemy' && unit.hp > 0).map(unit => unit.defId))
+  .toEqual(['goblin_grunt', 'goblin_archer', 'goblin_shaman']);
+ await seed(page, checkedDungeon(acceptDungeonBattle(entered, battle.state)));
+ await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+ expect((await readSession(page)).state).toEqual(battle.state);
+ const board = await boardReport(page);
+ const archer = board.units.find((unit: { id: number }) => unit.id === 5);
+ expect(archer.tile).toEqual({ x: 5, y: 2, elevation: 0 });
+ await page.screenshot({ path: info.outputPath('forest-elite-archer.png') });
+ for (const x of [5, 6]) expect(board.fadedTerrain ?? []).toContainEqual({ x, y: 3, columnAlpha: 0.3, surfaceAlpha: 0.3 });
 });
 
 test('Shaman production journey uses Hex and ally healing, reloads Weakened and replays a complete legal battle',async({page,isMobile},info)=>{
