@@ -32,6 +32,18 @@ Bestiary batch 1 adds five more illustrated goblin-family pairs with the same co
 
 Measured half-open sprite alpha bounds: Bramble Goblin (8,12,56,80); Goblin Snarehand (7,12,58,80); Mire Goblin (7,8,57,80); Coal Goblin (6,12,59,80); Ruin Lookout (7,12,57,80). All five keep feet on the bottom edge. No `pixelArt` / nearest-neighbor Phaser special case is recorded or added.
 
+Bestiary batch 2 adds five illustrated forest-family pairs with the same convention and foot anchor (32,76). They are registered as optional enemy units and packaged as ordinary Git blobs; they are not on the five-pair annotated sheet and are not placed into existing battles or dungeon encounter rosters.
+
+| Pair / asset IDs (`asset:` prefix) | Sprite | Portrait source | Runtime portrait |
+| --- | --- | --- | --- |
+| Briar Thrall: `briar_thrall_sprite`, `briar_thrall_portrait` | [64×80](../../public/battle/source/briar_thrall_sprite.png) | [1254×1254](../../public/battle/source/briar_thrall_portrait.png) | [96×96](../../public/battle/portraits/briar_thrall.png) |
+| Rotcap Sprout: `rotcap_sprout_sprite`, `rotcap_sprout_portrait` | [64×80](../../public/battle/source/rotcap_sprout_sprite.png) | [1254×1254](../../public/battle/source/rotcap_sprout_portrait.png) | [96×96](../../public/battle/portraits/rotcap_sprout.png) |
+| Spore Acolyte: `spore_acolyte_sprite`, `spore_acolyte_portrait` | [64×80](../../public/battle/source/spore_acolyte_sprite.png) | [1254×1254](../../public/battle/source/spore_acolyte_portrait.png) | [96×96](../../public/battle/portraits/spore_acolyte.png) |
+| Thornback Beetle: `thornback_beetle_sprite`, `thornback_beetle_portrait` | [64×80](../../public/battle/source/thornback_beetle_sprite.png) | [1254×1254](../../public/battle/source/thornback_beetle_portrait.png) | [96×96](../../public/battle/portraits/thornback_beetle.png) |
+| Blob: `blob_sprite`, `blob_portrait` | [64×80](../../public/battle/source/blob_sprite.png) | [1254×1254](../../public/battle/source/blob_portrait.png) | [96×96](../../public/battle/portraits/blob.png) |
+
+Measured half-open sprite alpha bounds: Briar Thrall (7,10,57,80); Rotcap Sprout (9,24,55,80); Spore Acolyte (7,12,57,80); Thornback Beetle (4,20,61,80); Blob (5,26,59,80). All five keep feet on the bottom edge. No `pixelArt` / nearest-neighbor Phaser special case is recorded or added.
+
 Canonical sources are owner-repository project artwork. No per-file third-party license, original prompt, model or generation method is recorded. Retain that uncertainty; these briefs are new production instructions, not reconstructed original prompts or a rights clearance.
 
 ## Observed visual language

@@ -1,4 +1,5 @@
 import { battlefieldEncounters, authoredEncounters, runCatalog } from './encounters';
+import { forestFamilyBattleContent } from './forestFamily';
 import { goblinFamilyBattleContent } from './goblinFamily';
 import { hobgoblinBattleContent, hobgoblinComposition, hobgoblinMap } from './hobgoblin';
 import { desertRunCatalog } from './desertCatalog';
@@ -119,6 +120,8 @@ export const hobgoblinDungeonBattleCatalog = hobgoblinBattleContent({
 });
 /** Registered goblin-family units and art; not placed into existing encounter rosters. */
 export const goblinFamilyDungeonBattleCatalog = goblinFamilyBattleContent(dungeonBattleCatalog);
+/** Registered forest-family units and art; not placed into existing encounter rosters. */
+export const forestFamilyDungeonBattleCatalog = forestFamilyBattleContent(dungeonBattleCatalog);
 export const hobgoblinDungeonEncounterCatalog: DungeonEncounterCatalog = {
   ...dungeonEncounterCatalog,
   compositions: [...dungeonEncounterCatalog.compositions, hobgoblinComposition],
