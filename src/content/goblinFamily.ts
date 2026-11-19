@@ -72,7 +72,7 @@ export function goblinFamilyBattleContent(baseline: ContentCatalog): ContentCata
     abilities: {
       ...baseline.abilities,
       [basic.id]: { ...basic, owners: [...basic.owners, ...GOBLIN_FAMILY_MELEE_IDS] },
-      [bow.id]: { ...bow, owners: [...bow.owners, ...SHORTBOW_OPTIONAL_ENEMY_IDS] },
+      [bow.id]: { ...bow, owners: [...bow.owners, ...SHORTBOW_OPTIONAL_ENEMY_IDS.filter(id => Object.hasOwn(goblinFamilyEnemies, id))] },
     },
     enemies: { ...baseline.enemies, ...goblinFamilyEnemies },
     assets: { ...baseline.assets, ...goblinFamilyAssets },

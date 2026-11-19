@@ -44,6 +44,18 @@ Bestiary batch 2 adds five illustrated forest-family pairs with the same convent
 
 Measured half-open sprite alpha bounds: Briar Thrall (7,10,57,80); Rotcap Sprout (9,24,55,80); Spore Acolyte (7,12,57,80); Thornback Beetle (4,20,61,80); Blob (5,26,59,80). All five keep feet on the bottom edge. No `pixelArt` / nearest-neighbor Phaser special case is recorded or added.
 
+Bestiary batch 3 adds five more illustrated forest-family pairs with the same convention and foot anchor (32,76). They are registered as optional enemy units and packaged as ordinary Git blobs; they are not on the five-pair annotated sheet and are not placed into existing battles or dungeon encounter rosters.
+
+| Pair / asset IDs (`asset:` prefix) | Sprite | Portrait source | Runtime portrait |
+| --- | --- | --- | --- |
+| Cinder Archer: `cinder_archer_sprite`, `cinder_archer_portrait` | [64×80](../../public/battle/source/cinder_archer_sprite.png) | [1254×1254](../../public/battle/source/cinder_archer_portrait.png) | [96×96](../../public/battle/portraits/cinder_archer.png) |
+| Ash Hound: `ash_hound_sprite`, `ash_hound_portrait` | [64×80](../../public/battle/source/ash_hound_sprite.png) | [1254×1254](../../public/battle/source/ash_hound_portrait.png) | [96×96](../../public/battle/portraits/ash_hound.png) |
+| Bellows Imp: `bellows_imp_sprite`, `bellows_imp_portrait` | [64×80](../../public/battle/source/bellows_imp_sprite.png) | [1254×1254](../../public/battle/source/bellows_imp_portrait.png) | [96×96](../../public/battle/portraits/bellows_imp.png) |
+| Mossback Boar: `mossback_boar_sprite`, `mossback_boar_portrait` | [64×80](../../public/battle/source/mossback_boar_sprite.png) | [1254×1254](../../public/battle/source/mossback_boar_portrait.png) | [96×96](../../public/battle/portraits/mossback_boar.png) |
+| Rootling Skirmisher: `rootling_skirmisher_sprite`, `rootling_skirmisher_portrait` | [64×80](../../public/battle/source/rootling_skirmisher_sprite.png) | [1254×1254](../../public/battle/source/rootling_skirmisher_portrait.png) | [96×96](../../public/battle/portraits/rootling_skirmisher.png) |
+
+Measured half-open sprite alpha bounds: Cinder Archer (8,12,56,80); Ash Hound (3,20,61,80); Bellows Imp (8,16,56,80); Mossback Boar (5,16,60,80); Rootling Skirmisher (6,12,59,80). All five keep feet on the bottom edge. No `pixelArt` / nearest-neighbor Phaser special case is recorded or added.
+
 Canonical sources are owner-repository project artwork. No per-file third-party license, original prompt, model or generation method is recorded. Retain that uncertainty; these briefs are new production instructions, not reconstructed original prompts or a rights clearance.
 
 ## Observed visual language
