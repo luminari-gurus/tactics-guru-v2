@@ -27,5 +27,7 @@ Changing the HUD would conceal the stale status while the original save reports
 failure to its caller. Broadening snapshot equality would let stale decisions
 through. Keeping the same queued request addresses both issues with one write.
 
-Unload durability depends on the browser running the callback and is tracked in
-[#434](https://github.com/luminari-gurus/tactics-guru-v2/issues/434).
+At pagehide, a sampled clock can outlive the callback in a small recovery record.
+It records the cumulative active time and a digest of the run and reviewed save
+bytes. Continue can fold it into the next locked save only when that source still
+matches. The record carries no battle commands or floor changes.

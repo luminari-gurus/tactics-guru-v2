@@ -218,6 +218,38 @@ test('visibility interruption finishes an accepted terminal presentation exactly
  await expect(page.locator('#dungeon-screen')).toBeVisible();expect(await snapshot(page)).toEqual(committed);await page.waitForTimeout(300);expect(await snapshot(page)).toEqual(committed);
 });
 
+test('reload recovers the last four seconds exactly once across a held dungeon lock', async ({page, context}) => {
+ const holder = await context.newPage();
+ try {
+  await holder.goto('./');
+  await page.addInitScript(() => {
+    let now = 0;
+    Object.defineProperty(performance, 'now', { value: () => now });
+    document.hasFocus = () => true;
+    window.addEventListener('advance-playtime', () => { now = 4000; });
+  });
+  await load(page, freshDungeon('reload-clock', 13, undefined, true));
+  await holder.evaluate(key => new Promise<void>(acquired => {
+    void navigator.locks.request(key, () => new Promise<void>(release => {
+      window.addEventListener('release-clock', () => release(), { once: true }); acquired();
+    }));
+  }), DUNGEON_KEYS.primary);
+  await page.evaluate(() => {
+    window.dispatchEvent(new Event('advance-playtime'));
+    window.dispatchEvent(new Event('blur'));
+  });
+  await expect.poll(() => holder.evaluate(async key =>
+    (await navigator.locks.query()).pending?.filter(lock => lock.name === key).length, DUNGEON_KEYS.primary)).toBe(1);
+  await page.reload();
+  await holder.evaluate(() => window.dispatchEvent(new Event('release-clock')));
+  const storedTime = () => page.evaluate(key => JSON.parse(localStorage.getItem(key)!).payload.stats.activeMs, DUNGEON_KEYS.primary);
+  await expect.poll(storedTime).toBe(4000);
+  await page.reload(); await expectDungeonResumed(page);
+  expect((await snapshot(page)).stats?.activeMs).toBe(4000);
+  expect(await storedTime()).toBe(4000);
+ } finally { await holder.close(); }
+});
+
  test('dungeon tabs serialize spatial publication and refuse the stale owner', async ({page,context}) => {
   // Freeze only playtime; the origin Web Lock and both tabs are real.
   await context.addInitScript(()=>Object.defineProperty(performance,'now',{value:()=>0}));

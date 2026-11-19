@@ -1533,6 +1533,22 @@ it('flushes explicitly unsaved playtime in memory while the write lock is held',
  expect(await retry).toBe(true);
 });
 
+it('never applies sampled time to a different save written before resume', async () => {
+ const data = memory(), storage = createDungeonStorage(() => data), initial = freshDungeon('stale-clock', 13, undefined, true);
+ assert(storage.save(initial).ok);
+ let now = 0; const grants: (() => void)[] = [];
+ const owner = new DungeonSession(initial, storage, null, () => now, task => grants.push(task));
+ assert(owner.continue(owner.inspect())); owner.setPlaytimeActive(true); now = 4000; owner.dispose();
+ expect(grants).toHaveLength(1);
+ const next = { ...initial, revision: initial.revision + 1 }, other = createDungeonStorage(() => data);
+ assert(other.save(next).ok);
+ grants.shift()!();
+ const resumed = new DungeonSession(initial, createDungeonStorage(() => data));
+ assert(resumed.continue(resumed.inspect()));
+ expect(resumed.snapshot).toEqual(next);
+ expect(other.inspect().primary).toMatchObject({ state: next });
+});
+
 it('finishes the admitted dungeon clock checkpoint under its lock after disposal', async () => {
  const m=memory(),storage=createDungeonStorage(()=>m),pending:(()=>void)[]=[];let now=0;
  const initial=freshDungeon('closing-clock',13,undefined,true);assert(storage.save(initial).ok);

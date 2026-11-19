@@ -34,6 +34,7 @@ export class DungeonSession {
   private review: DungeonInspection | null = null;
   private unsaved = false;
   private progressSaved = false;
+  private savedActiveMs = 0;
   private savedRevision: number | null = null;
   private boundaryError = '';
   private expectedPrimary: string | null | undefined;
@@ -73,7 +74,8 @@ export class DungeonSession {
     if (result.ok) {
       this.expectedPrimary = this.storage.lastSavedText();
       this.expectedBackup = undefined;
-      this.savedRevision = state.revision;
+      this.savedRevision = state.revision; this.savedActiveMs = state.stats?.activeMs ?? 0;
+      this.storage.clearClockCheckpoint();
     }
     return result;
   }
@@ -84,6 +86,9 @@ export class DungeonSession {
   dispose() {
     if (this.disposed) return;
     void this.flushPlaytime();
+    const activeMs = this.current.stats?.activeMs ?? 0;
+    if (this.started && this.savesProgress && this.expectedPrimary !== undefined && activeMs > this.savedActiveMs)
+      this.storage?.clockCheckpoint(this.current.id, this.expectedPrimary, this.expectedBackup, activeMs);
     this.disposed = true; this.battle?.dispose(); this.battle = null;
     this.onChange = null; this.onVictory = null;
     if (this.history) this.history.onChange = null;
@@ -265,7 +270,13 @@ export class DungeonSession {
     this.queuedSave = null;
     this.expectedBackup = slot === 'backup' ? selected : undefined;
     this.started = true; this.boundaryError = ''; this.savedRevision = this.current.revision;
+    this.savedActiveMs = selected.state.stats?.activeMs ?? 0;
     this.report(slot === 'backup' ? 'Continued backup; some progress may be lost.' : 'Continued saved dungeon');
+    const recovered = this.storage.clockCheckpoint(this.current.id, review.primary.text, this.expectedBackup);
+    if (recovered > this.savedActiveMs) {
+      this.current = { ...this.current, stats: { ...(this.current.stats ?? freshRunStats('since-upgrade')), activeMs: recovered } };
+      void this.save(true);
+    }
     if (this.history) void this.history.resume(this.current.id, dungeonRunRecord(this.current, this.history.now()));
     return true;
   }
@@ -358,7 +369,8 @@ export class DungeonSession {
     }
     this.reset(next);
     this.expectedPrimary = this.storage.lastSavedText();
-    this.progressSaved = true; this.savedRevision = next.revision;
+    this.progressSaved = true; this.savedRevision = next.revision; this.savedActiveMs = 0;
+    this.storage.clearClockCheckpoint();
     this.report('Dungeon saved on this device');
     return true;
   }

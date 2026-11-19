@@ -43,6 +43,7 @@ function primaryHidesRecentBackup(primary: Slot, rollback: DungeonState): boolea
 export function createDungeonStorage(provider: RunStorageProvider = () => window.localStorage) {
   let uncertain = false;
   let lastWritten: string | undefined;
+  let pendingClock: { key: string; text: string } | null = null;
   // Exact immutable bytes admit the same deterministic state. Keep private copies
   // and clone on return so callers can never mutate a future inspection result.
   const decoded = new Map<string, DungeonState>();
@@ -318,6 +319,37 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
     } catch (e) { return { ok: false, reason: error(e) }; }
   }
 
+  // pagehide cannot await a Web Lock. Only the sampled counter crosses unload;
+  // normal locked writes still own both game slots and validate their exact source.
+  function clockCheckpoint(id: string, primary: string | null, backup?: Slot, activeMs?: number): number {
+    try {
+      const storage = provider();
+      if (!storage) return 0;
+      const key = DUNGEON_KEYS[backup ? 'backup' : 'primary'] + ':pending-playtime';
+      const text = storage.getItem(key);
+      if (text === null && activeMs === undefined) return 0;
+      if (storage.getItem(DUNGEON_KEYS.primary) !== primary || backup && !sameSlot(inspect().backup, backup)) return 0;
+      const source = hashJson([id, primary, backup?.text ?? null, backup?.status === 'valid' ? backup.checkpoint ?? null : null]);
+      const [binding, value] = (text ?? '').split('\n');
+      const previous = binding === source && Number.isSafeInteger(Number(value)) && Number(value) > 0 ? Number(value) : 0;
+      if (activeMs === undefined) {
+        if (previous && text) pendingClock = { key, text };
+        return previous;
+      }
+      const receipt = source + '\n' + Math.max(activeMs, previous);
+      storage.setItem(key, receipt);
+      pendingClock = { key, text: receipt };
+      return Math.max(activeMs, previous);
+    } catch { return 0; } // Storage denial leaves the ordinary checkpoint pending.
+  }
+  function clearClockCheckpoint() {
+    if (!pendingClock) return;
+    try {
+      const storage = provider();
+      if (storage?.getItem(pendingClock.key) === pendingClock.text) storage.removeItem(pendingClock.key);
+    } catch { /* The committed primary no longer matches the receipt. */ }
+    pendingClock = null;
+  }
   function sameSlot(current: Slot, reviewed: Slot) {
     return current.status !== 'unavailable' && current.status === reviewed.status && current.text === reviewed.text &&
       (current.status !== 'valid' || reviewed.status === 'valid' && current.checkpoint === reviewed.checkpoint);
@@ -329,7 +361,7 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
     if (equal) uncertain = false;
     return equal;
   }
-  return { inspect, save, replace, remove, acknowledge, lastSavedText: () => lastWritten };
+  return { inspect, save, replace, remove, acknowledge, clockCheckpoint, clearClockCheckpoint, lastSavedText: () => lastWritten };
 }
 
 /** All browser dungeon mutations, including multi-slot recovery, share this lock. */
