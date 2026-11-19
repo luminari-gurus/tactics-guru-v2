@@ -2,13 +2,19 @@ import type { AssetId, AssetRecord, ContentCatalog, EnemyRecord, UnitStats } fro
 
 export const WETLANDS_FAMILY_IDS = [
   'lantern_imp', 'bog_gnawer', 'fenstalker', 'mire_hexer', 'bog_leech_swarm',
+  'marsh_croaker', 'siltback_turtle', 'fen_strider', 'reed_whisperer', 'swamp_stalker',
 ] as const;
 type FamilyId = typeof WETLANDS_FAMILY_IDS[number];
+type Illustrated = { readonly origin: 'canonical'; readonly repository: string; readonly revision: string; readonly rightsNote: string };
 
 const rightsNote = 'Canonical project artwork from owner repository. No per-file third-party license or generation method recorded; no third-party license asserted.';
 const illustrated = {
   origin: 'canonical', repository: 'https://github.com/luminari-gurus/tactics-guru-v2',
   revision: 'ea5d30c3f36a3394f9aaefe1c5e93a0c6d7bc8f9', rightsNote,
+} as const;
+const illustratedBatch7 = {
+  origin: 'canonical', repository: 'https://github.com/luminari-gurus/tactics-guru-v2',
+  revision: '51e56fe5596116038d59f9b8c3d5bcd5cc28c03b', rightsNote,
 } as const;
 
 const enemy = <Id extends FamilyId>(id: Id, stats: UnitStats) => ({
@@ -25,27 +31,32 @@ export const wetlandsFamilyEnemies = {
   fenstalker: enemy('fenstalker', { maxHp: 13, move: 4, jump: 1, accuracy: 4, armorClass: 12, power: 3, dexterity: 2, will: 0 }),
   mire_hexer: enemy('mire_hexer', { maxHp: 10, move: 3, jump: 1, accuracy: 5, armorClass: 11, power: 2, dexterity: 1, will: 2 }),
   bog_leech_swarm: enemy('bog_leech_swarm', { maxHp: 10, move: 4, jump: 1, accuracy: 4, armorClass: 11, power: 2, dexterity: 1, will: 0 }),
+  marsh_croaker: enemy('marsh_croaker', { maxHp: 9, move: 4, jump: 1, accuracy: 5, armorClass: 10, power: 3, dexterity: 2, will: 0 }),
+  siltback_turtle: enemy('siltback_turtle', { maxHp: 16, move: 3, jump: 1, accuracy: 3, armorClass: 13, power: 1, dexterity: 0, will: 0 }),
+  fen_strider: enemy('fen_strider', { maxHp: 13, move: 4, jump: 1, accuracy: 4, armorClass: 12, power: 2, dexterity: 1, will: 1 }),
+  reed_whisperer: enemy('reed_whisperer', { maxHp: 10, move: 4, jump: 1, accuracy: 5, armorClass: 11, power: 2, dexterity: 2, will: 1 }),
+  swamp_stalker: enemy('swamp_stalker', { maxHp: 12, move: 5, jump: 1, accuracy: 5, armorClass: 12, power: 3, dexterity: 2, will: 1 }),
 } as const satisfies Record<FamilyId, EnemyRecord>;
 
-const sprite = (id: FamilyId, sourceSha256: string, alphaBounds: string) => {
+const sprite = (id: FamilyId, sourceSha256: string, alphaBounds: string, art: Illustrated = illustrated) => {
   const sourcePath = `public/battle/source/${id}_sprite.png`;
   return {
     id: `asset:${id}_sprite` as const, kind: 'unit-sprite' as const, sourcePath, runtimePath: `/battle/source/${id}_sprite.png`,
     sourceWidth: 64, sourceHeight: 80, runtimeWidth: 64, runtimeHeight: 80, format: 'png' as const, anchor: { x: 32, y: 76 },
     provenance: {
-      ...illustrated, originalPath: sourcePath, sourceSha256,
+      ...art, originalPath: sourcePath, sourceSha256,
       productionNotes: `Illustrated 64×80 RGBA PNG matching existing goblin unit sprites; alpha bounds ${alphaBounds}, source-pixel foot anchor (32,76). Feet on the bottom edge.`,
     },
   };
 };
-const portrait = (id: FamilyId, sourceSha256: string, runtimeSha256: string) => {
+const portrait = (id: FamilyId, sourceSha256: string, runtimeSha256: string, art: Illustrated = illustrated) => {
   const sourcePath = `public/battle/source/${id}_portrait.png`;
   return {
     id: `asset:${id}_portrait` as const, kind: 'portrait' as const, sourcePath,
     runtimePath: `/battle/portraits/${id}.png`,
     sourceWidth: 1254, sourceHeight: 1254, runtimeWidth: 96, runtimeHeight: 96, format: 'png' as const,
     provenance: {
-      ...illustrated, originalPath: sourcePath, sourceSha256,
+      ...art, originalPath: sourcePath, sourceSha256,
       productionNotes: `Full 1254×1254 framed parchment portrait retained; reviewed 96×96 RGB PNG export for 48 CSS pixels at density 2, following issue 35 portrait rule. Runtime SHA-256 ${runtimeSha256}.`,
     },
   };
@@ -62,6 +73,16 @@ export const wetlandsFamilyAssets = {
   'asset:mire_hexer_portrait': portrait('mire_hexer', 'b6857a9d92cec9ffd059181c10eb6570bc3d63f7c2dad8e6155b6124eb9e0af0', 'c4902abb3a99dbdc4bd680b15451421ef130bd595d34187074f425c5635c29ac'),
   'asset:bog_leech_swarm_sprite': sprite('bog_leech_swarm', '85db7978c86c8d711c1afc64ea09590542415b570cb97916c15782e78b5110d6', '(2,33)-(62,80)'),
   'asset:bog_leech_swarm_portrait': portrait('bog_leech_swarm', '8fa57f3da90fe67e47b233e6777c2c1a9d9a54b33ac9467ceffbc77dc470e165', '76a897653df4fd3952d1d6d5d2c1c2b033a97fa1c7fedb031d7cc5dd4b8ef527'),
+  'asset:marsh_croaker_sprite': sprite('marsh_croaker', '0ff70ff80c228f1f358b3d29283abde1213f89f921cb85698ecce722c0339be5', '(2,27)-(62,80)', illustratedBatch7),
+  'asset:marsh_croaker_portrait': portrait('marsh_croaker', '707010e5c31ec3282acae22593f79a4a65396a6a78be1ac04ba5510ff557c278', '0dd6476212920b48c56a33ef8ddc90e253a11b6d3fb3d706cc1f88efa1c2a6fa', illustratedBatch7),
+  'asset:siltback_turtle_sprite': sprite('siltback_turtle', '5abc4dff98795ab61fdd3dfaed7ed53e16c15faf647bae0bbcb39d86b9090045', '(2,31)-(62,80)', illustratedBatch7),
+  'asset:siltback_turtle_portrait': portrait('siltback_turtle', '838dd8339cc4122cb1bb551e5ac517273c414f9333ab9cc2e4e681850b116937', 'e2dc6412bf722398ba58a483c044d0f56895c10e1fbdc850d1be69959131577e', illustratedBatch7),
+  'asset:fen_strider_sprite': sprite('fen_strider', 'a65f248e4b4b0fe55e1a8d0f901edb5c90c3dca66a019031eff41d77e83e2458', '(11,4)-(54,80)', illustratedBatch7),
+  'asset:fen_strider_portrait': portrait('fen_strider', '60d3c15b512f191827bbbd33886068e0707562515063b097e15b8fbcaf3fee82', '2ac75647593d51aee97f7c2312a9aa3cb5a3fc9887798524c5bae08f66d8256e', illustratedBatch7),
+  'asset:reed_whisperer_sprite': sprite('reed_whisperer', 'da61ab72f101ec6d471ab5b08ebb91ee884d2891833b727c88bc43618cd425cb', '(16,10)-(48,80)', illustratedBatch7),
+  'asset:reed_whisperer_portrait': portrait('reed_whisperer', '6acb3829ba2dba194c92ebf4ef26bfb579e4764e0a9559324bb3c7b6c5027e23', '2c1e6a894cdb11ea6f6e12b58187dda39aed17c5359a1ae025814de06c805f08', illustratedBatch7),
+  'asset:swamp_stalker_sprite': sprite('swamp_stalker', '92f59b516888ca88983073e40f10b7d180c0f588b3ad2885cf4f92f85f5d34cd', '(7,14)-(58,80)', illustratedBatch7),
+  'asset:swamp_stalker_portrait': portrait('swamp_stalker', 'a40cddfca45949a9ee94a47a5c8439899aeebd2cab0a083d7025f786af729bbe', '31ede37affa51e5f57cd3adf6771391d47c1236a6337cd38a0c5018c493c91e4', illustratedBatch7),
 } satisfies Record<AssetId, AssetRecord>;
 
 export function wetlandsFamilyBattleContent(baseline: ContentCatalog): ContentCatalog {

@@ -90,6 +90,18 @@ Bestiary batch 6 adds five illustrated wetlands-family pairs with the ordinary 6
 
 Measured half-open sprite alpha bounds: Lantern Imp (11,14,53,80); Bog Gnawer (9,18,55,80); Fenstalker (12,10,52,80); Mire Hexer (7,10,58,80); Bog Leech Swarm (2,33,62,80). All five keep feet on the bottom edge. No `pixelArt` / nearest-neighbor Phaser special case is recorded or added.
 
+Bestiary batch 7 adds five more illustrated wetlands-family pairs with the same convention and foot anchor (32,76). They are registered as optional enemy units and packaged as ordinary Git blobs; they are not on the five-pair annotated sheet and are not placed into existing battles or dungeon encounter rosters.
+
+| Pair / asset IDs (`asset:` prefix) | Sprite | Portrait source | Runtime portrait |
+| --- | --- | --- | --- |
+| Marsh Croaker: `marsh_croaker_sprite`, `marsh_croaker_portrait` | [64×80](../../public/battle/source/marsh_croaker_sprite.png) | [1254×1254](../../public/battle/source/marsh_croaker_portrait.png) | [96×96](../../public/battle/portraits/marsh_croaker.png) |
+| Siltback Turtle: `siltback_turtle_sprite`, `siltback_turtle_portrait` | [64×80](../../public/battle/source/siltback_turtle_sprite.png) | [1254×1254](../../public/battle/source/siltback_turtle_portrait.png) | [96×96](../../public/battle/portraits/siltback_turtle.png) |
+| Fen Strider: `fen_strider_sprite`, `fen_strider_portrait` | [64×80](../../public/battle/source/fen_strider_sprite.png) | [1254×1254](../../public/battle/source/fen_strider_portrait.png) | [96×96](../../public/battle/portraits/fen_strider.png) |
+| Reed Whisperer: `reed_whisperer_sprite`, `reed_whisperer_portrait` | [64×80](../../public/battle/source/reed_whisperer_sprite.png) | [1254×1254](../../public/battle/source/reed_whisperer_portrait.png) | [96×96](../../public/battle/portraits/reed_whisperer.png) |
+| Swamp Stalker: `swamp_stalker_sprite`, `swamp_stalker_portrait` | [64×80](../../public/battle/source/swamp_stalker_sprite.png) | [1254×1254](../../public/battle/source/swamp_stalker_portrait.png) | [96×96](../../public/battle/portraits/swamp_stalker.png) |
+
+Measured half-open sprite alpha bounds: Marsh Croaker (2,27,62,80); Siltback Turtle (2,31,62,80); Fen Strider (11,4,54,80); Reed Whisperer (16,10,48,80); Swamp Stalker (7,14,58,80). All five keep feet on the bottom edge. No `pixelArt` / nearest-neighbor Phaser special case is recorded or added.
+
 Canonical sources are owner-repository project artwork. No per-file third-party license, original prompt, model or generation method is recorded. Retain that uncertainty; these briefs are new production instructions, not reconstructed original prompts or a rights clearance.
 
 ## Observed visual language

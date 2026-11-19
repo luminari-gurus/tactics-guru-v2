@@ -30,7 +30,7 @@ it('packages illustrated wetlands-family sprites and portraits like the other go
       runtimeBytes += runtime.length;
     }
   }
-  expect(runtimeBytes).toBe(139228);
+  expect(runtimeBytes).toBe(270109);
 });
 
 it('registers bestiary stats and abilities without joining existing encounter catalogs', () => {
@@ -43,6 +43,7 @@ it('registers bestiary stats and abilities without joining existing encounter ca
   expect(goblinFamilyDungeonBattleCatalog.enemies).not.toHaveProperty('lantern_imp');
   expect(forestFamilyDungeonBattleCatalog.enemies).not.toHaveProperty('lantern_imp');
   expect(forestBossDungeonBattleCatalog.enemies).not.toHaveProperty('lantern_imp');
+  expect(goblinFamilyDungeonBattleCatalog.enemies).not.toHaveProperty('marsh_croaker');
   expect(goblinFamilyDungeonBattleCatalog.enemies).toHaveProperty('mire_goblin');
   expect(wetlandsFamilyDungeonBattleCatalog.enemies).not.toHaveProperty('mire_goblin');
   for (const change of [
@@ -59,7 +60,7 @@ it('registers bestiary stats and abilities without joining existing encounter ca
   ]) expect(validateContent(change(wetlandsFamilyDungeonBattleCatalog)).ok).toBe(false);
 });
 
-it('can create a battle that uses the five units without changing production maps', () => {
+it('can create a battle that uses the registered units without changing production maps', () => {
   const spawns = [
     { id: 1, side: 'heroes', unitId: 'fighter', x: 0, y: 0 },
     { id: 2, side: 'heroes', unitId: 'ranger', x: 1, y: 0 },
@@ -67,8 +68,8 @@ it('can create a battle that uses the five units without changing production map
     ...WETLANDS_FAMILY_IDS.map((unitId, i): SpawnRecord => ({ id: i + 4, side: 'enemies', unitId, x: i, y: 2 })),
   ] satisfies readonly SpawnRecord[];
   const map: MapRecord = {
-    id: 'map:wetlands_family_roster', width: 5, height: 3,
-    cells: Array.from({ length: 15 }, (_, i) => ({ x: i % 5, y: Math.floor(i / 5), elevation: 0, terrainId: 'grass' })),
+    id: 'map:wetlands_family_roster', width: 10, height: 3,
+    cells: Array.from({ length: 30 }, (_, i) => ({ x: i % 10, y: Math.floor(i / 10), elevation: 0, terrainId: 'grass' })),
     spawns,
   };
   const catalog = wetlandsFamilyBattleContent({ ...battleCatalog, maps: { ...battleCatalog.maps, [map.id]: map } });
