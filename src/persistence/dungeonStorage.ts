@@ -336,7 +336,7 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
         return previous;
       }
       const receipt = source + '\n' + Math.max(activeMs, previous);
-      storage.setItem(key, receipt);
+      if (text !== receipt) storage.setItem(key, receipt);
       pendingClock = { key, text: receipt };
       return Math.max(activeMs, previous);
     } catch { return 0; } // Storage denial leaves the ordinary checkpoint pending.

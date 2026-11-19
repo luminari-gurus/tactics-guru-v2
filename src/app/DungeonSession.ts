@@ -86,9 +86,6 @@ export class DungeonSession {
   dispose() {
     if (this.disposed) return;
     void this.flushPlaytime();
-    const activeMs = this.current.stats?.activeMs ?? 0;
-    if (this.started && this.savesProgress && this.expectedPrimary !== undefined && activeMs > this.savedActiveMs)
-      this.storage?.clockCheckpoint(this.current.id, this.expectedPrimary, this.expectedBackup, activeMs);
     this.disposed = true; this.battle?.dispose(); this.battle = null;
     this.onChange = null; this.onVictory = null;
     if (this.history) this.history.onChange = null;
@@ -106,6 +103,10 @@ export class DungeonSession {
   }
   private checkpointPlaytime(active: boolean) {
     if (this.capturePlaytime(active) && this.queuedSave?.snapshot !== this.current) void this.save(true);
+    // A background tab can close without another pagehide after this sample.
+    const activeMs = this.current.stats?.activeMs ?? 0;
+    if (this.started && this.savesProgress && this.expectedPrimary !== undefined && activeMs > this.savedActiveMs)
+      this.storage?.clockCheckpoint(this.current.id, this.expectedPrimary, this.expectedBackup, activeMs);
   }
   setPlaytimeActive(active: boolean) {
     if (this.disposed) return;
@@ -268,6 +269,8 @@ export class DungeonSession {
     if (!this.storage || this.disposed || review !== this.review || slot === null) return false;
     const selected = resumableDungeonSave(review, slot);
     if (!selected || !this.storage.acknowledge(review)) return false;
+    // Explicit Continue abandons this live lineage, including its staged clock.
+    if (this.started) this.storage.clearClockCheckpoint();
     this.battle?.dispose(); this.battle = null; this.current = structuredClone(selected.state); this.expectedPrimary = review.primary.text; this.unsaved = false; this.progressSaved = true; this.review = null;
     this.queuedSave = null;
     this.expectedBackup = slot === 'backup' ? selected : undefined;

@@ -218,16 +218,23 @@ test('visibility interruption finishes an accepted terminal presentation exactly
  await expect(page.locator('#dungeon-screen')).toBeVisible();expect(await snapshot(page)).toEqual(committed);await page.waitForTimeout(300);expect(await snapshot(page)).toEqual(committed);
 });
 
-test('reload recovers the last four seconds exactly once across a held dungeon lock', async ({page, context}) => {
+for (const departure of ['reload', 'close'] as const)
+test(`${departure} recovers the last four seconds exactly once across a held dungeon lock`, async ({page: original, context}) => {
  const holder = await context.newPage();
  try {
   await holder.goto('./');
-  await page.addInitScript(() => {
+  await context.addInitScript(() => {
     let now = 0;
     Object.defineProperty(performance, 'now', { value: () => now });
     document.hasFocus = () => true;
     window.addEventListener('advance-playtime', () => { now = 4000; });
   });
+  let page = original;
+  if (departure === 'close') {
+    const opened = holder.waitForEvent('popup');
+    await holder.evaluate(() => { window.open('about:blank'); });
+    page = await opened;
+  }
   await load(page, freshDungeon('reload-clock', 13, undefined, true));
   await holder.evaluate(key => new Promise<void>(acquired => {
     void navigator.locks.request(key, () => new Promise<void>(release => {
@@ -240,7 +247,15 @@ test('reload recovers the last four seconds exactly once across a held dungeon l
   });
   await expect.poll(() => holder.evaluate(async key =>
     (await navigator.locks.query()).pending?.filter(lock => lock.name === key).length, DUNGEON_KEYS.primary)).toBe(1);
-  await page.reload();
+  if (departure === 'reload') {
+    await page.reload();
+  } else {
+    const closed = page.waitForEvent('close');
+    await page.evaluate(() => window.close());
+    await closed;
+    page = original;
+    await page.goto('./?game=dungeon');
+  }
   await holder.evaluate(() => window.dispatchEvent(new Event('release-clock')));
   const storedTime = () => page.evaluate(key => JSON.parse(localStorage.getItem(key)!).payload.stats.activeMs, DUNGEON_KEYS.primary);
   await expect.poll(storedTime).toBe(4000);
