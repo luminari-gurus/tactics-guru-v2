@@ -55,6 +55,23 @@ it('guards acquisition, reads, backup writes and explicit removal', () => {
   expect(f.storage.removeSlot('primary', f.data.get(keys.primary)!)).toMatchObject({ ok: false, operation: 'remove' });
   expect(f.storage.removeSlot('foreign' as any, null)).toEqual({ ok: false, reason: 'invalidSlot' });
 });
+it.each(['missing', 'unreadable'] as const)('rolls back staging beside a sole valid backup when the %s primary was reviewed', original => {
+  const f = fixture(), old = encodeRunSave(rewardSnapshot(), runContext); assert(old.ok);
+  f.data.set(keys.backup, old.text);
+  if (original === 'unreadable') f.data.set(keys.primary, 'damaged primary');
+  const review = f.storage.load(); assert(review.ok);
+  const before = [...f.data];
+  f.fail(keys.backup);
+  expect(f.storage.replace(review.inspection, preparedSnapshot())).toMatchObject({ ok: false, kind: 'quota' });
+  expect([...f.data]).toEqual(before);
+  f.fail('');
+  expect(f.storage.replace(review.inspection, preparedSnapshot())).toEqual({ ok: true });
+  expect(f.data.get(keys.primary)).toBe(f.storage.lastSavedText());
+  expect(f.data.get(keys.backup)).toBe(f.storage.lastSavedText());
+  const saved = f.storage.load(); assert(saved.ok && saved.selected);
+  expect(saved.selected.state).toEqual(preparedSnapshot());
+});
+
 it('keeps sole valid backup when saving after explicit bad-primary removal', () => {
   const f = fixture(); const encoded = encodeRunSave(rewardSnapshot(), runContext); assert(encoded.ok);
   f.data.set(keys.backup, encoded.text); f.storage.save(preparedSnapshot());

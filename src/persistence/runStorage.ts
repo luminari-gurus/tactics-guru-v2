@@ -86,7 +86,7 @@ export function createRunStorage(context: RunSaveContext, provider: RunStoragePr
     return { ok: true, inspection, selected };
   }
 
-  function save(state: unknown, expectedPrimary?: string | null): RunWriteResult {
+  function save(state: unknown, expectedPrimary?: string | null, expectedBackup?: string): RunWriteResult {
     const encoded = encodeRunSave(state, context);
     if (!encoded.ok) return encoded;
     const storage = acquire();
@@ -101,6 +101,8 @@ export function createRunStorage(context: RunSaveContext, provider: RunStoragePr
     }
     if (expectedPrimary !== undefined && inspection.primary.status !== 'unavailable' && inspection.primary.text !== expectedPrimary)
       return {ok:false,reason:'changed'};
+    if (expectedBackup !== undefined && inspection.backup.status !== 'unavailable' && inspection.backup.text !== expectedBackup)
+      return { ok: false, reason: 'changed' };
     // A known primary is the current recovery point. A sole backup is never replaced.
     // First save seeds a recovery point before attempting primary publication.
     let backupText = inspection.primary.status === 'valid' ? inspection.primary.text
@@ -131,6 +133,44 @@ export function createRunStorage(context: RunSaveContext, provider: RunStoragePr
     return primary.ok ? { ok: true } : primary;
   }
 
+  /** The caller holds the run lock. Stage away from the last readable slot before replacing it. */
+  function replace(review: RunStorageInspection, next: RunSnapshot): RunWriteResult {
+    const encoded = encodeRunSave(next, context);
+    if (!encoded.ok) return encoded;
+    const store = acquire();
+    if (!store.ok) return store;
+    const { primary, backup } = review;
+    if (primary.status === 'unavailable') return primary.error;
+    if (backup.status === 'unavailable') return backup.error;
+    const keepPrimary = primary.status === 'valid' || (backup.status !== 'valid' && primary.text !== null);
+    const first = keepPrimary ? RUN_STORAGE_KEYS.backup : RUN_STORAGE_KEYS.primary;
+    const second = keepPrimary ? RUN_STORAGE_KEYS.primary : RUN_STORAGE_KEYS.backup;
+    const firstOld = keepPrimary ? backup.text : primary.text;
+    const secondOld = keepPrimary ? primary.text : backup.text;
+    const storage = store.value;
+    const written = attempt('write', undefined, () => {
+      if (storage.getItem(first) !== firstOld || storage.getItem(second) !== secondOld) return false;
+      let committed = false;
+      try {
+        storage.setItem(first, encoded.text);
+        if (storage.getItem(first) !== encoded.text || storage.getItem(second) !== secondOld) return false;
+        storage.setItem(second, encoded.text);
+        committed = storage.getItem(first) === encoded.text && storage.getItem(second) === encoded.text;
+        return committed;
+      } finally {
+        // Restore only our staging write, and only while the preserved slot still matches its review.
+        if (!committed && storage.getItem(first) === encoded.text && storage.getItem(second) === secondOld) {
+          if (firstOld === null) storage.removeItem(first);
+          else storage.setItem(first, firstOld);
+        }
+      }
+    });
+    if (!written.ok) return written;
+    if (!written.value) return { ok: false, reason: 'changed' };
+    lastSavedText = encoded.text;
+    return { ok: true };
+  }
+
   /** Explicit user-directed primitive, NOT atomic multi-slot reset or compare-and-swap. */
   function removeSlot(slot: RunStorageSlot, expectedText: string | null): RunRemoveResult {
     // Enforce namespace ownership even if an untyped caller bypasses the TS union.
@@ -145,7 +185,7 @@ export function createRunStorage(context: RunSaveContext, provider: RunStoragePr
     return removed.ok ? { ok: true } : { ...removed, expectedText };
   }
 
-  return { load, save, removeSlot, lastSavedText: () => lastSavedText };
+  return { load, save, replace, removeSlot, lastSavedText: () => lastSavedText };
 }
 
 /** Every browser run mutation shares this origin-scoped lock, including recovery and replacement. */

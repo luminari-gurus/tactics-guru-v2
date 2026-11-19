@@ -9,6 +9,7 @@ import { decodeRunSave, encodeRunSave } from '../../src/domain/runSaveEnvelope';
 import { runBoundaryId, transitionRun } from '../../src/domain/run';
 import { previewMovement } from '../../src/domain/grid';
 import { playerDecision } from '../helpers/playerPolicy';
+import { levelUpFeedback } from '../../src/domain/progression';
 import { readFileSync } from 'node:fs';
 
 it('opens counter-only saves read-only and freezes known counters without ranking unknown past time', async () => {
@@ -48,23 +49,161 @@ it('clears pending save feedback when a clock checkpoint coalesces the accepted 
   expect(owner.hasUnsavedProgress).toBe(false);expect(owner.status).toBe('Run saved on this device');
 });
 
+function heldRunWrites() {
+  const pending: { grant: () => void; refuse: () => void }[] = [];
+  const serialize = (grant: () => void, refuse: () => void) => { pending.push({ grant, refuse }); };
+  const grantAll = () => { while (pending.length) pending.shift()!.grant(); };
+  return { pending, serialize, grantAll };
+}
+
+it('only the latest request may rotate the previous durable snapshot into backup', () => {
+  const f = historyFixture(), lock = heldRunWrites(), initial = preparedSnapshot();
+  assert(f.storage.save(initial).ok);
+  const before = f.data.get(RUN_STORAGE_KEYS.primary);
+  const owner = new RunItemSession(initial, runContext, f.storage, lock.serialize);
+  assert(owner.continue(owner.inspect()));
+  assert(owner.dispatch({ ...owner.boundary(), type: 'useItem', itemId: 'item:healing_draught', heroId: 'fighter' }).ok);
+  owner.requestSave();
+  lock.grantAll();
+  expect(f.data.get(RUN_STORAGE_KEYS.backup)).toBe(before);
+  const saved = f.storage.load(); assert(saved.ok && saved.selected);
+  expect(saved.selected.state).toEqual(owner.snapshot);
+});
+
+it('a refused save from before Continue leaves the restored status and durability intact', () => {
+  const f = historyFixture(), lock = heldRunWrites(), initial = preparedSnapshot();
+  assert(f.storage.save(initial).ok);
+  const owner = new RunItemSession(initial, runContext, f.storage, lock.serialize);
+  owner.requestSave();
+  assert(owner.continue(owner.inspect()));
+  lock.pending.shift()!.refuse();
+  expect(owner.status).toBe('Continued saved run');
+  expect(owner.hasUnsavedProgress).toBe(false);
+});
+
+it.each(['primary', 'backup'] as const)('a waiting action and its flush respect reviewed removal of %s', async slot => {
+  const f = historyFixture(), lock = heldRunWrites(), initial = preparedSnapshot();
+  assert(f.storage.save(initial).ok);
+  const owner = new RunItemSession(initial, runContext, f.storage, lock.serialize);
+  assert(owner.continue(owner.inspect()));
+  assert(owner.dispatch({ ...owner.boundary(), type: 'useItem', itemId: 'item:healing_draught', heroId: 'fighter' }).ok);
+  const flushed = owner.flushPlaytime();
+  assert(owner.remove(slot, owner.inspect()));
+  const after = [...f.data];
+  lock.grantAll(); await flushed;
+  expect([...f.data]).toEqual(after);
+  expect(owner.status).toContain('Save removed');
+  expect(owner.hasUnsavedProgress).toBe(true);
+});
+
+it('a flush behind a refused action does not retry it silently or erase its feedback', async () => {
+  const f = historyFixture(), lock = heldRunWrites(), initial = preparedSnapshot();
+  const owner = new RunItemSession(initial, runContext, f.storage, lock.serialize);
+  owner.startNew(); lock.grantAll();
+  owner.requestSave(undefined, 'Earned feedback');
+  const flushed = owner.flushPlaytime();
+  lock.pending.shift()!.refuse(); lock.grantAll(); await flushed;
+  expect(owner.status).toBe('Progress unsaved: exclusive save access unavailable. Open Save recovery to export. Earned feedback');
+  expect(owner.hasUnsavedProgress).toBe(true);
+});
+
+it('explicit unsaved play settles and flushes without waiting for exclusive save access', async () => {
+  const f = historyFixture(), lock = heldRunWrites();
+  const owner = new RunItemSession(preparedSnapshot(), runContext, f.storage, lock.serialize);
+  owner.playUnsaved();
+  const flushed = owner.flushPlaytime();
+  expect(lock.pending).toHaveLength(0);
+  await flushed;
+  expect(owner.status).toMatch(/unsaved by choice/);
+  expect([...f.data]).toEqual([]);
+});
+
+it('opening a restored battle does not cancel a pending save of that battle', () => {
+  const f = historyFixture(), lock = heldRunWrites(), initial = activeSnapshot();
+  const owner = new RunItemSession(initial, runContext, f.storage, lock.serialize);
+  owner.startNew(); assert(owner.startEncounter()); lock.grantAll();
+  const saved = f.storage.load(); assert(saved.ok && saved.selected);
+  expect(saved.selected.state).toEqual(owner.snapshot);
+  expect(owner.status).toBe('Run saved on this device');
+});
+
+it('Continue discards the former active clock interval before starting the restored run', () => {
+  const f = historyFixture(); let now = 0;
+  const owner = new RunItemSession(freshRunSnapshot('former-clock', 13, runContext, true), runContext, f.storage, undefined, null, () => now);
+  owner.startNew(); owner.startEncounter(); owner.setPlaytimeActive(true);
+  const other = freshRunSnapshot('restored-clock', 14, runContext, true);
+  assert(f.storage.save(other).ok);
+  now = 4000; assert(owner.continue(owner.inspect()));
+  owner.startEncounter(); owner.setPlaytimeActive(true);
+  now = 4300; owner.setPlaytimeActive(false);
+  expect(owner.snapshot.stats?.activeMs).toBe(300);
+});
+
+it.each(['primary', 'backup'] as const)('a denied replacement %s write preserves both old slots and history', async denied => {
+  const f = historyFixture();
+  const old = preparedSnapshot(), backup = rewardSnapshot();
+  assert(f.storage.save(backup).ok); assert(f.storage.save(old).ok);
+  const storage = createRunStorage(runContext, () => ({
+    getItem: k => f.data.get(k) ?? null,
+    removeItem: k => { f.data.delete(k); },
+    setItem: (k, v) => { if (k === RUN_STORAGE_KEYS[denied]) throw new DOMException('full', 'QuotaExceededError'); f.data.set(k, v); },
+  }));
+  const owner = new RunItemSession(old, runContext, storage, undefined, f.history);
+  assert(owner.continue(owner.inspect())); await f.history.whenIdle();
+  const bytes = Object.values(RUN_STORAGE_KEYS).map(k => f.data.get(k));
+  const before = owner.snapshot;
+  expect(await owner.replace(owner.inspect(), 'replacement-run', 14)).toBe(false);
+  expect(Object.values(RUN_STORAGE_KEYS).map(k => f.data.get(k))).toEqual(bytes);
+  expect(owner.snapshot).toEqual(before);
+  expect(selectedRunRecords(f.records.inspect())?.records ?? []).toEqual([]);
+});
+
+it('a refused replacement after disposal settles without changing either slot', async () => {
+  const f = historyFixture(), lock = heldRunWrites(), before = preparedSnapshot();
+  assert(f.storage.save(before).ok);
+  const owner = new RunItemSession(before, runContext, f.storage, lock.serialize);
+  assert(owner.continue(owner.inspect()));
+  const bytes = [...f.data];
+  const replacing = owner.replace(owner.inspect(), 'after-disposal', 14);
+  owner.dispose(); lock.pending.shift()!.refuse(); lock.grantAll();
+  expect(await Promise.race([replacing, new Promise(resolve => setTimeout(() => resolve('still pending'), 0))])).toBe(false);
+  expect([...f.data]).toEqual(bytes);
+});
+
+it.each(['changed', 'removed'] as const)('the waiting first write after backup Continue refuses a %s recovery point', changed => {
+  const f = historyFixture(), lock = heldRunWrites(), old = preparedSnapshot();
+  assert(f.storage.save(old).ok); f.data.delete(RUN_STORAGE_KEYS.primary);
+  const owner = new RunItemSession(old, runContext, f.storage, lock.serialize);
+  assert(owner.continue(owner.inspect()));
+  owner.requestSave();
+  if (changed === 'removed') f.data.delete(RUN_STORAGE_KEYS.backup);
+  else {
+    const replacement = encodeRunSave(rewardSnapshot(), runContext); assert(replacement.ok);
+    f.data.set(RUN_STORAGE_KEYS.backup, replacement.text);
+  }
+  const bytes = [...f.data]; lock.grantAll();
+  expect([...f.data]).toEqual(bytes);
+  expect(owner.hasSaveConflict).toBe(true);
+  expect(owner.hasUnsavedProgress).toBe(true);
+});
+
 it.each(['granted', 'superseded by a reward claim', 'sampled after the next encounter starts', 'refused'] as const)('keeps run level-up feedback when its waiting save is %s', scenario => {
-  const f = historyFixture(), pending: { grant: () => void; refuse: () => void }[] = []; let now = 0;
+  const f = historyFixture(), { pending, serialize, grantAll } = heldRunWrites(); let now = 0;
   const fresh = freshRunSnapshot('level-feedback', 13, runContext, true);
   // One normal victory (30 XP) crosses the 60 XP threshold.
   const initial = { ...fresh, items: { ...fresh.items, run: { ...fresh.items.run, party: fresh.items.run.party.map(hero => ({ ...hero, xp: 59 })) } } };
-  const owner = new RunItemSession(initial, runContext, f.storage, (grant, refuse) => pending.push({ grant, refuse }), null, () => now);
-  const grant = () => { while (pending.length) pending.shift()!.grant(); };
+  const owner = new RunItemSession(initial, runContext, f.storage, serialize, null, () => now);
   owner.startNew(); const battle = owner.startEncounter()!;
   for (let i = 0; i < 500 && battle.state.outcome === 'ongoing'; i++) {
-    grant();
+    grantAll();
     const step = battle.phase === 'enemy' ? battle.nextEnemy()
       : (battle.prepare(playerDecision(battle.state, battle.catalog)), battle.confirm());
     assert(step); battle.finishPresentation(step.token);
   }
   expect(battle.state.outcome).toBe('playerWin');
-  const feedback = owner.status.match(/\w+ reached level 2.*$/)?.[0];
-  assert(feedback);
+  const feedback = levelUpFeedback(initial.items.run.party, owner.snapshot.items.run.party);
+  expect(feedback).toContain('reached level 2');
+  expect(owner.status).toBe(`Saving run… ${feedback}`);
   if (scenario !== 'granted' && scenario !== 'refused') {
     const offer = owner.snapshot.items.offer!;
     assert(owner.dispatch({ ...owner.boundary(), type: 'claimReward', offerId: offer.id, itemId: offer.options[0].itemId }).ok);
@@ -75,7 +214,7 @@ it.each(['granted', 'superseded by a reward claim', 'sampled after the next enco
     now = 1234; owner.setPlaytimeActive(false);
   }
   if (scenario === 'refused') while (pending.length) pending.shift()!.refuse();
-  else grant();
+  else grantAll();
   expect(owner.status).toBe(scenario === 'refused'
     ? `Progress unsaved: exclusive save access unavailable. Open Save recovery to export. ${feedback}`
     : `Run saved on this device. ${feedback}`);
@@ -151,14 +290,17 @@ it('starts old counters only on accepted play and disables even injected stats o
 });
 const unavailable = () => createRunStorage(runContext, () => null);
 function historyFixture() {
-  const data = new Map<string, string>(); let failRemoval = false;
+  const data = new Map<string, string>(); let failPrimary = false;
   const provider = () => ({ getItem: (key: string) => data.get(key) ?? null,
-    setItem: (key: string, text: string) => { data.set(key, text); }, removeItem: (key: string) => {
-      if (failRemoval && key === RUN_STORAGE_KEYS.primary) throw Error('partial reset'); data.delete(key);
+    setItem: (key: string, text: string) => {
+      if (failPrimary && key === RUN_STORAGE_KEYS.primary) throw Error('primary write refused');
+      data.set(key, text);
+    }, removeItem: (key: string) => {
+      if (failPrimary && key === RUN_STORAGE_KEYS.primary) throw Error('partial reset'); data.delete(key);
     } });
   const storage = createRunStorage(runContext, provider), records = createRunRecordsStorage(provider, async action => action());
   const history = new RunHistory('run', records, () => 100);
-  return { data, storage, records, history, fail() { failRemoval = true; } };
+  return { data, storage, records, history, fail() { failPrimary = true; } };
 }
 it('records a staged terminal Continue once while preserving exact saved slots and state', async () => {
   const f = historyFixture(), ready = preparedSnapshot();
