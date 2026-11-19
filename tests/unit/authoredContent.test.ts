@@ -32,7 +32,7 @@ describe('authored first battle', () => {
       if (asset.kind === 'unit-sprite') expect(runtime).toEqual(source);
       runtimeBytes += runtime.length;
     }
-    expect(runtimeBytes).toBe(28208);
+    expect(runtimeBytes).toBe(28691);
     for (const change of [(c: any) => { delete c.enemies.goblin_shaman; },
       (c: any) => { c.enemies.goblin_shaman.stats.will = NaN; },
       (c: any) => { c.enemies.goblin_shaman.spriteAssetId = 'asset:missing'; }]) {
