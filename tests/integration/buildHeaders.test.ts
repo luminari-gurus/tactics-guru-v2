@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { battleAssets } from '../../src/content/assets';
 import { desertAssets } from '../../src/content/desertAssets';
+import { forestBossAssets } from '../../src/content/forestBosses';
 import { forestFamilyAssets } from '../../src/content/forestFamily';
 import { goblinFamilyAssets } from '../../src/content/goblinFamily';
 import { hobgoblinAssets } from '../../src/content/hobgoblin';
@@ -17,16 +18,15 @@ for (const base of ['/', '/tactics/']) {
     const headers = result.output.find(file => file.fileName === '_headers');
     if (headers?.type !== 'asset') throw new Error('Missing cache headers');
     const rules = String(headers.source).trim().split('\n\n');
-    const paths = rules.map(rule => {
-      const [path, header, ...extra] = rule.split('\n');
-      expect(header).toBe('  Cache-Control: public, max-age=31536000, immutable');
-      expect(extra).toEqual([]);
-      expect(path.startsWith(base)).toBe(true);
-      return path.slice(base.length);
-    });
+    expect(rules).toHaveLength(1); // Cloudflare Pages rule limit is 100; hashed files share one prefix.
+    const [path, header, ...extra] = rules[0].split('\n');
+    expect(header).toBe('  Cache-Control: public, max-age=31536000, immutable');
+    expect(extra).toEqual([]);
+    expect(path).toBe(`${base}assets/*`);
     const code = result.output.filter(file => /\.(js|css)$/.test(file.fileName));
     expect(code.length).toBeGreaterThan(0);
-    const images = Object.values({...battleAssets,...desertAssets,...hobgoblinAssets,...goblinFamilyAssets,...forestFamilyAssets}).map(asset => {
+    expect(code.every(file => file.fileName.startsWith('assets/'))).toBe(true);
+    const images = Object.values({...battleAssets,...desertAssets,...hobgoblinAssets,...goblinFamilyAssets,...forestFamilyAssets,...forestBossAssets}).map(asset => {
       const bytes = readFileSync(`public${asset.runtimePath}`);
       const hash = createHash('sha256').update(bytes).digest('hex').slice(0,16);
       const path = `assets/${hash}${asset.runtimePath}`;
@@ -34,12 +34,10 @@ for (const base of ['/', '/tactics/']) {
       expect(emitted?.type, asset.id).toBe('asset');
       if (emitted?.type !== 'asset') throw new Error(`Missing versioned image: ${asset.id}`);
       expect(Buffer.from(emitted.source)).toEqual(bytes);
-      expect(paths).not.toContain(asset.runtimePath.slice(1));
+      expect(asset.runtimePath.startsWith('/assets/')).toBe(false);
       return path;
     });
-    expect(paths.sort()).toEqual([...code.map(file => file.fileName), ...images].sort());
-    expect(paths.length).toBeLessThanOrEqual(100); // Cloudflare Pages rule limit.
-    expect(paths).not.toContain('index.html');
+    expect(images.every(file => file.startsWith('assets/'))).toBe(true);
     expect(result.output.some(file => file.fileName === 'index.html')).toBe(true);
     const html = result.output.find(file => file.fileName === 'index.html');
     if (html?.type !== 'asset') throw new Error('Missing HTML');
@@ -62,7 +60,7 @@ for (const base of ['/', '/tactics/']) {
       const direct = preloads(`${base}${mode}`);
       expect(direct.length).toBeGreaterThan(0);
       expect(direct.every(link => link.href.startsWith(base))).toBe(true);
-      for (const asset of Object.values({...hobgoblinAssets, ...goblinFamilyAssets, ...forestFamilyAssets})) {
+      for (const asset of Object.values({...hobgoblinAssets, ...goblinFamilyAssets, ...forestFamilyAssets, ...forestBossAssets})) {
         expect(direct.some(link => link.href.endsWith(asset.runtimePath))).toBe(false);
       }
       expect(preloads(base, `?game=${mode}`)).toEqual([]);

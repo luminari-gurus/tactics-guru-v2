@@ -42,6 +42,8 @@ it('registers bestiary stats and abilities without joining existing encounter ca
   expect(goblinFamilyDungeonBattleCatalog.enemies).not.toHaveProperty('briar_thrall');
   expect(goblinFamilyDungeonBattleCatalog.enemies).not.toHaveProperty('cinder_archer');
   expect(goblinFamilyDungeonBattleCatalog.enemies).not.toHaveProperty('grove_hexer');
+  expect(forestFamilyDungeonBattleCatalog.enemies).not.toHaveProperty('hollow_root_matriarch');
+  expect(forestFamilyDungeonBattleCatalog.enemies).not.toHaveProperty('green_warden');
   for (const change of [
     (c: typeof forestFamilyDungeonBattleCatalog) => {
       const { briar_thrall: _, ...enemies } = c.enemies;
