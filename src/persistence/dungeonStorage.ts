@@ -100,8 +100,8 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
     };
     return { primary: slot('primary'), backup: slot('backup') };
   }
-  function inspect(): DungeonInspection {
-    const review = inspectSlots();
+  function inspect(): DungeonInspection { return withRecentBackup(inspectSlots()); }
+  function withRecentBackup(review: DungeonInspection): DungeonInspection {
     const { primary, backup } = review;
     if (backup.status !== 'valid' || hasHobgoblinFloor(backup.state) ||
         primaryHidesRecentBackup(primary, backup.state)) return review;
@@ -126,7 +126,11 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
       if (Object.values(old).some(s => s.status === 'unavailable')) return { ok: false, reason: 'unavailable' };
       if (Object.values(old).some(s => s.status === 'invalid')) return { ok: false, reason: 'recoveryRequired' };
       if (expectedPrimary !== undefined && old.primary.text !== expectedPrimary) return { ok: false, reason: 'changed' };
-      if (expectedBackup && !sameSlot(inspect().backup, expectedBackup)) return { ok: false, reason: 'changed' };
+      const reviewed = withRecentBackup(old);
+      if (expectedBackup && !sameSlot(reviewed.backup, expectedBackup)) return { ok: false, reason: 'changed' };
+      if (state.phase !== 'defeat' && [reviewed.primary, reviewed.backup].some(slot =>
+        slot.status === 'valid' && slot.state.id === state.id && slot.state.phase === 'defeat'))
+        return { ok: false, reason: 'this dungeon has ended in defeat' };
       let backup = old.primary.status === 'valid' ? old.primary.text : old.backup.status === 'missing' ? encoded.text : null;
       let backupState: DungeonState | undefined = old.primary.status === 'valid' ? old.primary.state
         : old.backup.status === 'valid' ? old.backup.state : encoded.state;

@@ -283,11 +283,6 @@ export class DungeonSession {
   retry(review: DungeonInspection) { this.recordEnding(); return this.mutate(() => this.retryNow(review), false); }
   private retryNow(review: DungeonInspection) {
     if (!this.storage || this.disposed || review !== this.review || !this.storage.acknowledge(review)) return false;
-    if (this.current.phase !== 'defeat' && [review.primary, review.backup].some(slot =>
-      slot.status === 'valid' && slot.state.id === this.current.id && slot.state.phase === 'defeat')) {
-      this.report('Retry refused: this dungeon has ended in defeat. Export progress or start a new dungeon.');
-      return false;
-    }
     this.expectedPrimary = review.primary.text;
     // An explicit retry acknowledges the newly reviewed storage boundary.
     if (this.expectedBackup) this.expectedBackup = review.backup.status === 'valid' ? review.backup : undefined;

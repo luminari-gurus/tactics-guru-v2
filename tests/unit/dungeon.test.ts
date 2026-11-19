@@ -452,10 +452,16 @@ describe('dungeon run history boundaries', () => {
     const owner = new DungeonSession(entry, f.storage, f.history);
     assert(owner.continue(owner.inspect()));
     assert(f.storage.save(defeated).ok);
-    if (slot === 'backup') assert(f.storage.save(entry).ok);
+    if (slot === 'backup') {
+      // A previous client may already have rotated the defeat out of primary.
+      f.m.setItem(DUNGEON_KEYS.backup, f.m.getItem(DUNGEON_KEYS.primary)!);
+      const saved = encodeDungeon(entry); assert(saved.ok);
+      f.m.setItem(DUNGEON_KEYS.primary, saved.text);
+    }
     const review = owner.inspect();
     expect(await owner.retry(review)).toBe(false);
     expect(owner.status).toContain('defeat');
+    expect(await owner.save()).toBe(false);
     expect(f.storage.inspect()).toEqual(review);
     expect(resumableDungeonSlot(review)).toBeNull();
     await f.history.reconcileDungeonDefeat(review);
