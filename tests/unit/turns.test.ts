@@ -51,6 +51,9 @@ const dexterity = {
   ash_crawler: 1, ashen_duelist: 1, cinder_imp: 1, ember_cultist: 1, furnace_golem: 1,
   lava_serpent: 1, magma_crab: 1, pyre_oracle: 1, scoria_hound: 1, smoke_wisp: 1,
   kiln_saint: 1,
+  frost_gnawer: 1, icebound_raider: 1, snowblind_crow: 1, drift_archer: 1, rime_shaman: 1,
+  glacier_ram: 1, ice_wraith: 1, yeti_bruiser: 1, aurora_seer: 1, frostforge_sentinel: 1,
+  hroth_whitehorn_king: 1,
 } as const;
 const base: ContentCatalog = copy(catalogFixture);
 const catalog: ContentCatalog = { ...base, maps: { [map.id]: map },
