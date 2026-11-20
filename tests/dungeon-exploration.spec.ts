@@ -27,6 +27,7 @@ import { AUTO_COLLECT_LOOT_KEY } from '../src/ui/autoCollectLootPreference';
 import { dungeonMovementGeometry, expectDungeonMovementVisible } from './helpers/dungeonLayout';
 
 const fixedSeedTest = test.extend({ pinDungeonSeed: 28 });
+const desertSeedTest = test.extend({ pinDungeonSeed: 3 });
 test.beforeEach(async ({ context }) => { await installRailControls(context); });
 
 async function loadGroundLootBoundary(page: Page, state: DungeonState) {
@@ -686,6 +687,23 @@ fixedSeedTest('map shortcuts work on entry and outside the map without taking ov
  expect(arrowOnly.floors[0].position).toBe(floor.position);
  expect(arrowOnly.revision).toBe(movedAgain.revision + 1);
  await expect(restart).toBeFocused();
+});
+
+desertSeedTest('Desert 8-bit dungeon markers have a dark edge over sand', async ({ page }) => {
+  await page.goto('./?game=dungeon&entry=new');
+  const grid = page.locator('#dungeon-map');
+  const player = grid.locator('[data-player]');
+  const encounter = grid.locator('[data-poi]').filter({ hasText: /^M$/ });
+  await expect(player).toHaveText('●');
+  await expect(encounter).toHaveCount(1);
+  await page.getByRole('combobox', { name: 'Map art', exact: true }).selectOption('legacy-8bit');
+  await expect(grid).toHaveAttribute('data-art', 'legacy-8bit');
+  for (const marker of [player, encounter]) {
+    await expect(marker).toHaveAttribute('data-terrain', 'desert-open');
+    await expect(marker).toHaveCSS('background-image', /\/desert-open\.png/);
+    await expect(marker).toHaveCSS('text-shadow', /rgb\(17, 26, 36\)/);
+  }
+  await expect(player).toHaveCSS('box-shadow', /rgb\(17, 26, 36\).*inset/);
 });
 
 fixedSeedTest('real traversal, art independence, keyboard locks, active battle and exact reload',async({page,isMobile})=>{
