@@ -32,6 +32,10 @@ export const OPTIONAL_ENEMY_IDS = [
   'glass_squire', 'ironhide_foreman', 'pit_ogre', 'prism_seer', 'quarry_scab',
   'quarry_vulture', 'shardling', 'sling_sapper', 'stonebound_laborer',
   'grimgor', 'gorrak_the_breaker', 'mirror_knight',
+  'bone_pickman', 'bone_porter', 'corpse_bride', 'crypt_bulwark', 'crypt_rat',
+  'dust_wraith', 'grave_lantern', 'gravebinder', 'ossuary_hound', 'sepulcher_golem',
+  'shard_hurler', 'skeleton_archer', 'tomb_shield', 'wailing_mourner',
+  'gravelord_kharrox', 'vorlach_the_hollow_crown',
 ] as const;
 export const ENEMY_IDS = [...CORE_ENEMY_IDS, ...OPTIONAL_ENEMY_IDS] as const;
 export const BASIC_ATTACK_OPTIONAL_ENEMY_IDS = [
@@ -51,9 +55,14 @@ export const BASIC_ATTACK_OPTIONAL_ENEMY_IDS = [
   'glass_squire', 'ironhide_foreman', 'pit_ogre', 'prism_seer', 'quarry_scab',
   'shardling', 'stonebound_laborer',
   'grimgor', 'gorrak_the_breaker', 'mirror_knight',
+  'bone_pickman', 'bone_porter', 'corpse_bride', 'crypt_bulwark', 'crypt_rat',
+  'dust_wraith', 'grave_lantern', 'gravebinder', 'ossuary_hound', 'sepulcher_golem',
+  'tomb_shield', 'wailing_mourner',
+  'gravelord_kharrox', 'vorlach_the_hollow_crown',
 ] as const;
 export const SHORTBOW_OPTIONAL_ENEMY_IDS = [
   'ruin_lookout', 'cinder_archer', 'fungus_slinger', 'crystal_hermit', 'sling_sapper', 'quarry_vulture',
+  'shard_hurler', 'skeleton_archer',
 ] as const;
 /** Explicit eligible support targets; future enemy IDs do not acquire healing by name. */
 export const HEAL_GOBLIN_IDS = ['goblin_grunt', 'goblin_archer', 'goblin_shaman'] as const;

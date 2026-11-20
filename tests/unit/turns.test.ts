@@ -44,6 +44,10 @@ const dexterity = {
   glass_squire: 1, ironhide_foreman: 1, pit_ogre: 2, prism_seer: 1, quarry_scab: 0,
   quarry_vulture: 1, shardling: 2, sling_sapper: 1, stonebound_laborer: 2,
   grimgor: 0, gorrak_the_breaker: 1, mirror_knight: 1,
+  bone_pickman: 1, bone_porter: 1, corpse_bride: 2, crypt_bulwark: 1, crypt_rat: 0,
+  dust_wraith: 2, grave_lantern: 2, gravebinder: 2, ossuary_hound: 1, sepulcher_golem: 0,
+  shard_hurler: 2, skeleton_archer: 1, tomb_shield: 1, wailing_mourner: 1,
+  gravelord_kharrox: 0, vorlach_the_hollow_crown: 1,
 } as const;
 const base: ContentCatalog = copy(catalogFixture);
 const catalog: ContentCatalog = { ...base, maps: { [map.id]: map },
