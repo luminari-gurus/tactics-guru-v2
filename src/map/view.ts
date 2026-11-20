@@ -110,7 +110,7 @@ export function startMap(): () => void {
     grid.dataset.art = art;
     const fallbacks = new Set([open.fallback, blocked.fallback]);
     grid.dataset.artFallback = String(Boolean(open.fallback || blocked.fallback));
-    const feedback = fallbacks.has('missing') ? ' · No legacy desert artwork; using Simple'
+    const feedback = fallbacks.has('missing') ? ` · No legacy artwork for ${biome.label}; using Simple`
       : fallbacks.has('failed') ? ' · Artwork unavailable; using Simple for affected terrain'
       : fallbacks.has('loading') ? ' · Loading artwork; using Simple while loading' : '';
     status.textContent = `${validation}${placementFailure}Seed ${map.seed} · ${MAP_TYPES.find(entry => entry.id === map.type)!.label} · ${map.version} · ${biome.label} (${map.biome}) · ${map.biomeVersion} · ${ART_STYLES.find(entry => entry.id === art)!.label} · ${walkable} walkable cells${map.fallback ? ' · Using a safe fallback layout' : ''}${feedback}`;

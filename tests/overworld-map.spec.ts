@@ -1,7 +1,7 @@
 import { expect, plainTest as test, type Page } from './helpers/startupDiagnostics';
 import { createOverworld } from '../src/map/state';
 import { generateMap, type MapType } from '../src/map/generate';
-import { applyBiome, type Biome } from '../src/map/biomes';
+import { applyBiome, BIOMES, type Biome } from '../src/map/biomes';
 
 // Match existing persistence suites: exercise real cached documents when requested.
 test.use({ launchOptions: { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE, ignoreDefaultArgs: ['--disable-back-forward-cache'] } });
@@ -250,25 +250,21 @@ test('biome combinations preserve topology and render matching Simple legends', 
   const topology = () => grid.locator('span').evaluateAll(cells => cells.map(cell => cell.className).join(','));
   const terrain = () => grid.locator('span').evaluateAll(cells => cells.map(cell => (cell as HTMLElement).dataset.terrain).join(','));
   const palette = new Set<string>();
-  for (const mapType of ['rooms', 'random-walker', 'cellular']) {
+  for (const mapType of ['rooms', 'random-walker', 'cellular', 'sector-graph', 'arena']) {
     await seed.fill('12345');
     await type.selectOption(mapType);
     const original = await topology();
     const treatments = new Set<string>();
-    for (const [id, label, open, blocked] of [
-      ['grassland', 'Grassland', 'Grass', 'Rock'],
-      ['forest', 'Forest', 'Clearing', 'Dense pines'],
-      ['desert', 'Desert', 'Sand', 'Rock'],
-    ]) {
+    for (const { id, label, version, open, blocked } of BIOMES) {
       await biome.selectOption(id);
       await expect(grid.locator('span')).toHaveCount(400);
       expect(await topology()).toBe(original);
       await expect(grid).toHaveAttribute('data-type', mapType);
       await expect(grid).toHaveAttribute('data-seed', '12345');
       await expect(grid).toHaveAttribute('data-biome', id);
-      await expect(grid).toHaveAttribute('data-biome-version', `${id}-v1`);
+      await expect(grid).toHaveAttribute('data-biome-version', version);
       await expect(page.locator('#map-status')).toContainText(`${label} (${id})`);
-      await expect(page.locator('#map-status')).toContainText(`${id}-v1`);
+      await expect(page.locator('#map-status')).toContainText(version);
       await expect(page.locator('#map-open-label')).toHaveText(`Walkable · ${open}`);
       await expect(page.locator('#map-blocked-label')).toHaveText(`Blocked · ${blocked}`);
       const treatment = await terrain();
@@ -298,11 +294,13 @@ test('biome combinations preserve topology and render matching Simple legends', 
         expect(rect!.height).toBeGreaterThanOrEqual(44);
       }
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      await page.screenshot({ path: testInfo.outputPath(`${mapType}-${id}.png`), fullPage: true });
+      if (mapType === 'rooms' || ['grassland', 'forest', 'desert'].includes(id)) {
+        await page.screenshot({ path: testInfo.outputPath(`${mapType}-${id}.png`), fullPage: true });
+      }
     }
-    expect(treatments.size).toBe(3);
+    expect(treatments.size).toBe(BIOMES.length);
   }
-  expect(palette.size).toBe(3);
+  expect(palette.size).toBe(BIOMES.length);
   expect(errors).toEqual([]);
 });
 
@@ -379,7 +377,7 @@ test('art styles preserve map data across all combinations and match legends', a
         await expect(grid).toHaveAttribute('data-art', style);
         if (style === 'legacy-8bit' && biome !== 'desert') await expect(grid).toHaveAttribute('data-art-fallback', 'false');
         if (style === 'legacy-8bit' && biome === 'desert') {
-          await expect(page.locator('#map-status')).toContainText('No legacy desert artwork; using Simple');
+          await expect(page.locator('#map-status')).toContainText('No legacy artwork for Desert; using Simple');
           await expect(grid.locator('[data-art="simple"]')).toHaveCount(400);
         }
         expect(await signature()).toEqual(original);
@@ -591,11 +589,16 @@ test('markers remain readable at 320px with usable native controls', async ({ pa
   else { await generate.focus(); await generate.press('Enter'); }
   await expect(page.locator('#map-grid')).toHaveAttribute('data-seed', '12345');
   await expectMarkers(page);
-  for (const biome of ['grassland', 'forest', 'desert']) {
+  for (const { id: biome, label } of BIOMES) {
     await page.getByLabel('Biome', { exact: true }).selectOption(biome);
     for (const art of ['simple', 'legacy-8bit']) {
       await page.getByLabel('Art style', { exact: true }).selectOption(art);
-      if (art === 'legacy-8bit' && biome !== 'desert') await expect(page.locator('#map-grid')).toHaveAttribute('data-art-fallback', 'false');
+      const usesFallback = art === 'legacy-8bit' && biome !== 'grassland' && biome !== 'forest';
+      await expect(page.locator('#map-grid')).toHaveAttribute('data-art-fallback', String(usesFallback));
+      if (usesFallback) {
+        await expect(page.locator('#map-status')).toContainText(`No legacy artwork for ${label}; using Simple`);
+        await expect(page.locator('#map-grid [data-art="simple"]')).toHaveCount(400);
+      }
       await expectMarkers(page);
       const shapes = await page.locator('#map-grid').evaluate(grid => [...grid.querySelectorAll('[data-marker-id]')].map(cell => {
         const s = getComputedStyle(cell, '::after'), box = cell.getBoundingClientRect();
