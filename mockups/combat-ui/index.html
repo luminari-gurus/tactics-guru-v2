@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Combat UI mockups · Tactics Guru</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <article class="docs">
+    <p class="eyebrow">Design exploration · no game code</p>
+    <h1>Combat UI — fewer steps</h1>
+    <p class="lead">The shipped battle HUD (issue #108 design, #111 rail/dock) makes every move and attack a four-control ritual: pick a verb, pick a target (often twice), Review, then Confirm. These mockups keep preview-before-commit and 44px targets, and cut the redundant chrome. Items stay out of combat, as they do today.</p>
+
+    <h2>Split-platform plan</h2>
+    <p>Owner direction: <strong>Option B on desktop</strong>, <strong>Option C on mobile</strong>. Same underlying action/target state. Older sketches stay below for comparison.</p>
+    <div class="cards">
+      <a class="card" href="desktop-b-final.html"><strong>Desktop final · B</strong> 1440×900. Bar + Go + path chip. Target-first specials. Turn start, path, enemy targeted, spent.</a>
+      <a class="card" href="mobile-c-final.html"><strong>Mobile final · C</strong> 390×844. Radial hold, tap fallback, pan-on-drag, special sub-ring, cancel in the hub, docked End turn.</a>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Action</th>
+          <th class="num">Today</th>
+          <th class="num">Desktop B</th>
+          <th class="num">Mobile C (hold)</th>
+          <th class="num">Mobile C (tap fallback)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Move</td><td class="num">3</td><td class="num">2</td><td class="num">1</td><td class="num">2</td></tr>
+        <tr><td>Basic attack</td><td class="num">4</td><td class="num">2–3</td><td class="num">1</td><td class="num">2</td></tr>
+        <tr><td>Default / last-used special</td><td class="num">4</td><td class="num">2</td><td class="num">1</td><td class="num">2–3</td></tr>
+        <tr><td>A different special</td><td class="num">5*</td><td class="num">3</td><td class="num">1</td><td class="num">2–3</td></tr>
+        <tr><td>Wait / End turn</td><td class="num">1</td><td class="num">1</td><td class="num">1</td><td class="num">1</td></tr>
+      </tbody>
+    </table>
+    <p class="muted" style="margin-top:8px">Desktop: click enemy preselects last-used legal special (2), Attack is +1. Mobile hold is one gesture even when sliding to a slice. Tap fallback exists so hold is never the only path. Wait is a first-class control on both — never a radial slice.</p>
+
+    <div class="rec">
+      <p><strong>Shared model:</strong> both skins write the same session fields — selected cell, selected verb (<code>move</code> / <code>basic_attack</code> / ability id), legal preview, then one confirm. Desktop Go and mobile release-on-slice (or tap-on-slice) are the same <code>prepare</code> + <code>confirm</code>. Esc and “release in the hub” clear the preview without committing.</p>
+    </div>
+
+    <h2>Earlier options (kept)</h2>
+    <div class="cards">
+      <a class="card" href="current.html"><strong>Current UI</strong> Recreation of the live rail/dock. Move 3 taps · Attack 4 · Wait 1.</a>
+      <a class="card" href="option-a.html"><strong>A · Board + wheel</strong> Direct manipulation. Confirm on the tile. Move 2 · Attack 2.</a>
+      <a class="card" href="option-b.html"><strong>B · Bar + defaults</strong> Chosen. Persistent Go. Chevron picker kept for comparison. Move 1–2 · Attack 1–2 · special 2, +1 to switch.</a>
+      <a class="card" href="option-c.html"><strong>C · Radial hold</strong> Hold/release gestures. Move 1 · Attack 1. Harder to discover.</a>
+    </div>
+
+    <h2>Option B · special-selection alternatives</h2>
+    <p>Chevron stays. These three replace the ▾ / long-press picker with different ways to choose among multiple specials, still without an Ability dropdown.</p>
+    <div class="cards">
+      <a class="card" href="option-b-specials-target.html"><strong>B · Target-first</strong> Tap an enemy. The bar lists only specials legal for that target. Last-used valid special is already pressed. Recommended.</a>
+      <a class="card" href="option-b-specials-segment.html"><strong>B · Segmented row</strong> Every owned special is a first-class bar button. Greyed in place. One special → one button.</a>
+      <a class="card" href="option-b-specials-chips.html"><strong>B · On-board chips</strong> After a target tap, ability chips with forecast sit next to that unit. No special slot in the bar.</a>
+    </div>
+
+    <h2>Special-selection step counts (Option B)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Path</th>
+          <th class="num">Chevron (kept)</th>
+          <th class="num">Target-first</th>
+          <th class="num">Segment</th>
+          <th class="num">Board chips</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Default / last-used special</td><td class="num">2</td><td class="num">2</td><td class="num">2</td><td class="num">2</td></tr>
+        <tr><td>A different special</td><td class="num">3 (+1)</td><td class="num">3 (+1)</td><td class="num">2 (same as default)</td><td class="num">3 (+1)</td></tr>
+        <tr><td>Single-special unit</td><td class="num">2, no ▾</td><td class="num">2, one button</td><td class="num">2, one button</td><td class="num">2, one chip</td></tr>
+      </tbody>
+    </table>
+    <p class="muted" style="margin-top:8px">Counts keep Option B’s “target + Go” as the second step. Swipe-the-slot was sketched and dropped: it fights board pan and has no desktop equivalent.</p>
+
+    <h2>Step counts vs today</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Action</th>
+          <th class="num">Today</th>
+          <th class="num">A Wheel</th>
+          <th class="num">B Bar</th>
+          <th class="num">C Radial</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Move (default already selected)</td><td class="num">3</td><td class="num">2</td><td class="num">1–2</td><td class="num">1</td></tr>
+        <tr><td>Basic attack</td><td class="num">4</td><td class="num">2</td><td class="num">1–2</td><td class="num">1</td></tr>
+        <tr><td>Signature / shown special</td><td class="num">4</td><td class="num">2–3</td><td class="num">2</td><td class="num">2</td></tr>
+        <tr><td>Switch to another special</td><td class="num">+1*</td><td class="num">—</td><td class="num">+1</td><td class="num">—</td></tr>
+        <tr><td>Wait / End turn</td><td class="num">1</td><td class="num">1</td><td class="num">1</td><td class="num">1</td></tr>
+        <tr><td>Use item in combat</td><td class="num">n/a</td><td class="num">n/a</td><td class="num">n/a</td><td class="num">n/a</td></tr>
+      </tbody>
+    </table>
+    <p class="muted" style="margin-top:8px">Today’s Move is auto-selected at turn start (#145). Count is still destination → Review → Confirm. Attacks add the verb tap. Wait already skips the dialog. Items are blocked during battle. *Today’s extra special is a second use of the Ability dropdown, then Signature — still Review + Confirm. Option B: ▾ then pick replaces that dropdown.</p>
+
+    <h2>What is redundant today</h2>
+    <ul class="pain">
+      <li>Ability dropdown and the Signature button bind the same owned ability.</li>
+      <li>Target dropdown duplicates board taps (and keyboard cell select).</li>
+      <li>“Selected (x, y)”, target-info, ability-info, availability copy, button subtitles, preview, and the Confirm dialog all restate the same decision.</li>
+      <li>Review action plus a Confirm modal is two confirms. Wait needs none.</li>
+      <li>Confirm dialog also offers Restart battle.</li>
+      <li>Board heading, round/turn line, and the legend caption compete for the same status.</li>
+      <li>Inspect party restates the actor panel. Inspect target is a third stats surface.</li>
+      <li>Portrait HUD on mobile is capped at 56% of the viewport, so the board is a strip.</li>
+    </ul>
+
+    <h2>Recommendation</h2>
+    <div class="rec">
+      <p><strong>Ship the split.</strong> Desktop uses the developed Option B pages (<a href="desktop-b-final.html">desktop-b-final.html</a>): persistent bar, one gold Go, on-tile path chip, <strong>target-first specials</strong>. Segmented is a cheap secondary variant only. Mobile uses the developed Option C pages (<a href="mobile-c-final.html">mobile-c-final.html</a>): radial hold with a 300ms threshold so pan still works, a tap fallback so hold is not the sole path, a Special sub-ring of legal specials, cancel in the hub, End turn docked.</p>
+      <p style="margin-top:10px">Do not restore the Ability dropdown. Keep every earlier mockup in this folder for comparison. Adopting this is a spec change from Review-then-Confirm to one confirm.</p>
+    </div>
+
+    <h2>Open each layout</h2>
+    <p>Developed finals: desktop at 1440×900, mobile at 390×844. Earlier pages still scale to both. Add <code>?export=1</code> to hide reviewer chrome.</p>
+    <ul>
+      <li><a href="desktop-b-final.html">desktop-b-final.html</a> ·
+        <a href="desktop-b-final.html?state=start">start</a> ·
+        <a href="desktop-b-final.html?state=move">move</a> ·
+        <a href="desktop-b-final.html?state=target">target</a> ·
+        <a href="desktop-b-final.html?state=spent">spent</a> ·
+        <a href="desktop-b-final.html?state=segment">segment</a></li>
+      <li><a href="mobile-c-final.html">mobile-c-final.html</a> ·
+        <a href="mobile-c-final.html?state=idle">idle</a> ·
+        <a href="mobile-c-final.html?state=move">hold tile</a> ·
+        <a href="mobile-c-final.html?state=enemy">hold enemy</a> ·
+        <a href="mobile-c-final.html?state=specials">sub-ring</a> ·
+        <a href="mobile-c-final.html?state=cancel">cancel</a></li>
+      <li><a href="current.html">current.html</a> · <a href="current.html?export=1">export</a></li>
+      <li><a href="option-a.html">option-a.html</a> · <a href="option-a.html?export=1">export</a></li>
+      <li><a href="option-b.html">option-b.html</a> · <a href="option-b.html?state=move&amp;export=1">move export</a> · <a href="option-b.html?state=picker&amp;export=1">picker export</a> · <a href="option-b.html?state=single">one special</a></li>
+      <li><a href="option-b-specials-target.html">option-b-specials-target.html</a> · <a href="option-b-specials-target.html?export=1">export</a></li>
+      <li><a href="option-b-specials-segment.html">option-b-specials-segment.html</a> · <a href="option-b-specials-segment.html?export=1">export</a></li>
+      <li><a href="option-b-specials-chips.html">option-b-specials-chips.html</a> · <a href="option-b-specials-chips.html?export=1">export</a></li>
+      <li><a href="option-c.html">option-c.html</a> · <a href="option-c.html?export=1">export</a></li>
+    </ul>
+    <p class="muted">Read <a href="README.md">README.md</a> for the full step table, removed elements, and how these sketches sit next to #108/#111.</p>
+  </article>
+</body>
+</html>
