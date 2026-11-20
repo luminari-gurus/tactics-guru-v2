@@ -28,6 +28,10 @@ export const OPTIONAL_ENEMY_IDS = [
   'cave_skulk', 'spore_mite_cluster', 'tunnel_beetle', 'fungus_slinger', 'echo_bat_swarm',
   'deep_delver', 'crystal_hermit', 'cave_troll', 'mycelial_shepherd', 'chasm_drake',
   'hollow_matriarch_boss',
+  'blast_adept', 'chain_hauler', 'clockwork_drillguard', 'dust_rat', 'echo_duelist',
+  'glass_squire', 'ironhide_foreman', 'pit_ogre', 'prism_seer', 'quarry_scab',
+  'quarry_vulture', 'shardling', 'sling_sapper', 'stonebound_laborer',
+  'grimgor', 'gorrak_the_breaker', 'mirror_knight',
 ] as const;
 export const ENEMY_IDS = [...CORE_ENEMY_IDS, ...OPTIONAL_ENEMY_IDS] as const;
 export const BASIC_ATTACK_OPTIONAL_ENEMY_IDS = [
@@ -43,8 +47,14 @@ export const BASIC_ATTACK_OPTIONAL_ENEMY_IDS = [
   'cave_skulk', 'spore_mite_cluster', 'tunnel_beetle', 'echo_bat_swarm',
   'deep_delver', 'cave_troll', 'mycelial_shepherd', 'chasm_drake',
   'hollow_matriarch_boss',
+  'blast_adept', 'chain_hauler', 'clockwork_drillguard', 'dust_rat', 'echo_duelist',
+  'glass_squire', 'ironhide_foreman', 'pit_ogre', 'prism_seer', 'quarry_scab',
+  'shardling', 'stonebound_laborer',
+  'grimgor', 'gorrak_the_breaker', 'mirror_knight',
 ] as const;
-export const SHORTBOW_OPTIONAL_ENEMY_IDS = ['ruin_lookout', 'cinder_archer', 'fungus_slinger', 'crystal_hermit'] as const;
+export const SHORTBOW_OPTIONAL_ENEMY_IDS = [
+  'ruin_lookout', 'cinder_archer', 'fungus_slinger', 'crystal_hermit', 'sling_sapper', 'quarry_vulture',
+] as const;
 /** Explicit eligible support targets; future enemy IDs do not acquire healing by name. */
 export const HEAL_GOBLIN_IDS = ['goblin_grunt', 'goblin_archer', 'goblin_shaman'] as const;
 /** Initial attack catalog limits; runtime validation also requires min range <= max range. */

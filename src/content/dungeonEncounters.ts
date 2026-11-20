@@ -4,6 +4,7 @@ import { forestFamilyBattleContent } from './forestFamily';
 import { goblinFamilyBattleContent } from './goblinFamily';
 import { wetlandsFamilyBattleContent } from './wetlandsFamily';
 import { cavernsFamilyBattleContent } from './cavernsFamily';
+import { quarryFamilyBattleContent } from './quarryFamily';
 import { hobgoblinBattleContent, hobgoblinComposition, hobgoblinMap } from './hobgoblin';
 import { desertRunCatalog } from './desertCatalog';
 import { isBattlefieldSource, readBattlefieldEncounter, type BattlefieldSource } from './battlefieldTypes';
@@ -131,6 +132,8 @@ export const forestBossDungeonBattleCatalog = forestBossBattleContent(dungeonBat
 export const wetlandsFamilyDungeonBattleCatalog = wetlandsFamilyBattleContent(dungeonBattleCatalog);
 /** Registered caverns-family units and art; not placed into existing encounter rosters. */
 export const cavernsFamilyDungeonBattleCatalog = cavernsFamilyBattleContent(dungeonBattleCatalog);
+/** Registered quarry-family units and art; not placed into existing encounter rosters. */
+export const quarryFamilyDungeonBattleCatalog = quarryFamilyBattleContent(dungeonBattleCatalog);
 export const hobgoblinDungeonEncounterCatalog: DungeonEncounterCatalog = {
   ...dungeonEncounterCatalog,
   compositions: [...dungeonEncounterCatalog.compositions, hobgoblinComposition],
