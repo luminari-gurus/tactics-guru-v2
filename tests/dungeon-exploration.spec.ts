@@ -702,7 +702,7 @@ fixedSeedTest('real traversal, art independence, keyboard locks, active battle a
  await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.keyboard.press('ArrowDown');expectSameProgress(await dungeonSnapshot(page), after);await page.locator('#dungeon-cancel-new').click();
  await page.locator('#dungeon-map').evaluate(n=>n.dataset.identity='retained');
  await page.getByRole('combobox',{name:'Map art',exact:true}).selectOption('legacy-8bit');await expect(page.locator('#dungeon-map')).toHaveAttribute('data-art','legacy-8bit');
- if(f.descriptor.biome==='desert-v1')await expect(page.locator('#dungeon-map-feedback')).toContainText('fallback');else await expect(page.locator('#dungeon-map-feedback')).not.toContainText('fallback');expectSameProgress(await dungeonSnapshot(page), after);
+ await expect(page.locator('#dungeon-map-feedback')).not.toContainText('fallback');expectSameProgress(await dungeonSnapshot(page), after);
  await page.getByRole('combobox',{name:'Map art',exact:true}).selectOption('simple');expectSameProgress(await dungeonSnapshot(page), after);
  await expect(page.locator('#dungeon-map')).toHaveAttribute('data-identity','retained');
  await expect.poll(()=>page.locator('.dungeon-directions button').evaluateAll(nodes=>nodes.length===4&&nodes.every(n=>{const b=n.getBoundingClientRect();return b.width>=44&&b.height>=44;}))).toBe(true);
