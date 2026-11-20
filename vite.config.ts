@@ -13,6 +13,7 @@ import { hobgoblinAssets } from './src/content/hobgoblin.ts';
 import { cavernsFamilyAssets } from './src/content/cavernsFamily.ts';
 import { quarryFamilyAssets } from './src/content/quarryFamily.ts';
 import { graveyardFamilyAssets } from './src/content/graveyardFamily.ts';
+import { emberWastesFamilyAssets } from './src/content/emberWastesFamily.ts';
 import { wetlandsFamilyAssets } from './src/content/wetlandsFamily.ts';
 import { resolveAppEntry } from './src/app/routes.ts';
 import { APPLICATION_LOAD_FILES_MANIFEST, APPLICATION_LOAD_FILES_META } from './src/diagnostics/applicationLoadFailure.ts';
@@ -46,7 +47,7 @@ function gamePreloads(): Plugin {
   return {
     name: 'game-startup-preloads',
     config(_config, {command}) {
-      if (command === 'build') for (const asset of Object.values({...battleAssets,...desertAssets,...hobgoblinAssets,...goblinFamilyAssets,...forestFamilyAssets,...forestBossAssets,...wetlandsFamilyAssets,...cavernsFamilyAssets,...quarryFamilyAssets,...graveyardFamilyAssets})) {
+      if (command === 'build') for (const asset of Object.values({...battleAssets,...desertAssets,...hobgoblinAssets,...goblinFamilyAssets,...forestFamilyAssets,...forestBossAssets,...wetlandsFamilyAssets,...cavernsFamilyAssets,...quarryFamilyAssets,...graveyardFamilyAssets,...emberWastesFamilyAssets})) {
         const source = readFileSync(resolve('public', asset.runtimePath.slice(1)));
         const hash = createHash('sha256').update(source).digest('hex').slice(0,16);
         const fileName = `assets/${hash}${asset.runtimePath}`;

@@ -36,6 +36,9 @@ export const OPTIONAL_ENEMY_IDS = [
   'dust_wraith', 'grave_lantern', 'gravebinder', 'ossuary_hound', 'sepulcher_golem',
   'shard_hurler', 'skeleton_archer', 'tomb_shield', 'wailing_mourner',
   'gravelord_kharrox', 'vorlach_the_hollow_crown',
+  'ash_crawler', 'ashen_duelist', 'cinder_imp', 'ember_cultist', 'furnace_golem',
+  'lava_serpent', 'magma_crab', 'pyre_oracle', 'scoria_hound', 'smoke_wisp',
+  'kiln_saint',
 ] as const;
 export const ENEMY_IDS = [...CORE_ENEMY_IDS, ...OPTIONAL_ENEMY_IDS] as const;
 export const BASIC_ATTACK_OPTIONAL_ENEMY_IDS = [
@@ -59,10 +62,14 @@ export const BASIC_ATTACK_OPTIONAL_ENEMY_IDS = [
   'dust_wraith', 'grave_lantern', 'gravebinder', 'ossuary_hound', 'sepulcher_golem',
   'tomb_shield', 'wailing_mourner',
   'gravelord_kharrox', 'vorlach_the_hollow_crown',
+  'ash_crawler', 'ashen_duelist', 'cinder_imp', 'furnace_golem',
+  'lava_serpent', 'magma_crab', 'scoria_hound',
+  'kiln_saint',
 ] as const;
 export const SHORTBOW_OPTIONAL_ENEMY_IDS = [
   'ruin_lookout', 'cinder_archer', 'fungus_slinger', 'crystal_hermit', 'sling_sapper', 'quarry_vulture',
   'shard_hurler', 'skeleton_archer',
+  'ember_cultist', 'pyre_oracle', 'smoke_wisp',
 ] as const;
 /** Explicit eligible support targets; future enemy IDs do not acquire healing by name. */
 export const HEAL_GOBLIN_IDS = ['goblin_grunt', 'goblin_archer', 'goblin_shaman'] as const;

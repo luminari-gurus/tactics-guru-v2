@@ -48,6 +48,9 @@ const dexterity = {
   dust_wraith: 2, grave_lantern: 2, gravebinder: 2, ossuary_hound: 1, sepulcher_golem: 0,
   shard_hurler: 2, skeleton_archer: 1, tomb_shield: 1, wailing_mourner: 1,
   gravelord_kharrox: 0, vorlach_the_hollow_crown: 1,
+  ash_crawler: 1, ashen_duelist: 1, cinder_imp: 1, ember_cultist: 1, furnace_golem: 1,
+  lava_serpent: 1, magma_crab: 1, pyre_oracle: 1, scoria_hound: 1, smoke_wisp: 1,
+  kiln_saint: 1,
 } as const;
 const base: ContentCatalog = copy(catalogFixture);
 const catalog: ContentCatalog = { ...base, maps: { [map.id]: map },
