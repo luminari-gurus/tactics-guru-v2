@@ -7,13 +7,11 @@ export const ART_STYLES = [
 export type ArtStyle = typeof ART_STYLES[number]['id'];
 
 const grass = '00_terrain_grass_plains.png';
-const artwork: Record<Terrain, string | undefined> = {
+const artwork: Partial<Record<Terrain, string>> = {
   'grassland-open': grass,
   'grassland-blocked': '04_terrain_mountain_blocked.png',
   'forest-open': grass,
   'forest-blocked': '01_terrain_forest.png',
-  'desert-open': undefined,
-  'desert-blocked': undefined,
 };
 export type ArtTreatment = { url?: string; fallback?: 'missing' | 'loading' | 'failed' };
 

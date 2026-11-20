@@ -29,6 +29,18 @@
 .map-page [data-biome="forest"] .map-wall { background: radial-gradient(ellipse at 50% 35%, #28583d 0 35%, transparent 38%), #173c2e; }
 .map-page [data-biome="desert"] .map-floor { background: #e5c581; }
 .map-page [data-biome="desert"] .map-wall { background: linear-gradient(135deg, transparent 40%, #916b46 42% 52%, transparent 54%), #6b4c38; }
+.map-page [data-biome="wetlands"] .map-floor { background: #a9b77c; }
+.map-page [data-biome="wetlands"] .map-wall { background: repeating-linear-gradient(75deg, transparent 0 23%, #47766e 25% 31%, transparent 33% 48%), #21534f; }
+.map-page [data-biome="underdeep-caverns"] .map-floor { background: #a39ab2; }
+.map-page [data-biome="underdeep-caverns"] .map-wall { background: linear-gradient(60deg, transparent 38%, #745ca0 40% 52%, transparent 54%), #352a50; }
+.map-page [data-biome="quarry"] .map-floor { background: #bdb099; }
+.map-page [data-biome="quarry"] .map-wall { background: repeating-linear-gradient(0deg, transparent 0 30%, #8f8474 32% 38%, transparent 40% 48%), #595248; }
+.map-page [data-biome="graveyard"] .map-floor { background: #b3a394; }
+.map-page [data-biome="graveyard"] .map-wall { background: radial-gradient(ellipse at 50% 65%, #858d92 0 27%, transparent 30%), #3f424a; }
+.map-page [data-biome="ember-wastes"] .map-floor { background: #c9a897; }
+.map-page [data-biome="ember-wastes"] .map-wall { background: linear-gradient(115deg, transparent 35%, #c86536 38% 48%, transparent 52%), #682f24; }
+.map-page [data-biome="winter-tundra"] .map-floor { background: #d8e8f2; }
+.map-page [data-biome="winter-tundra"] .map-wall { background: linear-gradient(145deg, transparent 38%, #80adc9 40% 50%, transparent 52%), #416784; }
 
 .map-page [data-art="legacy-8bit"].map-floor,
 .map-page [data-art="legacy-8bit"].map-wall { background-size: 100% 100%; background-repeat: no-repeat; image-rendering: pixelated; }
