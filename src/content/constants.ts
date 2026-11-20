@@ -25,6 +25,20 @@ export const OPTIONAL_ENEMY_IDS = [
   'marsh_croaker', 'siltback_turtle', 'fen_strider', 'reed_whisperer', 'swamp_stalker',
   'fen_hag', 'rotbloom_tendril', 'drowned_warden',
   'lantern_hag', 'maw_of_the_fen',
+  'cave_skulk', 'spore_mite_cluster', 'tunnel_beetle', 'fungus_slinger', 'echo_bat_swarm',
+  'deep_delver', 'crystal_hermit', 'cave_troll', 'mycelial_shepherd', 'chasm_drake',
+  'hollow_matriarch_boss',
+  'blast_adept', 'chain_hauler', 'clockwork_drillguard', 'dust_rat', 'echo_duelist',
+  'glass_squire', 'ironhide_foreman', 'pit_ogre', 'prism_seer', 'quarry_scab',
+  'quarry_vulture', 'shardling', 'sling_sapper', 'stonebound_laborer',
+  'grimgor', 'gorrak_the_breaker', 'mirror_knight',
+  'bone_pickman', 'bone_porter', 'corpse_bride', 'crypt_bulwark', 'crypt_rat',
+  'dust_wraith', 'grave_lantern', 'gravebinder', 'ossuary_hound', 'sepulcher_golem',
+  'shard_hurler', 'skeleton_archer', 'tomb_shield', 'wailing_mourner',
+  'gravelord_kharrox', 'vorlach_the_hollow_crown',
+  'ash_crawler', 'ashen_duelist', 'cinder_imp', 'ember_cultist', 'furnace_golem',
+  'lava_serpent', 'magma_crab', 'pyre_oracle', 'scoria_hound', 'smoke_wisp',
+  'kiln_saint',
 ] as const;
 export const ENEMY_IDS = [...CORE_ENEMY_IDS, ...OPTIONAL_ENEMY_IDS] as const;
 export const BASIC_ATTACK_OPTIONAL_ENEMY_IDS = [
@@ -37,8 +51,26 @@ export const BASIC_ATTACK_OPTIONAL_ENEMY_IDS = [
   'marsh_croaker', 'siltback_turtle', 'fen_strider', 'reed_whisperer', 'swamp_stalker',
   'fen_hag', 'rotbloom_tendril', 'drowned_warden',
   'lantern_hag', 'maw_of_the_fen',
+  'cave_skulk', 'spore_mite_cluster', 'tunnel_beetle', 'echo_bat_swarm',
+  'deep_delver', 'cave_troll', 'mycelial_shepherd', 'chasm_drake',
+  'hollow_matriarch_boss',
+  'blast_adept', 'chain_hauler', 'clockwork_drillguard', 'dust_rat', 'echo_duelist',
+  'glass_squire', 'ironhide_foreman', 'pit_ogre', 'prism_seer', 'quarry_scab',
+  'shardling', 'stonebound_laborer',
+  'grimgor', 'gorrak_the_breaker', 'mirror_knight',
+  'bone_pickman', 'bone_porter', 'corpse_bride', 'crypt_bulwark', 'crypt_rat',
+  'dust_wraith', 'grave_lantern', 'gravebinder', 'ossuary_hound', 'sepulcher_golem',
+  'tomb_shield', 'wailing_mourner',
+  'gravelord_kharrox', 'vorlach_the_hollow_crown',
+  'ash_crawler', 'ashen_duelist', 'cinder_imp', 'furnace_golem',
+  'lava_serpent', 'magma_crab', 'scoria_hound',
+  'kiln_saint',
 ] as const;
-export const SHORTBOW_OPTIONAL_ENEMY_IDS = ['ruin_lookout', 'cinder_archer'] as const;
+export const SHORTBOW_OPTIONAL_ENEMY_IDS = [
+  'ruin_lookout', 'cinder_archer', 'fungus_slinger', 'crystal_hermit', 'sling_sapper', 'quarry_vulture',
+  'shard_hurler', 'skeleton_archer',
+  'ember_cultist', 'pyre_oracle', 'smoke_wisp',
+] as const;
 /** Explicit eligible support targets; future enemy IDs do not acquire healing by name. */
 export const HEAL_GOBLIN_IDS = ['goblin_grunt', 'goblin_archer', 'goblin_shaman'] as const;
 /** Initial attack catalog limits; runtime validation also requires min range <= max range. */

@@ -3,6 +3,10 @@ import { forestBossBattleContent } from './forestBosses';
 import { forestFamilyBattleContent } from './forestFamily';
 import { goblinFamilyBattleContent } from './goblinFamily';
 import { wetlandsFamilyBattleContent } from './wetlandsFamily';
+import { cavernsFamilyBattleContent } from './cavernsFamily';
+import { quarryFamilyBattleContent } from './quarryFamily';
+import { graveyardFamilyBattleContent } from './graveyardFamily';
+import { emberWastesFamilyBattleContent } from './emberWastesFamily';
 import { hobgoblinBattleContent, hobgoblinComposition, hobgoblinMap } from './hobgoblin';
 import { desertRunCatalog } from './desertCatalog';
 import { isBattlefieldSource, readBattlefieldEncounter, type BattlefieldSource } from './battlefieldTypes';
@@ -128,6 +132,14 @@ export const forestFamilyDungeonBattleCatalog = forestFamilyBattleContent(dungeo
 export const forestBossDungeonBattleCatalog = forestBossBattleContent(dungeonBattleCatalog);
 /** Registered wetlands-family units and art; not placed into existing encounter rosters. */
 export const wetlandsFamilyDungeonBattleCatalog = wetlandsFamilyBattleContent(dungeonBattleCatalog);
+/** Registered caverns-family units and art; not placed into existing encounter rosters. */
+export const cavernsFamilyDungeonBattleCatalog = cavernsFamilyBattleContent(dungeonBattleCatalog);
+/** Registered quarry-family units and art; not placed into existing encounter rosters. */
+export const quarryFamilyDungeonBattleCatalog = quarryFamilyBattleContent(dungeonBattleCatalog);
+/** Registered graveyard-family units and art; not placed into existing encounter rosters. */
+export const graveyardFamilyDungeonBattleCatalog = graveyardFamilyBattleContent(dungeonBattleCatalog);
+/** Registered ember-wastes-family units and art; not placed into existing encounter rosters. */
+export const emberWastesFamilyDungeonBattleCatalog = emberWastesFamilyBattleContent(dungeonBattleCatalog);
 export const hobgoblinDungeonEncounterCatalog: DungeonEncounterCatalog = {
   ...dungeonEncounterCatalog,
   compositions: [...dungeonEncounterCatalog.compositions, hobgoblinComposition],
