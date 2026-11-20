@@ -123,6 +123,11 @@ describe('runtime content validation', () => {
       expect(validateContent(c).ok).toBe(true);
     }
   });
+  it('accepts native 96×120 unit sprites with a foot anchor inside that canvas', () => {
+    const c=fixture(); const asset=c.assets['asset:fixture_sprite'];
+    asset.sourceWidth=96; asset.sourceHeight=120; asset.runtimeWidth=96; asset.runtimeHeight=120; asset.anchor={x:48,y:114};
+    expect(validateContent(c).ok).toBe(true);
+  });
   it('rejects accessors, sparse arrays and non-JSON objects without reading getters', () => {
     const c=fixture(); Object.defineProperty(c.heroes.fighter,'stats',{enumerable:true,get(){throw Error('read getter');}});
     expect(validateContent(c).ok).toBe(false);

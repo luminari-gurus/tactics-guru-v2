@@ -1,10 +1,11 @@
-import type { ENEMY_IDS, FIRST_MAP_TERRAIN_IDS, HERO_IDS, TERRAIN_TEXTURE_SPEC } from './constants';
+import type { ENEMY_IDS, FIRST_MAP_TERRAIN_IDS, HERO_IDS, OPTIONAL_ENEMY_IDS, TERRAIN_TEXTURE_SPEC } from './constants';
 
 // Template prefixes prevent mixing map/unit/asset references without runtime wrappers.
 export type MapId = `map:${string}`;
 export type AssetId = `asset:${string}`;
 export type HeroId = typeof HERO_IDS[number];
 export type EnemyId = typeof ENEMY_IDS[number];
+export type OptionalEnemyId = typeof OPTIONAL_ENEMY_IDS[number];
 export type UnitId = HeroId | EnemyId;
 export type AbilityId = `ability:${string}`;
 interface AttackFields {
@@ -139,7 +140,7 @@ export interface ContentCatalog {
   readonly abilities: Readonly<Record<AbilityId, Ability>>;
   readonly maps: Readonly<Record<MapId, MapRecord>>;
   readonly heroes: Readonly<Record<HeroId, HeroRecord>>;
-  readonly enemies: Readonly<Record<string, EnemyRecord> & Record<Exclude<EnemyId, 'hobgoblin_warrior'>, EnemyRecord>>;
+  readonly enemies: Readonly<Record<string, EnemyRecord> & Record<Exclude<EnemyId, OptionalEnemyId>, EnemyRecord>>;
   readonly terrains: Readonly<Record<string, TerrainRecord>>;
   readonly assets: Readonly<Record<AssetId, AssetRecord>>;
 }

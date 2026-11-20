@@ -1,4 +1,8 @@
 import { battlefieldEncounters, authoredEncounters, runCatalog } from './encounters';
+import { forestBossBattleContent } from './forestBosses';
+import { forestFamilyBattleContent } from './forestFamily';
+import { goblinFamilyBattleContent } from './goblinFamily';
+import { wetlandsFamilyBattleContent } from './wetlandsFamily';
 import { hobgoblinBattleContent, hobgoblinComposition, hobgoblinMap } from './hobgoblin';
 import { desertRunCatalog } from './desertCatalog';
 import { isBattlefieldSource, readBattlefieldEncounter, type BattlefieldSource } from './battlefieldTypes';
@@ -116,6 +120,14 @@ export const dungeonEncounterIdentity = dungeonEncounterCatalogIdentity();
 export const hobgoblinDungeonBattleCatalog = hobgoblinBattleContent({
   ...dungeonBattleCatalog, maps: { ...dungeonBattleCatalog.maps, [hobgoblinMap.id]: hobgoblinMap },
 });
+/** Registered goblin-family units and art; not placed into existing encounter rosters. */
+export const goblinFamilyDungeonBattleCatalog = goblinFamilyBattleContent(dungeonBattleCatalog);
+/** Registered forest-family units and art; not placed into existing encounter rosters. */
+export const forestFamilyDungeonBattleCatalog = forestFamilyBattleContent(dungeonBattleCatalog);
+/** Registered forest-boss units and art; not placed into existing encounter rosters. */
+export const forestBossDungeonBattleCatalog = forestBossBattleContent(dungeonBattleCatalog);
+/** Registered wetlands-family units and art; not placed into existing encounter rosters. */
+export const wetlandsFamilyDungeonBattleCatalog = wetlandsFamilyBattleContent(dungeonBattleCatalog);
 export const hobgoblinDungeonEncounterCatalog: DungeonEncounterCatalog = {
   ...dungeonEncounterCatalog,
   compositions: [...dungeonEncounterCatalog.compositions, hobgoblinComposition],

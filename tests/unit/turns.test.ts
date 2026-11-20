@@ -26,7 +26,18 @@ const map = {
     { id: 3, side: 'enemies', unitId: 'goblin_grunt', x: 3, y: 2 }, { id: 2, side: 'heroes', unitId: 'ranger', x: 0, y: 1 },
   ],
 } as const satisfies MapRecord;
-const dexterity = { fighter: 2, ranger: 3, mage: 0, goblin_grunt: 0, goblin_archer: 1, goblin_shaman: 0, hobgoblin_warrior: 1 } as const;
+const dexterity = {
+  fighter: 2, ranger: 3, mage: 0, goblin_grunt: 0, goblin_archer: 1, goblin_shaman: 0, hobgoblin_warrior: 1,
+  bramble_goblin: 0, goblin_snarehand: 0, mire_goblin: 1, coal_goblin: 1, ruin_lookout: 2,
+  briar_thrall: 1, rotcap_sprout: 0, spore_acolyte: 2, thornback_beetle: 0, blob: -1,
+  cinder_archer: 2, ash_hound: 2, bellows_imp: 2, mossback_boar: 0, rootling_skirmisher: 0,
+  thornhide_warg: 0, grove_hexer: 1, ancient_treantling: 0, owlbear_forager: 1, ivybound_knight: 0,
+  hollow_root_matriarch: 0, ironmaw_furnace_beast: 0, green_warden: 1,
+  lantern_imp: 2, bog_gnawer: 1, fenstalker: 2, mire_hexer: 1, bog_leech_swarm: 1,
+  marsh_croaker: 2, siltback_turtle: 0, fen_strider: 1, reed_whisperer: 2, swamp_stalker: 2,
+  fen_hag: 2, rotbloom_tendril: 1, drowned_warden: 0,
+  lantern_hag: 0, maw_of_the_fen: 1,
+} as const;
 const base: ContentCatalog = copy(catalogFixture);
 const catalog: ContentCatalog = { ...base, maps: { [map.id]: map },
   heroes: { ...base.heroes, fighter: { ...base.heroes.fighter, stats: { ...base.heroes.fighter.stats, maxHp: 20, dexterity: dexterity.fighter } },

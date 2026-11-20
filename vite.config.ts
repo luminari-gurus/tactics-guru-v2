@@ -6,7 +6,11 @@ import { dirname, resolve } from 'node:path';
 import { defineConfig, type Plugin } from 'vite';
 import { battleAssets } from './src/content/assets.ts';
 import { desertAssets } from './src/content/desertAssets.ts';
+import { forestBossAssets } from './src/content/forestBosses.ts';
+import { forestFamilyAssets } from './src/content/forestFamily.ts';
+import { goblinFamilyAssets } from './src/content/goblinFamily.ts';
 import { hobgoblinAssets } from './src/content/hobgoblin.ts';
+import { wetlandsFamilyAssets } from './src/content/wetlandsFamily.ts';
 import { resolveAppEntry } from './src/app/routes.ts';
 import { APPLICATION_LOAD_FILES_MANIFEST, APPLICATION_LOAD_FILES_META } from './src/diagnostics/applicationLoadFailure.ts';
 
@@ -39,7 +43,7 @@ function gamePreloads(): Plugin {
   return {
     name: 'game-startup-preloads',
     config(_config, {command}) {
-      if (command === 'build') for (const asset of Object.values({...battleAssets,...desertAssets,...hobgoblinAssets})) {
+      if (command === 'build') for (const asset of Object.values({...battleAssets,...desertAssets,...hobgoblinAssets,...goblinFamilyAssets,...forestFamilyAssets,...forestBossAssets,...wetlandsFamilyAssets})) {
         const source = readFileSync(resolve('public', asset.runtimePath.slice(1)));
         const hash = createHash('sha256').update(source).digest('hex').slice(0,16);
         const fileName = `assets/${hash}${asset.runtimePath}`;
@@ -54,11 +58,11 @@ function gamePreloads(): Plugin {
       const root = new URL(base, 'https://build.invalid').pathname;
       const code = Object.values(bundle).map(file => file.fileName)
         .filter(file => /^assets\/.+-[\w-]{8}\.(?:js|css)$/.test(file));
-      const paths = code.concat(images.map(image => image.fileName));
       this.emitFile({ type: 'asset', fileName: APPLICATION_LOAD_FILES_MANIFEST, source: JSON.stringify(code.sort()) });
-      this.emitFile({ type: 'asset', fileName: '_headers', source: paths
-        .map(file => `${root}${file}\n  Cache-Control: public, max-age=31536000, immutable\n`)
-        .join('\n') });
+      // Cloudflare Pages caps `_headers` at 100 rules. Hashed JS/CSS and unit art
+      // already exceed that as per-file entries, so they share one `/assets/*` prefix.
+      this.emitFile({ type: 'asset', fileName: '_headers', source:
+        `${root}assets/*\n  Cache-Control: public, max-age=31536000, immutable\n` });
     },
     transformIndexHtml: { order: 'post', handler(_html, {bundle}) {
       if (!bundle) return;

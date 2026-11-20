@@ -20,6 +20,107 @@ All ten sources are preserved from `luminari-gurus/tactics-guru` revision `9303d
 
 Hobgoblin Warrior (`hobgoblin_warrior_sprite` / `hobgoblin_warrior_portrait`) and Goblin Shaman (`goblin_shaman_sprite` / `goblin_shaman_portrait`) now follow the same illustrated sprite/portrait convention as the goblin pairs: 64×80 RGBA sprites with foot anchor (32,76), and a 1254×1254 framed portrait source with a 96×96 runtime export. Hobgoblin previously derived its 96×96 portrait from a 48×48 nearest-neighbor crop of a pixel-art sprite; that exception is removed. They are not on the five-pair annotated sheet, which remains the original #88 reference.
 
+Bestiary batch 1 adds five more illustrated goblin-family pairs with the same convention and foot anchor (32,76). They are registered as optional enemy units and packaged as ordinary Git blobs; they are not on the five-pair annotated sheet and are not placed into existing battles or dungeon encounter rosters.
+
+| Pair / asset IDs (`asset:` prefix) | Sprite | Portrait source | Runtime portrait |
+| --- | --- | --- | --- |
+| Bramble Goblin: `bramble_goblin_sprite`, `bramble_goblin_portrait` | [64×80](../../public/battle/source/bramble_goblin_sprite.png) | [1254×1254](../../public/battle/source/bramble_goblin_portrait.png) | [96×96](../../public/battle/portraits/bramble_goblin.png) |
+| Goblin Snarehand: `goblin_snarehand_sprite`, `goblin_snarehand_portrait` | [64×80](../../public/battle/source/goblin_snarehand_sprite.png) | [1254×1254](../../public/battle/source/goblin_snarehand_portrait.png) | [96×96](../../public/battle/portraits/goblin_snarehand.png) |
+| Mire Goblin: `mire_goblin_sprite`, `mire_goblin_portrait` | [64×80](../../public/battle/source/mire_goblin_sprite.png) | [1254×1254](../../public/battle/source/mire_goblin_portrait.png) | [96×96](../../public/battle/portraits/mire_goblin.png) |
+| Coal Goblin: `coal_goblin_sprite`, `coal_goblin_portrait` | [64×80](../../public/battle/source/coal_goblin_sprite.png) | [1254×1254](../../public/battle/source/coal_goblin_portrait.png) | [96×96](../../public/battle/portraits/coal_goblin.png) |
+| Ruin Lookout: `ruin_lookout_sprite`, `ruin_lookout_portrait` | [64×80](../../public/battle/source/ruin_lookout_sprite.png) | [1254×1254](../../public/battle/source/ruin_lookout_portrait.png) | [96×96](../../public/battle/portraits/ruin_lookout.png) |
+
+Measured half-open sprite alpha bounds: Bramble Goblin (8,12,56,80); Goblin Snarehand (7,12,58,80); Mire Goblin (7,8,57,80); Coal Goblin (6,12,59,80); Ruin Lookout (7,12,57,80). All five keep feet on the bottom edge. No `pixelArt` / nearest-neighbor Phaser special case is recorded or added.
+
+Bestiary batch 2 adds five illustrated forest-family pairs with the same convention and foot anchor (32,76). They are registered as optional enemy units and packaged as ordinary Git blobs; they are not on the five-pair annotated sheet and are not placed into existing battles or dungeon encounter rosters.
+
+| Pair / asset IDs (`asset:` prefix) | Sprite | Portrait source | Runtime portrait |
+| --- | --- | --- | --- |
+| Briar Thrall: `briar_thrall_sprite`, `briar_thrall_portrait` | [64×80](../../public/battle/source/briar_thrall_sprite.png) | [1254×1254](../../public/battle/source/briar_thrall_portrait.png) | [96×96](../../public/battle/portraits/briar_thrall.png) |
+| Rotcap Sprout: `rotcap_sprout_sprite`, `rotcap_sprout_portrait` | [64×80](../../public/battle/source/rotcap_sprout_sprite.png) | [1254×1254](../../public/battle/source/rotcap_sprout_portrait.png) | [96×96](../../public/battle/portraits/rotcap_sprout.png) |
+| Spore Acolyte: `spore_acolyte_sprite`, `spore_acolyte_portrait` | [64×80](../../public/battle/source/spore_acolyte_sprite.png) | [1254×1254](../../public/battle/source/spore_acolyte_portrait.png) | [96×96](../../public/battle/portraits/spore_acolyte.png) |
+| Thornback Beetle: `thornback_beetle_sprite`, `thornback_beetle_portrait` | [64×80](../../public/battle/source/thornback_beetle_sprite.png) | [1254×1254](../../public/battle/source/thornback_beetle_portrait.png) | [96×96](../../public/battle/portraits/thornback_beetle.png) |
+| Blob: `blob_sprite`, `blob_portrait` | [64×80](../../public/battle/source/blob_sprite.png) | [1254×1254](../../public/battle/source/blob_portrait.png) | [96×96](../../public/battle/portraits/blob.png) |
+
+Measured half-open sprite alpha bounds: Briar Thrall (7,10,57,80); Rotcap Sprout (9,24,55,80); Spore Acolyte (7,12,57,80); Thornback Beetle (4,20,61,80); Blob (5,26,59,80). All five keep feet on the bottom edge. No `pixelArt` / nearest-neighbor Phaser special case is recorded or added.
+
+Bestiary batch 3 adds five more illustrated forest-family pairs with the same convention and foot anchor (32,76). They are registered as optional enemy units and packaged as ordinary Git blobs; they are not on the five-pair annotated sheet and are not placed into existing battles or dungeon encounter rosters.
+
+| Pair / asset IDs (`asset:` prefix) | Sprite | Portrait source | Runtime portrait |
+| --- | --- | --- | --- |
+| Cinder Archer: `cinder_archer_sprite`, `cinder_archer_portrait` | [64×80](../../public/battle/source/cinder_archer_sprite.png) | [1254×1254](../../public/battle/source/cinder_archer_portrait.png) | [96×96](../../public/battle/portraits/cinder_archer.png) |
+| Ash Hound: `ash_hound_sprite`, `ash_hound_portrait` | [64×80](../../public/battle/source/ash_hound_sprite.png) | [1254×1254](../../public/battle/source/ash_hound_portrait.png) | [96×96](../../public/battle/portraits/ash_hound.png) |
+| Bellows Imp: `bellows_imp_sprite`, `bellows_imp_portrait` | [64×80](../../public/battle/source/bellows_imp_sprite.png) | [1254×1254](../../public/battle/source/bellows_imp_portrait.png) | [96×96](../../public/battle/portraits/bellows_imp.png) |
+| Mossback Boar: `mossback_boar_sprite`, `mossback_boar_portrait` | [64×80](../../public/battle/source/mossback_boar_sprite.png) | [1254×1254](../../public/battle/source/mossback_boar_portrait.png) | [96×96](../../public/battle/portraits/mossback_boar.png) |
+| Rootling Skirmisher: `rootling_skirmisher_sprite`, `rootling_skirmisher_portrait` | [64×80](../../public/battle/source/rootling_skirmisher_sprite.png) | [1254×1254](../../public/battle/source/rootling_skirmisher_portrait.png) | [96×96](../../public/battle/portraits/rootling_skirmisher.png) |
+
+Measured half-open sprite alpha bounds: Cinder Archer (8,12,56,80); Ash Hound (3,20,61,80); Bellows Imp (8,16,56,80); Mossback Boar (5,16,60,80); Rootling Skirmisher (6,12,59,80). All five keep feet on the bottom edge. No `pixelArt` / nearest-neighbor Phaser special case is recorded or added.
+
+Bestiary batch 4 adds the last five non-boss illustrated forest-family pairs with the same convention and foot anchor (32,76). They are registered as optional enemy units and packaged as ordinary Git blobs; they are not on the five-pair annotated sheet and are not placed into existing battles or dungeon encounter rosters.
+
+| Pair / asset IDs (`asset:` prefix) | Sprite | Portrait source | Runtime portrait |
+| --- | --- | --- | --- |
+| Thornhide Warg: `thornhide_warg_sprite`, `thornhide_warg_portrait` | [64×80](../../public/battle/source/thornhide_warg_sprite.png) | [1254×1254](../../public/battle/source/thornhide_warg_portrait.png) | [96×96](../../public/battle/portraits/thornhide_warg.png) |
+| Grove Hexer: `grove_hexer_sprite`, `grove_hexer_portrait` | [64×80](../../public/battle/source/grove_hexer_sprite.png) | [1254×1254](../../public/battle/source/grove_hexer_portrait.png) | [96×96](../../public/battle/portraits/grove_hexer.png) |
+| Ancient Treantling: `ancient_treantling_sprite`, `ancient_treantling_portrait` | [64×80](../../public/battle/source/ancient_treantling_sprite.png) | [1254×1254](../../public/battle/source/ancient_treantling_portrait.png) | [96×96](../../public/battle/portraits/ancient_treantling.png) |
+| Owlbear Forager: `owlbear_forager_sprite`, `owlbear_forager_portrait` | [64×80](../../public/battle/source/owlbear_forager_sprite.png) | [1254×1254](../../public/battle/source/owlbear_forager_portrait.png) | [96×96](../../public/battle/portraits/owlbear_forager.png) |
+| Ivybound Knight: `ivybound_knight_sprite`, `ivybound_knight_portrait` | [64×80](../../public/battle/source/ivybound_knight_sprite.png) | [1254×1254](../../public/battle/source/ivybound_knight_portrait.png) | [96×96](../../public/battle/portraits/ivybound_knight.png) |
+
+Measured half-open sprite alpha bounds: Thornhide Warg (5,16,59,80); Grove Hexer (9,12,55,80); Ancient Treantling (10,6,54,80); Owlbear Forager (5,14,60,80); Ivybound Knight (7,8,57,80). All five keep feet on the bottom edge. No `pixelArt` / nearest-neighbor Phaser special case is recorded or added.
+
+Bestiary batch 5 adds the first larger forest-boss pairs. They occupy a single tile, use a 96×120 RGBA canvas (1.5× the ordinary 64×80 source) with foot anchor (48,114), and load at native board size 60×75 (the same 5/8 pixels-per-source-pixel scale as 64×80 → 40×50). They are not stretched from 64×80, not squashed to 40×50, and have no `pixelArt` / nearest-neighbor Phaser special case. They are registered as optional enemy units and packaged as ordinary Git blobs; they are not on the five-pair annotated sheet and are not placed into existing battles or dungeon encounter rosters. Underdeep Caverns “Hollow Matriarch” (`hollow_matriarch_boss`) is a different unit and is not this pair.
+
+| Pair / asset IDs (`asset:` prefix) | Sprite | Portrait source | Runtime portrait |
+| --- | --- | --- | --- |
+| Hollow Root Matriarch: `hollow_root_matriarch_sprite`, `hollow_root_matriarch_portrait` | [96×120](../../public/battle/source/hollow_root_matriarch_sprite.png) | [1254×1254](../../public/battle/source/hollow_root_matriarch_portrait.png) | [96×96](../../public/battle/portraits/hollow_root_matriarch.png) |
+| Ironmaw Furnace Beast: `ironmaw_furnace_beast_sprite`, `ironmaw_furnace_beast_portrait` | [96×120](../../public/battle/source/ironmaw_furnace_beast_sprite.png) | [1254×1254](../../public/battle/source/ironmaw_furnace_beast_portrait.png) | [96×96](../../public/battle/portraits/ironmaw_furnace_beast.png) |
+| Green Warden: `green_warden_sprite`, `green_warden_portrait` | [96×120](../../public/battle/source/green_warden_sprite.png) | [1254×1254](../../public/battle/source/green_warden_portrait.png) | [96×96](../../public/battle/portraits/green_warden.png) |
+
+Measured half-open sprite alpha bounds: Hollow Root Matriarch (9,8,87,120); Ironmaw Furnace Beast (6,14,91,120); Green Warden (11,10,86,120). All three keep feet on the bottom edge.
+
+Bestiary batch 6 adds five illustrated wetlands-family pairs with the ordinary 64×80 convention and foot anchor (32,76). They are registered as optional enemy units and packaged as ordinary Git blobs; they are not on the five-pair annotated sheet and are not placed into existing battles or dungeon encounter rosters. Mire Goblin is also a Wetlands unit, but remains in the goblin-family catalog from batch 1.
+
+| Pair / asset IDs (`asset:` prefix) | Sprite | Portrait source | Runtime portrait |
+| --- | --- | --- | --- |
+| Lantern Imp: `lantern_imp_sprite`, `lantern_imp_portrait` | [64×80](../../public/battle/source/lantern_imp_sprite.png) | [1254×1254](../../public/battle/source/lantern_imp_portrait.png) | [96×96](../../public/battle/portraits/lantern_imp.png) |
+| Bog Gnawer: `bog_gnawer_sprite`, `bog_gnawer_portrait` | [64×80](../../public/battle/source/bog_gnawer_sprite.png) | [1254×1254](../../public/battle/source/bog_gnawer_portrait.png) | [96×96](../../public/battle/portraits/bog_gnawer.png) |
+| Fenstalker: `fenstalker_sprite`, `fenstalker_portrait` | [64×80](../../public/battle/source/fenstalker_sprite.png) | [1254×1254](../../public/battle/source/fenstalker_portrait.png) | [96×96](../../public/battle/portraits/fenstalker.png) |
+| Mire Hexer: `mire_hexer_sprite`, `mire_hexer_portrait` | [64×80](../../public/battle/source/mire_hexer_sprite.png) | [1254×1254](../../public/battle/source/mire_hexer_portrait.png) | [96×96](../../public/battle/portraits/mire_hexer.png) |
+| Bog Leech Swarm: `bog_leech_swarm_sprite`, `bog_leech_swarm_portrait` | [64×80](../../public/battle/source/bog_leech_swarm_sprite.png) | [1254×1254](../../public/battle/source/bog_leech_swarm_portrait.png) | [96×96](../../public/battle/portraits/bog_leech_swarm.png) |
+
+Measured half-open sprite alpha bounds: Lantern Imp (11,14,53,80); Bog Gnawer (9,18,55,80); Fenstalker (12,10,52,80); Mire Hexer (7,10,58,80); Bog Leech Swarm (2,33,62,80). All five keep feet on the bottom edge. No `pixelArt` / nearest-neighbor Phaser special case is recorded or added.
+
+Bestiary batch 7 adds five more illustrated wetlands-family pairs with the same convention and foot anchor (32,76). They are registered as optional enemy units and packaged as ordinary Git blobs; they are not on the five-pair annotated sheet and are not placed into existing battles or dungeon encounter rosters.
+
+| Pair / asset IDs (`asset:` prefix) | Sprite | Portrait source | Runtime portrait |
+| --- | --- | --- | --- |
+| Marsh Croaker: `marsh_croaker_sprite`, `marsh_croaker_portrait` | [64×80](../../public/battle/source/marsh_croaker_sprite.png) | [1254×1254](../../public/battle/source/marsh_croaker_portrait.png) | [96×96](../../public/battle/portraits/marsh_croaker.png) |
+| Siltback Turtle: `siltback_turtle_sprite`, `siltback_turtle_portrait` | [64×80](../../public/battle/source/siltback_turtle_sprite.png) | [1254×1254](../../public/battle/source/siltback_turtle_portrait.png) | [96×96](../../public/battle/portraits/siltback_turtle.png) |
+| Fen Strider: `fen_strider_sprite`, `fen_strider_portrait` | [64×80](../../public/battle/source/fen_strider_sprite.png) | [1254×1254](../../public/battle/source/fen_strider_portrait.png) | [96×96](../../public/battle/portraits/fen_strider.png) |
+| Reed Whisperer: `reed_whisperer_sprite`, `reed_whisperer_portrait` | [64×80](../../public/battle/source/reed_whisperer_sprite.png) | [1254×1254](../../public/battle/source/reed_whisperer_portrait.png) | [96×96](../../public/battle/portraits/reed_whisperer.png) |
+| Swamp Stalker: `swamp_stalker_sprite`, `swamp_stalker_portrait` | [64×80](../../public/battle/source/swamp_stalker_sprite.png) | [1254×1254](../../public/battle/source/swamp_stalker_portrait.png) | [96×96](../../public/battle/portraits/swamp_stalker.png) |
+
+Measured half-open sprite alpha bounds: Marsh Croaker (2,27,62,80); Siltback Turtle (2,31,62,80); Fen Strider (11,4,54,80); Reed Whisperer (16,10,48,80); Swamp Stalker (7,14,58,80). All five keep feet on the bottom edge. No `pixelArt` / nearest-neighbor Phaser special case is recorded or added.
+
+Bestiary batch 8 adds three more illustrated wetlands-family pairs with the same convention and foot anchor (32,76), including Fen Hag, Rotbloom Tendril, and Drowned Warden, which the supplement labels Elite. They stay on the ordinary 64×80 canvas rather than the forest-boss 96×120 size. They are registered as optional enemy units and packaged as ordinary Git blobs; they are not on the five-pair annotated sheet and are not placed into existing battles or dungeon encounter rosters.
+
+| Pair / asset IDs (`asset:` prefix) | Sprite | Portrait source | Runtime portrait |
+| --- | --- | --- | --- |
+| Fen Hag: `fen_hag_sprite`, `fen_hag_portrait` | [64×80](../../public/battle/source/fen_hag_sprite.png) | [1254×1254](../../public/battle/source/fen_hag_portrait.png) | [96×96](../../public/battle/portraits/fen_hag.png) |
+| Rotbloom Tendril: `rotbloom_tendril_sprite`, `rotbloom_tendril_portrait` | [64×80](../../public/battle/source/rotbloom_tendril_sprite.png) | [1254×1254](../../public/battle/source/rotbloom_tendril_portrait.png) | [96×96](../../public/battle/portraits/rotbloom_tendril.png) |
+| Drowned Warden: `drowned_warden_sprite`, `drowned_warden_portrait` | [64×80](../../public/battle/source/drowned_warden_sprite.png) | [1254×1254](../../public/battle/source/drowned_warden_portrait.png) | [96×96](../../public/battle/portraits/drowned_warden.png) |
+
+Measured half-open sprite alpha bounds: Fen Hag (10,4,55,80); Rotbloom Tendril (2,14,62,80); Drowned Warden (15,10,50,80). All three keep feet on the bottom edge. No `pixelArt` / nearest-neighbor Phaser special case is recorded or added.
+
+Bestiary batch 9 adds the first larger wetlands-boss pairs. They occupy a single tile, use a 96×120 RGBA canvas (1.5× the ordinary 64×80 source) with foot anchor (48,114), and load at native board size 60×75 — the same per-unit sizing as forest bosses (`unitArtSize` / `unitOverlayOffsets`). They are not stretched from 64×80, not squashed to 40×50, and have no `pixelArt` / nearest-neighbor Phaser special case. They are registered as optional enemy units in the wetlands-family catalog and packaged as ordinary Git blobs; they are not on the five-pair annotated sheet and are not placed into existing battles or dungeon encounter rosters. Fen Hag (`fen_hag`) is a different unit and is not this pair.
+
+| Pair / asset IDs (`asset:` prefix) | Sprite | Portrait source | Runtime portrait |
+| --- | --- | --- | --- |
+| Lantern Hag: `lantern_hag_sprite`, `lantern_hag_portrait` | [96×120](../../public/battle/source/lantern_hag_sprite.png) | [1254×1254](../../public/battle/source/lantern_hag_portrait.png) | [96×96](../../public/battle/portraits/lantern_hag.png) |
+| Maw of the Fen: `maw_of_the_fen_sprite`, `maw_of_the_fen_portrait` | [96×120](../../public/battle/source/maw_of_the_fen_sprite.png) | [1254×1254](../../public/battle/source/maw_of_the_fen_portrait.png) | [96×96](../../public/battle/portraits/maw_of_the_fen.png) |
+
+Measured half-open sprite alpha bounds: Lantern Hag (8,13,87,120); Maw of the Fen (3,23,93,120). Both keep feet on the bottom edge.
+
 Canonical sources are owner-repository project artwork. No per-file third-party license, original prompt, model or generation method is recorded. Retain that uncertainty; these briefs are new production instructions, not reconstructed original prompts or a rights clearance.
 
 ## Observed visual language
@@ -46,9 +147,9 @@ These values were checked on main base `d15caca` against [assets](../../src/cont
 
 | Property | Observed current convention | Guidance for new work |
 | --- | --- | --- |
-| Sprite source/runtime | 64×80 PNG, transparent background; sources are loaded unchanged | Preserve editable/high-resolution masters separately if used. Deliver a reviewed 64×80 RGBA runtime export. Do not resize/crop existing sources. |
-| Foot anchor | Source pixel (32,76), normalized (0.5,0.95) | Align ground contact to this anchor; check placement beside all five references. It is a placement anchor, not the last opaque pixel. |
-| Board size | 40×50 board units on an 80×40 tile; camera fit/zoom scales both | Compare at board scale 1 and in the actual fitted/zoomed scene. Do not make all species the same opaque height. |
+| Sprite source/runtime | 64×80 PNG default, transparent background; sources are loaded unchanged. Forest bosses use a 96×120 RGBA canvas (1.5× that source) loaded at native size | Preserve editable/high-resolution masters separately if used. Deliver a reviewed 64×80 RGBA runtime export unless the unit is an approved 96×120 boss. Do not resize/crop existing sources, and do not stretch a 64×80 sprite to 96×120 at runtime. |
+| Foot anchor | Ordinary source pixel (32,76), normalized (0.5,0.95). Boss 96×120 canvas uses (48,114), the same normalized (0.5,0.95) | Align ground contact to this anchor; check placement beside the references. It is a placement anchor, not the last opaque pixel. Bosses still occupy one tile. |
+| Board size | Ordinary 40×50 board units on an 80×40 tile (5/8 of the 64×80 source). Bosses display at native 60×75 at that same scale; camera fit/zoom scales both | Compare at board scale 1 and in the actual fitted/zoomed scene. Do not squash a 96×120 boss to 40×50. Overlay Y (result/defeat labels, projectile/crit chest) derives from per-unit board height; health bars stay at the tile foot; turn/selection rings stay tile-sized. |
 | Portrait source/runtime | Full 1254×1254 square source → 96×96 optimized PNG, Pillow Lanczos | Keep the full frame, with no new crop. This source size is the observed baseline; a different master size requires a recorded exception and equivalent export proof. |
 | Portrait display | Battle HUD is 32×32 CSS pixels; proof/export convention is 48 CSS pixels × density 2 | Preview at both 32 and 48. The 96 export is retained; this guide does not change the HUD. Enemy portraits are catalog assets, not displayed in the current hero-only party HUD. |
 | Background | Sprite alpha; portrait warm parchment and brown frame | Avoid terrain, baked tile or opaque rectangle around sprites. Keep portrait framing and warm background unless an exception is reviewed. |
@@ -70,13 +171,13 @@ Measured nonzero-alpha bounds below use half-open coordinates `(left, top, right
 1. Copy both briefs and fill one identical identity block. Attach the closest complete reference pair and the five-pair sheet; provide exact reference file/revision or hash identifiers. Review pose, silhouette and identity before final export.
 2. Keep source masters and production settings: tool/model/version when known, prompt or artist brief, reference inputs, seed/settings when applicable, date, edits and rights evidence/gaps. Unknown fields stay unknown. No invented provenance.
 3. For a new snake_case slug, propose `asset:<slug>_sprite` and `asset:<slug>_portrait`. Current non-Fighter source names are `public/battle/source/<slug>_sprite.png` and `<slug>_portrait.png`; portrait runtimes are `public/battle/portraits/<slug>.png`. Fighter's proof paths are a historical exception. These names are recommendations until the new asset's integration is approved.
-4. Export the sprite as RGBA PNG at 64×80, preserving edge alpha. Export the portrait from the entire source frame using `Image.resize((96, 96), Image.Resampling.LANCZOS)` and `save(..., optimize=True)` in Pillow; record the actual tool/version. Do not upscale a tiny portrait to manufacture detail. This follows existing production records, not a new dependency requirement.
+4. Export the sprite as RGBA PNG at 64×80 with foot anchor (32,76), preserving edge alpha, unless the unit is an approved single-tile boss: then 96×120 with foot anchor (48,114), loaded at native 60×75 board units. Export the portrait from the entire source frame using `Image.resize((96, 96), Image.Resampling.LANCZOS)` and `save(..., optimize=True)` in Pillow; record the actual tool/version. Do not upscale a tiny portrait to manufacture detail. This follows existing production records, not a new dependency requirement.
 5. Record source/runtime pixel dimensions, format, anchor, SHA-256, file byte sizes and source-to-export operation. In a future integration, register the reviewed files in `src/content/assets.ts` and reference those IDs from the hero/enemy catalog; never replace a canonical asset merely to add a unit. Follow [content loading](../qa/issue-30-content-loading.md), the [restart budgets](../phaser4-restart-plan.md) and [technical design](../tech_design.phaser4.draft.md). Account for added runtime transfer, image decoding and catalog validation before shipping. This documentation issue adds no unit or runtime asset.
 
 ## Review checklist
 
 - [ ] Both briefs name identical species/face, headwear, clothing, weapon, accents and distinctive marks; references identify exact files/revisions/hashes.
-- [ ] Silhouette distinguishes the unit beside Fighter/Mage/Ranger and both goblins at 40×50; face/equipment remain legible at 32×32 and 48×48 portrait sizes.
+- [ ] Silhouette distinguishes the unit beside Fighter/Mage/Ranger and both goblins at 40×50 (or beside an ordinary unit at 60×75 for an approved 96×120 single-tile boss); face/equipment remain legible at 32×32 and 48×48 portrait sizes.
 - [ ] Sprite retains simplified shading/contours; portrait retains finer illustrated materials, parchment and frame. Detail supports the identity rather than noise.
 - [ ] Full source canvas, alpha bounds, padding, ground-contact anchor and relative body scale are checked; no clipped weapons, halos or unintended background on light/dark surfaces.
 - [ ] Portrait full-frame export, visible face and recognizable equipment are checked at 96×96 and both display sizes; no silent crop or headwear substitution.

@@ -3,7 +3,7 @@ import type { CellPosition, ContentCatalog, MapId } from '../content/types';
 import type { BattleEvent, BattleState } from '../domain/types';
 import { guardedEffect, movementBlockSource } from '../domain/effects';
 import { buildBoardPresentation, OCCUPANT_LAYER } from '../geometry/boardPresentation';
-import { CANOPY_ART, UNIT_ART, canopyBounds, canopyOccludes, unitBounds } from '../geometry/canopy';
+import { CANOPY_ART, canopyBounds, canopyOccludes, unitArtSize, unitBounds, unitOverlayOffsets } from '../geometry/canopy';
 import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, BASE_THICKNESS, ELEVATION_STEP, MAX_BOARD_SCALE, TILE_HEIGHT, TILE_WIDTH, type BoardRegion, type Bounds, type Point, type Tile } from '../geometry/iso';
 import { constrainView, DRAG_THRESHOLD, faceContainsPoint, MAX_ZOOM, pickTileCandidates, screenToBoard, type View } from '../geometry/picking';
 import { HEALTH_BAR, HEALTH_COLORS, healthArc, healthBarScale, healthColor, healthFraction } from './healthBar';
@@ -73,7 +73,7 @@ export class BoardRenderer {
   private presentation: CombatPresentationTiming | null = null;
   private effect: { kind: SignatureKind; actorId: number; targetId: number; progress: number;
     from: Point; to: Point; feedback: {unitId: number; text: string; x: number; y: number; visible: boolean}[] } | null = null;
-  private effectLabels: {text: Phaser.GameObjects.Text; anchor: Point; kind: 'result'|'defeat'|'guard'}[] = [];
+  private effectLabels: {text: Phaser.GameObjects.Text; anchor: Point; kind: 'result'|'defeat'|'guard'; artHeight: number}[] = [];
   private criticalGraphics: Phaser.GameObjects.Graphics | null = null;
   private criticalEffects: (CriticalImpact & {center: Point; progress: number; visible: boolean; reducedMotion: boolean})[] = [];
 
@@ -209,9 +209,10 @@ export class BoardRenderer {
     }
     for (const occupant of this.board.occupants) {
       const asset = catalog.assets[occupant.assetId];
+      const art = unitArtSize(asset);
       const image = scene.add.image(0, 0, occupant.assetId)
         .setOrigin(occupant.anchor.x / asset.runtimeWidth, occupant.anchor.y / asset.runtimeHeight)
-        .setDisplaySize(UNIT_ART.width, UNIT_ART.height);
+        .setDisplaySize(art.width, art.height);
       const ring = scene.add.graphics();
       this.images.set(occupant.id, image);
       this.rings.set(occupant.id, ring);
@@ -244,7 +245,8 @@ export class BoardRenderer {
     }), ...this.canopies.map(({ tile }) => canopyBounds(tile)),
       ...this.solidTiles.flatMap(tile => this.board.occupants.map(occupant => {
         const asset = catalog.assets[occupant.assetId];
-        return unitBounds(tile, { x: occupant.anchor.x / asset.runtimeWidth, y: occupant.anchor.y / asset.runtimeHeight });
+        return unitBounds(tile, { x: occupant.anchor.x / asset.runtimeWidth, y: occupant.anchor.y / asset.runtimeHeight },
+          unitArtSize(asset));
       }))];
     this.reducedMotion.addEventListener('change', this.motionChanged);
     scene.events.on(Phaser.Scenes.Events.UPDATE, this.updateBob);
@@ -369,7 +371,8 @@ export class BoardRenderer {
         if (unit.hp <= 0) return false;
         const tile = this.byCell.get(cellKey(unit.cell))!;
         const image = this.images.get(unit.id)!;
-        const art = unitBounds(tile, { x: image.originX, y: image.originY });
+        const art = unitBounds(tile, { x: image.originX, y: image.originY },
+          { width: image.displayWidth, height: image.displayHeight });
         return canopyOccludes(canopy.tile, tile, { ...art, top: art.top - BOB_HEIGHT }, this.catalog.maps[this.mapId].height);
       });
       canopy.graphics.setAlpha(overlaps ? CANOPY_ART.fadedAlpha : 1);
@@ -390,8 +393,8 @@ export class BoardRenderer {
       return {
         depth: moving?.depth ?? tile.depth,
         center: {
-          x: anchor.x + (0.5 - image.originX) * UNIT_ART.width,
-          y: anchor.y + (0.5 - image.originY) * UNIT_ART.height,
+          x: anchor.x + (0.5 - image.originX) * image.displayWidth,
+          y: anchor.y + (0.5 - image.originY) * image.displayHeight,
         },
       };
     });
@@ -427,26 +430,31 @@ export class BoardRenderer {
     const anchor=(id:number)=>projectTile(this.byCell.get(cellKey(before.units.find(u=>u.id===id)!.cell))!);
     for(const item of feedback) {
       const p=anchor(item.unitId);
-      const y=p.y+(item.kind==='guard'?16:item.kind==='defeat'?-88:-64);
+      const artHeight=this.images.get(item.unitId)!.displayHeight;
+      const offsets=unitOverlayOffsets(artHeight);
+      const y=p.y+(item.kind==='guard'?16:item.kind==='defeat'?offsets.defeat:offsets.damage);
       const text=this.scene.add.text(p.x,y,item.text,{fontFamily:'sans-serif',fontSize:'18px',fontStyle:'bold',
         color:item.kind==='guard'?'#a9f3e6':'#ffffff',backgroundColor:'#172033',padding:{x:4,y:2}})
         .setResolution(2).setOrigin(0.5).setDepth(10001).setVisible(!signature || timing.reducedMotion);
       this.root.add(text);labels.push(text);
-      this.effectLabels.push({text,anchor:p,kind:item.kind});
+      this.effectLabels.push({text,anchor:p,kind:item.kind,artHeight});
     }
     const graphics=signature && !timing.reducedMotion ? this.scene.add.graphics().setDepth(10000) : null;
     if(graphics && signature){
       this.root.add(graphics);
       const a=anchor(signature.actorId),b=anchor(signature.targetId);
+      const fromChest=unitOverlayOffsets(this.images.get(signature.actorId)!.displayHeight).chest;
+      const toChest=unitOverlayOffsets(this.images.get(signature.targetId)!.displayHeight).chest;
       this.effect={kind:signature.kind,actorId:signature.actorId,targetId:signature.targetId,progress:0,
-        from:{x:a.x,y:a.y-28},to:{x:b.x,y:b.y-28},
+        from:{x:a.x,y:a.y+fromChest},to:{x:b.x,y:b.y+toChest},
         feedback:feedback.map((item,i)=>({unitId:item.unitId,text:item.text,x:labels[i].x,y:labels[i].y,visible:false}))};
     }
     // Each accepted critical owns one burst for this presentation. Draw frames on
     // the existing tween; redraws, camera changes and resume never create impacts.
     this.criticalEffects = criticals.map(impact => {
       const point = anchor(impact.targetId);
-      return {...impact, center:{x:point.x,y:point.y-28}, progress:0,
+      const chest=unitOverlayOffsets(this.images.get(impact.targetId)!.displayHeight).chest;
+      return {...impact, center:{x:point.x,y:point.y+chest}, progress:0,
         visible:!signature || timing.reducedMotion, reducedMotion:timing.reducedMotion};
     });
     if(this.criticalEffects.length){
@@ -557,7 +565,8 @@ export class BoardRenderer {
           if(unit.hp<=0)return false;
           const tile=unit.id===move.unitId?movingTile:this.byCell.get(cellKey(unit.cell))!;
           const image=this.images.get(unit.id)!;
-          return canopyOccludes(canopy.tile,tile,unitBounds(tile,{x:image.originX,y:image.originY}),this.catalog.maps[this.mapId].height);
+          return canopyOccludes(canopy.tile,tile,unitBounds(tile,{x:image.originX,y:image.originY},
+            {width:image.displayWidth,height:image.displayHeight}),this.catalog.maps[this.mapId].height);
         });
         canopy.graphics.setAlpha(overlaps?CANOPY_ART.fadedAlpha:1);
       }
@@ -623,7 +632,7 @@ export class BoardRenderer {
   private placeBadges(id:number, point:Point, depth:number):void {
     // Both status symbols stay at least 12 CSS pixels wide at fitted mobile scale.
     const scale=Math.max(1,12/(14*this.view.scale));
-    const x=point.x-UNIT_ART.width/2-9*scale;
+    const x=point.x-this.images.get(id)!.displayWidth/2-9*scale;
     // Stay attached in board space; the canvas clip hides offscreen annotations.
     for(const badge of [this.guardBadges.get(id)!,this.snareBadges.get(id)!])badge.setPosition(
       x,
@@ -660,11 +669,12 @@ export class BoardRenderer {
     // Keep labels legible when the whole board is fitted into short mobile viewports.
     // Coordinates remain board-local, including the extra separation for defeat.
     const scale=Math.max(1,14/(18*this.view.scale));
-    this.effectLabels.forEach(({text,anchor,kind})=>{
+    this.effectLabels.forEach(({text,anchor,kind,artHeight})=>{
       text.setScale(scale);
       const height=text.height*scale;
+      const result=unitOverlayOffsets(artHeight).result;
       const y=kind==='guard'?anchor.y+height/2+6/this.view.scale
-        :anchor.y-54-height/2-(kind==='defeat'?height+3/this.view.scale:0);
+        :anchor.y+result-height/2-(kind==='defeat'?height+3/this.view.scale:0);
       text.setPosition(anchor.x,y);
     });
     // Keep each unit's result/defeat stack readable inside the clipped region.
@@ -794,7 +804,8 @@ export class BoardRenderer {
     for(const {unit,tile} of units){
       if(tile.depth+OCCUPANT_LAYER<depth)continue;
       const image=this.images.get(unit.id)!;
-      const bounds=unitBounds(tile,{x:image.originX,y:image.originY});
+      const bounds=unitBounds(tile,{x:image.originX,y:image.originY},
+        {width:image.displayWidth,height:image.displayHeight});
       if(!this.hitsImage(local,bounds,image))continue;
       artTile=tile;
       break;
@@ -839,7 +850,8 @@ export class BoardRenderer {
             position:{x:bar.x,y:bar.y},screen:{x:screen.x,y:screen.y},depth:bar.depth,scale:bar.scaleX,
             interactive:!!bar.input};
         })(),
-        assetId: image.texture.key, origin: { x: image.originX, y: image.originY }, depth: image.depth,
+        assetId: image.texture.key, origin: { x: image.originX, y: image.originY },
+        display: { width: image.displayWidth, height: image.displayHeight }, depth: image.depth,
         position: { x: image.x, y: image.y }, bobOffset, baseAnchorError: Math.hypot(base.x - actual.x, base.y - actual.y), anchorError: Math.hypot(expected.x - actual.x, expected.y - actual.y) };
     });
     const { x, y, scale } = this.view;

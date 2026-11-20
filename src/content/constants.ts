@@ -14,7 +14,31 @@ export const CONTENT_BOUNDS = {
 export const FIRST_MAP_TERRAIN_IDS = ['grass', 'grass_path', 'stone', 'forest', 'water'] as const;
 export const HERO_IDS = ['fighter', 'ranger', 'mage'] as const;
 export const CORE_ENEMY_IDS = ['goblin_grunt', 'goblin_archer', 'goblin_shaman'] as const;
-export const ENEMY_IDS = [...CORE_ENEMY_IDS, 'hobgoblin_warrior'] as const;
+/** Extra enemies a catalog may omit; required only when that catalog includes them. */
+export const OPTIONAL_ENEMY_IDS = [
+  'hobgoblin_warrior', 'bramble_goblin', 'goblin_snarehand', 'mire_goblin', 'coal_goblin', 'ruin_lookout',
+  'briar_thrall', 'rotcap_sprout', 'spore_acolyte', 'thornback_beetle', 'blob',
+  'cinder_archer', 'ash_hound', 'bellows_imp', 'mossback_boar', 'rootling_skirmisher',
+  'thornhide_warg', 'grove_hexer', 'ancient_treantling', 'owlbear_forager', 'ivybound_knight',
+  'hollow_root_matriarch', 'ironmaw_furnace_beast', 'green_warden',
+  'lantern_imp', 'bog_gnawer', 'fenstalker', 'mire_hexer', 'bog_leech_swarm',
+  'marsh_croaker', 'siltback_turtle', 'fen_strider', 'reed_whisperer', 'swamp_stalker',
+  'fen_hag', 'rotbloom_tendril', 'drowned_warden',
+  'lantern_hag', 'maw_of_the_fen',
+] as const;
+export const ENEMY_IDS = [...CORE_ENEMY_IDS, ...OPTIONAL_ENEMY_IDS] as const;
+export const BASIC_ATTACK_OPTIONAL_ENEMY_IDS = [
+  'hobgoblin_warrior', 'bramble_goblin', 'goblin_snarehand', 'mire_goblin', 'coal_goblin',
+  'briar_thrall', 'rotcap_sprout', 'spore_acolyte', 'thornback_beetle', 'blob',
+  'ash_hound', 'bellows_imp', 'mossback_boar', 'rootling_skirmisher',
+  'thornhide_warg', 'grove_hexer', 'ancient_treantling', 'owlbear_forager', 'ivybound_knight',
+  'hollow_root_matriarch', 'ironmaw_furnace_beast', 'green_warden',
+  'lantern_imp', 'bog_gnawer', 'fenstalker', 'mire_hexer', 'bog_leech_swarm',
+  'marsh_croaker', 'siltback_turtle', 'fen_strider', 'reed_whisperer', 'swamp_stalker',
+  'fen_hag', 'rotbloom_tendril', 'drowned_warden',
+  'lantern_hag', 'maw_of_the_fen',
+] as const;
+export const SHORTBOW_OPTIONAL_ENEMY_IDS = ['ruin_lookout', 'cinder_archer'] as const;
 /** Explicit eligible support targets; future enemy IDs do not acquire healing by name. */
 export const HEAL_GOBLIN_IDS = ['goblin_grunt', 'goblin_archer', 'goblin_shaman'] as const;
 /** Initial attack catalog limits; runtime validation also requires min range <= max range. */
