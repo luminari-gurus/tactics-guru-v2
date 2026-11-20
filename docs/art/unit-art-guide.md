@@ -112,6 +112,15 @@ Bestiary batch 8 adds three more illustrated wetlands-family pairs with the same
 
 Measured half-open sprite alpha bounds: Fen Hag (10,4,55,80); Rotbloom Tendril (2,14,62,80); Drowned Warden (15,10,50,80). All three keep feet on the bottom edge. No `pixelArt` / nearest-neighbor Phaser special case is recorded or added.
 
+Bestiary batch 9 adds the first larger wetlands-boss pairs. They occupy a single tile, use a 96×120 RGBA canvas (1.5× the ordinary 64×80 source) with foot anchor (48,114), and load at native board size 60×75 — the same per-unit sizing as forest bosses (`unitArtSize` / `unitOverlayOffsets`). They are not stretched from 64×80, not squashed to 40×50, and have no `pixelArt` / nearest-neighbor Phaser special case. They are registered as optional enemy units in the wetlands-family catalog and packaged as ordinary Git blobs; they are not on the five-pair annotated sheet and are not placed into existing battles or dungeon encounter rosters. Fen Hag (`fen_hag`) is a different unit and is not this pair.
+
+| Pair / asset IDs (`asset:` prefix) | Sprite | Portrait source | Runtime portrait |
+| --- | --- | --- | --- |
+| Lantern Hag: `lantern_hag_sprite`, `lantern_hag_portrait` | [96×120](../../public/battle/source/lantern_hag_sprite.png) | [1254×1254](../../public/battle/source/lantern_hag_portrait.png) | [96×96](../../public/battle/portraits/lantern_hag.png) |
+| Maw of the Fen: `maw_of_the_fen_sprite`, `maw_of_the_fen_portrait` | [96×120](../../public/battle/source/maw_of_the_fen_sprite.png) | [1254×1254](../../public/battle/source/maw_of_the_fen_portrait.png) | [96×96](../../public/battle/portraits/maw_of_the_fen.png) |
+
+Measured half-open sprite alpha bounds: Lantern Hag (8,13,87,120); Maw of the Fen (3,23,93,120). Both keep feet on the bottom edge.
+
 Canonical sources are owner-repository project artwork. No per-file third-party license, original prompt, model or generation method is recorded. Retain that uncertainty; these briefs are new production instructions, not reconstructed original prompts or a rights clearance.
 
 ## Observed visual language

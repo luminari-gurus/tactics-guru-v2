@@ -1,9 +1,11 @@
 import type { AssetId, AssetRecord, ContentCatalog, EnemyRecord, UnitStats } from './types';
+import { BOSS_SPRITE_CANVAS } from '../geometry/canopy';
 
 export const WETLANDS_FAMILY_IDS = [
   'lantern_imp', 'bog_gnawer', 'fenstalker', 'mire_hexer', 'bog_leech_swarm',
   'marsh_croaker', 'siltback_turtle', 'fen_strider', 'reed_whisperer', 'swamp_stalker',
   'fen_hag', 'rotbloom_tendril', 'drowned_warden',
+  'lantern_hag', 'maw_of_the_fen',
 ] as const;
 type FamilyId = typeof WETLANDS_FAMILY_IDS[number];
 type Illustrated = { readonly origin: 'canonical'; readonly repository: string; readonly revision: string; readonly rightsNote: string };
@@ -20,6 +22,10 @@ const illustratedBatch7 = {
 const illustratedBatch8 = {
   origin: 'canonical', repository: 'https://github.com/luminari-gurus/tactics-guru-v2',
   revision: '21f02e5389820f36482c7c0a0a5483f91aa0508c', rightsNote,
+} as const;
+const illustratedBatch9 = {
+  origin: 'canonical', repository: 'https://github.com/luminari-gurus/tactics-guru-v2',
+  revision: 'd55e881710caae126d6d7c53c985a425f963ea08', rightsNote,
 } as const;
 
 const enemy = <Id extends FamilyId>(id: Id, stats: UnitStats) => ({
@@ -44,6 +50,8 @@ export const wetlandsFamilyEnemies = {
   fen_hag: enemy('fen_hag', { maxHp: 13, move: 3, jump: 1, accuracy: 5, armorClass: 12, power: 2, dexterity: 2, will: 2 }),
   rotbloom_tendril: enemy('rotbloom_tendril', { maxHp: 15, move: 3, jump: 1, accuracy: 4, armorClass: 13, power: 2, dexterity: 1, will: 1 }),
   drowned_warden: enemy('drowned_warden', { maxHp: 18, move: 3, jump: 1, accuracy: 4, armorClass: 14, power: 1, dexterity: 0, will: 3 }),
+  lantern_hag: enemy('lantern_hag', { maxHp: 28, move: 3, jump: 1, accuracy: 5, armorClass: 13, power: 5, dexterity: 0, will: 2 }),
+  maw_of_the_fen: enemy('maw_of_the_fen', { maxHp: 28, move: 3, jump: 1, accuracy: 5, armorClass: 13, power: 5, dexterity: 1, will: 2 }),
 } as const satisfies Record<FamilyId, EnemyRecord>;
 
 const sprite = (id: FamilyId, sourceSha256: string, alphaBounds: string, art: Illustrated = illustrated) => {
@@ -54,6 +62,18 @@ const sprite = (id: FamilyId, sourceSha256: string, alphaBounds: string, art: Il
     provenance: {
       ...art, originalPath: sourcePath, sourceSha256,
       productionNotes: `Illustrated 64×80 RGBA PNG matching existing goblin unit sprites; alpha bounds ${alphaBounds}, source-pixel foot anchor (32,76). Feet on the bottom edge.`,
+    },
+  };
+};
+const bossSprite = (id: FamilyId, sourceSha256: string, alphaBounds: string, art: Illustrated) => {
+  const sourcePath = `public/battle/source/${id}_sprite.png`;
+  const { width, height, anchor } = BOSS_SPRITE_CANVAS;
+  return {
+    id: `asset:${id}_sprite` as const, kind: 'unit-sprite' as const, sourcePath, runtimePath: `/battle/source/${id}_sprite.png`,
+    sourceWidth: width, sourceHeight: height, runtimeWidth: width, runtimeHeight: height, format: 'png' as const, anchor,
+    provenance: {
+      ...art, originalPath: sourcePath, sourceSha256,
+      productionNotes: `Illustrated 96×120 RGBA PNG (1.5× the ordinary 64×80 canvas) loaded at native size; alpha bounds ${alphaBounds}, source-pixel foot anchor (48,114). Single-tile occupancy. Feet on the bottom edge. No runtime 1.5× stretch or pixelArt/nearest-neighbor special case.`,
     },
   };
 };
@@ -97,6 +117,10 @@ export const wetlandsFamilyAssets = {
   'asset:rotbloom_tendril_portrait': portrait('rotbloom_tendril', '8d749b3ecdae2bce72cb8e24d0d959dd2d7a8cd336a8b90f63b3746eb194bae6', '03f12dff8fed2ee825b842dcc0362a96a98bec1d25501f54cdf19ecd638ee15d', illustratedBatch8),
   'asset:drowned_warden_sprite': sprite('drowned_warden', '6109fd7ff48f36ec5332c826e33d6d53756ca2e8cc82ffa8faf5809b9e85d2b9', '(15,10)-(50,80)', illustratedBatch8),
   'asset:drowned_warden_portrait': portrait('drowned_warden', 'db9ee7a277f01f72efd28c2cdbd7a466792e0fa82c059904d2fbf540e2e2b8de', 'c37d1f15bc6ecad3b5f9e80cf55ce70ed16279a3244632967e283bad11cb3dac', illustratedBatch8),
+  'asset:lantern_hag_sprite': bossSprite('lantern_hag', '9a0aa8aba4ee584a2d4fbcea13bc884bb6b591b142f4b0073a8485fc9200c867', '(8,13)-(87,120)', illustratedBatch9),
+  'asset:lantern_hag_portrait': portrait('lantern_hag', '0071b69eab854203f37570249f1c463fcf7ed16e66dda94e27a126e368bfbb91', '94c36b9160b725f4a0b387e509846ca03624bc1513e425c466e56911008d0029', illustratedBatch9),
+  'asset:maw_of_the_fen_sprite': bossSprite('maw_of_the_fen', 'fe369d35065e77934ce95daa71fd1f30719d2be0c4f053102f48ff18a15ebcc7', '(3,23)-(93,120)', illustratedBatch9),
+  'asset:maw_of_the_fen_portrait': portrait('maw_of_the_fen', 'a98a453a0bbf84d32170995f9fda82a189576c1efebb1bed1ca3bd2c809e24b9', 'f8872dd20e40420b75c3ed6d00d04e3eae391d2ee05ddc0bd22a781dbc3d7d13', illustratedBatch9),
 } satisfies Record<AssetId, AssetRecord>;
 
 export function wetlandsFamilyBattleContent(baseline: ContentCatalog): ContentCatalog {

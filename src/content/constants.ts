@@ -24,6 +24,7 @@ export const OPTIONAL_ENEMY_IDS = [
   'lantern_imp', 'bog_gnawer', 'fenstalker', 'mire_hexer', 'bog_leech_swarm',
   'marsh_croaker', 'siltback_turtle', 'fen_strider', 'reed_whisperer', 'swamp_stalker',
   'fen_hag', 'rotbloom_tendril', 'drowned_warden',
+  'lantern_hag', 'maw_of_the_fen',
 ] as const;
 export const ENEMY_IDS = [...CORE_ENEMY_IDS, ...OPTIONAL_ENEMY_IDS] as const;
 export const BASIC_ATTACK_OPTIONAL_ENEMY_IDS = [
@@ -35,6 +36,7 @@ export const BASIC_ATTACK_OPTIONAL_ENEMY_IDS = [
   'lantern_imp', 'bog_gnawer', 'fenstalker', 'mire_hexer', 'bog_leech_swarm',
   'marsh_croaker', 'siltback_turtle', 'fen_strider', 'reed_whisperer', 'swamp_stalker',
   'fen_hag', 'rotbloom_tendril', 'drowned_warden',
+  'lantern_hag', 'maw_of_the_fen',
 ] as const;
 export const SHORTBOW_OPTIONAL_ENEMY_IDS = ['ruin_lookout', 'cinder_archer'] as const;
 /** Explicit eligible support targets; future enemy IDs do not acquire healing by name. */

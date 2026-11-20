@@ -9,7 +9,11 @@ import {
 } from '../../src/content/dungeonEncounters';
 import { validateContent } from '../../src/content/validate';
 import { createBattle } from '../../src/domain/turns';
+import { buildBoardPresentation } from '../../src/geometry/boardPresentation';
+import { BOSS_SPRITE_CANVAS, BOSS_UNIT_ART, unitArtSize } from '../../src/geometry/canopy';
 import type { MapRecord, SpawnRecord } from '../../src/content/types';
+
+const WETLANDS_BOSS_IDS = ['lantern_hag', 'maw_of_the_fen'] as const;
 
 it('packages illustrated wetlands-family sprites and portraits like the other goblin units', () => {
   let runtimeBytes = 0;
@@ -22,7 +26,13 @@ it('packages illustrated wetlands-family sprites and portraits like the other go
       expect([runtime.readUInt32BE(16), runtime.readUInt32BE(20)]).toEqual([asset.runtimeWidth, asset.runtimeHeight]);
       if (asset.kind === 'unit-sprite') {
         expect(runtime).toEqual(source);
-        expect(asset.anchor).toEqual({ x: 32, y: 76 });
+        if ((WETLANDS_BOSS_IDS as readonly string[]).includes(id)) {
+          expect([asset.runtimeWidth, asset.runtimeHeight]).toEqual([BOSS_SPRITE_CANVAS.width, BOSS_SPRITE_CANVAS.height]);
+          expect(asset.anchor).toEqual(BOSS_SPRITE_CANVAS.anchor);
+          expect(unitArtSize(asset)).toEqual(BOSS_UNIT_ART);
+        } else {
+          expect(asset.anchor).toEqual({ x: 32, y: 76 });
+        }
       } else {
         expect(createHash('sha256').update(runtime).digest('hex'))
           .toBe(asset.provenance.productionNotes.match(/Runtime SHA-256 ([a-f0-9]{64})/)?.[1]);
@@ -30,7 +40,7 @@ it('packages illustrated wetlands-family sprites and portraits like the other go
       runtimeBytes += runtime.length;
     }
   }
-  expect(runtimeBytes).toBe(355418);
+  expect(runtimeBytes).toBe(431084);
 });
 
 it('registers bestiary stats and abilities without joining existing encounter catalogs', () => {
@@ -43,8 +53,10 @@ it('registers bestiary stats and abilities without joining existing encounter ca
   expect(goblinFamilyDungeonBattleCatalog.enemies).not.toHaveProperty('lantern_imp');
   expect(forestFamilyDungeonBattleCatalog.enemies).not.toHaveProperty('lantern_imp');
   expect(forestBossDungeonBattleCatalog.enemies).not.toHaveProperty('lantern_imp');
+  expect(forestBossDungeonBattleCatalog.enemies).not.toHaveProperty('lantern_hag');
   expect(goblinFamilyDungeonBattleCatalog.enemies).not.toHaveProperty('marsh_croaker');
   expect(goblinFamilyDungeonBattleCatalog.enemies).not.toHaveProperty('fen_hag');
+  expect(goblinFamilyDungeonBattleCatalog.enemies).not.toHaveProperty('lantern_hag');
   expect(goblinFamilyDungeonBattleCatalog.enemies).toHaveProperty('mire_goblin');
   expect(wetlandsFamilyDungeonBattleCatalog.enemies).not.toHaveProperty('mire_goblin');
   for (const change of [
@@ -69,12 +81,27 @@ it('can create a battle that uses the registered units without changing producti
     ...WETLANDS_FAMILY_IDS.map((unitId, i): SpawnRecord => ({ id: i + 4, side: 'enemies', unitId, x: i, y: 2 })),
   ] satisfies readonly SpawnRecord[];
   const map: MapRecord = {
-    id: 'map:wetlands_family_roster', width: 13, height: 3,
-    cells: Array.from({ length: 39 }, (_, i) => ({ x: i % 13, y: Math.floor(i / 13), elevation: 0, terrainId: 'grass' })),
+    id: 'map:wetlands_family_roster', width: 15, height: 3,
+    cells: Array.from({ length: 45 }, (_, i) => ({ x: i % 15, y: Math.floor(i / 15), elevation: 0, terrainId: 'grass' })),
     spawns,
   };
   const catalog = wetlandsFamilyBattleContent({ ...battleCatalog, maps: { ...battleCatalog.maps, [map.id]: map } });
   const created = createBattle(map.id, 1, catalog);
   assert(created.ok);
   expect(created.state.units.filter(u => u.side === 'enemy').map(u => u.defId)).toEqual([...WETLANDS_FAMILY_IDS]);
+  expect(new Set(created.state.units.map(u => `${u.cell.x},${u.cell.y}`)).size).toBe(created.state.units.length);
+  const board = buildBoardPresentation(catalog, map.id);
+  expect(board.occupants).toHaveLength(18);
+  for (const occupant of board.occupants) {
+    const asset = catalog.assets[occupant.assetId];
+    expect(asset.kind).toBe('unit-sprite');
+    if (asset.kind !== 'unit-sprite') continue;
+    expect(occupant.anchor).toEqual(asset.anchor);
+    const boss = (WETLANDS_BOSS_IDS as readonly string[]).includes(occupant.unitId);
+    const expected = boss
+      ? { width: 96, height: 120, anchor: BOSS_SPRITE_CANVAS.anchor }
+      : { width: 64, height: 80, anchor: { x: 32, y: 76 } };
+    expect({ width: asset.runtimeWidth, height: asset.runtimeHeight, anchor: asset.anchor }).toEqual(expected);
+    if (boss) expect(unitArtSize(asset)).toEqual(BOSS_UNIT_ART);
+  }
 });

@@ -36,6 +36,7 @@ const dexterity = {
   lantern_imp: 2, bog_gnawer: 1, fenstalker: 2, mire_hexer: 1, bog_leech_swarm: 1,
   marsh_croaker: 2, siltback_turtle: 0, fen_strider: 1, reed_whisperer: 2, swamp_stalker: 2,
   fen_hag: 2, rotbloom_tendril: 1, drowned_warden: 0,
+  lantern_hag: 0, maw_of_the_fen: 1,
 } as const;
 const base: ContentCatalog = copy(catalogFixture);
 const catalog: ContentCatalog = { ...base, maps: { [map.id]: map },
