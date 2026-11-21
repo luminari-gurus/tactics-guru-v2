@@ -1,3 +1,4 @@
+import { EXPANDED_ENCOUNTER_POLICY } from '../domain/dungeonEncounters';
 import type { DungeonFloor, DungeonState } from '../domain/dungeon';
 import { currentFloor, clearedDungeonSlots, dungeonStairStatus } from '../domain/dungeon';
 import { dungeonContent } from '../content/dungeon';
@@ -11,8 +12,12 @@ export function dungeonBiomeLabel(s: DungeonState): string {
   return BIOMES.find(b => b.version === currentFloor(s).descriptor.biome)!.label;
 }
 export function dungeonEncounterLabel(s: DungeonState, slot: number): string {
-  const kind = currentFloor(s).descriptor.encounters[slot].selection.kind;
-  return kind === 'boss' ? 'Guardian · Goblins' : `${kind[0].toUpperCase()}${kind.slice(1)} encounter ${slot + 1}`;
+  const selection = currentFloor(s).descriptor.encounters[slot].selection;
+  const { kind } = selection;
+  if (kind !== 'boss') return `${kind[0].toUpperCase()}${kind.slice(1)} encounter ${slot + 1}`;
+  const leader = selection.encounter.roster.find(spawn => spawn.side === 'enemies');
+  if (selection.policy !== EXPANDED_ENCOUNTER_POLICY || !leader || leader.unitId.startsWith('goblin_')) return 'Guardian · Goblins';
+  return `Guardian · ${leader.unitId.replace(/_boss$/, '').replaceAll('_', ' ').replace(/\b\w/g, letter => letter.toUpperCase())}`;
 }
 
 const WASD_PREFERENCE_KEY = 'tactics-guru:dungeon-wasd';

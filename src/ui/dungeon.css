@@ -145,6 +145,18 @@ body:has(#dungeon-screen:not([hidden])) #battle-heading { display: none; }
 #dungeon-map [data-terrain="forest-blocked"] { background-color: var(--forest-blocked); }
 #dungeon-map [data-terrain="desert-open"] { background-color: var(--desert-open); }
 #dungeon-map [data-terrain="desert-blocked"] { background-color: var(--desert-blocked); }
+#dungeon-map [data-terrain="wetlands-open"] { background-color: #657248; }
+#dungeon-map [data-terrain="wetlands-blocked"] { background-color: #21534f; }
+#dungeon-map [data-terrain="underdeep-caverns-open"] { background-color: #655973; }
+#dungeon-map [data-terrain="underdeep-caverns-blocked"] { background-color: #352a50; }
+#dungeon-map [data-terrain="quarry-open"] { background-color: #8a7862; }
+#dungeon-map [data-terrain="quarry-blocked"] { background-color: #49433d; }
+#dungeon-map [data-terrain="graveyard-open"] { background-color: #756959; }
+#dungeon-map [data-terrain="graveyard-blocked"] { background-color: #3f424a; }
+#dungeon-map [data-terrain="ember-wastes-open"] { background-color: #895e4d; }
+#dungeon-map [data-terrain="ember-wastes-blocked"] { background-color: #682f24; }
+#dungeon-map [data-terrain="winter-tundra-open"] { background-color: #a6b9c8; }
+#dungeon-map [data-terrain="winter-tundra-blocked"] { background-color: #416784; }
 #dungeon-map .explore-hidden { background-color: #111a24; }
 #dungeon-map .explore-remembered { position: relative; isolation: isolate; }
 #dungeon-map .explore-remembered::before {
@@ -159,10 +171,12 @@ body:has(#dungeon-screen:not([hidden])) #battle-heading { display: none; }
 #dungeon-map [data-poi] { font-weight: bold; }
 #dungeon-map [data-loot] { position:relative; color:#ffdc85; font-weight:bold; text-shadow:0 1px 2px #000; }
 #dungeon-map [data-loot][data-player] { color:#8ce6ff; }
-#dungeon-map[data-art="legacy-8bit"] [data-terrain="desert-open"] {
+#dungeon-map[data-art="legacy-8bit"] [data-terrain$="-open"],
+#dungeon-map [data-terrain="winter-tundra-open"] {
   text-shadow: -1px 0 #111a24, 1px 0 #111a24, 0 -1px #111a24, 0 1px #111a24;
 }
-#dungeon-map[data-art="legacy-8bit"] [data-terrain="desert-open"][data-player] {
+#dungeon-map[data-art="legacy-8bit"] [data-terrain$="-open"][data-player],
+#dungeon-map [data-terrain="winter-tundra-open"][data-player] {
   box-shadow: inset 0 0 0 3px #111a24;
 }
 #dungeon-map [data-loot-overlay]::after {

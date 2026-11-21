@@ -5,7 +5,7 @@ import { HERO_IDS } from '../content/constants';
 import { dungeonContent, DUNGEON_TEMPLATE } from '../content/dungeon';
 import type { ItemCatalog, ItemId, ItemOwnership } from '../content/itemTypes';
 import { generateMap, type GeneratedMap } from '../map/generate';
-import { applyBiome } from '../map/biomes';
+import { applyBiome, BIOMES } from '../map/biomes';
 import { DEFAULT_BEHAVIORS, stepMovement } from '../map/movement';
 import { canonical, hashJson } from './contentIdentity';
 import { hasShape, isDenseArray } from './validation';
@@ -16,7 +16,7 @@ import { resolveBattlefield, sameBattlefield, layoutSeed, type BattlefieldDescri
 import { createBattle } from './turns';
 import { readBattleState } from './battle';
 import type { BattleState } from './types';
-import { DUNGEON_ENCOUNTER_POLICY, LEGACY_ENCOUNTER_POLICY, dungeonBiome, legacyDungeonEncounter, selectDungeonEncounter, readDungeonEncounterSelection,
+import { DUNGEON_ENCOUNTER_POLICY, EXPANDED_ENCOUNTER_POLICY, LEGACY_ENCOUNTER_POLICY, dungeonBiome, legacyDungeonEncounter, selectDungeonEncounter, readDungeonEncounterSelection,
   encounterBattleCatalog, projectDungeonEnemies, type EncounterSelection, type DungeonEncounterPolicy } from './dungeonEncounters';
 import { readBattlefieldDescriptor } from './battlefield';
 import { encounterHpLimit } from './effects';
@@ -27,7 +27,7 @@ import { UINT32_RANGE } from './constants';
 
 export interface FloorDescriptor {
   readonly depth: number; readonly seed: number; readonly template: typeof DUNGEON_TEMPLATE;
-  readonly generator: 'rooms-v1' | 'sector-graph-v1' | 'arena-v1'; readonly size?: number; readonly biome: 'grassland-v1' | 'forest-v1' | 'desert-v1'; readonly mapHash: string;
+  readonly generator: 'rooms-v1' | 'sector-graph-v1' | 'arena-v1'; readonly size?: number; readonly biome: typeof BIOMES[number]['version']; readonly mapHash: string;
   readonly upstairs: number; readonly downstairs: number;
   readonly encounters: readonly { readonly selection: EncounterSelection; readonly battlefield: BattlefieldDescriptor | null }[];
 }
@@ -124,13 +124,13 @@ function floorGeometry(seed: number, depth: number, biome: FloorDescriptor['biom
 export function floorDescriptor(seed: number, depth: number, cache = new FloorCache(), policy: DungeonEncounterPolicy = DUNGEON_ENCOUNTER_POLICY): FloorDescriptor {
   const legacy = policy === LEGACY_ENCOUNTER_POLICY;
   const encounters = legacy ? legacyEncounterPlans(depth) : [0, 1, 2].map(slot => {
-    const selection = selectDungeonEncounter(seed, depth, slot);
+    const selection = selectDungeonEncounter(seed, depth, slot, policy);
     const resolved = resolveBattlefield(selection.encounter, dungeonSeed(seed, depth, 'battle', slot), encounterBattleCatalog(selection));
-    if (!resolved.ok) throw Error('Invalid dungeon encounter pairing');
+    if (!resolved.ok) throw Error(`Invalid dungeon encounter pairing ${selection.mapId}: ${resolved.errors.map(error => error.detail).join('; ')}`);
     rememberAdmission(admissionKey(dungeonSeed(seed, depth, 'battle', slot), selection, resolved.descriptor));
     return { selection, battlefield: resolved.descriptor };
   });
-  return { ...floorGeometry(seed, depth, legacy ? 'grassland-v1' : `${dungeonBiome(seed, depth)}-v1`, cache), encounters };
+  return { ...floorGeometry(seed, depth, legacy ? 'grassland-v1' : `${dungeonBiome(seed, depth, policy)}-v1`, cache), encounters };
 }
 /** Injectable uint32 draw so app entropy and tests share the same previous-seed collision rule. */
 export function newDungeonSeed(draw: () => number, previous?: number): number {
@@ -139,7 +139,7 @@ export function newDungeonSeed(draw: () => number, previous?: number): number {
 }
 export function freshDungeon(id: string, seed: number, encounterPolicy: DungeonEncounterPolicy = DUNGEON_ENCOUNTER_POLICY, tracking = false): DungeonState {
   if (!/^[A-Za-z0-9-]{1,64}$/.test(id) || !seedOk(seed)) throw new RangeError('Invalid dungeon identity');
-  if (encounterPolicy !== DUNGEON_ENCOUNTER_POLICY && encounterPolicy !== LEGACY_ENCOUNTER_POLICY) throw new RangeError('Invalid encounter policy');
+  if (encounterPolicy !== DUNGEON_ENCOUNTER_POLICY && encounterPolicy !== EXPANDED_ENCOUNTER_POLICY && encounterPolicy !== LEGACY_ENCOUNTER_POLICY) throw new RangeError('Invalid encounter policy');
   const descriptor = floorDescriptor(seed, 1, undefined, encounterPolicy);
   return { id, seed, encounterPolicy, revision: 0, depth: 1, floors: [{ descriptor, position: descriptor.upstairs, completed: 0, exploration: freshExploration(descriptor.seed, descriptor.upstairs, floorMap(descriptor)) }],
     party: HERO_IDS.map(heroId => progressHero(heroId, 0, dungeonContent.catalog.heroes[heroId].stats.maxHp, dungeonContent.catalog)),
@@ -220,7 +220,7 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
   const stats = tracked ? readRunStats(input.stats) : null;
   if (tracked && !stats) return fail('invalidState');
   const policy = input.encounterPolicy;
-  if (policy !== LEGACY_ENCOUNTER_POLICY && policy !== DUNGEON_ENCOUNTER_POLICY) return fail('invalidPolicy');
+  if (policy !== LEGACY_ENCOUNTER_POLICY && policy !== DUNGEON_ENCOUNTER_POLICY && policy !== EXPANDED_ENCOUNTER_POLICY) return fail('invalidPolicy');
   const floors: DungeonFloor[] = [];
   for (let i = 0; i < input.floors.length; i++) {
     const f = input.floors[i];
@@ -228,16 +228,20 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
     if (!hasShape(f, ['descriptor','position','completed','exploration', ...(looted ? ['loot'] : [])]) || !hasShape(f.descriptor, f.descriptor && typeof f.descriptor === 'object' && 'size' in f.descriptor ? ['depth','seed','template','generator','size','biome','mapHash','upstairs','downstairs','encounters'] : ['depth','seed','template','generator','biome','mapHash','upstairs','downstairs','encounters']) ||
       !safeCount(f.completed) || f.completed > 3 || !safeCount(f.position) || f.position >= (f.descriptor.size === undefined ? 400 : Number(f.descriptor.size) ** 2) ||
       f.descriptor.depth !== i + 1 || f.descriptor.seed !== dungeonSeed(input.seed, i + 1, 'floor') || f.descriptor.template !== DUNGEON_TEMPLATE ||
-      !(f.descriptor.generator === 'rooms-v1' && f.descriptor.size === undefined || (f.descriptor.generator === 'sector-graph-v1' || f.descriptor.generator === 'arena-v1') && f.descriptor.size === floorSize(i + 1)) || (policy === LEGACY_ENCOUNTER_POLICY ? f.descriptor.biome !== 'grassland-v1' : !['forest-v1', 'desert-v1'].includes(f.descriptor.biome as string)) || typeof f.descriptor.mapHash !== 'string' || !/^sha256:[a-f0-9]{64}$/.test(f.descriptor.mapHash) ||
+      !(f.descriptor.generator === 'rooms-v1' && f.descriptor.size === undefined || (f.descriptor.generator === 'sector-graph-v1' || f.descriptor.generator === 'arena-v1') && f.descriptor.size === floorSize(i + 1)) || typeof f.descriptor.mapHash !== 'string' || !/^sha256:[a-f0-9]{64}$/.test(f.descriptor.mapHash) ||
       !safeCount(f.descriptor.upstairs) || !safeCount(f.descriptor.downstairs) || f.descriptor.upstairs >= f.descriptor.downstairs || f.descriptor.downstairs >= (f.descriptor.size === undefined ? 400 : Number(f.descriptor.size) ** 2) ||
       (i < input.floors.length - 1 && f.completed !== 3)) return fail('invalidFloor');
+    const biomeVersion = f.descriptor.biome;
+    const biome = BIOMES.find(biome => biome.version === biomeVersion);
+    if (!biome || policy === LEGACY_ENCOUNTER_POLICY && biome.id !== 'grassland' ||
+      policy === DUNGEON_ENCOUNTER_POLICY && biome.id !== 'forest' && biome.id !== 'desert') return fail('invalidFloor');
     let descriptor: FloorDescriptor;
     {
       if (!isDenseArray(f.descriptor.encounters, 3) || f.descriptor.encounters.length !== 3) return fail('invalidSelection');
       const encounters: FloorDescriptor['encounters'][number][] = [];
       for (const [slot, plan] of f.descriptor.encounters.entries()) {
         if (!hasShape(plan, ['selection', 'battlefield'])) return fail('invalidSelection');
-        const selection = readDungeonEncounterSelection(plan.selection, i + 1, slot, f.descriptor.biome === 'forest-v1' ? 'forest' : f.descriptor.biome === 'desert-v1' ? 'desert' : 'grassland', policy);
+        const selection = readDungeonEncounterSelection(plan.selection, i + 1, slot, biome.id, policy);
         if (!selection) return fail('invalidSelection');
         if (plan.battlefield === null) {
           if (policy !== LEGACY_ENCOUNTER_POLICY) return fail('invalidSelection');
@@ -264,7 +268,7 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
         }
       }
       descriptor = { ...f.descriptor, encounters } as unknown as FloorDescriptor;
-      if (policy === DUNGEON_ENCOUNTER_POLICY && i > 0 && descriptor.biome === floors[i - 1].descriptor.biome) return fail('invalidBiomeProgression');
+      if (policy !== LEGACY_ENCOUNTER_POLICY && i > 0 && descriptor.biome === floors[i - 1].descriptor.biome) return fail('invalidBiomeProgression');
     }
     const exploration = readExploration(f.exploration, descriptor.seed, f.position, floorMap(descriptor));
     if (!exploration || exploration.version === 'exploration-v2' && exploration.cleared!.length !== f.completed) return fail('invalidExploration');
@@ -481,7 +485,7 @@ function moveDungeonEnemies(s: DungeonState, previousPlayer: number): DungeonSta
   const f = currentFloor(s), cleared = clearedDungeonSlots(f);
   if (cleared.length === 3) return s;
   const exploration = movableExploration(f.exploration, f.descriptor.seed, f.completed, s.phase);
-  const map = applyBiome(floorMap(f.descriptor), f.descriptor.biome === 'forest-v1' ? 'forest' : f.descriptor.biome === 'desert-v1' ? 'desert' : 'grassland');
+  const map = applyBiome(floorMap(f.descriptor), BIOMES.find(biome => biome.version === f.descriptor.biome)!.id);
   const player = {id:'player' as const,kind:'player' as const,x:f.position % map.width,y:Math.floor(f.position / map.width)};
   // A cardinal approach commits the encounter to contact range. Otherwise a
   // same-speed wanderer/pursuer can step diagonally away on every approach.
