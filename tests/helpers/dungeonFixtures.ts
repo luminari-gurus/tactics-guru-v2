@@ -382,14 +382,14 @@ export function selectMageJourney(range:readonly [number,number]=MAGE_JOURNEY_SE
 }
 
 /** Explicit level-three/position staging; this is not evidence of earned progression or exploration. */
-export function stagedMageAbility(abilityId:'ability:frost_snare'|'ability:magic_missile') {
+export function stagedMageAbility(abilityId:'ability:frost_snare'|'ability:magic_missile', targetSide:'enemy'|'player'='enemy') {
   const fresh=freshDungeon('mage-focused-ability',190),party=fresh.party.map(h=>{
     const hero=progressHero(h.heroId,180,h.hp,dungeonContent.catalog);return {...hero,hp:hero.maxHp};
   });
   const entry=checkedDungeon(startDungeonBattle(atEncounter({...fresh,party}))),built=dungeonBattle(entry)!;
   const catalog:ContentCatalog=built.catalog;
   const initial=entry.activeBattle!,mage=initial.units.find(u=>u.defId==='mage')!,map=catalog.maps[initial.mapId];
-  for(const target of initial.units.filter(u=>u.side==='enemy'))for(const cell of map.cells) {
+  for(const target of initial.units.filter(u=>u.side===targetSide&&u.id!==mage.id))for(const cell of map.cells) {
     if(!built.catalog.terrains[cell.terrainId].walkable||initial.units.some(u=>u.id!==mage.id&&u.cell.x===cell.x&&u.cell.y===cell.y))continue;
     const battle={...initial,activeIndex:initial.initiative.indexOf(mage.id),units:initial.units.map(u=>u.id===mage.id?{...u,cell:{x:cell.x,y:cell.y}}:u)};
     const command={type:'useAbility' as const,unitId:mage.id,abilityId,target:{unitId:target.id}};
