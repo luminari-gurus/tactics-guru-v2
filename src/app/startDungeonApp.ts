@@ -1,3 +1,4 @@
+import { EXPANDED_ENCOUNTER_POLICY } from '../domain/dungeonEncounters';
 import { testingProgress } from '../ui/testingProgress';
 import { consumeEntryIntent, routeHref } from './routes';
 import { appEntry } from './entry';
@@ -24,7 +25,7 @@ import type { ClassGuidanceRun } from '../ui/classGuidance';
 function newSeed(previous?: number) {
  return newDungeonSeed(()=>crypto.getRandomValues(new Uint32Array(1))[0],previous);
 }
-const storage=appEntry.persistent?createDungeonStorage():null,session=new DungeonSession(freshDungeon(crypto.randomUUID(),newSeed(),undefined,appEntry.persistent),storage,storage?new RunHistory('dungeon'):null,undefined,serializeBrowserDungeonWrite),cache=new FloorCache();
+const storage=appEntry.persistent?createDungeonStorage():null,session=new DungeonSession(freshDungeon(crypto.randomUUID(),newSeed(),appEntry.persistent ? EXPANDED_ENCOUNTER_POLICY : undefined,appEntry.persistent),storage,storage?new RunHistory('dungeon'):null,undefined,serializeBrowserDungeonWrite),cache=new FloorCache();
 let guidanceScope: { id: string; run: ClassGuidanceRun; persistent: boolean } | null = null;
 const stopGuidanceWatch = watchClassGuidancePreferences(reset => { if (reset) guidanceScope?.run.dismissed.clear(); });
 function guidanceForRun(id: string): ClassGuidanceRun {
