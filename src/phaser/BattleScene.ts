@@ -275,11 +275,17 @@ export class BattleScene extends Phaser.Scene {
         if(focused)document.querySelector<HTMLElement>('#fit-restart')?.focus();
       };
       const command=plan?.ability??intent;
-      if(skin==='radial' && command && friendlyFire(session,command)){
+      if(command && friendlyFire(session,command)){
+        const railTarget=skin==='rail'?hud.target:null;
+        const cancelFriendlyAction=()=>{
+          if(!railTarget){cancel();return;}
+          selection.selectCell(null);
+          refresh();
+        };
         dialogs.showChoices('Friendly fire?',selection.message,[
-          {id:'battle-friendly-cancel',label:'Cancel',run:()=>cancel()},
+          {id:'battle-friendly-cancel',label:'Cancel',run:cancelFriendlyAction},
           {id:'battle-friendly-confirm',label:'Confirm friendly action',run:accept},
-        ],()=>cancel());
+        ],cancelFriendlyAction,railTarget?{returnFocus:()=>railTarget}:{});
       }else accept();
     };
     const cancel=()=>{if(dialogs.open || session.phase!=='player')return;clear();refresh();hud.focusAction();};

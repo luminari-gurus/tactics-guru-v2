@@ -182,6 +182,54 @@ test('desktop Rail keeps target selection clickable with a prepared Frost Snare'
   expect((await readSession(page)).state).toEqual(fixture.state.activeBattle);
 });
 
+test('Rail Magic Missile requires explicit confirmation before damaging an ally',async({page,hasTouch})=>{
+  const fixture=stagedMageAbility('ability:magic_missile','player');
+  await seed(page,fixture.state);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const before=await readSession(page);
+  const ally=before.state.units.find(unit=>unit.id===fixture.command.target.unitId)!;
+  const value=`${ally.cell.x},${ally.cell.y}`;
+  const activate=(control:Locator)=>hasTouch?control.tap():control.click();
+  const ability=page.getByRole('button',{name:'Magic Missile',exact:true});
+  const picker=page.locator('#battle-target');
+  const review=page.getByRole('button',{name:'Confirm action',exact:true});
+  const dialog=page.getByRole('dialog',{name:'Friendly fire?'});
+  await activate(ability);
+  await expect(picker.locator(`option[value="${value}"]`)).toContainText(' · Ally');
+
+  const reviewShot=async()=>{
+    await picker.selectOption(value);
+    await expect(dialog).toBeHidden();
+    expect((await readSession(page)).state).toEqual(before.state);
+    if(hasTouch)await review.tap();else await review.press('Enter');
+    await expect(dialog).toBeVisible();
+    await expect(dialog).toHaveAccessibleDescription(new RegExp(`${ally.defId} #${ally.id}`));
+    await expect(dialog.getByRole('button',{name:'Cancel',exact:true})).toBeFocused();
+    expect((await readSession(page)).state).toEqual(before.state);
+  };
+  for(const dismiss of ['button','escape']) {
+    await reviewShot();
+    if(dismiss==='button')await activate(dialog.getByRole('button',{name:'Cancel',exact:true}));
+    else await page.keyboard.press('Escape');
+    await expect(dialog).toBeHidden();
+    await expect(picker).toHaveValue('');
+    await expect(picker).toBeFocused();
+    await expect(ability).toHaveAttribute('aria-pressed','true');
+    await expect(review).toBeDisabled();
+    expect(await readSession(page)).toEqual(before);
+  }
+
+  await reviewShot();
+  await activate(dialog.getByRole('button',{name:'Confirm friendly action',exact:true}));
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const after=await readSession(page);
+  const expected=dispatch(before.state,fixture.command,dungeonBattle(fixture.state)!.catalog);
+  if(!expected.ok)throw Error(expected.reason);
+  expect(after.state.commandCount).toBe(before.state.commandCount+1);
+  expect(after.state).toEqual(expected.state);
+  expect(after.events).toEqual(expected.events);
+});
+
 for(const abilityId of ['ability:frost_snare','ability:magic_missile'] as const)test(`staged Mage ${abilityId} accepts exact effects replay and saved active reload`,async({page})=>{
  // The level/position boundary is deliberately staged. The extended journey alone proves earned XP.
  const fixture=stagedMageAbility(abilityId),catalog=dungeonBattle(fixture.state)!.catalog;
