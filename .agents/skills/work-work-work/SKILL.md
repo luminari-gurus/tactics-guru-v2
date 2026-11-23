@@ -1,6 +1,6 @@
 ---
 name: work-work-work
-description: Refresh backlog readiness, select the best ready-for-work GitHub issue, assign the caller, publish a branch, prepare a proportional plan, wait for approval, then implement and open a PR. Use when the user invokes /work-work-work or asks to pick up the next ready backlog issue.
+description: Pick up the next ready Tactics Guru issue, pick up a named issue, or continue an established issue workflow. Check readiness, claim and publish the branch, obtain plan approval, then implement and open a PR. Use for /work-work-work, $work-work-work, or the corresponding issue pickup and continuation requests.
 ---
 
 # Work work work
@@ -10,23 +10,46 @@ issue assignment, branch publication, and PR creation. Implementation requires
 explicit approval of the concrete implementation plan. Creating this skill or
 discussing it does not invoke the workflow.
 
-## Select and claim
+## Resolve the request
 
-1. Read repository instructions and inspect Git status/remotes. Resolve the
-   repository and default branch with `gh repo view --json nameWithOwner,defaultBranchRef`.
-   Resolve the caller with `gh api user --jq .login`, unless the user explicitly
-   identifies a different GitHub login. Do not guess the caller from Git author settings.
-   Read only `CAN_TEST_MOBILE` from the developer's local `.env`, using the value
-   contract in `.env.example`; never print or copy unrelated environment values.
-   It describes access to physical devices, not emulation or proven test results.
-   Parse case-insensitively with surrounding whitespace/quotes removed and
-   comma-separated platform names trimmed. `none` means no mobile platforms;
-   `ios` and `android` name individual platforms; `all` means both. `none`/`all`
-   must be used alone. Treat a missing, empty, unknown or conflicting value as
-   `none` and report that limitation; the example file is not local availability.
-   When using an isolated worktree, retain the capability value from the caller's
-   checkout without copying the rest of `.env` or committing local configuration.
-2. **Refresh backlog readiness before selecting any issue.** Build one inventory
+- **Next ready issue** or a bare invocation: run the backlog selection below.
+- **Pick up #N**: fetch that issue, its dependencies and related active work.
+  Apply the same readiness, device and ownership checks to it directly. If it
+  lacks the ready label but meets the promotion rules, verify and promote only
+  that issue. Report the specific blocker if it cannot be picked up.
+- **Continue or retry**: recover the issue, caller, branch and plan from the
+  task conversation, persisted task context and verified remote state. Recover
+  the explicit approval of that exact plan separately. If assignment or branch
+  publication was interrupted, resume that step. If there is no plan yet, prepare
+  one after confirming publication. If approval is pending or cannot be verified,
+  present the recovered plan for approval. If the approved scope was completed
+  and the caller requests the next increment, reuse the issue, check the previous
+  increment's merge state and dependencies, and plan the next increment for
+  approval. Start a fresh branch from the default branch when the prior branch
+  was merged. If the prior task
+  identity is ambiguous, ask which issue or branch to resume.
+
+Read repository instructions and inspect Git status/remotes. Resolve the repository
+and default branch with `gh repo view --json nameWithOwner,defaultBranchRef`.
+Resolve the caller with `gh api user --jq .login`, unless the user names another
+GitHub login. Use GitHub identity for ownership checks.
+
+### Device testing
+
+Apply AGENTS.md's standing browser/device emulation policy. Only when the caller
+explicitly requires physical-device testing, read `CAN_TEST_MOBILE` from the
+caller's local `.env` and use the contract in `.env.example`. Read only that
+variable, including when using an isolated worktree. Strip surrounding whitespace
+and quotes, normalize case and trim comma-separated platforms. `ios` and
+`android` name individual platforms. `all` means both and `none` means neither.
+Use `all` and `none` alone. Treat missing, empty, unknown or conflicting values
+as `none`. Report missing required platforms without changing global readiness.
+Record requested and available platforms in the plan only for an explicit
+physical-device request. Availability is separate from completed testing.
+
+## Select the next ready issue
+
+1. **Refresh backlog readiness before selecting any issue.** Build one inventory
    of all open issues and open PRs using `gh api --paginate` or limits verified
    to include every result. Include issue bodies, labels and assignees, including
    unlabeled issues. Index PRs by their linked issues and head branches. Inspect
@@ -47,44 +70,57 @@ discussing it does not invoke the workflow.
    successful only if that read confirms the label. Record the issue link and
    readiness evidence, or report the gap or failed write.
 
-3. Rank candidates from the updated inventory without another bulk backlog read.
+2. Rank candidates from the updated inventory without another bulk backlog read.
    Candidates must carry the exact `ready for work` label and satisfy the
    readiness criteria above. Exclude work assigned to others, covered by an
-   active branch/PR, or already in progress for this caller. Apply AGENTS.md's
-   standing device instruction: browser/device emulation is sufficient unless
-   the caller explicitly requires physical testing. For an explicit request,
-   check the requested `CAN_TEST_MOBILE` platforms and report missing access
-   without changing global readiness.
+   active branch/PR, or already in progress for this caller. Apply the
+   device testing rules above.
 
-4. Prefer issues that unblock the most actionable downstream work, then critical
+3. Prefer issues that unblock the most actionable downstream work, then critical
    path/release priority, then a clearly scoped and verifiable implementation.
    Use transitive dependencies when evidenced; do not invent links. Break equal
    choices by oldest issue number. Briefly explain the selection using issue
    links and concrete dependencies. If no eligible issue remains, report that
    and stop without assignment or branch creation.
-5. Check live eligibility for the selected issue immediately before claiming,
-   including the label, status, assignments, dependencies and active work. If it
-   has become ineligible, skip it and try the next ranked candidate without
-   repeating the bulk backlog read. Assign with `gh issue edit <number> --add-assignee <login>`
-   and verify the assignment. If it was claimed by someone else, reselect.
-   Preserve labels and existing assignees; do not close the issue.
-   Recheck device eligibility before assignment and record the available and
-   required platforms in the plan.
 
-## Publish the work branch
+## Claim the issue and publish the branch
 
-Fetch the default branch. Create a clean single-task branch from its current
-remote tip named `work/issue-<number>-<short-slug>`. Preserve all existing local
-changes and commits; use an isolated worktree when the current checkout is dirty
-or hosts other work. Follow the host's worktree lifecycle if available.
+Immediately before claiming, check live eligibility, including the label, status,
+assignments, dependencies and active work. For backlog selection, skip a candidate
+that has become ineligible and try the next ranked candidate from the inventory.
+For a named issue or continuation, report the blocker for that issue.
 
-Check local/remote branches before creation. Resume an existing branch only after
-verifying it belongs to this issue/caller and has no active PR or unrelated work;
-otherwise use a unique suffix. Publish immediately with
-`git push --set-upstream origin <branch>`, even before the plan exists. Never
-force-push. Confirm the remote branch and record the issue, caller, base and branch
-in the plan. If assignment or publishing fails, report the actual partial state
-and stop before implementation; do not claim publication succeeded.
+Record the repository, issue, caller and intended branch name in the task context
+before mutating GitHub. Reuse that record on retries. Assign with
+`gh issue edit <number> --repo <owner/repo> --add-assignee <login>` if the issue
+is unassigned. Reread the issue after the write and require the caller to be the
+sole assignee before publishing. If the reread finds another assignee alongside
+the caller, preserve both assignments and stop before publishing. On continuation,
+verify the existing sole assignment and distinguish the caller's own resumed work
+from a separate task on the same issue.
+
+Fetch the default branch. Start new work from its current remote tip using a clean
+single-task branch named `work/issue-<number>-<short-slug>`. Preserve existing
+local changes and commits. Use an isolated worktree when the checkout is dirty or
+hosts other work, following the host's worktree lifecycle where available.
+
+Check local and remote branches against the recorded claim before creating or
+publishing a branch. Confirm matching ownership from task context or associated
+GitHub work and verify the branch belongs to this issue. If a matching remote
+branch exists and contains the intended head, reuse it and confirm its remote
+ref. If the branch has an active PR for this task, resume that PR when directed
+to continue it. If the recorded branch is local only, retry publishing it with
+`git push --set-upstream origin <branch>`. If neither ref exists after an
+interrupted initial publication, recreate the recorded name. For a new task,
+use a suffix only after establishing that an existing branch belongs to separate
+work and the issue is otherwise eligible. If the branch identity or divergence
+cannot be resolved, report the conflict. Never force-push.
+
+Record the exact branch name and intended head before pushing. Publish the branch
+as soon as it is prepared, before planning, and verify the remote ref.
+Record the issue, caller, base and verified branch in the plan. If assignment or
+publication fails, state what succeeded and what failed. Stop before implementation
+and retry the same claim when the caller asks to continue.
 
 ## Choose the planning scope
 
