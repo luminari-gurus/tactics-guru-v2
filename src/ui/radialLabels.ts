@@ -27,16 +27,16 @@ export function fontSizeToFit(overflows: (px: number) => boolean, minPx = RADIAL
 
 function singleLineOverflows(node: HTMLElement, maxPx: number): boolean {
   node.style.whiteSpace = 'nowrap';
-  if (!node.clientWidth) return false;
+  if (!node.getBoundingClientRect().width) return false;
   const text = document.createRange();
   text.selectNodeContents(node);
+  const overflows = () => text.getBoundingClientRect().width > node.getBoundingClientRect().width;
   const size = fontSizeToFit(px => {
     node.style.fontSize = `${px}px`;
-    // scrollWidth is integer-rounded and can miss subpixel clipping/ellipsis.
-    return text.getBoundingClientRect().width > node.clientWidth - 1;
+    return overflows();
   }, RADIAL_LABEL_MIN_PX, maxPx);
   node.style.fontSize = `${size}px`;
-  return text.getBoundingClientRect().width > node.getBoundingClientRect().width;
+  return overflows();
 }
 
 /** Fit one line where possible. Wrap long titles and drop overflowing secondary copy. */

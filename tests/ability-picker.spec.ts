@@ -20,6 +20,61 @@ const learnedControls={
   mage:[['frost_snare','Frost Snare'],['magic_missile','Magic Missile']],
 } as const;
 
+for (const { hero, name, query } of [
+  { hero: 'mage', name: 'Magic Missile', query: '' },
+  { hero: 'fighter', name: 'Guarded Strike', query: '&xp=180' },
+] as const) {
+  test(`radial fits ${name} in the main slice and hub`, async ({ page, isMobile }) => {
+    if (!isMobile) await page.setViewportSize({ width: 1280, height: 800 });
+    await page.addInitScript(() => {
+      (globalThis as { __tacticsGuruCombatControls?: string }).__tacticsGuruCombatControls = 'radial';
+    });
+    await abilityReady(page, `/tests/fixtures/abilities/index.html?hero=${hero}&real${query}`);
+    const before = (await readSession(page)).state;
+    if (hero === 'mage') {
+      const destination = { x: 0, y: 1 };
+      await tapBoard(page, destination);
+      const plan = page.locator('#battle-radial-plan');
+      if (isMobile) await plan.tap();
+      else await plan.click();
+      await tapBoard(page, destination);
+    } else {
+      await tapBoard(page, { x: 1, y: 0 });
+    }
+
+    const special = page.locator('#battle-radial-special');
+    const hub = page.locator('#battle-radial-hub');
+    await expect(special).toBeEnabled();
+    await special.focus();
+    for (const label of [special.locator('strong'), hub.locator('strong')]) {
+      await expect(label).toHaveText(name);
+      await expect(label).toHaveCSS('white-space', 'nowrap');
+      const bounds = await label.evaluate(element => {
+        const range = document.createRange();
+        range.selectNodeContents(element);
+        const text = range.getBoundingClientRect();
+        const box = element.getBoundingClientRect();
+        return {
+          lines: range.getClientRects().length,
+          fits: text.left >= box.left && text.right <= box.right,
+          fontSize: parseFloat(getComputedStyle(element).fontSize),
+        };
+      });
+      expect(bounds).toMatchObject({ lines: 1, fits: true });
+      expect(bounds.fontSize).toBeGreaterThanOrEqual(10);
+    }
+    const sliceBox = (await special.boundingBox())!;
+    const hubBox = (await hub.boundingBox())!;
+    expect(sliceBox.width).toBeGreaterThanOrEqual(44);
+    expect(sliceBox.height).toBeGreaterThanOrEqual(44);
+    expect(sliceBox.x).toBeGreaterThanOrEqual(hubBox.x + hubBox.width);
+
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#battle-radial')).toBeHidden();
+    expect((await readSession(page)).state).toEqual(before);
+  });
+}
+
 test('review356 radial Tab review matches the ability actually confirmed',async({page})=>{
   await page.addInitScript(()=>{(globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls='radial';});
   await abilityReady(page,'/tests/fixtures/abilities/index.html?hero=mage&xp=180&real');
