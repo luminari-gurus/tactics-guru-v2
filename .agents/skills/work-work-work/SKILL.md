@@ -26,48 +26,46 @@ discussing it does not invoke the workflow.
    `none` and report that limitation; the example file is not local availability.
    When using an isolated worktree, retain the capability value from the caller's
    checkout without copying the rest of `.env` or committing local configuration.
-2. **Refresh backlog readiness before selecting any issue.** Read the entire
-   open backlog with pagination (`gh api --paginate` or a limit verified to
-   include all results), including bodies, labels and assignees. Do not filter
-   the initial scan to issues already labeled `ready for work`: check new and
-   previously unready issues for newly satisfied prerequisites. Inspect relevant
-   comments, GitHub dependency relationships, merged work on the default branch,
-   and active branches/open PRs. Never treat a parent/epic reference as a blocker.
+2. **Refresh backlog readiness before selecting any issue.** Build one inventory
+   of all open issues and open PRs using `gh api --paginate` or limits verified
+   to include every result. Include issue bodies, labels and assignees, including
+   unlabeled issues. Index PRs by their linked issues and head branches. Inspect
+   relevant comments, GitHub dependency relationships, active branches, and merged
+   work on the default branch. Cache evidence for shared prerequisites and merge
+   checks within this invocation. A parent/epic reference alone is not a blocker.
    An unmerged prerequisite PR is not a completed prerequisite.
 
-   Promote an issue only when its implementation scope and acceptance criteria
-   are concrete and verifiable, every actual prerequisite is complete, and no
-   unresolved product decision or blocker remains. Do not relabel another
-   person's assigned work or issues already covered by an active branch/PR.
-   Re-read each proposed promotion immediately before updating it to catch
-   changed status, assignments, dependencies or ongoing work. Add only the exact
+   Promote an issue only when the scope and acceptance criteria are concrete and
+   verifiable, actual prerequisites are complete, and no product decision or blocker
+   remains. Leave another person's assigned work and issues with active branches
+   or PRs unchanged. Immediately before each promotion, check live issue status,
+   assignments, dependencies and active work for that issue. Add only the exact
    `ready for work` label with
-   `gh issue edit <number> --repo <owner/repo> --add-label "ready for work"`;
-   preserve all existing labels/assignees and do not close issues. Read back the
-   exact issue to verify the label, and record the issue link plus evidence for
-   its readiness. If evidence is incomplete, leave it unchanged and report the
-   gap rather than guessing or broadening scope. If the label/update cannot be
-   performed, report the blocker; do not claim promotion succeeded.
-3. Refresh the backlog after the readiness pass so newly promoted issues compete
-   with existing ready issues. Candidates must have the exact `ready for work`
-   label; a label alone is insufficient. Recheck prerequisites against merged
-   work on the default branch. Exclude blocked issues, unresolved prerequisites,
-   issues assigned to other people, and work already covered by an active
-   branch/PR or this caller's ongoing task.
-   Apply AGENTS.md's standing device instruction: browser/device emulation is
-   sufficient unless the caller explicitly requests physical devices for this
-   task. Legacy hardware-only issue wording does not create an eligibility gate.
-   Only for an explicit physical-device request, require the corresponding
-   `CAN_TEST_MOBILE` platforms; report missing access without relabeling global
-   readiness. Available hardware is not proof of completed testing.
+   `gh issue edit <number> --repo <owner/repo> --add-label "ready for work"`.
+   Preserve existing labels and assignees. Reread the issue after the write and
+   replace its inventory entry with the returned state. Treat the promotion as
+   successful only if that read confirms the label. Record the issue link and
+   readiness evidence, or report the gap or failed write.
+
+3. Rank candidates from the updated inventory without another bulk backlog read.
+   Candidates must carry the exact `ready for work` label and satisfy the
+   readiness criteria above. Exclude work assigned to others, covered by an
+   active branch/PR, or already in progress for this caller. Apply AGENTS.md's
+   standing device instruction: browser/device emulation is sufficient unless
+   the caller explicitly requires physical testing. For an explicit request,
+   check the requested `CAN_TEST_MOBILE` platforms and report missing access
+   without changing global readiness.
+
 4. Prefer issues that unblock the most actionable downstream work, then critical
    path/release priority, then a clearly scoped and verifiable implementation.
    Use transitive dependencies when evidenced; do not invent links. Break equal
    choices by oldest issue number. Briefly explain the selection using issue
    links and concrete dependencies. If no eligible issue remains, report that
    and stop without assignment or branch creation.
-5. Re-read the selected issue immediately before claiming to catch changed
-   assignments/status. Assign with `gh issue edit <number> --add-assignee <login>`
+5. Check live eligibility for the selected issue immediately before claiming,
+   including the label, status, assignments, dependencies and active work. If it
+   has become ineligible, skip it and try the next ranked candidate without
+   repeating the bulk backlog read. Assign with `gh issue edit <number> --add-assignee <login>`
    and verify the assignment. If it was claimed by someone else, reselect.
    Preserve labels and existing assignees; do not close the issue.
    Recheck device eligibility before assignment and record the available and
