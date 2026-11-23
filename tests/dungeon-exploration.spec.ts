@@ -27,6 +27,7 @@ import { AUTO_COLLECT_LOOT_KEY } from '../src/ui/autoCollectLootPreference';
 import { dungeonMovementGeometry, expectDungeonMovementVisible } from './helpers/dungeonLayout';
 
 const fixedSeedTest = test.extend({ pinDungeonSeed: 28 });
+const desertSeedTest = test.extend({ pinDungeonSeed: 16 });
 test.beforeEach(async ({ context }) => { await installRailControls(context); });
 
 async function loadGroundLootBoundary(page: Page, state: DungeonState) {
@@ -688,6 +689,23 @@ fixedSeedTest('map shortcuts work on entry and outside the map without taking ov
  await expect(restart).toBeFocused();
 });
 
+desertSeedTest('Desert 8-bit dungeon markers have a dark edge over sand', async ({ page }) => {
+  await page.goto('./?game=dungeon&entry=new');
+  const grid = page.locator('#dungeon-map');
+  const player = grid.locator('[data-player]');
+  const encounter = grid.locator('[data-poi]').filter({ hasText: /^M$/ });
+  await expect(player).toHaveText('●');
+  await expect(encounter).toHaveCount(1);
+  await page.getByRole('combobox', { name: 'Map art', exact: true }).selectOption('legacy-8bit');
+  await expect(grid).toHaveAttribute('data-art', 'legacy-8bit');
+  for (const marker of [player, encounter]) {
+    await expect(marker).toHaveAttribute('data-terrain', 'desert-open');
+    await expect(marker).toHaveCSS('background-image', /\/desert-open\.png/);
+    await expect(marker).toHaveCSS('text-shadow', /rgb\(17, 26, 36\)/);
+  }
+  await expect(player).toHaveCSS('box-shadow', /rgb\(17, 26, 36\).*inset/);
+});
+
 fixedSeedTest('real traversal, art independence, keyboard locks, active battle and exact reload',async({page,isMobile})=>{
  test.setTimeout(120000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  // Qualify input/art/reload on a traversable witness, independently of fresh entropy.
@@ -702,7 +720,7 @@ fixedSeedTest('real traversal, art independence, keyboard locks, active battle a
  await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.keyboard.press('ArrowDown');expectSameProgress(await dungeonSnapshot(page), after);await page.locator('#dungeon-cancel-new').click();
  await page.locator('#dungeon-map').evaluate(n=>n.dataset.identity='retained');
  await page.getByRole('combobox',{name:'Map art',exact:true}).selectOption('legacy-8bit');await expect(page.locator('#dungeon-map')).toHaveAttribute('data-art','legacy-8bit');
- if(f.descriptor.biome==='desert-v1')await expect(page.locator('#dungeon-map-feedback')).toContainText('fallback');else await expect(page.locator('#dungeon-map-feedback')).not.toContainText('fallback');expectSameProgress(await dungeonSnapshot(page), after);
+ await expect(page.locator('#dungeon-map-feedback')).not.toContainText('fallback');expectSameProgress(await dungeonSnapshot(page), after);
  await page.getByRole('combobox',{name:'Map art',exact:true}).selectOption('simple');expectSameProgress(await dungeonSnapshot(page), after);
  await expect(page.locator('#dungeon-map')).toHaveAttribute('data-identity','retained');
  await expect.poll(()=>page.locator('.dungeon-directions button').evaluateAll(nodes=>nodes.length===4&&nodes.every(n=>{const b=n.getBoundingClientRect();return b.width>=44&&b.height>=44;}))).toBe(true);

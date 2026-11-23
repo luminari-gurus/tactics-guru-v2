@@ -466,7 +466,8 @@ export class BattleHud {
       const preview=command && (planMove && command.type==='useAbility'
         ? previewTacticalPlan(s.state,planMove,command,s.catalog) : s.preview(command));
       const reason=preview && !preview.ok ? ` · ${previewText(preview)}` : '';
-      options.push({cell:u.cell,label:`${unitLabel(s,u)}${reason}`});
+      const ally=u.side===actor.side && u.id!==actor.id ? ' · Ally' : '';
+      options.push({cell:u.cell,label:`${unitLabel(s,u)}${ally}${reason}`});
     }
     const selectedValue=selected?`${selected.x},${selected.y}`:'';
     const targetOptions=options.map(o=>new Option(o.label,`${o.cell.x},${o.cell.y}`));

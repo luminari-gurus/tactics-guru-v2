@@ -1,3 +1,4 @@
+import { EXPANDED_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
 import { dungeonContent } from '../src/content/dungeon';
 import { walkDungeon, acceptedDungeonSnapshot, settledDungeonSnapshot, expectSameProgress, reenterDungeonStair, expectDungeonResumed, openDungeonInventory, collectDungeonEncounterLoot } from './helpers/dungeonTraversal';
 import { atEncounter, atStairApproach, checkedDungeon, hobgoblinDungeonBoundary, stagedMageAbility, snaredDefeatBoundary } from './helpers/dungeonFixtures';
@@ -24,6 +25,9 @@ import { expectDungeonMovementVisible } from './helpers/dungeonLayout';
 import { BattleSession } from '../src/app/BattleSession';
 
 const fixedSeedTest = test.extend({ pinDungeonSeed: 28 });
+// Fresh saved runs avoid the initial dormant seed. Seed 5 clears Wetlands with the Fighter policy.
+const savedWetlandsSeed = 5;
+const savedWetlandsTest = test.extend({ pinDungeonSeed: savedWetlandsSeed - 1 });
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
 const boardReport=async(page:Page)=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
 async function setJourneyAutoCollect(page:Page,enabled:boolean,touch:boolean) {
@@ -182,6 +186,54 @@ test('desktop Rail keeps target selection clickable with a prepared Frost Snare'
   expect((await readSession(page)).state).toEqual(fixture.state.activeBattle);
 });
 
+test('Rail Magic Missile requires explicit confirmation before damaging an ally',async({page,hasTouch})=>{
+  const fixture=stagedMageAbility('ability:magic_missile','player');
+  await seed(page,fixture.state);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const before=await readSession(page);
+  const ally=before.state.units.find(unit=>unit.id===fixture.command.target.unitId)!;
+  const value=`${ally.cell.x},${ally.cell.y}`;
+  const activate=(control:Locator)=>hasTouch?control.tap():control.click();
+  const ability=page.getByRole('button',{name:'Magic Missile',exact:true});
+  const picker=page.locator('#battle-target');
+  const review=page.getByRole('button',{name:'Confirm action',exact:true});
+  const dialog=page.getByRole('dialog',{name:'Friendly fire?'});
+  await activate(ability);
+  await expect(picker.locator(`option[value="${value}"]`)).toContainText(' · Ally');
+
+  const reviewShot=async()=>{
+    await picker.selectOption(value);
+    await expect(dialog).toBeHidden();
+    expect((await readSession(page)).state).toEqual(before.state);
+    if(hasTouch)await review.tap();else await review.press('Enter');
+    await expect(dialog).toBeVisible();
+    await expect(dialog).toHaveAccessibleDescription(new RegExp(`${ally.defId} #${ally.id}`));
+    await expect(dialog.getByRole('button',{name:'Cancel',exact:true})).toBeFocused();
+    expect((await readSession(page)).state).toEqual(before.state);
+  };
+  for(const dismiss of ['button','escape']) {
+    await reviewShot();
+    if(dismiss==='button')await activate(dialog.getByRole('button',{name:'Cancel',exact:true}));
+    else await page.keyboard.press('Escape');
+    await expect(dialog).toBeHidden();
+    await expect(picker).toHaveValue('');
+    await expect(picker).toBeFocused();
+    await expect(ability).toHaveAttribute('aria-pressed','true');
+    await expect(review).toBeDisabled();
+    expect(await readSession(page)).toEqual(before);
+  }
+
+  await reviewShot();
+  await activate(dialog.getByRole('button',{name:'Confirm friendly action',exact:true}));
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  const after=await readSession(page);
+  const expected=dispatch(before.state,fixture.command,dungeonBattle(fixture.state)!.catalog);
+  if(!expected.ok)throw Error(expected.reason);
+  expect(after.state.commandCount).toBe(before.state.commandCount+1);
+  expect(after.state).toEqual(expected.state);
+  expect(after.events).toEqual(expected.events);
+});
+
 for(const abilityId of ['ability:frost_snare','ability:magic_missile'] as const)test(`staged Mage ${abilityId} accepts exact effects replay and saved active reload`,async({page})=>{
  // The level/position boundary is deliberately staged. The extended journey alone proves earned XP.
  const fixture=stagedMageAbility(abilityId),catalog=dungeonBattle(fixture.state)!.catalog;
@@ -315,13 +367,11 @@ test('Snared badge excludes a legally Pinned enemy on saved resume',async({page}
  expect((await boardReport(page)).units.every((u:any)=>!u.snare.visible)).toBe(true);
 });
 
-// Saved New Game avoids its initial dormant seed; draw 27 so the playable seed
-// is 28, matching the existing complete legal first-floor witness.
 for(const {saved,autoCollect,title} of [
  {saved:false,autoCollect:false,title:'testing dungeon legally clears a floor, descends and backtracks without accessing saves'},
  {saved:true,autoCollect:false,title:'saved menu dungeon keeps proof tools hidden across legal encounters'},
  {saved:true,autoCollect:true,title:'saved menu dungeon auto-collects loot across a complete first floor'},
-])(saved?test.extend({pinDungeonSeed:27}):fixedSeedTest)(title,async({page,isMobile})=>{
+])(saved?savedWetlandsTest:fixedSeedTest)(title,async({page,isMobile})=>{
  test.setTimeout(300000); // Three complete battles plus normal exploration and stair input.
  // Reuse the complete first floor of the existing legal Fighter journey.
  const errors:string[]=[];let taunted=false;const lootJourney:unknown[]=[];page.on('pageerror',error=>errors.push(error.message));
@@ -336,7 +386,7 @@ for(const {saved,autoCollect,title} of [
  if(saved){await setJourneyAutoCollect(page,autoCollect,isMobile);await page.getByRole('button',{name:'New Game',exact:true}).click();}
  else await page.goto('./dungeon');
  await expect(page.locator('#dungeon-map')).toBeVisible();
- expect((await snapshot(page)).seed).toBe(28);
+ expect((await snapshot(page)).seed).toBe(saved ? savedWetlandsSeed : 28);
  expect((await snapshot(page)).stats).toEqual(saved?expect.objectContaining({coverage:'whole-run',movesTaken:0,enemiesKilled:0}):undefined);
  let expectedKills=0;
  for(let slot=0;slot<3;slot++){
@@ -442,8 +492,7 @@ for(const {saved,autoCollect,title} of [
  expect(errors).toEqual([]);
 });
 
-// Use the same legal New Game seed as the complete saved first-floor journey above.
-test.extend({pinDungeonSeed:27})('saved dungeon downloads only after explicit recovery export',async({page,isMobile})=>{
+savedWetlandsTest('saved dungeon downloads only after explicit recovery export',async({page,isMobile})=>{
  test.setTimeout(120000);
  // Playtime checkpoints write saves when recovery opens or the page reloads.
  // Disable time accrual here so exact byte checks isolate export behavior.
@@ -457,7 +506,7 @@ test.extend({pinDungeonSeed:27})('saved dungeon downloads only after explicit re
  await test.step('ordinary exploration, accepted movement and an enemy turn never download',async()=>{
   await page.goto('./');await activate(page.getByRole('button',{name:'New Game',exact:true}));
   await expect(page.locator('#dungeon-map')).toBeVisible();
-  expect((await snapshot(page)).seed).toBe(28);
+  expect((await snapshot(page)).seed).toBe(savedWetlandsSeed);
   await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const before=await readSession(page),actor=before.state.initiative[before.state.activeIndex];
@@ -782,7 +831,7 @@ fixedSeedTest('dungeon battle undo survives reload and a legal defeat journey',a
  await expect(page.getByRole('heading',{name:/Dungeon · Floor 1/})).toBeVisible();
  expect(await historyRows(page)).toEqual(recorded);
 });
-fixedSeedTest('read-only entry, keyboard new dungeon, real action and active resume',async({page,isMobile})=>{
+savedWetlandsTest('read-only entry, keyboard new dungeon, real action and active resume',async({page,isMobile})=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  await page.addInitScript(()=>{
   // Record mounts, including nodes inserted and removed before Playwright can poll.
@@ -809,12 +858,16 @@ fixedSeedTest('read-only entry, keyboard new dungeon, real action and active res
  await newGame.focus();await page.keyboard.press('Enter');
  await expect(map).toBeVisible();
  const exploration=await snapshot(page);
+ expect(exploration.encounterPolicy).toBe(EXPANDED_ENCOUNTER_POLICY);
+ await expect(map).toHaveAttribute('data-biome', 'wetlands');
  await page.getByRole('link',{name:'Main menu',exact:true}).click();
  await expect(menu).toBeVisible();await expect(resume).toBeEnabled();
  expect(await mounts()).toEqual([]);
  await page.goto('./?game=dungeon');
  await expect(map).toBeVisible();
  expectSameProgress(await snapshot(page),exploration);
+ await page.locator('#dungeon-art').selectOption('legacy-8bit');
+ await expect(map.locator('[data-player]')).toHaveCSS('background-image', /wetlands-open\.png/);
  await expect(page.locator('#dungeon-descend')).toHaveCount(0);await expect(page.locator('#dungeon-ascend')).toHaveCount(0);
  const frame=await page.locator('#dungeon-screen').boundingBox();expect(frame!.y).toBe(0);expect(frame!.height).toBe(page.viewportSize()!.height);
  expect(await page.locator('#dungeon-screen').evaluate(n=>n.scrollWidth<=n.clientWidth)).toBe(true);
@@ -823,6 +876,10 @@ fixedSeedTest('read-only entry, keyboard new dungeon, real action and active res
  await expect(game).toHaveAttribute('data-phase','player');
  expect(await mounts()).not.toContain('continuation');
  const shortcutEntry=await snapshot(page);
+ const selection = dungeonBattle(shortcutEntry)!.selection;
+ expect(selection).toMatchObject({ biome: 'wetlands', policy: EXPANDED_ENCOUNTER_POLICY });
+ const foes = selection.encounter.roster.filter(spawn => spawn.side === 'enemies').map(spawn => spawn.unitId);
+ expect(shortcutEntry.activeBattle!.units.filter(unit => unit.side === 'enemy').map(unit => unit.defId)).toEqual(foes);
  await page.locator('canvas').focus();await page.keyboard.press('a');
  await expect(page.locator('[data-action=basic]')).toHaveAttribute('aria-pressed','true');
  await page.keyboard.press('m');await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');

@@ -197,10 +197,10 @@ export function shamanJourney(seed = 31) {
 
 /** Full Fighter acceptance witness; source-backed encounters may require a new deterministic seed. */
 export const FIGHTER_JOURNEY_SEED = 64;
-export function fighterJourney(seed:number) {
-  let state=freshDungeon('fighter-production-journey',seed),healed=false,taunted=false;
+export function fighterJourney(seed:number, policy: DungeonEncounterPolicy = DUNGEON_ENCOUNTER_POLICY, floorCount = 2) {
+  let state=freshDungeon('fighter-production-journey',seed,policy),healed=false,taunted=false;
   const records:{entry:DungeonState;state:import('../../src/domain/types').BattleState;commands:readonly Command[];events:readonly import('../../src/domain/types').BattleEvent[]}[]=[];
-  for(let depth=1;depth<=2;depth++) {
+  for(let depth=1;depth<=floorCount;depth++) {
     for(let slot=0;slot<3;slot++) {
       state=walkWitness(state);
       const entry=state,built=dungeonBattle(state)!,battle=new BattleSession(built.catalog,state.activeBattle!,state.activeBattle!.seed,undefined,true,built.battlefield);
@@ -218,9 +218,9 @@ export function fighterJourney(seed:number) {
       state=collectEncounterLoot(state,entry);
       for(let i=0;i<20;i++){const command=journeyPreparation(state);if(!command)break;state=checkedDungeon(dungeonItem(state,command));}
     }
-    if(depth<2)state=checkedDungeon(travelDungeon(atDownstairs(state),'descend',state.revision));
+    if(depth<floorCount)state=checkedDungeon(travelDungeon(atDownstairs(state),'descend',state.revision));
   }
-  return {seed,records,state,healed,taunted,depth:2,slot:2};
+  return {seed,records,state,healed,taunted,depth:floorCount,slot:2};
 }
 
 /** Follow the nearest live marker with actual player steps and enemy movement. */
@@ -382,14 +382,14 @@ export function selectMageJourney(range:readonly [number,number]=MAGE_JOURNEY_SE
 }
 
 /** Explicit level-three/position staging; this is not evidence of earned progression or exploration. */
-export function stagedMageAbility(abilityId:'ability:frost_snare'|'ability:magic_missile') {
+export function stagedMageAbility(abilityId:'ability:frost_snare'|'ability:magic_missile', targetSide:'enemy'|'player'='enemy') {
   const fresh=freshDungeon('mage-focused-ability',190),party=fresh.party.map(h=>{
     const hero=progressHero(h.heroId,180,h.hp,dungeonContent.catalog);return {...hero,hp:hero.maxHp};
   });
   const entry=checkedDungeon(startDungeonBattle(atEncounter({...fresh,party}))),built=dungeonBattle(entry)!;
   const catalog:ContentCatalog=built.catalog;
   const initial=entry.activeBattle!,mage=initial.units.find(u=>u.defId==='mage')!,map=catalog.maps[initial.mapId];
-  for(const target of initial.units.filter(u=>u.side==='enemy'))for(const cell of map.cells) {
+  for(const target of initial.units.filter(u=>u.side===targetSide&&u.id!==mage.id))for(const cell of map.cells) {
     if(!built.catalog.terrains[cell.terrainId].walkable||initial.units.some(u=>u.id!==mage.id&&u.cell.x===cell.x&&u.cell.y===cell.y))continue;
     const battle={...initial,activeIndex:initial.initiative.indexOf(mage.id),units:initial.units.map(u=>u.id===mage.id?{...u,cell:{x:cell.x,y:cell.y}}:u)};
     const command={type:'useAbility' as const,unitId:mage.id,abilityId,target:{unitId:target.id}};

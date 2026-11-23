@@ -1,7 +1,7 @@
 import { HERO_PROGRESSION } from '../../src/content/progression';
 import { progressHero } from '../../src/domain/progression';
-import { atEncounter, withLegacySight } from '../helpers/dungeonFixtures';
-import { freshDungeon, floorDescriptor, floorMap, startDungeonBattle, readDungeon } from '../../src/domain/dungeon';
+import { atDownstairs, atEncounter, withLegacySight } from '../helpers/dungeonFixtures';
+import { freshDungeon, floorDescriptor, floorMap, startDungeonBattle, readDungeon, travelDungeon } from '../../src/domain/dungeon';
 import { guardedBoundary } from '../helpers/guardedBoundary';
 import { combatStats } from '../../src/domain/effects';
 import { assert,expect,it } from 'vitest';
@@ -14,7 +14,7 @@ import { encodeDungeon,decodeDungeon } from '../../src/domain/dungeonSaveEnvelop
 import { dungeonContent } from '../../src/content/dungeon';
 import { resolveBattlefield } from '../../src/domain/battlefield';
 import { dispatch, replayCommandSequence } from '../../src/domain/turns';
-import { LEGACY_ENCOUNTER_POLICY } from '../../src/domain/dungeonEncounters';
+import { EXPANDED_ENCOUNTER_POLICY, LEGACY_ENCOUNTER_POLICY } from '../../src/domain/dungeonEncounters';
 import { priorDungeonEnvelope } from '../helpers/dungeonFixtures';
 import { freshExploration } from '../../src/domain/exploration';
 import { createDungeonStorage, DUNGEON_BACKUP_CHECKPOINT_KEY, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
@@ -368,6 +368,25 @@ it('legally clears both biome guardians and every encounter kind with carried re
   expect(witness.state.party.some(h=>h.hp>0)).toBe(true);
   expect(witness.state.party.filter(h=>h.hp>0).every(h=>h.xp>0 && h.level>=2)).toBe(true);
 },120000);
+
+it('clears a Wetlands floor through live traversal and resumes its saved encounters after descending', () => {
+  const witness = fighterJourney(5, EXPANDED_ENCOUNTER_POLICY, 1);
+  expect(witness.records.map(record => record.state.outcome)).toEqual(['playerWin', 'playerWin', 'playerWin']);
+  expect(witness.state.floors[0].completed).toBe(3);
+
+  const entry = witness.records[0].entry;
+  const encodedBattle = encodeDungeon(entry);
+  assert(encodedBattle.ok);
+  expect(decodeDungeon(encodedBattle.text)).toEqual({ ok: true, state: entry });
+
+  const downstairs = travelDungeon(atDownstairs(witness.state), 'descend', witness.state.revision);
+  assert(downstairs.ok);
+  expect(downstairs.state.floors.map(floor => floor.descriptor.biome)).toEqual(['wetlands-v1', 'underdeep-caverns-v1']);
+  expect(downstairs.state.floors[0].descriptor).toEqual(witness.state.floors[0].descriptor);
+  const encoded = encodeDungeon(downstairs.state);
+  assert(encoded.ok);
+  expect(decodeDungeon(encoded.text)).toEqual(downstairs);
+}, 30000);
 
 it('wins a legal guardian-first battle and continues with an uncleared ordinary encounter', () => {
   let victory: DungeonState | undefined;
