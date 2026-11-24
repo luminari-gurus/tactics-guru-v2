@@ -1,0 +1,62 @@
+name: Issue 208 signature interruption comparison
+on:
+  push:
+    branches: [work/issue-208-signature-interruption-verification]
+permissions:
+  contents: read
+concurrency:
+  group: tactics-browser-tactics-browser-01
+  queue: max
+  cancel-in-progress: false
+jobs:
+  compare:
+    if: github.repository == 'luminari-gurus/tactics-guru-v2'
+    runs-on: [self-hosted, tactics-browser, tactics-browser-01]
+    timeout-minutes: 35
+    steps:
+      - name: Check host disposition
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: ef23ce4e654488c7c6669b7df75cbe05c42ef2c9
+          path: control
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          path: candidate
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.2'
+          cache: npm
+          cache-dependency-path: candidate/package-lock.json
+      - name: Build both sources and prepare Chromium
+        id: build
+        run: |
+          (cd control && npm ci && npm run build)
+          (cd candidate && npm ci && npm run setup:browsers && npm run build)
+      - name: Run the control interruption cases in all Chromium profiles
+        working-directory: control
+        run: |
+          mkdir -p verification-receipts
+          npx --no-install playwright test -c playwright.regression.config.ts tests/battle-animations.spec.ts --grep 'repeated cancellation, modal refresh, resize and restart during travel and impact' --reporter=list,json
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/interruptions.json
+      - name: Run the candidate interruption cases in all Chromium profiles
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        working-directory: candidate
+        run: |
+          mkdir -p verification-receipts
+          npx --no-install playwright test -c playwright.regression.config.ts tests/battle-animations.spec.ts --grep 'modal refresh and resize preserve|restart discards the accepted signature' --reporter=list,json
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/interruptions.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: chromium-signature-interruption-comparison
+          path: |
+            control/verification-receipts/
+            candidate/verification-receipts/
+            control/test-results/
+            candidate/test-results/
+          if-no-files-found: warn
