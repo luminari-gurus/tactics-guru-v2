@@ -10,7 +10,8 @@ Implementation authorized November 24, 2026. The dedicated issue branch and work
 
 - Baseline seed **308**, Forest Elite slot **1**, Shaman **#6**. This legal battle ends in victory and includes three successful heals by the same Shaman. The [literal save](../../tests/fixtures/saves/issue-476/legacy-dungeon.json) was encoded at command 46, immediately after the second heal. The [literal replay](../../tests/fixtures/saves/issue-476/legacy-replay.json) records the complete history, source SHA, and the expected hash of the ordered events and final state. The save and replay file SHA-256 values are `0696b3d28c14285c7d94cd08c7869236d9db259fdec0997bffe4b826190ba3ef` and `54621b8d0992e7affffd5efc29045dc083af0ec57c625e2b8a4342e2dcbea0f7`.
 - The current browser witness remains seed **189**. The first and second heals resolve at commands 21 and 37. The first player decision after each is at commands 25 and 41, where inspection can show the new counts.
-- Linux verification checkout and raw artifacts live under `/home/aiwithapex/projects/tactics-476-verification.fwnjSo` in WSL Ubuntu. Baseline capture ran on Node 24.15.0 and Vitest 5.0.3. The focused rule, AI, and standalone/run save iteration passed 142 tests before adding dungeon integration coverage.
+- Linux verification checkout and raw artifacts live under `/home/aiwithapex/projects/tactics-476-verification.fwnjSo` in WSL Ubuntu. Baseline capture ran on Node 24.15.0 and Vitest 5.0.3. Five focused unit files passed 165 tests, including capped and legacy replay, dungeon Continue, independent casts, malformed counters and scoped save admission. `focused-units-first-failure.json` retains the earlier duplicate-import collection failure. `focused-units.json` records the corrected iteration.
+- [PR #488](https://github.com/luminari-gurus/tactics-guru-v2/pull/488) is the focused implementation PR. Ordinary PR verification passed in 176.1 seconds on `5c714f98`. Browser witness commit `dc73077d` adds an explicit durable-save assertion and preserves the original Weakened reload alongside the one-cast reload. Its final verification uses the WSL `final/` checkout.
 
 ## Selection
 
@@ -51,6 +52,16 @@ npx --no-install playwright test -c playwright.exploration.config.ts tests/dunge
 git diff --check
 ```
 
-## Estimate and open questions
+## Verification results
 
-Estimate 1.5–2.5 hours for implementation, baseline fixture capture, and verification with dependencies and browsers installed. Self-hosted queue time is additional. No open product or design questions. The first implementation check is to qualify a legal seed that demonstrates a third heal on the baseline. Recheck the chosen seed if #480 lands first.
+The final implementation and test source was clean at `27c5d694bb68381a7535d1f947a556915a526a93`. Verification ran in WSL Ubuntu with Node 24.15.0, npm 12.0.2, and Playwright 1.64.1. The production distribution’s sorted SHA-256 file manifest hashes to `519121171721c1f28b2b193afb8f85dc2fc59f9b91403fce110e49a339358656`. Manifest verification passed after the browser runs.
+
+- `npm run verify:pr` passed in 153.9 seconds. It ran 1,597 unit and content tests, both TypeScript scopes, two build integrations, a production bundle, and all seven smoke journeys. The clean-source receipt is `final/verification-receipts/pr/1795526059281-822521/summary.json` under the WSL evidence root above.
+- The existing Shaman production journey passed on Chromium desktop, mobile portrait, and mobile landscape in 232.8 seconds. It passed on WebKit desktop, portrait, and landscape in 159.0 seconds. Discovery and execution agreed on all six project/case combinations. Each ran once with zero skips and retries. Mobile profiles used Playwright emulation.
+- All six journeys displayed `2/2 → 1/2 → 0/2`, persisted and reloaded the one-cast state, preserved the Weakened reload, and reached victory. Their accepted commands, events, and final state including RNG matched across profiles. The projection of those three fields hashes to `59731975c46adecf642f106eadac7bf3bc1a3a6da68e9283cef92b10eedc1684`. The Chromium portrait screenshot shows the remaining cast count after Continue.
+- `chromium-focused.json`, `webkit-focused.json`, the `*-list.txt` discovery and the matching `*-artifacts/` folders retain the reports, exact case IDs, histories and screenshots. The earlier `dc73077d` typecheck failure is retained at `final/verification-receipts/pr/1795525971047-785446/` and corrected by `27c5d694`.
+- `openspec validate issue-476-heal-goblin-cap --strict` and `git diff --check` passed. The verification handoff and tracked task updates are documentation-only changes after the tested source.
+
+## Review handoff
+
+[PR #488](https://github.com/luminari-gurus/tactics-guru-v2/pull/488) carries `enhancement` and `risk:medium`. It closes #476 on merge and references #418 for follow-up on the original reported stall. The two-cast rule and backward-compatibility behavior are fully specified, with no open implementation questions.
