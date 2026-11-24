@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import { endTurn, session, readSession, tapBoard, boardPoint, combatSkin } from './helpers/battlePolicy';
 import { BATTLE_STORAGE_KEYS } from '../src/persistence/battleStorage';
 import { standaloneCatalog as catalog } from './helpers/playerPolicy';
@@ -22,6 +22,13 @@ async function ready(page: Page) {
   await page.goto('./battle');
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   await expect.poll(() => combatSkin(page)).toBe('radial');
+}
+
+function receivesPointerAtCenter(control: Locator) {
+  return control.evaluate(node => {
+    const { x, y, width, height } = node.getBoundingClientRect();
+    return node.contains(document.elementFromPoint(x + width / 2, y + height / 2));
+  });
 }
 
 async function holdAt(page: Page, point: { x: number; y: number }) {
@@ -583,7 +590,8 @@ test('radial hold dismisses on a native second touch over the overlay', async ({
 });
 
 test('radial invalid reselection clears the previous command before switching to rail', async ({page}) => {
-  await page.setViewportSize({width:412,height:915});
+  // Leave room for the clamped radial and a distinct, tappable enemy.
+  await page.setViewportSize({width:560,height:915});
   await ready(page);
   const current=await session(page);
   const actor=current.state.units.find(unit=>unit.id===current.state.initiative[current.state.activeIndex])!;
@@ -591,18 +599,21 @@ test('radial invalid reselection clears the previous command before switching to
   if(!reach.ok) throw Error(reach.reason);
   const enemy=current.state.units.find(unit=>unit.side==='enemy' && unit.hp>0)!;
   const enemyPoint=await boardPoint(page,enemy.cell);
-  let destination: {x:number;y:number}|null=null;
-  for(const entry of reach.cells.filter(entry=>entry.cost>0)) {
-    const point=await boardPoint(page,entry.cell);
-    if(Math.hypot(point.x-enemyPoint.x,point.y-enemyPoint.y)>200) {destination=entry.cell;break;}
-  }
-  expect(destination).not.toBeNull();
-  if(!destination) throw Error('No reachable tile far enough from the enemy');
+  const candidates=await Promise.all(reach.cells.filter(entry=>entry.cost>0).map(async ({cell})=>{
+    const point=await boardPoint(page,cell);
+    return {cell,distance:Math.hypot(point.x-enemyPoint.x,point.y-enemyPoint.y)};
+  }));
+  const destination=candidates.sort((a,b)=>b.distance-a.distance)[0]?.cell;
+  if(!destination) throw Error('No reachable move destination');
   await tapBoard(page,destination);
   await expect.poll(async()=> (await session(page)).pending).toMatchObject({type:'move',to:destination});
+  expect(await page.evaluate(({x,y})=>document.elementFromPoint(x,y)?.tagName,
+    await boardPoint(page,enemy.cell))).toBe('CANVAS');
   await tapBoard(page,enemy.cell);
   await expect(page.locator('#battle-target-info')).toContainText('Goblin');
   await expect(page.locator('#battle-radial-attack')).toBeDisabled();
+  await expect(page.locator('#battle-radial-hub')).toContainText(/range/i);
+  await expect(page.locator('#battle-radial-inspect')).toHaveAccessibleName(/Inspect, Goblin/i);
   expect((await session(page)).pending).toBeNull();
   await page.evaluate(()=>{delete (globalThis as {__tacticsGuruCombatControls?:string}).__tacticsGuruCombatControls;});
   await page.locator('#battle-overflow > summary').click();
@@ -712,6 +723,8 @@ test('radial plan cancellation stays available while choosing a destination or t
       await expect(page.locator('#battle-radial')).toBeHidden();
       await expect(page.locator('#battle-preview')).toContainText('Tap an enemy');
       await expect(cancel).toBeVisible();
+      // The player may have scrolled to secondary tools before cancelling.
+      await page.locator('#battle-scroll').evaluate(node=>{node.scrollTop=node.scrollHeight;});
     }
     const box=(await cancel.boundingBox())!;
     expect(box.width).toBeGreaterThanOrEqual(44);
@@ -721,6 +734,7 @@ test('radial plan cancellation stays available while choosing a destination or t
     expect(box.y).toBeGreaterThanOrEqual(0);
     expect(box.x+box.width).toBeLessThanOrEqual(viewport.width);
     expect(box.y+box.height).toBeLessThanOrEqual(viewport.height);
+    expect(await receivesPointerAtCenter(cancel)).toBe(true);
     if(test.info().project.use.hasTouch) await cancel.tap();
     else { await cancel.focus(); await page.keyboard.press('Enter'); }
     await expect(cancel).toBeHidden();
@@ -732,6 +746,36 @@ test('radial plan cancellation stays available while choosing a destination or t
     await tapBoard(page,cell);
     await expect(page.locator('#battle-radial-move')).toBeEnabled();
     await page.locator('#battle-radial-hub').click();
+  }
+});
+
+test('radial compact landscape keeps Cancel plan and focused HUD controls exposed', async ({ page, hasTouch }) => {
+  for (const width of [568, 480]) {
+    await page.setViewportSize({ width, height: 234 });
+    await ready(page);
+    const { cell, current } = await reachableEmpty(page);
+    await tapBoard(page, cell);
+    const plan = page.locator('#battle-radial-plan');
+    if (hasTouch) await plan.tap(); else await plan.click();
+
+    const cancel = page.getByRole('button', { name: 'Cancel plan', exact: true });
+    await expect(cancel).toBeInViewport({ ratio: 1 });
+    await page.locator('#battle-scroll').evaluate(node => { node.scrollTop = node.scrollHeight; });
+    await cancel.focus();
+    const danger = page.getByRole('button', { name: 'Show enemy danger', exact: true });
+    for (let count = 0; count < 5 && !(await danger.evaluate(node => node === document.activeElement)); count++) {
+      await page.keyboard.press('Tab');
+    }
+    await expect(danger).toBeFocused();
+    await expect.poll(() => receivesPointerAtCenter(danger)).toBe(true);
+    await expect(cancel).toBeInViewport({ ratio: 1 });
+    expect(await receivesPointerAtCenter(cancel)).toBe(true);
+    if (hasTouch) await cancel.tap(); else await cancel.press('Enter');
+    await expect(cancel).toBeHidden();
+    const after = await session(page);
+    expect(after.state).toEqual(current.state);
+    expect(after.replay.commands).toEqual(current.replay.commands);
+    expect(after.pending).toBeNull();
   }
 });
 
@@ -846,13 +890,19 @@ test('radial stays open on a layout reflow without a viewport resize', async ({p
   const board=page.locator('#battle-board-region');
   const plan=page.locator('#battle-radial-plan');
   const originalPlan=(await plan.boundingBox())!;
-  await caption.evaluate(node=>{node.style.paddingTop='60px';});
+  const originalBoard=(await board.boundingBox())!;
+  const originalRadial=(await page.locator('#battle-radial').boundingBox())!;
+  const originalPlanBottom=originalPlan.y+originalPlan.height;
+  const paddingIncrease=Math.ceil(originalBoard.y+originalBoard.height-originalPlanBottom)+6;
+  await caption.evaluate((node,increase)=>{
+    node.style.paddingTop=`${parseFloat(getComputedStyle(node).paddingTop)+increase}px`;
+  },paddingIncrease);
   await expect.poll(async()=> {
     const bounds=(await board.boundingBox())!;
     return bounds.y+bounds.height;
-  }).toBeLessThan(originalPlan.y+originalPlan.height);
+  }).toBeLessThan(originalPlanBottom);
   const bounds=(await board.boundingBox())!;
-  expect(bounds.height).toBeGreaterThan(320);
+  expect(bounds.height).toBeGreaterThan(originalPlanBottom-originalRadial.y+4);
   await expect.poll(async()=> {
     const box=(await plan.boundingBox())!;
     return box.y+box.height;

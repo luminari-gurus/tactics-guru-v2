@@ -10,9 +10,12 @@ export function mountBattleLayout(): void {
   scroll.setAttribute('aria-label', 'Actions, target and secondary tools; scroll for more');
   scroll.append(...panel.childNodes);
   scroll.prepend(scroll.querySelector('#battle-controls')!);
+  const dock = document.createElement('div');
+  dock.id = 'battle-dock';
+  dock.append(scroll);
   const actor = document.createElement('header');
   actor.id = 'battle-actor'; actor.tabIndex = 0;
   actor.setAttribute('aria-label', 'Acting unit information; scroll for details');
   actor.hidden = true;
-  panel.append(actor, scroll);
+  panel.append(actor, dock);
 }
