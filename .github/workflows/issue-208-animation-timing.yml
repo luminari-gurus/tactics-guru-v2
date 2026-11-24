@@ -1,0 +1,52 @@
+name: Measure battle animation setup
+on:
+  push:
+    branches: [qa/issue-208-animation-setup]
+permissions:
+  contents: read
+concurrency:
+  group: tactics-browser-tactics-browser-01
+  queue: max
+  cancel-in-progress: false
+jobs:
+  compare:
+    runs-on: [self-hosted, tactics-browser, tactics-browser-01]
+    timeout-minutes: 35
+    steps:
+      - run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.2'
+          cache: npm
+      - run: npm ci
+      - run: npm run setup:browsers && npm run check:browsers
+      - run: npm run build
+      - name: Compare legal feedback setup on one production build
+        shell: bash
+        run: |
+          mkdir -p verification-receipts/animation
+          suite=tests/battle-animations.spec.ts
+          candidate=6bdc09ea8e62e2e8d2a2405cd1d954b2ca7480cf
+          baseline=1a4b0af1bb1fbcfffc7864c327c2949940bea39c
+          for arm in base1 changed1 changed2 base2 devices; do
+            rev=$candidate
+            projects=(--project=desktop)
+            case "$arm" in
+              base*) rev=$baseline ;;
+              devices) projects=(--project=mobile-portrait --project=mobile-landscape) ;;
+            esac
+            git show "$rev:$suite" > "$suite"
+            PLAYWRIGHT_JSON_OUTPUT_FILE="verification-receipts/animation/$arm.json" \
+              npx --no-install playwright test -c playwright.regression.config.ts "$suite" "${projects[@]}" \
+              -g 'visible action feedback stays inside' --reporter=line,json --output="verification-receipts/animation/$arm"
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: animation-setup-comparison
+          path: verification-receipts/animation
+          retention-days: 14
