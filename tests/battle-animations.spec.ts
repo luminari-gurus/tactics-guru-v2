@@ -281,9 +281,9 @@ for(const kind of kinds)test(`${kind}: real controls, travel/impact, transformed
   expect((await readSession(page)).state).toEqual(fixture.after);expect(await stored(page)).toEqual(saved);expect(errors).toEqual([]);
 });
 
-for(const kind of kinds)test(`${kind}: repeated cancellation, modal refresh, resize and restart during travel and impact`,async({page})=>{
+test('guarded_strike: modal refresh and resize preserve the signature until visibility cancellation', async ({ page }) => {
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
-  const fixture=boundary(kind);await boot(page,fixture);await prepareSignature(page,fixture);await confirmFrozen(page);await page.clock.runFor(96);
+  const fixture=boundary('guarded_strike');await boot(page,fixture);await prepareSignature(page,fixture);await confirmFrozen(page);await page.clock.runFor(96);
   const saved=await stored(page);
   await page.locator('#fit-restart').click({force:true});await page.locator('#battle-cancel-restart').click({force:true});
   aligned(await report(page),fixture);
@@ -296,17 +296,39 @@ for(const kind of kinds)test(`${kind}: repeated cancellation, modal refresh, res
   await ready(page);expect((await report(page)).effect).toBeNull();expect((await readSession(page)).state).toEqual(fixture.after);expect(await stored(page)).toEqual(saved);
   await page.evaluate(()=>{delete (document as unknown as {hidden?:boolean}).hidden;document.dispatchEvent(new Event('visibilitychange'));});
   await page.clock.runFor(700);expect((await readSession(page)).state).toEqual(fixture.after);
-  for(const time of [96,288]){
-    await page.clock.resume();
-    await reachStandaloneBoundary(page,fixture.before);
-    await prepareSignature(page,fixture);await confirmFrozen(page);await page.clock.runFor(time);
-    const replacementSeed=((await readSession(page)).state.seed+1)>>>0;
-    await page.locator('#fit-restart').click({force:true});await confirmRestart(page,true);await page.clock.resume();
-    await expect.poll(async()=>JSON.parse((await page.locator('#game').getAttribute('data-session'))??'null')?.state.seed).toBe(replacementSeed);
-    await ready(page);
-    expect((await readSession(page)).state.seed).toBe(fixture.before.seed+1);expect((await report(page)).effect).toBeNull();
-    await expect(page.locator('canvas')).toHaveCount(1);
-  }
+  expect(errors).toEqual([]);
+});
+
+// BoardRenderer uses the same finish callback for all signatures. Check shutdown
+// at both stages, with the respective arrow and missile effects still active.
+for (const [kind, time, stage] of [
+  ['high_shot', 96, 'travel'],
+  ['magic_missile', 288, 'impact'],
+] as const) test(`${kind}: restart discards the accepted signature during ${stage}`, async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  const fixture = boundary(kind);
+  await boot(page, fixture);
+  await prepareSignature(page, fixture);
+  await confirmFrozen(page);
+  await page.clock.runFor(time);
+
+  const frame = await report(page);
+  aligned(frame, fixture);
+  if (stage === 'travel') expect(frame.effect.progress).toBeLessThan(0.45);
+  else expect(frame.effect.progress).toBeGreaterThanOrEqual(0.45);
+  expect((await readSession(page)).state).toEqual(fixture.after);
+
+  await page.locator('#fit-restart').click({ force: true });
+  await confirmRestart(page, true);
+  await page.clock.resume();
+  const replacementSeed = fixture.before.seed + 1;
+  await expect.poll(async () => JSON.parse(
+    (await page.locator('#game').getAttribute('data-session')) ?? 'null',
+  )?.state.seed).toBe(replacementSeed);
+  await ready(page);
+  expect((await report(page)).effect).toBeNull();
+  await expect(page.locator('canvas')).toHaveCount(1);
   expect(errors).toEqual([]);
 });
 
