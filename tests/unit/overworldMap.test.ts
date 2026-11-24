@@ -506,6 +506,15 @@ describe('sized layout profiles', () => {
 });
 
 
+it.each(['arena', 'sector-graph'] as const)('generates a connected rectangular %s across room-row boundaries', type => {
+  for (const height of [37, 47, 48, 281]) for (const seed of [0, 19, 0xffffffff]) {
+    const map = generateMap(seed, type, 36, height);
+    expect([map.width, map.height]).toEqual([36, height]);
+    expect(validMapCells(map.cells, 36, height, type === 'arena')).toBe(true);
+    expect(generateMap(seed, type, 36, height)).toEqual(map);
+  }
+});
+
 it('uses a deterministic valid fallback when a sized candidate is invalid', () => {
   for (const size of [20,24,28,32,36]) {
     const bad = Array<MapCell>(size * size).fill(0);

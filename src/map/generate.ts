@@ -1,6 +1,8 @@
-import { nextUint32, seedRng } from '../domain/rng';
+import { localUint32Stream, nextUint32, seedRng } from '../domain/rng';
 
 export const MAP_SIZE = 20;
+// At the save reader's 8,192-floor limit the tallest floor is 36 + 8,192 - 5.
+const MAX_MAP_HEIGHT = 8223;
 /** Bump when this layout algorithm or its reused RNG contract changes. */
 export const GENERATOR_VERSION = 'rooms-v1';
 export const MAP_TYPES = [
@@ -22,21 +24,63 @@ export interface GeneratedMap {
   readonly fallback: boolean;
 }
 
+const generatedOpenCells = new WeakMap<GeneratedMap, readonly number[]>();
+
+function openCells(map: GeneratedMap): number[] {
+  const open: number[] = [];
+  for (let i = 0; i < map.cells.length; i++) if (map.cells[i]) open.push(i);
+  return open;
+}
+
+/** Only freshly generated, deeply frozen geometry may skip a second connectivity walk. */
+export function generateFrozenMap(seed: number, type: MapType, width: number, height: number): GeneratedMap {
+  const map = generateMap(seed, type, width, height);
+  generatedOpenCells.set(map, openCells(map));
+  Object.freeze(map.cells);
+  Object.freeze(map);
+  return map;
+}
+
+/** The two endpoint cells are stairs. Return a private working copy for seeded placement. */
+export function encounterCandidates(map: GeneratedMap): number[] {
+  const open = generatedOpenCells.get(map);
+  if (open) return open.slice(1, -1);
+  if (!validMapCells(map.cells, map.width, map.height, map.type === 'arena')) throw Error('Invalid exploration geometry');
+  return openCells(map).slice(1, -1);
+}
+
 export function validMapCells(cells: readonly MapCell[], width = 20, height = width, allowOpen = false): boolean {
-  if (!Number.isInteger(width) || !Number.isInteger(height) || width < 20 || height < 20 || width > 36 || height > 36 || cells.length !== width * height || cells.some(cell => cell !== 0 && cell !== 1)) return false;
-  const floorCount = cells.reduce<number>((sum, cell) => sum + cell, 0);
+  if (!Number.isInteger(width) || !Number.isInteger(height) || width < 20 || height < 20 || width > 36 || height > MAX_MAP_HEIGHT || cells.length !== width * height) return false;
+  let floorCount = 0;
+  for (let i = 0; i < cells.length; i++) {
+    if (cells[i] === 1) floorCount++;
+    else if (cells[i] !== 0) return false;
+  }
   if (floorCount < 60 || floorCount > (allowOpen ? (width - 2) * (height - 2) : width * height - (2 * width + 2 * height))) return false;
   for (let x = 0; x < width; x++) if (cells[x] || cells[(height - 1) * width + x]) return false;
   for (let y = 0; y < height; y++) if (cells[y * width] || cells[y * width + width - 1]) return false;
-  const visited = new Set<number>();
-  const queue = [cells.indexOf(1)];
-  visited.add(queue[0]);
-  for (let i = 0; i < queue.length; i++) {
-    for (const next of [queue[i] - width, queue[i] + width, queue[i] - 1, queue[i] + 1]) {
-      if (cells[next] === 1 && !visited.has(next)) { visited.add(next); queue.push(next); }
+  // Once every interior cell is known to be open, connectivity follows from the rectangle.
+  if (floorCount === (width - 2) * (height - 2)) return true;
+  const seen = new Uint8Array(cells.length);
+  const queue = new Int32Array(floorCount);
+  queue[0] = cells.indexOf(1);
+  seen[queue[0]] = 1;
+  let count = 1;
+  const enqueue = (next: number) => {
+    if (cells[next] === 1 && !seen[next]) {
+      seen[next] = 1;
+      queue[count++] = next;
     }
+  };
+  // The verified wall border keeps all four neighbor indices in bounds.
+  for (let i = 0; i < count; i++) {
+    const cell = queue[i];
+    enqueue(cell - width);
+    enqueue(cell + width);
+    enqueue(cell - 1);
+    enqueue(cell + 1);
   }
-  return visited.size === floorCount;
+  return count === floorCount;
 }
 
 function generateRooms(seed: number): GeneratedMap {
@@ -144,13 +188,13 @@ function cellular(draw: (range: number) => number): MapCell[] {
   return cells;
 }
 
-export function generateMap(seed: number, type: MapType = 'rooms', size = 20): GeneratedMap {
+export function generateMap(seed: number, type: MapType = 'rooms', size = 20, height = size): GeneratedMap {
   if (!Number.isSafeInteger(seed) || seed < 0 || seed > 0xffffffff) throw new RangeError('Invalid seed');
   const entry = MAP_TYPES.find(entry => entry.id === type);
   if (!entry) throw new RangeError('Invalid map type');
-  if (!Number.isInteger(size) || size < 20 || size > 36) throw new RangeError('Invalid map size');
-  if (type === 'sector-graph' || type === 'arena') return generateSized(seed, type, size);
-  if (size !== 20) throw new RangeError('Unsupported map size');
+  if (!Number.isInteger(size) || size < 20 || size > 36 || !Number.isInteger(height) || height < size || height > MAX_MAP_HEIGHT) throw new RangeError('Invalid map size');
+  if (type === 'sector-graph' || type === 'arena') return generateSized(seed, type, size, height);
+  if (size !== 20 || height !== 20) throw new RangeError('Unsupported map size');
   if (type === 'rooms') return generateRooms(seed);
   const result = (cells: MapCell[], fallback: boolean): GeneratedMap => ({
     seed, type, version: entry.version, width: MAP_SIZE, height: MAP_SIZE, cells, fallback,
@@ -167,20 +211,22 @@ export function generateMap(seed: number, type: MapType = 'rooms', size = 20): G
   return result(cells, true);
 }
 
-/** Versioned square profiles use a private random stream and fixed work bounds. */
-function generateSized(seed: number, type: 'sector-graph' | 'arena', size: number): GeneratedMap {
-  const draw = localDraw((seed ^ 0x53454354) >>> 0);
-  const cells: MapCell[] = Array<MapCell>(size * size).fill(0);
+/** Versioned floor profiles use a private random stream and fixed work bounds. */
+function generateSized(seed: number, type: 'sector-graph' | 'arena', size: number, height: number): GeneratedMap {
+  const next = localUint32Stream((seed ^ 0x53454354) >>> 0);
+  const draw = (range: number) => next() % range;
+  const cells: MapCell[] = Array<MapCell>(size * height).fill(0);
   if (type === 'arena') {
-    for (let y = 1; y < size - 1; y++) for (let x = 1; x < size - 1; x++) cells[y * size + x] = 1;
+    for (let y = 1; y < height - 1; y++) cells.fill(1, y * size + 1, (y + 1) * size - 1);
   } else {
     const centers: {x:number; y:number}[] = [];
-    for (let sy = 0; sy < 3; sy++) for (let sx = 0; sx < 3; sx++) {
+    const rows = Math.max(3, Math.floor(height / 12));
+    for (let sy = 0; sy < rows; sy++) for (let sx = 0; sx < 3; sx++) {
       const left = 1 + Math.floor(sx * (size - 2) / 3), right = 1 + Math.floor((sx + 1) * (size - 2) / 3);
-      const top = 1 + Math.floor(sy * (size - 2) / 3), bottom = 1 + Math.floor((sy + 1) * (size - 2) / 3);
+      const top = 1 + Math.floor(sy * (height - 2) / rows), bottom = 1 + Math.floor((sy + 1) * (height - 2) / rows);
       const w = 3 + draw(Math.max(1, right - left - 3)), h = 3 + draw(Math.max(1, bottom - top - 3));
       const x = left + draw(right - left - w + 1), y = top + draw(bottom - top - h + 1);
-      for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) cells[yy * size + xx] = 1;
+      for (let yy = y; yy < y + h; yy++) cells.fill(1, yy * size + x, yy * size + x + w);
       centers.push({x:x + Math.floor(w / 2), y:y + Math.floor(h / 2)});
     }
     const connect = (a: typeof centers[number], b: typeof centers[number]) => {
@@ -190,16 +236,16 @@ function generateSized(seed: number, type: 'sector-graph' | 'arena', size: numbe
     for (let i = 1; i < centers.length; i++) connect(centers[i], centers[i % 3 ? i - 1 : i - 3]);
     for (let i = 3; i < centers.length; i++) if (draw(3) === 0) connect(centers[i], centers[i - 3]);
   }
-  const checked = sizedLayoutOrFallback(cells, size, type === 'arena');
-  return {seed, type, version: type + '-v1', width:size, height:size, ...checked};
+  const checked = sizedLayoutOrFallback(cells, size, type === 'arena', height);
+  return {seed, type, version: type + '-v1', width:size, height, ...checked};
 }
 
 /** Validate a bounded candidate before admitting it to the map and save contracts. */
-export function sizedLayoutOrFallback(candidate: readonly MapCell[], size: number, allowOpen: boolean): { cells: readonly MapCell[]; fallback: boolean } {
-  if (!Number.isInteger(size) || size < 20 || size > 36) throw new RangeError('Invalid map size');
-  if (validMapCells(candidate, size, size, allowOpen)) return {cells: candidate, fallback: false};
-  const cells: MapCell[] = Array<MapCell>(size * size).fill(0);
+export function sizedLayoutOrFallback(candidate: readonly MapCell[], size: number, allowOpen: boolean, height = size): { cells: readonly MapCell[]; fallback: boolean } {
+  if (!Number.isInteger(size) || size < 20 || size > 36 || !Number.isInteger(height) || height < size || height > MAX_MAP_HEIGHT) throw new RangeError('Invalid map size');
+  if (validMapCells(candidate, size, height, allowOpen)) return {cells: candidate, fallback: false};
+  const cells: MapCell[] = Array<MapCell>(size * height).fill(0);
   for (let y = 1; y < 9; y++) for (let x = 1; x < 11; x++) cells[y * size + x] = 1;
-  if (!validMapCells(cells, size, size, allowOpen)) throw new Error('Invalid map fallback');
+  if (!validMapCells(cells, size, height, allowOpen)) throw new Error('Invalid map fallback');
   return {cells, fallback: true};
 }

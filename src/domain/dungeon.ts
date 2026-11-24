@@ -4,7 +4,7 @@ import { freshArrivalExploration, freshExploration, readExploration, movableExpl
 import { HERO_IDS } from '../content/constants';
 import { dungeonContent, DUNGEON_TEMPLATE } from '../content/dungeon';
 import type { ItemCatalog, ItemId, ItemOwnership } from '../content/itemTypes';
-import { generateMap, type GeneratedMap } from '../map/generate';
+import { generateFrozenMap, type GeneratedMap } from '../map/generate';
 import { applyBiome, BIOMES } from '../map/biomes';
 import { DEFAULT_BEHAVIORS, stepMovement } from '../map/movement';
 import { canonical, hashJson } from './contentIdentity';
@@ -97,8 +97,7 @@ export class FloorCache {
     const key = `${seed}:${generator}:${size}`;
     let map = this.maps.get(key);
     if (!map) {
-      const generated = generateMap(seed, generator === 'rooms-v1' ? 'rooms' : generator === 'arena-v1' ? 'arena' : 'sector-graph', size);
-      map = Object.freeze({ ...generated, cells: Object.freeze([...generated.cells]) });
+      map = generateFrozenMap(seed, generator === 'rooms-v1' ? 'rooms' : generator === 'arena-v1' ? 'arena' : 'sector-graph', size, size);
       floorGeometryFacts.set(map, {});
     }
     this.maps.delete(key); this.maps.set(key, map);

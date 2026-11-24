@@ -1,4 +1,4 @@
-import { generateMap, validMapCells, type GeneratedMap } from '../map/generate';
+import { generateMap, encounterCandidates, type GeneratedMap } from '../map/generate';
 import type { OverworldMarker } from '../map/state';
 import { hashJson, canonical } from './contentIdentity';
 import { nextUint32, seedRng, isRngState, type RngState } from './rng';
@@ -46,10 +46,8 @@ export function visit(exploration: Exploration, position: number, map: Generated
     visited: union(exploration.visited, [position]) };
 }
 export function encounterPois(seed: number, map: GeneratedMap = generateMap(seed, 'rooms'), reserved: readonly number[] = []): EncounterPoi[] {
-  if (!validMapCells(map.cells, map.width, map.height, map.type === 'arena')) throw Error('Invalid exploration geometry');
-  const first = map.cells.indexOf(1), last = map.cells.lastIndexOf(1);
-  const candidates: number[] = [];
-  map.cells.forEach((cell,i) => { if (cell && i !== first && i !== last && !reserved.includes(i)) candidates.push(i); });
+  const open = encounterCandidates(map);
+  const candidates = reserved.length ? open.filter(cell => !reserved.includes(cell)) : open;
   if (candidates.length < 3) throw Error('Insufficient encounter cells');
   let rng = seedRng(Number.parseInt(hashJson({ seed, policy: EXPLORATION_VERSION }).slice(-8),16));
   return [0,1,2].map(encounterSlot => {
