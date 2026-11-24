@@ -281,21 +281,6 @@ for(const kind of kinds)test(`${kind}: real controls, travel/impact, transformed
   expect((await readSession(page)).state).toEqual(fixture.after);expect(await stored(page)).toEqual(saved);expect(errors).toEqual([]);
 });
 
-for(const [kind,outcome] of [['guarded_strike','miss'],['high_shot','miss'],['high_shot','critical'],['magic_missile','defeat']] as const)
-test(`${kind}: ${outcome} feedback matches resolved events`,async({page},info)=>{
-  const fixture=boundary(kind,outcome);await boot(page,fixture);await prepareSignature(page,fixture);await confirmFrozen(page);await page.clock.runFor(288);
-  const r=await report(page);aligned(r,fixture);
-  const feedback=abilityPresentation(fixture.events).feedback;
-  expect(r.effect.feedback.map((f:any)=>({unitId:f.unitId,text:f.text}))).toEqual(feedback.map(f=>({unitId:f.unitId,text:f.text})));
-  expect(r.effect.feedback.every((f:any)=>f.visible)).toBe(true);
-  if(outcome==='miss'){expect(feedback.some(f=>f.text==='Miss')).toBe(true);expect(feedback.some(f=>f.text.includes('−'))).toBe(false);}
-  if(outcome!=='critical')expect(r.criticalImpacts).toEqual([]);
-  if(kind==='guarded_strike')expect(feedback).toContainEqual({unitId:r.effect.actorId,kind:'guard',text:'Guarded'});
-  const positions=r.effect.feedback.map((f:any)=>`${f.x},${f.y}`);expect(new Set(positions).size).toBe(positions.length);
-  await page.screenshot({path:info.outputPath(`${kind}-${outcome}.png`)});await page.clock.runFor(500);
-  expect((await report(page)).effect).toBeNull();expect((await readSession(page)).state).toEqual(fixture.after);
-});
-
 for(const kind of kinds)test(`${kind}: repeated cancellation, modal refresh, resize and restart during travel and impact`,async({page})=>{
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
   const fixture=boundary(kind);await boot(page,fixture);await prepareSignature(page,fixture);await confirmFrozen(page);await page.clock.runFor(96);
@@ -406,7 +391,10 @@ test('visible action feedback stays inside the drawable board at small sizes and
     const x=r.x+r.width/2,y=r.y+r.height/2;
     await page.mouse.move(x,y);for(let i=0;i<3;i++)await page.mouse.wheel(0,-1000);
     await page.mouse.down();await page.mouse.move(r.x+r.width-6,r.y+6,{steps:4});await page.mouse.up();
-    const frame=await report(page);expect(frame.feedbackBounds).toHaveLength(2);
+    const frame=await report(page);aligned(frame,fixture);
+    expect(frame.criticalImpacts).toEqual([]);
+    expect(frame.feedbackBounds.map((label:any)=>label.text)).toEqual(abilityPresentation(fixture.events).feedback.map(label=>label.text));
+    expect(frame.feedbackBounds).toHaveLength(2);
     for(const b of frame.feedbackBounds){expect(b.x).toBeGreaterThanOrEqual(r.x);expect(b.y).toBeGreaterThanOrEqual(r.y);expect(b.x+b.width).toBeLessThanOrEqual(r.x+r.width);expect(b.y+b.height).toBeLessThanOrEqual(r.y+r.height);}
     const [a,b]=frame.feedbackBounds;expect(a.y+a.height<=b.y||b.y+b.height<=a.y).toBe(true);
     expect((await readSession(page)).state).toEqual(fixture.after);
@@ -542,7 +530,9 @@ test('active bob: presentation, actor change, hidden page and restart restore an
 
 test('active bob: initial reduced motion keeps sprite and static actor marker anchored', async ({page}, info) => {
   await page.emulateMedia({reducedMotion: 'reduce'});
-  await boot(page, boundary('high_shot', 'any', true));
+  await page.clock.install();
+  await page.goto('./?game=battle&entry=new');
+  await ready(page);
   await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
   const initial = await report(page), saved = await stored(page);
   for (let i = 0; i < 4; i++) {

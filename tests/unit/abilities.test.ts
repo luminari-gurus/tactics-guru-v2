@@ -37,11 +37,14 @@ it('maps frozen accepted signature events to affected units without changing sta
     expect({before,result}).toEqual(copy);expect(rollDie(result.state.rng,20)).toEqual(next);
   }
   const {catalog,state}=setup(3,2);
-  let seed=0;while(rollDie(seedRng(seed),20).value!==20)seed++;
-  const critical=dispatch(freeze({...state,rng:seedRng(seed)}),shot,catalog);assert(critical.ok);freeze(critical);
-  const view=abilityPresentation(critical.events);
-  expect(view.signature).toMatchObject({kind:'high_shot',actorId:2,targetId:4,missed:false});
-  expect(view.feedback).toEqual([{unitId:4,kind:'result',text:'Critical · −12'},{unitId:4,kind:'defeat',text:'Defeated'}]);
+  for (const natural of [1, 20]) {
+    const result = dispatch(freeze(naturalState(state, natural)), shot, catalog);
+    assert(result.ok);
+    const view = abilityPresentation(freeze(result.events));
+    expect(view.signature).toEqual({kind:'high_shot',actorId:2,targetId:4,missed:natural===1,guarded:false});
+    expect(view.feedback).toEqual(natural===1 ? [{unitId:4,kind:'result',text:'Miss'}] :
+      [{unitId:4,kind:'result',text:'Critical · −12'},{unitId:4,kind:'defeat',text:'Defeated'}]);
+  }
   for(let seed=0;seed<12;seed++){
     const {catalog,state}=missileSetup();
     const result=dispatch(freeze({...state,rng:seedRng(seed)}),missile,catalog);assert(result.ok);freeze(result);
@@ -777,6 +780,19 @@ function missileSetup(level = 1) {
   return { catalog: updated, state: { ...state, versions: { ...state.versions, content: contentVersion(updated) },
     activeIndex: state.initiative.indexOf(3), units: state.units.map(u => u.id === 3 ? { ...u, cell: { x: 1, y: 0 } } : u) } };
 }
+it('presents lethal Magic Missile damage and defeat on the same target', () => {
+  const { catalog, state } = missileSetup();
+  const before = { ...state, units: state.units.map(unit => unit.id === 4 ? { ...unit, hp: 1 } : unit) };
+  const result = dispatch(freeze(before), missile, catalog);
+  assert(result.ok);
+  const damage = result.events.find(event => event.type === 'damaged');
+  assert(damage);
+  expect(abilityPresentation(freeze(result.events)).feedback).toEqual([
+    { unitId: 4, kind: 'result', text: `−${damage.damage}` },
+    { unitId: 4, kind: 'defeat', text: 'Defeated' },
+  ]);
+});
+
 it('Magic Missile dispatch automatically hits with seeded 1d4+1 damage, pure preview and one action', () => {
   const faces = new Set<number>();
   for (let seed = 0; seed < 40; seed++) {
