@@ -131,6 +131,10 @@ export function projectDungeonEnemies(depth: number, kind: EncounterKind, catalo
   const { awards, thresholds } = HERO_PROGRESSION;
   const floorXp = awards.normal + Math.min(awards.elite, awards.vault) + awards.boss;
   const expectedLevel = thresholds.filter(xp => depth - 1 >= Math.ceil(xp / floorXp)).length;
+  const cappedAtDepth = 1 + Math.ceil(thresholds[thresholds.length - 1] / floorXp);
+  const extraFloors = Math.max(0, depth - cappedAtDepth);
+  // Half of the late-game HP allowance after four extra floors, tending to 20% of base HP.
+  const extraHpFraction = 0.2 * (extraFloors / (extraFloors + 4));
   const enemies = { ...catalog.enemies };
   for (const id of Object.keys(enemies) as EnemyId[]) {
     const enemy = catalog.enemies[id], stats = { ...enemy.stats };
@@ -138,6 +142,9 @@ export function projectDungeonEnemies(depth: number, kind: EncounterKind, catalo
       // Hero leveling adds HP and abilities, but no accuracy or armor class.
       if (scalingPolicy === PARTY_SCALING_POLICY && (field === 'accuracy' || field === 'armorClass')) continue;
       stats[field] = scaleEnemyStat(enemy.stats[field], scalingPolicy === PARTY_SCALING_POLICY ? expectedLevel : depth, kind, field);
+    }
+    if (scalingPolicy === PARTY_SCALING_POLICY) {
+      stats.maxHp = Math.min(CONTENT_BOUNDS.maxHp.max, stats.maxHp + Math.round(enemy.stats.maxHp * extraHpFraction));
     }
     enemies[id] = { ...enemy, stats };
   }

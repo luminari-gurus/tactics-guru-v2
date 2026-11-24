@@ -234,7 +234,9 @@ it('paces fresh expanded enemies against guaranteed floor XP and preserves saved
   const stats = (depth: number) => projectDungeonEnemies(depth, 'normal', undefined, PARTY_SCALING_POLICY).enemies.goblin_grunt.stats;
   const hp = [1, 2, 3, 4, 5].map(depth => stats(depth).maxHp);
   expect(hp.every((value, i) => i === 0 || value > hp[i - 1])).toBe(true);
-  expect(stats(8192)).toEqual(stats(5));
+  expect(stats(20).maxHp).toBeGreaterThan(stats(5).maxHp);
+  expect(stats(8192).maxHp - stats(5).maxHp).toBeLessThanOrEqual(Math.round(stats(1).maxHp * 0.2));
+  expect(stats(8192).power).toBe(stats(5).power);
   expect(stats(5).armorClass).toBe(stats(1).armorClass);
   expect(stats(5).accuracy).toBe(stats(1).accuracy);
 });
