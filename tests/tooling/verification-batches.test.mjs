@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { definitions, createPlan, discover, exactCoverage, inventory, verifyBuild, runRows, aggregate, preparationIds, validateBrowserResult, validatePerformanceResult, validateScheduling, schedulingCompute, timingReport, quarantineCleanup, pilotOverlap, samplePilotClock, awaitPilotRunners } from '../../scripts/verification-batches.mjs';
+import { definitions, createPlan, discover, exactCoverage, matchedCaseDigests, inventory, verifyBuild, runRows, aggregate, preparationIds, validateBrowserResult, validatePerformanceResult, validateScheduling, schedulingCompute, timingReport, quarantineCleanup, pilotOverlap, samplePilotClock, awaitPilotRunners } from '../../scripts/verification-batches.mjs';
 import { digest, compareReports } from '../../scripts/verification-report.mjs';
 import { stages } from '../../scripts/verification-timings.mjs';
 
@@ -394,4 +394,20 @@ test('matched pair selects the same two complete capture batches in both modes',
     assert.deepEqual(definitions(mode), expected);
     assert.throws(() => createPlan(mode, () => [], 'webkit-acceptance'), /requires both/);
   }
+});
+
+test('matched case digests detect different skips with identical case IDs and counts', () => {
+  const serial = [
+    { ...testcase('shared-id', 'desktop'), outcome: 'expected' },
+    { ...testcase('shared-id', 'portrait'), outcome: 'skipped' },
+  ];
+  const parallel = [
+    { ...serial[0], outcome: 'skipped' },
+    { ...serial[1], outcome: 'expected' },
+  ];
+  const serialDigests = matchedCaseDigests(serial);
+  const parallelDigests = matchedCaseDigests(parallel);
+  assert.deepEqual(matchedCaseDigests([...serial].reverse()), serialDigests);
+  assert.equal(parallelDigests.caseIds, serialDigests.caseIds);
+  assert.notEqual(parallelDigests.outcomes, serialDigests.outcomes);
 });

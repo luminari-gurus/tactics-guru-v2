@@ -22,6 +22,12 @@ const isParallel = mode => mode === 'parallel-pilot' || mode === 'parallel-pair'
 
 const key = test => JSON.stringify([test.project, test.id]);
 
+export function matchedCaseDigests(tests) {
+  const ids = tests.map(key).sort();
+  const outcomes = tests.map(test => JSON.stringify([test.project, test.id, test.outcome])).sort();
+  return { caseIds: digest(JSON.stringify(ids)), outcomes: digest(JSON.stringify(outcomes)) };
+}
+
 export function exactCoverage(expected, actual) {
   const wanted = expected.map(key), found = actual.map(key);
   invariant(new Set(wanted).size === wanted.length && new Set(found).size === found.length, 'Duplicate test IDs');
@@ -576,10 +582,15 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
     save(join(out, 'timing-report.json'), timingReport(plan, result));
     const table = (result.latest ?? []).flatMap(receipt => receipt.stages.map(stage =>
       `| ${receipt.batchId} / ${stage.id} | ${stage.status} | ${((stage.wallMs ?? 0) / 1000).toFixed(2)} | ${JSON.stringify(stage.summary?.counts ?? stage.performance ?? {})} |`));
-    const pairIdentity = isPair(plan.mode) ? (result.latest ?? []).filter(report => report.batchId !== 'prepare').map(report => {
-      const ids = report.stages.flatMap(row => (row.summary?.tests ?? []).map(key)).sort();
-      return `${report.batchId}: ${ids.length} reported case IDs, SHA-256 \`${digest(JSON.stringify(ids))}\`, build \`${report.buildHash}\`.`;
-    }).join('\n\n') : '';
+    const pairIdentity = isPair(plan.mode) ? [
+      `Source commit: \`${plan.source.commit}\`.`,
+      ...(result.latest ?? []).filter(report => report.batchId !== 'prepare').map(report => {
+        const tests = report.stages.flatMap(row => row.summary?.tests ?? []);
+        const digests = matchedCaseDigests(tests);
+        return `${report.batchId}: ${tests.length} reported case IDs, case-ID SHA-256 \`${digests.caseIds}\`, ` +
+          `outcome SHA-256 \`${digests.outcomes}\`, build \`${report.buildHash}\`.`;
+      }),
+    ].join('\n\n') : '';
     const summary = `# Serial verification\n\nScope: ${plan.scope}; complete: ${result.complete}; passed: ${result.passed}; baseline eligible: ${result.baselineEligible}\n\n` +
       `Job wall span: ${result.wallMs ?? 'unknown'} ms; total job time: ${result.totalJobMs ?? 'unknown'} ms; completed Actions compute: ${result.scheduling?.completedJobComputeMs ?? 'unknown'} ms.\n\n` +
       (result.overlapMs == null ? '' : `Minimum verified overlap between passing browser cases: ${result.overlapMs} ms.\n\n`) +
