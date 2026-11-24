@@ -114,6 +114,7 @@ export class BattleHud {
   private skin: CombatSkin = 'rail';
   private readonly actorRoot=document.querySelector<HTMLElement>('#battle-actor')!;
   private readonly stats: HTMLElement;
+  private readonly planCancel: HTMLButtonElement;
   private readonly turnQueue: BattleTurnQueue;
   private readonly classGuidance: BattleClassGuidance;
   private readonly disposeGuidancePreferences: () => void;
@@ -138,7 +139,7 @@ export class BattleHud {
     this.root.innerHTML=`<p class="battle-section-label">Choose your action</p><div class="battle-actions" aria-label="Acting unit actions">
       <button id="battle-move" data-action="move" aria-label="Move" aria-describedby="battle-availability"><strong>Move</strong><span>Uses movement</span></button>
       <button data-action="basic" aria-label="Basic attack" aria-describedby="battle-availability"><strong>Basic attack</strong><span>Uses action</span></button>
-      <button id="battle-next" aria-label="Wait / End turn" aria-describedby="battle-availability"><strong>Wait / End turn</strong><span>Pass to the next unit</span></button><button id="battle-plan-cancel" hidden>Cancel plan</button></div>
+      <button id="battle-next" aria-label="Wait / End turn" aria-describedby="battle-availability"><strong>Wait / End turn</strong><span>Pass to the next unit</span></button></div>
       <label for="battle-ability">Ability</label><select id="battle-ability" aria-describedby="battle-ability-info battle-availability"></select><p id="battle-ability-info"></p><p id="battle-availability"></p><section class="battle-decision" aria-label="Target and action preview"><label for="battle-target">Target / destination</label><select id="battle-target"><option value="">Choose target</option></select><div class="battle-review-content"><p id="battle-selection">Select a tile</p><p id="battle-target-info"></p><button id="battle-inspect-target" hidden>Inspect target</button><p id="battle-preview" aria-live="polite"><span id="battle-preview-warning"></span><span id="battle-preview-text">Choose an action and target</span></p><div class="battle-commit"><p id="battle-friendly-warning" aria-live="polite"></p><button id="battle-review" aria-describedby="battle-friendly-warning" disabled>Confirm action</button><button id="battle-cancel" disabled>Cancel action</button></div></div></section>
       <nav class="battle-tools" aria-label="Secondary battle tools"><button id="battle-plan">Plan move + ability</button><button id="battle-undo">Undo move</button><button id="battle-party">Inspect party</button><button id="battle-danger" aria-pressed="false" aria-describedby="battle-danger-info">Show enemy danger</button><button id="battle-log-open">Battle log</button><button id="battle-sound" aria-pressed="false" aria-describedby="battle-sound-status">Enable sound</button><button id="battle-sound-retry" hidden>Retry sound</button><details id="battle-overflow"><summary>More</summary><div class="battle-secondary-controls"></div></details></nav><p id="battle-danger-info">Danger shows living heroes reachable by an enemy attack or Weakening Hex on its next turn, assuming current positions and statuses; it does not predict enemy choice.</p><p id="battle-danger-results" aria-live="polite" aria-atomic="true"></p><p id="battle-sound-status" aria-live="polite">Sound off</p>`;
     const signal=this.abort.signal;
@@ -174,7 +175,13 @@ export class BattleHud {
     this.target.addEventListener('change',()=>{if(this.target.value){const [x,y]=this.target.value.split(',').map(Number);callbacks.target({x,y});}else callbacks.target(null);},{signal});
     this.root.querySelector('#battle-review')!.addEventListener('click',callbacks.confirm,{signal});
     this.root.querySelector('#battle-cancel')!.addEventListener('click',callbacks.cancel,{signal});
-    this.root.querySelector('#battle-plan-cancel')!.addEventListener('click',callbacks.cancel,{signal});
+    this.planCancel = document.createElement('button');
+    this.planCancel.id = 'battle-plan-cancel';
+    this.planCancel.type = 'button';
+    this.planCancel.textContent = 'Cancel plan';
+    this.planCancel.hidden = true;
+    this.planCancel.addEventListener('click', callbacks.cancel, { signal });
+    this.root.before(this.planCancel);
     this.root.querySelector('#battle-next')!.addEventListener('click',callbacks.wait,{signal});
     mountCombatControlsPreference(this.root.querySelector('#battle-overflow')!);
     this.disposePacePreference = mountCombatPacePreference(this.root.querySelector('#battle-overflow')!);
@@ -345,9 +352,7 @@ export class BattleHud {
     // The accepted state may already contain the next actor or a defeat. Keep
     // the queue aligned with the board and actor card until presentation finishes.
     this.turnQueue.render(presentationStart ?? s.state);
-    const showPlanCancel=this.skin==='radial' && planWaiting && enabled;
-    this.root.dataset.planWaiting=String(showPlanCancel);
-    this.root.querySelector<HTMLButtonElement>('#battle-plan-cancel')!.hidden=!showPlanCancel;
+    this.planCancel.hidden = this.skin !== 'radial' || !planWaiting || !enabled;
     const movement=enabled?previewMovement(s.state,actor.id,s.catalog):null;
     const dangerButton=this.root.querySelector<HTMLButtonElement>('#battle-danger')!;
     dangerButton.disabled=!enabled; dangerButton.setAttribute('aria-pressed',String(danger));
@@ -487,5 +492,5 @@ export class BattleHud {
     for(const e of events) {const text=eventText(e,id=>displayName(this.session.state.units.find(u=>u.id===id)!.defId)+` #${id}`);if(text)this.log.push(text);}
     this.log.splice(0,Math.max(0,this.log.length-LOG_LIMIT));
   }
-  dispose(){this.abort.abort();this.classGuidance.dispose();this.disposePacePreference();this.disposeGuidancePreferences();this.turnQueue.dispose();this.root.replaceChildren();this.actorRoot.replaceChildren();this.actorRoot.hidden=true;}
+  dispose(){this.abort.abort();this.classGuidance.dispose();this.disposePacePreference();this.disposeGuidancePreferences();this.turnQueue.dispose();this.planCancel.remove();this.root.replaceChildren();this.actorRoot.replaceChildren();this.actorRoot.hidden=true;}
 }
