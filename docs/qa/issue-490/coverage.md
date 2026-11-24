@@ -28,9 +28,12 @@ gestures, preserves previews, modal focus and restart preference`.
   miss and the run and dungeon hit/miss cases retain their project-default
   viewport badge and input assertions. Standalone invalid-target, dungeon
   resume, and every mode's incoming attacks and expiration remain covered.
-  The offscreen and return gestures run in the existing standalone hit, then
-  wheel zoom and the viewport refit restore the original camera before the
-  badge tap and turn advancement.
+  The offscreen and return gestures run in the existing standalone hit.
+  Touch pinch-in or desktop wheel zoom returns the camera to its fitted scale,
+  then the viewport refit restores its position before the badge tap and turn
+  advancement. The first [mobile run](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/45476391175)
+  reached the offscreen and return assertions on both Chromium profiles before
+  failing to restore the scale with wheel events.
 - **Audio.** For each seed the muted journey still verifies the initial state
   and two legal command checkpoints. The audible full journey compares those
   same checkpoints, verifies cue delivery and the terminal outcome, and

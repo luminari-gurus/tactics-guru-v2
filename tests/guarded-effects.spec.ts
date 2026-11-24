@@ -291,12 +291,22 @@ async function checkGuardedPan(page: Page, browserName: string, info: ReturnType
   const beforeZoom = await boardReport(page);
   const region = beforeZoom.region;
   const center={x:beforeZoom.units.find((u:any)=>u.id===1).health.screen.x,y:beforeZoom.units.find((u:any)=>u.id===1).health.screen.y};
+  const pinchChromium = async (anchor: { x: number; y: number }, from: number, to: number) => {
+    const cdp = await page.context().newCDPSession(page);
+    const points = (spread: number) => [
+      { x: anchor.x - spread, y: anchor.y, id: 1 },
+      { x: anchor.x + spread, y: anchor.y, id: 2 },
+    ];
+    try {
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: points(from) });
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: points(to) });
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    } finally {
+      await cdp.detach();
+    }
+  };
   if(browserName==='chromium') {
-    const cdp=await page.context().newCDPSession(page);
-    const points=(spread:number)=>[{x:center.x-spread,y:center.y,id:1},{x:center.x+spread,y:center.y,id:2}];
-    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:points(10)});
-    await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:points(20)});
-    await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.detach();
+    await pinchChromium(center, 10, 20);
   } else {
     // Same WebKit multipointer technique as the existing Guarded move case.
     await page.locator('canvas').evaluate((node,p)=>{
@@ -339,7 +349,12 @@ async function checkGuardedPan(page: Page, browserName: string, info: ReturnType
   await checkBadges(page);
   expect((await boardReport(page)).units.find((u:any)=>u.id===1).guard.visible).toBe(true);
   // Return to the fitted scale before continuing the Guarded lifecycle.
-  await page.mouse.move(region.x + region.width / 2, region.y + region.height / 2);
-  for (let i = 0; i < 8; i++) await page.mouse.wheel(0, 100);
+  const anchor = { x: region.x + region.width / 2, y: region.y + region.height / 2 };
+  if (browserName === 'chromium' && info.project.use.hasTouch) {
+    await pinchChromium(anchor, 40, 10);
+  } else {
+    await page.mouse.move(anchor.x, anchor.y);
+    for (let i = 0; i < 8; i++) await page.mouse.wheel(0, 100);
+  }
   await expect.poll(async () => (await boardReport(page)).transform.scale).toBeCloseTo(beforeZoom.transform.scale, 5);
 }
