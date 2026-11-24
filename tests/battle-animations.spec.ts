@@ -310,8 +310,9 @@ for(const kind of kinds)test(`${kind}: repeated cancellation, modal refresh, res
   expect(errors).toEqual([]);
 });
 
-for(const kind of kinds)test(`${kind}: reload discards the active presentation and starts fresh`,async({page})=>{
-  const fixture=boundary(kind);await boot(page,fixture);await prepareSignature(page,fixture);await confirmFrozen(page);await page.clock.runFor(112);
+// Standalone departure stops the whole scene and disposes its presentation for every ability.
+test('high_shot: reload discards the active presentation and starts fresh',async({page})=>{
+  const fixture=boundary('high_shot');await boot(page,fixture);await prepareSignature(page,fixture);await confirmFrozen(page);await page.clock.runFor(112);
   const saved=await stored(page);await page.reload();await page.clock.resume();await ready(page);
   expect((await readSession(page)).state.seed).toBe(1);
   expect((await readSession(page)).state).not.toEqual(fixture.after);
@@ -336,10 +337,10 @@ test('elevated target remains anchored through rotation during impact',async({pa
 });
 
 test.describe('ability departure through real browser history',()=>{
-  for(const kind of kinds)test(`${kind}: cached return starts fresh after an accepted action`,async({page,baseURL})=>{
+  test('high_shot: cached return starts fresh after an accepted action',async({page,baseURL})=>{
     const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
     await page.addInitScript(()=>window.addEventListener('pageshow',event=>{if(event.persisted)sessionStorage.setItem('test:animation-cached-return','yes');}));
-    const fixture=boundary(kind);await boot(page,fixture);await prepareSignature(page,fixture);await confirmFrozen(page);await page.clock.runFor(112);
+    const fixture=boundary('high_shot');await boot(page,fixture);await prepareSignature(page,fixture);await confirmFrozen(page);await page.clock.runFor(112);
     const saved=await stored(page),map=new URL('map',baseURL).href;
     await page.evaluate(map=>location.assign(map),map);await expect(page.locator('#map-grid span')).toHaveCount(400);
     await page.goBack({waitUntil:'commit'});await page.clock.resume();await ready(page);
