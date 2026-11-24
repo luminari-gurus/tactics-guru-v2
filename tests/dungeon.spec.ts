@@ -689,17 +689,25 @@ test('Shaman production journey uses Hex and ally healing, reloads Weakened and 
  await (await battleTool(page, '#battle-party')).click();await page.locator('#inspect-unit-6').click();
  await expect(page.getByRole('dialog')).toContainText('Weakening Hex range 2–4');
  await expect(page.getByRole('dialog')).toContainText('Heal Goblin range 1–4');
+ await expect(page.getByRole('dialog')).toContainText('Heal Goblin: 2/2 casts remaining');
  await expect(page.getByRole('dialog')).toContainText('Fighter #1 50%');
  await expect(page.getByRole('dialog')).toContainText('Ranger #2 45%');
  await expect(page.getByRole('dialog')).toContainText('Mage #3 55%');
  await page.screenshot({path:info.outputPath('shaman-abilities-inspection.png')});await page.locator('#inspection-close').click();
- let reloaded=false;let prefixCommands:readonly Command[]=[],prefixEvents:readonly BattleEvent[]=[];
+ const inspectCasts = async (remaining: number, screenshot: string) => {
+  await (await battleTool(page, '#battle-party')).click();
+  await page.locator('#inspect-unit-6').click();
+  await expect(page.getByRole('dialog')).toContainText(`Heal Goblin: ${remaining}/2 casts remaining`);
+  await page.screenshot({ path: info.outputPath(screenshot) });
+  await page.locator('#inspection-close').click();
+ };
+ let reloaded = false, inspectedWeakened = false, inspectedExhaustion = false;
+ let prefixCommands: readonly Command[] = [], prefixEvents: readonly BattleEvent[] = [];
  for(let step=0;(await snapshot(page)).phase==='battle'&&step<500;step++) {
   await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||(await readSession(page)).phase==='player';}).toBe(true);
   if((await snapshot(page)).phase!=='battle')break;
   const before=await readSession(page),weak=before.state.units.find(u=>u.weakenedBy!==undefined);
-  if(weak&&!reloaded) {
-   const saved=await snapshot(page);
+  if (weak && !inspectedWeakened) {
    await (await battleTool(page, '#battle-log-open')).click();await expect(page.getByRole('dialog')).toContainText('Will save fails');
    await expect(page.getByRole('dialog')).toContainText('50% save chance');
    await page.screenshot({path:info.outputPath('shaman-will-save-log.png')});await page.locator('#log-close').click();
@@ -707,6 +715,13 @@ test('Shaman production journey uses Hex and ally healing, reloads Weakened and 
    await expect(page.getByRole('dialog')).toContainText('Weakened by Goblin Shaman #6');
    await expect(page.getByRole('dialog')).toContainText('−2 accuracy');
    await page.screenshot({path:info.outputPath('shaman-weakened-inspection.png')});await page.locator('#inspection-close').click();
+   inspectedWeakened = true;
+  }
+  const remaining = before.state.units.find(unit => unit.id === 6)?.healGoblinRemaining;
+  if (remaining === 1 && !reloaded) {
+   await inspectCasts(1, 'shaman-one-cast.png');
+   const saved = await snapshot(page);
+   expect(saved.activeBattle?.units.find(unit => unit.id === 6)?.healGoblinRemaining).toBe(1);
    const commands=before.replay?.commands??before.continuation!.commands;
    if(commands.some(c=>c.type==='undoMove'))throw Error('Unexpected undo in Shaman witness');
    prefixCommands=commands as readonly Command[];prefixEvents=before.events;
@@ -714,12 +729,21 @@ test('Shaman production journey uses Hex and ally healing, reloads Weakened and 
    await page.reload();await expectDungeonResumed(page);
    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
    expect((await snapshot(page)).activeBattle).toEqual(saved.activeBattle);
-   expect((await readSession(page)).events).toEqual([]);reloaded=true;continue;
+   expect((await readSession(page)).events).toEqual([]);
+   await inspectCasts(1, 'shaman-one-cast-after-continue.png');
+   reloaded = true;
+   continue;
+  }
+  if (remaining === 0 && !inspectedExhaustion) {
+   await inspectCasts(0, 'shaman-casts-exhausted.png');
+   inspectedExhaustion = true;
   }
   await playCommand(page,playerDecision(before.state,catalog));
   await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||(await readSession(page)).state.commandCount>before.state.commandCount;}).toBe(true);
  }
- expect(reloaded).toBe(true);
+ expect({ reloaded, inspectedWeakened, inspectedExhaustion }).toEqual({
+  reloaded: true, inspectedWeakened: true, inspectedExhaustion: true,
+ });
  const record=JSON.parse((await page.locator('#game').getAttribute('data-dungeon-battle-record'))!);
  const commands=[...prefixCommands,...(record.replay?.commands??record.continuation.commands)],events=[...prefixEvents,...record.events];
  // The HUD submits one automatic missile as unitId; the pure policy uses its equivalent one-entry array.

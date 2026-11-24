@@ -4,6 +4,14 @@
 - Planned branch `branch/issue-476-heal-goblin-cap` · planning base `10895b93bc53a4e8ad9312baa25f2fdf7a6a8058` · November 24, 2026 (Asia/Jerusalem)
 - Previous handoff [#483 dungeon counter migration](issue-483-dungeon-counter-migration-plan.md)
 
+## Implementation status
+
+Implementation authorized November 24, 2026. The dedicated issue branch and worktree are based on `4006de2fe96f9f63a39b62829d2c14bb9e29426f` for baseline capture. [OpenSpec tasks](../../openspec/changes/issue-476-heal-goblin-cap/tasks.md) track implementation and verification.
+
+- Baseline seed **308**, Forest Elite slot **1**, Shaman **#6**. This legal battle ends in victory and includes three successful heals by the same Shaman. The [literal save](../../tests/fixtures/saves/issue-476/legacy-dungeon.json) was encoded at command 46, immediately after the second heal. The [literal replay](../../tests/fixtures/saves/issue-476/legacy-replay.json) records the complete history, source SHA, and the expected hash of the ordered events and final state. The save and replay file SHA-256 values are `0696b3d28c14285c7d94cd08c7869236d9db259fdec0997bffe4b826190ba3ef` and `54621b8d0992e7affffd5efc29045dc083af0ec57c625e2b8a4342e2dcbea0f7`.
+- The current browser witness remains seed **189**. The first and second heals resolve at commands 21 and 37. The first player decision after each is at commands 25 and 41, where inspection can show the new counts.
+- Linux verification checkout and raw artifacts live under `/home/aiwithapex/projects/tactics-476-verification.fwnjSo` in WSL Ubuntu. Baseline capture ran on Node 24.15.0 and Vitest 5.0.3. The focused rule, AI, and standalone/run save iteration passed 142 tests before adding dungeon integration coverage.
+
 ## Selection
 
 Reviewed all 41 open issues, four open PRs, recent branch refs, and available GitHub Projects. The review included unlabeled issues and found no org or account Projects. #476 was unassigned, with no linked branch or open implementation PR and no formal blockers. Its prerequisite, the Shaman combat implementation, shipped in [PR #252](https://github.com/luminari-gurus/tactics-guru-v2/pull/252). The active dungeon scaling work in [PR #480](https://github.com/luminari-gurus/tactics-guru-v2/pull/480) can affect seeded fixtures, so confirm their encounter identity again on the implementation base.

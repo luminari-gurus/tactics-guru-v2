@@ -1,0 +1,620 @@
+{
+  "source": "4006de2fe96f9f63a39b62829d2c14bb9e29426f",
+  "seed": 308,
+  "shamanId": 6,
+  "casts": 3,
+  "prefixCommands": 46,
+  "replay": {
+    "format": 5,
+    "versions": {
+      "rules": 6,
+      "rng": 1,
+      "content": "sha256:f10972ab228c65e59f938aa1c584412c92035b85b9fd9161ffd8375afcb88cdc"
+    },
+    "initial": {
+      "format": 5,
+      "versions": {
+        "rules": 6,
+        "rng": 1,
+        "content": "sha256:f10972ab228c65e59f938aa1c584412c92035b85b9fd9161ffd8375afcb88cdc"
+      },
+      "seed": 2481858771,
+      "rng": {
+        "words": [
+          12544546,
+          2721388397,
+          2225010954,
+          19
+        ],
+        "cursor": 6
+      },
+      "mapId": "map:forest_ruins",
+      "units": [
+        {
+          "id": 1,
+          "cell": {
+            "x": 1,
+            "y": 8
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "player",
+          "defId": "fighter",
+          "hp": 18
+        },
+        {
+          "id": 2,
+          "cell": {
+            "x": 2,
+            "y": 8
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "player",
+          "defId": "ranger",
+          "hp": 12
+        },
+        {
+          "id": 3,
+          "cell": {
+            "x": 1,
+            "y": 9
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "player",
+          "defId": "mage",
+          "hp": 11
+        },
+        {
+          "id": 4,
+          "cell": {
+            "x": 8,
+            "y": 4
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_grunt",
+          "hp": 9
+        },
+        {
+          "id": 5,
+          "cell": {
+            "x": 9,
+            "y": 2
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_archer",
+          "hp": 8
+        },
+        {
+          "id": 6,
+          "cell": {
+            "x": 8,
+            "y": 5
+          },
+          "hasMoved": false,
+          "hasActed": false,
+          "side": "enemy",
+          "defId": "goblin_shaman",
+          "hp": 10
+        }
+      ],
+      "initiative": [
+        2,
+        4,
+        3,
+        1,
+        5,
+        6
+      ],
+      "activeIndex": 0,
+      "round": 1,
+      "outcome": "ongoing",
+      "commandCount": 0
+    },
+    "commands": [
+      {
+        "type": "move",
+        "unitId": 2,
+        "to": {
+          "x": 3,
+          "y": 5
+        }
+      },
+      {
+        "type": "useAbility",
+        "unitId": 2,
+        "abilityId": "ability:high_shot",
+        "target": {
+          "unitId": 6
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 2
+      },
+      {
+        "type": "move",
+        "unitId": 4,
+        "to": {
+          "x": 6,
+          "y": 6
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 4
+      },
+      {
+        "type": "move",
+        "unitId": 3,
+        "to": {
+          "x": 2,
+          "y": 7
+        }
+      },
+      {
+        "type": "useAbility",
+        "unitId": 3,
+        "abilityId": "ability:magic_missile",
+        "target": {
+          "missileTargets": [
+            4
+          ]
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 3
+      },
+      {
+        "type": "move",
+        "unitId": 1,
+        "to": {
+          "x": 3,
+          "y": 6
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 1
+      },
+      {
+        "type": "move",
+        "unitId": 5,
+        "to": {
+          "x": 7,
+          "y": 4
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 5
+      },
+      {
+        "type": "move",
+        "unitId": 6,
+        "to": {
+          "x": 7,
+          "y": 5
+        }
+      },
+      {
+        "type": "useAbility",
+        "unitId": 6,
+        "abilityId": "ability:weakening_hex",
+        "target": {
+          "unitId": 2
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 6
+      },
+      {
+        "type": "useAbility",
+        "unitId": 2,
+        "abilityId": "ability:high_shot",
+        "target": {
+          "unitId": 5
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 2
+      },
+      {
+        "type": "move",
+        "unitId": 4,
+        "to": {
+          "x": 3,
+          "y": 7
+        }
+      },
+      {
+        "type": "useAbility",
+        "unitId": 4,
+        "abilityId": "ability:basic_attack",
+        "target": {
+          "unitId": 3
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 4
+      },
+      {
+        "type": "move",
+        "unitId": 3,
+        "to": {
+          "x": 3,
+          "y": 8
+        }
+      },
+      {
+        "type": "useAbility",
+        "unitId": 3,
+        "abilityId": "ability:basic_attack",
+        "target": {
+          "unitId": 4
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 3
+      },
+      {
+        "type": "move",
+        "unitId": 1,
+        "to": {
+          "x": 7,
+          "y": 6
+        }
+      },
+      {
+        "type": "useAbility",
+        "unitId": 1,
+        "abilityId": "ability:guarded_strike",
+        "target": {
+          "unitId": 6
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 1
+      },
+      {
+        "type": "move",
+        "unitId": 5,
+        "to": {
+          "x": 8,
+          "y": 3
+        }
+      },
+      {
+        "type": "useAbility",
+        "unitId": 5,
+        "abilityId": "ability:shortbow_shot",
+        "target": {
+          "unitId": 1
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 5
+      },
+      {
+        "type": "useAbility",
+        "unitId": 6,
+        "abilityId": "ability:heal_goblin",
+        "target": {
+          "unitId": 5
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 6
+      },
+      {
+        "type": "useAbility",
+        "unitId": 2,
+        "abilityId": "ability:high_shot",
+        "target": {
+          "unitId": 6
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 2
+      },
+      {
+        "type": "move",
+        "unitId": 4,
+        "to": {
+          "x": 2,
+          "y": 8
+        }
+      },
+      {
+        "type": "useAbility",
+        "unitId": 4,
+        "abilityId": "ability:basic_attack",
+        "target": {
+          "unitId": 3
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 4
+      },
+      {
+        "type": "move",
+        "unitId": 3,
+        "to": {
+          "x": 3,
+          "y": 6
+        }
+      },
+      {
+        "type": "useAbility",
+        "unitId": 3,
+        "abilityId": "ability:magic_missile",
+        "target": {
+          "missileTargets": [
+            6
+          ]
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 3
+      },
+      {
+        "type": "move",
+        "unitId": 1,
+        "to": {
+          "x": 8,
+          "y": 4
+        }
+      },
+      {
+        "type": "useAbility",
+        "unitId": 1,
+        "abilityId": "ability:guarded_strike",
+        "target": {
+          "unitId": 5
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 1
+      },
+      {
+        "type": "move",
+        "unitId": 5,
+        "to": {
+          "x": 8,
+          "y": 2
+        }
+      },
+      {
+        "type": "useAbility",
+        "unitId": 5,
+        "abilityId": "ability:shortbow_shot",
+        "target": {
+          "unitId": 1
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 5
+      },
+      {
+        "type": "useAbility",
+        "unitId": 6,
+        "abilityId": "ability:heal_goblin",
+        "target": {
+          "unitId": 5
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 6
+      },
+      {
+        "type": "move",
+        "unitId": 2,
+        "to": {
+          "x": 3,
+          "y": 2
+        }
+      },
+      {
+        "type": "useAbility",
+        "unitId": 2,
+        "abilityId": "ability:high_shot",
+        "target": {
+          "unitId": 5
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 2
+      },
+      {
+        "type": "move",
+        "unitId": 4,
+        "to": {
+          "x": 2,
+          "y": 6
+        }
+      },
+      {
+        "type": "useAbility",
+        "unitId": 4,
+        "abilityId": "ability:basic_attack",
+        "target": {
+          "unitId": 3
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 4
+      },
+      {
+        "type": "move",
+        "unitId": 3,
+        "to": {
+          "x": 7,
+          "y": 6
+        }
+      },
+      {
+        "type": "useAbility",
+        "unitId": 3,
+        "abilityId": "ability:magic_missile",
+        "target": {
+          "missileTargets": [
+            5
+          ]
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 3
+      },
+      {
+        "type": "move",
+        "unitId": 1,
+        "to": {
+          "x": 7,
+          "y": 4
+        }
+      },
+      {
+        "type": "useAbility",
+        "unitId": 1,
+        "abilityId": "ability:guarded_strike",
+        "target": {
+          "unitId": 6
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 1
+      },
+      {
+        "type": "move",
+        "unitId": 5,
+        "to": {
+          "x": 8,
+          "y": 3
+        }
+      },
+      {
+        "type": "useAbility",
+        "unitId": 5,
+        "abilityId": "ability:shortbow_shot",
+        "target": {
+          "unitId": 3
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 5
+      },
+      {
+        "type": "useAbility",
+        "unitId": 6,
+        "abilityId": "ability:heal_goblin",
+        "target": {
+          "unitId": 5
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 6
+      },
+      {
+        "type": "move",
+        "unitId": 2,
+        "to": {
+          "x": 4,
+          "y": 3
+        }
+      },
+      {
+        "type": "useAbility",
+        "unitId": 2,
+        "abilityId": "ability:high_shot",
+        "target": {
+          "unitId": 5
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 2
+      },
+      {
+        "type": "move",
+        "unitId": 4,
+        "to": {
+          "x": 3,
+          "y": 3
+        }
+      },
+      {
+        "type": "useAbility",
+        "unitId": 4,
+        "abilityId": "ability:basic_attack",
+        "target": {
+          "unitId": 2
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 4
+      },
+      {
+        "type": "useAbility",
+        "unitId": 1,
+        "abilityId": "ability:guarded_strike",
+        "target": {
+          "unitId": 6
+        }
+      },
+      {
+        "type": "endTurn",
+        "unitId": 1
+      },
+      {
+        "type": "move",
+        "unitId": 2,
+        "to": {
+          "x": 4,
+          "y": 2
+        }
+      },
+      {
+        "type": "useAbility",
+        "unitId": 2,
+        "abilityId": "ability:high_shot",
+        "target": {
+          "unitId": 4
+        }
+      }
+    ],
+    "battlefield": {
+      "encounterId": "encounter:forest_ruins",
+      "mapId": "map:forest_ruins",
+      "mapHash": "sha256:ac422194c5abcd30346b185319d8ec97393bf82b49f9bccb9b983102c95e80d2",
+      "kind": "authored"
+    }
+  },
+  "outcome": "playerWin",
+  "resultHash": "sha256:88fab8ed3dde6242afe0ec1e3eb50484d715ef18af5dc14d71415f5131abe5c6"
+}

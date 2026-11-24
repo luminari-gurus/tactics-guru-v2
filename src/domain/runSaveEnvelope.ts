@@ -7,7 +7,7 @@ import type { BattlefieldEncounter } from '../content/battlefieldTypes';
 import { resolveBattlefield, sameBattlefield, type BattlefieldDescriptor } from './battlefield';
 import type { ContentCatalog } from '../content/types';
 import type { ItemCatalog } from '../content/itemTypes';
-import { contentVersion, readBattleState } from './battle';
+import { contentVersion, hasHealGoblinCap, readBattleState } from './battle';
 import { canonical, hashJson } from './contentIdentity';
 import { projectItemCatalog, readRunItems, type RunItems } from './items';
 import { itemCatalogIdentity, previousItemCatalogIdentity } from './rewards';
@@ -70,7 +70,7 @@ export function readRunSnapshot(input: unknown, context: RunSaveContext): RunSna
   const catalog = runBattleCatalog(items, context);
   if (!catalog) return invalid;
   const battle = readBattleState(input.activeBattle, catalog);
-  if (!battle.ok || !matchesDraughtStock(battle.state.draughts, items.ownership, context.items) || battle.state.mapId !== resolved.map.id ||
+  if (!battle.ok || hasHealGoblinCap(battle.state.units) || !matchesDraughtStock(battle.state.draughts, items.ownership, context.items) || battle.state.mapId !== resolved.map.id ||
     battle.state.seed !== deriveRunSeed(items.run.seed, 'encounter', items.run.encounterIndex)) return invalid;
   if (battle.state.units.some(u => u.side === 'player' && u.hp > encounterHpLimit(u,items.run.party.find(h => h.heroId === u.defId)!.hp,catalog,
     draughtHealing(battle.state.draughts,u.defId)))) return invalid;
