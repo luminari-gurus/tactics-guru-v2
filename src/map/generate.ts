@@ -50,11 +50,17 @@ export function encounterCandidates(map: GeneratedMap): number[] {
 }
 
 export function validMapCells(cells: readonly MapCell[], width = 20, height = width, allowOpen = false): boolean {
-  if (!Number.isInteger(width) || !Number.isInteger(height) || width < 20 || height < 20 || width > 36 || height > MAX_MAP_HEIGHT || cells.length !== width * height || cells.some(cell => cell !== 0 && cell !== 1)) return false;
-  const floorCount = cells.reduce<number>((sum, cell) => sum + cell, 0);
+  if (!Number.isInteger(width) || !Number.isInteger(height) || width < 20 || height < 20 || width > 36 || height > MAX_MAP_HEIGHT || cells.length !== width * height) return false;
+  let floorCount = 0;
+  for (let i = 0; i < cells.length; i++) {
+    if (cells[i] === 1) floorCount++;
+    else if (cells[i] !== 0) return false;
+  }
   if (floorCount < 60 || floorCount > (allowOpen ? (width - 2) * (height - 2) : width * height - (2 * width + 2 * height))) return false;
   for (let x = 0; x < width; x++) if (cells[x] || cells[(height - 1) * width + x]) return false;
   for (let y = 0; y < height; y++) if (cells[y * width] || cells[y * width + width - 1]) return false;
+  // Once every interior cell is known to be open, connectivity follows from the rectangle.
+  if (floorCount === (width - 2) * (height - 2)) return true;
   const seen = new Uint8Array(cells.length);
   const queue = new Int32Array(floorCount);
   queue[0] = cells.indexOf(1);
@@ -206,7 +212,7 @@ function generateSized(seed: number, type: 'sector-graph' | 'arena', size: numbe
   const draw = localDraw((seed ^ 0x53454354) >>> 0);
   const cells: MapCell[] = Array<MapCell>(size * height).fill(0);
   if (type === 'arena') {
-    for (let y = 1; y < height - 1; y++) for (let x = 1; x < size - 1; x++) cells[y * size + x] = 1;
+    for (let y = 1; y < height - 1; y++) cells.fill(1, y * size + 1, (y + 1) * size - 1);
   } else {
     const centers: {x:number; y:number}[] = [];
     const rows = Math.max(3, Math.floor(height / 12));
@@ -215,7 +221,7 @@ function generateSized(seed: number, type: 'sector-graph' | 'arena', size: numbe
       const top = 1 + Math.floor(sy * (height - 2) / rows), bottom = 1 + Math.floor((sy + 1) * (height - 2) / rows);
       const w = 3 + draw(Math.max(1, right - left - 3)), h = 3 + draw(Math.max(1, bottom - top - 3));
       const x = left + draw(right - left - w + 1), y = top + draw(bottom - top - h + 1);
-      for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) cells[yy * size + xx] = 1;
+      for (let yy = y; yy < y + h; yy++) cells.fill(1, yy * size + x, yy * size + x + w);
       centers.push({x:x + Math.floor(w / 2), y:y + Math.floor(h / 2)});
     }
     const connect = (a: typeof centers[number], b: typeof centers[number]) => {
