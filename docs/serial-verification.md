@@ -205,3 +205,20 @@ For deliberate Actions execution, select the workflow's `pilot` or `capture` mod
 record host conditions and inspect its aggregate. Start with the bounded pilot
 before launching expensive full coverage after changes to this tooling.
 
+
+### Matched two-runner comparison (#208)
+
+Dispatch `serial-pair` and `parallel-pair` separately on the same commit, leaving
+`batches` empty and `extra_job` at `none`. Each mode runs the complete
+`chromium-desktop-2` batch on VM 01 and `webkit-acceptance` on VM 02. The
+serial control allows one active batch at a time. The parallel arm allows two
+and requires clock-bounded overlap between passing browser cases. Each arm
+builds once and restores its verified bundle for both batches.
+
+Compare the source SHA, build digest and per-batch case-ID digests in the run
+summaries. Review skips and failures in both arms. Use run creation to final
+completion for end-to-end time and sum completed non-skipped job durations for
+runner time, including preparation, setup, retries and aggregation. Report queues
+and outside runner load alongside the results. Only comparable passing runs can
+support a speedup for this pair. The full-suite target still requires broader
+coverage.

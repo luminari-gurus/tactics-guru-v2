@@ -311,9 +311,9 @@ test('workflow defaults to serial and pins the manual pilot to distinct per-VM l
   assert.match(rejection, /permissions: \{\}/);
   assert.doesNotMatch(rejection, /uses:/);
   assert.match(rejection, /exit 1/);
-  assert.ok(workflow.includes("max-parallel: ${{ inputs.mode == 'parallel-pilot' && 2 || 1 }}"));
+  assert.ok(workflow.includes("max-parallel: ${{ startsWith(inputs.mode, 'parallel-') && 2 || 1 }}"));
   assert.ok(workflow.includes("format('tactics-browser-{0}', matrix.runner)"));
-  assert.ok(workflow.includes("inputs.mode == 'parallel-pilot' && matrix.runner"));
+  assert.ok(workflow.includes("(startsWith(inputs.mode, 'parallel-') || inputs.mode == 'serial-pair') && matrix.runner"));
   assert.match(workflow, /fail-fast: false/); assert.match(workflow, /ref: \$\{\{ github.sha \}\}/);
   assert.match(workflow, /65m npm run verify:batches/); assert.doesNotMatch(workflow, /100m/);
   assert.match(workflow, /github.run_attempt/); assert.match(workflow, /name: Serial verification aggregate/);
@@ -360,9 +360,9 @@ test('browser workflows share a non-cancelling lock for the selected VM', () => 
     let group = 'tactics-browser-' + runner;
     if (file === 'issue-200-baseline.yml') {
       targets.push('ubuntu-latest');
-      group = "tactics-browser-${{ inputs.mode == 'parallel-pilot' && inputs.extra_job == 'none' && 'parallel-pilot' || inputs.runner || 'tactics-browser-01' }}";
+      group = "tactics-browser-${{ (startsWith(inputs.mode, 'parallel-') || inputs.mode == 'serial-pair') && inputs.extra_job == 'none' && 'parallel-pilot' || inputs.runner || 'tactics-browser-01' }}";
       for (const pilotRunner of ["'tactics-browser-01'", 'matrix.runner']) {
-        targets.push(`[self-hosted, tactics-browser, "\${{ inputs.mode == 'parallel-pilot' && ${pilotRunner} || inputs.runner || 'tactics-browser-01' }}"]`);
+        targets.push(`[self-hosted, tactics-browser, "\${{ (startsWith(inputs.mode, 'parallel-') || inputs.mode == 'serial-pair') && ${pilotRunner} || inputs.runner || 'tactics-browser-01' }}"]`);
       }
     }
     validate(workflow, group, targets);
@@ -385,5 +385,13 @@ test('automatic PR checks retain the shared VM reservation and durable pending q
     assert.match(concurrency, /queue: max/);
     assert.match(concurrency, /cancel-in-progress: false/);
     assert.match(workflow, /runs-on: \[self-hosted, tactics-browser, tactics-browser-01\]/);
+  }
+});
+
+test('matched pair selects the same two complete capture batches in both modes', () => {
+  const expected = ['chromium-desktop-2', 'webkit-acceptance'].map(id => definitions('capture').find(job => job.id === id));
+  for (const mode of ['serial-pair', 'parallel-pair']) {
+    assert.deepEqual(definitions(mode), expected);
+    assert.throws(() => createPlan(mode, () => [], 'webkit-acceptance'), /requires both/);
   }
 });
