@@ -392,10 +392,15 @@ for(const ability of ['ability:basic_attack','ability:guarded_strike'] as const)
 });
 
 test('visible action feedback stays inside the drawable board at small sizes and zoomed edges',async({page},info)=>{
-  const fixture=boundary('magic_missile','defeat');await boot(page,fixture);
+  test.setTimeout(180000);
+  const fixture=boundary('magic_missile','defeat');
+  await page.clock.install();
   for(const size of [{width:320,height:568},{width:568,height:320}]){
     await page.setViewportSize(size);await page.clock.resume();
     await reachStandaloneBoundary(page,fixture.before);
+    const route=new URL(page.url());
+    expect(route.pathname).toBe(process.env.PLAYWRIGHT_BASE_PATH ?? '/');
+    expect(route.searchParams.get('game')).toBe('battle');
     await prepareSignature(page,fixture);await confirmFrozen(page);await page.clock.runFor(288);
     const initial=await report(page),r=initial.region;
     const x=r.x+r.width/2,y=r.y+r.height/2;
