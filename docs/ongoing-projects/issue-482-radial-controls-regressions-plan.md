@@ -2,7 +2,7 @@
 
 - Issue [#482](https://github.com/luminari-gurus/tactics-guru-v2/issues/482)
 - Assignee [@moshehbenavraham](https://github.com/moshehbenavraham)
-- Branch [branch/issue-482-radial-controls-regressions](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-482-radial-controls-regressions)
+- Implementation [PR #484](https://github.com/luminari-gurus/tactics-guru-v2/pull/484) from `branch/issue-482-radial-controls-regressions`
 - Planning base `cadcf4d5c720b5556928195fe8af10bdf5ecca13` on `main`, reviewed 2026-11-24 (Asia/Jerusalem)
 - Previous handoff [#435 dungeon save feedback](issue-435-dungeon-save-feedback-plan.md)
 - OpenSpec [issue-482-radial-controls-regressions](../../openspec/changes/issue-482-radial-controls-regressions/proposal.md)

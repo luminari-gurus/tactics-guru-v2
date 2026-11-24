@@ -1,7 +1,7 @@
 # Issue #483 — Repair the dungeon counter migration browser assertion
 
 - Issue [#483](https://github.com/luminari-gurus/tactics-guru-v2/issues/483), claimed by [@moshehbenavraham](https://github.com/moshehbenavraham) in the [issue comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/483#issuecomment-7126376882)
-- Implementation branch [branch/issue-483-dungeon-counter-migration](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-483-dungeon-counter-migration)
+- Implementation [PR #486](https://github.com/luminari-gurus/tactics-guru-v2/pull/486) from `branch/issue-483-dungeon-counter-migration`
 - Planning base `960eb8d3ef594d4fc93e40ae04d53b7bf75bc5b2` on `main`, reviewed November 24, 2026 (Asia/Jerusalem)
 - Previous handoff [#482 radial battle controls](issue-482-radial-controls-regressions-plan.md)
 - OpenSpec [issue-483-dungeon-counter-migration](../../openspec/changes/issue-483-dungeon-counter-migration/proposal.md)
@@ -12,7 +12,7 @@ Implementation authorized November 24, 2026, including OpenSpec tracking. The pu
 
 The baseline root preview at `960eb8d3` built on Node `24.15.0` with the locked Playwright `1.64.1`. Discovery selected exactly the two WebKit cases. Both failed at the expected assertion with 13 expected and 17 received, one worker and zero retries. `base-webkit.json` and `base-webkit-artifacts/` retain the two failures. The sorted distribution file-manifest digest is `00f6eb16dfa505e729c661e4664b5b5ad0692d84e57b6d3657449235ebe994fd`.
 
-The two-file fix imports the existing format identifier and compares it to the saved envelope. Diff review confirmed the original fixture, legacy assertions, and production encoder and decoder logic are preserved. All three OpenSpec tasks are complete. The focused PR is linked from the issue's Development section when opened.
+The two-file fix imports the existing format identifier and compares it to the saved envelope. Diff review confirmed the original fixture, legacy assertions, and production encoder and decoder logic are preserved. All three OpenSpec tasks are complete.
 
 ## Verification results
 
@@ -21,7 +21,7 @@ The implementation at clean source `c1cb22cd2de7ebcbfaaa8b078f54e996fce4c43b` pa
 - `npm run test:unit -- tests/unit/dungeon.test.ts` passed all 131 cases. Output is in `dungeon-units.log`.
 - `npm run verify:pr` passed in 143.3 seconds. It covered tooling, 1,590 unit and content cases, both TypeScript scopes, two build integrations, the production bundle, and seven browser smoke journeys. The source-bound receipt is `checkout/verification-receipts/pr/1795517959739-2529883/summary.json` within the WSL evidence directory above.
 - Discovery and execution agreed for the migration case in `tests/main-menu.spec.ts`. WebKit portrait and landscape passed 2/2. Chromium desktop, mobile portrait, and mobile landscape passed 3/3. Both runs used one worker, zero retries, and emulated mobile profiles. The JSON reports and discovery lists are `final-webkit.json`, `final-chromium.json`, and `final-*-list.txt`.
-- `openspec validate issue-483-dungeon-counter-migration --strict` and `git diff --check` passed. The verification handoff and OpenSpec checkbox update are the only edits after the tested source. The original #208 matched comparison remains recorded as failed.
+- `openspec validate issue-483-dungeon-counter-migration --strict` and `git diff --check` passed. Subsequent edits only updated the verification handoff, OpenSpec task, and historical links. The original #208 matched comparison remains recorded as failed.
 
 ## Selection
 

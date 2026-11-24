@@ -30,4 +30,4 @@ The shared battle UI serves standalone battles, authored runs and dungeon
 battles. Use the existing scene, HUD, and Playwright suites to verify
 [#482](https://github.com/luminari-gurus/tactics-guru-v2/issues/482). See the
 [implementation plan](../../../docs/ongoing-projects/issue-482-radial-controls-regressions-plan.md) and
-[task branch](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-482-radial-controls-regressions).
+[merged PR #484](https://github.com/luminari-gurus/tactics-guru-v2/pull/484).
