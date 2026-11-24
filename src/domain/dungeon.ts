@@ -194,7 +194,7 @@ export function dungeonBattle(s: DungeonState) {
   const slot = activeDungeonSlot(s);
   if (slot >= 3) return null;
   const plan = currentFloor(s).descriptor.encounters[slot];
-  const baseline = plan.selection.policy === LEGACY_ENCOUNTER_POLICY ? dungeonContent.catalog : projectDungeonEnemies(s.depth, plan.selection.kind, encounterBattleCatalog(plan.selection));
+  const baseline = plan.selection.policy === LEGACY_ENCOUNTER_POLICY ? dungeonContent.catalog : projectDungeonEnemies(s.depth, plan.selection.kind, encounterBattleCatalog(plan.selection), plan.selection.scalingPolicy);
   const resolved = resolveBattlefield(plan.selection.encounter, dungeonSeed(s.seed, s.depth, 'battle', slot), baseline);
   if (!resolved.ok || (plan.battlefield === null ? plan.selection.policy !== LEGACY_ENCOUNTER_POLICY : !sameBattlefield(plan.battlefield, resolved.descriptor))) return null;
   const projected = projectOwnedCatalog(s.ownership, s.party, baseline, dungeonContent.items);

@@ -2,7 +2,7 @@ import { assert, expect, it } from 'vitest';
 import { dungeonBattleCatalog, dungeonEncounterCatalog, dungeonEncounterCatalogIdentity, hobgoblinDungeonBattleCatalog, hobgoblinDungeonEncounterCatalog, readDungeonEncounterCatalog, ENCOUNTER_KINDS } from '../../src/content/dungeonEncounters';
 import { desertRunCatalog } from '../../src/content/desertCatalog';
 import { CONTENT_BOUNDS, ENEMY_IDS, HERO_IDS } from '../../src/content/constants';
-import { EXPANDED_ENCOUNTER_POLICY, dungeonBiome, encounterBattleCatalog, readDungeonEncounterSelection, encounterSelectionSeed, projectDungeonEnemies, scaleEnemyStat, selectDungeonEncounter } from '../../src/domain/dungeonEncounters';
+import { PARTY_SCALING_POLICY, EXPANDED_ENCOUNTER_POLICY, dungeonBiome, encounterBattleCatalog, readDungeonEncounterSelection, encounterSelectionSeed, projectDungeonEnemies, scaleEnemyStat, selectDungeonEncounter } from '../../src/domain/dungeonEncounters';
 import { resolveBattlefield, layoutSeed } from '../../src/domain/battlefield';
 import { createBattle } from '../../src/domain/turns';
 import { dungeonSeed, freshDungeon } from '../../src/domain/dungeon';
@@ -222,4 +222,19 @@ it('round-trips a new dungeon in every biome and rejects selection identities fr
   const selection = selectDungeonEncounter(0, 1, 0, policy);
   expect(readDungeonEncounterSelection({ ...selection, catalogIdentity: dungeonEncounterCatalogIdentity() },
     1, 0, selection.biome, policy)).toBeNull();
+});
+
+it('paces fresh expanded enemies against guaranteed floor XP and preserves saved projections', () => {
+  const fresh = selectDungeonEncounter(42, 5, 0, EXPANDED_ENCOUNTER_POLICY);
+  expect(fresh.scalingPolicy).toBe(PARTY_SCALING_POLICY);
+  for (const scalingPolicy of [PARTY_SCALING_POLICY, 'enemy-depth-v1'] as const) {
+    const saved = { ...fresh, scalingPolicy };
+    expect(readDungeonEncounterSelection(saved, 5, 0, fresh.biome, fresh.policy)).toEqual(saved);
+  }
+  const stats = (depth: number) => projectDungeonEnemies(depth, 'normal', undefined, PARTY_SCALING_POLICY).enemies.goblin_grunt.stats;
+  const hp = [1, 2, 3, 4, 5].map(depth => stats(depth).maxHp);
+  expect(hp.every((value, i) => i === 0 || value > hp[i - 1])).toBe(true);
+  expect(stats(8192)).toEqual(stats(5));
+  expect(stats(5).armorClass).toBe(stats(1).armorClass);
+  expect(stats(5).accuracy).toBe(stats(1).accuracy);
 });
