@@ -1,0 +1,44 @@
+name: Issue 490 focused audio reload verification
+on:
+  push:
+    branches: [work/issue-490-reload-verification]
+permissions:
+  contents: read
+concurrency:
+  group: tactics-browser-tactics-browser-02
+  queue: max
+  cancel-in-progress: false
+jobs:
+  reload:
+    if: github.repository == 'luminari-gurus/tactics-guru-v2'
+    runs-on: [self-hosted, tactics-browser, tactics-browser-02]
+    timeout-minutes: 15
+    steps:
+      - name: Check host disposition
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run setup:browsers
+      - run: npm run build
+        id: build
+      - name: Exercise mid-battle reload on three Chromium profiles
+        run: |
+          mkdir -p verification-receipts/issue-490
+          npx --no-install playwright test -c playwright.regression.config.ts tests/battle-audio.spec.ts --grep 'sound control uses' --reporter=json > verification-receipts/issue-490/chromium.json
+      - name: Exercise mid-battle reload on two WebKit profiles
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          mkdir -p verification-receipts/issue-490
+          npx --no-install playwright test -c playwright.device-acceptance.config.ts tests/battle-audio.spec.ts --grep 'sound control uses' --reporter=json > verification-receipts/issue-490/webkit.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue490-audio-reload-receipts
+          path: verification-receipts/issue-490/
+          if-no-files-found: warn
