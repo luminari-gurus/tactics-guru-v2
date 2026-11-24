@@ -2,7 +2,7 @@ import { assert, expect, it } from 'vitest';
 import { dungeonBattleCatalog, dungeonEncounterCatalog, dungeonEncounterCatalogIdentity, hobgoblinDungeonBattleCatalog, hobgoblinDungeonEncounterCatalog, readDungeonEncounterCatalog, ENCOUNTER_KINDS } from '../../src/content/dungeonEncounters';
 import { desertRunCatalog } from '../../src/content/desertCatalog';
 import { CONTENT_BOUNDS, ENEMY_IDS, HERO_IDS } from '../../src/content/constants';
-import { PARTY_SCALING_POLICY, EXPANDED_ENCOUNTER_POLICY, dungeonBiome, encounterBattleCatalog, readDungeonEncounterSelection, encounterSelectionSeed, projectDungeonEnemies, scaleEnemyStat, selectDungeonEncounter } from '../../src/domain/dungeonEncounters';
+import { ENDLESS_SCALING_POLICY, PARTY_SCALING_POLICY, EXPANDED_ENCOUNTER_POLICY, dungeonBiome, encounterBattleCatalog, readDungeonEncounterSelection, encounterSelectionSeed, projectDungeonEnemies, scaleEnemyStat, selectDungeonEncounter } from '../../src/domain/dungeonEncounters';
 import { resolveBattlefield, layoutSeed } from '../../src/domain/battlefield';
 import { createBattle } from '../../src/domain/turns';
 import { dungeonSeed, freshDungeon } from '../../src/domain/dungeon';
@@ -226,8 +226,8 @@ it('round-trips a new dungeon in every biome and rejects selection identities fr
 
 it('paces fresh expanded enemies against guaranteed floor XP and preserves saved projections', () => {
   const fresh = selectDungeonEncounter(42, 5, 0, EXPANDED_ENCOUNTER_POLICY);
-  expect(fresh.scalingPolicy).toBe(PARTY_SCALING_POLICY);
-  for (const scalingPolicy of [PARTY_SCALING_POLICY, 'enemy-depth-v1'] as const) {
+  expect(fresh.scalingPolicy).toBe(ENDLESS_SCALING_POLICY);
+  for (const scalingPolicy of [ENDLESS_SCALING_POLICY, PARTY_SCALING_POLICY, 'enemy-depth-v1'] as const) {
     const saved = { ...fresh, scalingPolicy };
     expect(readDungeonEncounterSelection(saved, 5, 0, fresh.biome, fresh.policy)).toEqual(saved);
   }
@@ -245,4 +245,13 @@ it('paces fresh expanded enemies against guaranteed floor XP and preserves saved
   const wounded = projectDungeonEnemies(5, 'normal', undefined, PARTY_SCALING_POLICY, 2.25).enemies.goblin_grunt.stats;
   expect(wounded.maxHp).toBeLessThan(stats(5).maxHp);
   expect(wounded.maxHp).toBeGreaterThan(solo.maxHp);
+});
+
+it('keeps adding endurance across deep floors without increasing late-game damage', () => {
+  const projected = (depth: number) => projectDungeonEnemies(depth, 'normal', undefined, ENDLESS_SCALING_POLICY).enemies.goblin_grunt.stats;
+  const depths = [5, 25, 250, 2500, 8192, Number.MAX_SAFE_INTEGER];
+  for (const [i, depth] of depths.entries()) {
+    expect(projected(depth).power).toBe(projected(5).power);
+    if (i) expect(projected(depth).maxHp).toBeGreaterThan(projected(depths[i - 1]).maxHp);
+  }
 });
