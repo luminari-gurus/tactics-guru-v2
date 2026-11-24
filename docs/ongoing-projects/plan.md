@@ -1,62 +1,48 @@
-# Issue #483 — Repair the dungeon counter migration browser assertion
+# Issue #476 — Cap Heal Goblin in dungeon battles
 
-- Issue [#483](https://github.com/luminari-gurus/tactics-guru-v2/issues/483), claimed by [@moshehbenavraham](https://github.com/moshehbenavraham) in the [issue comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/483#issuecomment-7126376882)
-- Implementation [PR #486](https://github.com/luminari-gurus/tactics-guru-v2/pull/486) from `branch/issue-483-dungeon-counter-migration`
-- Planning base `960eb8d3ef594d4fc93e40ae04d53b7bf75bc5b2` on `main`, reviewed November 24, 2026 (Asia/Jerusalem)
-- Previous handoff [#482 radial battle controls](issue-482-radial-controls-regressions-plan.md)
-- OpenSpec [issue-483-dungeon-counter-migration](../../openspec/changes/issue-483-dungeon-counter-migration/proposal.md)
-
-## Implementation status
-
-Implementation authorized November 24, 2026, including OpenSpec tracking. The published planning branch was clean at `8e73e851` and has incorporated `main` at `1a4b0af1`. The intervening changes cover matched-batch tooling and leave the affected migration and browser inputs identical to the planning base. A Linux verification checkout and reports are under `/home/aiwithapex/projects/tactics-483-verification.giz3lM` in WSL Ubuntu. The baseline runs on the literal planning base.
-
-The baseline root preview at `960eb8d3` built on Node `24.15.0` with the locked Playwright `1.64.1`. Discovery selected exactly the two WebKit cases. Both failed at the expected assertion with 13 expected and 17 received, one worker and zero retries. `base-webkit.json` and `base-webkit-artifacts/` retain the two failures. The sorted distribution file-manifest digest is `00f6eb16dfa505e729c661e4664b5b5ad0692d84e57b6d3657449235ebe994fd`.
-
-The two-file fix imports the existing format identifier and compares it to the saved envelope. Diff review confirmed the original fixture, legacy assertions, and production encoder and decoder logic are preserved. All three OpenSpec tasks are complete.
-
-## Verification results
-
-The implementation at clean source `c1cb22cd2de7ebcbfaaa8b078f54e996fce4c43b` passed in WSL Ubuntu x86-64 with Node `24.15.0`, npm `12.0.2`, and Playwright `1.64.1` (Chromium `156.0.8078.4` and WebKit `27.2`). The literal fixture and lockfile matched the baseline. The ordinary PR command produced the root distribution used for both focused browser runs. Its sorted file-manifest SHA-256 was `6771259523fdc33ae60a621570a85e887aa865e00275ed36a311085ea61df8f0`.
-
-- `npm run test:unit -- tests/unit/dungeon.test.ts` passed all 131 cases. Output is in `dungeon-units.log`.
-- `npm run verify:pr` passed in 143.3 seconds. It covered tooling, 1,590 unit and content cases, both TypeScript scopes, two build integrations, the production bundle, and seven browser smoke journeys. The source-bound receipt is `checkout/verification-receipts/pr/1795517959739-2529883/summary.json` within the WSL evidence directory above.
-- Discovery and execution agreed for the migration case in `tests/main-menu.spec.ts`. WebKit portrait and landscape passed 2/2. Chromium desktop, mobile portrait, and mobile landscape passed 3/3. Both runs used one worker, zero retries, and emulated mobile profiles. The JSON reports and discovery lists are `final-webkit.json`, `final-chromium.json`, and `final-*-list.txt`.
-- `openspec validate issue-483-dungeon-counter-migration --strict` and `git diff --check` passed. Subsequent edits only updated the verification handoff, OpenSpec task, and historical links. The original #208 matched comparison remains recorded as failed.
+- Issue [#476](https://github.com/luminari-gurus/tactics-guru-v2/issues/476) · [claim](https://github.com/luminari-gurus/tactics-guru-v2/issues/476#issuecomment-7130827527) · requested by the Elite stall report in [#418](https://github.com/luminari-gurus/tactics-guru-v2/issues/418)
+- Planned branch `branch/issue-476-heal-goblin-cap` · planning base `10895b93bc53a4e8ad9312baa25f2fdf7a6a8058` · November 24, 2026 (Asia/Jerusalem)
+- Previous handoff [#483 dungeon counter migration](issue-483-dungeon-counter-migration-plan.md)
 
 ## Selection
 
-Reviewed all 42 open issues, including unlabeled items, five open PRs, active branch refs, and GitHub Projects visible to the authenticated account. No Projects were returned for the repository, organization, or account. #483 had no assignee, linked branch, implementation PR, or formal dependency. [#208](https://github.com/luminari-gurus/tactics-guru-v2/issues/208) and [PR #481](https://github.com/luminari-gurus/tactics-guru-v2/pull/481) reference the failure as part of their P1 verification work. The separate radial-control repair for the other six recorded failures, [PR #484](https://github.com/luminari-gurus/tactics-guru-v2/pull/484), is in the planning base.
+Reviewed all 41 open issues, four open PRs, recent branch refs, and available GitHub Projects. The review included unlabeled issues and found no org or account Projects. #476 was unassigned, with no linked branch or open implementation PR and no formal blockers. Its prerequisite, the Shaman combat implementation, shipped in [PR #252](https://github.com/luminari-gurus/tactics-guru-v2/pull/252). The active dungeon scaling work in [PR #480](https://github.com/luminari-gurus/tactics-guru-v2/pull/480) can affect seeded fixtures, so confirm their encounter identity again on the implementation base.
 
-The [serial](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/45306223119) and [parallel](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/45306284527) receipts show the same counter case failing in WebKit portrait and landscape at `9fc9d44`, with zero retries. The issue records expected format 13 and observed format 17. The inspected migration, storage, test, fixture, package and WebKit config paths are identical between that head and the planning base. This is the smallest verified repair that removes a known obstacle to rerunning the matched comparison. A new green comparison and the full verification timing target remain with #208.
+#476 directly addresses a reported progression stall in a core game mode and specifies the player-visible rule and compatibility obligations. Enemy visibility [#417](https://github.com/luminari-gurus/tactics-guru-v2/issues/417) and audio retry [#412](https://github.com/luminari-gurus/tactics-guru-v2/issues/412) still require root-cause isolation. The P1 CI sharding work [#208](https://github.com/luminari-gurus/tactics-guru-v2/issues/208) has an active owner and recent implementation.
 
-## Outcome and implementation
+## Outcome
 
-Make the existing [browser migration case](../../tests/main-menu.spec.ts#L735) assert the canonical envelope format for the fresh dungeon written after accepting replacement. The old save is read and recorded during that journey. The envelope check at the end is for the newly created dungeon.
+Each Goblin Shaman in a newly entered dungeon battle can successfully cast Heal Goblin twice. Inspection shows the acting unit’s own `2/2`, `1/2`, or `0/2` remaining. Every successful heal still costs one action and heals up to 4 HP under the existing targeting rules. A canceled, invalid, or exhausted action spends no cast. Continue preserves the remaining count. Older active dungeon battles and replays retain their original healing rules, including an eligible third cast. The next fresh battle uses the cap even in an older dungeon run.
 
-1. The [dungeon session replacement](../../src/app/DungeonSession.ts#L375) calls `freshDungeon` with tracking enabled. [Fresh exploration](../../src/domain/exploration.ts#L62) goes through `visit`, which sets wall sight. [The encoder](../../src/domain/dungeonSaveEnvelope.ts#L38) therefore uses `WALL_SIGHT_STATS_SAVE_FORMAT` (17) before any active encounter-entry or ground-loot state exists. Export that existing named constant from `src/domain/dungeonSaveEnvelope.ts`. Keep its value and encoder/decoder behavior intact.
-2. Add the constant to the existing envelope import in `tests/main-menu.spec.ts` and use it for the new primary save’s exact format assertion. Keep the literal [format-12 counter fixture](../../tests/fixtures/saves/issue-270/counter-dungeon-v1.json), byte-for-byte startup checks for both slots, and old/new identity checks. Retain the assertions for preserved kill and move counts, partial legacy time, the old record and counter bests, exclusion from the playtime best, and whole-run time coverage in the new save.
+## Implementation and files
 
-## Ablation and scope
+1. **Initialize at dungeon entry.** In [dungeon.ts](../../src/domain/dungeon.ts), have `startDungeonBattle` opt into initializing one remaining-use counter per Shaman through the existing projected battle builder. Both entry paths already pass through `startDungeonBattle`. Use a single cap constant and an optional per-unit field in [types.ts](../../src/domain/types.ts). A missing field is the legacy rule, and an explicit zero is an exhausted counter. Reconstruction for active snapshots keeps their saved counts, including when the snapshot contains zero commands. Keep the counter on its unit for the life of that battle, including after defeat.
+2. **Validate at existing boundaries.** Extend [battle.ts](../../src/domain/battle.ts) to admit only safe integers in `0..2` on eligible enemy Shamans. Require each Shaman in a capped snapshot to carry the field, with full uses at command zero. Check the accepted dungeon transition against its current battle so it cannot switch rules or increase uses. The dungeon envelope already validates and hashes the nested snapshot. Reuse that mechanism and its current identifiers. Apply the existing standalone and authored-run admission pattern in [saveEnvelope.ts](../../src/domain/saveEnvelope.ts) and [runSaveEnvelope.ts](../../src/domain/runSaveEnvelope.ts) to keep dungeon counters out of those save types.
+3. **Use one legality check.** In [combat.ts](../../src/domain/combat.ts), reject an exhausted Heal Goblin through the shared `previewSupportAbility` with `useExhausted`. The existing [AI planner](../../src/domain/ai.ts) uses that preview for both immediate attacks and movement goals, so both paths inherit the rule. Decrement only the caster’s counter in the existing successful heal resolution alongside HP, `hasActed`, and the accepted events. Hex and heals from an uncapped Shaman follow their existing paths.
+4. **Reconstruct the recorded rule on replay.** `BattleSession` already records the complete initial snapshot. For dungeon replay verification, rebuild the canonical dungeon entry using the existing builder with the recorded capped or legacy rule, compare it to the validated replay initial state, and run the existing `replayCommandSequence`. At a resumed boundary use the saved snapshot and continuation commands. The ordinary standalone and authored-run replay entry checks keep using their own canonical constructors.
+5. **Show the count in enemy inspection.** Extend the Shaman support text in [hud.ts](../../src/ui/hud.ts), which [BattleScene](../../src/phaser/BattleScene.ts) already uses to render the dialog. Render `Heal Goblin: 2/2 casts remaining` and the corresponding lower counts. The legacy text remains valid for records without a counter. Update [combat effects](../combat-effects.md) and [battle save format](../battle-save-format.md) with the cap, its compatibility rule, and the fact that older clients reject capped snapshots under exact-shape validation.
 
-Reuse the one named format definition and the existing browser journey. The envelope assertion checks which format the browser persisted. Simply decoding any supported format would lose that check. Exporting the existing constant avoids a second format literal or a helper. The [dungeon unit tests](../../tests/unit/dungeon.test.ts) still independently pin formats 12, 13, and 17 for their respective states. OpenSpec tracks the two-file implementation with `skip_specs: true` because the acceptance contract and application behavior are unchanged.
+## Ablation
 
-## Proof for the implementation PR
+One field per Shaman in the existing snapshot supplies the rule, persistence, and display. Its presence is sufficient to distinguish legacy commands for replay. A separate rules registry, storage migration, or replay format would duplicate that distinction. The same preview supplies the AI’s legality check. Keep cooldowns, general ability resources, battle round limits, and changes to healing amount or AI scoring outside this increment.
 
-1. Preserve the historical failures above. Use a root production preview of the literal planning base with one worker and zero retries to confirm that both WebKit profiles reach the stale assertion. If the base fails earlier, retain that report and diagnose the difference before attributing it. Use the same fixture, dependencies, browser versions and conditions for the final comparison.
-2. Run the existing dungeon units and ordinary PR verification on the final fix. The unit file covers reading the literal counter-only save, preserving partial time, and writing the applicable legacy and wall-sight formats. The PR tier covers both type scopes, the production build and the routine smoke journeys. Run the focused Playwright case against that final root build. Add `--list` to each Playwright command first to verify exactly two WebKit and three Chromium profile/case IDs. Both WebKit orientations and both Chromium mobile orientations are emulated.
+## Proof
 
-~~~sh
-npm run test:unit -- tests/unit/dungeon.test.ts
+- **Rules and AI.** Extend [abilities.test.ts](../../tests/unit/abilities.test.ts), [ai.test.ts](../../tests/unit/ai.test.ts), and [dungeonBattle.test.ts](../../tests/unit/dungeonBattle.test.ts). Prove `2 → 1 → 0`, healing clamped to missing HP, normal action cost, unchanged RNG on each heal, and unchanged HP, actions, RNG, and counts on an invalid or otherwise legal third attempt. Use a seeded Elite boundary with a wounded Grunt, an exhausted Shaman out of melee range, and a hero with a legal Hex line to prove the AI chooses Hex without a heal or heal-driven reposition. Verify two Shamans have independent counts and a later dungeon encounter starts fresh.
+- **Save and replay.** Capture a real pre-change save and replay from the planning base or the final unchanged baseline before editing. Pin bytes and source identity. Use a legal command history whose third heal succeeds under the legacy rule. Exercise reload after one use using the real dungeon codec and session, malformed counters and mixed legacy/capped rosters, zero-command legacy Continue, and new entry in an older run. Cover standalone/run save admission in the existing envelope tests. For a complete fresh battle, compare the rebuilt initial, accepted commands, ordered events, final state and RNG. For continuation, compare the saved snapshot and post-resume command/event sequence against the uninterrupted suffix.
+- **Browser.** Extend the existing `Shaman production journey` in [dungeon.spec.ts](../../tests/dungeon.spec.ts) and reuse its legal seeded [journey helper](../../tests/helpers/dungeonFixtures.ts). Verify inspection at `2/2`, after the first heal at `1/2`, after reload/Continue still at `1/2`, and after the second heal at `0/2`. Retain the current Hex, Weakened, and terminal outcome assertions. Freeze the seed and case IDs after qualifying the battle. Use Chromium desktop and emulated portrait/landscape touch and WebKit desktop and emulated portrait/landscape. Preserve the browser’s actual post-reload history and compare it to the deterministic legal battle witness.
+- **PR readiness.** Run focused units first, then `npm run verify:pr` for all ordinary units, both type scopes, the production build, and the core battle/run/dungeon smoke journeys. Discover the exact Shaman case IDs with `--list`, then use the same production build for the focused browser runs. Record commit, build identity, seeds, fixture provenance, profile/case IDs and any failures per the [verification policy](../verification-policy.md). When all #476 criteria pass, use `Closes #476` and `Refs #418` in the implementation PR so the original stall report remains available for its own verification.
+
+```sh
+npm run test:unit -- tests/unit/abilities.test.ts tests/unit/ai.test.ts tests/unit/dungeonBattle.test.ts tests/unit/saveEnvelope.test.ts tests/unit/runSaveEnvelope.test.ts
 npm run verify:pr
 
-case_name='counter-only dungeon upgrades known counters without inventing complete playtime'
-npx --no-install playwright test -c playwright.device-acceptance.config.ts tests/main-menu.spec.ts -g "$case_name" --workers=1 --retries=0
-npx --no-install playwright test -c playwright.regression.config.ts tests/main-menu.spec.ts -g "$case_name" --workers=1 --retries=0
+case_name='Shaman production journey'
+npx --no-install playwright test -c playwright.regression.config.ts tests/dungeon.spec.ts -g "$case_name" --workers=1 --retries=0
+npx --no-install playwright test -c playwright.exploration.config.ts tests/dungeon.spec.ts -g "$case_name" --workers=1 --retries=0
 git diff --check
-~~~
-
-3. Retain final reports and failures with commit, build, profile and test IDs per the [verification policy](../verification-policy.md). Scope browser execution to the changed case and the ordinary PR tier. A focused pass leaves the original matched runs recorded as failed. Once all five profile/case combinations and the remaining checks pass, open one PR with `Closes #483` and `Refs #208`.
+```
 
 ## Estimate and open questions
 
-Allow 20–35 minutes for implementation, focused comparison, and ordinary PR checks with dependencies and browser binaries available. Any self-hosted CI queue adds elapsed time. There are no open product or design questions.
+Estimate 1.5–2.5 hours for implementation, baseline fixture capture, and verification with dependencies and browsers installed. Self-hosted queue time is additional. No open product or design questions. The first implementation check is to qualify a legal seed that demonstrates a third heal on the baseline. Recheck the chosen seed if #480 lands first.
