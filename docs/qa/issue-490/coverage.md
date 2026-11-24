@@ -15,6 +15,9 @@ and **mobile-landscape** under `playwright.regression.config.ts`.
 | battle-audio | seed 1: short sound on/off legal checkpoints preserve deterministic session state and leave storage empty | seed 1: complete audible legal battle delivers committed cues and playerLoss |
 | battle-audio | seed 2: short sound on/off legal checkpoints preserve deterministic session state and leave storage empty | seed 2: complete audible legal battle delivers committed cues and playerWin |
 
+Both removed audio cases' reload assertions map to `sound control uses real
+gestures, preserves previews, modal focus and restart preference`.
+
 - **Animations.** `src/phaser/start.ts` stops the same BattleScene on `pagehide`
   and reloads on a persisted `pageshow`. Its shutdown cancels the presentation
   and disposes the session in `src/phaser/BattleScene.ts`. The High Shot test
@@ -25,15 +28,18 @@ and **mobile-landscape** under `playwright.regression.config.ts`.
   miss and the run and dungeon hit/miss cases retain their project-default
   viewport badge and input assertions. Standalone invalid-target, dungeon
   resume, and every mode's incoming attacks and expiration remain covered.
-  The offscreen and return gestures run in the existing standalone hit, then
-  wheel zoom and the viewport refit restore the original camera before the
-  badge tap and turn advancement.
+  The offscreen and return gestures run in the existing standalone hit.
+  Touch pinch-in or desktop wheel zoom returns the camera to its fitted scale,
+  then the viewport refit restores its position before the badge tap and turn
+  advancement. The first [mobile run](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/45476391175)
+  reached the offscreen and return assertions on both Chromium profiles before
+  failing to restore the scale with wheel events.
 - **Audio.** For each seed the muted journey still verifies the initial state
   and two legal command checkpoints. The audible full journey compares those
-  same checkpoints, verifies cue delivery and the terminal outcome, then
-  reloads and verifies a fresh seed, zero playback on re-enable and empty
-  storage. The reload now occurs after the outcome. Checkpoint and outcome
-  screenshots remain available.
+  same checkpoints, verifies cue delivery and the terminal outcome, and
+  retains the checkpoint and outcome screenshots. The sound-control journey
+  reloads an ongoing audible battle after a committed move and verifies a
+  fresh session, zero playback on re-enable and empty storage.
 
 Discovery of the affected specs under all 17 Playwright configs yielded
 189 → 168 regression executions (21 removed, zero added, all retained IDs
@@ -55,8 +61,8 @@ Expect 118 Chromium desktop cases, including the same three skips. Compare
 retained case IDs and outcomes, skips and retries against the original receipt.
 Estimate each consolidation's direct contribution from case durations in the
 corresponding file: removed IDs for the animation change, the six lifecycle
-cases plus the old standalone pan for Guarded, and the two audible outcome
-cases plus the old two checkpoint cases for audio. Include the cost of the
+cases plus the old standalone pan for Guarded, and the sound-control case,
+both audible outcomes and the two old checkpoint cases for audio. Include the cost of the
 assertions moved into the retained cases. Compare these per-file totals
 separately from the browser-stage duration, runner compute and dispatch-to-result
 time. Use the same parallel pair, per-runner locks and default worker count for
