@@ -1,0 +1,42 @@
+name: Issue 490 mobile Guarded pan verification
+on:
+  push:
+    branches: [work/issue-490-guarded-pan-verification]
+permissions:
+  contents: read
+concurrency:
+  group: tactics-browser-tactics-browser-02
+  queue: max
+  cancel-in-progress: false
+jobs:
+  guarded-pan:
+    if: github.repository == 'luminari-gurus/tactics-guru-v2'
+    runs-on: [self-hosted, tactics-browser, tactics-browser-02]
+    timeout-minutes: 15
+    steps:
+      - name: Check host disposition
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.2'
+          cache: npm
+      - run: npm ci
+      - run: npm run setup:browsers
+      - run: npm run build
+      - name: Exercise the Guarded pan and camera restoration on both mobile Chromium profiles
+        run: |
+          mkdir -p verification-receipts/issue-490-guarded-pan
+          npx --no-install playwright test -c playwright.regression.config.ts tests/guarded-effects.spec.ts --project=mobile-portrait --project=mobile-landscape --grep 'shared Guarded lifecycle: standalone hit' --reporter=list,json
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/issue-490-guarded-pan/chromium.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue490-mobile-guarded-pan
+          path: |
+            verification-receipts/issue-490-guarded-pan/
+            test-results/
+          if-no-files-found: warn
