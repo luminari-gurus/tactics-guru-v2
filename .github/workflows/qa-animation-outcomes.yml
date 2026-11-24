@@ -1,0 +1,34 @@
+name: Focused animation outcomes
+on:
+  push:
+    branches: [qa/issue-208-animation-outcomes-desktop]
+permissions:
+  contents: read
+concurrency:
+  group: tactics-browser-tactics-browser-01
+  queue: max
+  cancel-in-progress: false
+jobs:
+  animations:
+    runs-on: [self-hosted, tactics-browser, tactics-browser-01]
+    timeout-minutes: 25
+    steps:
+      - run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.2'
+          cache: npm
+      - run: npm ci
+      - run: npm run setup:browsers && npm run check:browsers
+      - run: npm run build
+      - run: npx --no-install playwright test -c playwright.regression.config.ts tests/battle-animations.spec.ts --project=desktop --reporter=line,json
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: animation-outcomes.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: animation-outcomes
+          path: animation-outcomes.json
