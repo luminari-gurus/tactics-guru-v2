@@ -32,6 +32,7 @@ jobs:
           suite=tests/battle-animations.spec.ts
           candidate=6bdc09ea8e62e2e8d2a2405cd1d954b2ca7480cf
           baseline=1a4b0af1bb1fbcfffc7864c327c2949940bea39c
+          status=0
           for arm in base1 changed1 changed2 base2 devices; do
             rev=$candidate
             projects=(--project=desktop)
@@ -42,8 +43,9 @@ jobs:
             git show "$rev:$suite" > "$suite"
             PLAYWRIGHT_JSON_OUTPUT_FILE="verification-receipts/animation/$arm.json" \
               npx --no-install playwright test -c playwright.regression.config.ts "$suite" "${projects[@]}" \
-              -g 'visible action feedback stays inside' --reporter=line,json --output="verification-receipts/animation/$arm"
+              -g 'visible action feedback stays inside' --reporter=line,json --output="verification-receipts/animation/$arm" || status=1
           done
+          exit "$status"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
