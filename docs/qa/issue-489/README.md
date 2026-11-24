@@ -34,8 +34,45 @@ missing, corrupt, backup-only and unavailable storage with the same access
 spy and byte-for-byte checks. The exclusions are confined to the WebKit
 acceptance config.
 
-The eight removed cases account for **311.086 s** of #68 case time.
-The baseline WebKit browser stage took **23m 23s** on `unraid-tactics-02`,
-with **1m 06s** of batch setup. The workflow completed in **38m 30s**.
-The case-time sum is an estimate of removable execution time. Candidate stage,
-runner compute and dispatch-to-result measurements come from the qualification run.
+## Self-hosted qualification
+
+[Run #71](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/45443890476)
+passed the full affected WebKit batch. The [batch receipt](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/45443890476/artifacts/14948653109)
+and [aggregate](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/45443890476/artifacts/14947018742)
+record candidate commit `a81b20b515d9`. Its only tree difference from PR
+implementation commit `ae63f85533a2` is the workflow configuration on the
+qualification branch, which limits dispatch to this batch on VM 02 and pins
+Node to the baseline version. The later PR documentation change preserves
+the verified inputs.
+
+| Metric | #68 parallel pair | #71 WebKit-only capture |
+| --- | ---: | ---: |
+| Selected case IDs | 224 | 216 |
+| Passed / skipped / retries | 218 / 6 / 0 | 210 / 6 / 0 |
+| Browser-stage duration | 23m 22.8s | 16m 42.2s |
+| WebKit batch runner compute | 24m 46s | 17m 26s |
+| WebKit batch setup to execution | 1m 06.4s | 28.5s |
+| Workflow runner compute, all jobs | 63m 08s | 23m 11s |
+| Dispatch to completed result | 38m 30s | 45m 43s |
+
+The candidate's 216 IDs and outcomes match the baseline after the eight documented
+omissions, including the exact six skipped IDs. Browser-stage duration decreased
+by **6m 40.6s (28.6%)**, and WebKit batch compute decreased by **7m 20s**.
+The omitted cases account for **5m 11.1s** of baseline case time. The retained
+cases also ran **1m 28.1s** faster in aggregate on this execution.
+
+Both WebKit batches used `unraid-tactics-02`, Node 24.22.2, Playwright 1.64.1,
+WebKit 27.2 (revision 2370), one worker, zero configured retries, and the root
+production preview. Application, fixture, asset and lockfile inputs match.
+The build hashes differ. Vite embeds the tested commit in each build.
+
+[Run #69](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/45439784341)
+failed the WebKit readiness wait while Chromium queued for VM 01. Its WebKit
+browser stage never started, and the incomplete pair was cancelled. Run #71
+reserved VM 02 through preparation, WebKit and aggregation. It waited **22m 29s**
+for that reservation, prepared on VM 02, and skipped the two-runner rendezvous.
+Run #68 prepared on VM 01 and overlapped WebKit with a Chromium batch whose
+browser stage took 32m 28s. Persistent caches were used in both runs and
+background load was not independently verified. The workflow-wide compute and
+dispatch times reflect those different scopes and conditions. WebKit's measured
+stage alone remains above #208's 15-minute end-to-end goal.
