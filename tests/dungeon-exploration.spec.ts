@@ -759,6 +759,16 @@ test('cold progression-format Continue retains a long saved history within the s
  expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe(encoded.text);
  writeFileSync(test.info().outputPath('cold-current-history.json'),JSON.stringify({floors:250,bytes:utf8Bytes(encoded.text),coldUsableMs,budgetMs:2500,rawRetained:true}));
  await page.screenshot({path:test.info().outputPath('cold-current-history.png')});
+ const floor = state.floors[state.depth - 1], map = floorMap(floor.descriptor);
+ const cells = page.locator('#dungeon-map [data-cell]');
+ await expect(cells).toHaveCount(floor.exploration.revealed.length);
+ const next = neighbors(floor.position, map.width, map.height).find(cell => map.cells[cell] && !floor.exploration.pois.some(p => poiCell(p, map.width) === cell));
+ if (next === undefined) throw Error('No clear step on the deep floor');
+ await walkDungeon(page, next);
+ const moved = await dungeonSnapshot(page);
+ expect(moved.floors[state.depth - 1].position).toBe(next);
+ await expect(cells).toHaveCount(moved.floors[state.depth - 1].exploration.revealed.length);
+ await expect(page.locator(`#dungeon-map [data-cell="${next}"]`)).toHaveAttribute('data-player', 'true');
 });
 
 test('map input stays inert while hidden and retains discovery through resize and failed art',async({page})=>{
