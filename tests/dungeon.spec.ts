@@ -707,7 +707,7 @@ test('Shaman production journey uses Hex and ally healing, reloads Weakened and 
   await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||(await readSession(page)).phase==='player';}).toBe(true);
   if((await snapshot(page)).phase!=='battle')break;
   const before=await readSession(page),weak=before.state.units.find(u=>u.weakenedBy!==undefined);
-  const reloadWeakened = Boolean(weak && !reloadedWeakened);
+  const reloadWeakened = weak !== undefined && !reloadedWeakened;
   if (weak && reloadWeakened) {
    await (await battleTool(page, '#battle-log-open')).click();await expect(page.getByRole('dialog')).toContainText('Will save fails');
    await expect(page.getByRole('dialog')).toContainText('50% save chance');
@@ -736,8 +736,8 @@ test('Shaman production journey uses Hex and ally healing, reloads Weakened and 
    expect((await snapshot(page)).activeBattle).toEqual(saved.activeBattle);
    expect((await readSession(page)).events).toEqual([]);
    if (reloadAtOneCast) await inspectCasts(1, 'shaman-one-cast-after-continue.png');
-   reloadedWeakened ||= reloadWeakened;
-   reloadedAtOneCast ||= reloadAtOneCast;
+   if (reloadWeakened) reloadedWeakened = true;
+   if (reloadAtOneCast) reloadedAtOneCast = true;
    continue;
   }
   if (remaining === 0 && !inspectedExhaustion) {
