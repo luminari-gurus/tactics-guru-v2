@@ -128,7 +128,7 @@ body:has(#dungeon-screen:not([hidden])) #battle-heading { display: none; }
   /* Reserve the full border box so minimum-size tracks cannot overlap the compass. */
   min-width: calc(var(--dungeon-map-columns) * var(--dungeon-map-min-cell) + (var(--dungeon-map-columns) - 1) * var(--dungeon-map-gap) + 2 * var(--dungeon-map-border));
   max-width: none;
-  aspect-ratio: 1;
+  aspect-ratio: var(--dungeon-map-columns) / var(--dungeon-map-rows);
   /* Keep layout independent without clipping focus or marker outlines. */
   contain: size layout;
   gap: var(--dungeon-map-gap);

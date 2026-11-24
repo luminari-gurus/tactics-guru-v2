@@ -1317,15 +1317,32 @@ describe('versioned floor dimensions', () => {
     expect(cache.resolve(original.seed,original.generator,original.size)).not.toBe(map);
   });
   it('grows new floors deterministically while preserving legacy floor geometry', () => {
-    for (const [depth,size] of [[1,20],[2,24],[3,28],[4,32],[5,36],[20,36]] as const) {
+    for (const [depth,size] of [[1,20],[2,24],[3,28],[4,32],[5,36],[6,36],[7,36],[20,36]] as const) {
       const descriptor = floorDescriptor(19,depth), map = floorMap(descriptor);
-      expect(map.width).toBe(size); expect(map.height).toBe(size);
+      expect(map.width).toBe(size); expect(map.height).toBe(size + Math.max(0, depth - 5));
       expect(floorMap(descriptor)).toEqual(map);
       expect(map.cells[descriptor.upstairs]).toBe(1); expect(map.cells[descriptor.downstairs]).toBe(1);
       const exploration=freshExploration(descriptor.seed,descriptor.upstairs,map);
       expect(new Set(exploration.pois.map(p=>poiCell(p,size))).size).toBe(3);
       for (const poi of exploration.pois) expect(map.cells[poiCell(poi,size)]).toBe(1);
     }
+  });
+  it('resumes a saved square sixth floor and grows the next floor on descent', () => {
+    const base = freshDungeon('deep-square-history', 19);
+    const floors = Array.from({ length: 6 }, (_, i) => {
+      const { height, ...descriptor } = floorDescriptor(base.seed, i + 1);
+      const map = floorMap(descriptor);
+      const saved = { ...descriptor, mapHash: hashJson(map), upstairs: map.cells.indexOf(1), downstairs: map.cells.lastIndexOf(1) };
+      return { descriptor: saved, completed: 3, position: saved.downstairs,
+        exploration: freshExploration(saved.seed, saved.downstairs, map) };
+    });
+    const state = good(readDungeon({ ...base, depth: 6, floors }));
+    const next = good(travelDungeon(state, 'descend', state.revision));
+    expect(floorMap(next.floors[5].descriptor).height).toBe(36);
+    expect(floorMap(next.floors[6].descriptor).height).toBe(38);
+    const encoded = encodeDungeon(next);
+    assert(encoded.ok);
+    expect(good(decodeDungeon(encoded.text))).toEqual(next);
   });
   it('rejects altered dimensions and retains larger floors through storage and travel', () => {
     const original=clearFloor(fresh()), next=good(travelDungeon(atDownstairs(original),'descend',original.revision));
