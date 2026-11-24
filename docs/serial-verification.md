@@ -1,6 +1,6 @@
 # Resumable serial verification (#208 phase A)
 
-The manual `issue-200-baseline.yml` workflow has four modes:
+The manual `issue-200-baseline.yml` workflow has six modes:
 
 - `qualify` (default): bounded tooling, diagnostics, build, two-engine smoke and
   timeout-recovery checks. It does not launch a baseline.
@@ -10,17 +10,22 @@ The manual `issue-200-baseline.yml` workflow has four modes:
 - `parallel-pilot`: run the same two browser batches on separate VMs using one
   verified build. The aggregate requires measured overlap between passing browser
   cases. See [Two-runner pilot](#two-runner-pilot).
+- `serial-pair` and `parallel-pair`: compare two full browser batches on the
+  same pair of VMs. See [Matched two-runner comparison](#matched-two-runner-comparison-208).
 - `capture`: prepare once, then run all 19 serial jobs, or a deliberately selected
   comma-separated `batches` subset. A subset cannot qualify the full baseline.
 
-The four modes are available on `main` and `work/issue-208-serial-batches`.
-`work/issue-200-verification-timings` also supports `qualify`, and
-`work/issue-208-parallel-pilot` supports both pilot modes. Unsupported manual
-dispatches fail in a hosted job that reports the ref error without checking out
-repository code. Browser jobs require `self-hosted` and `tactics-browser`, with
-`runner` set to `tactics-browser-01` or `tactics-browser-02` (default
-`tactics-browser-01`). In serial mode the selected unique label pins preparation,
-batches and aggregation to one VM; do not give both VMs the same unique label.
+All six modes are available on `main`. Use `work/issue-208-matched-pair` to
+dispatch the two matched-pair modes before merging. The older
+`work/issue-208-serial-batches` branch supports `qualify`, `pilot`,
+`parallel-pilot` and `capture`. `work/issue-200-verification-timings` supports
+`qualify`, and `work/issue-208-parallel-pilot` supports both pilot modes.
+Unsupported manual dispatches fail in a hosted job that reports the ref error
+without checking out repository code. Browser jobs require `self-hosted` and
+`tactics-browser`, with `runner` set to `tactics-browser-01` or
+`tactics-browser-02` (default `tactics-browser-01`). In `pilot` and `capture`,
+the selected unique label pins preparation, batches and aggregation to one VM;
+do not give both VMs the same unique label.
 The shared per-runner concurrency group reserves that VM across job boundaries,
 while an independent run selecting the other VM can execute concurrently.
 Push-triggered full verification has no dispatch inputs and selects VM 01.
@@ -125,8 +130,8 @@ The local CLI also shares the timing
 capture lock with the original timing tool; inspect stale locks before removal.
 
 Build artifacts, per-batch receipts and aggregates are retained for 30 days.
-Artifact names include run ID, batch and attempt. To resume an interrupted or
-failed run, rerun the failed job(s), not the entire workflow:
+Artifact names include run ID, batch and attempt. For serial modes, resume an
+interrupted or failed run by rerunning the affected jobs:
 
 ```sh
 gh run rerun RUN_ID --failed --repo luminari-gurus/tactics-guru-v2
@@ -151,8 +156,12 @@ same test in different root/prefix/dev modes is not deduplicated. Native blob ZI
 remain separate so a cross-mode HTML merge cannot overwrite those distinctions.
 
 Resuming the same run requires unchanged source and the original build artifact.
-After source changes or artifact expiry, start a new plan. A new targeted dispatch
-is partial, not an implicit combination with old runs or hosts. Preserve raw
+After source changes or artifact expiry, start a new plan. In `parallel-pilot`
+and `parallel-pair`, both batches must publish readiness in the same attempt.
+Dispatch a fresh run or rerun all jobs together. A targeted rerun of one batch
+will time out waiting for its peer's readiness artifact.
+
+A new targeted dispatch is partial and covers only that dispatch. Preserve raw
 artifacts beyond expiry if review or a baseline obligation still needs them.
 
 ## Timing and performance acceptance
@@ -205,3 +214,22 @@ For deliberate Actions execution, select the workflow's `pilot` or `capture` mod
 record host conditions and inspect its aggregate. Start with the bounded pilot
 before launching expensive full coverage after changes to this tooling.
 
+
+### Matched two-runner comparison (#208)
+
+Dispatch `serial-pair` and `parallel-pair` separately on the same commit, leaving
+`batches` empty and `extra_job` at `none`. Each mode runs the complete
+`chromium-desktop-2` batch on VM 01 and `webkit-acceptance` on VM 02. The
+serial control allows one active batch at a time. The parallel arm allows two
+and requires clock-bounded overlap between passing browser cases. Each arm
+builds once and restores its verified bundle for both batches.
+
+Compare the source SHA, build digest and per-batch case-ID and outcome digests
+in the run summaries. The outcome digest includes each project's outcome for
+each case, so matching skip counts alone cannot hide different skipped cases.
+If the digests differ, compare case outcomes in the aggregate's `summary.json`.
+Use run creation to final completion for end-to-end time and sum completed
+non-skipped job durations for runner time, including preparation, setup, retries
+and aggregation. Report queues and outside runner load alongside the results.
+Only comparable passing runs can support a speedup for this pair. The full-suite
+target still requires broader coverage.

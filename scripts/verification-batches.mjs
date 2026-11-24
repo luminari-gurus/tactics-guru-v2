@@ -16,7 +16,17 @@ export const preparationIds = ['tooling', 'units', 'typecheck-app', 'typecheck-d
 const prefixIds = ['build-prefix', 'assets-prefix-preview', 'assets-prefix-dev', 'restore-root'];
 const pilotRunners = { 'pilot-chromium': 'unraid-tactics-01', 'pilot-webkit': 'unraid-tactics-02' };
 
+const pairRunners = { 'chromium-desktop-2': 'unraid-tactics-01', 'webkit-acceptance': 'unraid-tactics-02' };
+const isPair = mode => mode === 'parallel-pair' || mode === 'serial-pair';
+const isParallel = mode => mode === 'parallel-pilot' || mode === 'parallel-pair';
+
 const key = test => JSON.stringify([test.project, test.id]);
+
+export function matchedCaseDigests(tests) {
+  const ids = tests.map(key).sort();
+  const outcomes = tests.map(test => JSON.stringify([test.project, test.id, test.outcome])).sort();
+  return { caseIds: digest(JSON.stringify(ids)), outcomes: digest(JSON.stringify(outcomes)) };
+}
 
 export function exactCoverage(expected, actual) {
   const wanted = expected.map(key), found = actual.map(key);
@@ -25,6 +35,14 @@ export function exactCoverage(expected, actual) {
 }
 
 export function definitions(mode = 'capture') {
+  if (isPair(mode)) {
+    const capture = definitions('capture');
+    return Object.keys(pairRunners).map(id => {
+      const job = capture.find(candidate => candidate.id === id);
+      invariant(job, `Missing matched batch ${id}`);
+      return job;
+    });
+  }
   invariant(['pilot', 'parallel-pilot', 'capture'].includes(mode), 'Expected pilot, parallel-pilot or capture mode');
   const chromium = stages.find(stage => stage.id === 'chromium');
   const webkit = stages.find(stage => stage.id === 'webkit-acceptance');
@@ -68,7 +86,7 @@ export function createPlan(mode, discoverCases = discover, filter = '') {
     const selected = jobs.flatMap(job => job.stages.filter(row => row.sourceStage === stage.id).flatMap(row => row.expected ?? []));
     exactCoverage(stage.tests, selected);
   }
-  invariant(mode !== 'parallel-pilot' || !filter, 'Parallel pilot requires both browser batches');
+  invariant((!isPair(mode) && mode !== 'parallel-pilot') || !filter, 'Parallel pilot requires both browser batches');
   const requested = filter ? filter.split(',') : jobs.map(job => job.id);
   invariant(requested.length === new Set(requested).size && requested.every(id => jobs.some(job => job.id === id)), 'Unknown or duplicate batch selection');
   return { schemaVersion: 1, mode, scope: mode === 'capture' && requested.length === jobs.length ? 'full' : 'partial',
@@ -99,6 +117,7 @@ function environment() {
 }
 
 function parallelRunner(plan, report) {
+  if (isPair(plan.mode)) return pairRunners[report.batchId];
   return plan.mode === 'parallel-pilot' ? pilotRunners[report.batchId] : undefined;
 }
 
@@ -154,9 +173,9 @@ function pilotIntervals(report) {
     });
 }
 
-export function pilotOverlap(receipts) {
-  const chromium = receipts.find(report => report.batchId === 'pilot-chromium');
-  const webkit = receipts.find(report => report.batchId === 'pilot-webkit');
+export function pilotOverlap(receipts, ids = Object.keys(pilotRunners)) {
+  const chromium = receipts.find(report => report.batchId === ids[0]);
+  const webkit = receipts.find(report => report.batchId === ids[1]);
   if (chromium?.attempt !== webkit?.attempt) return 0;
   const webkitCases = pilotIntervals(webkit);
   return Math.max(0, ...pilotIntervals(chromium).flatMap(left => webkitCases.map(right => Math.min(
@@ -242,9 +261,9 @@ function checkHostDisposition() {
 }
 
 export async function awaitPilotRunners(runId, attempt, getArtifacts, {
-  now = Date.now, wait = delay, timeoutMs = 240000,
+  now = Date.now, wait = delay, timeoutMs = 240000, ids = Object.keys(pilotRunners),
 } = {}) {
-  const names = Object.keys(pilotRunners).map(id => `issue208-ready-${runId}-${attempt}-${id}`);
+  const names = ids.map(id => `issue208-ready-${runId}-${attempt}-${id}`);
   const deadline = now() + timeoutMs;
   while (now() < deadline) {
     const timestamps = await Promise.all(names.map(async name => {
@@ -273,7 +292,7 @@ async function runReceipt(plan, id, rows, prerequisites, out, buildHash, sampleC
   try {
     checkHostDisposition();
     verifyRuntime(plan, report);
-    const parallel = Boolean(parallelRunner(plan, report));
+    const parallel = isParallel(plan.mode) && Boolean(parallelRunner(plan, report));
     if (parallel) {
       const ready = read(join(out, 'ready.json'));
       invariant(ready.runId === report.runId && ready.attempt === report.attempt && ready.batchId === id &&
@@ -344,7 +363,7 @@ export function aggregate(plan, build, preparation, receipts) {
   }
   const unexpected = receipts.filter(report => !plan.requested.includes(report.batchId));
   if (unexpected.length) { errors.push('Unexpected batch receipts'); complete = false; }
-  const overlapMs = plan.mode === 'parallel-pilot' ? pilotOverlap(latest) : null;
+  const overlapMs = isParallel(plan.mode) ? pilotOverlap(latest, plan.requested) : null;
   if (overlapMs === 0) errors.push('Parallel pilot could not establish overlapping passing browser cases within the clock offset bounds');
   const starts = latest.map(report => Date.parse(report.startedAt)), ends = latest.map(report => Date.parse(report.finishedAt));
   return { schemaVersion: 1, source: plan.source, planHash: plan.planHash, scope: plan.scope,
@@ -473,7 +492,7 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
       });
       invariant(response.ok, `Actions artifact listing failed: HTTP ${response.status}`);
       return (await response.json()).artifacts;
-    });
+    }, { ids: Object.keys(isPair(process.env.SERIAL_MODE) ? pairRunners : pilotRunners) });
     console.log(`Both pilot runners ready. Scheduled browser launch: ${release}`);
     return 0;
   }
@@ -488,7 +507,7 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
     save(join(bundle, 'plan.json'), plan);
     if (command === 'discover') return 0;
     if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `matrix=${JSON.stringify({ include: plan.requested.map(id => ({ id,
-      ...(plan.mode === 'parallel-pilot' ? { runner: id === 'pilot-chromium' ? 'tactics-browser-01' : 'tactics-browser-02' } : {}) })) })}\n`);
+      ...(parallelRunner(plan, { batchId: id }) ? { runner: parallelRunner(plan, { batchId: id }).replace('unraid-tactics-', 'tactics-browser-') } : {}) })) })}\n`);
     const report = await runReceipt(plan, 'prepare', stages.filter(stage => preparationIds.includes(stage.id)), [], join(bundle, 'preparation'));
     if (!report.passed) return 1;
     cpSync(join(root, 'dist'), join(bundle, 'dist'), { recursive: true });
@@ -517,8 +536,9 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
     const source = sourceIdentity(root);
     invariant(plan.planHash === digest(JSON.stringify({ ...plan, planHash: undefined })), 'Invalid plan hash');
     invariant(source.commit === plan.source.commit && source.inputHash === plan.source.inputHash, 'Source differs from preparation');
+    if (isPair(plan.mode)) invariant(build, 'Matched batches require a verified production build');
     if (build) verifyBuild(plan, build, join(bundle, 'dist'), source);
-    const sampleClock = plan.mode === 'parallel-pilot' ? pilotClockSampler() : undefined;
+    const sampleClock = isParallel(plan.mode) ? pilotClockSampler() : undefined;
     if (command === 'ready') {
       const ready = receipt(plan, batchId);
       invariant(parallelRunner(plan, ready) && build && process.env.GITHUB_RUN_ID, 'Readiness requires a prepared parallel pilot batch in Actions');
@@ -562,9 +582,19 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
     save(join(out, 'timing-report.json'), timingReport(plan, result));
     const table = (result.latest ?? []).flatMap(receipt => receipt.stages.map(stage =>
       `| ${receipt.batchId} / ${stage.id} | ${stage.status} | ${((stage.wallMs ?? 0) / 1000).toFixed(2)} | ${JSON.stringify(stage.summary?.counts ?? stage.performance ?? {})} |`));
+    const pairIdentity = isPair(plan.mode) ? [
+      `Source commit: \`${plan.source.commit}\`.`,
+      ...(result.latest ?? []).filter(report => report.batchId !== 'prepare').map(report => {
+        const tests = report.stages.flatMap(row => row.summary?.tests ?? []);
+        const digests = matchedCaseDigests(tests);
+        return `${report.batchId}: ${tests.length} reported case IDs, case-ID SHA-256 \`${digests.caseIds}\`, ` +
+          `outcome SHA-256 \`${digests.outcomes}\`, build \`${report.buildHash}\`.`;
+      }),
+    ].join('\n\n') : '';
     const summary = `# Serial verification\n\nScope: ${plan.scope}; complete: ${result.complete}; passed: ${result.passed}; baseline eligible: ${result.baselineEligible}\n\n` +
       `Job wall span: ${result.wallMs ?? 'unknown'} ms; total job time: ${result.totalJobMs ?? 'unknown'} ms; completed Actions compute: ${result.scheduling?.completedJobComputeMs ?? 'unknown'} ms.\n\n` +
       (result.overlapMs == null ? '' : `Minimum verified overlap between passing browser cases: ${result.overlapMs} ms.\n\n`) +
+      (pairIdentity ? pairIdentity + '\n\n' : '') +
       `| Batch / stage | Result | Stage seconds | Counts |\n| --- | --- | ---: | --- |\n${table.join('\n')}\n\n${(result.errors ?? []).map(error => '- ' + error).join('\n')}\n\n${result.comparison ?? ''}\n`;
     writeFileSync(join(out, 'summary.md'), summary);
     if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
