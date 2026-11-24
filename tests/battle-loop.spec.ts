@@ -1001,7 +1001,7 @@ test('opening enemy initiative is explicit before the first playable hero turn',
 });
 
 test('narrow landscape battle stacks controls below a usable board', async ({ page }) => {
- for (const viewport of [{width:320,height:200},{width:400,height:300},{width:480,height:320}]) {
+ for (const viewport of [{width:320,height:200},{width:400,height:300},{width:480,height:234},{width:480,height:320}]) {
   await page.setViewportSize(viewport);
   await page.goto('./battle');
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
@@ -1011,7 +1011,14 @@ test('narrow landscape battle stacks controls below a usable board', async ({ pa
   expect(board!.height).toBeGreaterThan(30);
   expect(panel!.y).toBeGreaterThanOrEqual(board!.y+board!.height);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-  await page.screenshot({path:test.info().outputPath(`narrow-${viewport.width}.png`)});
+  const move=page.getByRole('button',{name:'Move',exact:true});
+  await move.focus();
+  await expect.poll(()=>move.evaluate(button=>{
+   const control=button.getBoundingClientRect();
+   const scroller=button.closest('#battle-scroll')!.getBoundingClientRect();
+   return Math.min(control.bottom,scroller.bottom)-Math.max(control.top,scroller.top);
+  })).toBeGreaterThanOrEqual(44);
+  await page.screenshot({path:test.info().outputPath(`narrow-${viewport.width}x${viewport.height}.png`)});
   // Use the same inset hooks as the portrait/rail stress case above.
   await page.evaluate(()=>{
    for(const [side,size] of Object.entries({top:24,right:24,bottom:34,left:24}))document.body.style.setProperty('--safe-'+side,size+'px');
@@ -1026,7 +1033,7 @@ test('narrow landscape battle stacks controls below a usable board', async ({ pa
   expect(insetPanel!.x).toBeGreaterThanOrEqual(24);
   expect(insetPanel!.x+insetPanel!.width).toBeLessThanOrEqual(viewport.width-24);
   expect(insetPanel!.y+insetPanel!.height).toBeLessThanOrEqual(viewport.height-34);
-  await page.screenshot({path:test.info().outputPath(`narrow-${viewport.width}-safe-area.png`)});
+  await page.screenshot({path:test.info().outputPath(`narrow-${viewport.width}x${viewport.height}-safe-area.png`)});
  }
 });
 
