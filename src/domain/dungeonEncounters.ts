@@ -126,7 +126,7 @@ export function scaleEnemyStat(base: number, depth: number, kind: EncounterKind,
   return kind === 'vault' ? clamp(Math.floor((scaled * 12 + 5) / 10)) : scaled;
 }
 /** The baseline is intentionally fixed; callers cannot accidentally scale a prior projection. */
-export function projectDungeonEnemies(depth: number, kind: EncounterKind, catalog = dungeonBattleCatalog, scalingPolicy: ScalingPolicy = ENEMY_SCALING_POLICY): ContentCatalog {
+export function projectDungeonEnemies(depth: number, kind: EncounterKind, catalog = dungeonBattleCatalog, scalingPolicy: ScalingPolicy = ENEMY_SCALING_POLICY, livingHeroes = 3): ContentCatalog {
   if (!depthOk(depth)) throw new RangeError('Invalid depth');
   const { awards, thresholds } = HERO_PROGRESSION;
   const floorXp = awards.normal + Math.min(awards.elite, awards.vault) + awards.boss;
@@ -144,7 +144,11 @@ export function projectDungeonEnemies(depth: number, kind: EncounterKind, catalo
       stats[field] = scaleEnemyStat(enemy.stats[field], scalingPolicy === PARTY_SCALING_POLICY ? expectedLevel : depth, kind, field);
     }
     if (scalingPolicy === PARTY_SCALING_POLICY) {
-      stats.maxHp = Math.min(CONTENT_BOUNDS.maxHp.max, stats.maxHp + Math.round(enemy.stats.maxHp * extraHpFraction));
+      const endurance = Math.min(CONTENT_BOUNDS.maxHp.max, stats.maxHp + Math.round(enemy.stats.maxHp * extraHpFraction));
+      // Fewer living heroes means fewer player actions per round. Freeze the allowance at battle entry.
+      const partyFactor = (2 + livingHeroes) / 5;
+      stats.maxHp = Math.max(1, Math.round(endurance * partyFactor));
+      stats.power = Math.round(stats.power * partyFactor);
     }
     enemies[id] = { ...enemy, stats };
   }

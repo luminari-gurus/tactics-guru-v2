@@ -239,4 +239,7 @@ it('paces fresh expanded enemies against guaranteed floor XP and preserves saved
   expect(stats(8192).power).toBe(stats(5).power);
   expect(stats(5).armorClass).toBe(stats(1).armorClass);
   expect(stats(5).accuracy).toBe(stats(1).accuracy);
+  const solo = projectDungeonEnemies(5, 'normal', undefined, PARTY_SCALING_POLICY, 1).enemies.goblin_grunt.stats;
+  expect(solo.maxHp).toBe(Math.round(stats(5).maxHp * 0.6));
+  expect(solo.power).toBe(Math.round(stats(5).power * 0.6));
 });
