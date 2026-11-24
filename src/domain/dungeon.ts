@@ -195,7 +195,8 @@ export function dungeonBattle(s: DungeonState) {
   if (slot >= 3) return null;
   const plan = currentFloor(s).descriptor.encounters[slot];
   const living = new Set(s.party.filter(h => h.hp > 0).map(h => h.heroId));
-  const baseline = plan.selection.policy === LEGACY_ENCOUNTER_POLICY ? dungeonContent.catalog : projectDungeonEnemies(s.depth, plan.selection.kind, encounterBattleCatalog(plan.selection), plan.selection.scalingPolicy, living.size);
+  const partyStrength = s.party.reduce((total, hero) => total + (hero.hp > 0 ? (1 + hero.hp / hero.maxHp) / 2 : 0), 0);
+  const baseline = plan.selection.policy === LEGACY_ENCOUNTER_POLICY ? dungeonContent.catalog : projectDungeonEnemies(s.depth, plan.selection.kind, encounterBattleCatalog(plan.selection), plan.selection.scalingPolicy, partyStrength);
   const resolved = resolveBattlefield(plan.selection.encounter, dungeonSeed(s.seed, s.depth, 'battle', slot), baseline);
   if (!resolved.ok || (plan.battlefield === null ? plan.selection.policy !== LEGACY_ENCOUNTER_POLICY : !sameBattlefield(plan.battlefield, resolved.descriptor))) return null;
   const projected = projectOwnedCatalog(s.ownership, s.party, baseline, dungeonContent.items);
