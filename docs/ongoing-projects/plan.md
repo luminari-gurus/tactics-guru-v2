@@ -34,8 +34,11 @@ traces and diagnostic screenshots are in
   still fits the controls before requiring repositioning.
 
 The first fixed build passed all 15 original profile/case combinations on the
-first attempt. The exact committed source still needs the adjacent cases, the
-shared battle routes and the standard PR check.
+first attempt. Standard PR verification then passed on clean source
+`d265e573d56ca1b5ca77d29ccca0a3703713498e` with Node 24.15.0. It covered
+1,590 fast unit/content tests, both type scopes, two build integrations and
+seven core browser journeys. The exact-build radial matrix and targeted
+authored-run and dungeon cancellation witnesses use the same production bundle.
 
 ## Selection
 
@@ -69,12 +72,36 @@ npx playwright test -c playwright.device-acceptance.config.ts tests/battle-radia
 - Use the same configs for the adjacent valid Rail switch, compact landscape, and radial viewport resize cases. If board fitting changes, include the temporary-HUD reflow and viewport recentering cases in [battle-board.spec.ts](../../tests/battle-board.spec.ts). If selection or gesture behavior changes, run the affected [selection](../../tests/unit/battleSelection.test.ts) and [gesture](../../tests/unit/radialGesture.test.ts) units.
 - Run `npm run verify:pr` on the fix head for both TypeScript scopes, the production build, and the core standalone battle, authored run, and dungeon journeys. If shared runtime behavior changes, confirm the affected radial interaction through a bounded legal run and dungeon battle using their existing browser witnesses. Use the [verification policy](../verification-policy.md) to add only coverage warranted by the final diff. Give #208 the focused result and leave its matched-batch and timing acceptance on #208.
 
-## Estimate and open questions
+## Verification evidence
 
-**2–3 hours of active Codex implementation and verification**, plus any self-hosted runner queue. The low end assumes one or more fixture repairs. A real cross-browser layout or gesture defect could push the work to the upper end.
+- Standard PR receipt `verification-receipts/pr/1795505635286-310789/summary.json`
+  records the clean source and six passing stages (155.7 seconds).
+- Chromium regression passed 29 cases and WebKit device acceptance passed 18.
+  That includes all 15 combinations for the three original scenarios. Three
+  executions of the Chromium mobile CDP-only native touch case were skipped
+  by its existing guard on desktop Chromium and both WebKit profiles. The
+  case passed in both emulated Chromium mobile orientations. Zero retries.
+- The focused final runs used the bundle from standard PR verification,
+  including `battleLayout-NtChU9QZ.css`. Its SHA-256 is
+  `baf5a7e4a64d5f09e33de7d6f2cf375273b81550d278554f4f7e1072d7184442`.
+  The `base-*.json` and `exact-*.json` reports under `tmp/issue-482` retain
+  the case IDs, selected profiles and individual outcomes. Screenshots of
+  cancellation in both WebKit orientations were inspected.
+- Added a temporary cancellation step to the existing legal authored-run and
+  dungeon entry/resume journeys in the scratch checkout. All three witnesses
+  passed on the verified bundle (authored run and dungeon in desktop Chromium,
+  dungeon in portrait WebKit). They checked the real visible control, native
+  activation and an unchanged battle session, then continued the original
+  journeys. The run checked disposal and the dungeon checked a single control
+  after resume. `consumer-witness.json` records three passing first attempts
+  with zero report errors. The wrapper returned status 1 after the passing
+  report. The scratch checkout was clean after cleanup and the witness inputs,
+  output and screenshots are retained in `tmp/issue-482`.
+- OpenSpec strict validation and Git diff whitespace checks passed. The
+  evidence-only commit leaves the verified app, tests and build inputs
+  identical to `d265e573`.
 
-- Does the enemy tap hit the intended board tile after the first radial opens, or does a successful hit lose its selection feedback?
-- Is WebKit placing Cancel plan outside the visible shell, or is a focus/scroll transition changing its position?
-- Does the desktop caption mutation test exercise a real board-edge crossing at current dimensions, and does the menu respond when that crossing is forced?
-
-These are reproduction questions. The intended player behavior and acceptance criteria are specified.
+The three reported causes are resolved above. The matched-batch timing
+measurement and the separate legacy dungeon assertions remain tracked in
+[#208](https://github.com/luminari-gurus/tactics-guru-v2/issues/208) and
+[#483](https://github.com/luminari-gurus/tactics-guru-v2/issues/483).
