@@ -125,8 +125,12 @@ function generateRooms(seed: number): GeneratedMap {
 
 // All decisions use explicit local RNG state. These constants/draw orders are versioned.
 function localDraw(seed: number): (range: number) => number {
-  const next = localUint32Stream(seed);
-  return range => next() % range;
+  let rng = seedRng(seed);
+  return range => {
+    const next = nextUint32(rng);
+    rng = next.rng;
+    return next.value % range;
+  };
 }
 const DIRECTIONS = [[1, 0], [-1, 0], [0, 1], [0, -1]] as const;
 const inner = (n: number): number => Math.max(1, Math.min(18, n));
@@ -209,7 +213,8 @@ export function generateMap(seed: number, type: MapType = 'rooms', size = 20, he
 
 /** Versioned floor profiles use a private random stream and fixed work bounds. */
 function generateSized(seed: number, type: 'sector-graph' | 'arena', size: number, height: number): GeneratedMap {
-  const draw = localDraw((seed ^ 0x53454354) >>> 0);
+  const next = localUint32Stream((seed ^ 0x53454354) >>> 0);
+  const draw = (range: number) => next() % range;
   const cells: MapCell[] = Array<MapCell>(size * height).fill(0);
   if (type === 'arena') {
     for (let y = 1; y < height - 1; y++) cells.fill(1, y * size + 1, (y + 1) * size - 1);
