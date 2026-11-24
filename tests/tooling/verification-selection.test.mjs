@@ -17,6 +17,10 @@ test('real discoveries preserve every retained ID and special mode, with exactly
   assert.equal(radial[0].removed.project, 'mobile-landscape');
   assert.equal(radial[0].retained.project, 'mobile-portrait');
   assert.deepEqual(radial[0].effectiveUse.viewport, { width: 1280, height: 720 });
+  const webkit = comparison.mappings.filter(row => row.classification === 'webkit-orientation');
+  assert.equal(webkit.length, 8);
+  assert.equal(webkit.filter(row => row.removed.project === 'acceptance-webkit-landscape').length, 7);
+  assert.equal(webkit.filter(row => row.removed.project === 'acceptance-webkit-portrait').length, 1);
   const desktopOnly = comparison.mappings.filter(row => row.classification === 'desktop-only');
   assert.equal(desktopOnly.filter(row => row.stage.startsWith('telemetry')).length, 56);
   assert.equal(desktopOnly.filter(row => row.stage === 'assets-root-dev').length, 52);
