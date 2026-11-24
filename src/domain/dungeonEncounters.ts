@@ -1,6 +1,7 @@
 import { dungeonBattleCatalog, dungeonEncounterCatalog, dungeonEncounterIdentity, hobgoblinDungeonBattleCatalog,
   hobgoblinDungeonEncounterCatalog, hobgoblinEncounterIdentity, type DungeonBiome, type EncounterKind } from '../content/dungeonEncounters';
 import { readBattlefieldEncounter, type BattlefieldEncounter } from '../content/battlefieldTypes';
+import { HERO_PROGRESSION } from '../content/progression';
 import { CONTENT_BOUNDS } from '../content/constants';
 import type { ContentCatalog, EnemyId } from '../content/types';
 import { canonical, hashJson } from './contentIdentity';
@@ -16,13 +17,15 @@ export const DUNGEON_ENCOUNTER_POLICY = 'dungeon-encounters-v1';
 export const EXPANDED_ENCOUNTER_POLICY = 'dungeon-encounters-v2';
 export const ENEMY_SCALING_POLICY = 'enemy-depth-v1';
 export const LEGACY_ENCOUNTER_POLICY = 'legacy-fixed-v1';
+export const PARTY_SCALING_POLICY = 'enemy-party-v1';
+type ScalingPolicy = typeof ENEMY_SCALING_POLICY | typeof PARTY_SCALING_POLICY;
 type SeededEncounterPolicy = typeof DUNGEON_ENCOUNTER_POLICY | typeof EXPANDED_ENCOUNTER_POLICY;
 export type DungeonEncounterPolicy = SeededEncounterPolicy | typeof LEGACY_ENCOUNTER_POLICY;
 export interface DungeonEncounterSelection {
   readonly policy: SeededEncounterPolicy; readonly catalogIdentity: string;
   readonly biome: DungeonBiome; readonly kind: EncounterKind; readonly depth: number;
   readonly poolId: string; readonly mapId: string; readonly compositionId: string; readonly bossId: string | null;
-  readonly scalingPolicy: typeof ENEMY_SCALING_POLICY; readonly encounter: BattlefieldEncounter;
+  readonly scalingPolicy: ScalingPolicy; readonly encounter: BattlefieldEncounter;
 }
 export interface LegacyEncounterSelection {
   readonly policy: typeof LEGACY_ENCOUNTER_POLICY; readonly depth: number; readonly kind: 'normal' | 'boss';
@@ -51,7 +54,7 @@ export function readDungeonEncounterSelection(input: unknown, depth: number, slo
   }
   if (!hasShape(input, ['policy', 'catalogIdentity', 'biome', 'kind', 'depth', 'poolId', 'mapId', 'compositionId', 'bossId', 'scalingPolicy', 'encounter']) ||
     input.policy !== policy || input.depth !== depth || input.biome !== biome ||
-    input.scalingPolicy !== ENEMY_SCALING_POLICY || (slot === 0 ? input.kind !== 'normal' : slot === 2 ? input.kind !== 'boss' : !['elite', 'vault'].includes(input.kind as string))) return null;
+    (input.scalingPolicy !== ENEMY_SCALING_POLICY && !(policy === EXPANDED_ENCOUNTER_POLICY && input.scalingPolicy === PARTY_SCALING_POLICY)) || (slot === 0 ? input.kind !== 'normal' : slot === 2 ? input.kind !== 'boss' : !['elite', 'vault'].includes(input.kind as string))) return null;
   const expanded = policy === EXPANDED_ENCOUNTER_POLICY;
   const hasHobgoblins = !expanded && input.catalogIdentity === hobgoblinEncounterIdentity;
   const catalogIdentity = expanded ? expandedDungeonEncounterIdentity : hasHobgoblins ? hobgoblinEncounterIdentity : dungeonEncounterIdentity;
@@ -68,7 +71,7 @@ export function readDungeonEncounterSelection(input: unknown, depth: number, slo
   if (input.poolId !== pool.id || input.bossId !== (boss?.id ?? null) || !map || !composition || !map.compositionIds.includes(composition.id)) return null;
   const expected: DungeonEncounterSelection = { policy, catalogIdentity, biome: definition.id,
     kind: input.kind as EncounterKind, depth, poolId: pool.id, mapId: map.id, compositionId: composition.id, bossId: boss?.id ?? null,
-    scalingPolicy: ENEMY_SCALING_POLICY, encounter: { id: `encounter:${map.id}`, source: { ...map.source }, roster: composition.roster.map(s => ({ ...s })) } };
+    scalingPolicy: input.scalingPolicy as ScalingPolicy, encounter: { id: `encounter:${map.id}`, source: { ...map.source }, roster: composition.roster.map(s => ({ ...s })) } };
   const content = expanded ? expandedDungeonBattleCatalog : hasHobgoblins ? hobgoblinDungeonBattleCatalog : dungeonBattleCatalog;
   return readBattlefieldEncounter(input.encounter, content).ok && canonical(input) === canonical(expected) ? expected : null;
 }
@@ -105,7 +108,7 @@ export function selectDungeonEncounter(seed: number, depth: number, slot: number
   const composition = catalog.compositions.find(c => c.id === compositionId)!;
   const catalogIdentity = expanded ? expandedDungeonEncounterIdentity : useHobgoblins ? hobgoblinEncounterIdentity : dungeonEncounterIdentity;
   return { policy, catalogIdentity, biome, kind, depth, poolId: pool.id, mapId: map.id,
-    compositionId, bossId: boss?.id ?? null, scalingPolicy: ENEMY_SCALING_POLICY,
+    compositionId, bossId: boss?.id ?? null, scalingPolicy: expanded ? PARTY_SCALING_POLICY : ENEMY_SCALING_POLICY,
     encounter: { id: `encounter:${map.id}`, source: { ...map.source }, roster: composition.roster.map(s => ({ ...s })) } };
 }
 
@@ -123,11 +126,30 @@ export function scaleEnemyStat(base: number, depth: number, kind: EncounterKind,
   return kind === 'vault' ? clamp(Math.floor((scaled * 12 + 5) / 10)) : scaled;
 }
 /** The baseline is intentionally fixed; callers cannot accidentally scale a prior projection. */
-export function projectDungeonEnemies(depth: number, kind: EncounterKind, catalog = dungeonBattleCatalog): ContentCatalog {
+export function projectDungeonEnemies(depth: number, kind: EncounterKind, catalog = dungeonBattleCatalog, scalingPolicy: ScalingPolicy = ENEMY_SCALING_POLICY, partyStrength = 3): ContentCatalog {
+  if (!depthOk(depth)) throw new RangeError('Invalid depth');
+  const { awards, thresholds } = HERO_PROGRESSION;
+  const floorXp = awards.normal + Math.min(awards.elite, awards.vault) + awards.boss;
+  const expectedLevel = thresholds.filter(xp => depth - 1 >= Math.ceil(xp / floorXp)).length;
+  const cappedAtDepth = 1 + Math.ceil(thresholds[thresholds.length - 1] / floorXp);
+  const extraFloors = Math.max(0, depth - cappedAtDepth);
+  // Half of the late-game HP allowance after four extra floors, tending to 20% of base HP.
+  const extraHpFraction = 0.2 * (extraFloors / (extraFloors + 4));
   const enemies = { ...catalog.enemies };
   for (const id of Object.keys(enemies) as EnemyId[]) {
     const enemy = catalog.enemies[id], stats = { ...enemy.stats };
-    for (const field of ['maxHp', 'power', 'accuracy', 'armorClass'] as const) stats[field] = scaleEnemyStat(enemy.stats[field], depth, kind, field);
+    for (const field of ['maxHp', 'power', 'accuracy', 'armorClass'] as const) {
+      // Hero leveling adds HP and abilities, but no accuracy or armor class.
+      if (scalingPolicy === PARTY_SCALING_POLICY && (field === 'accuracy' || field === 'armorClass')) continue;
+      stats[field] = scaleEnemyStat(enemy.stats[field], scalingPolicy === PARTY_SCALING_POLICY ? expectedLevel : depth, kind, field);
+    }
+    if (scalingPolicy === PARTY_SCALING_POLICY) {
+      const endurance = Math.min(CONTENT_BOUNDS.maxHp.max, stats.maxHp + Math.round(enemy.stats.maxHp * extraHpFraction));
+      // Fewer living heroes means fewer player actions per round. Freeze the allowance at battle entry.
+      const partyFactor = 0.25 + 0.75 * (partyStrength / 3);
+      stats.maxHp = Math.max(1, Math.round(endurance * partyFactor));
+      stats.power = Math.round(stats.power * partyFactor);
+    }
     enemies[id] = { ...enemy, stats };
   }
   return { ...catalog, enemies };
