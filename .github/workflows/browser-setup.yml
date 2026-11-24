@@ -46,7 +46,7 @@ jobs:
       - run: npm run build
       - run: npm run test:browser-smoke -- --diagnostics
         if: inputs.suite != 'progression'
-      - name: Measure retained progression UI boundaries in Chromium and WebKit
+      - name: Measure deep-floor restoration, rendering and input in Chromium and WebKit
         if: inputs.suite == 'progression'
         run: |
           mkdir -p verification-receipts/progression
@@ -63,8 +63,8 @@ jobs:
           JS
           config=playwright.regression.config.ts
           if test ! -f "$config"; then config=playwright.config.ts; fi
-          npm run test:browser -- -c "$config" tests/dungeon.spec.ts -g 'menu dungeon restores Mage XP' --diagnostics
-          npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon.spec.ts -g 'menu dungeon restores Mage XP' --diagnostics
+          npm run test:browser -- -c "$config" tests/dungeon-exploration.spec.ts -g 'cold progression-format Continue|depth 8 saved floor' --diagnostics
+          npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon-exploration.spec.ts -g 'cold progression-format Continue|depth 8 saved floor' --diagnostics
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -72,5 +72,6 @@ jobs:
           path: |
             verification-receipts/
             test-results/
+            test-results-webkit/
           retention-days: 7
           if-no-files-found: ignore
