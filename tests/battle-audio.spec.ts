@@ -8,6 +8,11 @@ import { LOAD_TIMEOUT_MS } from '../src/phaser/BattleAudio';
 import { BATTLE_STORAGE_KEYS } from '../src/persistence/battleStorage';
 
 const audio=(page:Page)=>page.evaluate(()=>window.fitDiagnostics().battleAudio!);
+const standaloneStorage = (page: Page) => page.evaluate(
+  keys => ({ primary: localStorage.getItem(keys.primary), backup: localStorage.getItem(keys.backup) }),
+  BATTLE_STORAGE_KEYS,
+);
+
 async function ready(page:Page) {await expect(page.locator('#game')).toHaveAttribute('data-phase','player');}
 async function enable(page:Page) {
   await (await battleTool(page, '#battle-sound')).click();
@@ -20,6 +25,7 @@ function errors(page:Page) {
 }
 
 test('sound control uses real gestures, preserves previews, modal focus and restart preference',async({page})=>{
+  test.setTimeout(60_000);
   const found=errors(page);await page.goto('./?game=battle&entry=new');await ready(page);
   expect(await audio(page)).toMatchObject({enabled:false,started:0,status:'muted'});
   const before=await session(page);
@@ -53,7 +59,27 @@ test('sound control uses real gestures, preserves previews, modal focus and rest
     expect((await audio(page)).ownedSounds).toBeLessThanOrEqual(8);
     await expect(page.locator('#battle-sound')).toHaveCount(1);
   }
-  await page.reload();await ready(page);expect(await audio(page)).toMatchObject({enabled:false,started:0});expect(found).toEqual([]);
+  const restarted = await session(page);
+  await enable(page);
+  await page.locator('#battle-move').click();
+  await page.locator('#battle-target').selectOption({ index: 1 });
+  await page.locator('#battle-review').click();
+  await ready(page);
+  expect((await session(page)).state).toMatchObject({
+    outcome: 'ongoing',
+    commandCount: restarted.state.commandCount + 1,
+  });
+  await expect.poll(() => audio(page)).toMatchObject({ enabled: true, recent: ['move'] });
+  const saved = await standaloneStorage(page);
+  expect(saved).toEqual({ primary: null, backup: null });
+  await page.reload();
+  await ready(page);
+  expect((await session(page)).state).toEqual(before.state);
+  expect(await audio(page)).toMatchObject({ enabled: false, started: 0 });
+  await enable(page);
+  expect(await audio(page)).toMatchObject({ started: 0, recent: [] });
+  expect(await standaloneStorage(page)).toEqual(saved);
+  expect(found).toEqual([]);
 });
 
 for(const pace of ['normal','fast'] as const)test(pace==='normal'
@@ -330,44 +356,47 @@ async function startSeed(page:Page,seed:number,enabled:boolean) {
   if(enabled)await expect.poll(()=>audio(page)).toMatchObject({enabled:true,status:'ready'});
 }
 
-for(const seed of [1,2]) test(`seed ${seed}: short sound on/off legal checkpoints preserve deterministic session state and leave storage empty`,async({page})=>{
-  const found=errors(page),silent:{session:Awaited<ReturnType<typeof session>>;saved:{primary:string|null;backup:string|null}}[]=[];
-  const stored=()=>page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),BATTLE_STORAGE_KEYS);
-  for(const enabled of [false,true]){
-    await startSeed(page,seed,enabled);
-    for(let i=0;i<=2;i++){
-      const current=await session(page),saved=await stored(),checkpoint={session:current,saved};
-      expect(saved).toEqual({primary:null,backup:null});
-      const replay=replayBattle(current.replay,catalog);expect(replay.ok).toBe(true);if(replay.ok)expect(replay.state).toEqual(current.state);
-      if(enabled)expect(checkpoint).toEqual(silent[i]);else {silent.push(checkpoint);expect((await audio(page)).started).toBe(0);}
-      if(i===2)break;
-      const command=playerDecision(current.state),previous=(await audio(page)).started;
-      await playCommand(page,command);await ready(page);
-      if(enabled && command.type!=='endTurn'){
-        const expected=battleCues((await session(page)).events.slice(current.events.length),catalog),snapshot=await audio(page);
-        expect(snapshot.started).toBeGreaterThan(previous);
-        expect(snapshot.recent.slice(-(snapshot.started-previous))).toContain(expected[0]);
-      }
-    }
-    if(enabled){
-      expect((await audio(page)).started).toBeGreaterThan(0);
-      await page.screenshot({path:test.info().outputPath('audio-checkpoint.png')});
-      await page.reload();await ready(page);
-      expect((await readSession(page)).state.seed).toBe(1);
-      await enable(page);expect((await audio(page)).started).toBe(0);
-      expect(await stored()).toEqual(silent[2].saved);
+async function audioCheckpoint(page: Page, current: Awaited<ReturnType<typeof session>>) {
+  const saved = await standaloneStorage(page);
+  expect(saved).toEqual({ primary: null, backup: null });
+  const replay = replayBattle(current.replay, catalog);
+  expect(replay.ok).toBe(true);
+  if (replay.ok) expect(replay.state).toEqual(current.state);
+  return { session: current, saved };
+}
+
+async function silentCheckpoints(page: Page, seed: number) {
+  await startSeed(page, seed, false);
+  const checkpoints = [];
+  for (let i = 0; i <= 2; i++) {
+    const current = await session(page);
+    checkpoints.push(await audioCheckpoint(page, current));
+    expect((await audio(page)).started).toBe(0);
+    if (i < 2) {
+      await playCommand(page, playerDecision(current.state));
+      await ready(page);
     }
   }
-  expect(found).toEqual([]);
-});
+  return checkpoints;
+}
 
 for(const [seed,outcome] of [[1,'playerLoss'],[2,'playerWin']] as const) test(`seed ${seed}: complete audible legal battle delivers committed cues and ${outcome}`,async({page})=>{
   test.setTimeout(360000);const found=errors(page),heard=new Set<BattleCue>();
+  const silent = await silentCheckpoints(page, seed);
   await startSeed(page,seed,true);
   for(let i=0;i<200;i++){
     await expect.poll(async()=>(await session(page)).phase,{timeout:10000}).toMatch(/^(player|ended|error)$/);
     (await audio(page)).recent.forEach(c=>heard.add(c));
-    const s=await session(page);if(s.phase==='ended')break;expect(s.phase).toBe('player');
+    const s=await session(page);
+    if (i < silent.length) {
+      expect(s.phase).toBe('player');
+      expect(await audioCheckpoint(page, s)).toEqual(silent[i]);
+      if (i === silent.length - 1) {
+        expect((await audio(page)).started).toBeGreaterThan(0);
+        await page.screenshot({path:test.info().outputPath('audio-checkpoint.png')});
+      }
+    }
+    if(s.phase==='ended')break;expect(s.phase).toBe('player');
     const command=playerDecision(s.state),previous=(await audio(page)).started;
     await playCommand(page,command);
     if(command.type!=='endTurn'){

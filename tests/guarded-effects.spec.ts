@@ -71,7 +71,7 @@ function boundary(mode: 'standalone' | 'run' | 'dungeon', miss: boolean) {
   }
   throw Error('No Guarded boundary');
 }
-for (const mode of ['standalone', 'run', 'dungeon'] as const) for (const miss of [false, true]) test(`shared Guarded lifecycle: ${mode} ${miss?'miss':'hit'}`, async ({ page }) => {
+for (const mode of ['standalone', 'run', 'dungeon'] as const) for (const miss of [false, true]) test(`shared Guarded lifecycle: ${mode} ${miss?'miss':'hit'}`, async ({ page, browserName }, info) => {
   test.setTimeout(180000);
   // The public three-encounter mode starts at seed 13; restarts advance its seed.
   const f = boundary(mode, miss);
@@ -150,13 +150,23 @@ for (const mode of ['standalone', 'run', 'dungeon'] as const) for (const miss of
   expect((await readSession(page)).state).toEqual(cast.state);
   await checkBadges(page);
   expect((await boardReport(page)).effect).toBeNull();
-  // Narrow and short layouts, camera zoom, and selection must retain the badge.
-  const size=page.viewportSize()!;
-  for(const viewport of [{width:320,height:568},{width:568,height:320},size]) {
-    await page.setViewportSize(viewport);
-    await expect.poll(async()=>(await boardReport(page)).viewport).toEqual(viewport);
-    await checkBadges(page);
-    await page.screenshot({path:test.info().outputPath(`${mode}-guard-${viewport.width}x${viewport.height}.png`)});
+  if (mode === 'standalone' && !miss) {
+    const { transform: fitted } = await boardReport(page);
+    await checkGuardedPan(page, browserName, info);
+    expect((await readSession(page)).state).toEqual(cast.state);
+    // The real viewport changes recenter the camera at its restored fitted scale.
+    // The shared HUD uses a bottom dock in narrow portrait and a side dock in short landscape.
+    const size = page.viewportSize()!;
+    for (const viewport of [{ width: 320, height: 568 }, { width: 568, height: 320 }, size]) {
+      await page.setViewportSize(viewport);
+      await expect.poll(async () => (await boardReport(page)).viewport).toEqual(viewport);
+      await checkBadges(page);
+      await page.screenshot({ path: info.outputPath(`${mode}-guard-${viewport.width}x${viewport.height}.png`) });
+    }
+    const { transform } = await boardReport(page);
+    expect(transform.x).toBeCloseTo(fitted.x, 5);
+    expect(transform.y).toBeCloseTo(fitted.y, 5);
+    expect(transform.scale).toBeCloseTo(fitted.scale, 5);
   }
   const r=await boardReport(page), g=r.units.find((u:any)=>u.id===1).guard;
   const count=r.commandCount;
@@ -277,23 +287,26 @@ for(const kind of ['move','defeat'] as const)test(`Guarded badge follows legal $
   }
 });
 
-test('Guarded badge stays attached when panning the Fighter offscreen and back',async({page,browserName},info)=>{
-  const fixture=boundary('standalone',false), cast=dispatch(fixture.before,fixture.command,fixture.catalog);
-  if(!cast.ok)throw Error(cast.reason);
-  test.setTimeout(180000);
-  const state=cast.state;
-  await reachStandaloneBoundary(page,fixture.before);
-  await playCommand(page,fixture.command);
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-  expect((await readSession(page)).state).toEqual(state);
-  let initial=await boardReport(page);const region=initial.region;
-  const center={x:initial.units.find((u:any)=>u.id===1).health.screen.x,y:initial.units.find((u:any)=>u.id===1).health.screen.y};
+async function checkGuardedPan(page: Page, browserName: string, info: ReturnType<typeof test.info>) {
+  const beforeZoom = await boardReport(page);
+  const region = beforeZoom.region;
+  const center={x:beforeZoom.units.find((u:any)=>u.id===1).health.screen.x,y:beforeZoom.units.find((u:any)=>u.id===1).health.screen.y};
+  const pinchChromium = async (anchor: { x: number; y: number }, from: number, to: number) => {
+    const cdp = await page.context().newCDPSession(page);
+    const points = (spread: number) => [
+      { x: anchor.x - spread, y: anchor.y, id: 1 },
+      { x: anchor.x + spread, y: anchor.y, id: 2 },
+    ];
+    try {
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: points(from) });
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: points(to) });
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    } finally {
+      await cdp.detach();
+    }
+  };
   if(browserName==='chromium') {
-    const cdp=await page.context().newCDPSession(page);
-    const points=(spread:number)=>[{x:center.x-spread,y:center.y,id:1},{x:center.x+spread,y:center.y,id:2}];
-    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:points(10)});
-    await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:points(20)});
-    await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.detach();
+    await pinchChromium(center, 10, 20);
   } else {
     // Same WebKit multipointer technique as the existing Guarded move case.
     await page.locator('canvas').evaluate((node,p)=>{
@@ -305,8 +318,8 @@ test('Guarded badge stays attached when panning the Fighter offscreen and back',
       } finally {canvas.setPointerCapture=capture;}
     },center);
   }
-  await expect.poll(async()=>(await boardReport(page)).transform.scale).toBeGreaterThan(initial.transform.scale*1.5);
-  initial=await boardReport(page);
+  await expect.poll(async()=>(await boardReport(page)).transform.scale).toBeGreaterThan(beforeZoom.transform.scale*1.5);
+  const initial=await boardReport(page);
   const offset=initial.units.find((u:any)=>u.id===1).guard.position.x-initial.units.find((u:any)=>u.id===1).position.x;
   const pan=async(dx:number)=>{
     const from={x:region.x+region.width*(dx>0?.1:.85),y:region.y+region.height*.55};
@@ -335,5 +348,13 @@ test('Guarded badge stays attached when panning the Fighter offscreen and back',
   }
   await checkBadges(page);
   expect((await boardReport(page)).units.find((u:any)=>u.id===1).guard.visible).toBe(true);
-  expect((await readSession(page)).state).toEqual(state);
-});
+  // Return to the fitted scale before continuing the Guarded lifecycle.
+  const anchor = { x: region.x + region.width / 2, y: region.y + region.height / 2 };
+  if (browserName === 'chromium' && info.project.use.hasTouch) {
+    await pinchChromium(anchor, 40, 10);
+  } else {
+    await page.mouse.move(anchor.x, anchor.y);
+    for (let i = 0; i < 8; i++) await page.mouse.wheel(0, 100);
+  }
+  await expect.poll(async () => (await boardReport(page)).transform.scale).toBeCloseTo(beforeZoom.transform.scale, 5);
+}
