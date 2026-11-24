@@ -9,6 +9,7 @@ import {levelUpFeedback} from '../src/domain/progression';
 import type {ItemId} from '../src/content/itemTypes';
 import {RUN_STORAGE_KEYS} from '../src/persistence/runStorage';
 import {RUN_RECORD_KEYS} from '../src/persistence/runRecordsStorage';
+import {COMBAT_PACE_KEY} from '../src/ui/combatPacePreference';
 
 async function snapshot(page:Page):Promise<RunSnapshot>{return JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!);}
 async function start(page:Page){
@@ -18,12 +19,26 @@ async function start(page:Page){
  expect(drawable!.width).toBeGreaterThan(0);
  expect(drawable!.height).toBeGreaterThanOrEqual(page.viewportSize()!.height*0.3-1);
 }
-async function ready(page:Page){await expect.poll(async()=>await page.locator('#game').getAttribute('data-phase')??'boundary',{timeout:15000}).toMatch(/player|ended|boundary/);}
+async function waitForRunBattleBoundary(page: Page) {
+ // A terminal battle briefly publishes "ended" before the run screen has mounted.
+ await page.waitForFunction(() => document.querySelector(
+  '#game[data-phase="player"], #run-screen:not([hidden])'
+ ) !== null, undefined, {timeout: 15000});
+}
+
+// These journeys assert gameplay, storage and reload boundaries. The full reward/restart
+// journey still uses Normal pace for its renderer and class-guidance observations.
+async function useFastWebKitCombatPace(page: Page) {
+ if (!/^acceptance-webkit-(portrait|landscape)$/.test(test.info().project.name)) return;
+ await page.addInitScript(key => {
+  localStorage.setItem(key, JSON.stringify({version: 1, pace: 'fast'}));
+ }, COMBAT_PACE_KEY);
+}
 async function fight(page:Page,wait=false,useDraught=false,dismissedTip?:string){
  const partyBefore = (await snapshot(page)).items.run.party;
  let drank=false;
  for(let i=0;i<500;i++){
-  await ready(page);const current=await snapshot(page);if(current.items.run.phase!=='battle')break;
+  await waitForRunBattleBoundary(page);const current=await snapshot(page);if(current.items.run.phase!=='battle')break;
   if(dismissedTip)await expect(page.locator(`#battle-class-guidance:visible #battle-class-tip[data-tutorial-id="${dismissedTip}"]`)).toHaveCount(0);
   const battle=await readSession(page);expect(battle.phase).toBe('player');const catalog=runBattleCatalog(current.items,runContext)!;
   const unitId=battle.state.initiative[battle.state.activeIndex];
@@ -52,7 +67,9 @@ async function prepare(page:Page, itemId:ItemId='item:healing_draught'){
  await expect(page.locator('#run-item-status')).toHaveText('Progress resets on reload or when you leave.');
 }
 test('run battle undo and a legal terminal journey reset on reload',async({page,isMobile})=>{
- test.setTimeout(300000);await start(page);const entry=await snapshot(page);
+ test.setTimeout(300000);
+ await useFastWebKitCombatPace(page);
+ await start(page);const entry=await snapshot(page);
  expect(entry.stats).toBeUndefined();
  await page.locator('canvas').focus();await page.keyboard.press('a');
  await expect(page.locator('[data-action=basic]')).toHaveAttribute('aria-pressed','true');
@@ -152,7 +169,7 @@ test('legal run outcomes, earned rewards and fresh restart',async({page})=>{
  await page.locator('#run-start-encounter').click();await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  for(let turn=0;turn<4&&await tip.getAttribute('data-tutorial-id')!==dismissedTip;turn++){
   const current=await readSession(page);
-  await playCommand(page,{type:'endTurn',unitId:current.state.initiative[current.state.activeIndex]});await ready(page);
+  await playCommand(page,{type:'endTurn',unitId:current.state.initiative[current.state.activeIndex]});await waitForRunBattleBoundary(page);
  }
  await expect(guidance).toBeVisible();await expect(tip).toHaveAttribute('data-tutorial-id',dismissedTip);
  expect(errors).toEqual([]);
@@ -209,6 +226,7 @@ test('run preparation and dialogs retain 44px controls, native touch and narrow 
 test('testing routes: an earned combat draught stays in the transient authored run',async({page})=>{
  test.setTimeout(300000);
  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+ await useFastWebKitCombatPace(page);
  await page.addInitScript(()=>{
   const get=Storage.prototype.getItem,set=Storage.prototype.setItem,remove=Storage.prototype.removeItem;
   const saved=(key:string)=>key.startsWith('tactics-guru:phaser:')||key==='tactics-guru:menu-new-dungeon-review';
