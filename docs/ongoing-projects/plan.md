@@ -105,3 +105,19 @@ The three reported causes are resolved above. The matched-batch timing
 measurement and the separate legacy dungeon assertions remain tracked in
 [#208](https://github.com/luminari-gurus/tactics-guru-v2/issues/208) and
 [#483](https://github.com/luminari-gurus/tactics-guru-v2/issues/483).
+
+## Independent PR review
+
+- On the original PR head, Tab advanced to fully covered HUD controls at
+  568×234 after scrolling with a plan waiting. The new compact Radial test
+  failed at the focused control's pointer hit check. Cancel plan now occupies a
+  separate slot beside the scroller and uses the same cancel handler and
+  scene cleanup. The test covers 568×234 and 480×234, including native
+  activation and unchanged state, replay and pending intent.
+- A separate inherited issue left a 31px scroll viewport at 480×234 on
+  `cadcf4d5` even before planning. The strengthened Rail test failed on the
+  base with only 25.81px of the focused Move button exposed in its narrowest
+  case. The stacked HUD now reserves 48px and allows the actor area to shrink.
+- The Chromium repair smoke passed the narrow Rail, compact Radial focus and
+  original Radial cancellation cases. Prior Playwright receipts and review
+  reproductions are retained separately.

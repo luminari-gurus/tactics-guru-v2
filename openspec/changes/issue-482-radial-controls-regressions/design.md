@@ -16,7 +16,9 @@ radial interaction, responsive layout where needed, and its regression tests.
   fixture alone causes the interception.
 - Measure Cancel plan before Playwright can scroll it into view. If its
   current container clips the button, fit the existing control into the
-  available layout while the plan is waiting.
+  available layout while the plan is waiting. Put it beside the scroll
+  viewport so it cannot cover controls brought into view by keyboard focus.
+  Reserve one tap-target height for the scroller in stacked landscape.
 - Make the reflow witness drive an actual board-edge crossing at the same
   viewport. Trace the existing resize observer and radial placement only if
   the control fails to follow the measured change.

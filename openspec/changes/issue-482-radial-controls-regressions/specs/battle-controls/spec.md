@@ -25,6 +25,12 @@ CSS pixels while the radial is closed and awaiting a destination or target.
 - **THEN** normal selection resumes, with no pending action, accepted command,
   replay entry, or RNG change
 
+#### Scenario: Navigate the compact HUD while a plan is waiting
+
+- **WHEN** a player tabs from Cancel plan to a scrolling HUD control in short
+  landscape
+- **THEN** both controls remain reachable and the focused control is visible
+
 ### Requirement: Tap-open radial reflow
 
 A tap-open radial SHALL reposition within a drawable board that can fit its

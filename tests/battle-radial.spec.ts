@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import { endTurn, session, readSession, tapBoard, boardPoint, combatSkin } from './helpers/battlePolicy';
 import { BATTLE_STORAGE_KEYS } from '../src/persistence/battleStorage';
 import { standaloneCatalog as catalog } from './helpers/playerPolicy';
@@ -22,6 +22,13 @@ async function ready(page: Page) {
   await page.goto('./battle');
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   await expect.poll(() => combatSkin(page)).toBe('radial');
+}
+
+function receivesPointerAtCenter(control: Locator) {
+  return control.evaluate(node => {
+    const { x, y, width, height } = node.getBoundingClientRect();
+    return node.contains(document.elementFromPoint(x + width / 2, y + height / 2));
+  });
 }
 
 async function holdAt(page: Page, point: { x: number; y: number }) {
@@ -727,10 +734,7 @@ test('radial plan cancellation stays available while choosing a destination or t
     expect(box.y).toBeGreaterThanOrEqual(0);
     expect(box.x+box.width).toBeLessThanOrEqual(viewport.width);
     expect(box.y+box.height).toBeLessThanOrEqual(viewport.height);
-    expect(await cancel.evaluate(node=>{
-      const {x,y,width,height}=node.getBoundingClientRect();
-      return node.contains(document.elementFromPoint(x+width/2,y+height/2));
-    })).toBe(true);
+    expect(await receivesPointerAtCenter(cancel)).toBe(true);
     if(test.info().project.use.hasTouch) await cancel.tap();
     else { await cancel.focus(); await page.keyboard.press('Enter'); }
     await expect(cancel).toBeHidden();
@@ -742,6 +746,36 @@ test('radial plan cancellation stays available while choosing a destination or t
     await tapBoard(page,cell);
     await expect(page.locator('#battle-radial-move')).toBeEnabled();
     await page.locator('#battle-radial-hub').click();
+  }
+});
+
+test('radial compact landscape keeps Cancel plan and focused HUD controls exposed', async ({ page, hasTouch }) => {
+  for (const width of [568, 480]) {
+    await page.setViewportSize({ width, height: 234 });
+    await ready(page);
+    const { cell, current } = await reachableEmpty(page);
+    await tapBoard(page, cell);
+    const plan = page.locator('#battle-radial-plan');
+    if (hasTouch) await plan.tap(); else await plan.click();
+
+    const cancel = page.getByRole('button', { name: 'Cancel plan', exact: true });
+    await expect(cancel).toBeInViewport({ ratio: 1 });
+    await page.locator('#battle-scroll').evaluate(node => { node.scrollTop = node.scrollHeight; });
+    await cancel.focus();
+    const danger = page.getByRole('button', { name: 'Show enemy danger', exact: true });
+    for (let count = 0; count < 5 && !(await danger.evaluate(node => node === document.activeElement)); count++) {
+      await page.keyboard.press('Tab');
+    }
+    await expect(danger).toBeFocused();
+    await expect.poll(() => receivesPointerAtCenter(danger)).toBe(true);
+    await expect(cancel).toBeInViewport({ ratio: 1 });
+    expect(await receivesPointerAtCenter(cancel)).toBe(true);
+    if (hasTouch) await cancel.tap(); else await cancel.press('Enter');
+    await expect(cancel).toBeHidden();
+    const after = await session(page);
+    expect(after.state).toEqual(current.state);
+    expect(after.replay.commands).toEqual(current.replay.commands);
+    expect(after.pending).toBeNull();
   }
 });
 

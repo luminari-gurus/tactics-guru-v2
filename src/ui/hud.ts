@@ -181,7 +181,7 @@ export class BattleHud {
     this.planCancel.textContent = 'Cancel plan';
     this.planCancel.hidden = true;
     this.planCancel.addEventListener('click', callbacks.cancel, { signal });
-    this.root.before(this.planCancel);
+    document.querySelector('#battle-dock')!.prepend(this.planCancel);
     this.root.querySelector('#battle-next')!.addEventListener('click',callbacks.wait,{signal});
     mountCombatControlsPreference(this.root.querySelector('#battle-overflow')!);
     this.disposePacePreference = mountCombatPacePreference(this.root.querySelector('#battle-overflow')!);
