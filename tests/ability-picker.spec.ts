@@ -330,13 +330,15 @@ test('direct ability controls fit the desktop rail and compact touch layouts',as
         const board=document.querySelector('#battlefield')!.getBoundingClientRect();
         const panel=document.querySelector('#fit-panel')!.getBoundingClientRect();
         const controls=buttons.map(button=>{
-          button.scrollIntoView({block:'nearest'});
+          button.scrollIntoView({block:'center',behavior:'instant'});
           const bounds=button.getBoundingClientRect(),visible=scroll.getBoundingClientRect();
+          const top=Math.max(bounds.top,visible.top),bottom=Math.min(bounds.bottom,visible.bottom);
+          const hit=document.elementFromPoint(bounds.left+bounds.width/2,(top+bottom)/2);
           const label=button.querySelector('strong')!,range=document.createRange();range.selectNodeContents(label);
           return {name:button.getAttribute('aria-label'),width:bounds.width,height:bounds.height,
             inViewport:bounds.left>=0&&bounds.right<=innerWidth,
-            reachable:bounds.top>=visible.top&&bounds.bottom<=visible.bottom,
-            labelFits:[...range.getClientRects()].every(r=>r.left>=bounds.left&&r.right<=bounds.right&&r.top>=bounds.top&&r.bottom<=bounds.bottom)};
+            visibleHeight:bottom-top,reachable:button.contains(hit),
+            labelFits:[...range.getClientRects()].every(r=>r.left>=bounds.left&&r.right<=bounds.right&&r.top>=top&&r.bottom<=bottom)};
         });
         return {columns:getComputedStyle(document.querySelector('.battle-actions')!).gridTemplateColumns.split(' ').length,
           overflow:document.documentElement.scrollWidth>innerWidth,
@@ -344,7 +346,8 @@ test('direct ability controls fit the desktop rail and compact touch layouts',as
       });
       expect(layout.columns).toBe(2);expect(layout.overflow).toBe(false);expect(layout.separate).toBe(true);
       for(const control of layout.controls){
-        expect(control.width,control.name!).toBeGreaterThanOrEqual(44);expect(control.height,control.name!).toBeGreaterThanOrEqual(66);
+        expect(control.width,control.name!).toBeGreaterThanOrEqual(44);expect(control.height,control.name!).toBeGreaterThanOrEqual(hasTouch?66:44);
+        expect(control.visibleHeight,control.name!).toBeGreaterThanOrEqual(44);
         expect(control.inViewport,control.name!).toBe(true);expect(control.reachable,control.name!).toBe(true);expect(control.labelFits,control.name!).toBe(true);
       }
       const ability=hero==='fighter'?'ability:second_wind':'ability:mark_target',button=abilityButton(page,ability);

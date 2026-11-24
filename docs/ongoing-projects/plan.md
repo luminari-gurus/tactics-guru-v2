@@ -121,3 +121,9 @@ measurement and the separate legacy dungeon assertions remain tracked in
 - The Chromium repair smoke passed the narrow Rail, compact Radial focus and
   original Radial cancellation cases. Prior Playwright receipts and review
   reproductions are retained separately.
+- The shared ability-picker fixture had identical failures on `cadcf4d5`
+  and the reviewed runtime at `720d4b66`. The fixture now checks the desktop
+  44px control contract, retains its 66px touch button sizing check, and
+  measures the exposed hit area and readable label after scrolling. All three
+  Chromium profiles passed the repaired test. The fixture correction changes
+  no application or build inputs from the reviewed runtime.
