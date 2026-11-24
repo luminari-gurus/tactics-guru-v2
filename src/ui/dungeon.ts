@@ -2,7 +2,7 @@ import { progressionLabel } from '../domain/progression';
 import { DungeonMap, dungeonBiomeLabel } from './dungeonMap';
 import { poiCell } from '../domain/exploration';
 import { dungeonContent } from '../content/dungeon';
-import { dungeonBoundary, currentFloor, clearedDungeonSlots, dungeonStairStatus, FloorCache, type DungeonItemCommand, type DungeonState } from '../domain/dungeon';
+import { dungeonBoundary, floorMap, currentFloor, clearedDungeonSlots, dungeonStairStatus, FloorCache, type DungeonItemCommand, type DungeonState } from '../domain/dungeon';
 import type { DungeonSession } from '../app/DungeonSession';
 import { EQUIPMENT_SLOTS, ITEM_BOUNDS } from '../content/itemTypes';
 import type { HeroId } from '../content/types';
@@ -135,7 +135,7 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
     {id:'dungeon-item-cancel',label:'Cancel',run:()=>root.querySelector<HTMLElement>('h1')?.focus()},
   ]);
 
-  mapView.render(s,cache.resolve(floor.descriptor.seed, floor.descriptor.generator, floor.descriptor.size ?? 20),session.lootStatus);
+  mapView.render(s,floorMap(floor.descriptor, cache),session.lootStatus);
   const canEnter=s.phase==='ready'&&floor.completed<3&&floor.exploration.pois.some(p=>!clearedDungeonSlots(floor).includes(p.encounterSlot)&&floor.position===poiCell(p, floor.descriptor.size ?? 20));
   if(canEnter)sidebar.prepend(button('Enter encounter',actions.start,false,'dungeon-start-encounter'));
   const travel=disclosure('dungeon-travel','Travel and map guide');

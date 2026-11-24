@@ -27,7 +27,7 @@ import { UINT32_RANGE } from './constants';
 
 export interface FloorDescriptor {
   readonly depth: number; readonly seed: number; readonly template: typeof DUNGEON_TEMPLATE;
-  readonly generator: 'rooms-v1' | 'sector-graph-v1' | 'arena-v1'; readonly size?: number; readonly biome: typeof BIOMES[number]['version']; readonly mapHash: string;
+  readonly generator: 'rooms-v1' | 'sector-graph-v1' | 'arena-v1'; readonly size?: number; readonly height?: number; readonly biome: typeof BIOMES[number]['version']; readonly mapHash: string;
   readonly upstairs: number; readonly downstairs: number;
   readonly encounters: readonly { readonly selection: EncounterSelection; readonly battlefield: BattlefieldDescriptor | null }[];
 }
@@ -93,11 +93,11 @@ export class FloorCache {
   private maps = new Map<string, GeneratedMap>();
   constructor(private readonly capacity = 3) {}
   get size() { return this.maps.size; }
-  resolve(seed: number, generator: FloorDescriptor['generator'] = 'rooms-v1', size = 20): GeneratedMap {
-    const key = `${seed}:${generator}:${size}`;
+  resolve(seed: number, generator: FloorDescriptor['generator'] = 'rooms-v1', size = 20, height = size): GeneratedMap {
+    const key = `${seed}:${generator}:${size}:${height}`;
     let map = this.maps.get(key);
     if (!map) {
-      map = generateFrozenMap(seed, generator === 'rooms-v1' ? 'rooms' : generator === 'arena-v1' ? 'arena' : 'sector-graph', size, size);
+      map = generateFrozenMap(seed, generator === 'rooms-v1' ? 'rooms' : generator === 'arena-v1' ? 'arena' : 'sector-graph', size, height);
       floorGeometryFacts.set(map, {});
     }
     this.maps.delete(key); this.maps.set(key, map);
@@ -106,18 +106,20 @@ export class FloorCache {
   }
 }
 export const floorSize = (depth: number) => 20 + 4 * Math.min(depth - 1, 4);
+// Square floors reach the viewport width at depth five; subsequent floors extend vertically.
+const extraFloorHeight = (depth: number) => depth > 5 ? floorSize(depth) + depth - 5 : undefined;
 const sharedFloorCache = new FloorCache(256);
-export const floorMap = (descriptor: FloorDescriptor, cache = sharedFloorCache) => cache.resolve(descriptor.seed, descriptor.generator, descriptor.size ?? 20);
+export const floorMap = (descriptor: FloorDescriptor, cache = sharedFloorCache) => cache.resolve(descriptor.seed, descriptor.generator, descriptor.size ?? 20, descriptor.height);
 /** Prior saves contain no per-slot geometry. Keep their fixed facts cheap until battle entry. */
 function legacyEncounterPlans(depth: number): FloorDescriptor['encounters'] {
   return [0,1,2].map(slot=>({selection:legacyDungeonEncounter(depth,slot),battlefield:null}));
 }
-function floorGeometry(seed: number, depth: number, biome: FloorDescriptor['biome'], cache = sharedFloorCache, generator: FloorDescriptor['generator'] = depth === 1 ? 'rooms-v1' : dungeonSeed(seed, depth, 'floor') % 4 === 0 ? 'arena-v1' : 'sector-graph-v1'): Omit<FloorDescriptor, 'encounters'> {
-  const floorSeed = dungeonSeed(seed, depth, 'floor'), size = generator === 'rooms-v1' ? 20 : floorSize(depth), map = cache.resolve(floorSeed, generator, size);
+function floorGeometry(seed: number, depth: number, biome: FloorDescriptor['biome'], cache = sharedFloorCache, generator: FloorDescriptor['generator'] = depth === 1 ? 'rooms-v1' : dungeonSeed(seed, depth, 'floor') % 4 === 0 ? 'arena-v1' : 'sector-graph-v1', height?: number): Omit<FloorDescriptor, 'encounters'> {
+  const floorSeed = dungeonSeed(seed, depth, 'floor'), size = generator === 'rooms-v1' ? 20 : floorSize(depth), map = cache.resolve(floorSeed, generator, size, height);
   const cached = floorGeometryFacts.get(map);
   const facts = cached?.value ?? { mapHash: hashJson(map), upstairs: map.cells.indexOf(1), downstairs: map.cells.lastIndexOf(1) };
   if (cached) cached.value = facts;
-  return { depth, seed: floorSeed, template: DUNGEON_TEMPLATE, generator, ...(generator === 'rooms-v1' ? {} : {size}), biome,
+  return { depth, seed: floorSeed, template: DUNGEON_TEMPLATE, generator, ...(generator === 'rooms-v1' ? {} : {size}), ...(height === undefined ? {} : {height}), biome,
     ...facts };
 }
 export function floorDescriptor(seed: number, depth: number, cache = new FloorCache(), policy: DungeonEncounterPolicy = DUNGEON_ENCOUNTER_POLICY): FloorDescriptor {
@@ -129,7 +131,7 @@ export function floorDescriptor(seed: number, depth: number, cache = new FloorCa
     rememberAdmission(admissionKey(dungeonSeed(seed, depth, 'battle', slot), selection, resolved.descriptor));
     return { selection, battlefield: resolved.descriptor };
   });
-  return { ...floorGeometry(seed, depth, legacy ? 'grassland-v1' : `${dungeonBiome(seed, depth, policy)}-v1`, cache), encounters };
+  return { ...floorGeometry(seed, depth, legacy ? 'grassland-v1' : `${dungeonBiome(seed, depth, policy)}-v1`, cache, undefined, extraFloorHeight(depth)), encounters };
 }
 /** Injectable uint32 draw so app entropy and tests share the same previous-seed collision rule. */
 export function newDungeonSeed(draw: () => number, previous?: number): number {
@@ -225,12 +227,15 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
   for (let i = 0; i < input.floors.length; i++) {
     const f = input.floors[i];
     const looted = f !== null && typeof f === 'object' && Object.hasOwn(f, 'loot');
-    if (!hasShape(f, ['descriptor','position','completed','exploration', ...(looted ? ['loot'] : [])]) || !hasShape(f.descriptor, f.descriptor && typeof f.descriptor === 'object' && 'size' in f.descriptor ? ['depth','seed','template','generator','size','biome','mapHash','upstairs','downstairs','encounters'] : ['depth','seed','template','generator','biome','mapHash','upstairs','downstairs','encounters']) ||
-      !safeCount(f.completed) || f.completed > 3 || !safeCount(f.position) || f.position >= (f.descriptor.size === undefined ? 400 : Number(f.descriptor.size) ** 2) ||
+    if (!hasShape(f, ['descriptor','position','completed','exploration', ...(looted ? ['loot'] : [])]) || !hasShape(f.descriptor, f.descriptor && typeof f.descriptor === 'object' && 'size' in f.descriptor ? ['depth','seed','template','generator','size', ...('height' in f.descriptor ? ['height'] : []),'biome','mapHash','upstairs','downstairs','encounters'] : ['depth','seed','template','generator','biome','mapHash','upstairs','downstairs','encounters']) ||
+      !safeCount(f.completed) || f.completed > 3 || !safeCount(f.position) ||
       f.descriptor.depth !== i + 1 || f.descriptor.seed !== dungeonSeed(input.seed, i + 1, 'floor') || f.descriptor.template !== DUNGEON_TEMPLATE ||
-      !(f.descriptor.generator === 'rooms-v1' && f.descriptor.size === undefined || (f.descriptor.generator === 'sector-graph-v1' || f.descriptor.generator === 'arena-v1') && f.descriptor.size === floorSize(i + 1)) || typeof f.descriptor.mapHash !== 'string' || !/^sha256:[a-f0-9]{64}$/.test(f.descriptor.mapHash) ||
-      !safeCount(f.descriptor.upstairs) || !safeCount(f.descriptor.downstairs) || f.descriptor.upstairs >= f.descriptor.downstairs || f.descriptor.downstairs >= (f.descriptor.size === undefined ? 400 : Number(f.descriptor.size) ** 2) ||
+      !(f.descriptor.generator === 'rooms-v1' && f.descriptor.size === undefined || (f.descriptor.generator === 'sector-graph-v1' || f.descriptor.generator === 'arena-v1') && f.descriptor.size === floorSize(i + 1) && (f.descriptor.height === undefined || f.descriptor.height === extraFloorHeight(i + 1))) || typeof f.descriptor.mapHash !== 'string' || !/^sha256:[a-f0-9]{64}$/.test(f.descriptor.mapHash) ||
+      !safeCount(f.descriptor.upstairs) || !safeCount(f.descriptor.downstairs) || f.descriptor.upstairs >= f.descriptor.downstairs ||
       (i < input.floors.length - 1 && f.completed !== 3)) return fail('invalidFloor');
+    const width = Number(f.descriptor.size ?? 20);
+    const area = width * Number(f.descriptor.height ?? width);
+    if (f.position >= area || f.descriptor.downstairs >= area) return fail('invalidFloor');
     const biomeVersion = f.descriptor.biome;
     const biome = BIOMES.find(biome => biome.version === biomeVersion);
     if (!biome || policy === LEGACY_ENCOUNTER_POLICY && biome.id !== 'grassland' ||
@@ -320,7 +325,7 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
   if (!['ready','battle','reward','defeat'].includes(input.phase as string)) return fail('invalidPhase');
   const state = { ...input, ...(stats ? { stats } : {}), encounterPolicy: policy, floors, party, ownership: owned.ownership } as unknown as DungeonState;
   const { encounters, ...geometry } = currentFloor(state).descriptor;
-  if (canonical(geometry) !== canonical(floorGeometry(state.seed, state.depth, currentFloor(state).descriptor.biome, undefined, currentFloor(state).descriptor.generator))) return fail('invalidFloor');
+  if (canonical(geometry) !== canonical(floorGeometry(state.seed, state.depth, currentFloor(state).descriptor.biome, undefined, currentFloor(state).descriptor.generator, geometry.height))) return fail('invalidFloor');
   const slot = dungeonSlot(state), alive = party.some(h => h.hp > 0);
   if ((state.phase === 'defeat') === alive || state.phase === 'battle' && slot === 3 ||
     state.phase === 'reward' && (slot < 1 || currentFloor(state).loot?.some(loot => loot.rewardIndex === slot - 1)) ||
@@ -366,7 +371,7 @@ export function travelDungeon(s: DungeonState, direction: 'ascend' | 'descend', 
   if (dungeonStairStatus(s, direction) !== 'available') return fail('lockedStairs');
   if (currentFloor(s).position !== (direction === 'descend' ? currentFloor(s).descriptor.downstairs : currentFloor(s).descriptor.upstairs)) return fail('remoteStairs');
   const depth = s.depth + (direction === 'descend' ? 1 : -1);
-  if (!safeCount(depth, 1)) return fail('resourceLimit');
+  if (!safeCount(depth, 1) || depth > MAX_DUNGEON_FLOORS) return fail('resourceLimit');
   let floors = [...s.floors];
   const current = currentFloor(s);
   floors[s.depth - 1] = { ...current, position: direction === 'descend' ? current.descriptor.downstairs : current.descriptor.upstairs };

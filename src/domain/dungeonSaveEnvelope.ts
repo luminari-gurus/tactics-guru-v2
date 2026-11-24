@@ -54,7 +54,7 @@ export function encodeDungeon(input: unknown): { ok: true; text: string } | { ok
 /** Store just the changes needed to undo the legacy projection in a current client. */
 export function encodeDungeonRollback(state: DungeonState): { ok: true; text: string; checkpoint: string } | { ok: false; reason: string } {
   const addedCells = state.floors.map(floor => floor.exploration.sightVersion === undefined ? null :
-    reveal(floor.position, floor.descriptor.size ?? 20).filter(cell => !floor.exploration.revealed.includes(cell)));
+    reveal(floor.position, floor.descriptor.size ?? 20, floor.descriptor.height).filter(cell => !floor.exploration.revealed.includes(cell)));
   const floors = state.floors.map((floor, index) => {
     const added = addedCells[index];
     if (added === null) return floor;
@@ -79,7 +79,7 @@ export function restoreDungeonRollback(text: string, legacy: DungeonState, check
     const floors = legacy.floors.map((floor, index) => {
       const added = addedCells[index];
       if (added === null) return floor;
-      const visible = reveal(floor.position, floor.descriptor.size ?? 20);
+      const visible = reveal(floor.position, floor.descriptor.size ?? 20, floor.descriptor.height);
       if (!isDenseArray(added, visible.length) || !added.every(cell =>
         typeof cell === 'number' && visible.includes(cell) && floor.exploration.revealed.includes(cell))) throw Error('Invalid rollback cells');
       return { ...floor, exploration: { ...floor.exploration, sightVersion: WALL_SIGHT_VERSION,

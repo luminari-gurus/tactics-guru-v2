@@ -123,7 +123,11 @@ export class DungeonMap {
     this.lootStatus.setAttribute('aria-atomic', 'true');
     this.grid.addEventListener('click',e=>{
       if(!this.live||!this.state||!this.map||this.locked()||document.hidden||!(e.target instanceof Element))return;
-      const cell=e.target.closest<HTMLElement>('[data-cell]');if(!cell)return;
+      const cell=e.target.closest<HTMLElement>('[data-cell]');
+      if(!cell) {
+        if (this.grid.classList.contains('sparse-floor')) this.feedback.textContent='Choose an adjacent cell or use the direction controls.';
+        return;
+      }
       const destination=Number(cell.dataset.cell),floor=currentFloor(this.state);
       if(neighbors(floor.position,this.map.width,this.map.height).includes(destination))this.move(destination);
       else this.feedback.textContent='Choose an adjacent cell or use the direction controls.';
@@ -149,7 +153,16 @@ export class DungeonMap {
     this.resize.observe(this.grid);
     this.resize.observe(this.heading);
     this.viewport.addEventListener('scroll', () => {
-      this.viewportScroll = { left: this.viewport.scrollLeft, top: this.viewport.scrollTop };
+      const left = this.viewport.scrollLeft, top = this.viewport.scrollTop;
+      const width = this.viewport.clientWidth, height = this.viewport.clientHeight;
+      const clampedLeft = Math.min(this.viewportScroll.left, this.viewport.scrollWidth - width);
+      const clampedTop = Math.min(this.viewportScroll.top, this.viewport.scrollHeight - height);
+      // A manual pan supersedes a queued follow. A resize that clamps the old offset still follows.
+      if (left !== clampedLeft || top !== clampedTop) {
+        this.revealPlayer = false;
+        this.layoutSize = { width, height };
+      }
+      this.viewportScroll = { left, top };
     }, {signal, passive: true});
     window.addEventListener('resize', () => this.scheduleLayout(false, true), {signal});
     window.visualViewport?.addEventListener('resize', () => this.scheduleLayout(false, true), {signal});
@@ -327,17 +340,31 @@ export class DungeonMap {
     if (this.lootHere.textContent !== contentsHere) this.lootHere.textContent = contentsHere;
     const pois=new Map([...shownPois].sort((a,b)=>Number(cleared.includes(b.encounterSlot))-Number(cleared.includes(a.encounterSlot))).map(p=>[poiCell(p,map.width),p]));
     const total=map.width*map.height;
-    let rebuild=this.cells.length!==total||grid.children.length!==total;
-    if (rebuild) {
-      const fragment=document.createDocumentFragment();this.cells.length=0;this.terrainCells.clear();this.fallbackCells.clear();
-      for(let i=0;i<total;i++) {const cell=document.createElement('span');cell.dataset.cell=String(i);cell.setAttribute('aria-hidden','true');this.cells.push(cell);fragment.append(cell);}
+    // On long floors undiscovered terrain is a repeated fog tile, without a DOM node per tile.
+    const sparse = total > 4096;
+    const prior = this.visual;
+    const remount = grid.classList.contains('sparse-floor') !== sparse ||
+      (sparse ? prior?.map !== map : this.cells.length !== total || grid.children.length !== total);
+    if (remount) {
+      grid.classList.toggle('sparse-floor', sparse);
+      const fragment = document.createDocumentFragment();
+      this.cells.length = 0;
+      this.terrainCells.clear();
+      this.fallbackCells.clear();
+      if (!sparse) for (let i = 0; i < total; i++) {
+        const cell = this.createCell(i);
+        this.cells[i] = cell;
+        fragment.append(cell);
+      }
       grid.replaceChildren(fragment);
     }
-    const prior=this.visual;
-    rebuild ||= !prior || prior.map!==map || prior.biome!==biome.id;
+    const rebuild = remount || !prior || prior.map !== map || prior.biome !== biome.id;
     const markers=[f.position,f.descriptor.upstairs,f.descriptor.downstairs,...pois.keys(),...shownLoot.keys()];
     const dirty=new Set<number>(),artDirty=new Set<HTMLElement>();
-    if(rebuild) {for(let i=0;i<total;i++)dirty.add(i);}
+    if(rebuild) {
+      if (sparse) for (const i of revealed) dirty.add(i);
+      else for(let i=0;i<total;i++)dirty.add(i);
+    }
     else if(prior) {
       for(const index of markers)dirty.add(index);
       for(const index of prior.markers)dirty.add(index);
@@ -347,8 +374,24 @@ export class DungeonMap {
       for(const index of prior.sight)if(!sight.has(index))dirty.add(index);
     }
     for(const i of dirty) {
-      const cell=this.cells[i];
       const known = revealed.has(i), open = map.cells[i] === 1;
+      let cell = this.cells[i];
+      if (sparse && !known) {
+        if (cell) {
+          this.terrainCells.delete(cell);
+          this.fallbackCells.delete(cell);
+          cell.remove();
+          delete this.cells[i];
+        }
+        continue;
+      }
+      if (!cell) {
+        cell = this.createCell(i);
+        cell.style.gridColumnStart = String(1 + i % map.width);
+        cell.style.gridRowStart = String(1 + Math.floor(i / map.width));
+        this.cells[i] = cell;
+        grid.append(cell);
+      }
       const terrainClass = open ? 'explore-open' : 'explore-wall';
       const className = known ? terrainClass + (sight.has(i) ? '' : ' explore-remembered') : 'explore-hidden';
       if(cell.className!==className)cell.className=className;
@@ -389,6 +432,12 @@ export class DungeonMap {
     // Movement only treats newly changed terrain. Style changes and image completion repaint remembered and visible terrain.
     this.paintArt(artDirty);
     if(focused&&document.activeElement!==focused&&focused.isConnected)focused.focus({preventScroll:true});
+  }
+  private createCell(index: number): HTMLSpanElement {
+    const cell = document.createElement('span');
+    cell.dataset.cell = String(index);
+    cell.setAttribute('aria-hidden', 'true');
+    return cell;
   }
   /** Image completion changes pixels only; never detach active input or scroll targets. */
   private paintArt(cells: Iterable<HTMLElement> = this.terrainCells) {
