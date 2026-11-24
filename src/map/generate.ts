@@ -1,4 +1,4 @@
-import { nextUint32, seedRng } from '../domain/rng';
+import { localUint32Stream, nextUint32, seedRng } from '../domain/rng';
 
 export const MAP_SIZE = 20;
 // At the save reader's 8,192-floor limit the tallest floor is 36 + 8,192 - 5.
@@ -24,21 +24,57 @@ export interface GeneratedMap {
   readonly fallback: boolean;
 }
 
+const generatedOpenCells = new WeakMap<GeneratedMap, readonly number[]>();
+
+function openCells(map: GeneratedMap): number[] {
+  const open: number[] = [];
+  for (let i = 0; i < map.cells.length; i++) if (map.cells[i]) open.push(i);
+  return open;
+}
+
+/** Only freshly generated, deeply frozen geometry may skip a second connectivity walk. */
+export function generateFrozenMap(seed: number, type: MapType, width: number, height: number): GeneratedMap {
+  const map = generateMap(seed, type, width, height);
+  generatedOpenCells.set(map, openCells(map));
+  Object.freeze(map.cells);
+  Object.freeze(map);
+  return map;
+}
+
+/** The two endpoint cells are stairs. Return a private working copy for seeded placement. */
+export function encounterCandidates(map: GeneratedMap): number[] {
+  const open = generatedOpenCells.get(map);
+  if (open) return open.slice(1, -1);
+  if (!validMapCells(map.cells, map.width, map.height, map.type === 'arena')) throw Error('Invalid exploration geometry');
+  return openCells(map).slice(1, -1);
+}
+
 export function validMapCells(cells: readonly MapCell[], width = 20, height = width, allowOpen = false): boolean {
   if (!Number.isInteger(width) || !Number.isInteger(height) || width < 20 || height < 20 || width > 36 || height > MAX_MAP_HEIGHT || cells.length !== width * height || cells.some(cell => cell !== 0 && cell !== 1)) return false;
   const floorCount = cells.reduce<number>((sum, cell) => sum + cell, 0);
   if (floorCount < 60 || floorCount > (allowOpen ? (width - 2) * (height - 2) : width * height - (2 * width + 2 * height))) return false;
   for (let x = 0; x < width; x++) if (cells[x] || cells[(height - 1) * width + x]) return false;
   for (let y = 0; y < height; y++) if (cells[y * width] || cells[y * width + width - 1]) return false;
-  const visited = new Set<number>();
-  const queue = [cells.indexOf(1)];
-  visited.add(queue[0]);
-  for (let i = 0; i < queue.length; i++) {
-    for (const next of [queue[i] - width, queue[i] + width, queue[i] - 1, queue[i] + 1]) {
-      if (cells[next] === 1 && !visited.has(next)) { visited.add(next); queue.push(next); }
+  const seen = new Uint8Array(cells.length);
+  const queue = new Int32Array(floorCount);
+  queue[0] = cells.indexOf(1);
+  seen[queue[0]] = 1;
+  let count = 1;
+  const enqueue = (next: number) => {
+    if (cells[next] === 1 && !seen[next]) {
+      seen[next] = 1;
+      queue[count++] = next;
     }
+  };
+  // The verified wall border keeps all four neighbor indices in bounds.
+  for (let i = 0; i < count; i++) {
+    const cell = queue[i];
+    enqueue(cell - width);
+    enqueue(cell + width);
+    enqueue(cell - 1);
+    enqueue(cell + 1);
   }
-  return visited.size === floorCount;
+  return count === floorCount;
 }
 
 function generateRooms(seed: number): GeneratedMap {
@@ -83,12 +119,8 @@ function generateRooms(seed: number): GeneratedMap {
 
 // All decisions use explicit local RNG state. These constants/draw orders are versioned.
 function localDraw(seed: number): (range: number) => number {
-  let rng = seedRng(seed);
-  return range => {
-    const next = nextUint32(rng);
-    rng = next.rng;
-    return next.value % range;
-  };
+  const next = localUint32Stream(seed);
+  return range => next() % range;
 }
 const DIRECTIONS = [[1, 0], [-1, 0], [0, 1], [0, -1]] as const;
 const inner = (n: number): number => Math.max(1, Math.min(18, n));

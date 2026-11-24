@@ -15,6 +15,19 @@ export function isRngState(value: unknown): value is RngState {
 }
 export function nextUint32(input: RngState): { value: number; rng: RngState } {
   if (!isRngState(input) || input.cursor === RULE_BOUNDS.cursor.max) throw new RangeError('Invalid or exhausted RNG state');
+  return advance(input);
+}
+/** Map generators own the stream from seed to completion; no external state enters a draw. */
+export function localUint32Stream(seed: number): () => number {
+  let rng = seedRng(seed);
+  return () => {
+    if (rng.cursor === RULE_BOUNDS.cursor.max) throw new RangeError('Exhausted RNG state');
+    const next = advance(rng);
+    rng = next.rng;
+    return next.value;
+  };
+}
+function advance(input: RngState): { value: number; rng: RngState } {
   const [a,b,c,counter] = input.words;
   const value = (a + b + counter) >>> 0;
   return { value, rng: { words: [ (b ^ (b >>> 9)) >>> 0, (c + (c << 3)) >>> 0,

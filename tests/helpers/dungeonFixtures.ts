@@ -243,7 +243,7 @@ function walkWitness(initial:DungeonState):DungeonState {
     if(f.completed===3)blocked.add(f.descriptor.downstairs);
     const map=floorMap(f.descriptor),previous=new Map<number,number>([[f.position,-1]]),queue=[f.position];
     let destination:number|undefined;
-    for(let i=0;i<queue.length&&destination===undefined;i++)for(const n of neighbors(queue[i],width))if(map.cells[n]&&!previous.has(n)){
+    for(let i=0;i<queue.length&&destination===undefined;i++)for(const n of neighbors(queue[i],width,map.height))if(map.cells[n]&&!previous.has(n)){
       if(blocked.has(n)){if(live.some(p=>poiCell(p,width)===n)){previous.set(n,queue[i]);destination=n;break;}continue;}
       previous.set(n,queue[i]);queue.push(n);
     }

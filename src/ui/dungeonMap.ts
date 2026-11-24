@@ -149,7 +149,11 @@ export class DungeonMap {
     this.resize.observe(this.grid);
     this.resize.observe(this.heading);
     this.viewport.addEventListener('scroll', () => {
-      this.viewportScroll = { left: this.viewport.scrollLeft, top: this.viewport.scrollTop };
+      const left = this.viewport.scrollLeft, top = this.viewport.scrollTop;
+      if (left !== this.viewportScroll.left || top !== this.viewportScroll.top) this.revealPlayer = false;
+      this.viewportScroll = { left, top };
+      // A pan may arrive before the resize observer reports the current viewport.
+      this.layoutSize = { width: this.viewport.clientWidth, height: this.viewport.clientHeight };
     }, {signal, passive: true});
     window.addEventListener('resize', () => this.scheduleLayout(false, true), {signal});
     window.visualViewport?.addEventListener('resize', () => this.scheduleLayout(false, true), {signal});

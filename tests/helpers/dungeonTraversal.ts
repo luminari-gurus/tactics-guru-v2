@@ -64,7 +64,7 @@ export async function walkDungeon(page: Page, target?: number, mode: 'keyboard'|
     // Entering an available stair changes floors, so only route through the requested stair.
     for(const stair of [...(s.depth>1?[f.descriptor.upstairs]:[]),...(f.completed===3?[f.descriptor.downstairs]:[])])if(stair!==destination)blocked.add(stair);
     const map=floorMap(f.descriptor), previous=new Map<number,number>(), queue=[f.position];previous.set(f.position,-1);
-    for(let i=0;i<queue.length&&(destination===undefined||!previous.has(destination));i++)for(const n of neighbors(queue[i],width))if(map.cells[n]&&!previous.has(n)){
+    for(let i=0;i<queue.length&&(destination===undefined||!previous.has(destination));i++)for(const n of neighbors(queue[i],width,map.height))if(map.cells[n]&&!previous.has(n)){
       if(blocked.has(n)){if(target===undefined&&live.some(p=>poiCell(p,width)===n)){previous.set(n,queue[i]);destination=n;break;}continue;}
       previous.set(n,queue[i]);queue.push(n);
     }
@@ -72,7 +72,7 @@ export async function walkDungeon(page: Page, target?: number, mode: 'keyboard'|
     // advance the simulation, then plan again against the new positions.
     let n: number;
     if(destination===undefined||!previous.has(destination)) {
-      const choices=neighbors(f.position,width).filter(cell=>map.cells[cell]&&!blocked.has(cell));
+      const choices=neighbors(f.position,width,map.height).filter(cell=>map.cells[cell]&&!blocked.has(cell));
       if(!choices.length)throw Error('No safe step toward fixture destination');
       n=choices[attempt%choices.length];
     } else { n=destination;while(previous.get(n)!==f.position)n=previous.get(n)!; }
@@ -118,7 +118,7 @@ export async function reenterDungeonStair(page: Page, direction: 'ascend'|'desce
   const width=map.width;
   const stair=direction==='ascend'?f.descriptor.upstairs:f.descriptor.downstairs;
   expect(f.position).toBe(stair);
-  const adjacent=neighbors(stair,width).find(n=>map.cells[n]&&!f.exploration.pois.some(p=>poiCell(p,width)===n));
+  const adjacent=neighbors(stair,width,map.height).find(n=>map.cells[n]&&!f.exploration.pois.some(p=>poiCell(p,width)===n));
   if(adjacent===undefined)throw Error('No safe staircase exit');
   await walkDungeon(page,adjacent,mode);expect((await dungeonSnapshot(page)).depth).toBe(s.depth);
   await walkDungeon(page,stair,mode);
