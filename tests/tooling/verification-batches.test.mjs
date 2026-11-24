@@ -66,10 +66,9 @@ test('real Playwright pilot discovery matches full titles in all intended projec
   assert.equal(chromium.length, 3); assert.equal(webkit.length, 2);
   assert.deepEqual(chromium.map(row => row.project).sort(), ['desktop', 'mobile-landscape', 'mobile-portrait']);
   assert.ok(chromium.every(row => row.title === 'boots a Phaser scene and fits the viewport after resize'));
-  assert.ok(webkit.every(row => row.project === 'acceptance-webkit-portrait'));
-  assert.deepEqual(webkit.map(row => row.title).sort(), [
-    'complete legal authored battle seed 1 reaches playerLoss through controls and replays',
-    'complete legal authored battle seed 2 reaches playerWin through controls and replays',
+  assert.deepEqual(webkit.map(row => [row.project, row.title]).sort(), [
+    ['acceptance-webkit-landscape', 'complete legal authored battle seed 2 reaches playerWin through controls and replays'],
+    ['acceptance-webkit-portrait', 'complete legal authored battle seed 1 reaches playerLoss through controls and replays'],
   ]);
 });
 

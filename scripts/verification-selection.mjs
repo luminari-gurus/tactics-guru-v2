@@ -14,6 +14,25 @@ export const desktopOnlyStages = new Set([
   'telemetry-production', 'telemetry-development', 'assets-root-dev',
 ]);
 export const prefixTouchStages = new Set(['assets-prefix-preview', 'assets-prefix-dev']);
+const webkitAcceptance = 'webkit-acceptance';
+const webkitPortrait = 'acceptance-webkit-portrait';
+const webkitLandscape = 'acceptance-webkit-landscape';
+
+const webkitOrientationCases = new Map([
+  ['battle-loop.spec.ts', new Map([
+    ['complete legal authored battle seed 1 reaches playerLoss through controls and replays', webkitPortrait],
+    ['complete legal authored battle seed 2 reaches playerWin through controls and replays', webkitLandscape],
+  ])],
+  ['run-progression.spec.ts', new Map([
+    ['legal run outcomes, earned rewards and fresh restart', webkitPortrait],
+    ['testing routes: an earned combat draught stays in the transient authored run', webkitPortrait],
+  ])],
+  ['battle-persistence.spec.ts', new Map(
+    ['missing', 'corrupt', 'backup-only', 'unavailable'].map(condition => [
+      `testing routes: fresh play never accesses ${condition} saved games`, webkitPortrait,
+    ]),
+  )],
+]);
 function withoutProjectFilters(args) {
   const remaining = [];
   for (let i = 0; i < args.length; i++) {
@@ -69,7 +88,13 @@ export function captureSelections({ allProfiles = false } = {}) {
       const remaining = selected >= 0 ? args.filter((_, i) => i !== selected && i !== selected + 1) : args;
       const files = defaultMatrix ? ['tests/public-asset-base.spec.ts'] : withoutProjectFilters(remaining);
       const control = join(directory, 'control.config.ts');
-      writeFileSync(control, `import base from ${JSON.stringify(config)};\nexport default { ...base, testDir: ${JSON.stringify(resolve(root, 'tests'))}, projects: base.projects.map(({ grepInvert, grep, ...project }) => project) };\n`);
+      // Keep the common engine exclusion in the WebKit orientation control.
+      const controlProject = config.endsWith('playwright.device-acceptance.config.ts')
+        ? '({ ...project, grepInvert: grepInvert[0] })' : 'project';
+      writeFileSync(control, `import base from ${JSON.stringify(config)};
+export default { ...base, testDir: ${JSON.stringify(resolve(root, 'tests'))},
+  projects: base.projects.map(({ grepInvert, grep, ...project }) => ${controlProject}) };
+`);
       return discoverSelection([...files, '-c', control], env);
     } finally { rmSync(directory, { recursive: true, force: true }); }
   };
@@ -139,7 +164,8 @@ export function compareSelections(before, after) {
       assert.deepEqual({ ...next, grepInvert: null, grep: null }, { ...project, grepInvert: null, grep: null }, 'Changed effective project configuration');
       const expected = project.name === 'mobile-portrait' ? { source: '@canonical', flags: '' }
         : project.name === 'mobile-landscape' ? { source: '@canonical|@fixed-viewport', flags: '' } : project.grepInvert;
-      assert.deepEqual(next.grepInvert, expected, 'Unexpected selection filter');
+      const commonFilter = stage === webkitAcceptance ? next.grepInvert?.[0] : next.grepInvert;
+      assert.deepEqual(commonFilter, expected, 'Unexpected selection filter');
       const expectedGrep = prefixTouch && project.name === 'mobile-portrait' ? { source: '@touch-audio', flags: '' } : project.grep;
       assert.deepEqual(next.grep, expectedGrep, 'Unexpected project grep');
     }
@@ -150,7 +176,9 @@ export function compareSelections(before, after) {
       const desktopReduced = desktopOnly && test.project !== 'desktop';
       const prefixReduced = prefixTouch && (test.project === 'mobile-landscape'
         || test.project === 'mobile-portrait' && !touchAudio);
-      const reduced = desktopReduced || prefixReduced || stage === 'chromium' && (tag === '@canonical' && test.project.startsWith('mobile-')
+      const orientationWitness = stage === webkitAcceptance && webkitOrientationCases.get(test.file)?.get(test.title);
+      const webkitReduced = orientationWitness && test.project !== orientationWitness;
+      const reduced = webkitReduced || desktopReduced || prefixReduced || stage === 'chromium' && (tag === '@canonical' && test.project.startsWith('mobile-')
         || tag === '@fixed-viewport' && test.project === 'mobile-landscape');
       const retained = remaining.get(identity(test));
       if (!reduced) {
@@ -160,7 +188,8 @@ export function compareSelections(before, after) {
         continue;
       }
       assert.ok(!retained, 'Approved reduction still selected');
-      const targetProject = desktopReduced || prefixReduced && !touchAudio || tag === '@canonical' ? 'desktop' : 'mobile-portrait';
+      const targetProject = orientationWitness
+        || (desktopReduced || prefixReduced && !touchAudio || tag === '@canonical' ? 'desktop' : 'mobile-portrait');
       const target = candidate.tests.find(row => row.project === targetProject && row.file === test.file
         && JSON.stringify(row.titlePath) === JSON.stringify(test.titlePath));
       assert.ok(target, 'Missing retained coverage counterpart');
@@ -173,8 +202,9 @@ export function compareSelections(before, after) {
         effectiveUse = effective(targetProject);
       }
       mappings.push({ stage, removed: test, retained: target,
-        classification: desktopReduced ? 'desktop-only' : prefixReduced ? 'prefix-touch' : tag,
-        reason: desktopReduced ? (stage.startsWith('telemetry')
+        classification: webkitReduced ? 'webkit-orientation' : desktopReduced ? 'desktop-only' : prefixReduced ? 'prefix-touch' : tag,
+        reason: webkitReduced ? 'The full journey is retained in one WebKit orientation; focused controls and layout cases run in both'
+          : desktopReduced ? (stage.startsWith('telemetry')
           ? 'Telemetry ingestion/opt-in has no touch, orientation or viewport branches; desktop coverage retained in both dedicated modes'
           : 'Asset-base/server-mode resolution does not depend on device; root-preview chromium retains all three profiles including hasTouch branches')
           : prefixReduced ? 'Prefixed asset-base/server-mode resolution does not depend on device; @touch-audio cases stay on Pixel portrait'
@@ -185,6 +215,8 @@ export function compareSelections(before, after) {
   }
   assert.equal(mappings.filter(row => row.classification === '@canonical' || row.classification === '@fixed-viewport').length, 24,
     'Unexpected chromium reduction count');
+  assert.equal(mappings.filter(row => row.classification === 'webkit-orientation').length, 8,
+    'Unexpected WebKit acceptance reduction count');
   return { beforeCount: before.selections.chromium.tests.length, afterCount: after.selections.chromium.tests.length, mappings };
 }
 

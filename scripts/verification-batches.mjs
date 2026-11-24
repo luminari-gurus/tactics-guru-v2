@@ -50,7 +50,7 @@ export function definitions(mode = 'capture') {
     { id: 'pilot-chromium', stages: [{ ...chromium, id: 'pilot-chromium', args: [...chromium.args,
       'tests/boot.spec.ts', '-g', 'boots a Phaser scene and fits the viewport after resize$'] }] },
     { id: 'pilot-webkit', stages: [{ ...webkit, id: 'pilot-webkit', args: [...webkit.args,
-      '--project=acceptance-webkit-portrait', 'tests/battle-loop.spec.ts', '-g', 'complete legal authored battle seed'] }] },
+      'tests/battle-loop.spec.ts', '-g', 'complete legal authored battle seed'] }] },
   ];
   const batches = read(join(root, 'scripts/verification-batches.json'));
   const chromiumJobs = batches.map(batch => ({ id: 'chromium-' + batch.id,
