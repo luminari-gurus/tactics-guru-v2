@@ -4,7 +4,7 @@ import { generateMap } from '../src/map/generate';
 import { readFileSync } from 'node:fs';
 import { type Page, type Response, type Locator } from '@playwright/test';
 import { test as base, expect } from './helpers/dungeonEntropy';
-import { encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
+import { encodeDungeon, WALL_SIGHT_STATS_SAVE_FORMAT } from '../src/domain/dungeonSaveEnvelope';
 import { freshRunStats } from '../src/domain/runStats';
 import { BATTLE_STORAGE_KEYS } from '../src/persistence/battleStorage';
 import { RUN_STORAGE_KEYS } from '../src/persistence/runStorage';
@@ -746,7 +746,9 @@ test('main menu: counter-only dungeon upgrades known counters without inventing 
   await expect.poll(()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)??'{"records":[]}').records,RUN_RECORD_KEYS.primary)).toMatchObject([{id:oldId,stats:{version:2,coverage:'whole-run',timeCoverage:'since-upgrade',enemiesKilled:old.stats.enemiesKilled,movesTaken:old.stats.movesTaken}}]);
   const history=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!),RUN_RECORD_KEYS.primary);
   expect(history.bests[mode].enemiesKilled.id).toBe(oldId);expect(history.bests[mode].movesTaken.id).toBe(oldId);expect(history.bests[mode].activeMs).toBeUndefined();
-  const next=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!),slots.primary);expect(next.format).toBe(13);expect(next.payload.stats).toMatchObject({version:2,coverage:'whole-run',timeCoverage:'whole-run'});
+  const next = await page.evaluate(key => JSON.parse(localStorage.getItem(key)!), slots.primary);
+  expect(next.format).toBe(WALL_SIGHT_STATS_SAVE_FORMAT);
+  expect(next.payload.stats).toMatchObject({version:2,coverage:'whole-run',timeCoverage:'whole-run'});
 });
 
 test('main menu: five-stat records and retained personal bests stay keyboard and touch accessible', async ({page,isMobile,context},info)=>{

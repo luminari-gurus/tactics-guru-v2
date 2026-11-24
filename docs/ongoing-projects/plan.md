@@ -4,6 +4,15 @@
 - Implementation branch [branch/issue-483-dungeon-counter-migration](https://github.com/luminari-gurus/tactics-guru-v2/tree/branch/issue-483-dungeon-counter-migration)
 - Planning base `960eb8d3ef594d4fc93e40ae04d53b7bf75bc5b2` on `main`, reviewed November 24, 2026 (Asia/Jerusalem)
 - Previous handoff [#482 radial battle controls](issue-482-radial-controls-regressions-plan.md)
+- OpenSpec [issue-483-dungeon-counter-migration](../../openspec/changes/issue-483-dungeon-counter-migration/proposal.md)
+
+## Implementation status
+
+Implementation authorized November 24, 2026, including OpenSpec tracking. The published planning branch was clean at `8e73e851` and has incorporated `main` at `1a4b0af1`. The intervening changes cover matched-batch tooling and leave the affected migration and browser inputs identical to the planning base. A Linux verification checkout and reports are under `/home/aiwithapex/projects/tactics-483-verification.giz3lM` in WSL Ubuntu. The baseline runs on the literal planning base.
+
+The baseline root preview at `960eb8d3` built on Node `24.15.0` with the locked Playwright `1.64.1`. Discovery selected exactly the two WebKit cases. Both failed at the expected assertion with 13 expected and 17 received, one worker and zero retries. `base-webkit.json` and `base-webkit-artifacts/` retain the two failures. The sorted distribution file-manifest digest is `00f6eb16dfa505e729c661e4664b5b5ad0692d84e57b6d3657449235ebe994fd`.
+
+The two-file source fix is in place. The test now imports the existing format identifier and compares it to the saved envelope. Diff review confirmed the original fixture, legacy assertions and production encoder/decoder logic are preserved. The final targeted and ordinary PR checks are the remaining OpenSpec task.
 
 ## Selection
 
@@ -20,7 +29,7 @@ Make the existing [browser migration case](../../tests/main-menu.spec.ts#L735) a
 
 ## Ablation and scope
 
-Reuse the one named format definition and the existing browser journey. The envelope assertion checks which format the browser persisted. Simply decoding any supported format would lose that check. Exporting the existing constant avoids a second format literal or a helper; the [dungeon unit tests](../../tests/unit/dungeon.test.ts) still independently pin formats 12, 13, and 17 for their respective states. Save migration code, fixture generation, application behavior, workflow changes, and OpenSpec artifacts are outside this two-file implementation.
+Reuse the one named format definition and the existing browser journey. The envelope assertion checks which format the browser persisted. Simply decoding any supported format would lose that check. Exporting the existing constant avoids a second format literal or a helper. The [dungeon unit tests](../../tests/unit/dungeon.test.ts) still independently pin formats 12, 13, and 17 for their respective states. OpenSpec tracks the two-file implementation with `skip_specs: true` because the acceptance contract and application behavior are unchanged.
 
 ## Proof for the implementation PR
 
@@ -41,4 +50,4 @@ git diff --check
 
 ## Estimate and open questions
 
-Allow 20–35 minutes for implementation, focused comparison, and ordinary PR checks with dependencies and browser binaries available. Any self-hosted CI queue adds elapsed time. There are no open product or design questions. Fresh base and final browser results are pending implementation.
+Allow 20–35 minutes for implementation, focused comparison, and ordinary PR checks with dependencies and browser binaries available. Any self-hosted CI queue adds elapsed time. There are no open product or design questions.
