@@ -8,6 +8,11 @@ import { LOAD_TIMEOUT_MS } from '../src/phaser/BattleAudio';
 import { BATTLE_STORAGE_KEYS } from '../src/persistence/battleStorage';
 
 const audio=(page:Page)=>page.evaluate(()=>window.fitDiagnostics().battleAudio!);
+const standaloneStorage = (page: Page) => page.evaluate(
+  keys => ({ primary: localStorage.getItem(keys.primary), backup: localStorage.getItem(keys.backup) }),
+  BATTLE_STORAGE_KEYS,
+);
+
 async function ready(page:Page) {await expect(page.locator('#game')).toHaveAttribute('data-phase','player');}
 async function enable(page:Page) {
   await (await battleTool(page, '#battle-sound')).click();
@@ -20,6 +25,7 @@ function errors(page:Page) {
 }
 
 test('sound control uses real gestures, preserves previews, modal focus and restart preference',async({page})=>{
+  test.setTimeout(60_000);
   const found=errors(page);await page.goto('./?game=battle&entry=new');await ready(page);
   expect(await audio(page)).toMatchObject({enabled:false,started:0,status:'muted'});
   const before=await session(page);
@@ -53,7 +59,27 @@ test('sound control uses real gestures, preserves previews, modal focus and rest
     expect((await audio(page)).ownedSounds).toBeLessThanOrEqual(8);
     await expect(page.locator('#battle-sound')).toHaveCount(1);
   }
-  await page.reload();await ready(page);expect(await audio(page)).toMatchObject({enabled:false,started:0});expect(found).toEqual([]);
+  const restarted = await session(page);
+  await enable(page);
+  await page.locator('#battle-move').click();
+  await page.locator('#battle-target').selectOption({ index: 1 });
+  await page.locator('#battle-review').click();
+  await ready(page);
+  expect((await session(page)).state).toMatchObject({
+    outcome: 'ongoing',
+    commandCount: restarted.state.commandCount + 1,
+  });
+  await expect.poll(() => audio(page)).toMatchObject({ enabled: true, recent: ['move'] });
+  const saved = await standaloneStorage(page);
+  expect(saved).toEqual({ primary: null, backup: null });
+  await page.reload();
+  await ready(page);
+  expect((await session(page)).state).toEqual(before.state);
+  expect(await audio(page)).toMatchObject({ enabled: false, started: 0 });
+  await enable(page);
+  expect(await audio(page)).toMatchObject({ started: 0, recent: [] });
+  expect(await standaloneStorage(page)).toEqual(saved);
+  expect(found).toEqual([]);
 });
 
 for(const pace of ['normal','fast'] as const)test(pace==='normal'
@@ -330,11 +356,6 @@ async function startSeed(page:Page,seed:number,enabled:boolean) {
   if(enabled)await expect.poll(()=>audio(page)).toMatchObject({enabled:true,status:'ready'});
 }
 
-const standaloneStorage = (page: Page) => page.evaluate(
-  keys => ({ primary: localStorage.getItem(keys.primary), backup: localStorage.getItem(keys.backup) }),
-  BATTLE_STORAGE_KEYS,
-);
-
 async function audioCheckpoint(page: Page, current: Awaited<ReturnType<typeof session>>) {
   const saved = await standaloneStorage(page);
   expect(saved).toEqual({ primary: null, backup: null });
@@ -395,11 +416,5 @@ for(const [seed,outcome] of [[1,'playerLoss'],[2,'playerWin']] as const) test(`s
   }
   await page.screenshot({path:test.info().outputPath('audio-outcome.png')});
   await test.info().attach('audio',{body:JSON.stringify({seed,heard:[...heard],snapshot:await audio(page),replay:final.replay}),contentType:'application/json'});
-  await page.reload();
-  await ready(page);
-  expect((await readSession(page)).state.seed).toBe(1);
-  await enable(page);
-  expect((await audio(page)).started).toBe(0);
-  expect(await standaloneStorage(page)).toEqual(silent.at(-1)!.saved);
   expect(found).toEqual([]);
 });
