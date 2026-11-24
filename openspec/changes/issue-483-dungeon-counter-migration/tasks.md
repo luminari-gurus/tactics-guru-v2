@@ -9,4 +9,4 @@ See the [implementation and verification plan](../../../docs/ongoing-projects/pl
 
 ## 2. Verify the final build
 
-- [ ] 2.1 Pass the dungeon unit suite, ordinary PR verification, the two WebKit case IDs, and the three Chromium case IDs on the final implementation. Record source, build, profiles, and pass/fail evidence in the plan.
+- [x] 2.1 Pass the dungeon unit suite, ordinary PR verification, the two WebKit case IDs, and the three Chromium case IDs on the final implementation. Record source, build, profiles, and pass/fail evidence in the plan.

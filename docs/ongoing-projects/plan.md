@@ -12,7 +12,16 @@ Implementation authorized November 24, 2026, including OpenSpec tracking. The pu
 
 The baseline root preview at `960eb8d3` built on Node `24.15.0` with the locked Playwright `1.64.1`. Discovery selected exactly the two WebKit cases. Both failed at the expected assertion with 13 expected and 17 received, one worker and zero retries. `base-webkit.json` and `base-webkit-artifacts/` retain the two failures. The sorted distribution file-manifest digest is `00f6eb16dfa505e729c661e4664b5b5ad0692d84e57b6d3657449235ebe994fd`.
 
-The two-file source fix is in place. The test now imports the existing format identifier and compares it to the saved envelope. Diff review confirmed the original fixture, legacy assertions and production encoder/decoder logic are preserved. The final targeted and ordinary PR checks are the remaining OpenSpec task.
+The two-file fix imports the existing format identifier and compares it to the saved envelope. Diff review confirmed the original fixture, legacy assertions, and production encoder and decoder logic are preserved. All three OpenSpec tasks are complete. The focused PR is linked from the issue's Development section when opened.
+
+## Verification results
+
+The implementation at clean source `c1cb22cd2de7ebcbfaaa8b078f54e996fce4c43b` passed in WSL Ubuntu x86-64 with Node `24.15.0`, npm `12.0.2`, and Playwright `1.64.1` (Chromium `156.0.8078.4` and WebKit `27.2`). The literal fixture and lockfile matched the baseline. The ordinary PR command produced the root distribution used for both focused browser runs. Its sorted file-manifest SHA-256 was `6771259523fdc33ae60a621570a85e887aa865e00275ed36a311085ea61df8f0`.
+
+- `npm run test:unit -- tests/unit/dungeon.test.ts` passed all 131 cases. Output is in `dungeon-units.log`.
+- `npm run verify:pr` passed in 143.3 seconds. It covered tooling, 1,590 unit and content cases, both TypeScript scopes, two build integrations, the production bundle, and seven browser smoke journeys. The source-bound receipt is `checkout/verification-receipts/pr/1795517959739-2529883/summary.json` within the WSL evidence directory above.
+- Discovery and execution agreed for the migration case in `tests/main-menu.spec.ts`. WebKit portrait and landscape passed 2/2. Chromium desktop, mobile portrait, and mobile landscape passed 3/3. Both runs used one worker, zero retries, and emulated mobile profiles. The JSON reports and discovery lists are `final-webkit.json`, `final-chromium.json`, and `final-*-list.txt`.
+- `openspec validate issue-483-dungeon-counter-migration --strict` and `git diff --check` passed. The verification handoff and OpenSpec checkbox update are the only edits after the tested source. The original #208 matched comparison remains recorded as failed.
 
 ## Selection
 
