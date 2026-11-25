@@ -21,18 +21,6 @@ const test = base.extend<{ applicationLoadDiagnostics: ApplicationLoadDiagnostic
 });
 const keys={battle:BATTLE_STORAGE_KEYS,run:RUN_STORAGE_KEYS,dungeon:DUNGEON_KEYS};
 
-test('main menu: records empty state is read-only and keyboard focus returns to the invoker', async ({ page }) => {
-  await page.goto('./');
-  const invoker = page.getByRole('button', { name: 'Hall of Records', exact: true });
-  await invoker.focus(); await page.keyboard.press('Enter');
-  const dialog = page.getByRole('dialog', { name: 'Hall of Records', exact: true });
-  await expect(dialog.getByRole('status')).toHaveText('No finished journeys recorded yet.');
-  await expect(dialog).toContainText('Records stay on this device and browser');
-  expect(await page.evaluate(slots => [localStorage.getItem(slots.primary), localStorage.getItem(slots.backup)], RUN_RECORD_KEYS)).toEqual([null, null]);
-  await dialog.getByRole('button', { name: 'Close', exact: true }).focus(); await page.keyboard.press('Enter');
-  await expect(invoker).toBeFocused(); await expect(dialog).not.toBeVisible();
-});
-
 test('main menu: an unsaved defeat retries history after reload without replaying the summary', async ({ page }) => {
   const lockOwner = await page.context().newPage();
   try {
@@ -295,6 +283,14 @@ test('main menu: read-only root, separate artwork and isolated loading',async({p
  expect(await image.evaluate(n=>(n as HTMLImageElement).naturalWidth/(n as HTMLImageElement).naturalHeight)).toBe(3);
  await expect(page.locator('canvas')).toHaveCount(0);
  expect(requests.some(url=>/\/start-[^/]+\.js|\.mp3|\.ogg|\/battle\/audio/.test(url))).toBe(false);
+  const invoker = page.getByRole('button', { name: 'Hall of Records', exact: true });
+  await invoker.focus(); await page.keyboard.press('Enter');
+  const dialog = page.getByRole('dialog', { name: 'Hall of Records', exact: true });
+  await expect(dialog.getByRole('status')).toHaveText('No finished journeys recorded yet.');
+  await expect(dialog).toContainText('Records stay on this device and browser');
+  expect(await page.evaluate(slots => [localStorage.getItem(slots.primary), localStorage.getItem(slots.backup)], RUN_RECORD_KEYS)).toEqual([null, null]);
+  await dialog.getByRole('button', { name: 'Close', exact: true }).focus(); await page.keyboard.press('Enter');
+  await expect(invoker).toBeFocused(); await expect(dialog).not.toBeVisible();
  await page.getByRole('button',{name:'Hall of Records'}).click();await expect(page.getByRole('dialog')).toContainText('No finished journeys recorded yet');
  await page.keyboard.press('Escape');await expect(page.getByRole('button',{name:'Hall of Records'})).toBeFocused();
  await page.getByRole('button',{name:'Settings',exact:true}).click();await expect(page.getByRole('dialog')).toContainText('Sound controls');
@@ -466,7 +462,10 @@ test('main menu: unavailable storage and failed artwork keep native actions usab
  await expect(page.getByRole('dialog')).toHaveCount(0);
 });
 test('main menu: portrait composition scrolls at narrow, short and enlarged text sizes',async({page})=>{
- await page.goto('./');
+ await page.goto('./nonexistent');
+ await expect(page).toHaveURL(new URL('./', test.info().project.use.baseURL!).href);
+ await expect(page.locator('[data-menu-action]')).toHaveCount(4);
+ await expect(page.locator('canvas')).toHaveCount(0);
  for(const [width,height] of [[320,568],[915,412],[1280,720]]){
   await page.setViewportSize({width,height});
   await page.evaluate(()=>{document.documentElement.style.fontSize='200%';});
@@ -573,12 +572,7 @@ for(const path of ['unsaved play','failed replacement'] as const)test(`main menu
  const accept=page.waitForEvent('dialog');const leave=page.getByRole('link',{name:'Main menu',exact:true}).click();
  await (await accept).accept();await leave;await expect(page.locator('#main-menu')).toBeVisible();
 });
-test('main menu: invalid entry nonexistent returns to the root', async ({ page }) => {
- await page.goto('./nonexistent');
- await expect(page).toHaveURL(new URL('./', test.info().project.use.baseURL!).href);
- await expect(page.locator('[data-menu-action]')).toHaveCount(4);
- await expect(page.locator('canvas')).toHaveCount(0);
-});
+
 
 test('main menu: five-stat records and retained personal bests stay keyboard and touch accessible', async ({page,isMobile,context},info)=>{
   const at=Date.UTC(2026,10,11,12),oldId='old-best-'+ 'a'.repeat(55);
