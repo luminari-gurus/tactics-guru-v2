@@ -20,6 +20,13 @@ export function dungeonEncounterLabel(s: DungeonState, slot: number): string {
   return `Guardian · ${leader.unitId.replace(/_boss$/, '').replaceAll('_', ' ').replace(/\b\w/g, letter => letter.toUpperCase())}`;
 }
 
+export function dungeonCellMarker(stair: '' | '↑' | '↓', encounter: 'live' | 'cleared' | undefined, hasLoot: boolean): string {
+  if (encounter === 'live') return 'M';
+  if (stair) return stair;
+  if (hasLoot) return '◆';
+  return encounter === 'cleared' ? '✓' : '';
+}
+
 const WASD_PREFERENCE_KEY = 'tactics-guru:dungeon-wasd';
 
 type LootContent = { readonly cell: number; readonly itemId: ItemId; readonly remaining: 0 | 1 };
@@ -401,10 +408,12 @@ export class DungeonMap {
         const terrain=`${biome.id}-${open?'open':'blocked'}`;
         if(cell.dataset.terrain!==terrain){cell.dataset.terrain=terrain;artDirty.add(cell);}
         this.terrainCells.add(cell);
-        if(showUpstairs&&i===f.descriptor.upstairs)text='↑';
-        if(showDownstairs&&i===f.descriptor.downstairs)text='↓';
-        const p=pois.get(i);if(p){if(!cleared.includes(p.encounterSlot))text='M';else if(!(showUpstairs&&i===f.descriptor.upstairs)&&!(showDownstairs&&i===f.descriptor.downstairs))text='✓';poi=p.id;}
-        if (loot && (!text || text === '✓')) text = '◆';
+        const stair = showDownstairs && i === f.descriptor.downstairs ? '↓'
+          : showUpstairs && i === f.descriptor.upstairs ? '↑' : '';
+        const marker = pois.get(i);
+        poi = marker?.id;
+        const encounter = marker && (cleared.includes(marker.encounterSlot) ? 'cleared' : 'live');
+        text = dungeonCellMarker(stair, encounter, Boolean(loot));
       } else if(cell.dataset.terrain!==undefined) {
         delete cell.dataset.terrain;cell.style.backgroundImage='';this.terrainCells.delete(cell);this.fallbackCells.delete(cell);
       }

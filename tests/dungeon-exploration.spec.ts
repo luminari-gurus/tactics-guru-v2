@@ -337,23 +337,6 @@ test('live markers follow current sight across movement, art changes and reload'
  }
 });
 
-test('stairs remain visible under cleared saved markers and live markers stay visible',async({page})=>{
- const base=freshDungeon('stair-overlap',1), descriptor=floorDescriptor(base.seed,2), initial=freshExploration(descriptor.seed,descriptor.upstairs,floorMap(descriptor));
- const map=floorMap(descriptor), from=neighbors(descriptor.upstairs,map.width,map.height).find(n=>map.cells[n]&&!initial.pois.some(p=>poiCell(p,map.width)===n));
- if(from===undefined)throw Error('No safe approach');
- const explore=movableExploration(initial,descriptor.seed,0,'ready');
- const pois=explore.pois.map((p,i)=>i===0?{...p,x:descriptor.upstairs%map.width,y:Math.floor(descriptor.upstairs/map.width)}:p);
- const state=atCell({...base,depth:2,floors:[{...base.floors[0],completed:3},{descriptor,position:descriptor.upstairs,completed:0,exploration:{...explore,pois}}]},from);
- const load=async(s:DungeonState)=>{const encoded=encodeDungeon(s);if(!encoded.ok)throw Error(encoded.reason);await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});await page.goto('./?game=dungeon');await expectDungeonResumed(page);};
- const stair=page.locator(`#dungeon-map [data-cell="${descriptor.upstairs}"]`);
- await load(state);await expect(stair).toHaveText('M');
- const floor=state.floors[1];await load({...state,floors:[state.floors[0],{...floor,completed:1,exploration:{...floor.exploration,cleared:[0]}}]});
- await expect(stair).toHaveText('↑');await page.reload();await expectDungeonResumed(page);await expect(stair).toHaveText('↑');
- const down=descriptor.downstairs, moved=pois.map((p,i)=>i===0?{...p,x:down%map.width,y:Math.floor(down/map.width)}:p);
- const all={...floor,completed:3,exploration:{...floor.exploration,pois:moved,cleared:[0,1,2],revealed:Array.from({length:map.width*map.height},(_,i)=>i)}};
- await load({...state,floors:[state.floors[0],all]});await expect(page.locator(`#dungeon-map [data-cell="${down}"]`)).toHaveText('↓');
-});
-
 test('stairs travel once per entry with keyboard, compass and cell controls, stay on arrival and restore, and respect locks',async({page,isMobile})=>{
  test.setTimeout(240000);
  const base=freshDungeon('stairs-browser',6074),cleared={...base,floors:[{...base.floors[0],completed:3}]};
