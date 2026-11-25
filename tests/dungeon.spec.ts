@@ -313,6 +313,10 @@ for(const {saved,autoCollect,title} of [
  test.setTimeout(300000); // Three complete battles plus normal exploration and stair input.
  // Reuse the complete first floor of the existing legal Fighter journey.
  const errors:string[]=[];let taunted=false;const lootJourney:unknown[]=[];page.on('pageerror',error=>errors.push(error.message));
+ // Exercise automatic pickup through a complete floor with reduced-motion combat.
+ if(autoCollect && test.info().project.name==='mobile-portrait'){
+  await page.emulateMedia({reducedMotion:'reduce'});
+ }
  // Exercise manual pickup at Fast battle speed and automatic pickup at the default pace.
  if(!autoCollect)await page.addInitScript(key=>{
   localStorage.setItem(key,JSON.stringify({version:1,pace:'fast'}));
