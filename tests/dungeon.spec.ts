@@ -311,6 +311,11 @@ for(const {saved,autoCollect,title} of [
  {saved:true,autoCollect:true,title:'saved menu dungeon auto-collects loot across a complete first floor'},
 ])(saved?savedWetlandsTest:fixedSeedTest)(title,async({page,isMobile})=>{
  test.setTimeout(300000); // Three complete battles plus normal exploration and stair input.
+ const activateWithKeyboard = async (control: Locator) => {
+  await expect(control).toBeVisible();
+  await expect(control).toBeEnabled();
+  await control.press('Enter');
+ };
  // Reuse the complete first floor of the existing legal Fighter journey.
  const errors:string[]=[];let taunted=false;const lootJourney:unknown[]=[];page.on('pageerror',error=>errors.push(error.message));
  // Exercise automatic pickup through a complete floor with reduced-motion combat.
@@ -361,7 +366,8 @@ for(const {saved,autoCollect,title} of [
   let state=(await readSession(page)).state;
   for(let step=0;step<500;step++){
    const command=fighterDecision(state,catalog,taunted);
-   await playCommand(page,command,state);taunted ||= command.type==='useAbility'&&command.abilityId==='ability:taunt';
+   await playCommand(page, command, state, isMobile ? undefined : activateWithKeyboard);
+   taunted ||= command.type==='useAbility'&&command.abilityId==='ability:taunt';
    const boundary=await page.waitForFunction(previousCount=>{
     if((window as unknown as {issue408Return:DungeonState|null}).issue408Return)return 'finished' as const;
     const game=document.querySelector<HTMLElement>('#game');
