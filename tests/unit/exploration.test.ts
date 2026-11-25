@@ -152,11 +152,16 @@ describe('movement onto stairs', () => {
   expect(currentFloor(second).position).toBe(currentFloor(second).descriptor.upstairs);
   expect(second.party).toEqual(before.party);expect(second.ownership).toEqual(before.ownership);
   expect(stepDungeon(second,down)).toEqual({ok:false,reason:'staleBoundary'});
-  const encoded=encodeDungeon(second);if(!encoded.ok)throw Error(encoded.reason);
-  expect(decodeDungeon(encoded.text)).toEqual({ok:true,state:second});
-  expect(new DungeonSession(second).snapshot).toEqual(second);
-  const approach=atStairApproach(second,'ascend');
-  const off=good(stepDungeon(second,command(second,currentFloor(approach).position)));
+  const restoreArrival = (arrival: typeof second) => {
+   const encoded = encodeDungeon(arrival); if (!encoded.ok) throw Error(encoded.reason);
+   const decoded = decodeDungeon(encoded.text); if (!decoded.ok) throw Error(decoded.reason);
+   const restored = new DungeonSession(decoded.state).snapshot;
+   expect(restored).toEqual(arrival);
+   return restored;
+  };
+  const restoredSecond = restoreArrival(second);
+  const approach=atStairApproach(restoredSecond,'ascend');
+  const off=good(stepDungeon(restoredSecond,command(restoredSecond,currentFloor(approach).position)));
   expect(off.depth).toBe(2);
   const first=good(stepDungeon(off,command(off,currentFloor(off).descriptor.upstairs)));
   expect(first.depth).toBe(1);expect(first.revision).toBe(second.revision+2);
@@ -164,7 +169,8 @@ describe('movement onto stairs', () => {
   expect(dungeonStairStatus(first,'ascend')).toBe('floorOne');
   expect(currentFloor(first).position).toBe(currentFloor(first).descriptor.downstairs);
   expect(first.party).toEqual(before.party);expect(first.ownership).toEqual(before.ownership);
-  const away=atStairApproach(first),reentered=good(stepDungeon(first,command(first,currentFloor(away).position)));
+  const restoredFirst = restoreArrival(first);
+  const away=atStairApproach(restoredFirst),reentered=good(stepDungeon(restoredFirst,command(restoredFirst,currentFloor(away).position)));
   const revisit=good(stepDungeon(reentered,command(reentered,currentFloor(reentered).descriptor.downstairs)));
   expect(revisit.depth).toBe(2);expect(currentFloor(revisit)).toEqual(first.floors[1]);
   expect(canonical(before)).toBe(original);

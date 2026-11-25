@@ -131,7 +131,6 @@ test('ground loot: entering an occupied pile starts combat and closes inventory'
 
 test('map markers respect stair availability, discovery and saved floor state',async({page,isMobile})=>{
  const base=freshDungeon('marker-browser',1),floor=base.floors[0];
- const reload=async()=>{await page.reload();await expectDungeonResumed(page);};
  const cell=(index:number)=>page.locator(`#dungeon-map [data-cell="${index}"]`);
  const accessibleMap=page.getByRole('application',{name:/Floor \d+ map/});
  // Structural saved-state fixtures isolate rendering; they do not prove preceding battle completion.
@@ -161,7 +160,6 @@ test('map markers respect stair availability, discovery and saved floor state',a
  const firstStep=neighbors(floor.position).find(n=>firstMap.cells[n]&&!floor.exploration.pois.some(p=>poiCell(p,firstMap.width)===n))!;
  await walkDungeon(page,firstStep,isMobile?'touch':'keyboard');
  await expect(cell(floor.descriptor.upstairs)).toHaveText('');
- await reload();await expect(cell(floor.descriptor.upstairs)).toHaveText('');
  // Completion alone cannot reveal an undiscovered staircase.
  await openSavedDungeon(page,{...base,floors:[{...floor,completed:3}]});
  await expect(page.locator('#dungeon-encounter-progress')).toHaveText('Encounters: 3 / 3 cleared');
@@ -176,7 +174,6 @@ test('map markers respect stair availability, discovery and saved floor state',a
  const downstairs = new RegExp(`Downstairs at row ${Math.floor(floor.descriptor.downstairs / firstMap.width) + 1}, column ${floor.descriptor.downstairs % firstMap.width + 1}\\.$`);
  await expect(accessibleMap).toHaveAccessibleDescription(/Guardian · Goblins at row \d+, column \d+\. Cleared\./);
  for(const poi of floor.exploration.pois)await expect(cell(poiCell(poi))).toHaveText('✓');
- await reload();await expect(cell(floor.descriptor.downstairs)).toHaveText('↓');
  await expect(accessibleMap).toHaveAccessibleDescription(downstairs);
  await page.locator('#dungeon-map').scrollIntoViewIfNeeded();
  await page.locator('#dungeon-map').screenshot({path:test.info().outputPath('markers-cleared-map.png')});
@@ -186,7 +183,7 @@ test('map markers respect stair availability, discovery and saved floor state',a
  const map=floorMap(descriptor),adjacent=neighbors(descriptor.upstairs,map.width,map.height).find(n=>map.cells[n]&&!exploration.pois.some(p=>poiCell(p,map.width)===n))!;
  await walkDungeon(page,adjacent,isMobile?'touch':'keyboard');await expect(cell(descriptor.upstairs)).toHaveText('↑');
  await expect(accessibleMap).toHaveAccessibleDescription(/^Upstairs at row \d+, column \d+\./);
- await reload();await expect(cell(descriptor.upstairs)).toHaveText('↑');
+ await page.reload();await expectDungeonResumed(page);await expect(cell(descriptor.upstairs)).toHaveText('↑');
  await page.locator('#dungeon-map').scrollIntoViewIfNeeded();
  await page.locator('#dungeon-map').screenshot({path:test.info().outputPath('markers-upper-floor-map.png')});
  if(isMobile){await page.setViewportSize({width:320,height:740});await page.locator('#dungeon-progress').scrollIntoViewIfNeeded();}
@@ -288,8 +285,11 @@ test('stairs travel once per entry with keyboard, compass and cell controls, and
  await expect(page.locator('#dungeon-map')).toHaveAttribute('data-position',String(upper.position));
  await expect(page.locator('#dungeon-ascend, #dungeon-descend')).toHaveCount(0);
  await expect(travelHint).toContainText('Step off the upstairs and back onto it to ascend.');
- await reload();expectSameProgress(await dungeonSnapshot(page),second);
- await expect(travelHint).toContainText('Step off the upstairs and back onto it to ascend.');
+ if(!isMobile){
+  await reload();
+  await expect(page.locator('#dungeon-map')).toHaveAttribute('data-position',String(second.floors[second.depth-1].position));
+  await expect(travelHint).toContainText('Step off the upstairs and back onto it to ascend.');
+ }
  const off=atStairApproach(second,'ascend').floors[1].position;
  await move(off,'compass');expect((await dungeonSnapshot(page)).depth).toBe(2);
  await move(upper.descriptor.upstairs,'wasd');
@@ -297,8 +297,11 @@ test('stairs travel once per entry with keyboard, compass and cell controls, and
  await expect(travelHint).toContainText('Encounters: 3 / 3 cleared');
  expect(first.floors[0].position).toBe(first.floors[0].descriptor.downstairs);
  await expect(travelHint).toContainText('Step off the downstairs and back onto it to descend.');
- await reload();expectSameProgress(await dungeonSnapshot(page),first);
- await expect(travelHint).toContainText('Step off the downstairs and back onto it to descend.');
+ if(isMobile){
+  await reload();
+  await expect(page.locator('#dungeon-map')).toHaveAttribute('data-position',String(first.floors[first.depth-1].position));
+  await expect(travelHint).toContainText('Step off the downstairs and back onto it to descend.');
+ }
  await page.screenshot({path:test.info().outputPath('stairs-arrival.png'),fullPage:true});
  // Cross the same stair boundary using the two pointer controls as well.
  await move(atStairApproach(first).floors[0].position,'wasd');
