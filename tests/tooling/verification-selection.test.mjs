@@ -69,7 +69,7 @@ test('routine verification clears each first-floor scenario once and checks both
     ]) assert.deepEqual(profilesFor(title), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('visibility interruption finishes an accepted terminal presentation exactly once'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('confirmed charm discard frees full capacity without cancelling or duplicating the pending reward'), [stage === 'chromium' ? desktop : portrait]);
-    assert.deepEqual(profilesFor('dungeon battle undo survives reload and a legal defeat journey'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('dungeon battle undo survives reload'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('saved dungeon downloads only after explicit recovery export'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('Shaman production journey uses Hex and ally healing, reloads Weakened and replays a complete legal battle'), []);
     assert.deepEqual(profilesFor('resumed Shaman Hex shows the Weakened hero and accuracy penalty'), [stage === 'chromium' ? desktop : portrait]);
