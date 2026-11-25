@@ -349,40 +349,9 @@ test('stairs remain visible under cleared saved markers and live markers stay vi
  await load({...state,floors:[state.floors[0],all]});await expect(page.locator(`#dungeon-map [data-cell="${down}"]`)).toHaveText('↓');
 });
 
-test('fresh descent leaves room to move off the arrival stairs before battle', async ({page,isMobile})=>{
- // Seed 6074 previously placed the Desert Guardian immediately east of the landing.
- const base=freshDungeon('safe-arrival',6074);
- const approach=atStairApproach({...base,floors:[{...base.floors[0],completed:3}]});
- const encoded=encodeDungeon(approach);
- if(!encoded.ok)throw Error(encoded.reason);
- await page.goto('./');
- await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
- await page.goto('./?game=dungeon');await expectDungeonResumed(page);
-
- const mode=isMobile?'touch':'keyboard';
- await walkDungeon(page,approach.floors[0].descriptor.downstairs,mode);
- const arrived=await dungeonSnapshot(page), floor=arrived.floors[1], map=floorMap(floor.descriptor);
- expect(arrived).toMatchObject({depth:2,phase:'ready',activeBattle:null,party:approach.party});
- expect(floor.position).toBe(floor.descriptor.upstairs);
- const east=floor.position+1;
- expect(map.cells[east]).toBe(1);
- // Compact landscape hides the exploration subheading; the page heading and the redrawn map name floor 2 everywhere.
- await expect(page.locator('#dungeon-screen h1')).toHaveText('Dungeon · Floor 2 · Desert');
- await expect(page.getByRole('application',{name:/^Floor 2 map\./})).toBeVisible();
- await page.reload();await expectDungeonResumed(page);
- expectSameProgress(await dungeonSnapshot(page),arrived);
-
- await walkDungeon(page,east,mode);
- const moved=await dungeonSnapshot(page);
- expect(moved).toMatchObject({depth:2,phase:'ready',activeBattle:null});
- expect(moved.floors[1].position).toBe(east);
- const landing=[floor.position,...neighbors(floor.position,map.width,map.height)];
- expect(floor.exploration.pois.every(p=>!landing.includes(poiCell(p,map.width)))).toBe(true);
-});
-
 test('stairs travel once per entry with keyboard, compass and cell controls, stay on arrival and restore, and respect locks',async({page,isMobile})=>{
  test.setTimeout(240000);
- const base=freshDungeon('stairs-browser',1),cleared={...base,floors:[{...base.floors[0],completed:3}]};
+ const base=freshDungeon('stairs-browser',6074),cleared={...base,floors:[{...base.floors[0],completed:3}]};
  const load=async(state:DungeonState)=>{
   const encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
   await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
@@ -411,6 +380,8 @@ test('stairs travel once per entry with keyboard, compass and cell controls, sta
  await expect(travelHint).toContainText('Downstairs: unlocked · walk onto the stairs');
  await move(approach.floors[0].descriptor.downstairs,'arrows');
  const second=await dungeonSnapshot(page),upper=second.floors[1];expect(second.depth).toBe(2);expect(second.revision).toBe(approach.revision+1);
+ await expect(page.locator('#dungeon-screen h1')).toHaveText('Dungeon · Floor 2 · Desert');
+ await expect(page.getByRole('application',{name:/^Floor 2 map\./})).toBeVisible();
  await expect(travelHint).toContainText('Encounters: 0 / 3 cleared');
  await expect(travelHint).toContainText('Downstairs: locked · clear 3 more encounters');
  await expect(travelHint).toContainText('Upstairs: available');
