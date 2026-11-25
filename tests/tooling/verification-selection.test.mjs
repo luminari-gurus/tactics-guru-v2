@@ -100,6 +100,12 @@ test('routine verification clears each first-floor scenario once and checks both
   }
 });
 
+test('Guarded keeps desktop and touch lifecycles plus a short landscape layout check', () => {
+  const profiles = title => after.selections.chromium.tests.filter(row => row.title === title).map(row => row.project).sort();
+  assert.deepEqual(profiles('shared Guarded lifecycle: dungeon miss'), ['desktop', 'mobile-portrait']);
+  assert.deepEqual(profiles('landscape touch keeps the resumed Guarded badge visible and noninteractive'), ['mobile-landscape']);
+});
+
 test('menu save recovery and run history use desktop Chromium and portrait WebKit', () => {
   const titles = [
     'main menu: legacy battle and run slots are ignored through launch and dungeon Continue',

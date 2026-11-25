@@ -6,6 +6,9 @@ const serverMode = process.env.PLAYWRIGHT_SERVER_MODE === 'dev' ? 'dev' : 'previ
 const baseURL = `http://127.0.0.1:4173${basePath}`;
 
 export const redundantProfileJourneys = [
+  // Desktop and portrait enact the full Guarded lifecycle. Landscape checks its tighter badge layout.
+  /^mobile-landscape .*shared Guarded lifecycle: dungeon miss$/,
+  /^(?!mobile-landscape ).*landscape touch keeps the resumed Guarded badge visible and noninteractive$/,
   /@extended-shaman(?: |$)/,
   /^(?:mobile-portrait|mobile-landscape|portrait-webkit|landscape-webkit) .*@desktop-keyboard(?: |$)/,
   // Frost Snare exercises wheel zoom, native Chromium pinch, and WebKit pointer gestures.
