@@ -91,9 +91,8 @@ test('real nine-batch discovery partitions the entire reduced default selection'
 
 test('long progression journeys are excluded from routine selection and remain available on all extended profiles', () => {
   const titles = ['Mage legal progression', 'Ranger legal progression', 'Fighter legal progression'];
-  const routine = captureSelections();
   for (const stage of ['chromium', 'webkit-exploration']) {
-    assert.equal(routine.selections[stage].tests.filter(row => titles.some(title => row.title.startsWith(title))).length, 0);
+    assert.equal(after.selections[stage].tests.filter(row => titles.some(title => row.title.startsWith(title))).length, 0);
   }
   for (const config of ['playwright.extended.config.ts', 'playwright.extended-webkit.config.ts']) {
     const selection = discoverSelection(['-c', config]);

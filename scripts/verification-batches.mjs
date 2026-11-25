@@ -79,9 +79,13 @@ export function discover(stage, cwd = root) {
 }
 
 export function createPlan(mode, discoverCases = discover, filter = '') {
-  const jobs = definitions(mode).map(job => ({ ...job, stages: job.stages.map(stage => ({ ...stage,
-    expected: stage.browser ? discoverCases(stage) : null })) }));
-  const canonical = stages.filter(stage => stage.browser).map(stage => ({ id: stage.id, tests: discoverCases(stage) }));
+  const batches = definitions(mode);
+  // Unpartitioned jobs use the canonical stage object. Filtered Chromium and
+  // pilot stages have their own selectors and need independent discovery.
+  const canonicalCases = new Map(stages.filter(stage => stage.browser).map(stage => [stage, discoverCases(stage)]));
+  const canonical = Array.from(canonicalCases, ([stage, tests]) => ({ id: stage.id, tests }));
+  const jobs = batches.map(job => ({ ...job, stages: job.stages.map(stage => ({ ...stage,
+    expected: stage.browser ? (canonicalCases.get(stage) ?? discoverCases(stage)) : null })) }));
   if (mode === 'capture') for (const stage of canonical) {
     const selected = jobs.flatMap(job => job.stages.filter(row => row.sourceStage === stage.id).flatMap(row => row.expected ?? []));
     exactCoverage(stage.tests, selected);
