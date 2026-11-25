@@ -80,7 +80,7 @@ test('each engine clears one full floor per profile and checks both pickup modes
     assert.deepEqual(profilesFor('Hobgoblin formation affects Shield Bash, displaces the hero and survives Continue'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('fresh preparation cancels a pending automatic step'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('hero progression commits once, heals at a threshold and survives inspection and reload'), [stage === 'chromium' ? desktop : portrait]);
-    assert.deepEqual(profilesFor('auto loot defaults on: one delayed ordinary step, pickup, enemy tick and durable resume'), allProfiles);
+    assert.deepEqual(profilesFor('auto loot defaults on: one delayed ordinary step, pickup, enemy tick and durable resume'), [stage === 'chromium' ? desktop : portrait]);
   }
 });
 
