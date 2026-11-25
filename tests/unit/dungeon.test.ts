@@ -387,6 +387,11 @@ it.each([false, true])('versions final reward saves and keeps a rollback checkpo
   const claimed = good(dungeonItem(pending, {
     ...dungeonBoundary(pending), type: 'claimReward', offerId: offer.id, itemId: charm.itemId,
   }));
+  expect(claimed.phase).toBe('ready');
+  expect(claimed.offer).toBeNull();
+  expect(claimed.ownership.equipment.map(item => item.itemId)).toEqual([
+    ...pending.ownership.equipment.map(item => item.itemId), charm.itemId,
+  ]);
   const declined = good(dungeonItem(pending, {
     ...dungeonBoundary(pending), type: 'declineReward', offerId: offer.id,
   }));
