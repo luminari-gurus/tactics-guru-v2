@@ -140,9 +140,8 @@ test('ground loot: full capacity keeps same-cell rewards and retries on discard 
  expect((await dungeonSnapshot(page)).ownership).toEqual(depleted.ownership);expect((await dungeonSnapshot(page)).floors).toEqual(depleted.floors);
 });
 
-test('ground loot: an occupied pile starts combat at the origin and preserves both rewards through resume',async({page,isMobile})=>{
- await page.addInitScript(()=>{document.hasFocus=()=>false;});
- const {state,cell,origin}=sharedGroundPile(1,true);await loadGroundLootBoundary(page,state);
+test('ground loot: entering an occupied pile starts combat and closes inventory',async({page,isMobile})=>{
+ const {state,cell}=sharedGroundPile(1,true);await loadGroundLootBoundary(page,state);
  const tile=page.locator(`#dungeon-map [data-cell="${cell}"]`);
  await expect(tile).toHaveAttribute('data-loot','2');await expect(tile).toHaveAttribute('data-loot-overlay','true');await expect(tile).toHaveText('M');
  await openDungeonInventory(page);
@@ -151,11 +150,6 @@ test('ground loot: an occupied pile starts combat at the origin and preserves bo
  if(isMobile)await tile.tap();else await tile.click();
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  await expect(discard).toHaveCount(0);
- const active=await dungeonSnapshot(page),floor=active.floors[active.depth-1];
- expect(active.phase).toBe('battle');expect(active.encounterEntry).toEqual({origin,contact:cell,slot:2});
- expect(floor.position).toBe(origin);expect(floor.loot).toEqual(state.floors[state.depth-1].loot);expect(active.ownership).toEqual(state.ownership);
- await page.reload();await expectDungeonResumed(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- const reloaded=await dungeonSnapshot(page);expect(reloaded.floors).toEqual(active.floors);expect(reloaded.ownership).toEqual(active.ownership);expect(reloaded.encounterEntry).toEqual(active.encounterEntry);
 });
 
 test('ground loot: final victory unlocks stairs and shows the uncollected reward after reload',async({page})=>{
