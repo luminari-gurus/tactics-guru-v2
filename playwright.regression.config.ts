@@ -8,6 +8,7 @@ const baseURL = `http://127.0.0.1:4173${basePath}`;
 // Keep every full-floor journey on desktop. Touch profiles split saved automatic
 // pickup (portrait) and unsaved manual pickup (landscape) within each engine.
 export const redundantProfileJourneys = [
+  /^(?:mobile-portrait|mobile-landscape|portrait-webkit|landscape-webkit) .*@desktop-keyboard(?: |$)/,
   // Cover an occupied loot tile with a landscape Chromium tap and a desktop WebKit click.
   /^(?:desktop|mobile-portrait|portrait-webkit|landscape-webkit) .*ground loot: entering an occupied pile starts combat and closes inventory$/,
   // Tagged loading scenarios run on both desktops and one touch orientation per engine.

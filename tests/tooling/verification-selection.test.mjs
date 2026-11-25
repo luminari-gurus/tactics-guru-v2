@@ -62,6 +62,19 @@ test('each engine splits full-floor touch journeys and checks both pickup modes 
   }
 });
 
+test('keyboard focus and shortcuts run on desktop while the touch target checks cover every profile', () => {
+  for (const [stage, desktop] of [['chromium', 'desktop'], ['webkit-exploration', 'desktop-webkit']]) {
+    const { tests, projects } = after.selections[stage];
+    const keyboard = tests.filter(row => row.tags.includes('@desktop-keyboard'));
+    assert.deepEqual(keyboard.map(row => [row.project, row.title]).sort(), [
+      [desktop, 'compass keeps keyboard focus when movement disables the activated direction'],
+      [desktop, 'map shortcuts work on entry and outside the map without taking over other controls'],
+    ]);
+    const touchTargets = tests.filter(row => row.title === 'map-edge direction controls, focus, touch targets and unavailable states');
+    assert.deepEqual(touchTargets.map(row => row.project).sort(), projects.map(project => project.name).sort());
+  }
+});
+
 test('deferred loading keeps each desktop case on one mobile orientation per engine', () => {
   for (const stage of ['chromium', 'webkit-exploration']) {
     const { tests } = after.selections[stage];
