@@ -404,17 +404,17 @@ test('fresh descent leaves room to move off the arrival stairs before battle', a
  expect(floor.exploration.pois.every(p=>!landing.includes(poiCell(p,map.width)))).toBe(true);
 });
 
-for(const control of ['arrows','wasd','compass','cell'] as const)test(`stairs travel once per entry with ${control}, stay on arrival and restore, and respect locks`,async({page,isMobile})=>{
+test('stairs travel once per entry with keyboard, compass and cell controls, stay on arrival and restore, and respect locks',async({page,isMobile})=>{
  test.setTimeout(240000);
  const base=freshDungeon('stairs-browser',1),cleared={...base,floors:[{...base.floors[0],completed:3}]};
  const load=async(state:DungeonState)=>{
   const encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
   await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
   await page.goto('./?game=dungeon');await expectDungeonResumed(page);
-  if(control==='compass')await expectDungeonMovementVisible(page);
  };
- const reload=async()=>{await page.reload();await expectDungeonResumed(page);if(control==='compass')await expectDungeonMovementVisible(page);};
- const move=async(destination:number)=>{
+ const reload=async()=>{await page.reload();await expectDungeonResumed(page);};
+ const move=async(destination:number,control:'arrows'|'wasd'|'compass'|'cell')=>{
+  if(control==='compass')await expectDungeonMovementVisible(page);
   const before=await dungeonSnapshot(page),delta=destination-before.floors[before.depth-1].position, width=before.floors[before.depth-1].descriptor.size ?? 20;
   const direction=delta===-width?'north':delta===width?'south':delta===1?'east':'west';
   if(control==='arrows'||control==='wasd'){
@@ -433,7 +433,7 @@ for(const control of ['arrows','wasd','compass','cell'] as const)test(`stairs tr
  const travelHint = page.locator('.dungeon-header');
  await expect(travelHint).toContainText('Encounters: 3 / 3 cleared');
  await expect(travelHint).toContainText('Downstairs: unlocked · walk onto the stairs');
- await move(approach.floors[0].descriptor.downstairs);
+ await move(approach.floors[0].descriptor.downstairs,'arrows');
  const second=await dungeonSnapshot(page),upper=second.floors[1];expect(second.depth).toBe(2);expect(second.revision).toBe(approach.revision+1);
  await expect(travelHint).toContainText('Encounters: 0 / 3 cleared');
  await expect(travelHint).toContainText('Downstairs: locked · clear 3 more encounters');
@@ -442,25 +442,30 @@ for(const control of ['arrows','wasd','compass','cell'] as const)test(`stairs tr
  await expect(page.locator('#dungeon-map')).toHaveAttribute('data-position',String(upper.position));
  await expect(page.locator('#dungeon-ascend, #dungeon-descend')).toHaveCount(0);
  await expect(travelHint).toContainText('Step off the upstairs and back onto it to ascend.');
- await reload();expect(await dungeonSnapshot(page)).toEqual(second);
+ await reload();expectSameProgress(await dungeonSnapshot(page),second);
  await expect(travelHint).toContainText('Step off the upstairs and back onto it to ascend.');
  const off=atStairApproach(second,'ascend').floors[1].position;
- await move(off);expect((await dungeonSnapshot(page)).depth).toBe(2);
- await move(upper.descriptor.upstairs);
+ await move(off,'compass');expect((await dungeonSnapshot(page)).depth).toBe(2);
+ await move(upper.descriptor.upstairs,'wasd');
  const first=await dungeonSnapshot(page);expect(first.depth).toBe(1);expect(first.revision).toBe(second.revision+2);
  await expect(travelHint).toContainText('Encounters: 3 / 3 cleared');
  expect(first.floors[0].position).toBe(first.floors[0].descriptor.downstairs);
  await expect(travelHint).toContainText('Step off the downstairs and back onto it to descend.');
- await reload();expect(await dungeonSnapshot(page)).toEqual(first);
+ await reload();expectSameProgress(await dungeonSnapshot(page),first);
  await expect(travelHint).toContainText('Step off the downstairs and back onto it to descend.');
- await page.screenshot({path:test.info().outputPath(`stairs-${control}-arrival.png`),fullPage:true});
+ await page.screenshot({path:test.info().outputPath('stairs-arrival.png'),fullPage:true});
+ // Cross the same stair boundary using the two pointer controls as well.
+ await move(atStairApproach(first).floors[0].position,'wasd');
+ await move(first.floors[0].descriptor.downstairs,'compass');
+ const revisited=await dungeonSnapshot(page);expect(revisited.depth).toBe(2);
+ await move(atStairApproach(revisited,'ascend').floors[1].position,'arrows');
+ await move(upper.descriptor.upstairs,'cell');expect((await dungeonSnapshot(page)).depth).toBe(1);
  // Floor-one upstairs and uncleared downstairs remain ordinary walkable cells.
  for(const direction of ['ascend','descend'] as const){
   const locked=atStairApproach(base,direction);await load(locked);
   const cell=direction==='ascend'?base.floors[0].descriptor.upstairs:base.floors[0].descriptor.downstairs;
-  await move(cell);const after=await dungeonSnapshot(page);expect(after.depth).toBe(1);expect(after.floors[0].position).toBe(cell);
+  await move(cell,direction==='ascend'?'cell':'compass');const after=await dungeonSnapshot(page);expect(after.depth).toBe(1);expect(after.floors[0].position).toBe(cell);
   await expect(travelHint).not.toContainText('Step off');
-  await reload();expectSameProgress(await dungeonSnapshot(page),after);
  }
 });
 

@@ -163,6 +163,11 @@ describe('movement onto stairs', () => {
   expect(atUp.depth).toBe(1);
   const locked=atStairApproach(initial),atDown=good(stepDungeon(locked,command(locked,currentFloor(locked).descriptor.downstairs)));
   expect(atDown.depth).toBe(1);expect(currentFloor(atDown).completed).toBe(0);
+  for (const arrival of [atUp, atDown]) {
+   const encoded=encodeDungeon(arrival);if(!encoded.ok)throw Error(encoded.reason);
+   const restored=decodeDungeon(encoded.text);if(!restored.ok)throw Error(restored.reason);
+   expect(new DungeonSession(restored.state).snapshot).toEqual(arrival);
+  }
   const ready=atStairApproach(cleared()),entry=command(ready,currentFloor(ready).descriptor.downstairs);
   for(const phase of ['battle','reward','defeat'] as const)expect(stepDungeon({...ready,phase},entry)).toEqual({ok:false,reason:'wrongPhase'});
   const limited={...ready,revision:Number.MAX_SAFE_INTEGER};
