@@ -85,6 +85,7 @@ test('explicit modes isolate inherited build/report flags but preserve browser s
     PLAYWRIGHT_BASE_PATH: '/wrong/', PLAYWRIGHT_SERVER_MODE: 'dev',
     PLAYWRIGHT_TELEMETRY_DEV: 'false', VITE_POSTHOG_ENABLED: 'true', POSTHOG_SOURCEMAPS: 'true',
     PLAYWRIGHT_JSON_OUTPUT_DIR: '/wrong/', PLAYWRIGHT_CHROMIUM_EXECUTABLE: '/browser',
+    COLD_DUNGEON_HISTORY_FILE: '/stale/save.json',
   });
   assert.equal(env.PLAYWRIGHT_BASE_PATH, undefined);
   assert.equal(env.PLAYWRIGHT_SERVER_MODE, 'dev');
@@ -94,6 +95,7 @@ test('explicit modes isolate inherited build/report flags but preserve browser s
   assert.equal(env.PLAYWRIGHT_CHROMIUM_EXECUTABLE, '/browser');
   assert.equal(env.PLAYWRIGHT_JSON_OUTPUT_FILE, join('/reports', 'assets-root-dev.json'));
   assert.equal(env.PLAYWRIGHT_JSON_OUTPUT_DIR, undefined);
+  assert.equal(env.COLD_DUNGEON_HISTORY_FILE, undefined);
 });
 
 test('aggregate refuses filters that could silently narrow required coverage', () => {

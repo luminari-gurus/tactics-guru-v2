@@ -1,3 +1,4 @@
+import { encodeDungeon } from '../../src/domain/dungeonSaveEnvelope';
 import { freshRunStats } from '../../src/domain/runStats';
 import { freshExploration, movableExploration, neighbors, poiCell, reveal, visit } from '../../src/domain/exploration';
 import { freshDungeon, floorDescriptor, floorMap, dungeonOffer, dungeonLootReward, readDungeon, startDungeonBattle, dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, travelDungeon, stepDungeon, clearedDungeonSlots, type DungeonState, type DungeonResult, type DungeonItemCommand } from '../../src/domain/dungeon';
@@ -18,6 +19,22 @@ import { DUNGEON_ENCOUNTER_POLICY, LEGACY_ENCOUNTER_POLICY, type DungeonEncounte
 import { legacyDungeonIdentity, priorDungeonIdentity } from '../../src/content/dungeon';
 import { canonical, hashJson } from '../../src/domain/contentIdentity';
 import { dungeonContent } from '../../src/content/dungeon';
+export function coldDungeonHistory() {
+  const base = freshDungeon('cold-browser', 13);
+  const depth = 250;
+  const floors = Array.from({ length: depth }, (_, index) => {
+    const descriptor = floorDescriptor(base.seed, index + 1);
+    return {
+      descriptor, completed: index + 1 === depth ? 0 : 3, position: descriptor.upstairs,
+      exploration: freshExploration(descriptor.seed, descriptor.upstairs, floorMap(descriptor)),
+    };
+  });
+  const state = { ...base, depth, floors };
+  const encoded = encodeDungeon(state);
+  if (!encoded.ok) throw Error(encoded.reason);
+  return { state, text: encoded.text };
+}
+
 /** Rebuild the terrain memory that the through-wall discovery rule would have saved. */
 export function withLegacySight(state: DungeonState): DungeonState {
   const floors = state.floors.map(floor => {
