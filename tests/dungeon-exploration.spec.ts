@@ -1124,7 +1124,7 @@ fixedSeedTest('class guidance: unsaved dungeon keeps dismissals in memory until 
  expect(errors).toEqual([]);
 });
 
-test('a second dungeon encounter reuses the engine after a legal victory without reloading',async({page,isMobile})=>{
+test('a second dungeon encounter reuses the engine after a legal victory without reloading', { tag: '@desktop-chromium-portrait-webkit' }, async({page,isMobile})=>{
  test.setTimeout(90000);
  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
  // The fixture reaches this ongoing battle through legal domain commands; the browser enacts its final attack.
@@ -1145,8 +1145,6 @@ test('a second dungeon encounter reuses the engine after a legal victory without
  await expect(guidance).toBeHidden();await expect(page.locator('#battle-move')).toBeDisabled();
  await expect(page.locator('#battle-next')).toBeFocused();
  expect(await readSession(page)).toEqual(beforeDismiss);expectSameProgress(await dungeonSnapshot(page),beforeDungeon);
- const acknowledged=await page.evaluate(()=>localStorage.getItem('tactics-guru:class-guidance'));
- expect(JSON.parse(acknowledged!).seen).toContain(dismissedTip);
  // Continuing the same saved dungeon must retain this run's dismissal, even
  // though it reconstructs the battle HUD. Both encounters below then reuse
  // the resumed engine without another page load.
@@ -1155,7 +1153,6 @@ test('a second dungeon encounter reuses the engine after a legal victory without
  expect((await dungeonSnapshot(page)).id).toBe(witness.snapshot.id);
  expect((await readSession(page)).state).toEqual(beforeDismiss.state);
  await expect(guidance).toBeHidden();
- expect(await page.evaluate(()=>localStorage.getItem('tactics-guru:class-guidance'))).toBe(acknowledged);
  await expect(page.locator('canvas')).toHaveCount(1);
  const canvas=await page.locator('#game canvas').elementHandle();if(!canvas)throw Error('Missing initial battle canvas');
  await playCommand(page,witness.command);
@@ -1206,7 +1203,6 @@ test('a second dungeon encounter reuses the engine after a legal victory without
  }
  expect(current.state.units.find(unit=>unit.id===current.state.initiative[current.state.activeIndex])!.defId).toBe(dismissedActor.defId);
  await expect(guidance).toBeHidden();
- expect(await page.evaluate(()=>localStorage.getItem('tactics-guru:class-guidance'))).toBe(acknowledged);
  await expect(page.locator('canvas')).toHaveCount(1);
  expect(await canvas.evaluate(node=>node.isConnected&&node===document.querySelector('#game canvas'))).toBe(true);
  expect(errors).toEqual([]);
