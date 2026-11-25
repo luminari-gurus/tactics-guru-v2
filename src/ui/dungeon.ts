@@ -1,8 +1,9 @@
+import { dungeonStairLabel } from './dungeonStairLabel';
 import { progressionLabel } from '../domain/progression';
 import { DungeonMap, dungeonBiomeLabel } from './dungeonMap';
 import { poiCell } from '../domain/exploration';
 import { dungeonContent } from '../content/dungeon';
-import { dungeonBoundary, floorMap, currentFloor, clearedDungeonSlots, dungeonStairStatus, FloorCache, type DungeonItemCommand, type DungeonState } from '../domain/dungeon';
+import { dungeonBoundary, floorMap, currentFloor, clearedDungeonSlots, FloorCache, type DungeonItemCommand, type DungeonState } from '../domain/dungeon';
 import type { DungeonSession } from '../app/DungeonSession';
 import { EQUIPMENT_SLOTS, ITEM_BOUNDS } from '../content/itemTypes';
 import type { HeroId } from '../content/types';
@@ -93,22 +94,7 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
   const total = floor.descriptor.encounters.length;
   progressRow('dungeon-encounter-progress', `Encounters: ${floor.completed} / ${total} cleared`);
   for (const direction of ['descend', 'ascend'] as const) {
-    const stair = direction === 'descend' ? 'Downstairs' : 'Upstairs';
-    const availability = dungeonStairStatus(s, direction);
-    let detail: string;
-    if (availability === 'available') {
-      detail = direction === 'descend' ? 'unlocked' : 'available';
-      if (floor.position === (direction === 'descend' ? floor.descriptor.downstairs : floor.descriptor.upstairs)) {
-        detail += ` · Step off the ${stair.toLowerCase()} and back onto it to ${direction}.`;
-      } else if (direction === 'descend') detail += ' · walk onto the stairs';
-    } else if (availability === 'encounters') {
-      const remaining = total - floor.completed;
-      detail = `locked · clear ${remaining} more encounter${remaining === 1 ? '' : 's'}`;
-    } else detail = {
-      floorOne: 'unavailable on floor 1', reward: 'locked · resolve reward',
-      battle: 'unavailable during battle', defeat: 'unavailable after defeat',
-    }[availability];
-    progressRow(`dungeon-stair-${direction}`, `${stair}: ${detail}`);
+    progressRow(`dungeon-stair-${direction}`, dungeonStairLabel(s, direction));
   }
   // Session snapshots are cloned, so compare the values used by cards and sheet handlers.
   // Keep unchanged portraits mounted during movement; revision-bound actions below stay fresh.

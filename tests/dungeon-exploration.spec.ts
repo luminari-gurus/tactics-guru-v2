@@ -358,7 +358,7 @@ test('live markers follow current sight across movement, art changes and reload'
  }
 });
 
-test('stairs travel once per entry with keyboard, compass and cell controls, stay on arrival and restore, and respect locks',async({page,isMobile})=>{
+test('stairs travel once per entry with keyboard, compass and cell controls, and stay on arrival and restore',async({page,isMobile})=>{
  test.setTimeout(240000);
  const base=freshDungeon('stairs-browser',6074),cleared={...base,floors:[{...base.floors[0],completed:3}]};
  const load=async(state:DungeonState)=>{
@@ -416,13 +416,6 @@ test('stairs travel once per entry with keyboard, compass and cell controls, sta
  const revisited=await dungeonSnapshot(page);expect(revisited.depth).toBe(2);
  await move(atStairApproach(revisited,'ascend').floors[1].position,'arrows');
  await move(upper.descriptor.upstairs,'cell');expect((await dungeonSnapshot(page)).depth).toBe(1);
- // Floor-one upstairs and uncleared downstairs remain ordinary walkable cells.
- for(const direction of ['ascend','descend'] as const){
-  const locked=atStairApproach(base,direction);await load(locked);
-  const cell=direction==='ascend'?base.floors[0].descriptor.upstairs:base.floors[0].descriptor.downstairs;
-  await move(cell,direction==='ascend'?'cell':'compass');const after=await dungeonSnapshot(page);expect(after.depth).toBe(1);expect(after.floors[0].position).toBe(cell);
-  await expect(travelHint).not.toContainText('Step off');
- }
 });
 
 test('map-edge direction controls, focus, touch targets and unavailable states',async({page,isMobile,browserName})=>{

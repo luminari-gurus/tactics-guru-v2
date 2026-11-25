@@ -1,3 +1,4 @@
+import { dungeonStairLabel } from '../../src/ui/dungeonStairLabel';
 import { describe, expect, it, vi } from 'vitest';
 import { dungeonStairStatus, freshDungeon, stepDungeon, readDungeon, startDungeonBattle, acceptDungeonBattle, travelDungeon, currentFloor, floorMap } from '../../src/domain/dungeon';
 import { currentSight, encounterPois, freshExploration, neighbors, poiCell, readExploration, reveal } from '../../src/domain/exploration';
@@ -163,6 +164,12 @@ describe('movement onto stairs', () => {
   expect(atUp.depth).toBe(1);
   const locked=atStairApproach(initial),atDown=good(stepDungeon(locked,command(locked,currentFloor(locked).descriptor.downstairs)));
   expect(atDown.depth).toBe(1);expect(currentFloor(atDown).completed).toBe(0);
+  expect(currentFloor(atUp).position).toBe(currentFloor(initial).descriptor.upstairs);
+  expect(currentFloor(atDown).position).toBe(currentFloor(initial).descriptor.downstairs);
+  expect(atUp.revision).toBe(upApproach.revision + 1);
+  expect(atDown.revision).toBe(locked.revision + 1);
+  expect(dungeonStairLabel(atUp, 'ascend')).toBe('Upstairs: unavailable on floor 1');
+  expect(dungeonStairLabel(atDown, 'descend')).toBe('Downstairs: locked · clear 3 more encounters');
   for (const arrival of [atUp, atDown]) {
    const encoded=encodeDungeon(arrival);if(!encoded.ok)throw Error(encoded.reason);
    const restored=decodeDungeon(encoded.text);if(!restored.ok)throw Error(restored.reason);
