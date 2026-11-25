@@ -56,3 +56,14 @@ it('marks unknown paths for a base-aware menu redirect', () => {
     expect(resolveAppEntry(`${base}nonexistent`, '', base)).toEqual({ route: 'menu', persistent: false, redirectToMenu: true });
   }
 });
+
+it('replaces an invalid game query with the menu URL before mounting', async () => {
+  vi.resetModules();
+  const history = { state: { preserved: true }, replaceState: vi.fn() };
+  vi.stubGlobal('history', history);
+  vi.stubGlobal('location', { pathname: '/', search: '?game=zzz' });
+
+  const { appEntry } = await import('../../src/app/entry');
+  expect(appEntry.route).toBe('menu');
+  expect(history.replaceState.mock.calls).toEqual([[history.state, '', '/']]);
+});
