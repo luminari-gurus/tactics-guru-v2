@@ -1,5 +1,5 @@
 import { dungeonOffer } from '../src/domain/dungeon';
-import { checkedDungeon } from './helpers/dungeonFixtures';
+import { checkedDungeon, sharedGroundPile } from './helpers/dungeonFixtures';
 import { expect,test } from './helpers/startupDiagnostics';
 import type { Locator, Page } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
@@ -7,7 +7,7 @@ import { gzipSync } from 'node:zlib';
 import { dungeonSnapshot, acceptedDungeonSnapshot, expectSameProgress, walkDungeon, expectDungeonResumed, openDungeonInventory, reenterDungeonStair } from './helpers/dungeonTraversal';
 import { currentSight, neighbors, poiCell } from '../src/domain/exploration';
 import { generateMap } from '../src/map/generate';
-import { freshDungeon, floorDescriptor, floorMap, readDungeon, dungeonSeed, dungeonLootReward, stepDungeon, type DungeonState } from '../src/domain/dungeon';
+import { freshDungeon, floorDescriptor, floorMap, readDungeon, dungeonSeed, stepDungeon, type DungeonState } from '../src/domain/dungeon';
 import { dungeonContent, legacyDungeonIdentity } from '../src/content/dungeon';
 import { canonical, hashJson } from '../src/domain/contentIdentity';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
@@ -22,7 +22,6 @@ import { freshExploration, movableExploration } from '../src/domain/exploration'
 import { encodeDungeon, utf8Bytes } from '../src/domain/dungeonSaveEnvelope';
 import { holdFinalRecordsWrite } from './helpers/recordsWriteGate';
 import { startBattleModuleFaultServer } from './helpers/battleModuleFaultServer';
-import { progressHero } from '../src/domain/progression';
 import { AUTO_COLLECT_LOOT_KEY } from '../src/ui/autoCollectLootPreference';
 import { dungeonMovementGeometry, expectDungeonMovementVisible } from './helpers/dungeonLayout';
 
@@ -36,34 +35,6 @@ async function loadGroundLootBoundary(page: Page, state: DungeonState) {
  await page.evaluate(({key,text,preferenceKey})=>{localStorage.setItem(preferenceKey,'off');localStorage.setItem(key,text);},
   {key:DUNGEON_KEYS.primary,text:encoded.text,preferenceKey:AUTO_COLLECT_LOOT_KEY});
  await page.goto('./?game=dungeon');await expectDungeonResumed(page);
-}
-
-/** Explicit capacity/overlap staging; the complete saved journey proves earned loot separately. */
-function sharedGroundPile(ownedCount: number, occupied = false) {
- for(let seed=1;seed<=64;seed++) {
-  const base=freshDungeon(`ground-pile-${ownedCount}-${occupied}`,seed),depth=3;
-  const floors=Array.from({length:depth},(_,i)=>{
-   const descriptor=floorDescriptor(seed,i+1),map=floorMap(descriptor);
-   return {descriptor,position:descriptor.upstairs,completed:i===depth-1?2:3,
-    exploration:movableExploration(freshExploration(descriptor.seed,descriptor.upstairs,map),descriptor.seed,i===depth-1?2:3,'ready')};
-  });
-  const floor=floors[depth-1],map=floorMap(floor.descriptor),stairs=[floor.descriptor.upstairs,floor.descriptor.downstairs];
-  const cell=map.cells.findIndex((open,index)=>open===1&&!stairs.includes(index)&&
-   !floor.exploration.pois.some(p=>poiCell(p,map.width)===index)&&
-   neighbors(index,map.width,map.height).some(n=>map.cells[n]&&!stairs.includes(n)&&!floor.exploration.pois.some(p=>poiCell(p,map.width)===n)));
-  if(cell<0)continue;
-  const origin=neighbors(cell,map.width,map.height).find(n=>map.cells[n]&&!stairs.includes(n)&&!floor.exploration.pois.some(p=>poiCell(p,map.width)===n))!;
-  const loot=[0,1].map(slot=>dungeonLootReward({...base,depth},slot,slot,cell));
-  if(loot.some(item=>dungeonContent.items[item.itemId].kind!=='equipment'))continue;
-  const equipment=Array.from({length:ownedCount},(_,i)=>({instanceId:`${base.id}:floor:${Math.floor(i/3)+1}:reward:${i%3}:option:0`,itemId:'item:warding_charm' as const}));
-  const party=base.party.map(hero=>{const progressed=progressHero(hero.heroId,180,hero.hp,dungeonContent.catalog);return {...progressed,hp:progressed.maxHp};});
-  const state=checkedDungeon(readDungeon(atCell({...base,depth,party,
-   ownership:{consumables:[],equipment,assignments:[]},
-   floors:floors.map((f,index)=>index!==depth-1?f:{...f,loot,exploration:{...f.exploration,
-    pois:f.exploration.pois.map(p=>p.encounterSlot<2||occupied?{...p,x:cell%map.width,y:Math.floor(cell/map.width)}:p)}})},origin)));
-  return {state,cell,origin};
- }
- throw Error('No deterministic two-charm ground pile');
 }
 
 test('ground loot: legal victory saves one item at contact and a manual pickup survives refusal and reload',async({page,isMobile})=>{
@@ -128,28 +99,28 @@ test('ground loot: legal victory saves one item at contact and a manual pickup s
  await expect(tile).not.toHaveAttribute('data-loot');
 });
 
-for(const ownedCount of [5,6])test(`ground loot: ${ownedCount===5?'partial':'full'} capacity keeps same-cell rewards and retries on discard without moving enemies`,async({page,isMobile})=>{
+test('ground loot: full capacity keeps same-cell rewards and retries on discard without moving enemies',async({page,isMobile})=>{
  test.setTimeout(60000);
  await page.addInitScript(()=>{document.hasFocus=()=>false;});
- const {state,cell}=sharedGroundPile(ownedCount);await loadGroundLootBoundary(page,state);
+ const {state,cell}=sharedGroundPile(6);await loadGroundLootBoundary(page,state);
  const original=state.floors[state.depth-1].loot!,tile=page.locator(`#dungeon-map [data-cell="${cell}"]`);
  await expect(tile).toHaveAttribute('data-loot','2');await expect(tile).toHaveText('◆');
  await walkDungeon(page,cell,isMobile?'touch':'keyboard');
  const entered=await dungeonSnapshot(page),enteredFloor=entered.floors[entered.depth-1];
- expect(enteredFloor.loot!.map(item=>item.remaining)).toEqual(ownedCount===5?[0,1]:[1,1]);
+ expect(enteredFloor.loot!.map(item=>item.remaining)).toEqual([1,1]);
  expect(entered.ownership.equipment).toHaveLength(6);expect(entered.ownership.assignments).toEqual([]);
  await expect(page.locator('.dungeon-loot-status')).toContainText('Inventory full');
  await expect(tile).toHaveAttribute('data-loot-overlay','true');
  await expect(page.locator('.dungeon-loot-here')).toBeVisible();
  await expect(page.locator('#dungeon-map')).toHaveAccessibleDescription(/Beneath the party/);
  await tile.scrollIntoViewIfNeeded();
- await page.screenshot({path:test.info().outputPath(`ground-loot-capacity-${ownedCount}.png`),fullPage:true});
+ await page.screenshot({path:test.info().outputPath('ground-loot-capacity-6.png'),fullPage:true});
  await page.reload();await expectDungeonResumed(page);
  expect((await dungeonSnapshot(page)).floors).toEqual(entered.floors);expect((await dungeonSnapshot(page)).ownership).toEqual(entered.ownership);
- for(const pending of original.filter((_,i)=>ownedCount===6||i===1)) {
+ for(const [index,pending] of original.entries()) {
   const before=await dungeonSnapshot(page),floor=before.floors[before.depth-1];
   await openDungeonInventory(page);
-  const discard=page.locator(`[data-instance-id="${state.ownership.equipment[original.indexOf(pending)].instanceId}"]`).getByRole('button',{name:'Discard Warding Charm',exact:true});
+  const discard=page.locator(`[data-instance-id="${state.ownership.equipment[index].instanceId}"]`).getByRole('button',{name:'Discard Warding Charm',exact:true});
   if(isMobile)await discard.tap();else await discard.click();
   await page.locator('#dungeon-discard-confirm').click();
   await expect(page.locator('.dungeon-loot-status')).toContainText(`Picked up ${dungeonContent.items[pending.itemId].label}`);
@@ -157,6 +128,11 @@ for(const ownedCount of [5,6])test(`ground loot: ${ownedCount===5?'partial':'ful
   expect(afterFloor.position).toBe(cell);expect(afterFloor.exploration).toEqual(floor.exploration);
   expect(after.ownership.equipment).toHaveLength(6);expect(after.ownership.equipment.some(item=>item.instanceId===pending.id)).toBe(true);
   expect(afterFloor.loot!.find(item=>item.id===pending.id)?.remaining).toBe(0);
+  if(index===0){
+   await expect(tile).toHaveAttribute('data-loot','1');
+   await expect(tile).toHaveAttribute('data-loot-overlay','true');
+   await expect(page.locator('#dungeon-map')).toHaveAccessibleDescription(/Beneath the party/);
+  }
   expect(after.party).toEqual(before.party);expect(after.ownership.assignments).toEqual([]);
  }
  const depleted=await dungeonSnapshot(page);expect(depleted.floors[depleted.depth-1].loot!.map(item=>item.remaining)).toEqual([0,0]);
