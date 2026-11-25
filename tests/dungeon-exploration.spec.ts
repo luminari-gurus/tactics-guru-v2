@@ -716,8 +716,8 @@ for(const biome of ['forest','desert'] as const)test(`${biome} saved kinds, scal
   const { slot, state: saved } = savedBiomeEncounter(biome, kind);
   const floor=saved.floors[1],map=floorMap(floor.descriptor),target=poiCell(floor.exploration.pois[slot],map.width);
   const prior=neighbors(target,map.width,map.height).find(n=>map.cells[n]&&!floor.exploration.pois.some(p=>poiCell(p,map.width)===n));if(prior===undefined)throw Error('No safe approach');
-  const state=atCell(saved,prior);const encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
-  await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});await page.goto('./?game=dungeon');await expectDungeonResumed(page);
+  const state=atCell(saved,prior);
+  await openSavedDungeon(page,state);
   await expect(page.locator('#dungeon-map')).toHaveAttribute('data-biome',biome);
   expect(await page.locator('#dungeon-screen').evaluate(n=>n.scrollWidth<=n.clientWidth)).toBe(true);
   await expect(page.locator('#dungeon-screen h1')).toHaveText(`Dungeon · Floor 2 · ${biome==='forest'?'Forest':'Desert'}`);
@@ -748,8 +748,12 @@ for(const biome of ['forest','desert'] as const)test(`${biome} saved kinds, scal
   await expect(page.locator('#battle-dialog-message')).toContainText(`HP ${enemy.hp}/${stats.maxHp}`);await expect(page.locator('#battle-dialog-message')).toContainText(`AC ${stats.armorClass}`);
   await page.locator('#battle-dialog-title').scrollIntoViewIfNeeded();await page.screenshot({path:test.info().outputPath(`${biome}-${kind}-scaled-inspection.png`)});await page.locator('#inspection-close').click();
   expectSameProgress(await dungeonSnapshot(page), before);
-  await page.reload();await expectDungeonResumed(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-  expectSameProgress(await dungeonSnapshot(page), before);await expect(page.locator('#battle-heading h1')).toContainText(label);
+  // Vitest restores all eight biome/kind combinations. Check the browser
+  // reload once per biome, at the narrow inspection viewport.
+  if(kind==='vault'||kind==='boss'){
+   await page.reload();await expectDungeonResumed(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+   expectSameProgress(await dungeonSnapshot(page), before);await expect(page.locator('#battle-heading h1')).toContainText(label);
+  }
  }
 });
 
