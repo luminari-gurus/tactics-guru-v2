@@ -1652,3 +1652,24 @@ it.each([['primary','granted'],['primary','refused'],['backup','granted'],['back
  expect([m.getItem(DUNGEON_KEYS.primary),m.getItem(DUNGEON_KEYS.backup)]).toEqual(bytes);
  expect(owner.snapshot).toEqual(continued);expect(owner.hasUnsavedProgress).toBe(false);expect(owner.status).toBe(status);
 });
+
+it('keeps the landing clear for the first step after restoring a fresh descent', () => {
+  // Seed 6074 used to place the Desert Guardian immediately east of the landing.
+  const base = freshDungeon('safe-arrival', 6074);
+  const cleared = atDownstairs({ ...base, floors: [{ ...base.floors[0], completed: 3 }] });
+  const arrived = good(travelDungeon(cleared, 'descend', cleared.revision));
+  const floor = arrived.floors[1];
+  const map = floorMap(floor.descriptor);
+  const landing = [floor.position, ...neighbors(floor.position, map.width, map.height)];
+  expect(floor.position).toBe(floor.descriptor.upstairs);
+  for (const poi of floor.exploration.pois) expect(landing).not.toContain(poiCell(poi, map.width));
+  const encoded = encodeDungeon(arrived);
+  assert(encoded.ok);
+  const restored = decodeDungeon(encoded.text);
+  assert(restored.ok);
+  const state = restored.state;
+  const east = floor.position + 1;
+  const moved = good(stepDungeon(state, { id: state.id, depth: state.depth, revision: state.revision, destination: east }));
+  expect(moved).toMatchObject({ depth: 2, phase: 'ready', activeBattle: null, party: base.party });
+  expect(moved.floors[1].position).toBe(east);
+});
