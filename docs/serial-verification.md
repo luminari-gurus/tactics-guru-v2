@@ -81,7 +81,7 @@ full-suite measurement against #200 remain part of #208.
 
 ## Coverage and build provenance
 
-`scripts/verification-batches.mjs` derives the 20 timing rows from the existing
+`scripts/verification-batches.mjs` derives 14 timing rows from the
 13-stage `verify-full.mjs` plan. Preparation runs tooling, fast units (including
 content), both TypeScript scopes, real build integrations and the root bundle.
 It uploads that ordinary root output once, with source/input identity, a complete
