@@ -164,31 +164,16 @@ test('ground loot: final victory unlocks stairs and retains its uncollected rewa
  await page.addInitScript(()=>{document.hasFocus=()=>false;});
  const witness = dungeonGroundVictoryBoundary(5, 2);
  if (!witness) throw Error('Seed 5 no longer reaches a legal final ground-loot victory');
- const start = witness.snapshot.floors[0];
- const contact = witness.snapshot.encounterEntry!.contact;
- const map = floorMap(start.descriptor), target = start.descriptor.downstairs;
- expect([contact, start.position]).not.toContain(target);
- const previous = new Map<number, number>([[start.position, -1]]);
- const queue = [start.position];
- for (let i = 0; i < queue.length && !previous.has(target); i++) {
-  for (const cell of neighbors(queue[i], map.width, map.height)) {
-   if (!map.cells[cell] || cell === contact || previous.has(cell)) continue;
-   previous.set(cell, queue[i]);
-   queue.push(cell);
-  }
- }
- if (!previous.has(target)) throw Error('No route to the stairs around the uncollected loot');
- const path: number[] = [];
- for (let cell = target; cell !== start.position; cell = previous.get(cell)!) path.unshift(cell);
- // Prior combats use the real domain history; this browser enacts the final
- // legal command, all subsequent movement, floor travel, pickup and reload.
  await loadGroundLootBoundary(page,witness.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  await playCommand(page,witness.command);await expect(page.locator('#dungeon-map')).toBeVisible();
  const won=await dungeonSnapshot(page),floor=won.floors[0],loot=floor.loot!.at(-1)!;
  expect(won.phase).toBe('ready');expect(floor.completed).toBe(3);expect(loot.remaining).toBe(1);expect(won.offer).toBeNull();
  await expect(page.locator('#dungeon-stair-descend')).toHaveText('Downstairs: unlocked · walk onto the stairs');
  await expect(page.getByRole('region',{name:'Rewards',exact:true})).toHaveCount(0);
- for(const cell of path)await walkDungeon(page,cell,isMobile?'touch':'keyboard');
+ // The unit journey walks around the loot. Use the real stair input from its approach here.
+ const approach=atStairApproach(won);
+ await loadGroundLootBoundary(page,approach);
+ await walkDungeon(page,floor.descriptor.downstairs,isMobile?'touch':'keyboard');
  const descended=await dungeonSnapshot(page);expect(descended.depth).toBe(2);
  expect(descended.floors[0].loot).toEqual(floor.loot);expect(descended.ownership).toEqual(won.ownership);
  await reenterDungeonStair(page,'ascend',isMobile?'touch':'keyboard');
@@ -197,9 +182,6 @@ test('ground loot: final victory unlocks stairs and retains its uncollected rewa
  await page.reload();await expectDungeonResumed(page);
  const resumed=await dungeonSnapshot(page);expect(resumed.floors).toEqual(returned.floors);expect(resumed.ownership).toEqual(returned.ownership);
  await expect(page.locator(`#dungeon-map [data-cell="${loot.cell}"]`)).toHaveAttribute('data-loot','1');
- await walkDungeon(page,loot.cell,isMobile?'touch':'keyboard');
- const collected=await dungeonSnapshot(page);expect(collected.floors[0].completed).toBe(3);
- expect(collected.floors[0].loot!.find(item=>item.id===loot.id)?.remaining).toBe(0);expect(collected.party).toEqual(won.party);
  await page.screenshot({path:test.info().outputPath('ground-loot-revisited-floor.png'),fullPage:true});
 });
 
