@@ -94,34 +94,41 @@ it('continues an occupied-pile battle at its origin with both rewards still on t
   resumed.dispose();
 });
 
-it('restores a partial pickup and collects the remaining charm on discard', async () => {
-  const { state, cell } = sharedGroundPile(5);
-  const [first, second] = currentFloor(state).loot!;
+it.each([
+  { owned: 5, pickedUp: 1, warning: '1 item remains' },
+  { owned: 6, pickedUp: 0, warning: '2 items remain' },
+])('restores a shared pile with $owned owned items and collects one charm per discard', async ({ owned, pickedUp, warning }) => {
+  const { state, cell } = sharedGroundPile(owned);
+  const loot = currentFloor(state).loot!;
   const { storage, owner } = savedOwner(state);
   assert(await owner.step({ ...owner.spatialBoundary, destination: cell }));
   const entered = owner.snapshot;
-  expect(currentFloor(entered).loot).toEqual([{ ...first, remaining: 0 }, second]);
-  expect(entered.ownership.equipment).toEqual([...state.ownership.equipment, { instanceId: first.id, itemId: first.itemId }]);
-  expect(owner.status).toContain('Inventory full: 1 item remains on the ground.');
+  const expectedLoot = (count: number) => loot.map((item, index) => ({ ...item, remaining: index < count ? 0 : 1 }));
+  let equipment = [...state.ownership.equipment, ...loot.slice(0, pickedUp).map(item => ({ instanceId: item.id, itemId: item.itemId }))];
+  expect(currentFloor(entered).loot).toEqual(expectedLoot(pickedUp));
+  expect(entered.ownership).toEqual({ ...state.ownership, equipment });
+  expect(owner.status).toContain(`Inventory full: ${warning} on the ground.`);
   owner.dispose();
 
   const resumed = new DungeonSession(state, storage);
   assert(resumed.continue(resumed.inspect()));
   expect(resumed.snapshot).toEqual(entered);
-  const discarded = state.ownership.equipment[1].instanceId;
-  assert(await resumed.dispatch({ ...dungeonBoundary(entered), type: 'discardEquipment', instanceId: discarded }));
+  for (const [index, item] of loot.entries()) {
+    if (index < pickedUp) continue;
+    const discarded = state.ownership.equipment[index].instanceId;
+    assert(await resumed.dispatch({ ...dungeonBoundary(resumed.snapshot), type: 'discardEquipment', instanceId: discarded }));
+    equipment = [...equipment.filter(ownedItem => ownedItem.instanceId !== discarded), { instanceId: item.id, itemId: item.itemId }];
+    expect(currentFloor(resumed.snapshot)).toEqual({ ...currentFloor(entered), position: cell, loot: expectedLoot(index + 1) });
+    expect(resumed.snapshot.ownership).toEqual({ ...state.ownership, equipment });
+    expect(resumed.snapshot.party).toEqual(entered.party);
+    expect(resumed.status).toContain(`Picked up ${dungeonContent.items[item.itemId].label}`);
+  }
   const collected = resumed.snapshot;
-  expect(currentFloor(collected)).toEqual({ ...currentFloor(entered), loot: [first, second].map(item => ({ ...item, remaining: 0 })) });
-  expect(collected.ownership.equipment).toEqual([
-    ...entered.ownership.equipment.filter(item => item.instanceId !== discarded),
-    { instanceId: second.id, itemId: second.itemId },
-  ]);
-  expect(collected.ownership.assignments).toEqual([]);
-  expect(collected.party).toEqual(entered.party);
-  expect(resumed.status).toContain(`Picked up ${dungeonContent.items[second.itemId].label}`);
-  const saved = storage.inspect().primary; assert(saved.status === 'valid');
-  expect(saved.state).toEqual(collected);
   resumed.dispose();
+  const restored = new DungeonSession(state, storage);
+  assert(restored.continue(restored.inspect()));
+  expect(restored.snapshot).toEqual(collected);
+  restored.dispose();
 });
 
 it.each(['before', 'after'] as const)('does not publish a pickup when the primary write fails %s committing', async when => {
