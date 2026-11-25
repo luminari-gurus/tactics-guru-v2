@@ -318,13 +318,13 @@ it('retains the accepted-command history through every legal encounter',()=>{
   }
 },120000);
 
-it('continues a legally reached Guarded dungeon boundary through exact save/resume and expiry', () => {
-  let reached = false;
-  for (let seed = 1; seed <= 10 && !reached; seed++) {
+it.each([{ seed: 1, outcome: 'hit' }, { seed: 5, outcome: 'miss' }])(
+  'continues a legal Guarded $outcome through exact dungeon save/resume and expiry', ({ seed, outcome }) => {
     const started = startDungeonBattle(atEncounter(freshDungeon('guarded-save', seed))); if (!started.ok) throw Error(started.reason);
     const built = dungeonBattle(started.state)!;
-    let fixture; try { fixture = guardedBoundary(built.catalog, started.state.activeBattle!); } catch { continue; }
+    const fixture = guardedBoundary(built.catalog, started.state.activeBattle!);
     const cast = dispatch(fixture.before, fixture.command, built.catalog); if (!cast.ok) throw Error(cast.reason);
+    expect(cast.events.find(event => event.type === 'attackRolled')).toMatchObject({ result: outcome });
     const snapshot = { ...started.state, activeBattle: cast.state };
     const encoded = encodeDungeon(snapshot); if (!encoded.ok) throw Error(encoded.reason);
     const decoded = decodeDungeon(encoded.text); if (!decoded.ok) throw Error(decoded.reason);
@@ -342,10 +342,7 @@ it('continues a legally reached Guarded dungeon boundary through exact save/resu
       const bad = { ...snapshot, activeBattle: { ...cast.state, units: cast.state.units.map((u, i) => i ? u : { ...u, [field]: [] }) } };
       expect(readDungeon(bad).ok).toBe(false);
     }
-    reached = true;
-  }
-  expect(reached).toBe(true);
-});
+  });
 
 
 it('uses the same scaled catalog for inspection, attack preview, AI, actual damage and replay', () => {
