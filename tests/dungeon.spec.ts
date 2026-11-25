@@ -104,25 +104,24 @@ async function historyRows(page:Page){return page.evaluate(keys=>{
 
 // UI witnesses straddle the Frost Snare gate; exact XP/HP/caster projections and
 // forged save rejection live in dungeonProgressionBoundary.test.ts.
-for(const [xp,level,maxHp]of [[0,1,11],[180,3,19]])test(`menu dungeon restores Mage XP ${xp}, caster level and exact active boundary`,async({page})=>{
+for(const [xp,level] of [[0,1],[180,3]])test(`menu dungeon restores Mage XP ${xp}, caster level and exact active boundary`,async({page})=>{
  // Explicit boundary fixture; earned progression is covered by the extended journeys.
  const fresh=freshDungeon(`menu-caster-${xp}`,190,undefined,true);
  const progressed={...fresh,party:fresh.party.map(hero=>progressHero(hero.heroId,xp,1,dungeonContent.catalog))};
  const started=startDungeonBattle(atEncounter(progressed));if(!started.ok)throw Error(started.reason);
  const battle=started.state.activeBattle!,mage=battle.units.find(unit=>unit.defId==='mage')!;
  const boundary={...started.state,activeBattle:{...battle,activeIndex:battle.initiative.indexOf(mage.id)}};
- await seed(page,boundary);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- const before=await snapshot(page);expect(before.party.find(hero=>hero.heroId==='mage')).toMatchObject({xp,level,maxHp});
- await (await battleTool(page, '#battle-party')).click();await expect(page.locator('#battle-dialog-message')).toContainText(`Level ${level}`);await page.locator('#inspection-close').click();
- await page.reload();await expectDungeonResumed(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- const resumed=await snapshot(page);
- // Reload can flush elapsed playtime independently of gameplay or progression.
- expect(resumed.stats!.activeMs).toBeGreaterThanOrEqual(before.stats!.activeMs);
- expect(resumed).toEqual({...before,stats:{...before.stats,activeMs:resumed.stats!.activeMs}});
- expect((await readSession(page)).state).toEqual(before.activeBattle);expect((await readSession(page)).events).toEqual([]);
+ const encoded=encodeDungeon(boundary);if(!encoded.ok)throw Error(encoded.reason);
+ await page.addInitScript(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
+ await page.goto('./?game=dungeon');await expectDungeonResumed(page);
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ expectSameProgress(await snapshot(page),boundary);
+ const resumed=await readSession(page);
+ expect(resumed.state).toEqual(boundary.activeBattle);expect(resumed.events).toEqual([]);
+ await (await battleTool(page, '#battle-party')).click();
+ await expect(page.locator('#battle-dialog-message')).toContainText(`Level ${level}`);
+ await page.locator('#inspection-close').click();
  await expect(page.locator('#battle-ability option[value="ability:frost_snare"]')).toHaveCount(level>=3?1:0);
- const catalog=dungeonBattle(await snapshot(page))!.catalog,missile=catalog.abilities['ability:magic_missile'];expect(missile.kind).toBe('magicMissile');
- if(missile.kind==='magicMissile')expect(missile.casterLevel).toBe(level);
 });
 
 test('desktop Rail keeps Frost Snare controls visible and its target picker clickable', async ({page,isMobile}) => {
