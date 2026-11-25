@@ -12,7 +12,8 @@ import { RunHistory } from './RunHistory';
 import { dungeonRunRecord } from '../domain/runRecords';
 import { freshDungeon, FloorCache, newDungeonSeed, type DungeonState } from '../domain/dungeon';
 import type { DungeonAutoCollectIntent } from '../domain/dungeonAutoCollect';
-import { bothDungeonSlotsMissing, createDungeonStorage, removingDungeonSaveWouldReopenRun, resumableDungeonSave, resumableDungeonSlot, serializeBrowserDungeonWrite } from '../persistence/dungeonStorage';
+import { newDungeonEntryAction, type MenuDungeonReview } from './newDungeonEntry';
+import { createDungeonStorage, removingDungeonSaveWouldReopenRun, resumableDungeonSave, resumableDungeonSlot, serializeBrowserDungeonWrite } from '../persistence/dungeonStorage';
 import { dungeonElement as el, renderDungeon } from '../ui/dungeon';
 import { BattleDialogs, type DialogChoice } from '../ui/dialogs';
 import type { RunBattleHost } from '../phaser/BattleScene';
@@ -298,17 +299,15 @@ if(!storage){
  const review=session.inspect();
  void session.history?.reconcileDungeonDefeat(review);
  if(entryIntent==='new'){
-  let approved: { primary?: { status?: string; text?: string | null }; backup?: { status?: string; text?: string | null } } | null=null;
+  let approved: MenuDungeonReview | null=null;
   try {
    const text=sessionStorage.getItem('tactics-guru:menu-new-dungeon-review');
    sessionStorage.removeItem('tactics-guru:menu-new-dungeon-review');
    if(text)approved=JSON.parse(text);
   } catch { /* Inspect the current saves when the menu handoff is unavailable. */ }
-  const matches=(['primary','backup'] as const).every(slot=>review[slot].status!=='unavailable' && approved?.[slot]?.status===review[slot].status && approved?.[slot]?.text===review[slot].text);
-  if(matches || bothDungeonSlotsMissing(review))void replace(review);
-  else if(approved || resumableDungeonSlot(review))void requestNew();
-  // Preserve unreadable saves for recovery when starting without a replacement review.
-  else if(Object.values(review).some(slot=>slot.status==='invalid'||slot.status==='unavailable'))playUnsavedDungeon();
+  const action=newDungeonEntryAction(review,approved);
+  if(action==='confirm')void requestNew();
+  else if(action==='unsaved')playUnsavedDungeon();
   else void replace(review);
  }else if(entryIntent==='recovery')void recovery();
  else if(!resumeDungeon(review)){
