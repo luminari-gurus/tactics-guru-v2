@@ -158,28 +158,33 @@ test('ground loot: an occupied pile starts combat at the origin and preserves bo
 test('ground loot: final victory unlocks stairs and retains its uncollected reward through a floor revisit',async({page,isMobile})=>{
  test.setTimeout(90000);
  await page.addInitScript(()=>{document.hasFocus=()=>false;});
- let selected:{witness:NonNullable<ReturnType<typeof dungeonGroundVictoryBoundary>>;path:number[]}|undefined;
- for(let seed=1;seed<=24&&!selected;seed++) {
-  const witness=dungeonGroundVictoryBoundary(seed,2);if(!witness)continue;
-  const floor=witness.snapshot.floors[0],contact=witness.snapshot.encounterEntry!.contact,map=floorMap(floor.descriptor),target=floor.descriptor.downstairs;
-  if(contact===target||floor.position===target)continue;
-  const previous=new Map<number,number>([[floor.position,-1]]),queue=[floor.position];
-  for(let i=0;i<queue.length&&!previous.has(target);i++)for(const n of neighbors(queue[i],map.width,map.height))
-   if(map.cells[n]&&n!==contact&&!previous.has(n)){previous.set(n,queue[i]);queue.push(n);}
-  if(!previous.has(target))continue;
-  const path:number[]=[];for(let cell=target;cell!==floor.position;cell=previous.get(cell)!)path.unshift(cell);
-  selected={witness,path};
+ const witness = dungeonGroundVictoryBoundary(5, 2);
+ if (!witness) throw Error('Seed 5 no longer reaches a legal final ground-loot victory');
+ const start = witness.snapshot.floors[0];
+ const contact = witness.snapshot.encounterEntry!.contact;
+ const map = floorMap(start.descriptor), target = start.descriptor.downstairs;
+ expect([contact, start.position]).not.toContain(target);
+ const previous = new Map<number, number>([[start.position, -1]]);
+ const queue = [start.position];
+ for (let i = 0; i < queue.length && !previous.has(target); i++) {
+  for (const cell of neighbors(queue[i], map.width, map.height)) {
+   if (!map.cells[cell] || cell === contact || previous.has(cell)) continue;
+   previous.set(cell, queue[i]);
+   queue.push(cell);
+  }
  }
- if(!selected)throw Error('No legal final victory with a route around its loot');
+ if (!previous.has(target)) throw Error('No route to the stairs around the uncollected loot');
+ const path: number[] = [];
+ for (let cell = target; cell !== start.position; cell = previous.get(cell)!) path.unshift(cell);
  // Prior combats use the real domain history; this browser enacts the final
  // legal command, all subsequent movement, floor travel, pickup and reload.
- await loadGroundLootBoundary(page,selected.witness.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- await playCommand(page,selected.witness.command);await expect(page.locator('#dungeon-map')).toBeVisible();
+ await loadGroundLootBoundary(page,witness.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ await playCommand(page,witness.command);await expect(page.locator('#dungeon-map')).toBeVisible();
  const won=await dungeonSnapshot(page),floor=won.floors[0],loot=floor.loot!.at(-1)!;
  expect(won.phase).toBe('ready');expect(floor.completed).toBe(3);expect(loot.remaining).toBe(1);expect(won.offer).toBeNull();
  await expect(page.locator('#dungeon-stair-descend')).toHaveText('Downstairs: unlocked · walk onto the stairs');
  await expect(page.getByRole('region',{name:'Rewards',exact:true})).toHaveCount(0);
- for(const cell of selected.path)await walkDungeon(page,cell,isMobile?'touch':'keyboard');
+ for(const cell of path)await walkDungeon(page,cell,isMobile?'touch':'keyboard');
  const descended=await dungeonSnapshot(page);expect(descended.depth).toBe(2);
  expect(descended.floors[0].loot).toEqual(floor.loot);expect(descended.ownership).toEqual(won.ownership);
  await reenterDungeonStair(page,'ascend',isMobile?'touch':'keyboard');
