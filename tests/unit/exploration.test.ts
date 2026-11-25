@@ -6,7 +6,7 @@ import { generateMap } from '../../src/map/generate';
 import { encodeDungeon, decodeDungeon } from '../../src/domain/dungeonSaveEnvelope';
 import { legacyDungeonIdentity } from '../../src/content/dungeon';
 import { canonical, hashJson } from '../../src/domain/contentIdentity';
-import { atEncounter, atCell, atStairApproach, dungeonCapacityFixture, priorDungeonPayload } from '../helpers/dungeonFixtures';
+import { atEncounter, atCell, dungeonSightTransition, atStairApproach, dungeonCapacityFixture, priorDungeonPayload } from '../helpers/dungeonFixtures';
 import { LEGACY_ENCOUNTER_POLICY } from '../../src/domain/dungeonEncounters';
 import { DungeonSession } from '../../src/app/DungeonSession';
 import { createDungeonStorage, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
@@ -16,6 +16,17 @@ const command=(s:ReturnType<typeof fresh>,destination:number)=>({id:s.id,depth:s
 const legacy=(s:ReturnType<typeof fresh>)=>priorDungeonPayload(s, 1);
 const envelope=(payload:unknown)=>{const body={kind:'tactics-guru:dungeon',format:1,identity:legacyDungeonIdentity,payload};return canonical({...body,digest:hashJson(body)});};
 describe('exploration placement and validation', () => {
+ it.each([true, false])('encounter movement changes marker visibility (entering: %s)', entering => {
+  const { before, after, slot } = dungeonSightTransition(entering);
+  const start = currentFloor(before), end = currentFloor(after), map = floorMap(start.descriptor);
+  const oldCell = poiCell(start.exploration.pois[slot], map.width);
+  const newCell = poiCell(end.exploration.pois[slot], map.width);
+  const sight = currentSight(end.position, map);
+  expect(after.phase).toBe('ready');
+  expect(currentSight(start.position, map).includes(oldCell)).toBe(!entering);
+  expect(sight.includes(oldCell)).toBe(!entering);
+  expect(sight.includes(newCell)).toBe(entering);
+ });
  it('reproduces connected distinct markers without changing terrain for 100 seeds', async () => {
   for(let seed=0;seed<100;seed++){const map=generateMap(seed,'rooms'),before=canonical(map),pois=encounterPois(seed,map);expect(pois).toEqual(encounterPois(seed));expect(new Set(pois.map(p => poiCell(p))).size).toBe(3);for(const p of pois){expect(map.cells[poiCell(p)]).toBe(1);expect([map.cells.indexOf(1),map.cells.lastIndexOf(1)]).not.toContain(poiCell(p));}expect(canonical(map)).toBe(before);}
   expect(()=>encounterPois(1,{...generateMap(1,'rooms'),cells:Array(400).fill(0)})).toThrow();

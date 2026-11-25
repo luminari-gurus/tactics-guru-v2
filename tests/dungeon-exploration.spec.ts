@@ -1,5 +1,5 @@
 import { dungeonOffer } from '../src/domain/dungeon';
-import { checkedDungeon, savedBiomeEncounter, sharedGroundPile } from './helpers/dungeonFixtures';
+import { checkedDungeon, dungeonSightTransition, savedBiomeEncounter, sharedGroundPile } from './helpers/dungeonFixtures';
 import { expect,test } from './helpers/startupDiagnostics';
 import type { Locator, Page } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
@@ -7,7 +7,7 @@ import { gzipSync } from 'node:zlib';
 import { openSavedDungeon, openDungeonWithStorage, dungeonSnapshot, acceptedDungeonSnapshot, expectSameProgress, walkDungeon, expectDungeonResumed, openDungeonInventory } from './helpers/dungeonTraversal';
 import { currentSight, neighbors, poiCell } from '../src/domain/exploration';
 import { generateMap } from '../src/map/generate';
-import { freshDungeon, floorDescriptor, floorMap, readDungeon, dungeonSeed, stepDungeon, type DungeonState } from '../src/domain/dungeon';
+import { freshDungeon, floorDescriptor, floorMap, readDungeon, dungeonSeed, type DungeonState } from '../src/domain/dungeon';
 import { dungeonContent, legacyDungeonIdentity } from '../src/content/dungeon';
 import { canonical, hashJson } from '../src/domain/contentIdentity';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
@@ -15,7 +15,6 @@ import { endTurn, battleTool, readSession,playCommand } from './helpers/battlePo
 import { installRailControls } from './helpers/forceRailControls';
 import { playerDecision } from './helpers/playerPolicy';
 import { dungeonBattle } from '../src/domain/dungeon';
-import { freshRunStats } from '../src/domain/runStats';
 import { atCell, atEncounter, atStairApproach, dungeonCapacityFixture, dungeonContactApproach, dungeonVictoryBoundary, dungeonGroundVictoryBoundary } from './helpers/dungeonFixtures';
 import { freshExploration, movableExploration } from '../src/domain/exploration';
 import { encodeDungeon, utf8Bytes } from '../src/domain/dungeonSaveEnvelope';
@@ -197,40 +196,17 @@ test('map markers respect stair availability, discovery and saved floor state',a
 });
 
 test('live markers follow current sight across movement, art changes and reload', async ({ page, isMobile }) => {
- const base = { ...freshDungeon('sight-movement', 1), stats: freshRunStats('since-upgrade') };
- const map = floorMap(base.floors[0].descriptor);
- const encounterCell = (state: DungeonState, slot: number) => poiCell(state.floors[0].exploration.pois[slot], map.width);
  for (const entering of [true, false]) {
-  let witness: { before: DungeonState; after: DungeonState; slot: number } | undefined;
-  for (const [position, open] of map.cells.entries()) {
-   if (!open || base.floors[0].exploration.pois.some(poi => poiCell(poi, map.width) === position)) continue;
-   const before = atCell(base, position);
-   for (const destination of neighbors(position, map.width, map.height)) {
-    const result = stepDungeon(before, { id: before.id, depth: before.depth, revision: before.revision, destination });
-    if (!result.ok || result.state.phase !== 'ready') continue;
-    const beforeSight = currentSight(position, map), afterSight = currentSight(destination, map);
-    const slot = before.floors[0].exploration.pois.findIndex((_, i) => {
-     const oldCell = encounterCell(before, i), newCell = encounterCell(result.state, i);
-     return beforeSight.includes(oldCell) === !entering &&
-      afterSight.includes(oldCell) === !entering && afterSight.includes(newCell) === entering;
-    });
-    if (slot >= 0) {
-     witness = { before, after: result.state, slot };
-     break;
-    }
-   }
-   if (witness) break;
-  }
-  if (!witness) throw Error('Missing encounter sight transition');
-  const { before, after, slot } = witness, encoded = encodeDungeon(before);
-  if (!encoded.ok) throw Error(encoded.reason);
+  const { before, after, slot } = dungeonSightTransition(entering);
+  const map = floorMap(before.floors[0].descriptor);
+  const encounterCell = (state: DungeonState) => poiCell(state.floors[0].exploration.pois[slot], map.width);
   const marker = page.locator(`#dungeon-map [data-poi="enemy-${slot + 1}"]`);
   const accessibleMap = page.getByRole('application', { name: /Floor 1 map/ });
   const label = slot === 2 ? 'Guardian · Goblins' : `encounter ${slot + 1}`;
   const check = async (state: DungeonState, visible: boolean) => {
    await expect(marker).toHaveCount(visible ? 1 : 0);
    if (visible) {
-    const index = encounterCell(state, slot);
+    const index = encounterCell(state);
     await expect(marker).toHaveText('M');
     await expect(marker).toHaveAttribute('data-cell', String(index));
     await expect(accessibleMap).toHaveAccessibleDescription(new RegExp(
@@ -239,10 +215,7 @@ test('live markers follow current sight across movement, art changes and reload'
     await expect(accessibleMap).not.toHaveAccessibleDescription(new RegExp(label));
    }
   };
-  await page.goto('./');
-  await page.evaluate(({ key, text }) => localStorage.setItem(key, text), { key: DUNGEON_KEYS.primary, text: encoded.text });
-  await page.goto('./?game=dungeon');
-  await expectDungeonResumed(page);
+  await openSavedDungeon(page, before);
   const expectIdle = async () => {
    const snapshot = await dungeonSnapshot(page);
    await page.clock.runFor(5000);
