@@ -630,7 +630,11 @@ test('resumed Shaman Hex shows the Weakened hero and accuracy penalty', { tag: '
  const witness = shamanJourney(189);
  const catalog = dungeonBattle(witness.entry)!.catalog;
  let state = witness.entry.activeBattle!;
+ let lastPlayerTurn: BattleState | undefined;
  for (const command of witness.commands) {
+  if (state.units.find(unit => unit.id === state.initiative[state.activeIndex])?.side === 'player') {
+   lastPlayerTurn = state;
+  }
   const result = dispatch(state, command, catalog);
   if (!result.ok) throw Error(result.reason);
   state = result.state;
@@ -638,7 +642,19 @@ test('resumed Shaman Hex shows the Weakened hero and accuracy penalty', { tag: '
   const weakened = state.units.find(unit => unit.weakenedBy !== undefined);
   if (actor?.side !== 'player' || !weakened) continue;
 
-  await openSavedDungeon(page, checkedDungeon(acceptDungeonBattle(witness.entry, state)));
+  if (!lastPlayerTurn) throw Error('No player turn before the Shaman cast');
+  expect(lastPlayerTurn.units.every(unit => unit.weakenedBy === undefined)).toBe(true);
+  await openSavedDungeon(page, checkedDungeon(acceptDungeonBattle(witness.entry, lastPlayerTurn)));
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  await playCommand(page, playerDecision(lastPlayerTurn, catalog), lastPlayerTurn);
+  await expect.poll(async () => {
+   const raw = await page.evaluate(key => localStorage.getItem(key), DUNGEON_KEYS.primary);
+   if (!raw) return null;
+   const saved = decodeDungeon(raw);
+   return saved.ok ? saved.state.activeBattle : null;
+  }).toEqual(state);
+  await page.reload();
+  await expectDungeonResumed(page);
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   expect((await readSession(page)).state).toEqual(state);
   await (await battleTool(page, '#battle-party')).click();
