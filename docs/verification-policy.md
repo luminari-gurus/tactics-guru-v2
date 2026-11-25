@@ -55,6 +55,8 @@ Contents: [tiers](#choose-a-tier), [change matrix](#pr-readiness-selection-by-ch
 [evidence reuse](#evidence-reuse-and-final-source-identity),
 [self-hosted execution](#execution-capacity-and-follow-up-work).
 
+Routine verification clears three complete first floors. Desktop WebKit checks saved manual pickup, portrait Chromium checks saved automatic pickup, and landscape WebKit checks unsaved manual pickup. For first-floor certification across all six profiles, run `npm run test:extended -- -g @full-first-floor` and `npm run test:extended:webkit -- -g @full-first-floor`.
+
 ## Choose a tier
 
 | Tier | When | Required result |

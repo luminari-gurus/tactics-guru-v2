@@ -309,7 +309,7 @@ for(const {saved,autoCollect,title} of [
  {saved:false,autoCollect:false,title:'testing dungeon legally clears a floor, descends and backtracks without accessing saves'},
  {saved:true,autoCollect:false,title:'saved menu dungeon keeps proof tools hidden across legal encounters'},
  {saved:true,autoCollect:true,title:'saved menu dungeon auto-collects loot across a complete first floor'},
-])(saved?savedWetlandsTest:fixedSeedTest)(title,async({page,isMobile})=>{
+])(saved?savedWetlandsTest:fixedSeedTest)(title, { tag: '@full-first-floor' }, async({page,isMobile})=>{
  test.setTimeout(300000); // Three complete battles plus normal exploration and stair input.
  // Reuse the complete first floor of the existing legal Fighter journey.
  const errors:string[]=[];let taunted=false;const lootJourney:unknown[]=[];page.on('pageerror',error=>errors.push(error.message));

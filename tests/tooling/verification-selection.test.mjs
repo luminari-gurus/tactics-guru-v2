@@ -41,18 +41,18 @@ test('real discoveries preserve every retained ID with the approved desktop and 
   }
 });
 
-test('each engine clears one full floor per profile and checks both pickup modes in every orientation', () => {
+test('routine verification clears each first-floor scenario once and checks both pickup modes in every orientation', () => {
   for (const [stage, desktop] of [['chromium', 'desktop'], ['webkit-exploration', 'desktop-webkit']]) {
     const { tests, projects } = after.selections[stage];
     const profilesFor = title => tests.filter(row => row.title === title).map(row => row.project).sort();
     const allProfiles = projects.map(project => project.name).sort();
-    assert.deepEqual(profilesFor('saved menu dungeon keeps proof tools hidden across legal encounters'), [desktop]);
+    assert.deepEqual(profilesFor('saved menu dungeon keeps proof tools hidden across legal encounters'), stage === 'chromium' ? [] : [desktop]);
     const portrait = allProfiles.find(name => name.includes('portrait'));
     const landscape = allProfiles.find(name => name.includes('landscape'));
     assert.deepEqual(profilesFor('staged Mage Frost Snare cancels invalid casts and restores the active badge'),
       stage === 'chromium' ? [desktop, portrait].sort() : [landscape]);
-    assert.deepEqual(profilesFor('testing dungeon legally clears a floor, descends and backtracks without accessing saves'), [landscape]);
-    assert.deepEqual(profilesFor('saved menu dungeon auto-collects loot across a complete first floor'), [portrait]);
+    assert.deepEqual(profilesFor('testing dungeon legally clears a floor, descends and backtracks without accessing saves'), stage === 'chromium' ? [] : [landscape]);
+    assert.deepEqual(profilesFor('saved menu dungeon auto-collects loot across a complete first floor'), stage === 'chromium' ? [portrait] : []);
     assert.deepEqual(profilesFor('closing on the guardian first holds contact and resumes its battle'),
       [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('Guardian-first reward, map and encounter state survive claim and reload at depth 5'),
@@ -170,10 +170,15 @@ test('long progression journeys are excluded from routine selection and remain a
   }
   for (const config of ['playwright.extended.config.ts', 'playwright.extended-webkit.config.ts']) {
     const selection = discoverSelection(['-c', config]);
-    assert.equal(selection.tests.length, 12);
+    assert.equal(selection.tests.length, 21);
     for (const project of selection.projects) {
       const cases = selection.tests.filter(row => row.project === project.name);
-      assert.equal(cases.length, 4);
+      assert.equal(cases.length, 7);
+      assert.deepEqual(cases.filter(row => row.tags.includes('@full-first-floor')).map(row => row.title).sort(), [
+        'saved menu dungeon auto-collects loot across a complete first floor',
+        'saved menu dungeon keeps proof tools hidden across legal encounters',
+        'testing dungeon legally clears a floor, descends and backtracks without accessing saves',
+      ]);
       for (const title of [...titles, 'Shaman production journey']) assert.equal(cases.filter(row => row.title.startsWith(title)).length, 1);
     }
   }
