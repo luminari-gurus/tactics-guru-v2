@@ -1,7 +1,7 @@
 import { showsSnareBadge } from '../../src/phaser/abilityPresentation';
 import { HERO_PROGRESSION } from '../../src/content/progression';
 import { progressHero } from '../../src/domain/progression';
-import { atDownstairs, atEncounter, snaredDefeatBoundary, stagedMageAbility, withLegacySight } from '../helpers/dungeonFixtures';
+import { atDownstairs, atEncounter, savedBiomeEncounter, snaredDefeatBoundary, stagedMageAbility, withLegacySight } from '../helpers/dungeonFixtures';
 import { freshDungeon, floorDescriptor, floorMap, startDungeonBattle, readDungeon, travelDungeon } from '../../src/domain/dungeon';
 import { guardedBoundary } from '../helpers/guardedBoundary';
 import { combatStats } from '../../src/domain/effects';
@@ -396,6 +396,26 @@ it.each([{ seed: 1, outcome: 'hit' }, { seed: 5, outcome: 'miss' }])(
     }
   });
 
+
+for (const biome of ['forest', 'desert'] as const) {
+  it.each(['normal', 'elite', 'vault', 'boss'] as const)(`restores the selected ${biome} %s encounter and enemy stats`, kind => {
+    const { slot, state } = savedBiomeEncounter(biome, kind);
+    const started = startDungeonBattle(atEncounter(state, slot)); assert(started.ok);
+    const built = dungeonBattle(started.state)!;
+    const encoded = encodeDungeon(started.state); assert(encoded.ok);
+    const restored = decodeDungeon(encoded.text); assert(restored.ok && restored.state.activeBattle);
+    expect(restored.state).toEqual(started.state);
+    const rebuilt = dungeonBattle(restored.state)!;
+    expect(restored.state.floors[1].descriptor.encounters[slot].selection).toMatchObject({ kind });
+    const enemies = restored.state.activeBattle.units.filter(unit => unit.side === 'enemy');
+    expect(enemies.length).toBeGreaterThan(0);
+    for (const enemy of enemies) {
+      const id = enemy.defId as keyof typeof built.catalog.enemies;
+      expect(enemy.hp).toBe(built.catalog.enemies[id].stats.maxHp);
+      expect(combatStats(enemy, rebuilt.catalog).armorClass).toBe(built.catalog.enemies[id].stats.armorClass);
+    }
+  });
+}
 
 it('uses the same scaled catalog for inspection, attack preview, AI, actual damage and replay', () => {
   const base = freshDungeon('scaled-consumers', 1);
