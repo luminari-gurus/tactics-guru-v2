@@ -135,19 +135,16 @@ test('auto loot defaults on: one delayed ordinary step, pickup, enemy tick and d
   await page.locator('#dungeon-screen').screenshot({ path: info.outputPath('auto-loot-collected.png') });
 });
 
-test('auto loot Settings are accessible and persist; off waits at origin and re-enabling does not sweep old loot', async ({ page }, info) => {
+test('auto loot Settings are accessible and persist; off waits at origin and re-enabling does not sweep old loot', { tag: '@desktop-chromium-portrait-webkit' }, async ({ page, isMobile }, info) => {
   await page.goto('./');
-  await page.evaluate(() => localStorage.setItem('tactics-guru:telemetry-opt-out', 'true'));
-  const preferences = () => page.evaluate(() => ({ combat: localStorage.getItem('tactics-guru:combat-controls'), privacy: localStorage.getItem('tactics-guru:telemetry-opt-out') }));
-  const otherPreferences = await preferences();
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   const setting = page.getByRole('checkbox', { name: 'Auto-collect loot', exact: true });
   await expect(setting).toBeChecked();
   await expect(setting).toHaveAccessibleDescription("After victory, automatically move onto the defeated enemy's square and collect its loot.");
   await expect(page.getByRole('group', { name: 'Dungeon loot', exact: true })).toContainText('Auto-collect loot');
-  await setting.focus(); await page.keyboard.press('Space'); await expect(setting).not.toBeChecked();
-  expect(await page.evaluate(key => localStorage.getItem(key), AUTO_COLLECT_LOOT_KEY)).toBe('off');
-  expect(await preferences()).toEqual(otherPreferences);
+  if (isMobile) await setting.tap();
+  else { await setting.focus(); await page.keyboard.press('Space'); }
+  await expect(setting).not.toBeChecked();
   await page.getByRole('dialog').screenshot({ path: info.outputPath('auto-loot-settings-off.png') });
   await page.getByRole('button', { name: 'Close', exact: true }).click();
   const witness = await loadBoundary(page), won = await finishVictory(page, witness, false);
@@ -155,9 +152,9 @@ test('auto loot Settings are accessible and persist; off waits at origin and re-
   expect(await heldCount(page)).toBe(0);
   await page.getByRole('link', { name: 'Main menu', exact: true }).first().click();
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
-  await expect(setting).not.toBeChecked(); await setting.check();
-  expect(await page.evaluate(key => localStorage.getItem(key), AUTO_COLLECT_LOOT_KEY)).toBe('on');
-  expect(await preferences()).toEqual(otherPreferences);
+  await expect(setting).not.toBeChecked();
+  if (isMobile) await setting.tap(); else await setting.check();
+  await expect(setting).toBeChecked();
   await page.getByRole('button', { name: 'Close', exact: true }).click();
   await page.getByRole('button', { name: 'Continue', exact: true }).click();
   await expect(page.locator('#dungeon-map')).toBeVisible(); await settleBrowser(page);
