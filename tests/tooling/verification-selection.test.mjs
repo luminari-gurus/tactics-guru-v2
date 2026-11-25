@@ -70,6 +70,7 @@ test('each engine clears one full floor per profile and checks both pickup modes
     assert.deepEqual(profilesFor('auto loot Settings are accessible and persist; off waits at origin and re-enabling does not sweep old loot'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('fresh manual movement cancels a pending automatic step, including its stale callback'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('fresh preparation cancels a pending automatic step'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('hero progression commits once, heals at a threshold and survives inspection and reload'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('auto loot defaults on: one delayed ordinary step, pickup, enemy tick and durable resume'), allProfiles);
   }
 });
