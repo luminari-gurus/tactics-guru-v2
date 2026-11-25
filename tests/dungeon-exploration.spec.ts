@@ -308,7 +308,7 @@ test('live markers follow current sight across movement, art changes and reload'
     await expect(marker).toHaveText('M');
     await expect(marker).toHaveAttribute('data-cell', String(index));
     await expect(accessibleMap).toHaveAccessibleDescription(new RegExp(
-     `${label} at row ${Math.floor(index / map.width) + 1}, column ${index % map.width + 1}\\.`));
+     `${label} at row ${Math.floor(index / map.width) + 1}, column ${index % map.width + 1}\\. Available\\.`));
    } else {
     await expect(accessibleMap).not.toHaveAccessibleDescription(new RegExp(label));
    }
@@ -317,9 +317,25 @@ test('live markers follow current sight across movement, art changes and reload'
   await page.evaluate(({ key, text }) => localStorage.setItem(key, text), { key: DUNGEON_KEYS.primary, text: encoded.text });
   await page.goto('./?game=dungeon');
   await expectDungeonResumed(page);
+  const expectIdle = async () => {
+   const snapshot = await dungeonSnapshot(page);
+   await page.clock.runFor(5000);
+   expect(await dungeonSnapshot(page)).toEqual(snapshot);
+  };
   await check(before, !entering);
-  await walkDungeon(page, after.floors[0].position, isMobile ? 'touch' : 'keyboard');
+  if (entering) {
+   const saved = await page.evaluate(key => localStorage.getItem(key), DUNGEON_KEYS.primary);
+   await page.clock.install();
+   await expectIdle();
+   expect(await page.evaluate(key => localStorage.getItem(key), DUNGEON_KEYS.primary)).toBe(saved);
+   const cell = page.locator(`#dungeon-map [data-cell="${after.floors[0].position}"]`);
+   if (isMobile) await cell.tap();
+   else await cell.click();
+  } else {
+   await walkDungeon(page, after.floors[0].position, isMobile ? 'touch' : 'keyboard');
+  }
   await check(after, entering);
+  if (entering) await expectIdle();
   const previousSight = currentSight(before.floors[0].position, map);
   const nextSight = currentSight(after.floors[0].position, map);
   const remembered = previousSight.find(cell => !nextSight.includes(cell));
@@ -334,6 +350,7 @@ test('live markers follow current sight across movement, art changes and reload'
   await check(after, entering);
   await expect(rememberedCell).toHaveClass(/explore-remembered/);
   expectSameProgress(await dungeonSnapshot(page), after);
+  if (entering) await expectIdle();
  }
 });
 
@@ -840,37 +857,6 @@ for(const biome of ['forest','desert'] as const)test(`${biome} saved kinds, scal
  }
  await page.setViewportSize({width:393,height:852});await page.locator('#dungeon-map').scrollIntoViewIfNeeded();
  await page.screenshot({path:test.info().outputPath('square-overworld-mobile.png')});
-});
-
-test('dungeon enemies move only after a player step and persist across reload', async ({page,isMobile})=>{
- const base=freshDungeon('unordered-moving-browser',1), floor=base.floors[0], map=floorMap(floor.descriptor);
- const revealed=Array.from({length:map.cells.length},(_,i)=>i);
- const encoded=encodeDungeon({...base,floors:[{...floor,exploration:{...floor.exploration,revealed}}]});if(!encoded.ok)throw Error(encoded.reason);
- await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
- await page.goto('./?game=dungeon');await expectDungeonResumed(page);
- const before=await dungeonSnapshot(page), savedBefore=await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary);
- await page.clock.install();await page.clock.runFor(5000);
- expect(await dungeonSnapshot(page)).toEqual(before);expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe(savedBefore);
- const f=before.floors[0];
- // Uncleared enemies are described only within current sight; take the step that moves one into view.
- const movedInSight=(s:DungeonState)=>{const a=s.floors[0],sight=currentSight(a.position,map);
-  return a.exploration.pois.find(p=>poiCell(p,map.width)!==poiCell(f.exploration.pois.find(old=>old.id===p.id)!,map.width)&&sight.includes(poiCell(p,map.width)));};
- const destination=neighbors(f.position).find(n=>{if(!map.cells[n]||f.exploration.pois.some(p=>poiCell(p,map.width)===n))return false;
-  const r=stepDungeon(before,{id:before.id,depth:before.depth,revision:before.revision,destination:n});return r.ok&&movedInSight(r.state)!==undefined;});
- if(destination===undefined)throw Error('No safe step moves an enemy into sight');
- const cell=page.locator(`#dungeon-map [data-cell="${destination}"]`);if(isMobile)await cell.tap();else await cell.click();
- const after=await acceptedDungeonSnapshot(page,before,before.revision+1);expect(after.floors[0].exploration.movement!.step).toBe(1);
- expect(after.floors[0].exploration.pois).not.toEqual(before.floors[0].exploration.pois);
- const moved=movedInSight(after);expect(moved).toBeDefined();
- const markerCell=poiCell(moved!,map.width);
- const location=new RegExp(`at row ${Math.floor(markerCell / map.width) + 1}, column ${markerCell % map.width + 1}\\. Available\\.`);
- const accessibleMap=page.getByRole('application',{name:/Floor 1 map/});
- await expect(accessibleMap).toHaveAccessibleDescription(location);
- await page.clock.runFor(5000);expect(await dungeonSnapshot(page)).toEqual(after);
- await page.reload();await expectDungeonResumed(page);
- await expect(accessibleMap).toHaveAccessibleDescription(location);
- const resumed=await dungeonSnapshot(page);expectSameProgress(resumed,after);
- await page.clock.runFor(5000);expect(await dungeonSnapshot(page)).toEqual(resumed);
 });
 
 test('depth 8 saved floor renders and accepts a step after reload', async ({page,isMobile,browserName}) => {
