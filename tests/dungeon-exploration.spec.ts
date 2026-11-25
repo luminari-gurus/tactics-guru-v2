@@ -1165,7 +1165,7 @@ for(const interruption of ['restart','pagehide','visible'] as const)test(interru
    await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();
    await page.locator('#dungeon-confirm-new').click();
    await expect(page.locator('#dungeon-map')).toBeVisible();
-   const fresh=await dungeonSnapshot(page);expect(fresh.id).not.toBe(initial.id);expect(fresh.phase).toBe('ready');
+   const fresh=await dungeonSnapshot(page);expect(fresh.id).not.toBe(initial.id);expect(fresh.seed).not.toBe(initial.seed);expect(fresh.phase).toBe('ready');
   }else {
    await page.evaluate(()=>Object.defineProperty(document,'hidden',{configurable:true,value:true}));
   }
@@ -1191,6 +1191,10 @@ for(const interruption of ['restart','pagehide','visible'] as const)test(interru
    expect(resumed.id).toBe(retained.id);expect(resumed.activeBattle!.seed).toBe(retained.activeBattle!.seed);
    await expect(page.locator('canvas')).toHaveCount(1);
   }else await expect(page.locator('canvas')).toHaveCount(0);
+  if(interruption==='restart'){
+   await page.reload();await expectDungeonResumed(page);
+   expectSameProgress(await dungeonSnapshot(page),retained);
+  }
   expect(errors).toEqual([]);
  }finally {release();}
 });

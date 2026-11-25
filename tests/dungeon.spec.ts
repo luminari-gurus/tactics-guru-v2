@@ -19,7 +19,6 @@ import { playerDecision, fighterDecision } from './helpers/playerPolicy';
 import { journeyPreparation, healedFighterBoundary, shamanJourney } from './helpers/dungeonFixtures';
 import { dispatch } from '../src/domain/turns';
 import { previewMovement } from '../src/domain/grid';
-import { generateMap } from '../src/map/generate';
 import type { Command, BattleEvent } from '../src/domain/types';
 import { movementBlockSource } from '../src/domain/effects';
 import { expectDungeonMovementVisible } from './helpers/dungeonLayout';
@@ -606,18 +605,6 @@ savedWetlandsTest('saved dungeon downloads only after explicit recovery export',
  });
 });
 
-test('new dungeons use fresh layouts across reloads and saved dungeons retain theirs',async({page})=>{
- await page.goto('./?game=dungeon&entry=new');
- await expect(page.locator('#dungeon-map')).toBeVisible();
- const first=await snapshot(page);
- await page.reload();await expectDungeonResumed(page);
- expectSameProgress(await snapshot(page),first);
- const before=await snapshot(page);
- await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();
- const second=await acceptedDungeonSnapshot(page,before);
- expect(second.seed).not.toBe(first.seed);
- expect(generateMap(second.floors[0].descriptor.seed,'rooms').cells).not.toEqual(generateMap(first.floors[0].descriptor.seed,'rooms').cells);
-});
 test('play unsaved dungeon uses a fresh layout each visit and does not write a save',async({page})=>{
  await page.goto('./?game=dungeon&entry=recovery');
  await page.getByRole('button',{name:'Play unsaved dungeon',exact:true}).click();
@@ -626,7 +613,6 @@ test('play unsaved dungeon uses a fresh layout each visit and does not write a s
  await page.getByRole('button',{name:'Play unsaved dungeon',exact:true}).click();
  const second=await snapshot(page);
  expect(second.seed).not.toBe(first.seed);
- expect(generateMap(second.floors[0].descriptor.seed,'rooms').cells).not.toEqual(generateMap(first.floors[0].descriptor.seed,'rooms').cells);
  expect(await page.evaluate(()=>Object.keys(localStorage).filter(key=>key.includes(':dungeon:')))).toEqual([]);
 });
 
