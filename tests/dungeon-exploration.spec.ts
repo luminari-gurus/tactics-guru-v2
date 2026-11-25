@@ -452,13 +452,18 @@ test('movement controls stay visible with the player without scrolling on entry 
  const origin=terrain.cells.findIndex((open,cell)=>open===1&&!stairs.includes(cell)&&neighbors(cell,terrain.width).some(next=>terrain.cells[next]&&!stairs.includes(next)));
  const destination=neighbors(origin,terrain.width).find(next=>terrain.cells[next]&&!stairs.includes(next));
  if(origin<0||destination===undefined)throw Error('No safe visibility witness');
- const encoded=encodeDungeon(atCell(base,origin));if(!encoded.ok)throw Error(encoded.reason);
- await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
- await page.goto('./?game=dungeon');await expectDungeonResumed(page);
+ await openSavedDungeon(page,atCell(base,origin));
  const originalViewport=page.viewportSize()!;
  const party=await page.getByRole('region',{name:'Party',exact:true}).elementHandle();
  if(!party)throw Error('Missing party summary');
- const sizes=[originalViewport,{width:320,height:568},{width:393,height:684},{width:568,height:320},{width:667,height:375},{width:740,height:360},{width:393,height:852},originalViewport];
+ const portrait=[{width:320,height:568},{width:393,height:684},{width:393,height:852}];
+ const landscape=[{width:568,height:320},{width:667,height:375},{width:740,height:360}];
+ // Desktop exercises every size with a mouse. Each touch profile rotates into
+ // the opposite orientation, covers its three sizes, then returns to native.
+ const resized = isMobile
+  ? (originalViewport.width < originalViewport.height ? landscape : portrait)
+  : [...portrait, ...landscape];
+ const sizes=[originalViewport,...resized,originalViewport];
  const delta=destination-origin,name=delta===-terrain.width?'north':delta===terrain.width?'south':delta===1?'east':'west';
  const reverse={north:'south',south:'north',east:'west',west:'east'}[name];
  const activate=async(id:string)=>{
