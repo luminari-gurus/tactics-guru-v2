@@ -88,7 +88,7 @@ test('ground loot: legal victory saves one item at contact and a manual pickup s
  }
 });
 
-test('ground loot: full capacity keeps same-cell rewards and retries on discard without moving enemies',async({page,isMobile})=>{
+test('ground loot: full capacity keeps same-cell rewards and retries on discard without moving enemies', { tag: '@desktop-chromium-portrait-webkit' }, async({page,isMobile})=>{
  test.setTimeout(60000);
  await page.addInitScript(()=>{document.hasFocus=()=>false;});
  const {state,cell}=sharedGroundPile(6);await loadGroundLootBoundary(page,state);
