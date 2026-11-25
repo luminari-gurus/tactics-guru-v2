@@ -5,8 +5,8 @@ const basePath = process.env.PLAYWRIGHT_BASE_PATH ?? '/';
 const serverMode = process.env.PLAYWRIGHT_SERVER_MODE === 'dev' ? 'dev' : 'preview';
 const baseURL = `http://127.0.0.1:4173${basePath}`;
 
-// Keep every full-floor journey on desktop. Touch profiles split saved automatic
-// pickup (portrait) and unsaved manual pickup (landscape) within each engine.
+// Each engine clears one full floor per profile: saved manual pickup on desktop,
+// saved automatic pickup on portrait, and unsaved manual pickup on landscape.
 export const redundantProfileJourneys = [
   /^(?:mobile-portrait|mobile-landscape|portrait-webkit|landscape-webkit) .*@desktop-keyboard(?: |$)/,
   // Cover an occupied loot tile with a landscape Chromium tap and a desktop WebKit click.
@@ -19,8 +19,8 @@ export const redundantProfileJourneys = [
   // One real reload per engine verifies that boot leaves the automatic pickup unscheduled.
   /^(?:mobile-portrait|mobile-landscape|portrait-webkit|landscape-webkit) .*reload before the pending step restores the ground pile without surprise movement or collection$/,
   /^(?:mobile-portrait|mobile-landscape|portrait-webkit|landscape-webkit) .*saved menu dungeon keeps proof tools hidden across legal encounters$/,
-  /^(?:mobile-portrait|portrait-webkit) .*testing dungeon legally clears a floor, descends and backtracks without accessing saves$/,
-  /^(?:mobile-landscape|landscape-webkit) .*saved menu dungeon auto-collects loot across a complete first floor$/,
+  /^(?:desktop|desktop-webkit|mobile-portrait|portrait-webkit) .*testing dungeon legally clears a floor, descends and backtracks without accessing saves$/,
+  /^(?:desktop|desktop-webkit|mobile-landscape|landscape-webkit) .*saved menu dungeon auto-collects loot across a complete first floor$/,
 ];
 
 export default defineConfig({

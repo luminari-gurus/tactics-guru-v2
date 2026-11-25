@@ -41,7 +41,7 @@ test('real discoveries preserve every retained ID with the approved desktop and 
   }
 });
 
-test('each engine splits full-floor touch journeys and checks both pickup modes in every orientation', () => {
+test('each engine clears one full floor per profile and checks both pickup modes in every orientation', () => {
   for (const [stage, desktop] of [['chromium', 'desktop'], ['webkit-exploration', 'desktop-webkit']]) {
     const { tests, projects } = after.selections[stage];
     const profilesFor = title => tests.filter(row => row.title === title).map(row => row.project).sort();
@@ -49,8 +49,8 @@ test('each engine splits full-floor touch journeys and checks both pickup modes 
     assert.deepEqual(profilesFor('saved menu dungeon keeps proof tools hidden across legal encounters'), [desktop]);
     const portrait = allProfiles.find(name => name.includes('portrait'));
     const landscape = allProfiles.find(name => name.includes('landscape'));
-    assert.deepEqual(profilesFor('testing dungeon legally clears a floor, descends and backtracks without accessing saves'), [desktop, landscape].sort());
-    assert.deepEqual(profilesFor('saved menu dungeon auto-collects loot across a complete first floor'), [desktop, portrait].sort());
+    assert.deepEqual(profilesFor('testing dungeon legally clears a floor, descends and backtracks without accessing saves'), [landscape]);
+    assert.deepEqual(profilesFor('saved menu dungeon auto-collects loot across a complete first floor'), [portrait]);
     assert.deepEqual(profilesFor('closing on the guardian first holds contact and resumes its battle'),
       [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('Guardian-first reward, map and encounter state survive claim and reload at depth 5'),
