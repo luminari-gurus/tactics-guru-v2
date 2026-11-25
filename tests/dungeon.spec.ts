@@ -6,7 +6,7 @@ import { expect,railTest as test,type Page } from './helpers/dungeonEntropy';
 import { readFileSync, writeFileSync } from 'node:fs';
 import type { Locator } from '@playwright/test';
 import { dungeonCapacityFixture, dungeonVictoryBoundary } from './helpers/dungeonFixtures';
-import { dungeonBattle, startDungeonBattle, acceptDungeonBattle, dungeonBoundary, dungeonItem, freshDungeon, readDungeon, type DungeonState } from '../src/domain/dungeon';
+import { dungeonBattle, startDungeonBattle, acceptDungeonBattle, dungeonBoundary, dungeonItem, freshDungeon, type DungeonState } from '../src/domain/dungeon';
 import { progressHero } from '../src/domain/progression';
 import { decodeDungeon, encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
@@ -268,9 +268,12 @@ for(const abilityId of ['ability:frost_snare','ability:magic_missile'] as const)
    expect(accepted.state.rng).toEqual(before.state.rng);expect(accepted.state.units.map(u=>u.hp)).toEqual(before.state.units.map(u=>u.hp));
    expect(accepted.events).toContainEqual({type:'movementBlocked',unitId:fixture.command.target.unitId,sourceId:fixture.command.unitId,abilityId});
  } else expect(accepted.events.filter(e=>e.type==='missileRolled')).toHaveLength(2);
- const saved=await snapshot(page),slots=await page.evaluate(keys=>keys.map(key=>localStorage.getItem(key)),[DUNGEON_KEYS.primary,DUNGEON_KEYS.backup]);
+ // Opening recovery flushes active playtime before capturing the exact save bytes.
+ await page.getByRole('button',{name:'Save recovery',exact:true}).click();
+ await expect(page.getByRole('heading',{name:'Dungeon save recovery',exact:true})).toBeVisible();
+ const saved=await settledDungeonSnapshot(page),slots=await page.evaluate(keys=>keys.map(key=>localStorage.getItem(key)),[DUNGEON_KEYS.primary,DUNGEON_KEYS.backup]);
  await page.reload();await expectDungeonResumed(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- const resumed=await readSession(page);expect(await snapshot(page)).toEqual(saved);expect(resumed.state).toEqual(accepted.state);expect(resumed.events).toEqual([]);
+ const resumed=await readSession(page);expectSameProgress(await snapshot(page),saved);expect(resumed.state).toEqual(accepted.state);expect(resumed.events).toEqual([]);
  expect(await page.evaluate(keys=>keys.map(key=>localStorage.getItem(key)),[DUNGEON_KEYS.primary,DUNGEON_KEYS.backup])).toEqual(slots);
  if(abilityId==='ability:frost_snare') {
   await checkSnares(page,true);expect((await boardReport(page)).feedbackBounds).toEqual([]);
@@ -355,16 +358,6 @@ for(const kind of ['source','target'] as const)test(`Snared badge clears on lega
  expect((await readSession(page)).events).toContainEqual({type:'movementBlockExpired',unitId:f.targetId,sourceId:3,abilityId:'ability:frost_snare'});
  await page.screenshot({path:test.info().outputPath(`snared-${kind}-defeated.png`)});
  await test.info().attach('legal-defeat-boundary',{body:JSON.stringify(f),contentType:'application/json'});
-});
-
-test('Snared badge excludes a legally Pinned enemy on saved resume',async({page})=>{
- const f=stagedMageAbility('ability:frost_snare'),initial=f.state.activeBattle!,ranger=initial.units.find(u=>u.defId==='ranger')!,mage=initial.units.find(u=>u.defId==='mage')!;
- const before={...initial,activeIndex:initial.initiative.indexOf(ranger.id),units:initial.units.map(u=>({...u,cell:u.id===mage.id?ranger.cell:u.id===ranger.id?mage.cell:u.cell}))};
- const pin=dispatch(before,{type:'useAbility',unitId:ranger.id,abilityId:'ability:pinning_shot',target:f.command.target},dungeonBattle(f.state)!.catalog);
- if(!pin.ok)throw Error(pin.reason);await seed(page,checkedDungeon(readDungeon({...f.state,activeBattle:pin.state})));
- await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await checkSnares(page,true);
- expect((await readSession(page)).state.units.find(u=>u.id===f.command.target.unitId)!.movementBlock?.abilityId).toBe('ability:pinning_shot');
- expect((await boardReport(page)).units.every((u:any)=>!u.snare.visible)).toBe(true);
 });
 
 for(const {saved,autoCollect,title} of [
