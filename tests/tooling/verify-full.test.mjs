@@ -13,16 +13,16 @@ test('required failures do not suppress later suites and fail the aggregate', ()
   assert.equal(result.exitCode, 1);
 });
 
-test('failed build blocks stale preview but still runs dev fixtures and restoration', () => {
+test('failed build blocks stale preview but still runs development checks and restoration', () => {
   const visited = [];
   const result = runStages(stages, stage => {
     visited.push(stage.id); return { exitCode: stage.id.startsWith('build-') ? 1 : 0 };
   });
-  for (const id of ['chromium', 'webkit-acceptance', 'webkit-exploration', 'health-bars', 'performance', 'assets-prefix-preview']) {
+  for (const id of ['chromium', 'webkit-acceptance', 'webkit-exploration', 'assets-prefix-preview']) {
     assert.equal(result.results.find(r => r.id === id).status, 'blocked');
     assert.ok(!visited.includes(id));
   }
-  for (const id of ['fixtures', 'placement-dev', 'telemetry-production', 'telemetry-development', 'assets-prefix-dev', 'restore-root']) assert.ok(visited.includes(id));
+  for (const id of ['telemetry-production', 'telemetry-development', 'assets-prefix-dev', 'restore-root']) assert.ok(visited.includes(id));
   assert.equal(result.exitCode, 1);
 });
 
@@ -38,10 +38,12 @@ test('signals, spawn errors and exceptions remain failures; results are checkpoi
   assert.equal(result.exitCode, 1);
 });
 
-test('all successful stages pass and fixture selection is combined exactly once', () => {
+test('all successful stages pass with only the supported browser stages', () => {
   assert.equal(runStages(stages, () => ({ exitCode: 0 })).exitCode, 0);
-  assert.equal(stages.filter(s => s.id === 'fixtures').length, 1);
-  assert.ok(stages.find(s => s.id === 'fixtures').args.includes('playwright.fixtures.config.ts'));
+  assert.deepEqual(stages.filter(stage => stage.browser).map(stage => stage.id), [
+    'chromium', 'webkit-acceptance', 'webkit-exploration', 'telemetry-production',
+    'telemetry-development', 'assets-root-dev', 'assets-prefix-preview', 'assets-prefix-dev',
+  ]);
 });
 
 test('ordinary bundles reuse one unit/content pass and both type scopes', () => {
@@ -69,11 +71,11 @@ test('failed units or types block unchecked bundles while independent coverage c
       return { exitCode: stage.id === failed ? 1 : 0 };
     });
     for (const id of ['build-root', 'build-prefix', 'restore-root', 'chromium',
-      'webkit-acceptance', 'webkit-exploration', 'health-bars', 'performance', 'assets-prefix-preview']) {
+      'webkit-acceptance', 'webkit-exploration', 'assets-prefix-preview']) {
       assert.equal(result.results.find(stage => stage.id === id).status, 'blocked', `${failed}: ${id}`);
       assert.ok(!visited.includes(id));
     }
-    for (const id of ['build-integration', 'fixtures', 'placement-dev', 'telemetry-production',
+    for (const id of ['build-integration', 'telemetry-production',
       'telemetry-development', 'assets-root-dev', 'assets-prefix-dev']) assert.ok(visited.includes(id));
     assert.equal(result.exitCode, 1);
   }
@@ -99,10 +101,10 @@ test('aggregate refuses filters that could silently narrow required coverage', (
   assert.throws(() => main(['--project=desktop']), /filters belong/);
 });
 
-test('full verification captures the local build despite an inherited remote FIT_URL', async () => {
+test('stage environments clear inherited FIT_URL independently of the manual collector', async () => {
   const { execFileSync } = await import('node:child_process');
   const inherited = { FIT_URL: 'https://previous-deployment.example/game/' };
-  const env = stageEnvironment(stages.find(s => s.id === 'performance'), '/reports', inherited);
+  const env = stageEnvironment(stages.find(s => s.id === 'chromium'), '/reports', inherited);
   // Use the collector's real parser; the flag also supports Node 22.12's TS loader.
   const parser = new URL('../../scripts/measure-fit-options.ts', import.meta.url).href;
   const parsed = JSON.parse(execFileSync(process.execPath, [

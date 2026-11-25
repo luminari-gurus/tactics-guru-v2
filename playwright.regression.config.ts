@@ -8,8 +8,7 @@ const baseURL = `http://127.0.0.1:4173${basePath}`;
 export default defineConfig({
   testDir: './tests',
   testMatch: '**/*.spec.ts',
-  // Source-entry fixtures run under the explicit test:fixtures dev-server command.
-  testIgnore: ['**/dungeon-extended.spec.ts', '**/telemetry.spec.ts', '**/ability-picker.spec.ts', '**/authored-encounters.spec.ts', '**/run-items.spec.ts'],
+  testIgnore: ['**/dungeon-extended.spec.ts', '**/telemetry.spec.ts'],
   // Phaser renderers share the host GPU; serialize to avoid headless boot contention.
   workers: 1,
   use: {
@@ -24,7 +23,7 @@ export default defineConfig({
   projects: [
     // 1.64 forwards descriptor.screen; retain the former viewport-based screen.
     { name: 'desktop', use: { ...devices['Desktop Chrome'], screen: undefined, channel: 'chromium' } },
-    { name: 'mobile-portrait', grepInvert: /@canonical/, use: { ...devices['Pixel 7'], screen: undefined, channel: 'chromium' } },
-    { name: 'mobile-landscape', grepInvert: /@canonical|@fixed-viewport/, use: { ...devices['Pixel 7'], screen: undefined, channel: 'chromium', viewport: { width: 915, height: 412 } } },
+    { name: 'mobile-portrait', use: { ...devices['Pixel 7'], screen: undefined, channel: 'chromium' } },
+    { name: 'mobile-landscape', use: { ...devices['Pixel 7'], screen: undefined, channel: 'chromium', viewport: { width: 915, height: 412 } } },
   ],
 });

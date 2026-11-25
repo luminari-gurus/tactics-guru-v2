@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { menuFixture } from './helpers/menuFixtures';
 import { generateMap } from '../src/map/generate';
 import { readFileSync } from 'node:fs';
-import { type Page, type Response, type Locator } from '@playwright/test';
+import { type Page, type Locator } from '@playwright/test';
 import { test as base, expect } from './helpers/dungeonEntropy';
 import { encodeDungeon, WALL_SIGHT_STATS_SAVE_FORMAT } from '../src/domain/dungeonSaveEnvelope';
 import { freshRunStats } from '../src/domain/runStats';
@@ -11,12 +11,7 @@ import { RUN_STORAGE_KEYS } from '../src/persistence/runStorage';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { appendRunRecord, emptyRunRecords, type RunRecord } from '../src/domain/runRecords';
 import { encodeRunRecords, RUN_RECORD_KEYS } from '../src/persistence/runRecordsStorage';
-import { readSession, playerDecision } from './helpers/battlePolicy';
-import { BattleSession } from '../src/app/BattleSession';
-import { encodeBattleSave } from '../src/domain/saveEnvelope';
-import { standaloneCatalog as battleCatalog } from './helpers/playerPolicy';
 import { startApplicationLoadDiagnostics, type ApplicationLoadDiagnostics } from './helpers/applicationLoadDiagnostics';
-import { startBattleModuleFaultServer } from './helpers/battleModuleFaultServer';
 import { holdFinalRecordsWrite } from './helpers/recordsWriteGate';
 
 const test = base.extend<{ applicationLoadDiagnostics: ApplicationLoadDiagnostics }>({
@@ -244,7 +239,7 @@ test('main menu: startup hides proof tools before application modules run',async
   else await route.continue();
  });
  try{
-  for(const route of ['', '?game=battle', '?game=run', '?game=dungeon', 'battle', 'run', 'dungeon', 'map']){
+  for(const route of ['', '?game=dungeon', 'dungeon']){
    held=new Promise<void>(resolve=>{release=resolve;});
    await page.goto('./'+route,{waitUntil:'commit'});
    await expect(page.locator('#fit-status')).toBeVisible();
@@ -266,102 +261,26 @@ test('main menu: startup hides proof tools before application modules run',async
 
 test('main menu: failed gameplay imports retain visible recovery without proof tools',async({page})=>{
  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
- await page.route(/\/start(?:Battle|Run|Dungeon)App(?:-[^/]+\.js|\.ts)(?:\?|$)/,route=>route.abort());
- for(const mode of ['battle','run','dungeon']){
-  await page.goto(mode==='dungeon'?'./?game=dungeon':`./?game=${mode}&entry=new`);
-  await expect(page.getByRole('alert')).toHaveText('Error: Could not load the application. Reload the page to retry.');
-  await expect(page.getByRole('alert')).toBeVisible();
-  await expect(page.getByText('Board controls',{exact:true})).not.toBeVisible();
-  await expect(page.getByText('Measurements',{exact:true})).not.toBeVisible();
-  await expect(page.getByRole('complementary',{name:'Proof scene diagnostics'})).toHaveCount(0);
- }
+ await page.route(/\/startDungeonApp(?:-[^/]+\.js|\.ts)(?:\?|$)/,route=>route.abort());
+ await page.goto('./?game=dungeon');
+ await expect(page.getByRole('alert')).toHaveText('Error: Could not load the application. Reload the page to retry.');
+ await expect(page.getByRole('alert')).toBeVisible();
+ await expect(page.getByText('Board controls',{exact:true})).not.toBeVisible();
+ await expect(page.getByText('Measurements',{exact:true})).not.toBeVisible();
+ await expect(page.getByRole('complementary',{name:'Proof scene diagnostics'})).toHaveCount(0);
  expect(errors).toEqual([]);
 });
 
-test('main menu: application import failure preserves legacy bytes and reload starts a fresh battle',async({page,browserName,applicationLoadDiagnostics},info)=>{
- test.skip(process.env.PLAYWRIGHT_SERVER_MODE==='dev','Requires emitted production chunks and the build manifest.');
- // Reach a real accepted High Shot boundary, retaining different valid primary
- // and backup bytes so a reload cannot silently replace either saved slot.
- const session=new BattleSession(battleCatalog,'map:forest_ruins',2);
- let saved:{primary:string;backup:string;state:typeof session.state}|undefined;
- try {
-  for(let i=0;i<200 && session.state.outcome==='ongoing';i++){
-   const command=session.phase==='player'?playerDecision(session.state):null;
-   if(command && !session.prepare(command).ok)throw Error('Recovery fixture policy rejected');
-   const step=command?session.confirm():session.nextEnemy();
-   if(!step)throw Error('Recovery fixture did not advance');
-   session.finishPresentation(step.token);
-   if(command?.type==='useAbility' && command.abilityId==='ability:high_shot'){
-    const primary=encodeBattleSave(step.after,battleCatalog),backup=encodeBattleSave(step.before,battleCatalog);
-    if(!primary.ok || !backup.ok)throw Error('Recovery fixture could not be encoded');
-    saved={primary:primary.text,backup:backup.text,state:step.after};break;
-   }
-  }
- } finally { session.dispose(); }
- if(!saved)throw Error('No legal saved High Shot boundary');
- expect(saved.primary).not.toBe(saved.backup);
- const bytes={primary:saved.primary,backup:saved.backup};
- const stored=()=>page.evaluate(slots=>({primary:localStorage.getItem(slots.primary),backup:localStorage.getItem(slots.backup)}),keys.battle);
- await page.addInitScript(({slots,bytes})=>{
-  if(!sessionStorage.getItem('test:application-load-seeded')){
-   localStorage.setItem(slots.primary,bytes.primary);localStorage.setItem(slots.backup,bytes.backup);
-   sessionStorage.setItem('test:application-load-seeded','yes');
-  }
- },{slots:keys.battle,bytes});
- const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
- await page.clock.install();
- const faultServer=await startBattleModuleFaultServer();
- let failedResponses=0,recoveryVerified=false;
- const observeEntryResponse=(response:Response)=>{if(faultServer.isModuleURL(response.url()) && response.status()===503)failedResponses++;};
- page.on('response',observeEntryResponse);
- // The first document receives a real server HTTP 503 with the legal save seeded.
- // The origin stays fixed; recovery serves the unchanged build through Vite.
- try {
-  await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
-  await page.goto(faultServer.battleURL);
-  await expect.poll(()=>faultServer.receipt().blocked).toBeGreaterThan(0);
-  await expect.poll(()=>failedResponses).toBeGreaterThan(0);
-  await expect(page.getByRole('alert')).toHaveText('Error: Could not load the application. Reload the page to retry.');
-  await expect(page.getByRole('alert')).toBeVisible();await expect(page.locator('#save-continue')).toHaveCount(0);
-  expect(await stored()).toEqual(bytes);
-  await expect.poll(()=>applicationLoadDiagnostics.failures().length).toBe(1);
-  const [failure]=applicationLoadDiagnostics.failures();
-  expect(failure).toMatchObject({route:'battle',name:'TypeError',category:'module-fetch'});
-  // Chromium includes the failed module URL in the caught error. Check that
-  // both the browser and host allowlists retain the real emitted filename.
-  if(browserName==='chromium'){
-   expect(failure.frames).toEqual(expect.arrayContaining([{file:faultServer.receipt().assets[0].file}]));
-  }
-  const allowedBeforeRecovery=faultServer.receipt().allowed;faultServer.allowImport();
-  await page.reload();await page.clock.resume();
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-  expect(faultServer.receipt().allowed).toBeGreaterThan(allowedBeforeRecovery);
-  await expect.poll(()=>faultServer.receipt().assets.reduce((sum,asset)=>sum+asset.responses['200']+asset.responses['304'],0)).toBeGreaterThan(0);
-  const fresh=await readSession(page);
-  expect(fresh.state.seed).toBe(1);
-  expect(fresh.continuation).toBeNull();expect(fresh.pending).toBeNull();
-  expect(JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!).effect).toBeNull();
-  expect(await stored()).toEqual(bytes);expect(errors).toEqual([]);
-  await expect(page.locator('link[rel="modulepreload"][href*="/assets/startBattleApp-"]')).toHaveCount(0);
-  recoveryVerified=true;
- } finally {
-  page.off('response',observeEntryResponse);
-  try {
-   await info.attach('application-load-recovery',{body:JSON.stringify({...faultServer.receipt(),recoveryVerified,
-    injectedResponse:{status:503,cacheControl:'no-store',observed:failedResponses},failures:applicationLoadDiagnostics.failures()},null,2),contentType:'application/json'});
-  } finally { await faultServer.close(); }
- }
-});
-
-for(const mode of ['run','dungeon'] as const)test(`main menu: post-mount ${mode} failure remains visible and preserves saves`,async({page},info)=>{
+test('main menu: post-mount dungeon failure remains visible and preserves saves',async({page},info)=>{
+ const mode = 'dungeon';
  const saved=menuFixture(mode);
  const backup='preserved recovery bytes';
  await page.addInitScript(({slots,saved,backup})=>{localStorage.setItem(slots.primary,saved);localStorage.setItem(slots.backup,backup);},{slots:keys[mode],saved,backup});
- await page.route(/\/start(?:Run|Dungeon)App(?:-[^/]+\.js|\.ts)(?:\?|$)/,async route=>{
+ await page.route(/\/startDungeonApp(?:-[^/]+\.js|\.ts)(?:\?|$)/,async route=>{
   const response=await route.fetch();
   await route.fulfill({response,body:(await response.text())+'\nthrow new Error("review: post-mount initialization failed");\n'});
  });
- await page.goto(mode==='dungeon'?'./?game=dungeon':`./?game=${mode}&entry=new`);
+ await page.goto('./?game=dungeon');
  await expect(page.getByRole('alert')).toHaveText('Error: Could not load the application. Reload the page to retry.');
  await expect(page.getByRole('alert')).toBeInViewport();
  await expect(page.locator('#fit-board-controls')).not.toBeVisible();
@@ -370,36 +289,6 @@ for(const mode of ['run','dungeon'] as const)test(`main menu: post-mount ${mode}
  await page.screenshot({path:info.outputPath(`${mode}-post-mount-error.png`)});
 });
 
-test('main menu: run preparation runtime errors use one visible alert and preserve saves',async({page},info)=>{
- const saved=menuFixture('run');
- const backup='preserved recovery bytes';
- await page.addInitScript(({slots,saved,backup})=>{localStorage.setItem(slots.primary,saved);localStorage.setItem(slots.backup,backup);},{slots:keys.run,saved,backup});
- await page.goto('./?game=run&entry=new');await expect(page.locator('#run-start')).toBeVisible();
- for(let i=0;i<2;i++){
-  await page.evaluate(()=>window.dispatchEvent(new ErrorEvent('error',{message:'review: renderer initialization failed'})));
-  await expect(page.getByRole('alert')).toHaveCount(1);
-  await expect(page.getByRole('alert')).toHaveText('Error: The run encountered a runtime error. Reload to retry.');
-  await expect(page.getByRole('alert')).toBeInViewport();
- }
- await expect(page.locator('#fit-board-controls')).not.toBeVisible();
- await expect(page.locator('#fit-measurements')).not.toBeVisible();
- expect(await page.evaluate(slots=>({primary:localStorage.getItem(slots.primary),backup:localStorage.getItem(slots.backup)}),keys.run)).toEqual({primary:saved,backup});
- await page.screenshot({path:info.outputPath('run-preparation-error.png')});
-});
-
-test('main menu: repeated scene selectors use the first value throughout startup',async({page})=>{
- await page.goto('./?scene=unknown&scene=proof');
- await expect(page.locator('[data-menu-action]')).toHaveCount(4);
- await expect(page.locator('canvas')).toHaveCount(0);
- await page.goto('./?game=run&entry=new&scene=unknown&scene=proof');
- await expect(page.locator('#run-start')).toBeVisible();
- for(const scene of ['proof','content-smoke']){
-  await page.goto(`./?game=run&scene=${scene}&scene=unknown`);
-  await expect(page.locator('#fit-status')).toHaveText(scene==='proof'?'Ready':'Content ready');
-  await expect(page.locator('#game')).not.toHaveAttribute('data-session',/.+/);
- }
- await page.screenshot({path:test.info().outputPath('repeated-scene.png')});
-});
 test('main menu: read-only root, separate artwork and isolated loading',async({page})=>{
  const requests:string[]=[];page.on('request',r=>requests.push(r.url()));
  await page.addInitScript(()=>{Storage.prototype.setItem=function(k,v){throw Error(`Unexpected menu write ${k}`);};});
@@ -410,9 +299,6 @@ test('main menu: read-only root, separate artwork and isolated loading',async({p
  const image=page.getByRole('img',{name:'Tactics Guru'});await expect(image).toBeVisible();
  expect(await image.evaluate(n=>(n as HTMLImageElement).naturalWidth/(n as HTMLImageElement).naturalHeight)).toBe(3);
  await expect(page.locator('canvas')).toHaveCount(0);
- await expect(page.getByRole('link',{name:'Standalone battle',exact:true})).toHaveAttribute('href',/\?game=battle&entry=new$/);
- await expect(page.getByRole('link',{name:'Three-encounter run',exact:true})).toHaveAttribute('href',/\?game=run&entry=new$/);
- await expect(page.getByRole('link',{name:'Map inspection',exact:true})).toHaveAttribute('href',/\/map$/);
  expect(requests.some(url=>/\/start-[^/]+\.js|\.mp3|\.ogg|\/battle\/audio/.test(url))).toBe(false);
  await page.getByRole('button',{name:'Hall of Records'}).click();await expect(page.getByRole('dialog')).toContainText('No finished journeys recorded yet');
  await page.keyboard.press('Escape');await expect(page.getByRole('button',{name:'Hall of Records'})).toBeFocused();
@@ -450,21 +336,6 @@ test('main menu: legacy battle and run slots are ignored through launch and dung
   const getValues = (names: string[]) => page.evaluate(names=>Object.fromEntries(names.map(key=>[key,localStorage.getItem(key)])),names);
   const watched = [...Object.keys(seed),...Object.values(keys.dungeon),RUN_RECORD_KEYS.backup];
   const before = await getValues(watched);
-
-  for (const [name,mode] of [['Standalone battle','battle'],['Three-encounter run','run']] as const) {
-    await page.getByRole('link',{name,exact:true}).click();
-    await expect(page).toHaveURL(new RegExp('[?]game='+mode+'&entry=new$'));
-    if(mode==='run'){
-      await page.locator('#run-start').click();
-      await page.locator('#run-start-encounter').click();
-    }
-    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-    await expect(page.getByText('Progress resets on reload or when you leave.',{exact:true})).toBeVisible();
-    await expect(page.getByRole('button',{name:/Continue saved|Save recovery/})).toHaveCount(0);
-    await page.getByRole('link',{name:'Main menu',exact:true}).click();
-    await expect(menu).toBeEnabled();
-    expect(await getValues(watched)).toEqual(before);
-  }
 
   await menu.click();
   await expect(page).toHaveURL(/[?]game=dungeon$/);
@@ -725,7 +596,7 @@ for(const path of ['unsaved play','failed replacement'] as const)test(`main menu
  const accept=page.waitForEvent('dialog');const leave=page.getByRole('link',{name:'Main menu',exact:true}).click();
  await (await accept).accept();await leave;await expect(page.locator('#main-menu')).toBeVisible();
 });
-for (const route of ['nonexistent', '?game=zzz', '?game=run&game=battle', '?game=battle', '?game=run']) test(`main menu: invalid entry ${route} returns to the root`, async ({ page }) => {
+for (const route of ['nonexistent', '?game=zzz']) test(`main menu: invalid entry ${route} returns to the root`, async ({ page }) => {
  await page.goto('./'+route);
  await expect(page).toHaveURL(new URL('./', test.info().project.use.baseURL!).href);
  await expect(page.locator('[data-menu-action]')).toHaveCount(4);
@@ -812,142 +683,4 @@ test('main menu: five-stat records and retained personal bests stay keyboard and
   await expect(dialog.locator('.run-personal-bests')).toHaveCount(0);await expect(dialog.getByRole('status')).toContainText('No finished journeys recorded yet.');
   const cleared=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!),RUN_RECORD_KEYS.primary);
   expect(cleared.records).toEqual([]);expect(cleared.bests).toEqual({run:{},dungeon:{}});
-});
-
-test('main menu: class guidance settings persist and reset tutorials without changing battle progress',async({page},info)=>{
-  test.setTimeout(90000);
-  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
-  const key='tactics-guru:class-guidance';
-  const preferences=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)!),key);
-  const otherStorage=()=>page.evaluate(key=>Object.fromEntries(Object.keys(localStorage).filter(name=>name!==key).sort()
-    .map(name=>[name,localStorage.getItem(name)])),key);
-  const activate=async(control:Locator)=>{
-    if(info.project.use.hasTouch)await control.tap();
-    else {await control.focus();await page.keyboard.press('Enter');}
-  };
-  const toggle=async(control:Locator)=>{
-    if(info.project.use.hasTouch)await control.tap();
-    else {await control.focus();await page.keyboard.press('Space');}
-  };
-  const ready=()=>expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-  const guidance=page.locator('#battle-class-guidance');
-  await page.goto('./?game=battle&entry=new');await ready();
-  const skin=await page.evaluate(()=>document.body.dataset.combatSkin);
-  await expect(page.locator('#battle-guidance-teaching')).toHaveAttribute('data-tutorial-id',`preview:${skin}:v1`);
-  await expect(page.locator('#battle-guidance-teaching')).toContainText(skin==='radial'?'Tapping an action':'Confirm action');
-  const first=await readSession(page);await activate(page.locator('#battle-guidance-dismiss'));
-  await expect(guidance).toBeHidden();expect(await readSession(page)).toEqual(first);
-  const acknowledged=await preferences();expect(acknowledged.seen.length).toBeGreaterThan(0);
-  const untouchedStorage=await otherStorage();
-  await page.goto('./');
-  const settings=page.getByRole('button',{name:'Settings',exact:true});
-  await activate(settings);
-  const dialog=page.getByRole('dialog',{name:'Settings',exact:true});
-  const enabled=dialog.locator('[data-class-guidance-enabled]'),reset=dialog.locator('[data-class-guidance-reset]');
-  expect(await enabled.evaluate(input=>input.closest('label')!.getBoundingClientRect().height)).toBeGreaterThanOrEqual(44);
-  await expect(enabled).toBeChecked();await toggle(enabled);await expect(enabled).not.toBeChecked();
-  expect(await preferences()).toEqual({...acknowledged,enabled:false});
-  await activate(dialog.getByRole('button',{name:'Close',exact:true}));await expect(settings).toBeFocused();
-  await page.reload();await activate(settings);await expect(enabled).not.toBeChecked();
-  await activate(reset);await expect(enabled).not.toBeChecked();
-  expect(await preferences()).toMatchObject({version:1,enabled:false,seen:[]});
-  if(!info.project.use.hasTouch)await expect(reset).toBeFocused();
-  await page.screenshot({path:info.outputPath('class-guidance-settings-reset-disabled.png')});
-  await toggle(enabled);await expect(enabled).toBeChecked();
-  await activate(dialog.getByRole('button',{name:'Close',exact:true}));
-  await activate(page.getByRole('link',{name:'Standalone battle',exact:true}));await ready();
-  await expect(guidance).toBeVisible();await expect(page.locator('#battle-guidance-teaching')).toBeVisible();
-  const before=await readSession(page);await activate(page.locator('#battle-guidance-dismiss'));
-  await expect(guidance).toBeHidden();expect(await readSession(page)).toEqual(before);
-  const more=page.locator('#battle-overflow');await activate(more.locator(':scope > summary'));
-  const moreEnabled=more.locator('[data-class-guidance-enabled]'),moreReset=more.locator('[data-class-guidance-reset]');
-  expect(await moreEnabled.evaluate(input=>input.closest('label')!.getBoundingClientRect().height)).toBeGreaterThanOrEqual(44);
-  await expect(moreEnabled).toBeChecked();await activate(moreReset);
-  await expect(guidance).toBeVisible();await expect(page.locator('#battle-guidance-teaching')).toBeVisible();
-  expect(await preferences()).toMatchObject({version:1,enabled:true,seen:[]});
-  expect(await readSession(page)).toEqual(before);
-  if(!info.project.use.hasTouch)await expect(moreReset).toBeFocused();
-  expect(await guidance.evaluate(element=>element.contains(document.activeElement))).toBe(false);
-  await toggle(moreEnabled);await expect(guidance).toBeHidden();
-  expect(await readSession(page)).toEqual(before);
-  expect(await preferences()).toMatchObject({version:1,enabled:false,seen:[]});
-  await page.reload();await ready();await expect(guidance).toBeHidden();
-  await activate(more.locator(':scope > summary'));await expect(moreEnabled).not.toBeChecked();
-  expect(await preferences()).toMatchObject({version:1,enabled:false,seen:[]});
-  expect(await otherStorage()).toEqual(untouchedStorage);expect(errors).toEqual([]);
-});
-
-test('main menu: combat pace persists through Settings and More with native controls and an independent Normal reset',async({page},info)=>{
-  test.setTimeout(90000);
-  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
-  const paceKey='tactics-guru:combat-pace',guidanceKey='tactics-guru:class-guidance';
-  const preferences=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)!),paceKey);
-  const guidance=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)!),guidanceKey);
-  const otherStorage=()=>page.evaluate(excluded=>Object.fromEntries(Object.keys(localStorage).filter(key=>!excluded.includes(key)).sort()
-    .map(key=>[key,localStorage.getItem(key)])),[paceKey,guidanceKey]);
-  await page.addInitScript(({slots,run,dungeon})=>{
-    if(sessionStorage.getItem('test:combat-pace-saves'))return;
-    localStorage.setItem(slots.run.primary,run);localStorage.setItem(slots.run.backup,run);
-    localStorage.setItem(slots.dungeon.primary,dungeon);localStorage.setItem(slots.dungeon.backup,dungeon);
-    sessionStorage.setItem('test:combat-pace-saves','yes');
-  },{slots:keys,run:menuFixture('run'),dungeon:menuFixture('dungeon')});
-  const activate=async(control:Locator)=>{
-    if(info.project.use.hasTouch)await control.tap();else {await control.focus();await page.keyboard.press('Enter');}
-  };
-  const choose=async(container:Locator,pace:'normal'|'fast')=>{
-    const radio=container.locator(`[data-combat-pace-value="${pace}"]`);
-    if(info.project.use.hasTouch)await radio.tap();
-    else {
-      await container.locator('[data-combat-pace-value]:checked').focus();
-      await page.keyboard.press(pace==='fast'?'ArrowRight':'ArrowLeft');await expect(radio).toBeFocused();
-    }
-    await expect(radio).toBeChecked();expect(await preferences()).toEqual({version:1,pace});
-  };
-  const viewport=page.viewportSize()!;
-  const checkSmallControls=async(container:Locator,name:string)=>{
-    await page.setViewportSize({width:320,height:568});
-    await page.evaluate(()=>{document.documentElement.style.fontSize='32px';});
-    for(const pace of ['normal','fast']){
-      const radio=container.locator(`[data-combat-pace-value="${pace}"]`);
-      await radio.scrollIntoViewIfNeeded();await expect(radio).toBeInViewport();
-      const bounds=await radio.evaluate(input=>{const rect=input.closest('label')!.getBoundingClientRect();return {left:rect.left,right:rect.right,height:rect.height};});
-      expect(bounds.height).toBeGreaterThanOrEqual(44);expect(bounds.left).toBeGreaterThanOrEqual(0);expect(bounds.right).toBeLessThanOrEqual(321);
-    }
-    expect(await container.evaluate(element=>element.scrollWidth<=element.clientWidth+1)).toBe(true);
-    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
-    await page.screenshot({path:info.outputPath(`combat-pace-${name}-large-text.png`)});
-    await page.evaluate(()=>{document.documentElement.style.fontSize='';});await page.setViewportSize(viewport);
-  };
-  await page.goto('./');
-  const settings=page.getByRole('button',{name:'Settings',exact:true});await activate(settings);
-  const dialog=page.getByRole('dialog',{name:'Settings',exact:true});
-  await expect(dialog.locator('[data-combat-pace]')).toHaveAccessibleName('Battle speed');
-  await expect(dialog.locator('[data-combat-pace-value="normal"]')).toBeChecked();expect(await preferences()).toBeNull();
-  const preserved=await otherStorage();
-  await choose(dialog,'fast');expect(await otherStorage()).toEqual(preserved);
-  await activate(dialog.getByRole('button',{name:'Close',exact:true}));await expect(settings).toBeFocused();
-  await page.reload();await activate(settings);await expect(dialog.locator('[data-combat-pace-value="fast"]')).toBeChecked();
-  await checkSmallControls(dialog,'settings');
-  await activate(dialog.getByRole('button',{name:'Close',exact:true}));
-  await activate(page.getByRole('link',{name:'Standalone battle',exact:true}));
-  const ready=()=>expect(page.locator('#game')).toHaveAttribute('data-phase','player');await ready();
-  const initial=await readSession(page);await activate(page.locator('#battle-guidance-dismiss'));
-  const seen=await guidance();expect(seen.seen.length).toBeGreaterThan(0);expect(await readSession(page)).toEqual(initial);
-  const more=page.locator('#battle-overflow');await activate(more.locator(':scope > summary'));
-  await expect(more.locator('[data-combat-pace-value="fast"]')).toBeChecked();
-  await choose(more,'normal');expect(await readSession(page)).toEqual(initial);expect(await guidance()).toEqual(seen);
-  await choose(more,'fast');expect(await readSession(page)).toEqual(initial);expect(await guidance()).toEqual(seen);
-  const reset=more.locator('[data-class-guidance-reset]');await activate(reset);
-  await expect(page.locator('#battle-class-guidance')).toBeVisible();expect(await guidance()).toMatchObject({version:1,enabled:true,seen:[]});
-  expect(await preferences()).toEqual({version:1,pace:'fast'});expect(await readSession(page)).toEqual(initial);
-  if(!info.project.use.hasTouch)await expect(reset).toBeFocused();
-  await checkSmallControls(more,'more');
-  await choose(more,'normal');expect(await readSession(page)).toEqual(initial);
-  expect(await otherStorage()).toEqual(preserved);
-  await page.reload();await ready();await activate(more.locator(':scope > summary'));
-  await expect(more.locator('[data-combat-pace-value="normal"]')).toBeChecked();
-  expect(await preferences()).toEqual({version:1,pace:'normal'});expect(await guidance()).toMatchObject({version:1,enabled:true,seen:[]});
-  expect(await readSession(page)).toEqual(initial);expect(await otherStorage()).toEqual(preserved);
-  await page.goto('./');await activate(settings);await expect(dialog.locator('[data-combat-pace-value="normal"]')).toBeChecked();
-  expect(await otherStorage()).toEqual(preserved);expect(errors).toEqual([]);
 });

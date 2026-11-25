@@ -24,7 +24,6 @@
     "test:extended:webkit": "playwright test -c playwright.extended-webkit.config.ts",
     "test:browser": "node scripts/browser-test.mjs",
     "test:browser-smoke": "node scripts/browser-test.mjs -c playwright.setup-smoke.config.ts",
-    "test:fixtures": "playwright test -c playwright.fixtures.config.ts",
     "verify:full": "node scripts/verify-full.mjs",
     "test:verification": "node --test tests/tooling/verify-full.test.mjs",
     "test:build": "vitest run --config vitest.build.config.ts",

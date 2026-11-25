@@ -4,37 +4,25 @@ import { captureSelections, compareSelections, discoverSelection, desktopOnlySta
 import { createPlan, exactCoverage } from '../../scripts/verification-batches.mjs';
 
 let before, after;
-test('real discoveries preserve every retained ID and special mode, with exactly 24 chromium and the approved desktop-only mappings', () => {
+test('real discoveries preserve every retained ID with the approved desktop and prefix mappings', () => {
   before = captureSelections({ allProfiles: true });
   after = captureSelections();
   const comparison = compareSelections(before, after);
-  assert.equal(comparison.beforeCount - comparison.afterCount, 24);
-  assert.equal(comparison.mappings.filter(row => row.classification === '@canonical').length, 18);
-  assert.equal(comparison.mappings.filter(row => row.effectiveUse?.hasTouch).length, 6);
-  const radial = comparison.mappings.filter(row => row.removed.file === 'battle-radial.spec.ts');
-  assert.equal(radial.length, 1);
-  assert.equal(radial[0].classification, '@fixed-viewport');
-  assert.equal(radial[0].removed.project, 'mobile-landscape');
-  assert.equal(radial[0].retained.project, 'mobile-portrait');
-  assert.deepEqual(radial[0].effectiveUse.viewport, { width: 1280, height: 720 });
-  const webkit = comparison.mappings.filter(row => row.classification === 'webkit-orientation');
-  assert.equal(webkit.length, 12);
-  assert.equal(webkit.filter(row => row.removed.project === 'acceptance-webkit-landscape').length, 11);
-  assert.equal(webkit.filter(row => row.removed.project === 'acceptance-webkit-portrait').length, 1);
-  const acceptance = after.selections['webkit-acceptance'].tests;
-  for (const route of ['fresh play', 'diagnostic play']) {
-    const valid = acceptance.filter(row => row.file === 'battle-persistence.spec.ts'
-      && row.title === `testing routes: ${route} never accesses valid saved games`);
-    assert.deepEqual(valid.map(row => row.project).sort(), ['acceptance-webkit-landscape', 'acceptance-webkit-portrait']);
-  }
+  assert.equal(comparison.beforeCount, comparison.afterCount);
+  assert.deepEqual([...new Set(after.selections.chromium.tests.map(row => row.file))].sort(), [
+    'battle-persistence.spec.ts', 'dungeon-exploration.spec.ts', 'dungeon-lifecycle.spec.ts',
+    'dungeon-loot.spec.ts', 'dungeon.spec.ts', 'guarded-effects.spec.ts', 'main-menu.spec.ts',
+    'public-asset-base.spec.ts',
+  ]);
+  assert.ok(after.selections['webkit-acceptance'].tests.every(row => row.file === 'main-menu.spec.ts'));
   const desktopOnly = comparison.mappings.filter(row => row.classification === 'desktop-only');
-  assert.equal(desktopOnly.filter(row => row.stage.startsWith('telemetry')).length, 56);
-  assert.equal(desktopOnly.filter(row => row.stage === 'assets-root-dev').length, 52);
-  assert.equal(desktopOnly.length, 108);
+  assert.equal(desktopOnly.filter(row => row.stage.startsWith('telemetry')).length, 16);
+  assert.equal(desktopOnly.filter(row => row.stage === 'assets-root-dev').length, 6);
+  assert.equal(desktopOnly.length, 22);
   const prefixTouchMappings = comparison.mappings.filter(row => row.classification === 'prefix-touch');
-  assert.equal(prefixTouchMappings.filter(row => row.removed.project === 'mobile-landscape').length, 52);
-  assert.equal(prefixTouchMappings.filter(row => row.removed.project === 'mobile-portrait').length, 46);
-  assert.equal(prefixTouchMappings.length, 98);
+  assert.equal(prefixTouchMappings.filter(row => row.removed.project === 'mobile-landscape').length, 6);
+  assert.equal(prefixTouchMappings.filter(row => row.removed.project === 'mobile-portrait').length, 2);
+  assert.equal(prefixTouchMappings.length, 8);
   assert.ok(prefixTouchMappings.filter(row => row.removed.project === 'mobile-landscape'
     && (row.removed.tags ?? []).includes('@touch-audio')).every(row => row.retained.project === 'mobile-portrait'));
   assert.ok(prefixTouchMappings.filter(row => !(row.removed.tags ?? []).includes('@touch-audio'))
@@ -49,7 +37,7 @@ test('real discoveries preserve every retained ID and special mode, with exactly
       ['desktop', 'mobile-landscape', 'mobile-portrait']);
     assert.deepEqual([...new Set(tests.map(row => row.project))].sort(), ['desktop', 'mobile-portrait']);
     const portrait = tests.filter(row => row.project === 'mobile-portrait');
-    assert.equal(portrait.length, 3);
+    assert.equal(portrait.length, 2);
     assert.ok(portrait.every(row => row.tags.includes('@touch-audio')));
   }
 });
@@ -61,9 +49,9 @@ test('selection contract rejects missing, extra, duplicate, wrong-profile and de
   reject(value => value.selections.chromium.tests.push({ ...value.selections.chromium.tests[0], id: 'unexpected' }));
   reject(value => value.selections.chromium.tests.push(value.selections.chromium.tests[0]));
   reject(value => value.selections['webkit-acceptance'].tests.pop());
-  reject(value => value.selections.fixtures.tests.pop());
+  reject(value => value.selections['webkit-exploration'].tests.pop());
   reject(value => value.selections['telemetry-development'].tests.pop());
-  reject(value => { value.selections.chromium.projects[1].grepInvert = null; });
+  reject(value => { value.selections.chromium.projects[1].grepInvert = { source: '@unexpected', flags: '' }; });
   reject(value => { value.selections.chromium.projects[2].use.deviceScaleFactor = 1; });
   reject(value => { value.selections.chromium.tests[0].timeout++; });
 });
@@ -72,13 +60,13 @@ test('new unclassified cases keep all existing profiles without rewriting histor
   const original = structuredClone(before), candidate = structuredClone(after);
   for (const project of original.selections.chromium.projects) {
     const example = original.selections.chromium.tests.find(row => row.project === project.name);
-    const added = { ...example, id: 'new-' + project.name, file: 'assets.spec.ts',
-      title: 'new unclassified case', titlePath: ['assets.spec.ts', 'new unclassified case'], tags: [] };
+    const added = { ...example, id: 'new-' + project.name, file: 'dungeon.spec.ts',
+      title: 'new unclassified case', titlePath: ['dungeon.spec.ts', 'new unclassified case'], tags: [] };
     original.selections.chromium.tests.push(added);
     candidate.selections.chromium.tests.push(added);
   }
   const compared = compareSelections(original, candidate);
-  assert.equal(compared.beforeCount - compared.afterCount, 24);
+  assert.equal(compared.beforeCount, compared.afterCount);
 });
 
 test('real nine-batch discovery partitions the entire reduced default selection', () => {
@@ -90,23 +78,6 @@ test('real nine-batch discovery partitions the entire reduced default selection'
   exactCoverage(expected, jobs.flatMap(job => job.stages.flatMap(stage => stage.expected)));
 });
 
-
-test('health-bars keeps iPhone WebKit; Chromium health coverage stays in the default suite', () => {
-  assert.ok(after);
-  assert.deepEqual(after.selections['health-bars'].projects.map(project => project.name),
-    ['health-iphone-portrait', 'health-iphone-landscape']);
-  const titles = [...new Set(after.selections['health-bars'].tests.map(row => row.title))].sort();
-  assert.ok(titles.length > 0);
-  for (const project of ['desktop', 'mobile-landscape', 'mobile-portrait']) {
-    const chromiumTitles = after.selections.chromium.tests
-      .filter(row => row.file === 'unit-health-bars.spec.ts' && row.project === project)
-      .map(row => row.title).sort();
-    assert.deepEqual(chromiumTitles, titles);
-  }
-  const assets = after.selections.chromium.tests.filter(row => row.file === 'public-asset-base.spec.ts');
-  assert.deepEqual([...new Set(assets.map(row => row.project))].sort(),
-    ['desktop', 'mobile-landscape', 'mobile-portrait']);
-});
 
 test('long progression journeys are excluded from routine selection and remain available on all extended profiles', () => {
   const titles = ['Mage legal progression', 'Ranger legal progression', 'Fighter legal progression'];

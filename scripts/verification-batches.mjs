@@ -48,9 +48,9 @@ export function definitions(mode = 'capture') {
   const webkit = stages.find(stage => stage.id === 'webkit-acceptance');
   if (mode !== 'capture') return [
     { id: 'pilot-chromium', stages: [{ ...chromium, id: 'pilot-chromium', args: [...chromium.args,
-      'tests/boot.spec.ts', '-g', 'boots a Phaser scene and fits the viewport after resize$'] }] },
+      'tests/main-menu.spec.ts', '-g', 'main menu: New Game starts immediately when no dungeon save exists$'] }] },
     { id: 'pilot-webkit', stages: [{ ...webkit, id: 'pilot-webkit', args: [...webkit.args,
-      'tests/battle-loop.spec.ts', '-g', 'complete legal authored battle seed'] }] },
+      'tests/main-menu.spec.ts', '-g', 'main menu: New Game starts immediately when no dungeon save exists$'] }] },
   ];
   const batches = read(join(root, 'scripts/verification-batches.json'));
   const chromiumJobs = batches.map(batch => ({ id: 'chromium-' + batch.id,

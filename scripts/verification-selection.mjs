@@ -14,26 +14,6 @@ export const desktopOnlyStages = new Set([
   'telemetry-production', 'telemetry-development', 'assets-root-dev',
 ]);
 export const prefixTouchStages = new Set(['assets-prefix-preview', 'assets-prefix-dev']);
-const webkitAcceptance = 'webkit-acceptance';
-const webkitPortrait = 'acceptance-webkit-portrait';
-const webkitLandscape = 'acceptance-webkit-landscape';
-
-const webkitOrientationCases = new Map([
-  ['battle-loop.spec.ts', new Map([
-    ['complete legal authored battle seed 1 reaches playerLoss through controls and replays', webkitPortrait],
-    ['complete legal authored battle seed 2 reaches playerWin through controls and replays', webkitLandscape],
-  ])],
-  ['run-progression.spec.ts', new Map([
-    ['legal run outcomes, earned rewards and fresh restart', webkitPortrait],
-    ['testing routes: an earned combat draught stays in the transient authored run', webkitPortrait],
-  ])],
-  ['battle-persistence.spec.ts', new Map(
-    ['fresh play', 'diagnostic play'].flatMap(route =>
-      ['missing', 'corrupt', 'backup-only', 'unavailable'].map(condition => [
-        `testing routes: ${route} never accesses ${condition} saved games`, webkitPortrait,
-      ])),
-  )],
-]);
 function withoutProjectFilters(args) {
   const remaining = [];
   for (let i = 0; i < args.length; i++) {
@@ -89,12 +69,9 @@ export function captureSelections({ allProfiles = false } = {}) {
       const remaining = selected >= 0 ? args.filter((_, i) => i !== selected && i !== selected + 1) : args;
       const files = defaultMatrix ? ['tests/public-asset-base.spec.ts'] : withoutProjectFilters(remaining);
       const control = join(directory, 'control.config.ts');
-      // Keep the common engine exclusion in the WebKit orientation control.
-      const controlProject = config.endsWith('playwright.device-acceptance.config.ts')
-        ? '({ ...project, grepInvert: grepInvert[0] })' : 'project';
       writeFileSync(control, `import base from ${JSON.stringify(config)};
 export default { ...base, testDir: ${JSON.stringify(resolve(root, 'tests'))},
-  projects: base.projects.map(({ grepInvert, grep, ...project }) => ${controlProject}) };
+  projects: base.projects.map(({ grepInvert, grep, ...project }) => project) };
 `);
       return discoverSelection([...files, '-c', control], env);
     } finally { rmSync(directory, { recursive: true, force: true }); }
@@ -102,30 +79,11 @@ export default { ...base, testDir: ${JSON.stringify(resolve(root, 'tests'))},
   const selections = Object.fromEntries(stages.filter(stage => stage.browser).map(stage => [stage.id,
     capture(stage.args.slice(stage.args.indexOf('test') + 1), stage.env,
       { defaultMatrix: prefixTouchStages.has(stage.id) })]));
-  for (const config of ['playwright.encounters.config.ts', 'playwright.run-items.config.ts', 'playwright.abilities.config.ts', 'playwright.setup-smoke.config.ts']) {
-    selections[config] = capture(['-c', config]);
-  }
+  const setup = 'playwright.setup-smoke.config.ts';
+  selections[setup] = capture(['-c', setup]);
   return { source: sourceIdentity(root), selections };
 }
 
-export const canonicalCases = new Map([
-  ['assets.spec.ts', [
-    'failed canonical asset load gives a controlled visible error',
-    'a proof image that downloads but cannot be decoded gives a controlled visible error',
-    'a proof asset answered by the HTML shell (missing file on the deploy) gives a controlled visible error',
-  ]],
-  ['boot.spec.ts', ['', '?scene=proof', '?scene=content-smoke', 'run'].map(route =>
-    `missing engine chunk reports a recoverable startup error on ${route || 'battle'}`)],
-  ['engine-fit.spec.ts', [
-    'shows loading before boot and a controlled error if the engine module cannot load',
-    'shell initially displays loading while the engine is delayed',
-  ]],
-]);
-export const layoutCases = [ [390,844], [844,390], [360,640], [915,412], [1280,720] ]
-  .map(([width, height]) => `controls stay at least 44 px and reachable at ${width}x${height}`);
-const classification = test => canonicalCases.get(test.file)?.includes(test.title) ? '@canonical'
-  : (test.file === 'layout.spec.ts' && layoutCases.includes(test.title)
-    || test.file === 'battle-radial.spec.ts' && test.title === 'radial preference replaces the side rail with a bottom dock at 1280x720') ? '@fixed-viewport' : null;
 const identity = test => JSON.stringify([test.project, test.id]);
 function unique(tests) {
   const map = new Map(tests.map(test => [identity(test), test]));
@@ -163,61 +121,36 @@ export function compareSelections(before, after) {
         continue;
       }
       assert.deepEqual({ ...next, grepInvert: null, grep: null }, { ...project, grepInvert: null, grep: null }, 'Changed effective project configuration');
-      const expected = project.name === 'mobile-portrait' ? { source: '@canonical', flags: '' }
-        : project.name === 'mobile-landscape' ? { source: '@canonical|@fixed-viewport', flags: '' } : project.grepInvert;
-      const commonFilter = stage === webkitAcceptance ? next.grepInvert?.[0] : next.grepInvert;
-      assert.deepEqual(commonFilter, expected, 'Unexpected selection filter');
+      assert.deepEqual(next.grepInvert, project.grepInvert, 'Unexpected selection filter');
       const expectedGrep = prefixTouch && project.name === 'mobile-portrait' ? { source: '@touch-audio', flags: '' } : project.grep;
       assert.deepEqual(next.grep, expectedGrep, 'Unexpected project grep');
     }
     const old = unique(original.tests), remaining = unique(candidate.tests);
     for (const test of original.tests) {
-      const tag = classification(test);
       const touchAudio = (test.tags ?? []).includes('@touch-audio');
       const desktopReduced = desktopOnly && test.project !== 'desktop';
       const prefixReduced = prefixTouch && (test.project === 'mobile-landscape'
         || test.project === 'mobile-portrait' && !touchAudio);
-      const orientationWitness = stage === webkitAcceptance && webkitOrientationCases.get(test.file)?.get(test.title);
-      const webkitReduced = orientationWitness && test.project !== orientationWitness;
-      const reduced = webkitReduced || desktopReduced || prefixReduced || stage === 'chromium' && (tag === '@canonical' && test.project.startsWith('mobile-')
-        || tag === '@fixed-viewport' && test.project === 'mobile-landscape');
+      const reduced = desktopReduced || prefixReduced;
       const retained = remaining.get(identity(test));
       if (!reduced) {
         assert.ok(retained, `Unmapped omission: ${stage} ${test.project} ${test.title}`);
-        const expectedTags = tag ? [...new Set([...test.tags, tag])] : test.tags;
-        assert.deepEqual(retained, { ...test, tags: expectedTags }, 'Changed retained ID, assertions metadata or classification');
+        assert.deepEqual(retained, test, 'Changed retained ID or test metadata');
         continue;
       }
       assert.ok(!retained, 'Approved reduction still selected');
-      const targetProject = orientationWitness
-        || (desktopReduced || prefixReduced && !touchAudio || tag === '@canonical' ? 'desktop' : 'mobile-portrait');
+      const targetProject = prefixReduced && touchAudio ? 'mobile-portrait' : 'desktop';
       const target = candidate.tests.find(row => row.project === targetProject && row.file === test.file
         && JSON.stringify(row.titlePath) === JSON.stringify(test.titlePath));
       assert.ok(target, 'Missing retained coverage counterpart');
-      let effectiveUse;
-      if (tag === '@fixed-viewport') {
-        const use = name => original.projects.find(p => p.name === name).use;
-        const viewport = test.title.match(/(\d+)x(\d+)$/);
-        const effective = name => ({ ...use(name), viewport: { width: Number(viewport[1]), height: Number(viewport[2]) } });
-        assert.deepEqual(effective(test.project), effective(targetProject), 'Non-equivalent fixed viewport devices');
-        effectiveUse = effective(targetProject);
-      }
       mappings.push({ stage, removed: test, retained: target,
-        classification: webkitReduced ? 'webkit-orientation' : desktopReduced ? 'desktop-only' : prefixReduced ? 'prefix-touch' : tag,
-        reason: webkitReduced ? 'The full journey is retained in one WebKit orientation; focused controls and layout cases run in both'
-          : desktopReduced ? (stage.startsWith('telemetry')
-          ? 'Telemetry ingestion/opt-in has no touch, orientation or viewport branches; desktop coverage retained in both dedicated modes'
-          : 'Asset-base/server-mode resolution does not depend on device; root-preview chromium retains all three profiles including hasTouch branches')
-          : prefixReduced ? 'Prefixed asset-base/server-mode resolution does not depend on device; @touch-audio cases stay on Pixel portrait'
-          : tag === '@canonical' ? 'Resource failure/delay assertions have no touch, density, orientation or backend-specific behavior; exhaustive desktop coverage retained'
-          : 'Identical Pixel configuration and explicit viewport set before navigation', ...(effectiveUse ? { effectiveUse } : {}) });
+        classification: desktopReduced ? 'desktop-only' : 'prefix-touch',
+        reason: desktopReduced
+          ? 'The root-dev asset checks and telemetry checks keep a desktop witness'
+          : 'Prefixed asset checks keep desktop coverage and touch audio also runs on Pixel portrait' });
     }
     for (const key of remaining.keys()) assert.ok(old.has(key), 'Unexpected extra selected ID');
   }
-  assert.equal(mappings.filter(row => row.classification === '@canonical' || row.classification === '@fixed-viewport').length, 24,
-    'Unexpected chromium reduction count');
-  assert.equal(mappings.filter(row => row.classification === 'webkit-orientation').length, 12,
-    'Unexpected WebKit acceptance reduction count');
   return { beforeCount: before.selections.chromium.tests.length, afterCount: after.selections.chromium.tests.length, mappings };
 }
 

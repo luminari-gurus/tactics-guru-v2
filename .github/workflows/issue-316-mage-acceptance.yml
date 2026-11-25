@@ -57,9 +57,6 @@ jobs:
       - name: Focused production WebKit
         if: ${{ !cancelled() && inputs.scope != 'progression' && steps.build.outcome == 'success' }}
         run: npm run test:browser -- -c playwright.exploration.config.ts tests/dungeon.spec.ts -g 'Mage' --diagnostics
-      - name: Retained Mage picker
-        if: ${{ !cancelled() && inputs.scope != 'progression' && steps.build.outcome == 'success' }}
-        run: npm run test:browser -- -c playwright.fixtures.config.ts tests/ability-picker.spec.ts -g 'Mage real' --diagnostics
       - name: Complete earned Mage progression Chromium
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npm run test:browser -- -c playwright.extended.config.ts -g 'Mage legal progression' --diagnostics
