@@ -6,7 +6,7 @@ import { DEFAULT_BEHAVIORS, stepMovement } from '../../src/map/movement';
 import { HERO_PROGRESSION } from '../../src/content/progression';
 import { assert, describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { dungeonCapacityFixture, dungeonVictoryBoundary } from '../helpers/dungeonFixtures';
+import { dungeonCapacityFixture, dungeonVictoryBoundary, walkWitness } from '../helpers/dungeonFixtures';
 import { dungeonStairStatus, clearedDungeonSlots, freshDungeon, newDungeonSeed, stepDungeon, dungeonBattle, dungeonOffer, floorDescriptor, floorMap, FloorCache, dungeonSeed, readDungeon, travelDungeon, startDungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
 import { encodeDungeon, decodeDungeon, encodeDungeonRollback, utf8Bytes } from '../../src/domain/dungeonSaveEnvelope';
 import { dungeonContent, dungeonIdentity, previousDungeonIdentity } from '../../src/content/dungeon';
@@ -109,6 +109,13 @@ it('starts legacy reward playtime at the first exploration checkpoint after decl
   const saved = storage.inspect().primary; assert(saved.status === 'valid');
   expect(saved.state).toEqual({ ...declined, stats: { ...freshRunStats('since-upgrade'), activeMs: 250 } });
   session.dispose();
+  const resumed = new DungeonSession(initial, storage, null, () => now);
+  assert(resumed.continue(resumed.inspect()));
+  expect(resumed.snapshot).toEqual(saved.state);
+  const entered = walkWitness(resumed.snapshot);
+  expect(entered.phase).toBe('battle');
+  expect(entered.activeBattle?.outcome).toBe('ongoing');
+  resumed.dispose();
 });
 
 it('clears an unsaved status when a later clock checkpoint recovers storage', async () => {
