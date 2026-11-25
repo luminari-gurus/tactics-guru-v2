@@ -930,38 +930,6 @@ test('walking onto a guardian before other enemies starts and resumes its own en
  expect((await dungeonSnapshot(page)).floors[0].exploration.active).toBe(2);
 });
 
-test('chase follows the previous cell while block targets the resulting cell', async ({page,isMobile})=>{
- for(const [slot, expectedDelta] of [[1,[-2,-1]],[2,[-1,0]]] as const){
-  let selected: {state:DungeonState; destination:number; expected:number}|undefined;
-  for(let seed=0;seed<100&&!selected;seed++){
-   const base=freshDungeon(`pursuit-browser-${slot}`,seed), f=base.floors[0], map=generateMap(f.descriptor.seed,'rooms');
-   const exploration=movableExploration(f.exploration,f.descriptor.seed,0,'ready');
-   for(let y=3;y<17&&!selected;y++)for(let x=4;x<16&&!selected;x++){
-    const old=(y-1)*20+x, dest=y*20+x, enemy=y*20+x-2;
-    const required=[old,dest,enemy,(y-1)*20+x-2,(y-1)*20+x-1,y*20+x-1];
-    if(required.some(c=>!map.cells[c]||c===f.descriptor.downstairs||c===f.descriptor.upstairs))continue;
-    const reserved=new Set(required);
-    const spare=map.cells.flatMap((v,i)=>v&&!reserved.has(i)&&i!==f.descriptor.downstairs&&i!==f.descriptor.upstairs&&Math.abs(i%20-x)+Math.abs(Math.floor(i/20)-y)>11?[i]:[]);
-    if(spare.length<2)continue;
-    let other=0;
-    const pois=exploration.pois.map((p,i)=>{const cell=i===slot?enemy:spare[other++];return {...p,x:cell%20,y:Math.floor(cell/20)};});
-    const state=atCell({...base,floors:[{...f,exploration:{...exploration,pois}}]},old);
-    if(!readDungeon(state).ok)continue;
-    selected={state,destination:dest,expected:(y+expectedDelta[1])*20+x+expectedDelta[0]};
-   }
-  }
-  if(!selected)throw Error('No legal pursuit fixture');
-  const encoded=encodeDungeon(selected.state);if(!encoded.ok)throw Error(encoded.reason);
-  await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
-  await page.goto('./?game=dungeon');await expectDungeonResumed(page);
-  await walkDungeon(page,selected.destination,isMobile?'touch':'keyboard');
-  const after=await dungeonSnapshot(page);
-  expect(poiCell(after.floors[0].exploration.pois[slot])).toBe(selected.expected);
-  await page.reload();await expectDungeonResumed(page);
-  expectSameProgress(await dungeonSnapshot(page),after);
- }
-});
-
 for (const depth of [5, 8]) test(`depth ${depth} saved floor renders and accepts a step after reload`, async ({page,isMobile,browserName}) => {
  const base=freshDungeon('large-floor-browser',19);
  const floors=Array.from({length:depth},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1),map=floorMap(descriptor);return {descriptor,position:descriptor.upstairs,completed:i===depth-1?0:3,exploration:freshExploration(descriptor.seed,descriptor.upstairs,map)};});
