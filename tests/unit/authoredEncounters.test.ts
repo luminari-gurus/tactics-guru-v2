@@ -72,14 +72,17 @@ function canEngage(initial: BattleState, actorId: number, catalog: typeof runCat
     }
     return state;
   };
-  const queue = [takeTurn(initial)], seen = new Set<string>();
+  const firstTurn = takeTurn(initial);
+  const start = firstTurn.units.find(unit => unit.id === actorId)!.cell;
+  const queue = [firstTurn], seen = new Set([`${start.x},${start.y}`]);
   while (queue.length) {
-    const state = queue.shift()!, actor = state.units.find(u => u.id === actorId)!;
-    const key = `${actor.cell.x},${actor.cell.y}`; if (seen.has(key)) continue; seen.add(key);
+    const state = queue.shift()!;
     if (state.units.some(u => u.side === 'enemy' && previewAttack(state,{type:'useAbility',unitId:actorId,abilityId:'ability:basic_attack',target:{unitId:u.id}},catalog).ok)) return true;
     const reach = previewMovement(state, actorId, catalog); assert(reach.ok);
     for (const {cell} of reach.cells) {
-      if (cell.x === actor.cell.x && cell.y === actor.cell.y || seen.has(`${cell.x},${cell.y}`)) continue;
+      const key = `${cell.x},${cell.y}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
       const moved = moveUnit(state, {type:'move',unitId:actorId,to:cell}, catalog); assert(moved.ok);
       const ended = dispatch(moved.state,{type:'endTurn',unitId:actorId},catalog); assert(ended.ok);
       queue.push(takeTurn(ended.state));
