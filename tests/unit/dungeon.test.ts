@@ -102,6 +102,8 @@ it('starts legacy reward playtime at the first exploration checkpoint after decl
   assert(session.continue(session.inspect()));
   assert(await session.dispatch({ ...dungeonBoundary(initial), type: 'declineReward', offerId: initial.offer!.id }));
   const declined = session.snapshot;
+  expect(declined).toMatchObject({ phase: 'ready', offer: null, ownership: initial.ownership });
+  expect(declined.revision).toBe(initial.revision + 1);
   expect(declined.stats).toBeUndefined();
   session.setPlaytimeActive(true);
   now = 250;

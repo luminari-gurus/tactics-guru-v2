@@ -898,7 +898,7 @@ test('corrupt bytes stay exportable and uncertain travel requires explicit recov
  expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe('broken save bytes');
 });
 
-test('declining a dungeon reward preserves inventory and updates stair progress',async({page,isMobile})=>{
+test('declining a dungeon reward preserves inventory and updates stair progress', { tag: '@desktop-chromium-portrait-webkit' }, async({page,isMobile})=>{
  const initial=dungeonCapacityFixture();await openSavedDungeon(page,initial);
  const progress=page.locator('#dungeon-encounter-progress'),stairs=page.locator('#dungeon-stair-descend');
  await expect(progress).toHaveText('Encounters: 1 / 3 cleared');
@@ -916,8 +916,6 @@ test('declining a dungeon reward preserves inventory and updates stair progress'
  await activate();await page.locator('#dungeon-item-cancel').click();
  expect(await settledDungeonSnapshot(page)).toEqual(initial);
  await activate();await page.locator('#dungeon-item-confirm').click();
- const next=await acceptedDungeonSnapshot(page,initial);
- expect(next).toMatchObject({phase:'ready',offer:null,ownership:initial.ownership});
  await expect(progress).toHaveText('Encounters: 1 / 3 cleared');
  await expect(stairs).toHaveText('Downstairs: locked · clear 2 more encounters');
  await expect(rewards).toHaveCount(0);
