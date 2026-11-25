@@ -3,7 +3,7 @@ import { DungeonSession } from '../../src/app/DungeonSession';
 import { ITEM_BOUNDS } from '../../src/content/itemTypes';
 import { dungeonContent } from '../../src/content/dungeon';
 import { autoCollectDungeon, victoryAutoCollectIntent } from '../../src/domain/dungeonAutoCollect';
-import { acceptDungeonBattle, currentFloor, dungeonLootReward, floorDescriptor, floorMap, freshDungeon,
+import { acceptDungeonBattle, currentFloor, dungeonBoundary, dungeonItem, dungeonLootReward, floorDescriptor, floorMap, freshDungeon,
   readDungeon, startDungeonBattle, stepDungeon, type DungeonResult, type DungeonState } from '../../src/domain/dungeon';
 import { freshExploration, movableExploration, neighbors, poiCell } from '../../src/domain/exploration';
 import { createDungeonStorage, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
@@ -36,6 +36,20 @@ it('completes exactly the ordinary interrupted step, including the same single e
   expect(currentFloor(automatic).exploration.movement!.step).toBe(currentFloor(won).exploration.movement!.step + 1);
   expect(currentFloor(automatic).loot![0].remaining).toBe(0);
   expect(autoCollectDungeon(automatic, intent)).toEqual({ ok: false, reason: 'staleBoundary' });
+});
+
+it('reviving a hero invalidates the pending pickup without moving the party or enemies', () => {
+  const { won, intent } = victory();
+  const before = good(readDungeon({ ...won,
+    party: won.party.map(hero => hero.heroId === 'mage' ? { ...hero, hp: 0 } : hero),
+    ownership: { ...won.ownership, consumables: [{ itemId: 'item:revive_kit', quantity: 1 }] },
+  }));
+  const prepared = good(dungeonItem(before, { ...dungeonBoundary(before), type: 'useItem',
+    itemId: 'item:revive_kit', heroId: 'mage' }));
+  expect(prepared.party.find(hero => hero.heroId === 'mage')!.hp).toBeGreaterThan(0);
+  expect(prepared.ownership.consumables).toEqual([]);
+  expect(currentFloor(prepared)).toEqual(currentFloor(before));
+  expect(autoCollectDungeon(prepared, intent)).toEqual({ ok: false, reason: 'staleBoundary' });
 });
 
 it('rejects every stale identity, contact and reward binding without redirecting', () => {
