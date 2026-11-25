@@ -4,7 +4,6 @@ import base from './playwright.regression.config';
 // Explicit allowlists keep new regression cases from silently growing PR latency.
 // Reuse the original journeys and assertions; the broad configs remain available.
 export const desktopJourneys = [
-  'main menu: New Game starts immediately when no dungeon save exists',
   'main menu: failed gameplay imports retain visible recovery without proof tools',
   'fresh dungeon keeps the map and party in view and opens the selected character sheet',
   'read-only entry, keyboard new dungeon, real action and active resume',
