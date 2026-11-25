@@ -704,7 +704,7 @@ function fixture(slot: number) {
 function declineReward(state: DungeonState) {
  return checkedDungeon(dungeonItem(state, { ...dungeonBoundary(state), type: 'declineReward', offerId: state.offer!.id }));
 }
-fixedSeedTest('dungeon battle undo survives reload and a legal defeat journey',async({page,isMobile})=>{
+fixedSeedTest('dungeon battle undo survives reload and a legal defeat journey', { tag: '@desktop-chromium-portrait-webkit' }, async({page,isMobile})=>{
  test.setTimeout(300000);
  // This case qualifies undo/reload/defeat; random-layout identity has its own case.
  await page.goto('./?game=dungeon&entry=new');

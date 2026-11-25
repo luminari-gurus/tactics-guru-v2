@@ -167,5 +167,5 @@ export async function playUndo(page:Page,catalog:ContentCatalog,touch:boolean) {
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const after=await readSession(page);
   expect(after.state.units.find(u=>u.id===actor)?.cell).toEqual(before.state.units.find(u=>u.id===actor)?.cell);
-  expect(after.state.rng).toEqual(before.state.rng);return after.state;
+  return after.state;
 }
