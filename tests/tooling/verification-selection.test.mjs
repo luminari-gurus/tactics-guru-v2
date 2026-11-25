@@ -70,6 +70,11 @@ test('each engine clears one full floor per profile and checks both pickup modes
     ]) assert.deepEqual(profilesFor(title), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('ground loot: entering an occupied pile starts combat and closes inventory'), [stage === 'chromium' ? landscape : desktop]);
     assert.deepEqual(profilesFor('restart during accepted presentation discards old callbacks and history'), [stage === 'chromium' ? desktop : portrait]);
+    for (const title of [
+      'reload recovers the last four seconds exactly once across a held dungeon lock',
+      'close recovers the last four seconds exactly once across a held dungeon lock',
+      'dungeon tabs serialize spatial publication and refuse the stale owner',
+    ]) assert.deepEqual(profilesFor(title), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('visibility interruption finishes an accepted terminal presentation exactly once'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('character sheets switch heroes and show equipped charms through equip, resume, and unequip'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('confirmed charm discard frees full capacity without cancelling or duplicating the pending reward'), [stage === 'chromium' ? desktop : portrait]);
