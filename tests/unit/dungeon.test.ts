@@ -350,6 +350,30 @@ it('commits a dungeon victory once when presentation completion is repeated', as
   expect(dungeon.snapshot).toEqual(committed);
 });
 
+it('discards a pending victory presentation when replacing a saved dungeon', async () => {
+  const fixture = dungeonVictoryBoundary(1, 0); assert(fixture);
+  const data = memory();
+  const storage = createDungeonStorage(() => data);
+  assert(storage.save(fixture.snapshot).ok);
+  const dungeon = new DungeonSession(fixture.snapshot, storage);
+  assert(dungeon.continue(dungeon.inspect()));
+  const battle = await dungeon.startEncounter(); assert(battle);
+  battle.prepare(fixture.command);
+  const step = battle.confirm(); assert(step);
+  expect(battle.phase).toBe('presenting');
+  expect(dungeon.completedBattle).toBeTruthy();
+
+  assert(await dungeon.replace(dungeon.inspect(), 'replacement-dungeon', fixture.snapshot.seed + 1));
+  const replacement = dungeon.snapshot;
+  const saved = data.getItem(DUNGEON_KEYS.primary);
+  expect(replacement.ownership).toEqual({ consumables: [], equipment: [], assignments: [] });
+  battle.finishPresentation(step.token);
+  expect(battle.phase).toBe('disposed');
+  expect(dungeon.completedBattle).toBeNull();
+  expect(dungeon.snapshot).toEqual(replacement);
+  expect(data.getItem(DUNGEON_KEYS.primary)).toBe(saved);
+});
+
 it.each([false, true])('versions final reward saves and keeps a rollback checkpoint (tracked: %s)', tracked => {
   const fixture = dungeonVictoryBoundary(5, 2); assert(fixture);
   const entry = tracked ? { ...fixture.snapshot, stats: freshRunStats() } : fixture.snapshot;
