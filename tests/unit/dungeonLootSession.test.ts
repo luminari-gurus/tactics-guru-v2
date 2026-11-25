@@ -1,7 +1,7 @@
 import { assert, expect, it } from 'vitest';
 import { DungeonSession } from '../../src/app/DungeonSession';
 import { dungeonContent } from '../../src/content/dungeon';
-import { acceptDungeonBattle, currentFloor, dungeonBoundary, readDungeon, startDungeonBattle, stepDungeon,
+import { acceptDungeonBattle, currentFloor, dungeonBoundary, freshDungeon, readDungeon, startDungeonBattle, stepDungeon,
   type DungeonResult, type DungeonState } from '../../src/domain/dungeon';
 import { freshRunStats } from '../../src/domain/runStats';
 import { createDungeonStorage, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
@@ -60,6 +60,19 @@ it.each([
   const resumed = new DungeonSession(initial, storage); assert(resumed.continue(resumed.inspect()));
   expect(resumed.snapshot).toEqual(accepted);
   expect(currentFloor(resumed.snapshot).loot![0]).toEqual({ ...loot, remaining: 0 });
+});
+
+it('keeps the uncollected victory pile and party position across consecutive restores', () => {
+  const won = victory(28);
+  const { storage, owner } = savedOwner(won);
+  owner.dispose();
+  const initial = freshDungeon('unused-start', 1);
+  for (let restore = 0; restore < 2; restore++) {
+    const resumed = new DungeonSession(initial, storage);
+    assert(resumed.continue(resumed.inspect()));
+    expect(resumed.snapshot).toEqual(won);
+    resumed.dispose();
+  }
 });
 
 it('continues an occupied-pile battle at its origin with both rewards still on the ground', async () => {

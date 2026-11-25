@@ -11,6 +11,8 @@ export const redundantProfileJourneys = [
   // Tagged loading scenarios run on both desktops and one touch orientation per engine.
   /^(?:mobile-portrait|portrait-webkit) .*@mobile-landscape(?: |$)/,
   /^(?:mobile-landscape|landscape-webkit) .*@mobile-portrait(?: |$)/,
+  // One real reload per engine verifies that boot leaves the automatic pickup unscheduled.
+  /^(?:mobile-portrait|mobile-landscape|portrait-webkit|landscape-webkit) .*reload before the pending step restores the ground pile without surprise movement or collection$/,
   /^(?:mobile-portrait|mobile-landscape|portrait-webkit|landscape-webkit) .*saved menu dungeon keeps proof tools hidden across legal encounters$/,
   /^(?:mobile-portrait|portrait-webkit) .*testing dungeon legally clears a floor, descends and backtracks without accessing saves$/,
   /^(?:mobile-landscape|landscape-webkit) .*saved menu dungeon auto-collects loot across a complete first floor$/,
