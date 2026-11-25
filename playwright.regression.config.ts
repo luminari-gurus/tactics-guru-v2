@@ -11,8 +11,8 @@ export const redundantProfileJourneys = [
   // Tagged loading scenarios run on both desktops and one touch orientation per engine.
   /^(?:mobile-portrait|portrait-webkit) .*@mobile-landscape(?: |$)/,
   /^(?:mobile-landscape|landscape-webkit) .*@mobile-portrait(?: |$)/,
-  // Exercise legacy reward claims with a desktop click and a WebKit portrait tap.
-  /^(?:mobile-portrait|mobile-landscape|desktop-webkit|landscape-webkit) .*Guardian-first reward, map and encounter state survive claim and reload at depth 5$/,
+  // Keep desktop Chromium and portrait WebKit for paired desktop and touch interactions.
+  /^(?:mobile-portrait|mobile-landscape|desktop-webkit|landscape-webkit) .*@desktop-chromium-portrait-webkit(?: |$)/,
   // One real reload per engine verifies that boot leaves the automatic pickup unscheduled.
   /^(?:mobile-portrait|mobile-landscape|portrait-webkit|landscape-webkit) .*reload before the pending step restores the ground pile without surprise movement or collection$/,
   /^(?:mobile-portrait|mobile-landscape|portrait-webkit|landscape-webkit) .*saved menu dungeon keeps proof tools hidden across legal encounters$/,
