@@ -126,7 +126,7 @@ for(const [xp,level,maxHp]of [[0,1,11],[180,3,19]])test(`menu dungeon restores M
  if(missile.kind==='magicMissile')expect(missile.casterLevel).toBe(level);
 });
 
-test('desktop Rail keeps a prepared Frost Snare and its controls in view', async ({page,isMobile}) => {
+test('desktop Rail keeps Frost Snare controls visible and its target picker clickable', async ({page,isMobile}) => {
   test.skip(isMobile, 'Desktop fine-pointer rail geometry');
   await page.setViewportSize({width:1280,height:720});
   const fixture = stagedMageAbility('ability:frost_snare');
@@ -162,21 +162,14 @@ test('desktop Rail keeps a prepared Frost Snare and its controls in view', async
   await cancel.click();
   await expect(page.locator('#battle-move')).toBeFocused();
   expect((await readSession(page)).state).toEqual(fixture.state.activeBattle);
-});
 
-test('desktop Rail keeps target selection clickable with a prepared Frost Snare', async ({page,isMobile}) => {
-  test.skip(isMobile, 'Desktop fine-pointer rail geometry');
+  // At the shortest height the prepared preview must still leave the picker clickable.
   await page.setViewportSize({width:1280,height:580});
-  const fixture = stagedMageAbility('ability:frost_snare');
-  await seed(page,fixture.state);
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-  const target = fixture.state.activeBattle!.units.find(unit=>unit.id===fixture.command.target.unitId)!;
   await page.getByRole('button',{name:'Frost Snare',exact:true}).click();
   const picker = page.locator('#battle-target');
   const bounds = (await picker.boundingBox())!;
   const point = {x:bounds.x+40,y:bounds.y+bounds.height-8};
   await picker.selectOption(`${target.cell.x},${target.cell.y}`);
-  const confirm = page.getByRole('button',{name:'Confirm action',exact:true});
   await expect(confirm).toBeEnabled();
 
   const hit = await page.evaluate(({x,y})=>document.elementFromPoint(x,y)?.id,point);
