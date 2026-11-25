@@ -1,19 +1,25 @@
 import { expect, type Page } from '@playwright/test';
 import type { DungeonState } from '../../src/domain/dungeon';
+import { encodeDungeon } from '../../src/domain/dungeonSaveEnvelope';
 import { generateMap } from '../../src/map/generate';
 import { neighbors, poiCell } from '../../src/domain/exploration';
 import { clearedDungeonSlots, floorMap } from '../../src/domain/dungeon';
 import { dungeonContactDetour } from './dungeonFixtures';
 import { DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
 export async function openDungeonWithStorage(page: Page, entries: Record<string, string>) {
- await page.addInitScript(values => {
+ await page.addInitScript(({ values, marker }) => {
   // Reload and recovery must read the checkpoint written by the application.
-  const marker = 'test:dungeon-fixture-installed';
   if (window !== window.top || sessionStorage.getItem(marker)) return;
   for (const [key, value] of Object.entries(values)) localStorage.setItem(key, value);
   sessionStorage.setItem(marker, '1');
- }, entries);
+ }, { values: entries, marker: `test:dungeon-fixture:${crypto.randomUUID()}` });
  await page.goto('./?game=dungeon');
+}
+export async function openSavedDungeon(page: Page, state: DungeonState) {
+ const saved = encodeDungeon(state);
+ if (!saved.ok) throw Error(saved.reason);
+ await openDungeonWithStorage(page, { [DUNGEON_KEYS.primary]: saved.text });
+ await expectDungeonResumed(page);
 }
 export async function dungeonSnapshot(page: Page): Promise<DungeonState> { return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!); }
 /** Steps and confirms apply asynchronously; return the first snapshot with a new dungeon or a newer
