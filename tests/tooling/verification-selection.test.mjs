@@ -63,6 +63,7 @@ test('each engine clears one full floor per profile and checks both pickup modes
     assert.deepEqual(profilesFor('confirmed charm discard frees full capacity without cancelling or duplicating the pending reward'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('dungeon battle undo survives reload and a legal defeat journey'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('saved dungeon downloads only after explicit recovery export'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('Shaman production journey uses Hex and ally healing, reloads Weakened and replays a complete legal battle'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('declining a dungeon reward preserves inventory and updates stair progress'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('dungeon previous-format recovery preserves and exports both original slots'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('interrupting automatic loot cancels the pending step without replay'), [stage === 'chromium' ? desktop : portrait]);
@@ -144,11 +145,11 @@ test('long progression journeys are excluded from routine selection and remain a
   }
   for (const config of ['playwright.extended.config.ts', 'playwright.extended-webkit.config.ts']) {
     const selection = discoverSelection(['-c', config]);
-    assert.equal(selection.tests.length, 9);
+    assert.equal(selection.tests.length, 12);
     for (const project of selection.projects) {
       const cases = selection.tests.filter(row => row.project === project.name);
-      assert.equal(cases.length, 3);
-      for (const title of titles) assert.equal(cases.filter(row => row.title.startsWith(title)).length, 1);
+      assert.equal(cases.length, 4);
+      for (const title of [...titles, 'Shaman production journey']) assert.equal(cases.filter(row => row.title.startsWith(title)).length, 1);
     }
   }
 });
