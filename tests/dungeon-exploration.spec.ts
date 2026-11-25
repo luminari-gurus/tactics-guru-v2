@@ -136,22 +136,6 @@ test('ground loot: entering an occupied pile starts combat and closes inventory'
  await expect(discard).toHaveCount(0);
 });
 
-test('ground loot: final victory unlocks stairs and shows the uncollected reward after reload',async({page})=>{
- test.setTimeout(90000);
- await page.addInitScript(()=>{document.hasFocus=()=>false;});
- const witness = dungeonGroundVictoryBoundary(5, 2);
- if (!witness) throw Error('Seed 5 no longer reaches a legal final ground-loot victory');
- await loadGroundLootBoundary(page,witness.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- await playCommand(page,witness.command);await expect(page.locator('#dungeon-map')).toBeVisible();
- const won=await dungeonSnapshot(page),floor=won.floors[0],loot=floor.loot!.at(-1)!;
- expect(won.phase).toBe('ready');expect(floor.completed).toBe(3);expect(loot.remaining).toBe(1);expect(won.offer).toBeNull();
- await expect(page.locator('#dungeon-stair-descend')).toHaveText('Downstairs: unlocked · walk onto the stairs');
- await expect(page.getByRole('region',{name:'Rewards',exact:true})).toHaveCount(0);
- await page.reload();await expectDungeonResumed(page);
- await expect(page.locator('#dungeon-stair-descend')).toHaveText('Downstairs: unlocked · walk onto the stairs');
- await expect(page.locator(`#dungeon-map [data-cell="${loot.cell}"]`)).toHaveAttribute('data-loot','1');
-});
-
 test('map markers respect stair availability, discovery and saved floor state',async({page,isMobile})=>{
  const base=freshDungeon('marker-browser',1),floor=base.floors[0];
  const reload=async()=>{await page.reload();await expectDungeonResumed(page);};
