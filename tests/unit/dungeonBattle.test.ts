@@ -1,7 +1,7 @@
 import { showsSnareBadge } from '../../src/phaser/abilityPresentation';
 import { HERO_PROGRESSION } from '../../src/content/progression';
 import { progressHero } from '../../src/domain/progression';
-import { atDownstairs, atEncounter, stagedMageAbility, withLegacySight } from '../helpers/dungeonFixtures';
+import { atDownstairs, atEncounter, snaredDefeatBoundary, stagedMageAbility, withLegacySight } from '../helpers/dungeonFixtures';
 import { freshDungeon, floorDescriptor, floorMap, startDungeonBattle, readDungeon, travelDungeon } from '../../src/domain/dungeon';
 import { guardedBoundary } from '../helpers/guardedBoundary';
 import { combatStats } from '../../src/domain/effects';
@@ -43,6 +43,23 @@ it.each(['ability:pinning_shot', 'ability:frost_snare'] as const)('projects Snar
   expect(restoredUnits.find(unit => unit.id === command.target.unitId)?.movementBlock).toEqual({ sourceId: actor.id, abilityId });
   expect(restoredUnits.filter(unit => showsSnareBadge(unit, restoredUnits)).map(unit => unit.id))
     .toEqual(abilityId === 'ability:frost_snare' ? [command.target.unitId] : []);
+});
+
+it.each(['source', 'target'] as const)('removes the Snared badge on legal %s defeat', kind => {
+  const fixture = snaredDefeatBoundary(kind);
+  const before = fixture.state.activeBattle!.units;
+  expect(showsSnareBadge(before.find(unit => unit.id === fixture.targetId)!, before)).toBe(true);
+  const replay = replayCommandSequence(fixture.initial, fixture.commands, dungeonBattle(fixture.state)!.catalog);
+  assert(replay.ok);
+  expect(replay.state).toEqual(fixture.expected);
+  expect(replay.events).toContainEqual({
+    type: 'movementBlockExpired', unitId: fixture.targetId, sourceId: 3, abilityId: 'ability:frost_snare',
+  });
+  const after = replay.state.units;
+  expect(after.find(unit => unit.id === fixture.defeatedId)?.hp).toBe(0);
+  const target = after.find(unit => unit.id === fixture.targetId)!;
+  expect(target.movementBlock).toBeUndefined();
+  expect(showsSnareBadge(target, after)).toBe(false);
 });
 
 it.each([[10, 11], [10, 15]])('saves a draught in checkpoint/battle formats %i/%i and settles stock on either outcome', (checkpointFormat, battleFormat) => {
