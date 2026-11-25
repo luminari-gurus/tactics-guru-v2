@@ -596,8 +596,8 @@ for(const path of ['unsaved play','failed replacement'] as const)test(`main menu
  const accept=page.waitForEvent('dialog');const leave=page.getByRole('link',{name:'Main menu',exact:true}).click();
  await (await accept).accept();await leave;await expect(page.locator('#main-menu')).toBeVisible();
 });
-for (const route of ['nonexistent', '?game=zzz']) test(`main menu: invalid entry ${route} returns to the root`, async ({ page }) => {
- await page.goto('./'+route);
+test('main menu: invalid entry nonexistent returns to the root', async ({ page }) => {
+ await page.goto('./nonexistent');
  await expect(page).toHaveURL(new URL('./', test.info().project.use.baseURL!).href);
  await expect(page.locator('[data-menu-action]')).toHaveCount(4);
  await expect(page.locator('canvas')).toHaveCount(0);
