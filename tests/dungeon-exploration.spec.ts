@@ -128,7 +128,7 @@ test('ground loot: entering an occupied pile starts combat and closes inventory'
  await expect(discard).toHaveCount(0);
 });
 
-test('map markers respect stair availability, discovery and saved floor state',async({page,isMobile})=>{
+test('map markers respect stair availability, discovery and saved floor state', { tag: '@desktop-chromium-portrait-webkit' }, async({page,isMobile})=>{
  const base=freshDungeon('marker-browser',1),floor=base.floors[0];
  const cell=(index:number)=>page.locator(`#dungeon-map [data-cell="${index}"]`);
  const accessibleMap=page.getByRole('application',{name:/Floor \d+ map/});
@@ -191,7 +191,7 @@ test('map markers respect stair availability, discovery and saved floor state',a
  await page.screenshot({path:test.info().outputPath('floor-progress-narrow.png'),fullPage:true});
 });
 
-test('live markers follow current sight across movement, art changes and reload', async ({ page, isMobile }) => {
+test('live markers follow current sight across movement, art changes and reload', { tag: '@desktop-chromium-portrait-webkit' }, async ({ page, isMobile }) => {
  for (const entering of [true, false]) {
   const { before, after, slot } = dungeonSightTransition(entering);
   const map = floorMap(before.floors[0].descriptor);
@@ -249,7 +249,7 @@ test('live markers follow current sight across movement, art changes and reload'
  }
 });
 
-test('stairs travel once per entry with keyboard, compass and cell controls, and stay on arrival and restore',async({page,isMobile})=>{
+test('stairs travel once per entry with keyboard, compass and cell controls, and stay on arrival and restore', { tag: '@desktop-chromium-portrait-webkit' }, async({page,isMobile})=>{
  test.setTimeout(240000);
  const base=freshDungeon('stairs-browser',6074),cleared={...base,floors:[{...base.floors[0],completed:3}]};
  const reload=async()=>{await page.reload();await expectDungeonResumed(page);};
