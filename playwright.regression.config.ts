@@ -12,9 +12,9 @@ export const redundantProfileJourneys = [
   /^(?:mobile-landscape|desktop-webkit|portrait-webkit) .*staged Mage Frost Snare cancels invalid casts and restores the active badge$/,
   // Cover an occupied loot tile with a landscape Chromium tap and a desktop WebKit click.
   /^(?:desktop|mobile-portrait|portrait-webkit|landscape-webkit) .*ground loot: entering an occupied pile starts combat and closes inventory$/,
-  // Tagged loading scenarios run on both desktops and one touch orientation per engine.
+  // Tagged scenarios keep desktop and one touch orientation per engine.
   /^(?:mobile-portrait|portrait-webkit) .*@mobile-landscape(?: |$)/,
-  /^(?:mobile-landscape|landscape-webkit) .*@mobile-portrait(?: |$)/,
+  /^(?:mobile-landscape|landscape-webkit|acceptance-webkit-landscape) .*@mobile-portrait(?: |$)/,
   // Keep desktop Chromium and portrait WebKit for paired desktop and touch interactions.
   /^(?:mobile-portrait|mobile-landscape|desktop-webkit|landscape-webkit|acceptance-webkit-landscape) .*@desktop-chromium-portrait-webkit(?: |$)/,
   // One real reload per engine verifies that boot leaves the automatic pickup unscheduled.

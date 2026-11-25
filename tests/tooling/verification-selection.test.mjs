@@ -151,13 +151,21 @@ test('deferred loading keeps each desktop case on one mobile orientation per eng
   for (const stage of ['chromium', 'webkit-exploration']) {
     const { tests } = after.selections[stage];
     for (const [orientation, count] of [['portrait', 4], ['landscape', 3]]) {
-      const tagged = tests.filter(row => row.tags.includes('@mobile-' + orientation));
+      const tagged = tests.filter(row => row.file.endsWith('dungeon-exploration.spec.ts') && row.tags.includes('@mobile-' + orientation));
       const desktop = tagged.filter(row => row.project.includes('desktop')).map(row => row.title).sort();
       const mobile = tagged.filter(row => row.project.includes(orientation)).map(row => row.title).sort();
       assert.equal(desktop.length, count);
       assert.deepEqual(mobile, desktop);
       assert.equal(tagged.length, count * 2);
     }
+  }
+});
+
+test('enlarged menu checks run on desktop Chromium and one mobile profile per engine', () => {
+  const title = 'main menu: portrait composition scrolls at narrow, short and enlarged text sizes';
+  for (const [stage, expected] of [['chromium', ['desktop', 'mobile-portrait']], ['webkit-acceptance', ['acceptance-webkit-portrait']]]) {
+    const selected = after.selections[stage].tests.filter(row => row.title === title);
+    assert.deepEqual(selected.map(row => row.project).sort(), expected);
   }
 });
 
