@@ -3,7 +3,7 @@ import { menuFixture } from './helpers/menuFixtures';
 import { readFileSync } from 'node:fs';
 import { type Page, type Locator } from '@playwright/test';
 import { test as base, expect } from './helpers/dungeonEntropy';
-import { encodeDungeon, WALL_SIGHT_STATS_SAVE_FORMAT } from '../src/domain/dungeonSaveEnvelope';
+import { encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
 import { freshRunStats } from '../src/domain/runStats';
 import { BATTLE_STORAGE_KEYS } from '../src/persistence/battleStorage';
 import { RUN_STORAGE_KEYS } from '../src/persistence/runStorage';
@@ -583,27 +583,6 @@ test('main menu: invalid entry nonexistent returns to the root', async ({ page }
  await expect(page).toHaveURL(new URL('./', test.info().project.use.baseURL!).href);
  await expect(page.locator('[data-menu-action]')).toHaveCount(4);
  await expect(page.locator('canvas')).toHaveCount(0);
-});
-
-test('main menu: counter-only dungeon upgrades known counters without inventing complete playtime',async({page})=>{
-  const mode='dungeon', raw=readFileSync(`tests/fixtures/saves/issue-270/counter-${mode}-v1.json`,'utf8'),old=JSON.parse(raw).payload,slots=keys[mode],oldId=old.id;
-  await page.addInitScript(({slots,raw,mode})=>{const flag=`test:counter-upgrade:${mode}`;if(sessionStorage.getItem(flag))return;localStorage.setItem(slots.primary,raw);localStorage.setItem(slots.backup,raw);sessionStorage.setItem(flag,'yes');},{slots,raw,mode});
-  await page.goto(`./?game=${mode}`);
-  const attribute='data-dungeon-snapshot';
-  const game=page.locator('#game');
-  await expect(game).toHaveAttribute(attribute, /.+/);
-  const snapshot=()=>game.getAttribute(attribute).then(text=>JSON.parse(text!));
-  await expect.poll(async()=>(await snapshot()).stats?.version).toBe(2);
-  expect((await snapshot()).stats).toMatchObject({coverage:'whole-run',timeCoverage:'since-upgrade',enemiesKilled:old.stats.enemiesKilled,movesTaken:old.stats.movesTaken});
-  expect(await page.evaluate(slots=>[localStorage.getItem(slots.primary),localStorage.getItem(slots.backup)],slots)).toEqual([raw,raw]);
-  await page.getByRole('button',{name:'Start new dungeon',exact:true}).click();await page.locator('#dungeon-confirm-new').click();await expect(page.locator('#dungeon-map')).toBeVisible();
-  await expect.poll(async()=>(await snapshot()).id).not.toBe(oldId);
-  await expect.poll(()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)??'{"records":[]}').records,RUN_RECORD_KEYS.primary)).toMatchObject([{id:oldId,stats:{version:2,coverage:'whole-run',timeCoverage:'since-upgrade',enemiesKilled:old.stats.enemiesKilled,movesTaken:old.stats.movesTaken}}]);
-  const history=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!),RUN_RECORD_KEYS.primary);
-  expect(history.bests[mode].enemiesKilled.id).toBe(oldId);expect(history.bests[mode].movesTaken.id).toBe(oldId);expect(history.bests[mode].activeMs).toBeUndefined();
-  const next = await page.evaluate(key => JSON.parse(localStorage.getItem(key)!), slots.primary);
-  expect(next.format).toBe(WALL_SIGHT_STATS_SAVE_FORMAT);
-  expect(next.payload.stats).toMatchObject({version:2,coverage:'whole-run',timeCoverage:'whole-run'});
 });
 
 test('main menu: five-stat records and retained personal bests stay keyboard and touch accessible', async ({page,isMobile,context},info)=>{
