@@ -577,6 +577,14 @@ it('clears a Wetlands floor through live traversal and resumes its saved encount
   expect(witness.records.map(record => record.state.outcome)).toEqual(['playerWin', 'playerWin', 'playerWin']);
   expect(witness.state.floors[0].completed).toBe(3);
 
+  for (const { entry } of witness.records) {
+    const { selection } = dungeonBattle(entry)!;
+    expect(selection).toMatchObject({ biome: 'wetlands', policy: EXPANDED_ENCOUNTER_POLICY });
+    const enemies = selection.encounter.roster.filter(spawn => spawn.side === 'enemies');
+    expect(entry.activeBattle!.units.filter(unit => unit.side === 'enemy').map(unit => unit.defId))
+      .toEqual(enemies.map(spawn => spawn.unitId));
+  }
+
   const entry = witness.records[0].entry;
   const encodedBattle = encodeDungeon(entry);
   assert(encodedBattle.ok);
