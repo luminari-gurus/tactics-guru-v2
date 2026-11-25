@@ -4,7 +4,7 @@ import { expect,test } from './helpers/startupDiagnostics';
 import type { Locator, Page } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
-import { openDungeonWithStorage, dungeonSnapshot, acceptedDungeonSnapshot, expectSameProgress, walkDungeon, expectDungeonResumed, openDungeonInventory } from './helpers/dungeonTraversal';
+import { openSavedDungeon, openDungeonWithStorage, dungeonSnapshot, acceptedDungeonSnapshot, expectSameProgress, walkDungeon, expectDungeonResumed, openDungeonInventory } from './helpers/dungeonTraversal';
 import { currentSight, neighbors, poiCell } from '../src/domain/exploration';
 import { generateMap } from '../src/map/generate';
 import { freshDungeon, floorDescriptor, floorMap, readDungeon, dungeonSeed, stepDungeon, type DungeonState } from '../src/domain/dungeon';
@@ -168,17 +168,12 @@ test('ground loot: final victory unlocks stairs and shows the uncollected reward
 
 test('map markers respect stair availability, discovery and saved floor state',async({page,isMobile})=>{
  const base=freshDungeon('marker-browser',1),floor=base.floors[0];
- const load=async(state:DungeonState)=>{
-  const encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
-  await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
-  await page.goto('./?game=dungeon');await expectDungeonResumed(page);
- };
  const reload=async()=>{await page.reload();await expectDungeonResumed(page);};
  const cell=(index:number)=>page.locator(`#dungeon-map [data-cell="${index}"]`);
  const accessibleMap=page.getByRole('application',{name:/Floor \d+ map/});
  // Structural saved-state fixtures isolate rendering; they do not prove preceding battle completion.
  const revealed={...floor,exploration:{...floor.exploration,revealed:Array.from({length:400},(_,i)=>i)}};
- await load({...base,floors:[{...revealed,position:floor.position}]});
+ await openSavedDungeon(page,{...base,floors:[{...revealed,position:floor.position}]});
  await expect(page.locator('[aria-label="Discovered places"]')).toHaveCount(0);
  const firstMap = floorMap(floor.descriptor), sight = currentSight(floor.position, firstMap);
  await expect(accessibleMap).toHaveAccessibleDescription(/Guardian · Goblins at row \d+, column \d+\. Available\./);
@@ -205,7 +200,7 @@ test('map markers respect stair availability, discovery and saved floor state',a
  await expect(cell(floor.descriptor.upstairs)).toHaveText('');
  await reload();await expect(cell(floor.descriptor.upstairs)).toHaveText('');
  // Completion alone cannot reveal an undiscovered staircase.
- await load({...base,floors:[{...floor,completed:3}]});
+ await openSavedDungeon(page,{...base,floors:[{...floor,completed:3}]});
  await expect(page.locator('#dungeon-encounter-progress')).toHaveText('Encounters: 3 / 3 cleared');
  await expect(page.locator('#dungeon-stair-descend')).toHaveText('Downstairs: unlocked · walk onto the stairs');
  await expect(cell(floor.descriptor.downstairs)).toHaveClass('explore-hidden');
@@ -213,7 +208,7 @@ test('map markers respect stair availability, discovery and saved floor state',a
  const hiddenPoi = floor.exploration.pois.map(p=>poiCell(p,firstMap.width)).find(i=>!floor.exploration.revealed.includes(i))!;
  await expect(cell(hiddenPoi)).toHaveClass('explore-hidden');
  await expect(accessibleMap).not.toHaveAccessibleDescription(new RegExp(`at row ${Math.floor(hiddenPoi / firstMap.width) + 1}, column ${hiddenPoi % firstMap.width + 1}\\.`));
- await load({...base,floors:[{...revealed,position:floor.position,completed:3}]});
+ await openSavedDungeon(page,{...base,floors:[{...revealed,position:floor.position,completed:3}]});
  await expect(cell(floor.descriptor.downstairs)).toHaveText('↓');
  const downstairs = new RegExp(`Downstairs at row ${Math.floor(floor.descriptor.downstairs / firstMap.width) + 1}, column ${floor.descriptor.downstairs % firstMap.width + 1}\\.$`);
  await expect(accessibleMap).toHaveAccessibleDescription(/Guardian · Goblins at row \d+, column \d+\. Cleared\./);
@@ -224,7 +219,7 @@ test('map markers respect stair availability, discovery and saved floor state',a
  await page.locator('#dungeon-map').screenshot({path:test.info().outputPath('markers-cleared-map.png')});
  const descriptor=floorDescriptor(base.seed,2),exploration=freshExploration(descriptor.seed,descriptor.upstairs,floorMap(descriptor));
  const second={descriptor,completed:0,position:descriptor.upstairs,exploration};
- await load({...base,depth:2,floors:[{...floor,completed:3},second]});
+ await openSavedDungeon(page,{...base,depth:2,floors:[{...floor,completed:3},second]});
  const map=floorMap(descriptor),adjacent=neighbors(descriptor.upstairs,map.width,map.height).find(n=>map.cells[n]&&!exploration.pois.some(p=>poiCell(p,map.width)===n))!;
  await walkDungeon(page,adjacent,isMobile?'touch':'keyboard');await expect(cell(descriptor.upstairs)).toHaveText('↑');
  await expect(accessibleMap).toHaveAccessibleDescription(/^Upstairs at row \d+, column \d+\./);
@@ -324,11 +319,6 @@ test('live markers follow current sight across movement, art changes and reload'
 test('stairs travel once per entry with keyboard, compass and cell controls, and stay on arrival and restore',async({page,isMobile})=>{
  test.setTimeout(240000);
  const base=freshDungeon('stairs-browser',6074),cleared={...base,floors:[{...base.floors[0],completed:3}]};
- const load=async(state:DungeonState)=>{
-  const encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
-  await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
-  await page.goto('./?game=dungeon');await expectDungeonResumed(page);
- };
  const reload=async()=>{await page.reload();await expectDungeonResumed(page);};
  const move=async(destination:number,control:'arrows'|'wasd'|'compass'|'cell')=>{
   if(control==='compass')await expectDungeonMovementVisible(page);
@@ -346,7 +336,7 @@ test('stairs travel once per entry with keyboard, compass and cell controls, and
   if(control==='compass')await expectDungeonMovementVisible(page);
  };
  // Structural clear-floor input isolates traversal. The legal guardian journey separately proves unlock.
- const approach=atStairApproach(cleared);await load(approach);
+ const approach=atStairApproach(cleared);await openSavedDungeon(page,approach);
  const travelHint = page.locator('.dungeon-header');
  await expect(travelHint).toContainText('Encounters: 3 / 3 cleared');
  await expect(travelHint).toContainText('Downstairs: unlocked · walk onto the stairs');
@@ -387,12 +377,7 @@ test('map-edge direction controls, focus, touch targets and unavailable states',
  const safe=(cell:number)=>map.cells[cell]&&!floor.exploration.pois.some(p=>poiCell(p)===cell);
  const center=map.cells.findIndex((_,cell)=>safe(cell)&&neighbors(cell).length===4&&neighbors(cell).every(safe));
  expect(center).toBeGreaterThanOrEqual(0);
- const load=async(state:DungeonState)=>{
-  const encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
-  await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
-  await page.goto('./?game=dungeon');await expectDungeonResumed(page);
- };
- await load(atCell(base,center));
+ await openSavedDungeon(page,atCell(base,center));
  const compass=page.getByRole('group',{name:'Move player',exact:true});
  await expect(compass.getByRole('button')).toHaveCount(4);
  await expectDungeonMovementVisible(page);
@@ -444,7 +429,7 @@ test('map-edge direction controls, focus, touch targets and unavailable states',
   await page.screenshot({path:test.info().outputPath('compass-pressed.png')});await page.mouse.up();
  }
  const wallPosition=map.cells.findIndex((_,cell)=>safe(cell)&&neighbors(cell).some(next=>!map.cells[next]));
- await load(atCell(base,wallPosition));const before=await dungeonSnapshot(page);
+ await openSavedDungeon(page,atCell(base,wallPosition));const before=await dungeonSnapshot(page);
  for(const [name,delta] of directions){
   const unavailable=!neighbors(wallPosition).includes(wallPosition+delta)||!map.cells[wallPosition+delta];
   const button=compass.getByRole('button',{name,exact:true});
@@ -456,7 +441,7 @@ test('map-edge direction controls, focus, touch targets and unavailable states',
  if(isMobile){await page.setViewportSize({width:320,height:740});await expectDungeonMovementVisible(page);}
  expect(await page.locator('#dungeon-screen').evaluate(node=>node.scrollWidth<=node.clientWidth)).toBe(true);
  const compassBox=(await compass.boundingBox())!;expect(compassBox.x).toBeGreaterThanOrEqual(0);expect(compassBox.x+compassBox.width).toBeLessThanOrEqual(page.viewportSize()!.width);
- await load(dungeonCapacityFixture());
+ await openSavedDungeon(page,dungeonCapacityFixture());
  for(const [name] of directions)await expect(compass.getByRole('button',{name,exact:true})).toBeDisabled();
  const reward=await dungeonSnapshot(page);await page.locator('#dungeon-map').focus();await page.keyboard.press('ArrowUp');expect(await dungeonSnapshot(page)).toEqual(reward);
 });
