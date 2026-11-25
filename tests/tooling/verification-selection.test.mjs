@@ -68,6 +68,7 @@ test('routine verification clears each first-floor scenario once and checks both
       'live markers follow current sight across movement, art changes and reload',
       'stairs travel once per entry with keyboard, compass and cell controls, and stay on arrival and restore',
     ]) assert.deepEqual(profilesFor(title), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('ground loot: full capacity keeps same-cell rewards and retries on discard without moving enemies'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('ground loot: entering an occupied pile starts combat and closes inventory'), [stage === 'chromium' ? landscape : desktop]);
     assert.deepEqual(profilesFor('restart during accepted presentation discards old callbacks and history'), [stage === 'chromium' ? desktop : portrait]);
     for (const title of [
