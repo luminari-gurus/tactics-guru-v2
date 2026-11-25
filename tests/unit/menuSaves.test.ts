@@ -2,7 +2,7 @@ import { expect, it, vi } from 'vitest';
 import { inspectMenuSave } from '../../src/app/menuSaves';
 import { BATTLE_STORAGE_KEYS } from '../../src/persistence/battleStorage';
 import { RUN_STORAGE_KEYS } from '../../src/persistence/runStorage';
-import { DUNGEON_KEYS, DUNGEON_BACKUP_CHECKPOINT_KEY, DUNGEON_RECENT_BACKUP_KEY } from '../../src/persistence/dungeonStorage';
+import { createDungeonStorage, resumableDungeonSlot, DUNGEON_KEYS, DUNGEON_BACKUP_CHECKPOINT_KEY, DUNGEON_RECENT_BACKUP_KEY } from '../../src/persistence/dungeonStorage';
 import { menuFixture } from '../helpers/menuFixtures';
 
 it('inspects only dungeon slots even with legacy battle and run saves', () => {
@@ -28,15 +28,19 @@ it('preserves eligibility and warnings for all dungeon slot combinations', () =>
   const states = ['missing', 'valid', 'invalid', 'unavailable'] as const;
   const text = menuFixture('dungeon');
   for (const primary of states) for (const backup of states) {
-    const result = inspectMenuSave(() => ({
-      getItem(key) {
+    const provider = () => ({
+      getItem(key: string) {
         const status = key === DUNGEON_KEYS.primary ? primary : backup;
         if (status === 'unavailable') throw Error('denied');
         return status === 'missing' ? null : status === 'valid' ? text : 'invalid';
       },
       setItem() { throw Error('unexpected write'); },
       removeItem() { throw Error('unexpected removal'); },
-    }));
+    });
+    const review = createDungeonStorage(provider).inspect();
+    const expectedSlot = primary === 'valid' ? 'primary' : backup === 'valid' ? 'backup' : null;
+    expect(resumableDungeonSlot(review)).toBe(expectedSlot);
+    const result = inspectMenuSave(provider);
     expect(result).toEqual({
       primary, backup, hasDefeatedSave: false, resumable: primary === 'valid' || backup === 'valid',
       fromBackup: primary !== 'valid' && backup === 'valid',
