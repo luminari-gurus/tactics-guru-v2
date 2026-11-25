@@ -42,6 +42,10 @@ export const OPTIONAL_ENEMY_IDS = [
   'frost_gnawer', 'icebound_raider', 'snowblind_crow', 'drift_archer', 'rime_shaman',
   'glacier_ram', 'ice_wraith', 'yeti_bruiser', 'aurora_seer', 'frostforge_sentinel',
   'hroth_whitehorn_king',
+  'sand_jackal', 'dune_archer', 'mirage_pup', 'saltbone_howler', 'dune_jackal',
+  'sand_bandit', 'scarab_swarm', 'mirage_adept', 'camel_lancer', 'sand_mummy',
+  'glass_viper', 'obelisk_guardian', 'sandstorm_djinn', 'caravan_reaver',
+  'sirocco_jackal_king', 'saffron_colossus',
 ] as const;
 export const ENEMY_IDS = [...CORE_ENEMY_IDS, ...OPTIONAL_ENEMY_IDS] as const;
 export const BASIC_ATTACK_OPTIONAL_ENEMY_IDS = [
@@ -71,12 +75,17 @@ export const BASIC_ATTACK_OPTIONAL_ENEMY_IDS = [
   'frost_gnawer', 'icebound_raider', 'snowblind_crow', 'glacier_ram',
   'yeti_bruiser', 'frostforge_sentinel',
   'hroth_whitehorn_king',
+  'sand_jackal', 'mirage_pup', 'saltbone_howler', 'dune_jackal',
+  'sand_bandit', 'scarab_swarm', 'camel_lancer', 'sand_mummy',
+  'glass_viper', 'obelisk_guardian', 'caravan_reaver',
+  'sirocco_jackal_king', 'saffron_colossus',
 ] as const;
 export const SHORTBOW_OPTIONAL_ENEMY_IDS = [
   'ruin_lookout', 'cinder_archer', 'fungus_slinger', 'crystal_hermit', 'sling_sapper', 'quarry_vulture',
   'shard_hurler', 'skeleton_archer',
   'ember_cultist', 'pyre_oracle', 'smoke_wisp',
   'drift_archer', 'rime_shaman', 'ice_wraith', 'aurora_seer',
+  'dune_archer', 'mirage_adept', 'sandstorm_djinn',
 ] as const;
 /** Explicit eligible support targets; future enemy IDs do not acquire healing by name. */
 export const HEAL_GOBLIN_IDS = ['goblin_grunt', 'goblin_archer', 'goblin_shaman'] as const;
