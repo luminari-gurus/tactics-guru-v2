@@ -444,7 +444,7 @@ for(const {saved,autoCollect,title} of [
  expect(errors).toEqual([]);
 });
 
-savedWetlandsTest('saved dungeon downloads only after explicit recovery export',async({page,isMobile})=>{
+savedWetlandsTest('saved dungeon downloads only after explicit recovery export', { tag: '@desktop-chromium-portrait-webkit' }, async({page,isMobile})=>{
  test.setTimeout(120000);
  // Playtime checkpoints write saves when recovery opens or the page reloads.
  // Disable time accrual here so exact byte checks isolate export behavior.
