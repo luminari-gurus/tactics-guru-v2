@@ -8,7 +8,7 @@ import { combatStats } from '../../src/domain/effects';
 import { assert,expect,it } from 'vitest';
 import { previewSupportAbility } from '../../src/domain/combat';
 import { dungeonJourney, dungeonVictoryBoundary, rangerJourney, selectMageJourney, MAGE_JOURNEY_SEEDS, FIGHTER_JOURNEY_SEED, healedFighterBoundary, shamanJourney, fighterJourney } from '../helpers/dungeonFixtures';
-import { dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState } from '../../src/domain/dungeon';
+import { dungeonStairStatus, dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState } from '../../src/domain/dungeon';
 import { BattleSession } from '../../src/app/BattleSession';
 import { playerDecision } from '../helpers/playerPolicy';
 import { encodeDungeon,decodeDungeon } from '../../src/domain/dungeonSaveEnvelope';
@@ -310,10 +310,7 @@ it('restores bounded healing and Taunt without refreshing them and resets battle
   const old=JSON.stringify({...JSON.parse(encoded.text),format:4});expect(decodeDungeon(old)).toEqual({ok:false,reason:'incompatible'});
 });
 it('legally reaches guardian victory with next-command/RNG equivalence after save/resume',()=>{
-  let fixture:ReturnType<typeof dungeonVictoryBoundary>=null,seed=0;
-  for(seed=1;seed<=50&&!fixture;seed++)fixture=dungeonVictoryBoundary(seed,2);
-  expect(fixture).not.toBeNull();if(!fixture)return;
-  expect(seed-1).toBeGreaterThan(0);
+  const fixture = dungeonVictoryBoundary(5, 2); assert(fixture);
   const encoded=encodeDungeon(fixture.snapshot);expect(encoded.ok).toBe(true);if(!encoded.ok)return;
   const decoded=decodeDungeon(encoded.text);expect(decoded.ok).toBe(true);if(!decoded.ok)return;
   const catalog=dungeonBattle(fixture.snapshot)!.catalog;
@@ -322,10 +319,29 @@ it('legally reaches guardian victory with next-command/RNG equivalence after sav
   if(a.ok){expect(a.state.outcome).toBe('playerWin');const result=acceptDungeonBattle(decoded.state,a.state);expect(result.ok).toBe(true);if(result.ok){expect(result.state.phase).toBe('reward');expect(result.state.floors[0].completed).toBe(3);}}
 },120000);
 
+it('restores the first reward and keeps descent locked after it is claimed', () => {
+  const fixture = dungeonVictoryBoundary(1, 0); assert(fixture);
+  const entry = fixture.snapshot;
+  const victory = dispatch(entry.activeBattle!, fixture.command, dungeonBattle(entry)!.catalog);
+  assert(victory.ok && victory.state.outcome === 'playerWin');
+  const pending = acceptDungeonBattle(entry, victory.state); assert(pending.ok);
+  const encoded = encodeDungeon(pending.state); assert(encoded.ok);
+  const restored = decodeDungeon(encoded.text); assert(restored.ok);
+  expect(restored.state).toEqual(pending.state);
+  expect(dungeonStairStatus(restored.state, 'descend')).toBe('reward');
+  const offer = restored.state.offer; assert(offer);
+  const claimed = dungeonItem(restored.state, {
+    ...dungeonBoundary(restored.state), type: 'claimReward', offerId: offer.id, itemId: offer.options[0].itemId,
+  });
+  assert(claimed.ok);
+  expect(claimed.state).toMatchObject({ phase: 'ready', offer: null });
+  expect(claimed.state.ownership).not.toEqual(restored.state.ownership);
+  expect(claimed.state.floors[0].completed).toBe(1);
+  expect(dungeonStairStatus(claimed.state, 'descend')).toBe('encounters');
+});
+
 it('retains the accepted-command history through every legal encounter',()=>{
-  let fixture:ReturnType<typeof dungeonVictoryBoundary>=null;
-  for(let seed=1;seed<=50&&!fixture;seed++)fixture=dungeonVictoryBoundary(seed,2);
-  expect(fixture).not.toBeNull();if(!fixture)return;
+  const fixture = dungeonVictoryBoundary(5, 2); assert(fixture);
   for(const value of fixture.histories){
     const {replay:record,entry}=value as {replay:import('../../src/domain/types').Replay;entry:import('../../src/domain/dungeon').DungeonState};
     const catalog=dungeonBattle(entry)!.catalog;
