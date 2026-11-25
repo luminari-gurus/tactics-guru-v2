@@ -84,6 +84,7 @@ test('routine verification clears each first-floor scenario once and checks both
     assert.deepEqual(profilesFor('class guidance: unsaved dungeon keeps dismissals in memory until saving and resuming the same run'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('a second dungeon encounter reuses the engine after a legal victory without reloading'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('declining a dungeon reward preserves inventory and updates stair progress'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('corrupt bytes stay exportable and uncertain travel requires explicit recovery'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('dungeon previous-format recovery preserves and exports both original slots'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('interrupting automatic loot cancels the pending step without replay'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('auto loot Settings are accessible and persist; off waits at origin and re-enabling does not sweep old loot'), [stage === 'chromium' ? desktop : portrait]);

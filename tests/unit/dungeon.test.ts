@@ -904,14 +904,29 @@ describe('dungeon persistence', () => {
     expect((await enterStairs(session))).toBe(false);expect(session.snapshot).toEqual(before);expect(store.inspect().primary.status).toBe('valid');
     m.setItem=write;expect((await session.retry(session.inspect()))).toBe(true);expect((await enterStairs(session))).toBe(true);expect(session.snapshot.depth).toBe(2);
   });
-  it('requires explicit recovery after uncertain primary writes', async () => {
-    const m=memory(),store=createDungeonStorage(()=>m),s=atStairApproach(clearFloor(fresh()));store.save(s);const session=new DungeonSession(s,store);
-    const read=m.getItem;let failRead=false;
-    m.setItem=(k,v)=>{m.values.set(k,v);if(k===DUNGEON_KEYS.primary)failRead=true;};
-    m.getItem=k=>{if(failRead&&k===DUNGEON_KEYS.primary)throw Error('readback');return read(k);};
-    expect((await enterStairs(session))).toBe(false);expect(session.snapshot.depth).toBe(1);
-    failRead=false;expect((await enterStairs(session))).toBe(false);
-    expect(session.continue(session.inspect())).toBe(true);expect(session.snapshot.depth).toBe(2);
+  it.each(['write throws after commit', 'readback fails'])('requires explicit travel recovery when the primary %s', async failure => {
+    const m=memory(),store=createDungeonStorage(()=>m),s=atStairApproach(clearFloor(fresh()));
+    expect(store.save(s).ok).toBe(true);
+    const session=new DungeonSession(s,store),before=session.snapshot;
+    const read=m.getItem,write=m.setItem;
+    let failRead=false;
+    m.setItem=(key,value)=>{
+      write(key,value);
+      if(key!==DUNGEON_KEYS.primary)return;
+      if(failure==='write throws after commit')throw Error('uncertain travel write');
+      failRead=true;
+    };
+    m.getItem=key=>{if(failRead&&key===DUNGEON_KEYS.primary)throw Error('readback');return read(key);};
+    expect(await enterStairs(session)).toBe(false);
+    expect(session.snapshot).toEqual(before);
+    m.setItem=write;m.getItem=read;
+    expect(await enterStairs(session)).toBe(false);
+    expect(session.snapshot).toEqual(before);
+    const review=session.inspect();
+    assert(review.primary.status==='valid');
+    expect(review.primary.state.depth).toBe(2);
+    expect(session.continue(review)).toBe(true);
+    expect(session.snapshot).toEqual(review.primary.state);
   });
   it('allows explicit unsaved battles but blocks travel and disposes stale sessions', async () => {
     const session=new DungeonSession(atStairApproach(clearFloor(fresh())),createDungeonStorage(()=>null));session.playUnsaved();
