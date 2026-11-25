@@ -762,15 +762,19 @@ for(const biome of ['forest','desert'] as const)test(`${biome} saved kinds, scal
  }
 });
 
- test('exploration keeps the map first on narrow screens and cells square across art styles',async({page})=>{
+test('exploration keeps the map first on narrow screens and cells square across art styles',async({page,isMobile,viewport})=>{
  await page.goto('./?game=dungeon&entry=recovery');await page.getByRole('button',{name:'Play unsaved dungeon',exact:true}).click();
  const map = page.locator('#dungeon-map');
  const party = page.getByRole('region', { name: 'Party', exact: true });
- for(const viewport of [{width:320,height:568},{width:393,height:852},{width:667,height:375},{width:740,height:360},{width:812,height:375},{width:915,height:412},{width:1280,height:800}]){
-  await page.setViewportSize(viewport);
+ // Split the seven layout sizes among the three profiles in each engine.
+ const sizes = !isMobile ? [{width:1280,height:800}]
+  : viewport!.width < viewport!.height ? [{width:320,height:568},{width:393,height:852}]
+  : [{width:667,height:375},{width:740,height:360},{width:812,height:375},{width:915,height:412}];
+ for(const size of sizes){
+  await page.setViewportSize(size);
   await page.locator('#dungeon-screen').evaluate(screen => { screen.scrollTop = 0; });
   await expect(map).toBeInViewport();
-  if (viewport.width < viewport.height) {
+  if (size.width < size.height) {
    const layout = await page.locator('#dungeon-screen').evaluate(screen => {
     const map = screen.querySelector('#dungeon-map')!.getBoundingClientRect();
     const party = screen.querySelector('[aria-label="Party"]')!.getBoundingClientRect();
@@ -796,7 +800,7 @@ for(const biome of ['forest','desert'] as const)test(`${biome} saved kinds, scal
     }
     return { count: cells.length, invalid: null };
    });
-   expect(geometry, `${art} cells at ${viewport.width}×${viewport.height}`).toEqual({ count: 400, invalid: null });
+   expect(geometry, `${art} cells at ${size.width}×${size.height}`).toEqual({ count: 400, invalid: null });
   }
  }
  await page.setViewportSize({width:393,height:852});await page.locator('#dungeon-map').scrollIntoViewIfNeeded();
