@@ -1,3 +1,4 @@
+import { freshRunStats } from '../src/domain/runStats';
 import { EXPANDED_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
 import { dungeonContent } from '../src/content/dungeon';
 import { walkDungeon, acceptedDungeonSnapshot, settledDungeonSnapshot, expectSameProgress, reenterDungeonStair, expectDungeonResumed, openDungeonInventory, collectDungeonEncounterLoot } from './helpers/dungeonTraversal';
@@ -999,7 +1000,11 @@ test('declining a dungeon reward preserves inventory and allows the next encount
  await expect(stairs).toHaveText('Downstairs: locked · clear 2 more encounters');
  await expect(rewards).toHaveCount(0);
  await expect(page.locator('.dungeon-status')).toContainText('Dungeon saved on this device');
- await page.reload();await expectDungeonResumed(page);expectSameProgress(await snapshot(page),next);
+ await page.reload();await expectDungeonResumed(page);
+ // The first exploration playtime checkpoint can initialize stats on this legacy reward save.
+ const resumed=await snapshot(page);
+ const expected=(!next.stats && resumed.stats) ? {...next,stats:freshRunStats('since-upgrade')} : next;
+ expectSameProgress(resumed,expected);
  await expect(progress).toHaveText('Encounters: 1 / 3 cleared');
  await expect(stairs).toHaveText('Downstairs: locked · clear 2 more encounters');
  await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
@@ -1037,8 +1042,11 @@ test('confirmed charm discard frees full capacity without cancelling or duplicat
  await page.reload();await expectDungeonResumed(page);expect(await snapshot(page)).toEqual(disposed);
  await page.getByRole('button',{name:/^Claim /}).first().click();await page.locator('#dungeon-item-confirm').click();
  const claimed=await acceptedDungeonSnapshot(page,disposed);expect(claimed.ownership.equipment).toHaveLength(6);expect(claimed.ownership.equipment.some(e=>e.instanceId===target)).toBe(false);expect(claimed.phase).toBe('ready');expect(claimed.offer).toBeNull();
+ const savedClaim=await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary);
+ expect(savedClaim).not.toBeNull();
+ const decoded=decodeDungeon(savedClaim!);if(!decoded.ok)throw Error(decoded.reason);
+ expectSameProgress(decoded.state,claimed);
  await page.screenshot({path:test.info().outputPath('discard-capacity-recovered.png'),fullPage:true});
- await page.reload();await expectDungeonResumed(page);expectSameProgress(await snapshot(page),claimed);
  await openDungeonInventory(page);
  await page.getByRole('button',{name:/^Discard /}).first().click();await page.locator('#dungeon-discard-confirm').click();
  const prepared=await acceptedDungeonSnapshot(page,claimed);expect(prepared.phase).toBe('ready');expect(prepared.ownership.equipment).toHaveLength(5);

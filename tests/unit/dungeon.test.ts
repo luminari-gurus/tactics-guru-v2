@@ -73,6 +73,23 @@ it('checkpoints eligible exploration time without counting paused or closed sess
   (await owner.flushPlaytime()); expect(owner.snapshot.stats?.activeMs).toBe(750);
 });
 
+it('starts legacy reward playtime at the first exploration checkpoint after decline', async () => {
+  let now = 0;
+  const initial = dungeonCapacityFixture(), data = memory(), storage = createDungeonStorage(() => data);
+  assert(storage.save(initial).ok);
+  const session = new DungeonSession(initial, storage, null, () => now);
+  assert(session.continue(session.inspect()));
+  assert(await session.dispatch({ ...dungeonBoundary(initial), type: 'declineReward', offerId: initial.offer!.id }));
+  const declined = session.snapshot;
+  expect(declined.stats).toBeUndefined();
+  session.setPlaytimeActive(true);
+  now = 250;
+  await session.flushPlaytime();
+  const saved = storage.inspect().primary; assert(saved.status === 'valid');
+  expect(saved.state).toEqual({ ...declined, stats: { ...freshRunStats('since-upgrade'), activeMs: 250 } });
+  session.dispose();
+});
+
 it('clears an unsaved status when a later clock checkpoint recovers storage', async () => {
   const m=memory(),storage=createDungeonStorage(()=>m);let now=0;
   const owner=new DungeonSession(freshDungeon('clock-recovery',13,undefined,true),storage,null,()=>now);
@@ -985,6 +1002,8 @@ describe('confirmed dungeon charm disposal', () => {
     const encoded=encodeDungeon(discarded);if(!encoded.ok)throw Error(encoded.reason);expect(decodeDungeon(encoded.text)).toEqual({ok:true,state:discarded});
     const claimed=good(dungeonItem(discarded,{...dungeonBoundary(discarded),type:'claimReward',offerId:discarded.offer!.id,itemId:discarded.offer!.options[0].itemId}));
     expect(claimed.ownership.equipment).toHaveLength(6);expect(claimed.phase).toBe('ready');expect(claimed.offer).toBeNull();expect(claimed.ownership.equipment.some(e=>e.instanceId===instanceId)).toBe(false);
+    const stored=encodeDungeon(claimed);assert(stored.ok);
+    expect(decodeDungeon(stored.text)).toEqual({ok:true,state:claimed});
   });
   it('rejects unowned/malformed/battle/defeat commands without mutation', async () => {
     const original=dungeonCapacityFixture(),instanceId=original.ownership.equipment[0].instanceId,command={...dungeonBoundary(original),type:'discardEquipment' as const,instanceId};
