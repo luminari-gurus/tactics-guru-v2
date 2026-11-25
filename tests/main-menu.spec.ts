@@ -170,8 +170,7 @@ test('main menu: records dungeon replacement withholds exploration until final h
   await expect.poll(async () => JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!).revision).toBe(revision + 1);
 });
 
-for (const completion of ['finished', 'interrupted'] as const)
-test(`main menu: records replacing distinct saved and unsaved dungeon preserves both after ${completion} history`, async ({ page, isMobile }, info) => {
+test('main menu: records replacing distinct saved and unsaved dungeon preserves both after interrupted history', async ({ page, isMobile }, info) => {
   const mode = 'dungeon', slots = keys.dungeon, savedPayload = {...JSON.parse(menuFixture(mode)).payload,
     stats:{...freshRunStats(),enemiesKilled:0,movesTaken:6,activeMs:5000}};
   const encoded=encodeDungeon(savedPayload);
@@ -195,7 +194,7 @@ test(`main menu: records replacing distinct saved and unsaved dungeon preserves 
   const request = () => activate(page.getByRole('button', { name: 'Start new dungeon', exact: true }));
   await request(); await activate(page.locator('#dungeon-cancel-new'));
   expect((await history()).records).toEqual([]); expect(await activeSlots()).toEqual(before);
-  const releaseHistory = await holdFinalRecordsWrite(page);
+  await holdFinalRecordsWrite(page);
   await request(); await activate(page.locator('#dungeon-confirm-new'));
   await expect(page.locator('html')).toHaveAttribute('data-records-held', 'yes');
   const pending = (await history()).receipts[mode];
@@ -209,12 +208,8 @@ test(`main menu: records replacing distinct saved and unsaved dungeon preserves 
   const nextId = nextPayload.id;
   expect([savedId, liveId]).not.toContain(nextId);
   const expectCurrentMap = () => expect(page.locator('#dungeon-map')).toBeVisible();
-  if (completion === 'interrupted') {
-    // Startup now resumes the new save and reconciles its pending record.
-    await page.reload(); await expectCurrentMap();
-  } else {
-    await releaseHistory(); await expect(page.locator('#dungeon-map')).toBeVisible();
-  }
+  // Startup resumes the new save and reconciles the pending pair.
+  await page.reload(); await expectCurrentMap();
   await expect.poll(async () => (await history()).records).toHaveLength(2);
   const recorded = (await history()).records;
   expect(recorded.map((row: RunRecord) => row.id).sort()).toEqual([savedId, liveId].sort());

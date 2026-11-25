@@ -601,7 +601,8 @@ describe('dungeon run history boundaries', () => {
     expect(f.rows()).toMatchObject([{ id: initial.id, outcome: 'abandoned', battlesWon: 0 }]);
   });
   it.each(['accepted', 'stale', 'partial'] as const)('records the distinct saved and admitted unsaved dungeon only when replacement is %s', async result => {
-    const f = fixture(), saved = fresh(), live = freshDungeon('unsaved-live-dungeon', 23);
+    const f = fixture(), saved = { ...fresh(), stats: { ...freshRunStats(), movesTaken: 6, activeMs: 5000 } };
+    const live = freshDungeon('unsaved-live-dungeon', 23, undefined, true);
     assert(f.storage.save(saved).ok);
     const session = new DungeonSession(live, f.storage, f.history);
     session.playUnsaved(); const before = session.snapshot, review = session.inspect();
@@ -614,9 +615,10 @@ describe('dungeon run history boundaries', () => {
     if (result === 'accepted') {
       const rows = f.rows(); expect(rows).toHaveLength(2);
       expect(rows).toEqual(expect.arrayContaining([
-        expect.objectContaining({ id: saved.id, outcome: 'abandoned' }),
-        expect.objectContaining({ id: live.id, outcome: 'abandoned' }),
+        expect.objectContaining({ id: saved.id, outcome: 'abandoned', stats: expect.objectContaining({ movesTaken: 6, activeMs: 5000 }) }),
+        expect.objectContaining({ id: live.id, outcome: 'abandoned', stats: expect.objectContaining({ movesTaken: 0 }) }),
       ]));
+      expect(selectedRunRecords(f.records.inspect())?.bests.dungeon.movesTaken?.id).toBe(saved.id);
       assert(session.continue(session.inspect())); await f.history.whenIdle(); expect(f.rows()).toEqual(rows);
     } else { expect(f.rows()).toEqual([]); expect(session.snapshot).toEqual(before); }
   });
