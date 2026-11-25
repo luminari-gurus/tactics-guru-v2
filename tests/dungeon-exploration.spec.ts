@@ -548,13 +548,14 @@ test('movement controls stay visible with the player without scrolling on entry 
 test('compass keeps keyboard focus when movement disables the activated direction',async({page})=>{
  const fresh=freshDungeon('compass-browser',1),initial=atCell({...fresh,floors:[{...fresh.floors[0],completed:3}]},27),encoded=encodeDungeon(initial);
  if(!encoded.ok)throw Error(encoded.reason);
+ await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
+ await page.goto('./?game=dungeon');await expectDungeonResumed(page);
+ const west=page.getByRole('button',{name:'West',exact:true}),map=page.locator('#dungeon-map');
+ let revision=initial.revision;
  for(const key of ['Enter','Space']){
-  await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
-  await page.goto('./?game=dungeon');await expectDungeonResumed(page);
-  const west=page.getByRole('button',{name:'West',exact:true}),map=page.locator('#dungeon-map');
   await expect(west).toBeEnabled();await west.focus();await page.keyboard.press(key);
   await expect.poll(async () => (await dungeonSnapshot(page)).floors[0].position).toBe(26);
-  const moved=await dungeonSnapshot(page);expect(moved.revision).toBe(initial.revision+1);
+  const moved=await dungeonSnapshot(page);expect(moved.revision).toBe(revision+1);
   await expect(west).toBeDisabled();await expect(map).toBeFocused();
   expect(await map.evaluate(node=>node.matches(':focus-visible')&&getComputedStyle(node).outlineStyle==='solid')).toBe(true);
   await page.screenshot({path:test.info().outputPath(`compass-focus-fallback-${key}.png`)});
@@ -562,7 +563,8 @@ test('compass keeps keyboard focus when movement disables the activated directio
   await page.keyboard.press('ArrowRight');
   await expect.poll(async () => (await dungeonSnapshot(page)).floors[0].position).toBe(27);
   const returned=await dungeonSnapshot(page);
-  expect(returned.revision).toBe(initial.revision+2);await expect(map).toBeFocused();await expect(west).toBeEnabled();
+  expect(returned.revision).toBe(revision+2);await expect(map).toBeFocused();await expect(west).toBeEnabled();
+  revision=returned.revision;
  }
 });
 
