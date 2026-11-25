@@ -612,7 +612,31 @@ test('Forest Elite keeps a living goblin visible behind raised terrain', async (
  for (const x of [5, 6]) expect(board.fadedTerrain ?? []).toContainEqual({ x, y: 3, columnAlpha: 0.3, surfaceAlpha: 0.3 });
 });
 
-test('Shaman production journey uses Hex and ally healing, reloads Weakened and replays a complete legal battle', { tag: '@desktop-chromium-portrait-webkit' }, async({page,isMobile},info)=>{
+test('resumed Shaman Hex shows the Weakened hero and accuracy penalty', { tag: '@desktop-chromium-portrait-webkit' }, async ({ page }) => {
+ const witness = shamanJourney(189);
+ const catalog = dungeonBattle(witness.entry)!.catalog;
+ let state = witness.entry.activeBattle!;
+ for (const command of witness.commands) {
+  const result = dispatch(state, command, catalog);
+  if (!result.ok) throw Error(result.reason);
+  state = result.state;
+  const actor = state.units.find(unit => unit.id === state.initiative[state.activeIndex]);
+  const weakened = state.units.find(unit => unit.weakenedBy !== undefined);
+  if (actor?.side !== 'player' || !weakened) continue;
+
+  await openSavedDungeon(page, checkedDungeon(acceptDungeonBattle(witness.entry, state)));
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  expect((await readSession(page)).state).toEqual(state);
+  await (await battleTool(page, '#battle-party')).click();
+  await page.locator(`#inspect-unit-${weakened.id}`).click();
+  await expect(page.getByRole('dialog')).toContainText('Weakened by Goblin Shaman #6');
+  await expect(page.getByRole('dialog')).toContainText('−2 accuracy');
+  return;
+ }
+ throw Error('Shaman journey never reached a player turn with a Weakened hero');
+});
+
+test('Shaman production journey uses Hex and ally healing, reloads Weakened and replays a complete legal battle', { tag: '@extended-shaman' }, async({page,isMobile},info)=>{
  test.setTimeout(120000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  const witness=shamanJourney(189),catalog=dungeonBattle(witness.entry)!.catalog;
  // This is the canonical unplayed save: level 1, full HP, no fabricated inventory or combat boundary.
