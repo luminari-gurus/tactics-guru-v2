@@ -1031,41 +1031,6 @@ test('a claimed Revive Kit restores a fallen dungeon hero across Continue',async
  await expect(mageHealth).toHaveAttribute('aria-valuetext','3 of 11 hit points, injured');
 });
 
-test('an earned Healing Draught survives dungeon Continue after use',async({page,isMobile})=>{
- test.setTimeout(180000);
- const witness=dungeonVictoryBoundary(13);if(!witness)throw Error('Missing victory witness');
- const won=dispatch(witness.snapshot.activeBattle,witness.command,dungeonBattle(witness.snapshot)!.catalog);if(!won.ok)throw Error(won.reason);
- const victory=acceptDungeonBattle(witness.snapshot,won.state);if(!victory.ok)throw Error(victory.reason);
- await seed(page,victory.state);
- const claim=page.getByRole('button',{name:'Claim Healing Draught',exact:true});
- if(isMobile)await claim.tap();else await claim.click();
- await page.locator('#dungeon-item-confirm').click();
- await acceptedDungeonSnapshot(page,victory.state);
- await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
- for(let i=0;i<500;i++){
-  await expect.poll(async()=>{const s=await snapshot(page);return !s||s.phase!=='battle'||await page.locator('#game').getAttribute('data-phase')==='player';}).toBe(true);
-  const current=await snapshot(page);if(!current||current.phase!=='battle')break;
-  const before=(await readSession(page)).state, actor=before.units.find(u=>u.id===before.initiative[before.activeIndex])!;
-  const button=page.locator('#battle-draught');
-  if(await button.isEnabled()){
-   await playCommand(page,{type:'drinkDraught',unitId:actor.id});
-   await expect(button).toHaveText('Healing Draught ×0 · None left');
-   const accepted=(await readSession(page)).state;
-   expect(accepted.rng).toEqual(before.rng);
-   expect(accepted.units.find(u=>u.id===actor.id)!.hp).toBeGreaterThan(actor.hp);
-   await expect.poll(() => page.evaluate(key => {
-    const saved = localStorage.getItem(key);
-    return saved && JSON.parse(saved).payload.activeBattle?.commandCount;
-   }, DUNGEON_KEYS.primary)).toBe(accepted.commandCount);
-   await page.reload();await expectDungeonResumed(page);
-   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-   expect((await readSession(page)).state).toEqual(accepted);
-   return;
-  } else await playCommand(page,playerDecision(before,dungeonBattle(current)!.catalog));
- }
- throw Error('The encounter ended or reached the command limit before using the draught');
-});
-
 test('fresh dungeon keeps the map and party in view and opens the selected character sheet', async ({page,isMobile}) => {
  await page.route('**/battle/portraits/mage.png', route => route.abort());
  await page.goto('./');

@@ -52,6 +52,12 @@ test('boxed-in hero can cancel Wait before acting and end immediately after acti
  await playCommand(page, {type:'drinkDraught', unitId:actor.id});
  const acted = (await readSession(page)).state;
  expect(acted.units.find(unit => unit.id === actor.id)?.hasActed).toBe(true);
+ await expect(page.locator('#battle-draught')).toHaveText('Healing Draught ×0 · None left');
+ await expect.poll(() => page.evaluate(key => JSON.parse(localStorage.getItem(key)!).payload.activeBattle.commandCount,
+  DUNGEON_KEYS.primary)).toBe(acted.commandCount);
+ await page.reload(); await expectDungeonResumed(page);
+ await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+ expect((await readSession(page)).state).toEqual(acted);
  if (isMobile) await wait.tap(); else await wait.click();
  await expect(dialog).toBeHidden();
  await expect.poll(async () => (await readSession(page)).state.commandCount).toBeGreaterThan(acted.commandCount);
