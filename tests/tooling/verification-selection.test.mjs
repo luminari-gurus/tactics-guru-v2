@@ -53,10 +53,6 @@ test('each engine clears one full floor per profile and checks both pickup modes
       stage === 'chromium' ? [desktop, portrait].sort() : [landscape]);
     assert.deepEqual(profilesFor('testing dungeon legally clears a floor, descends and backtracks without accessing saves'), [landscape]);
     assert.deepEqual(profilesFor('saved menu dungeon auto-collects loot across a complete first floor'), [portrait]);
-    for (const biome of ['forest', 'desert']) {
-      assert.deepEqual(profilesFor(`${biome} saved kinds, scaled inspection and reload use actual selected definitions`),
-        [stage === 'chromium' ? desktop : portrait]);
-    }
     assert.deepEqual(profilesFor('closing on the guardian first holds contact and resumes its battle'),
       [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('Guardian-first reward, map and encounter state survive claim and reload at depth 5'),
@@ -179,6 +175,17 @@ test('long progression journeys are excluded from routine selection and remain a
       const cases = selection.tests.filter(row => row.project === project.name);
       assert.equal(cases.length, 4);
       for (const title of [...titles, 'Shaman production journey']) assert.equal(cases.filter(row => row.title.startsWith(title)).length, 1);
+    }
+  }
+});
+
+
+test('saved biome inspection runs on desktop Chromium and portrait WebKit', () => {
+  for (const [stage, profile] of [['chromium', 'desktop'], ['webkit-exploration', 'portrait-webkit']]) {
+    for (const biome of ['forest', 'desert']) {
+      const title = `${biome} saved kinds, scaled inspection and reload use actual selected definitions`;
+      const cases = after.selections[stage].tests.filter(row => row.title === title);
+      assert.deepEqual(cases.map(row => row.project), [profile]);
     }
   }
 });
