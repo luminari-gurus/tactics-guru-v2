@@ -199,6 +199,9 @@ it('settles the last earned draught after playing the next encounter to completi
 
 it('completes production Shaman Hex and healing through the real session with exact command/event/RNG replay',()=>{
   const witness=shamanJourney(189),catalog=dungeonBattle(witness.entry)!.catalog;
+  const entrySave = encodeDungeon(witness.entry);
+  assert(entrySave.ok);
+  expect(decodeDungeon(entrySave.text)).toEqual({ ok: true, state: witness.entry });
   expect(witness.state.outcome).toBe('playerWin');
   expect(witness.events.filter(e=>e.type==='healed')).toHaveLength(2);
   expect(witness.events.some(e=>e.type==='saveRolled'&&!e.saved)).toBe(true);
@@ -214,6 +217,9 @@ it('completes production Shaman Hex and healing through the real session with ex
     state=result.state;events.push(...result.events);
   }
   expect({state,events}).toEqual({state:witness.state,events:witness.events});
+  const settled = acceptDungeonBattle(witness.entry, state);
+  assert(settled.ok);
+  expect(settled.state.party.every(hero => !Object.hasOwn(hero, 'weakenedBy'))).toBe(true);
 });
 
 it('retains a legal six-battle Fighter level-three witness with healing, Taunt and exact terminal replay',()=>{
