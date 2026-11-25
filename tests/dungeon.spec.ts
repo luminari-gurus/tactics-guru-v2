@@ -380,6 +380,14 @@ for(const {saved,autoCollect,title} of [
    await page.waitForTimeout(500);
    const waiting=await snapshot(page);expect(waiting.floors[0]).toEqual(finished.floors[0]);
    expect(waiting.ownership).toEqual(finished.ownership);
+   if(saved && slot === 2) {
+    const stairs = page.locator('#dungeon-stair-descend');
+    await expect(stairs).toHaveText('Downstairs: unlocked · walk onto the stairs');
+    await page.reload();
+    await expectDungeonResumed(page);
+    await expect(stairs).toHaveText('Downstairs: unlocked · walk onto the stairs');
+    await expect(page.locator(`#dungeon-map [data-cell="${reward.cell}"]`)).toHaveAttribute('data-loot','1');
+   }
    await collectDungeonEncounterLoot(page,encounterEntry,isMobile?'touch':'keyboard');
   }
   const collected=await snapshot(page),collectedFloor=collected.floors[0];
