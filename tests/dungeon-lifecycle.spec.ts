@@ -16,7 +16,7 @@ import { readFileSync } from 'node:fs';
 import { canonical, hashJson } from '../src/domain/contentIdentity';
 import { RUN_RECORD_KEYS } from '../src/persistence/runRecordsStorage';
 
-test('boxed-in hero can cancel Wait before acting and end immediately after acting', async ({page, isMobile}) => {
+test('boxed-in hero can cancel Wait before acting and end immediately after acting', { tag: '@desktop-chromium-portrait-webkit' }, async ({page, isMobile}) => {
  const base = freshDungeon('boxed-in-wait', 1);
  const ready = {...base, party: base.party.map(hero => ({...hero, hp: hero.maxHp - 1})),
   ownership: {...base.ownership, consumables: [{itemId: 'item:healing_draught' as const, quantity: 1}]}};

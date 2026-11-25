@@ -98,6 +98,18 @@ test('menu save recovery runs on desktop Chromium and portrait WebKit', () => {
   }
 });
 
+test('battle confirmations cover keyboard and touch activation', () => {
+  for (const [stage, profile] of [['chromium', 'desktop'], ['webkit-exploration', 'portrait-webkit']]) {
+    for (const title of [
+      'Rail Magic Missile requires explicit confirmation before damaging an ally',
+      'boxed-in hero can cancel Wait before acting and end immediately after acting',
+    ]) {
+      const cases = after.selections[stage].tests.filter(row => row.title === title);
+      assert.deepEqual(cases.map(row => row.project), [profile]);
+    }
+  }
+});
+
 test('keyboard focus and shortcuts run on desktop while the touch target checks cover every profile', () => {
   for (const [stage, desktop] of [['chromium', 'desktop'], ['webkit-exploration', 'desktop-webkit']]) {
     const { tests, projects } = after.selections[stage];
