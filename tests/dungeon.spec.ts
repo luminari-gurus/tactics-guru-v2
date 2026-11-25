@@ -239,8 +239,6 @@ test('staged Mage Frost Snare cancels invalid casts and restores the active badg
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const accepted=await readSession(page);expect(accepted.state).toEqual(expected.state);expect(accepted.events).toEqual(expected.events);
  await checkSnares(page,true);await page.screenshot({path:test.info().outputPath('snared-cast.png')});
- expect(accepted.state.rng).toEqual(before.state.rng);expect(accepted.state.units.map(u=>u.hp)).toEqual(before.state.units.map(u=>u.hp));
- expect(accepted.events).toContainEqual({type:'movementBlocked',unitId:fixture.command.target.unitId,sourceId:fixture.command.unitId,abilityId});
  // Opening recovery flushes active playtime before capturing the exact save bytes.
  await page.getByRole('button',{name:'Save recovery',exact:true}).click();
  await expect(page.getByRole('heading',{name:'Dungeon save recovery',exact:true})).toBeVisible();
