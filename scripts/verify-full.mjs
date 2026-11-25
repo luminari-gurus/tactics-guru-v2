@@ -21,16 +21,8 @@ export const stages = [
   npm('build-integration', ['run', 'test:build']),
   bundle('build-root'),
   preview('chromium', ['-c', 'playwright.regression.config.ts']),
-  browser('fixtures', ['-c', 'playwright.fixtures.config.ts']),
-  browser('placement-dev', ['-c', 'playwright.regression.config.ts', 'tests/overworld-map.spec.ts', '-g',
-    'controlled placement failure preserves complete state and supports retry|direct map disposer is idempotent and detaches listeners'],
-    { env: { PLAYWRIGHT_SERVER_MODE: 'dev' } }),
   preview('webkit-acceptance', ['-c', 'playwright.device-acceptance.config.ts']),
   preview('webkit-exploration', ['-c', 'playwright.exploration.config.ts']),
-  preview('health-bars', ['-c', 'playwright.health-bars.config.ts']),
-  browser('telemetry-production', ['-c', 'playwright.telemetry.config.ts', '--project=desktop']),
-  browser('telemetry-development', ['-c', 'playwright.telemetry.config.ts', '--project=desktop'],
-    { env: { PLAYWRIGHT_TELEMETRY_DEV: 'true' } }),
   browser('assets-root-dev', ['-c', 'playwright.regression.config.ts', 'tests/public-asset-base.spec.ts', '--project=desktop'],
     { env: { PLAYWRIGHT_SERVER_MODE: 'dev' } }),
   npm('performance', ['run', 'measure:fit'], { needs: ['build-root'] }),
@@ -81,7 +73,7 @@ export function stageEnvironment(stage, directory, inherited = process.env) {
 
 export function main(args = process.argv.slice(2)) {
   if (args.length && !(args.length === 1 && args[0] === '--list')) {
-    throw new Error('Usage: npm run verify:full [-- --list] (filters belong on test:regression or test:fixtures)');
+    throw new Error('Usage: npm run verify:full [-- --list] (filters belong on test:regression)');
   }
   if (args[0] === '--list') { console.log(JSON.stringify(stages, null, 2)); return 0; }
   const directory = resolve('tmp/verification', `full-${new Date().toISOString().replaceAll(':', '-')}-${process.pid}`);
@@ -91,8 +83,9 @@ export function main(args = process.argv.slice(2)) {
   const result = runStages(stages, stage => {
     const log = join(directory, `${stage.id}.log`);
     const argv = [...stage.args];
+    const performanceCapture = join(directory, 'performance.json');
+    if (stage.id === 'performance') argv.push('--', performanceCapture);
     if (stage.browser) argv.push('--reporter=line,json', '--output', join(directory, `${stage.id}-artifacts`));
-    if (stage.id === 'performance') argv.push('--', join(directory, 'performance.json'));
     console.log(`Running ${stage.id}; log: ${log}`);
     const fd = openSync(log, 'w');
     try {
@@ -100,7 +93,14 @@ export function main(args = process.argv.slice(2)) {
       const child = spawnSync(process.execPath, [process.env.npm_execpath, ...argv], {
         env: stageEnvironment(stage, directory), stdio: ['ignore', fd, fd],
       });
-      return { exitCode: child.status, signal: child.signal, error: child.error?.message, command: ['npm', ...argv], log };
+      const receipt = { exitCode: child.status, signal: child.signal, error: child.error?.message, command: ['npm', ...argv], log };
+      if (stage.id !== 'performance' || child.status !== 0) return receipt;
+
+      const evaluationPath = join(directory, 'performance-evaluation.json');
+      const evaluation = spawnSync(process.execPath, [
+        '--experimental-strip-types', 'scripts/evaluate-fit.ts', performanceCapture, evaluationPath,
+      ], { stdio: ['ignore', fd, fd] });
+      return { ...receipt, exitCode: evaluation.status, signal: evaluation.signal, error: evaluation.error?.message, evaluationPath };
     } finally { closeSync(fd); }
   }, results => {
     writeFileSync(join(directory, 'summary.json'), JSON.stringify({ source, results }, null, 2) + '\n');

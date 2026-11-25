@@ -37,6 +37,10 @@ test('whole-file batches partition canonical Chromium and preserve every remaini
   assert.deepEqual([...new Set([...stages.filter(stage => preparationIds.includes(stage.id)), ...jobStages].map(stage => stage.sourceStage))].sort(),
     [...new Set(stages.map(stage => stage.sourceStage))].sort());
   assert.equal(plan.scope, 'full');
+  const performance = plan.jobs.find(job => job.id === 'performance');
+  assert.equal(performance.stages[0].id, 'performance');
+  assert.deepEqual(performance.stages[0].needs, ['build-root']);
+  assert.ok(plan.requested.includes('performance'));
   const prefix = plan.jobs.find(job => job.id === 'prefix-assets');
   assert.deepEqual(prefix.stages.map(stage => stage.id), ['build-prefix', 'assets-prefix-preview', 'assets-prefix-dev', 'restore-root']);
   for (const job of plan.jobs.filter(job => !job.id.startsWith('chromium-'))) for (const row of job.stages) {
@@ -54,10 +58,10 @@ test('selection drift, missing and duplicate IDs fail closed', () => {
 });
 
 test('targeted runs and pilot cannot claim full coverage; unknown batch filters fail', () => {
-  assert.equal(createPlan('capture', discovery, 'telemetry-development').scope, 'partial');
+  assert.equal(createPlan('capture', discovery, 'assets-root-dev').scope, 'partial');
   assert.equal(createPlan('pilot', () => [testcase('pilot')]).scope, 'partial');
   assert.throws(() => createPlan('capture', discovery, 'typo'), /Unknown/);
-  assert.throws(() => createPlan('capture', discovery, 'performance,performance'), /duplicate/);
+  assert.throws(() => createPlan('capture', discovery, 'webkit-acceptance,webkit-acceptance'), /duplicate/);
 });
 
 test('real Playwright pilot discovery matches full titles in all intended projects', () => {
@@ -65,10 +69,10 @@ test('real Playwright pilot discovery matches full titles in all intended projec
   const chromium = discover(jobs[0].stages[0]), webkit = discover(jobs[1].stages[0]);
   assert.equal(chromium.length, 3); assert.equal(webkit.length, 2);
   assert.deepEqual(chromium.map(row => row.project).sort(), ['desktop', 'mobile-landscape', 'mobile-portrait']);
-  assert.ok(chromium.every(row => row.title === 'boots a Phaser scene and fits the viewport after resize'));
+  assert.ok(chromium.every(row => row.title === 'main menu: New Game starts immediately when no dungeon save exists'));
   assert.deepEqual(webkit.map(row => [row.project, row.title]).sort(), [
-    ['acceptance-webkit-landscape', 'complete legal authored battle seed 2 reaches playerWin through controls and replays'],
-    ['acceptance-webkit-portrait', 'complete legal authored battle seed 1 reaches playerLoss through controls and replays'],
+    ['acceptance-webkit-landscape', 'main menu: New Game starts immediately when no dungeon save exists'],
+    ['acceptance-webkit-portrait', 'main menu: New Game starts immediately when no dungeon save exists'],
   ]);
 });
 

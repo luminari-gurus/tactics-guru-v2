@@ -81,8 +81,8 @@ full-suite measurement against #200 remain part of #208.
 
 ## Coverage and build provenance
 
-`scripts/verification-batches.mjs` derives the 20 timing rows from the existing
-19-stage `verify-full.mjs` plan. Preparation runs tooling, fast units (including
+`scripts/verification-batches.mjs` derives 15 timing rows from the
+14-stage `verify-full.mjs` plan. Preparation runs tooling, fast units (including
 content), both TypeScript scopes, real build integrations and the root bundle.
 It uploads that ordinary root output once, with source/input identity, a complete
 per-file SHA-256 inventory, the discovery plan and preparation receipts. Every
@@ -90,21 +90,15 @@ consumer verifies the plan, exact checkout/input hash and downloaded build bytes
 before copying `dist`. Builds from another commit, altered/missing files and
 stale local `dist` are rejected.
 
-The historical nine whole-file/project groups from the #200 investigation supply
-the Chromium partition. They are not test-level shards and do not alter fixtures,
-assertions or project configuration. Fresh discovery must prove their exact union
-equals the current canonical selection, with zero missing, extra or duplicate IDs.
-At main `b749ba4`, this includes **693** cases (231 per profile), not the historical
-687. WebKit exploration similarly now selects 57 cases rather than 51.
+Nine whole-file groups partition Dungeon and shared menu and asset cases across
+the three Chromium profiles. Fresh discovery verifies their exact union with the
+current canonical selection and rejects missing, extra or duplicate test IDs.
 
-The other jobs retain fixtures, explicit dev placement, both WebKit matrices,
-health bars, separate production/development telemetry, root dev assets and the
-local performance collector. `prefix-assets` runs the canonical prefix build,
+The other browser jobs cover WebKit menu and Dungeon and root-dev assets. `prefix-assets` runs the canonical prefix build,
 prefix preview/dev consumers and final root restoration in one job. Failed prefix
 builds block only their preview consumer; dev coverage and eligible root
-restoration still run. Telemetry retains its own configured build/server, rather
-than treating the ordinary artifact as its instrumented build. Failed preparation
-gates block their consumers; independent dev/telemetry coverage can still run from
+restoration still run. Failed preparation
+gates block their consumers; independent dev asset coverage can still run from
 the retained preparation report.
 
 Each batch has its own 65-minute foreground budget and 85-minute job ceiling,
@@ -187,12 +181,10 @@ invented. API totals exclude the still-running aggregate job. Per-runner cross-w
 locking does not establish that unrelated host workloads are idle; coordinate
 those separately and document them in `conditions`.
 
-The performance job runs both the collector and the existing `evaluate-fit.ts`.
-Collection success alone cannot pass a sample that violates unchanged performance
-limits. Evaluation JSON and its nonzero result are retained separately. The two
-budget failures in PR #225's Windows capture remain historical failures; that
-capture is not a self-hosted comparison baseline. Both earlier 100-minute failed
-captures and the hosted failure remain recorded in every aggregate.
+Full capture runs the standalone proof-scene collector and evaluates the
+source-bound samples against the documented budgets. The evaluation JSON and
+its exit status are recorded separately. The budget failures from PR #225 and
+earlier failed runs remain in the historical receipts.
 
 `complete` describes accounted execution/coverage; `passed` also requires all
 current gates to pass. `baselineEligible` additionally requires a full scope and
