@@ -8,9 +8,9 @@ on:
         options: [tactics-browser-01, tactics-browser-02]
         default: tactics-browser-01
       mode:
-        description: Qualification, serial pilot, two-runner pilot, matched pair, or serial capture
+        description: Qualification, serial pilot, two-runner pilot, matched pair, full two-runner verification, or serial capture
         type: choice
-        options: [qualify, pilot, parallel-pilot, serial-pair, parallel-pair, capture]
+        options: [qualify, pilot, parallel-pilot, serial-pair, parallel-pair, parallel-full, capture]
         default: qualify
       batches:
         description: Optional comma-separated batch IDs; empty capture selects the full plan
@@ -56,7 +56,7 @@ jobs:
       (github.repository != 'luminari-gurus/tactics-guru-v2' ||
       (inputs.extra_job != 'full-verify' &&
       !(github.ref == 'refs/heads/main' ||
-      (endsWith(inputs.mode, '-pair') && github.ref == 'refs/heads/work/issue-208-matched-pair') || github.ref == 'refs/heads/work/issue-208-serial-batches' ||
+      (endsWith(inputs.mode, '-pair') && github.ref == 'refs/heads/work/issue-208-matched-pair') || (inputs.mode == 'parallel-full' && github.ref == 'refs/heads/work/208-full-parallel') || github.ref == 'refs/heads/work/issue-208-serial-batches' ||
       (inputs.mode == 'qualify' && github.ref == 'refs/heads/work/issue-200-verification-timings') ||
       ((inputs.mode == 'pilot' || inputs.mode == 'parallel-pilot') &&
       github.ref == 'refs/heads/work/issue-208-parallel-pilot'))))
@@ -107,7 +107,7 @@ jobs:
           retention-days: 30
           if-no-files-found: warn
   prepare:
-    if: github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || (endsWith(inputs.mode, '-pair') && github.ref == 'refs/heads/work/issue-208-matched-pair') || github.ref == 'refs/heads/work/issue-208-serial-batches' || ((inputs.mode == 'pilot' || inputs.mode == 'parallel-pilot') && github.ref == 'refs/heads/work/issue-208-parallel-pilot'))
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || (endsWith(inputs.mode, '-pair') && github.ref == 'refs/heads/work/issue-208-matched-pair') || (inputs.mode == 'parallel-full' && github.ref == 'refs/heads/work/208-full-parallel') || github.ref == 'refs/heads/work/issue-208-serial-batches' || ((inputs.mode == 'pilot' || inputs.mode == 'parallel-pilot') && github.ref == 'refs/heads/work/issue-208-parallel-pilot'))
     runs-on: [self-hosted, tactics-browser, "${{ (startsWith(inputs.mode, 'parallel-') || inputs.mode == 'serial-pair') && 'tactics-browser-01' || inputs.runner || 'tactics-browser-01' }}"]
     concurrency:
       group: ${{ (startsWith(inputs.mode, 'parallel-') || inputs.mode == 'serial-pair') && format('tactics-browser-{0}', 'tactics-browser-01') || format('issue208-prepare-{0}', github.run_id) }}
@@ -226,7 +226,7 @@ jobs:
   aggregate:
     name: Serial verification aggregate
     needs: [prepare, batch]
-    if: always() && github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || (endsWith(inputs.mode, '-pair') && github.ref == 'refs/heads/work/issue-208-matched-pair') || github.ref == 'refs/heads/work/issue-208-serial-batches' || ((inputs.mode == 'pilot' || inputs.mode == 'parallel-pilot') && github.ref == 'refs/heads/work/issue-208-parallel-pilot'))
+    if: always() && github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || (endsWith(inputs.mode, '-pair') && github.ref == 'refs/heads/work/issue-208-matched-pair') || (inputs.mode == 'parallel-full' && github.ref == 'refs/heads/work/208-full-parallel') || github.ref == 'refs/heads/work/issue-208-serial-batches' || ((inputs.mode == 'pilot' || inputs.mode == 'parallel-pilot') && github.ref == 'refs/heads/work/issue-208-parallel-pilot'))
     runs-on: [self-hosted, tactics-browser, "${{ (startsWith(inputs.mode, 'parallel-') || inputs.mode == 'serial-pair') && 'tactics-browser-01' || inputs.runner || 'tactics-browser-01' }}"]
     concurrency:
       group: ${{ (startsWith(inputs.mode, 'parallel-') || inputs.mode == 'serial-pair') && format('tactics-browser-{0}', 'tactics-browser-01') || format('issue208-aggregate-{0}', github.run_id) }}
