@@ -63,6 +63,11 @@ test('each engine clears one full floor per profile and checks both pickup modes
       [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('reload before the pending step restores the ground pile without surprise movement or collection'), [desktop]);
     assert.deepEqual(profilesFor('ground loot: legal victory saves one item at contact and a manual pickup survives refusal and reload'), allProfiles);
+    for (const title of [
+      'map markers respect stair availability, discovery and saved floor state',
+      'live markers follow current sight across movement, art changes and reload',
+      'stairs travel once per entry with keyboard, compass and cell controls, and stay on arrival and restore',
+    ]) assert.deepEqual(profilesFor(title), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('ground loot: entering an occupied pile starts combat and closes inventory'), [stage === 'chromium' ? landscape : desktop]);
     assert.deepEqual(profilesFor('restart during accepted presentation discards old callbacks and history'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('visibility interruption finishes an accepted terminal presentation exactly once'), [stage === 'chromium' ? desktop : portrait]);
