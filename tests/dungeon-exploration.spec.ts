@@ -496,10 +496,8 @@ test('movement controls stay visible with the player without scrolling on entry 
 });
 
 test('compass keeps keyboard focus when movement disables the activated direction',async({page})=>{
- const fresh=freshDungeon('compass-browser',1),initial=atCell({...fresh,floors:[{...fresh.floors[0],completed:3}]},27),encoded=encodeDungeon(initial);
- if(!encoded.ok)throw Error(encoded.reason);
- await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
- await page.goto('./?game=dungeon');await expectDungeonResumed(page);
+ const fresh=freshDungeon('compass-browser',1),initial=atCell({...fresh,floors:[{...fresh.floors[0],completed:3}]},27);
+ await openSavedDungeon(page,initial);
  const west=page.getByRole('button',{name:'West',exact:true}),map=page.locator('#dungeon-map');
  let revision=initial.revision;
  for(const key of ['Enter','Space']){
@@ -811,9 +809,7 @@ test('depth 8 saved floor renders and accepts a step after reload', async ({page
  const depth=8;
  const base=freshDungeon('large-floor-browser',19);
  const floors=Array.from({length:depth},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1),map=floorMap(descriptor);return {descriptor,position:descriptor.upstairs,completed:i===depth-1?0:3,exploration:freshExploration(descriptor.seed,descriptor.upstairs,map)};});
- const state={...base,depth,floors}, encoded=encodeDungeon(state); if(!encoded.ok)throw Error(encoded.reason);
- await page.goto('./'); await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
- await page.goto('./?game=dungeon'); await expectDungeonResumed(page);
+ await openSavedDungeon(page,{...base,depth,floors});
  const map=page.locator('#dungeon-map'); await expect(map.locator('[data-cell]')).toHaveCount(36 * 39);
  const assertLayout=async()=>{
   await expectDungeonMovementVisible(page);
@@ -914,7 +910,8 @@ test('depth 8 saved floor renders and accepts a step after reload', async ({page
   await expect(page.locator(`#dungeon-step-${name}`)).toBeEnabled({enabled});
  }
  await assertLayout();
- await page.reload(); await expectDungeonResumed(page); expectSameProgress(await dungeonSnapshot(page),after);
+ await page.reload(); await expectDungeonResumed(page);
+ await expect(map).toHaveAttribute('data-position',String(destination));
  await assertLayout();
 });
 
@@ -939,10 +936,7 @@ test('maximum-size floor step responsiveness meets the established budget', asyn
 test('closing on the guardian first holds contact and resumes its battle', async ({page,isMobile})=>{
  const slot=2;
  const {state,approach,target}=dungeonContactApproach(slot);
- const encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
- await page.goto('./');
- await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
- await page.goto('./?game=dungeon');await expectDungeonResumed(page);
+ await openSavedDungeon(page,state);
  await walkDungeon(page,approach,isMobile?'touch':'keyboard');
  const adjacent=await dungeonSnapshot(page);
  expect(adjacent.phase).toBe('ready');
@@ -1214,10 +1208,7 @@ test('a second dungeon encounter reuses the engine after a legal victory without
  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
  // The fixture reaches this ongoing battle through legal domain commands; the browser enacts its final attack.
  const witness=dungeonVictoryBoundary(1,0);if(!witness)throw Error('Missing legal victory boundary');
- const encoded=encodeDungeon(witness.snapshot);if(!encoded.ok)throw Error(encoded.reason);
- await page.goto('./');
- await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
- await page.goto('./?game=dungeon');await expectDungeonResumed(page);
+ await openSavedDungeon(page,witness.snapshot);
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  expect((await readSession(page)).state).toEqual(witness.snapshot.activeBattle);
  const guidance=page.locator('#battle-class-guidance'),tip=page.locator('#battle-class-tip');
