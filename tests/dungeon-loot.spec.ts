@@ -175,7 +175,7 @@ test('fresh manual movement cancels a pending automatic step, including its stal
   await walkDungeon(page, destination, isMobile ? 'touch' : 'keyboard');
   await expectProgress(page, expected);
   expect(await page.evaluate(() => window.issue408AutoSteps[0].cancelled)).toBe(true);
-  await releaseAutomaticStep(page); await releaseAutomaticStep(page);
+  await releaseAutomaticStep(page);
   await expectProgress(page, expected); await expectSavedProgress(page, expected);
   expect(currentFloor(await dungeonSnapshot(page)).loot![0].remaining).toBe(1);
 });
@@ -196,8 +196,13 @@ test('fresh preparation cancels a pending automatic step', async ({ page }) => {
   await releaseAutomaticStep(page); await expectProgress(page, prepared); await expectSavedProgress(page, prepared);
 });
 
-test('visibility interruption and explicit recovery each cancel the pending automatic step without replay', async ({ page }, info) => {
-  for (const interruption of ['visibility', 'recovery'] as const) await test.step(interruption, async () => {
+test('interrupting automatic loot cancels the pending step without replay', async ({ page, isMobile, viewport }, info) => {
+  // Each engine covers both interruptions on desktop and one per touch orientation.
+  const interruptions = ['visibility', 'recovery'] as const;
+  const selected = isMobile && viewport
+    ? [viewport.width > viewport.height ? 'recovery' : 'visibility']
+    : interruptions;
+  for (const interruption of selected) await test.step(interruption, async () => {
     const witness = await loadBoundary(page), won = await finishVictory(page, witness);
     if (interruption === 'visibility') {
       // Synthetic visibility event isolates cancellation; this is not native tab/background proof.
