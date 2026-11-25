@@ -41,14 +41,18 @@ test('real discoveries preserve every retained ID with the approved desktop and 
   }
 });
 
-test('full-floor journeys keep saved manual pickup on desktop and touch pickup on mobile', () => {
+test('each engine splits full-floor touch journeys and checks both pickup modes in every orientation', () => {
   for (const [stage, desktop] of [['chromium', 'desktop'], ['webkit-exploration', 'desktop-webkit']]) {
     const { tests, projects } = after.selections[stage];
     const profilesFor = title => tests.filter(row => row.title === title).map(row => row.project).sort();
     const allProfiles = projects.map(project => project.name).sort();
     assert.deepEqual(profilesFor('saved menu dungeon keeps proof tools hidden across legal encounters'), [desktop]);
-    assert.deepEqual(profilesFor('testing dungeon legally clears a floor, descends and backtracks without accessing saves'), allProfiles);
-    assert.deepEqual(profilesFor('saved menu dungeon auto-collects loot across a complete first floor'), allProfiles);
+    const portrait = allProfiles.find(name => name.includes('portrait'));
+    const landscape = allProfiles.find(name => name.includes('landscape'));
+    assert.deepEqual(profilesFor('testing dungeon legally clears a floor, descends and backtracks without accessing saves'), [desktop, landscape].sort());
+    assert.deepEqual(profilesFor('saved menu dungeon auto-collects loot across a complete first floor'), [desktop, portrait].sort());
+    assert.deepEqual(profilesFor('ground loot: legal victory saves one item at contact and a manual pickup survives refusal and reload'), allProfiles);
+    assert.deepEqual(profilesFor('auto loot defaults on: one delayed ordinary step, pickup, enemy tick and durable resume'), allProfiles);
   }
 });
 
