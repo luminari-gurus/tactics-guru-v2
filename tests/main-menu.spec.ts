@@ -608,7 +608,9 @@ test('main menu: counter-only dungeon upgrades known counters without inventing 
   await page.addInitScript(({slots,raw,mode})=>{const flag=`test:counter-upgrade:${mode}`;if(sessionStorage.getItem(flag))return;localStorage.setItem(slots.primary,raw);localStorage.setItem(slots.backup,raw);sessionStorage.setItem(flag,'yes');},{slots,raw,mode});
   await page.goto(`./?game=${mode}`);
   const attribute='data-dungeon-snapshot';
-  const snapshot=()=>page.locator('#game').getAttribute(attribute).then(text=>JSON.parse(text!));
+  const game=page.locator('#game');
+  await expect(game).toHaveAttribute(attribute, /.+/);
+  const snapshot=()=>game.getAttribute(attribute).then(text=>JSON.parse(text!));
   await expect.poll(async()=>(await snapshot()).stats?.version).toBe(2);
   expect((await snapshot()).stats).toMatchObject({coverage:'whole-run',timeCoverage:'since-upgrade',enemiesKilled:old.stats.enemiesKilled,movesTaken:old.stats.movesTaken});
   expect(await page.evaluate(slots=>[localStorage.getItem(slots.primary),localStorage.getItem(slots.backup)],slots)).toEqual([raw,raw]);
