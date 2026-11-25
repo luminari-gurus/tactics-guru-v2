@@ -60,6 +60,7 @@ test('each engine splits full-floor touch journeys and checks both pickup modes 
     assert.deepEqual(profilesFor('ground loot: entering an occupied pile starts combat and closes inventory'), [stage === 'chromium' ? landscape : desktop]);
     assert.deepEqual(profilesFor('restart during accepted presentation discards old callbacks and history'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('visibility interruption finishes an accepted terminal presentation exactly once'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('confirmed charm discard frees full capacity without cancelling or duplicating the pending reward'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('declining a dungeon reward preserves inventory and updates stair progress'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('dungeon previous-format recovery preserves and exports both original slots'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('interrupting automatic loot cancels the pending step without replay'), [stage === 'chromium' ? desktop : portrait]);
