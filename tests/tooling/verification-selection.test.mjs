@@ -81,6 +81,7 @@ test('routine verification clears each first-floor scenario once and checks both
     assert.deepEqual(profilesFor('saved dungeon downloads only after explicit recovery export'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('Shaman production journey uses Hex and ally healing, reloads Weakened and replays a complete legal battle'), []);
     assert.deepEqual(profilesFor('resumed Shaman Hex shows the Weakened hero and accuracy penalty'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('class guidance: unsaved dungeon keeps dismissals in memory until saving and resuming the same run'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('a second dungeon encounter reuses the engine after a legal victory without reloading'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('declining a dungeon reward preserves inventory and updates stair progress'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('dungeon previous-format recovery preserves and exports both original slots'), [stage === 'chromium' ? desktop : portrait]);
