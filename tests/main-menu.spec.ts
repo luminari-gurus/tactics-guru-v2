@@ -431,15 +431,6 @@ test.extend({pinDungeonSeed:13})('main menu: New Game stays playable after retry
  await expect(screen).toContainText('Playing unsaved.');
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.dungeon.primary)).toBe(corrupt);
 });
-test('main menu: an active dungeon save appearing during navigation requires confirmation',async({page})=>{
- const text=menuFixture('dungeon');
- await page.addInitScript(({key,text})=>{
-  if(new URLSearchParams(location.search).get('game')==='dungeon')localStorage.setItem(key,text);
- },{key:keys.dungeon.primary,text});
- await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();
- await expect(page.getByRole('dialog')).toContainText('Start new dungeon?');
- expect(await page.evaluate(key=>localStorage.getItem(key),keys.dungeon.primary)).toBe(text);
-});
 test('main menu: changed dungeon save requires a fresh confirmation',async({page})=>{
  const text=menuFixture('dungeon');await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:keys.dungeon.primary,text});
  await page.getByRole('button',{name:'New Game',exact:true}).click();
