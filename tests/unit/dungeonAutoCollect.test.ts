@@ -1,5 +1,6 @@
 import { assert, expect, it } from 'vitest';
 import { DungeonSession } from '../../src/app/DungeonSession';
+import { ITEM_BOUNDS } from '../../src/content/itemTypes';
 import { dungeonContent } from '../../src/content/dungeon';
 import { autoCollectDungeon, victoryAutoCollectIntent } from '../../src/domain/dungeonAutoCollect';
 import { acceptDungeonBattle, currentFloor, dungeonLootReward, floorDescriptor, floorMap, freshDungeon,
@@ -93,6 +94,25 @@ it('keeps the origin when nothing fits and performs partial collection when any 
   expect(currentFloor(partial).position).toBe(intent.destination);
   expect(partial.ownership.equipment).toEqual(state.ownership.equipment);
   for (const loot of currentFloor(partial).loot!) expect(loot.remaining).toBe(dungeonContent.items[loot.itemId].kind === 'equipment' ? 1 : 0);
+});
+
+it('reports full inventory on repeated automatic pickup without changing progress or the save', async () => {
+  const { won, intent } = victory(13);
+  expect(currentFloor(won).loot![0].itemId).toBe('item:revive_kit');
+  const full = good(readDungeon({ ...won, ownership: { ...won.ownership,
+    consumables: [{ itemId: 'item:revive_kit', quantity: ITEM_BOUNDS.stack.max }] } }));
+  const data = memory(), storage = createDungeonStorage(() => data);
+  assert(storage.save(full).ok);
+  const owner = new DungeonSession(full, storage);
+  assert(owner.continue(owner.inspect()));
+  const saved = data.getItem(DUNGEON_KEYS.primary);
+  for (let attempt = 0; attempt < 2; attempt++) {
+    expect(await owner.autoCollect(intent, () => true)).toBe(false);
+    expect(owner.lootStatus).toBe('Inventory full. Loot remains on the ground; the party has not moved.');
+    expect(owner.snapshot).toEqual(full);
+    expect(data.getItem(DUNGEON_KEYS.primary)).toBe(saved);
+  }
+  owner.dispose();
 });
 
 it('cancels an automatic step that would descend, while a manual step collects before travel', () => {
