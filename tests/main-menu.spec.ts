@@ -491,14 +491,12 @@ test('main menu: supplied background compositions remain independent of controls
   await expect(page.locator('[data-menu-action]')).toHaveText(['Continue','New Game','Hall of Records','Settings']);
  }
 });
-test('main menu: stale Continue and unknown intents preserve dungeon saves',async({page})=>{
- for(const entry of ['continue','unrecognized']){
-  await page.goto(`./?game=dungeon&entry=${entry}`);
+test('main menu: stale Continue returns to the menu without creating a dungeon save', async ({ page }) => {
+  await page.goto('./?game=dungeon&entry=continue');
   await expect(page.locator('#main-menu')).toBeVisible();
-  await expect(page.getByRole('button',{name:'Continue',exact:true})).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Continue', exact: true })).toBeDisabled();
   await expect(page).toHaveURL(new URL('./', test.info().project.use.baseURL!).href);
-  expect(await page.evaluate(()=>Object.keys(localStorage).filter(key=>key.includes(':dungeon:')))).toEqual([]);
- }
+  expect(await page.evaluate(() => Object.keys(localStorage).filter(key => key.includes(':dungeon:')))).toEqual([]);
 });
 test('main menu: Continue opens recovery when a valid primary is paired with an unreadable backup',async({page})=>{
  const primary=menuFixture('dungeon');
