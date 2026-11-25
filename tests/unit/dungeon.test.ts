@@ -23,6 +23,27 @@ import { createRunRecordsStorage, RUN_RECORD_KEYS, selectedRunRecords } from '..
 import * as battlefields from '../../src/domain/battlefield';
 import { freshRunStats } from '../../src/domain/runStats';
 
+it.each([
+  { behavior: 'chase', slot: 1, expected: { x: 4, y: 7 } },
+  { behavior: 'block', slot: 2, expected: { x: 5, y: 8 } },
+])('saves the $behavior enemy at the correct cell after a dungeon step', ({ slot, expected }) => {
+  const base = freshDungeon('pursuit', 0);
+  const floor = base.floors[0];
+  const exploration = movableExploration(floor.exploration, floor.descriptor.seed, 0, 'ready');
+  // The player walks south from (6,7) to (6,8), two columns east of the pursuing enemy.
+  const pois = exploration.pois.map((poi, index) => ({
+    ...poi, ...(index === slot ? { x: 4, y: 8 } : index === 0 ? { x: 14, y: 12 } : { x: 13, y: 13 }),
+  }));
+  const width = floorMap(floor.descriptor).width;
+  const state = atCell({ ...base, floors: [{ ...floor, exploration: { ...exploration, pois } }] }, 7 * width + 6);
+  const result = stepDungeon(state, { id: state.id, revision: state.revision, depth: 1, destination: 8 * width + 6 });
+  assert(result.ok);
+  expect(result.state.floors[0].exploration.pois[slot]).toMatchObject(expected);
+  const save = encodeDungeon(result.state);
+  assert(save.ok);
+  expect(decodeDungeon(save.text)).toEqual({ ok: true, state: result.state });
+});
+
 it('projects stair eligibility for both exploration versions without changing state or travel rejections', () => {
   const base = freshDungeon('stair-status', 1), descriptor = floorDescriptor(base.seed, 2);
   for (const depth of [1, 2]) for (const completed of [0, 1, 2, 3]) {
