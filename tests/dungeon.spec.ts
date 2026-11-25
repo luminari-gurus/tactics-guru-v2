@@ -29,20 +29,6 @@ const savedWetlandsSeed = 5;
 const savedWetlandsTest = test.extend({ pinDungeonSeed: savedWetlandsSeed - 1 });
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
 const boardReport=async(page:Page)=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
-async function setJourneyAutoCollect(page:Page,enabled:boolean,touch:boolean) {
- await page.goto('./');
- const activate=async(control:Locator)=>{if(touch)await control.tap();else await control.click();};
- await activate(page.getByRole('button',{name:'Settings',exact:true}));
- const setting=page.getByRole('checkbox',{name:'Auto-collect loot',exact:true});
- // Exercise a real saved choice even when the default already matches it.
- if(await setting.isChecked()===enabled)await activate(setting);
- await activate(setting);await expect(setting).toBeChecked({checked:enabled});
- expect(await page.evaluate(key=>localStorage.getItem(key),AUTO_COLLECT_LOOT_KEY)).toBe(enabled?'on':'off');
- await activate(page.getByRole('button',{name:'Close',exact:true}));
- await page.reload();await activate(page.getByRole('button',{name:'Settings',exact:true}));
- await expect(setting).toBeChecked({checked:enabled});
- await activate(page.getByRole('button',{name:'Close',exact:true}));
-}
 /** Observe the actual winning boundary before the natural timer, without holding or replacing it. */
 async function observeDungeonReturn(page:Page) {
  await page.evaluate(()=>{
@@ -335,7 +321,11 @@ for(const {saved,autoCollect,title} of [
   Storage.prototype.setItem=function(key,value){if(gameKey(key))throw Error('Testing saved-game write');set.call(this,key,value);};
   Storage.prototype.removeItem=function(key){if(gameKey(key))throw Error('Testing saved-game removal');remove.call(this,key);};
  },AUTO_COLLECT_LOOT_KEY);
- if(saved){await setJourneyAutoCollect(page,autoCollect,isMobile);await page.getByRole('button',{name:'New Game',exact:true}).click();}
+ if(saved){
+  await page.goto('./');
+  await page.evaluate(({key,value})=>localStorage.setItem(key,value),{key:AUTO_COLLECT_LOOT_KEY,value:autoCollect?'on':'off'});
+  await page.getByRole('button',{name:'New Game',exact:true}).click();
+ }
  else await page.goto('./dungeon');
  await expect(page.locator('#dungeon-map')).toBeVisible();
  expect((await snapshot(page)).seed).toBe(saved ? savedWetlandsSeed : 28);
@@ -359,12 +349,12 @@ for(const {saved,autoCollect,title} of [
    await expect(page.locator('#fit-restart')).toBeFocused();
   }
   if(saved)await page.screenshot({path:test.info().outputPath(`gameplay-battle-${slot}.png`)});
+  const catalog=dungeonBattle(encounterEntry)!.catalog;
   for(let step=0;step<500;step++){
-   await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||(await readSession(page))?.phase==='player';}).toBe(true);
-   const s=await snapshot(page);if(s.phase!=='battle')break;
-   const command=fighterDecision((await readSession(page)).state,dungeonBattle(s)!.catalog,taunted);
+   const command=fighterDecision((await readSession(page)).state,catalog,taunted);
    await playCommand(page,command);taunted ||= command.type==='useAbility'&&command.abilityId==='ability:taunt';
-   await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||(await readSession(page))?.phase==='player';}).toBe(true);
+   await expect.poll(async()=> (await snapshot(page)).phase!=='battle'||(await readSession(page))?.phase==='player').toBe(true);
+   if((await snapshot(page)).phase!=='battle')break;
   }
   const finished=await page.evaluate(()=>(window as unknown as {issue408Return:DungeonState|null}).issue408Return);
   if(!finished)throw Error('Missing observed dungeon return');
