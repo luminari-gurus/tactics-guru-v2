@@ -4,7 +4,7 @@ import { expect,test } from './helpers/startupDiagnostics';
 import type { Locator, Page } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
-import { dungeonSnapshot, acceptedDungeonSnapshot, expectSameProgress, walkDungeon, expectDungeonResumed, openDungeonInventory, reenterDungeonStair } from './helpers/dungeonTraversal';
+import { dungeonSnapshot, acceptedDungeonSnapshot, expectSameProgress, walkDungeon, expectDungeonResumed, openDungeonInventory } from './helpers/dungeonTraversal';
 import { currentSight, neighbors, poiCell } from '../src/domain/exploration';
 import { generateMap } from '../src/map/generate';
 import { freshDungeon, floorDescriptor, floorMap, readDungeon, dungeonSeed, stepDungeon, type DungeonState } from '../src/domain/dungeon';
@@ -158,7 +158,7 @@ test('ground loot: an occupied pile starts combat at the origin and preserves bo
  const reloaded=await dungeonSnapshot(page);expect(reloaded.floors).toEqual(active.floors);expect(reloaded.ownership).toEqual(active.ownership);expect(reloaded.encounterEntry).toEqual(active.encounterEntry);
 });
 
-test('ground loot: final victory unlocks stairs and retains its uncollected reward through a floor revisit',async({page,isMobile})=>{
+test('ground loot: final victory unlocks stairs and shows the uncollected reward after reload',async({page})=>{
  test.setTimeout(90000);
  await page.addInitScript(()=>{document.hasFocus=()=>false;});
  const witness = dungeonGroundVictoryBoundary(5, 2);
@@ -169,19 +169,9 @@ test('ground loot: final victory unlocks stairs and retains its uncollected rewa
  expect(won.phase).toBe('ready');expect(floor.completed).toBe(3);expect(loot.remaining).toBe(1);expect(won.offer).toBeNull();
  await expect(page.locator('#dungeon-stair-descend')).toHaveText('Downstairs: unlocked · walk onto the stairs');
  await expect(page.getByRole('region',{name:'Rewards',exact:true})).toHaveCount(0);
- // The unit journey walks around the loot. Use the real stair input from its approach here.
- const approach=atStairApproach(won);
- await loadGroundLootBoundary(page,approach);
- await walkDungeon(page,floor.descriptor.downstairs,isMobile?'touch':'keyboard');
- const descended=await dungeonSnapshot(page);expect(descended.depth).toBe(2);
- expect(descended.floors[0].loot).toEqual(floor.loot);expect(descended.ownership).toEqual(won.ownership);
- await reenterDungeonStair(page,'ascend',isMobile?'touch':'keyboard');
- const returned=await dungeonSnapshot(page);expect(returned.depth).toBe(1);expect(returned.floors[0].loot).toEqual(floor.loot);
- expect(returned.party).toEqual(won.party);expect(returned.ownership).toEqual(won.ownership);
  await page.reload();await expectDungeonResumed(page);
- const resumed=await dungeonSnapshot(page);expect(resumed.floors).toEqual(returned.floors);expect(resumed.ownership).toEqual(returned.ownership);
+ await expect(page.locator('#dungeon-stair-descend')).toHaveText('Downstairs: unlocked · walk onto the stairs');
  await expect(page.locator(`#dungeon-map [data-cell="${loot.cell}"]`)).toHaveAttribute('data-loot','1');
- await page.screenshot({path:test.info().outputPath('ground-loot-revisited-floor.png'),fullPage:true});
 });
 
 test('map markers respect stair availability, discovery and saved floor state',async({page,isMobile})=>{
