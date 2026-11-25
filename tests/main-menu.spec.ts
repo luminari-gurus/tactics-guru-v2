@@ -301,6 +301,12 @@ test('main menu: read-only root, separate artwork and isolated loading',async({p
  await expect(page.getByRole('dialog').locator('summary')).toBeFocused();
  await page.keyboard.press('Escape');await expect(page.getByRole('button',{name:'Settings',exact:true})).toBeFocused();
  await page.screenshot({path:test.info().outputPath('menu.png'),fullPage:true});
+ for(const art of ['dawn','midnight']){
+  await page.locator('.menu-backdrop').evaluate((node,name)=>{(node as HTMLImageElement).src=`${(node as HTMLImageElement).src.replace(/[^/]+$/,'')}${name}.webp`;},art);
+  await expect.poll(()=>page.locator('.menu-backdrop').evaluate(n=>(n as HTMLImageElement).complete&&(n as HTMLImageElement).naturalWidth>0)).toBe(true);
+  await page.screenshot({path:test.info().outputPath(`background-${art}.png`),fullPage:true});
+  await expect(page.locator('[data-menu-action]')).toHaveText(['Continue','New Game','Hall of Records','Settings']);
+ }
 });
 test('main menu: legacy battle and run slots are ignored through launch and dungeon Continue',async({page})=>{
   await page.goto('./?game=dungeon&entry=continue');
@@ -469,15 +475,6 @@ test('main menu: portrait composition scrolls at narrow, short and enlarged text
   for(const button of await page.locator('[data-menu-action]').all())expect((await button.boundingBox())!.height).toBeGreaterThanOrEqual(44);
   await page.getByRole('link',{name:'Map inspection'}).scrollIntoViewIfNeeded();await expect(page.getByRole('link',{name:'Map inspection'})).toBeInViewport();
   await page.screenshot({path:test.info().outputPath(`menu-${width}x${height}.png`),fullPage:true});
- }
-});
-test('main menu: supplied background compositions remain independent of controls',async({page})=>{
- await page.goto('./');
- for(const art of ['dawn','midnight']){
-  await page.locator('.menu-backdrop').evaluate((node,name)=>{(node as HTMLImageElement).src=`${(node as HTMLImageElement).src.replace(/[^/]+$/,'')}${name}.webp`;},art);
-  await expect.poll(()=>page.locator('.menu-backdrop').evaluate(n=>(n as HTMLImageElement).complete&&(n as HTMLImageElement).naturalWidth>0)).toBe(true);
-  await page.screenshot({path:test.info().outputPath(`background-${art}.png`),fullPage:true});
-  await expect(page.locator('[data-menu-action]')).toHaveText(['Continue','New Game','Hall of Records','Settings']);
  }
 });
 test('main menu: Continue opens recovery when a valid primary is paired with an unreadable backup',async({page})=>{
