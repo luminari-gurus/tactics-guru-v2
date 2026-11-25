@@ -82,12 +82,13 @@ async function loadBoundary(page: Page, seed = 28, reviveStock?: number) {
     ...(reviveStock === undefined ? {} : { ownership: { ...witness.snapshot.ownership,
       consumables: [{ itemId: 'item:revive_kit', quantity: reviveStock }] } }) }));
   const encoded = encodeDungeon(snapshot); if (!encoded.ok) throw Error(encoded.reason);
-  // Leave the previous owner before staging another boundary, so pagehide cannot
-  // overwrite the fixture with the outgoing journey's playtime checkpoint.
-  await page.goto('./');
-  await page.evaluate(({ keys, text }) => {
+  // Seed the incoming document after the previous owner's pagehide checkpoint.
+  // Each fixture runs once, so later reloads exercise the game's own save.
+  await page.addInitScript(({ keys, text, marker }) => {
+    if (window !== window.top || sessionStorage.getItem(marker)) return;
     localStorage.setItem(keys.primary, text); localStorage.removeItem(keys.backup);
-  }, { keys: DUNGEON_KEYS, text: encoded.text });
+    sessionStorage.setItem(marker, '1');
+  }, { keys: DUNGEON_KEYS, text: encoded.text, marker: `test:loot-fixture:${crypto.randomUUID()}` });
   await page.goto('./?game=dungeon'); await expectDungeonResumed(page);
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   expect((await readSession(page)).state).toEqual(snapshot.activeBattle);
