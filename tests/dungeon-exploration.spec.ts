@@ -648,7 +648,7 @@ test('records route transfer and map responsiveness against established budgets'
  expect.soft(frames.stepP95,'Exploration movement-frame P95').toBeLessThanOrEqual(33.4);
 });
 
-for(const biome of ['forest','desert'] as const)test(`${biome} saved kinds, scaled inspection and reload use actual selected definitions`,async({page,isMobile})=>{
+for(const biome of ['forest','desert'] as const)test(`${biome} saved kinds, scaled inspection and reload use actual selected definitions`, { tag: '@desktop-chromium-portrait-webkit' }, async({page,isMobile})=>{
  test.setTimeout(120000);
  // Structural depth/slot fixtures isolate presentation, not preceding battle completion.
  const kinds = biome === 'forest' ? ['elite', 'vault'] as const : ['normal', 'boss'] as const;

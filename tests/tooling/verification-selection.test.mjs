@@ -229,3 +229,13 @@ test('long progression journeys are excluded from routine selection and remain a
     }
   }
 });
+
+test('saved biome inspection runs on desktop Chromium and portrait WebKit', () => {
+  for (const [stage, profile] of [['chromium', 'desktop'], ['webkit-exploration', 'portrait-webkit']]) {
+    for (const biome of ['forest', 'desert']) {
+      const title = `${biome} saved kinds, scaled inspection and reload use actual selected definitions`;
+      const cases = after.selections[stage].tests.filter(row => row.title === title);
+      assert.deepEqual(cases.map(row => row.project), [profile]);
+    }
+  }
+});
