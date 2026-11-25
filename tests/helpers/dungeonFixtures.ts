@@ -1,3 +1,4 @@
+import { freshRunStats } from '../../src/domain/runStats';
 import { freshExploration, movableExploration, neighbors, poiCell, reveal, visit } from '../../src/domain/exploration';
 import { freshDungeon, floorDescriptor, floorMap, dungeonOffer, dungeonLootReward, readDungeon, startDungeonBattle, dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, travelDungeon, stepDungeon, clearedDungeonSlots, type DungeonState, type DungeonResult, type DungeonItemCommand } from '../../src/domain/dungeon';
 import { generateMap } from '../../src/map/generate';
@@ -168,6 +169,14 @@ export function atCell(s: DungeonState, position: number): DungeonState {
   floors[s.depth-1] = { ...f, position, exploration: visit(f.exploration,position,floorMap(f.descriptor)) };
   return { ...s, floors };
 }
+// On seed 1 these legal steps move an encounter into or out of current sight.
+export function dungeonSightTransition(entering: boolean) {
+  const [position, destination, slot] = entering ? [47, 48, 1] : [307, 306, 0];
+  const before = atCell({ ...freshDungeon('sight-movement', 1), stats: freshRunStats('since-upgrade') }, position);
+  const after = checkedDungeon(stepDungeon(before, { id: before.id, depth: before.depth, revision: before.revision, destination }));
+  return { before, after, slot };
+}
+
 export function atEncounter(s: DungeonState, slot = s.floors[s.depth-1].completed): DungeonState {
   return slot >= 3 ? s : atCell(s, poiCell(s.floors[s.depth-1].exploration.pois[slot], s.floors[s.depth-1].descriptor.size ?? 20));
 }
