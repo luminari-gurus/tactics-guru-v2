@@ -842,9 +842,17 @@ for(const biome of ['forest','desert'] as const)test(`${biome} saved kinds, scal
   }
   for(const art of ['simple','legacy-8bit']){
    await page.locator('#dungeon-art').selectOption(art);
-   const sizes=await page.locator('#dungeon-map span').evaluateAll(cells=>cells.map(cell=>{const r=cell.getBoundingClientRect();return {width:r.width,height:r.height};}));
-   expect(sizes).toHaveLength(400);
-   for(const size of sizes){expect(size.width).toBeGreaterThan(0);expect(Math.abs(size.width-size.height)).toBeLessThan(0.1);expect(Math.abs(size.height-sizes[0].height)).toBeLessThan(0.1);}
+   const geometry = await map.locator('span').evaluateAll(cells => {
+    const referenceHeight = cells[0]?.getBoundingClientRect().height;
+    for (const [index, cell] of cells.entries()) {
+     const { width, height } = cell.getBoundingClientRect();
+     if (!(width > 0 && Math.abs(width - height) < 0.1 && Math.abs(height - referenceHeight) < 0.1)) {
+      return { count: cells.length, invalid: { index, width, height, referenceHeight } };
+     }
+    }
+    return { count: cells.length, invalid: null };
+   });
+   expect(geometry, `${art} cells at ${viewport.width}×${viewport.height}`).toEqual({ count: 400, invalid: null });
   }
  }
  await page.setViewportSize({width:393,height:852});await page.locator('#dungeon-map').scrollIntoViewIfNeeded();
