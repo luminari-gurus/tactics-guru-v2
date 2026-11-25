@@ -434,7 +434,7 @@ test('movement controls stay visible with the player without scrolling on entry 
  expect((await expectDungeonMovementVisible(page)).scrollTop).toBe(0);
 });
 
-test('compass keeps keyboard focus when movement disables the activated direction',async({page})=>{
+test('compass keeps keyboard focus when movement disables the activated direction', { tag: '@desktop-keyboard' }, async({page})=>{
  const fresh=freshDungeon('compass-browser',1),initial=atCell({...fresh,floors:[{...fresh.floors[0],completed:3}]},27);
  await openSavedDungeon(page,initial);
  const west=page.getByRole('button',{name:'West',exact:true}),map=page.locator('#dungeon-map');
@@ -455,7 +455,7 @@ test('compass keeps keyboard focus when movement disables the activated directio
  }
 });
 
-fixedSeedTest('map shortcuts work on entry and outside the map without taking over other controls', async ({page}) => {
+fixedSeedTest('map shortcuts work on entry and outside the map without taking over other controls', { tag: '@desktop-keyboard' }, async ({page}) => {
  await page.goto('./?game=dungeon&entry=new');
  await expect(page.locator('#dungeon-map')).toBeVisible();
  const initial = await dungeonSnapshot(page);
