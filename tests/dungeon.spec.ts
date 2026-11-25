@@ -14,6 +14,7 @@ import { RUN_STORAGE_KEYS } from '../src/persistence/runStorage';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { RUN_RECORD_KEYS } from '../src/persistence/runRecordsStorage';
 import { COMBAT_CONTROLS_KEY } from '../src/ui/combatControls';
+import { COMBAT_PACE_KEY } from '../src/ui/combatPacePreference';
 import { AUTO_COLLECT_LOOT_KEY } from '../src/ui/autoCollectLootPreference';
 import { endTurn, battleTool, readSession,playCommand,playUndo,checkActivePlaytime,checkBackgroundPlaytime } from './helpers/battlePolicy';
 import { playerDecision, fighterDecision } from './helpers/playerPolicy';
@@ -315,6 +316,10 @@ for(const {saved,autoCollect,title} of [
  test.setTimeout(300000); // Three complete battles plus normal exploration and stair input.
  // Reuse the complete first floor of the existing legal Fighter journey.
  const errors:string[]=[];let taunted=false;const lootJourney:unknown[]=[];page.on('pageerror',error=>errors.push(error.message));
+ // Exercise manual pickup at Fast battle speed and automatic pickup at the default pace.
+ if(!autoCollect)await page.addInitScript(key=>{
+  localStorage.setItem(key,JSON.stringify({version:1,pace:'fast'}));
+ },COMBAT_PACE_KEY);
  if(!saved)await page.addInitScript(preferenceKey=>{
   localStorage.setItem(preferenceKey,'off');
   const get=Storage.prototype.getItem,set=Storage.prototype.setItem,remove=Storage.prototype.removeItem;
@@ -353,10 +358,17 @@ for(const {saved,autoCollect,title} of [
   if(saved)await page.screenshot({path:test.info().outputPath(`gameplay-battle-${slot}.png`)});
   const catalog=dungeonBattle(encounterEntry)!.catalog;
   for(let step=0;step<500;step++){
-   const command=fighterDecision((await readSession(page)).state,catalog,taunted);
+   const {state}=await readSession(page);
+   const command=fighterDecision(state,catalog,taunted);
    await playCommand(page,command);taunted ||= command.type==='useAbility'&&command.abilityId==='ability:taunt';
-   await expect.poll(async()=> (await snapshot(page)).phase!=='battle'||(await readSession(page))?.phase==='player').toBe(true);
-   if((await snapshot(page)).phase!=='battle')break;
+   const boundary=await page.waitForFunction(previousCount=>{
+    if((window as unknown as {issue408Return:DungeonState|null}).issue408Return)return 'finished';
+    const game=document.querySelector<HTMLElement>('#game');
+    if(game?.dataset.phase==='player' && JSON.parse(game.dataset.session!).state.commandCount>previousCount)return 'player';
+   },state.commandCount,{timeout:5000});
+   const finished=await boundary.jsonValue()==='finished';
+   await boundary.dispose();
+   if(finished)break;
   }
   const finished=await page.evaluate(()=>(window as unknown as {issue408Return:DungeonState|null}).issue408Return);
   if(!finished)throw Error('Missing observed dungeon return');
