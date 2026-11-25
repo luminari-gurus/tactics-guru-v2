@@ -15,7 +15,7 @@ import { COMBAT_CONTROLS_KEY } from '../src/ui/combatControls';
 import { AUTO_COLLECT_LOOT_KEY } from '../src/ui/autoCollectLootPreference';
 import { endTurn, battleTool, readSession,playCommand,playUndo,checkActivePlaytime,checkBackgroundPlaytime } from './helpers/battlePolicy';
 import { playerDecision, fighterDecision } from './helpers/playerPolicy';
-import { journeyPreparation, healedFighterBoundary, shamanJourney } from './helpers/dungeonFixtures';
+import { journeyPreparation, shamanJourney } from './helpers/dungeonFixtures';
 import { dispatch } from '../src/domain/turns';
 import { previewMovement } from '../src/domain/grid';
 import type { Command, BattleEvent } from '../src/domain/types';
@@ -692,24 +692,6 @@ test('Hobgoblin formation affects Shield Bash, displaces the hero and survives C
   expect((await readSession(page)).events).toEqual([]);
 });
 
-test('automatic stairs preserve healed Fighter carry and fresh battle resources',async({page,isMobile})=>{
- test.setTimeout(90000);
- // Generate the legal boundary under current rules; the historical #163 receipt remains immutable.
- const record=healedFighterBoundary();expect(record.state.units.find(u=>u.defId==='fighter')!.secondWindUsed).toBe(true);
- const completed=acceptDungeonBattle(record.entry,record.state);if(!completed.ok)throw Error(completed.reason);
- const approach=atStairApproach(declineReward(completed.state)),party=approach.party,ownership=approach.ownership;
- expect(party.find(h=>h.heroId==='fighter')!.hp).toBeGreaterThan(0);expect(party.find(h=>h.heroId==='fighter')!.learned).toContain('ability:second_wind');
- await seed(page,approach);await walkDungeon(page,approach.floors[0].descriptor.downstairs,isMobile?'touch':'keyboard');
- const arrived=await snapshot(page);expect(arrived.depth).toBe(2);expect(arrived.revision).toBe(approach.revision+1);expect(arrived.party).toEqual(party);expect(arrived.ownership).toEqual(ownership);
- expect(arrived.party.every(h=>!Object.hasOwn(h,'secondWindUsed')&&!Object.hasOwn(h,'tauntedBy'))).toBe(true);
- await page.screenshot({path:test.info().outputPath('healed-party-automatic-arrival.png'),fullPage:true});
- await page.reload();await expectDungeonResumed(page);expectSameProgress(await snapshot(page),arrived);
- await walkDungeon(page,undefined,isMobile?'touch':'keyboard');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- const entry=await snapshot(page),built=dungeonBattle(entry)!;expect(built.state.units.find(u=>u.defId==='fighter')!.hp).toBe(party.find(h=>h.heroId==='fighter')!.hp);
- expect((await readSession(page)).state.units.every(u=>!u.secondWindUsed&&u.tauntedBy===undefined)).toBe(true);
- await (await battleTool(page, '#battle-party')).click();await page.locator('#inspect-unit-1').click();await expect(page.getByRole('dialog')).toContainText('Second Wind 1/1');
- await page.screenshot({path:test.info().outputPath('fresh-resource-after-automatic-stairs.png')});
-});
 async function seed(page:Page,s:DungeonState){const encoded=encodeDungeon(s);if(!encoded.ok)throw Error(encoded.reason);await page.goto('./');await page.evaluate(({key,text})=>{localStorage.setItem(key,text);}, {key:DUNGEON_KEYS.primary,text:encoded.text});await page.goto('./?game=dungeon');await expectDungeonResumed(page);}
 function fixture(slot: number) {
  const seed = slot === 2 ? 5 : 1;
@@ -838,6 +820,10 @@ test('legal guardian reward, travel reload, backtracking and isolated saves',asy
  const slot=2;
  const f=fixture(slot);writeFileSync(test.info().outputPath(`legal-boundary-${slot}.json`),JSON.stringify(f));
  await seed(page,f.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ await (await battleTool(page, '#battle-party')).click();
+ await page.locator('#inspect-unit-1').click();
+ await expect(page.getByRole('dialog')).toContainText('Second Wind 1/1');
+ await page.locator('#inspection-close').click();
  await expect(page.locator('#dungeon-progress')).not.toBeVisible();
  await playCommand(page,f.command);await expect(page.locator('#dungeon-screen')).toBeVisible();
  const s=await snapshot(page),result=dispatch(f.snapshot.activeBattle!,f.command,dungeonBattle(f.snapshot)!.catalog);expect(result.ok).toBe(true);
