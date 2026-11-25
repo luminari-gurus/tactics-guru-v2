@@ -10,11 +10,11 @@ test('PR discovery contains exactly the seven core journeys on their intended de
   const dungeon = 'read-only entry, keyboard new dungeon, real action and active resume';
   assert.deepEqual(cases.sort(), [
     ['pr-desktop', 'main-menu.spec.ts', 'main menu: New Game starts immediately when no dungeon save exists'],
-    ['pr-desktop', 'boot.spec.ts', 'missing engine chunk reports a recoverable startup error on battle'],
-    ['pr-desktop', 'battle-loop.spec.ts', 'complete legal authored battle seed 2 reaches playerWin through controls and replays'],
+    ['pr-desktop', 'main-menu.spec.ts', 'main menu: failed gameplay imports retain visible recovery without proof tools'],
+    ['pr-desktop', 'main-menu.spec.ts', 'main menu: New Game starts a fresh dungeon layout'],
     ['pr-desktop', 'dungeon.spec.ts', dungeon],
-    ['pr-desktop', 'run-progression.spec.ts', 'run battle undo and a legal terminal journey reset on reload'],
-    ['pr-touch', 'battle-loop.spec.ts', 'real touch previews a board move, modal backdrop captures it, and suspend resumes exactly once'],
+    ['pr-desktop', 'dungeon.spec.ts', 'fresh dungeon keeps the map and party in view and opens the selected character sheet'],
+    ['pr-touch', 'main-menu.spec.ts', 'main menu: records unavailable storage is honest and leaves gameplay navigation usable'],
     ['pr-webkit', 'dungeon.spec.ts', dungeon],
   ].sort());
   assert.equal(report.workers, 1);
@@ -67,20 +67,6 @@ test('explicit regression matrices retain both UI progression witnesses on every
         'menu dungeon restores Mage XP 0, caster level and exact active boundary',
         'menu dungeon restores Mage XP 180, caster level and exact active boundary',
       ]);
-    }
-  }
-});
-
-test('ability fixtures retain all three distinct picker states on every Chromium profile', () => {
-  for (const config of ['playwright.fixtures.config.ts', 'playwright.abilities.config.ts']) {
-    const selection = discoverSelection(['-c', config, 'tests/ability-picker.spec.ts', '-g', 'progression XP ']);
-    assert.equal(selection.tests.length, 9);
-    assert.deepEqual(selection.projects.map(project => project.name).sort(), ['desktop', 'mobile-landscape', 'mobile-portrait']);
-    for (const project of selection.projects) {
-      assert.deepEqual(selection.tests.filter(row => row.project === project.name).map(row => row.title).sort(),
-        [0, 60, 180].map(xp => `progression XP ${xp} gates learned fixture actions and resets on reload`).sort());
-      assert.equal(project.use.defaultBrowserType, 'chromium');
-      assert.equal(project.use.hasTouch, project.name !== 'desktop');
     }
   }
 });

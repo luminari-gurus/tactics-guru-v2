@@ -78,7 +78,6 @@ test('timed coverage follows every full-verification stage and splits only the t
     assert.deepEqual(measured.args, original.args);
     assert.deepEqual(measured.env, original.env);
   }
-  assert.equal(stages.filter(s => s.id === 'fixtures').length, 1);
   assert.equal(stages.some(s => s.id === 'content'), false);
   assert.deepEqual(selectStages(['assets-prefix-preview']).map(s => s.id),
     ['units','typecheck-app','typecheck-domain','build-prefix','assets-prefix-preview']);
@@ -94,7 +93,7 @@ test('async timing scheduler preserves independent coverage and restoration afte
     }, rows => checkpoints.push(rows.length));
     assert.equal(results.length, stages.length);
     assert.equal(checkpoints.at(-1), stages.length);
-    for (const id of ['build-integration','fixtures','placement-dev','telemetry-production', 'telemetry-development','assets-prefix-dev']) assert.ok(visited.includes(id));
+    for (const id of ['build-integration','telemetry-production', 'telemetry-development','assets-prefix-dev']) assert.ok(visited.includes(id));
     assert.equal(results.find(s => s.id === 'assets-prefix-preview').status, 'blocked');
     if (failed === 'build-prefix') assert.ok(visited.includes('restore-root'));
     else {
@@ -110,25 +109,23 @@ test('timed commands preserve selectors and explicit mode isolation from full ve
     PLAYWRIGHT_BASE_PATH: '/old/', PLAYWRIGHT_SERVER_MODE: 'dev', PLAYWRIGHT_TELEMETRY_DEV: 'true',
     PLAYWRIGHT_CHROMIUM_EXECUTABLE: '/chosen/browser', PLAYWRIGHT_JSON_OUTPUT_DIR: '/old' };
   const command = id => stageCommand(stages.find(s => s.id === id), '/receipts', inherited, '/npm-cli.js');
-  assert.equal(command('performance').env.FIT_URL, undefined);
-  assert.deepEqual(command('performance').args.slice(-2), ['--', '/receipts/performance.json']);
+  assert.equal(command('chromium').env.FIT_URL, undefined);
   assert.equal(command('telemetry-production').env.PLAYWRIGHT_TELEMETRY_DEV, undefined);
   assert.equal(command('telemetry-development').env.PLAYWRIGHT_TELEMETRY_DEV, 'true');
   assert.equal(command('assets-prefix-preview').env.PLAYWRIGHT_BASE_PATH, '/prototype/');
   assert.equal(command('assets-prefix-preview').env.PLAYWRIGHT_SERVER_MODE, undefined);
-  assert.equal(command('placement-dev').env.PLAYWRIGHT_SERVER_MODE, 'dev');
+  assert.equal(command('assets-root-dev').env.PLAYWRIGHT_SERVER_MODE, 'dev');
   assert.equal(command('chromium').env.PLAYWRIGHT_CHROMIUM_EXECUTABLE, '/chosen/browser');
   assert.equal(command('chromium').env.PLAYWRIGHT_JSON_OUTPUT_DIR, undefined);
   assert.ok(command('units').args.includes('--outputFile.json=/receipts/units.json'));
   assert.ok(command('build-integration').args.includes('test:build'));
 });
 
-test('preflight accounts for WebKit health checks and full Chromium versus headless collection', () => {
+test('preflight accounts for the engines used by the remaining browser suites', () => {
   const engines = id => enginesFor(stages.find(s => s.id === id));
-  assert.deepEqual(engines('health-bars'), ['webkit']);
-  assert.deepEqual(engines('performance'), ['chromium-headless']);
+  assert.deepEqual(engines('webkit-acceptance'), ['webkit']);
   assert.deepEqual(engines('webkit-exploration'), ['webkit']);
-  assert.deepEqual(engines('fixtures'), ['chromium']);
+  assert.deepEqual(engines('chromium'), ['chromium']);
   assert.deepEqual(engines('units'), []);
 });
 

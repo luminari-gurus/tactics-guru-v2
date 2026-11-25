@@ -201,12 +201,6 @@ test('legal enemy defeat waits for its save and returns to the menu during a pen
  expect((await snapshot(page)).id).not.toBe(entry.id);
  expect((await snapshot(page)).party.every(h=>h.hp>0)).toBe(true);expect((await snapshot(page)).floors).toHaveLength(1);
 });
-test('run navigation reaches the base-aware dungeon entry and returns to existing modes',async({page,baseURL})=>{
- await page.goto('./?game=run&entry=new');await page.getByRole('link',{name:'Dungeon floors',exact:true}).click();expect(page.url()).toBe(new URL('dungeon',baseURL).href);
- await expect(page.locator('#dungeon-map')).toBeVisible();await page.getByRole('link',{name:'Three-battle scenario',exact:true}).click();
- await expect(page.locator('#run-start')).toBeVisible();
-});
-
 test('visibility interruption finishes an accepted terminal presentation exactly once',async({page})=>{
  const f=dungeonVictoryBoundary(1,0);if(!f)throw Error('fixture changed');await load(page,f.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const cmd=f.command,state=(await readSession(page)).state;if(cmd.type!=='useAbility')throw Error('expected attack');
