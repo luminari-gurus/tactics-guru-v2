@@ -266,7 +266,7 @@ export function fighterJourney(seed:number, policy: DungeonEncounterPolicy = DUN
 }
 
 /** Follow the nearest live marker with actual player steps and enemy movement. */
-function walkWitness(initial:DungeonState):DungeonState {
+export function walkWitness(initial:DungeonState):DungeonState {
   let state=initial;
   const seen = new Set<string>(); let detour: number[] = [];
   for(let attempt=0;attempt<400;attempt++) {

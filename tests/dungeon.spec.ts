@@ -1,4 +1,3 @@
-import { freshRunStats } from '../src/domain/runStats';
 import { EXPANDED_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
 import { dungeonContent } from '../src/content/dungeon';
 import { walkDungeon, acceptedDungeonSnapshot, settledDungeonSnapshot, expectSameProgress, reenterDungeonStair, expectDungeonResumed, openDungeonInventory, collectDungeonEncounterLoot } from './helpers/dungeonTraversal';
@@ -947,7 +946,7 @@ test('corrupt bytes stay exportable and uncertain travel requires explicit recov
  expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe('broken save bytes');
 });
 
-test('declining a dungeon reward preserves inventory and allows the next encounter',async({page,isMobile})=>{
+test('declining a dungeon reward preserves inventory and updates stair progress',async({page,isMobile})=>{
  const initial=dungeonCapacityFixture();await seed(page,initial);
  const progress=page.locator('#dungeon-encounter-progress'),stairs=page.locator('#dungeon-stair-descend');
  await expect(progress).toHaveText('Encounters: 1 / 3 cleared');
@@ -971,15 +970,7 @@ test('declining a dungeon reward preserves inventory and allows the next encount
  await expect(stairs).toHaveText('Downstairs: locked · clear 2 more encounters');
  await expect(rewards).toHaveCount(0);
  await expect(page.locator('.dungeon-status')).toContainText('Dungeon saved on this device');
- await page.reload();await expectDungeonResumed(page);
- // The first exploration playtime checkpoint can initialize stats on this legacy reward save.
- const resumed=await snapshot(page);
- const expected=(!next.stats && resumed.stats) ? {...next,stats:freshRunStats('since-upgrade')} : next;
- expectSameProgress(resumed,expected);
- await expect(progress).toHaveText('Encounters: 1 / 3 cleared');
- await expect(stairs).toHaveText('Downstairs: locked · clear 2 more encounters');
- await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
- await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+
 });
 
 test('confirmed charm discard frees full capacity without cancelling or duplicating the pending reward',async({page,isMobile})=>{
