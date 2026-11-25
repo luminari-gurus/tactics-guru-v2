@@ -1,6 +1,6 @@
 import { EXPANDED_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
 import { dungeonContent } from '../src/content/dungeon';
-import { walkDungeon, acceptedDungeonSnapshot, settledDungeonSnapshot, expectSameProgress, reenterDungeonStair, expectDungeonResumed, openDungeonInventory, collectDungeonEncounterLoot } from './helpers/dungeonTraversal';
+import { openSavedDungeon, walkDungeon, acceptedDungeonSnapshot, settledDungeonSnapshot, expectSameProgress, reenterDungeonStair, expectDungeonResumed, openDungeonInventory, collectDungeonEncounterLoot } from './helpers/dungeonTraversal';
 import { atEncounter, atStairApproach, checkedDungeon, hobgoblinDungeonBoundary, stagedMageAbility, snaredDefeatBoundary } from './helpers/dungeonFixtures';
 import { expect,railTest as test,type Page } from './helpers/dungeonEntropy';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -114,7 +114,7 @@ test('desktop Rail keeps Frost Snare controls visible and its target picker clic
   test.skip(isMobile, 'Desktop fine-pointer rail geometry');
   await page.setViewportSize({width:1280,height:720});
   const fixture = stagedMageAbility('ability:frost_snare');
-  await seed(page,fixture.state);
+  await openSavedDungeon(page,fixture.state);
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const target = fixture.state.activeBattle!.units.find(unit=>unit.id===fixture.command.target.unitId)!;
   await page.getByRole('button',{name:'Frost Snare',exact:true}).click();
@@ -165,7 +165,7 @@ test('desktop Rail keeps Frost Snare controls visible and its target picker clic
 
 test('Rail Magic Missile requires explicit confirmation before damaging an ally',async({page,hasTouch})=>{
   const fixture=stagedMageAbility('ability:magic_missile','player');
-  await seed(page,fixture.state);
+  await openSavedDungeon(page,fixture.state);
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const before=await readSession(page);
   const ally=before.state.units.find(unit=>unit.id===fixture.command.target.unitId)!;
@@ -216,7 +216,7 @@ test('staged Mage Frost Snare cancels invalid casts and restores the active badg
  // The level/position boundary is deliberately staged. The extended journey alone proves earned XP.
  const fixture=stagedMageAbility(abilityId),catalog=dungeonBattle(fixture.state)!.catalog;
  const expected=dispatch(fixture.state.activeBattle!,fixture.command,catalog);expect(expected.ok).toBe(true);if(!expected.ok)throw Error(expected.reason);
- await seed(page,fixture.state);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ await openSavedDungeon(page,fixture.state);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const before=await readSession(page);expect(before.state).toEqual(fixture.state.activeBattle);expect(before.events).toEqual([]);
  await checkSnares(page,true);
  const target=before.state.units.find(u=>u.id===fixture.command.target.unitId)!;
@@ -594,7 +594,7 @@ test('Forest Elite keeps a living goblin visible behind raised terrain', async (
  expect(battle.state.round).toBe(2);
  expect(battle.state.units.filter(unit => unit.side === 'enemy' && unit.hp > 0).map(unit => unit.defId))
   .toEqual(['goblin_grunt', 'goblin_archer', 'goblin_shaman']);
- await seed(page, checkedDungeon(acceptDungeonBattle(entered, battle.state)));
+ await openSavedDungeon(page, checkedDungeon(acceptDungeonBattle(entered, battle.state)));
  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
  expect((await readSession(page)).state).toEqual(battle.state);
  const board = await boardReport(page);
@@ -608,7 +608,7 @@ test('Shaman production journey uses Hex and ally healing, reloads Weakened and 
  test.setTimeout(120000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  const witness=shamanJourney(189),catalog=dungeonBattle(witness.entry)!.catalog;
  // This is the canonical unplayed save: level 1, full HP, no fabricated inventory or combat boundary.
- await seed(page,freshDungeon('shaman-production-journey',189));
+ await openSavedDungeon(page,freshDungeon('shaman-production-journey',189));
  await walkDungeon(page,undefined,isMobile?'touch':'keyboard');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const first=await readSession(page);expect(first.state.units.find(u=>u.id===6)?.defId).toBe('goblin_shaman');
  const board=JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
@@ -667,7 +667,7 @@ test('Shaman production journey uses Hex and ally healing, reloads Weakened and 
 
 test('Hobgoblin formation affects Shield Bash, displaces the hero and survives Continue', async ({ page }) => {
   const fixture = hobgoblinDungeonBoundary();
-  await seed(page, fixture.entry);
+  await openSavedDungeon(page, fixture.entry);
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   await (await battleTool(page, '#battle-party')).click();
   await page.locator('#inspect-unit-4').click();
@@ -692,7 +692,6 @@ test('Hobgoblin formation affects Shield Bash, displaces the hero and survives C
   expect((await readSession(page)).events).toEqual([]);
 });
 
-async function seed(page:Page,s:DungeonState){const encoded=encodeDungeon(s);if(!encoded.ok)throw Error(encoded.reason);await page.goto('./');await page.evaluate(({key,text})=>{localStorage.setItem(key,text);}, {key:DUNGEON_KEYS.primary,text:encoded.text});await page.goto('./?game=dungeon');await expectDungeonResumed(page);}
 function fixture(slot: number) {
  const seed = slot === 2 ? 5 : 1;
  const boundary = dungeonVictoryBoundary(seed, slot);
@@ -819,7 +818,7 @@ test('legal guardian reward, travel reload, backtracking and isolated saves',asy
  test.setTimeout(180000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  const slot=2;
  const f=fixture(slot);writeFileSync(test.info().outputPath(`legal-boundary-${slot}.json`),JSON.stringify(f));
- await seed(page,f.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ await openSavedDungeon(page,f.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  await (await battleTool(page, '#battle-party')).click();
  await page.locator('#inspect-unit-1').click();
  await expect(page.getByRole('dialog')).toContainText('Second Wind 1/1');
@@ -882,7 +881,7 @@ test('corrupt bytes stay exportable and uncertain travel requires explicit recov
  await page.addInitScript(()=>{document.hasFocus=()=>false;});
  test.setTimeout(90000);const f=fixture(2),result=dispatch(f.snapshot.activeBattle!,f.command,dungeonBattle(f.snapshot)!.catalog);if(!result.ok)throw Error('fixture failed');
  const cleared=acceptDungeonBattle(f.snapshot,result.state);if(!cleared.ok)throw Error(cleared.reason);
- const approach=atStairApproach(declineReward(cleared.state));await seed(page,approach);
+ const approach=atStairApproach(declineReward(cleared.state));await openSavedDungeon(page,approach);
  await page.evaluate(key=>{const original=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){original.call(this,k,v);if(k===key&&JSON.parse(v).payload.depth===2)throw Error('uncertain travel write');};},DUNGEON_KEYS.primary);
  await page.locator(`#dungeon-map [data-cell="${approach.floors[0].descriptor.downstairs}"]`).click();
  await expect(page.locator('.dungeon-status')).toContainText('Travel not published');
@@ -897,7 +896,7 @@ test('corrupt bytes stay exportable and uncertain travel requires explicit recov
 });
 
 test('declining a dungeon reward preserves inventory and updates stair progress',async({page,isMobile})=>{
- const initial=dungeonCapacityFixture();await seed(page,initial);
+ const initial=dungeonCapacityFixture();await openSavedDungeon(page,initial);
  const progress=page.locator('#dungeon-encounter-progress'),stairs=page.locator('#dungeon-stair-descend');
  await expect(progress).toHaveText('Encounters: 1 / 3 cleared');
  await expect(stairs).toHaveText('Downstairs: locked · resolve reward');
@@ -924,7 +923,7 @@ test('declining a dungeon reward preserves inventory and updates stair progress'
 });
 
 test('confirmed charm discard frees full capacity without cancelling or duplicating the pending reward',async({page,isMobile})=>{
- const initial=dungeonCapacityFixture();await seed(page,initial);
+ const initial=dungeonCapacityFixture();await openSavedDungeon(page,initial);
  const rewards=page.getByRole('region',{name:'Rewards',exact:true});
  const manage=rewards.getByRole('button',{name:'Manage owned items',exact:true});
  const inventory=page.locator('#dungeon-inventory');
@@ -970,7 +969,7 @@ test('a claimed Revive Kit restores a fallen dungeon hero across Continue',async
  const result=dispatch(entry.activeBattle,command,dungeonBattle(entry)!.catalog);if(!result.ok)throw Error(result.reason);
  const victory=acceptDungeonBattle(entry,result.state);if(!victory.ok)throw Error(victory.reason);
  expect(victory.state.party[2].hp).toBe(0);
- await seed(page,victory.state);
+ await openSavedDungeon(page,victory.state);
  const mageHealth = page.locator('meter[aria-label="Mage health"]');
  await expect(mageHealth).toHaveAttribute('aria-valuetext','0 of 11 hit points, defeated');
  await expect(page.locator('#dungeon-hero-mage')).toBeEnabled();
@@ -1054,7 +1053,7 @@ test('hero progression commits once, heals at a threshold and survives inspectio
  const leveled=completed.state.party.filter((h,i)=>h.level>f.snapshot.party[i].level);
  expect(leveled.length).toBeGreaterThan(0);for(const h of leveled)expect(h.hp).toBe(h.maxHp);
  writeFileSync(test.info().outputPath('legal-boundary-1.json'),JSON.stringify(f));
- await seed(page,f.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ await openSavedDungeon(page,f.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  await (await battleTool(page, '#battle-party')).click();await expect(page.getByRole('dialog')).toContainText('Level 1');await page.locator('#inspection-close').click();
  await playCommand(page,f.command);
  await expect(page.locator('#dungeon-screen')).toBeVisible();
@@ -1094,7 +1093,7 @@ test('hero progression commits once, heals at a threshold and survives inspectio
 
 test('character sheets switch heroes and show equipped charms through equip, resume, and unequip', async ({page,isMobile}) => {
  const initial = dungeonCapacityFixture();
- await seed(page, initial);
+ await openSavedDungeon(page, initial);
  const party = page.getByRole('region',{name:'Party',exact:true});
  const fighter = party.getByRole('button',{name:'Fighter',exact:true});
  const ranger = party.getByRole('button',{name:'Ranger',exact:true});
