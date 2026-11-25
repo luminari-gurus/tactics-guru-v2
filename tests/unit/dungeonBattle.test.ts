@@ -7,7 +7,7 @@ import { guardedBoundary } from '../helpers/guardedBoundary';
 import { combatStats } from '../../src/domain/effects';
 import { assert,expect,it } from 'vitest';
 import { previewSupportAbility } from '../../src/domain/combat';
-import { dungeonJourney, dungeonVictoryBoundary, rangerJourney, selectMageJourney, MAGE_JOURNEY_SEEDS, FIGHTER_JOURNEY_SEED, healedFighterBoundary, shamanJourney, fighterJourney } from '../helpers/dungeonFixtures';
+import { dungeonJourney, dungeonVictoryBoundary, walkWitness, rangerJourney, selectMageJourney, MAGE_JOURNEY_SEEDS, FIGHTER_JOURNEY_SEED, healedFighterBoundary, shamanJourney, fighterJourney } from '../helpers/dungeonFixtures';
 import { dungeonStairStatus, dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState } from '../../src/domain/dungeon';
 import { BattleSession } from '../../src/app/BattleSession';
 import { playerDecision } from '../helpers/playerPolicy';
@@ -153,6 +153,48 @@ it.each([[10, 11], [10, 15]])('saves a draught in checkpoint/battle formats %i/%
     expect(finished.state.activeBattle).toBeNull();
     expect(acceptDungeonBattle(finished.state, state)).toEqual({ ok: false, reason: 'staleBoundary' });
   }
+});
+
+it('settles the last earned draught after playing the next encounter to completion', () => {
+  const witness = dungeonVictoryBoundary(13);
+  assert(witness);
+  const won = dispatch(witness.snapshot.activeBattle, witness.command, dungeonBattle(witness.snapshot)!.catalog);
+  assert(won.ok);
+  const reward = acceptDungeonBattle(witness.snapshot, won.state);
+  assert(reward.ok && reward.state.offer);
+  const claimed = dungeonItem(reward.state, {
+    ...dungeonBoundary(reward.state), type: 'claimReward', offerId: reward.state.offer.id, itemId: 'item:healing_draught',
+  });
+  assert(claimed.ok);
+  let dungeon = walkWitness(claimed.state);
+  const source = dungeonBattle(dungeon)!;
+  const battle = new BattleSession(source.catalog, dungeon.activeBattle!, source.state.seed, undefined, true, source.battlefield);
+  let used = false;
+  for (let i = 0; i < 500 && battle.state.outcome === 'ongoing'; i++) {
+    const drink = { type: 'drinkDraught', unitId: battle.active.id } as const;
+    if (battle.phase === 'enemy') {
+      const step = battle.nextEnemy();
+      assert(step);
+      battle.finishPresentation(step.token);
+    } else {
+      const command = !used && battle.preview(drink).ok ? drink : playerDecision(battle.state, source.catalog);
+      assert(battle.prepare(command).ok);
+      const step = battle.confirm();
+      assert(step);
+      battle.finishPresentation(step.token);
+      if (command === drink) used = true;
+    }
+    const accepted = acceptDungeonBattle(dungeon, battle.state);
+    assert(accepted.ok);
+    dungeon = accepted.state;
+  }
+  expect(used).toBe(true);
+  expect(dungeon.activeBattle).toBeNull();
+  expect(dungeon.ownership.consumables).toEqual([]);
+  expect(acceptDungeonBattle(dungeon, battle.state)).toEqual({ ok: false, reason: 'staleBoundary' });
+  const encoded = encodeDungeon(dungeon);
+  assert(encoded.ok);
+  expect(decodeDungeon(encoded.text)).toEqual({ ok: true, state: dungeon });
 });
 
 it('completes production Shaman Hex and healing through the real session with exact command/event/RNG replay',()=>{
