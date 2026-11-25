@@ -136,6 +136,21 @@ export function sharedGroundPile(ownedCount: number, occupied = false) {
  throw Error('No deterministic two-charm ground pile');
 }
 
+export function guardianFirstRewardFixture(): DungeonState {
+ const depth=5;
+ // Structural reward boundary isolates marker rendering, not preceding combat.
+ const fresh=freshDungeon('guardian-first',1,undefined,true);
+ const floors=Array.from({length:depth},(_,i)=>{
+  const descriptor=floorDescriptor(fresh.seed,i+1),map=floorMap(descriptor);
+  return {descriptor,position:descriptor.upstairs,completed:i===depth-1?0:3,
+   exploration:freshExploration(descriptor.seed,descriptor.upstairs,map)};
+ });
+ const base=atEncounter({...fresh,depth,floors},2),floor=base.floors[depth-1],map=floorMap(floor.descriptor);
+ const staged:DungeonState={...base,phase:'reward',floors:base.floors.map((f,i)=>i!==depth-1?f:{...floor,completed:1,
+  exploration:{...movableExploration(floor.exploration,floor.descriptor.seed,0,'ready'),cleared:[2],active:2,revealed:Array.from({length:map.cells.length},(_,i)=>i)}})};
+ return checkedDungeon(readDungeon({...staged,offer:dungeonOffer(staged)}));
+}
+
 export function savedBiomeEncounter(biome: 'forest' | 'desert', kind: 'normal' | 'elite' | 'vault' | 'boss') {
   const seeds = { forest: { normal: 0, elite: 9, vault: 0, boss: 0 }, desert: { normal: 1, elite: 2, vault: 1, boss: 1 } };
   const seed = seeds[biome][kind];
