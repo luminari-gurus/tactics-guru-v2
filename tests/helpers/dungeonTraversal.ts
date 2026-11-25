@@ -64,8 +64,9 @@ export async function walkDungeon(page: Page, target?: number, mode: 'keyboard'|
   const targetPoi=target===undefined ? undefined : floor.exploration.pois.find(p=>poiCell(p,floor.descriptor.size ?? 20)===target&&!clearedDungeonSlots(floor).includes(p.encounterSlot));
   const path:number[]=[];
   const seen=new Set<string>();let detour:number[]=[];
+  let current = initial;
   for(let attempt=0;attempt<400;attempt++) {
-    const s=await dungeonSnapshot(page), f=s.floors[s.depth-1];
+    const s=current, f=s.floors[s.depth-1];
     if(s.depth!==initial.depth||s.phase!=='ready')return path;
     const width=f.descriptor.size ?? 20;
     const live=f.exploration.pois.filter(p=>!clearedDungeonSlots(f).includes(p.encounterSlot));
@@ -101,15 +102,14 @@ export async function walkDungeon(page: Page, target?: number, mode: 'keyboard'|
     // Encounter contact interrupts the attempted step. Wait for the accepted
     // boundary without treating the destination as a completed exploration move.
     await expect.poll(async () => {
-      const after=await dungeonSnapshot(page);
-      return after.floors[s.depth-1].position===n || (after.phase==='battle' &&
-        after.encounterEntry?.origin===f.position && after.encounterEntry.contact===n);
+      current=await dungeonSnapshot(page);
+      return current.floors[s.depth-1].position===n || (current.phase==='battle' &&
+        current.encounterEntry?.origin===f.position && current.encounterEntry.contact===n);
     }).toBe(true);
     path.push(n);
-    const after=await dungeonSnapshot(page);
-    if(after.phase==='battle') {
-      expect(after.floors[s.depth-1].position).toBe(f.position);
-      expect(after.encounterEntry).toMatchObject({origin:f.position,contact:n});
+    if(current.phase==='battle') {
+      expect(current.floors[s.depth-1].position).toBe(f.position);
+      expect(current.encounterEntry).toMatchObject({origin:f.position,contact:n});
       return path;
     }
   }
