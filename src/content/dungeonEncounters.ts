@@ -9,6 +9,7 @@ import { graveyardFamilyBattleContent } from './graveyardFamily';
 import { emberWastesFamilyBattleContent } from './emberWastesFamily';
 import { winterTundraFamilyBattleContent } from './winterTundraFamily';
 import { sunscorchedDesertFamilyBattleContent } from './sunscorchedDesertFamily';
+import { stormCoastFamilyBattleContent } from './stormCoastFamily';
 import { hobgoblinBattleContent, hobgoblinComposition, hobgoblinMap } from './hobgoblin';
 import { desertRunCatalog } from './desertCatalog';
 import { isBattlefieldSource, readBattlefieldEncounter, type BattlefieldSource } from './battlefieldTypes';
@@ -148,6 +149,8 @@ export const emberWastesFamilyDungeonBattleCatalog = emberWastesFamilyBattleCont
 export const winterTundraFamilyDungeonBattleCatalog = winterTundraFamilyBattleContent(dungeonBattleCatalog);
 /** Registered sunscorched-desert-family units and art; not placed into existing encounter rosters. */
 export const sunscorchedDesertFamilyDungeonBattleCatalog = sunscorchedDesertFamilyBattleContent(dungeonBattleCatalog);
+/** Registered storm-coast-family units and art; not placed into existing encounter rosters. */
+export const stormCoastFamilyDungeonBattleCatalog = stormCoastFamilyBattleContent(dungeonBattleCatalog);
 export const hobgoblinDungeonEncounterCatalog: DungeonEncounterCatalog = {
   ...dungeonEncounterCatalog,
   compositions: [...dungeonEncounterCatalog.compositions, hobgoblinComposition],
