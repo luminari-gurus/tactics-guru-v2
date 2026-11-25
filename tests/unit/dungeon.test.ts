@@ -612,10 +612,13 @@ describe('dungeon floors', () => {
     expect(newDungeonSeed(() => 0xffffffff, 0xffffffff)).toBe(0);
     expect(newDungeonSeed(() => -1)).toBe(0xffffffff);
   });
-  it('generates a different first-floor layout even when replacement entropy repeats', () => {
+  it.each([
+    { draw: 7, previous: 7, scenario: 'replacement with repeated entropy' },
+    { draw: 8, previous: undefined, scenario: 'independent fresh visit' },
+  ])('generates a different first-floor layout for a $scenario', ({ draw, previous }) => {
     const first = freshDungeon('first', 7);
-    const replacement = freshDungeon('replacement', newDungeonSeed(() => first.seed, first.seed));
-    expect(floorMap(replacement.floors[0].descriptor).cells).not.toEqual(floorMap(first.floors[0].descriptor).cells);
+    const next = freshDungeon('next', newDungeonSeed(() => draw, previous));
+    expect(floorMap(next.floors[0].descriptor).cells).not.toEqual(floorMap(first.floors[0].descriptor).cells);
   });
   it('builds a legal first floor for thousands of seeds', () => {
     const failed: { seed: number; message: string }[] = [];
