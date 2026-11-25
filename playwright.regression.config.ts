@@ -8,6 +8,9 @@ const baseURL = `http://127.0.0.1:4173${basePath}`;
 // Each engine clears one full floor per profile: saved manual pickup on desktop,
 // saved automatic pickup on portrait, and unsaved manual pickup on landscape.
 export const redundantProfileJourneys = [
+  // Desktop and portrait enact the full Guarded lifecycle. Landscape checks its tighter badge layout.
+  /^mobile-landscape .*shared Guarded lifecycle: dungeon miss$/,
+  /^(?!mobile-landscape ).*landscape touch keeps the resumed Guarded badge visible and noninteractive$/,
   /^(?:mobile-portrait|mobile-landscape|portrait-webkit|landscape-webkit) .*@desktop-keyboard(?: |$)/,
   // Frost Snare exercises wheel zoom, native Chromium pinch, and WebKit pointer gestures.
   /^(?:mobile-landscape|desktop-webkit|portrait-webkit) .*staged Mage Frost Snare cancels invalid casts and restores the active badge$/,
