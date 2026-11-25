@@ -338,13 +338,24 @@ function win(s: DungeonState) {
   return good(acceptDungeonBattle(s, { ...b, outcome: 'playerWin', units: b.units.map(u => u.side === 'enemy' ? { ...u, hp: 0 } : u) }));
 }
 
-it('commits a dungeon victory once when presentation completion is repeated', async () => {
-  const fixture = dungeonVictoryBoundary(1, 0); assert(fixture);
-  const dungeon = new DungeonSession(fixture.snapshot, null);
+it('commits level-up healing and victory statistics once when presentation completion is repeated', async () => {
+  const fixture = dungeonVictoryBoundary(1, 1); assert(fixture);
+  const data = memory(), storage = createDungeonStorage(() => data);
+  assert(storage.save(fixture.snapshot).ok);
+  const dungeon = new DungeonSession(fixture.snapshot, storage);
+  assert(dungeon.continue(dungeon.inspect()));
   const battle = await dungeon.startEncounter(); assert(battle);
   battle.prepare(fixture.command);
   const step = battle.confirm(); assert(step);
   const committed = dungeon.snapshot;
+  const expected = good(acceptDungeonBattle(fixture.snapshot, battle.state));
+  expect(committed).toEqual({ ...expected, stats: expect.objectContaining({
+    coverage: 'since-upgrade', enemiesKilled: 1, movesTaken: 0,
+    boundary: { battle: 1, command: battle.state.commandCount },
+  }) });
+  const leveled = committed.party.filter((hero, i) => hero.level > fixture.snapshot.party[i].level);
+  expect(leveled.length).toBeGreaterThan(0);
+  for (const hero of leveled) expect(hero.hp).toBe(hero.maxHp);
   expect(committed.phase).toBe('reward');
   battle.finishPresentation(step.token);
   expect(battle.phase).toBe('ended');
