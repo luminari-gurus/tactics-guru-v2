@@ -62,6 +62,25 @@ it.each([
   expect(currentFloor(resumed.snapshot).loot![0]).toEqual({ ...loot, remaining: 0 });
 });
 
+it('continues an occupied-pile battle at its origin with both rewards still on the ground', async () => {
+  const { state, cell, origin } = sharedGroundPile(1, true);
+  const { storage, owner } = savedOwner(state);
+  assert(await owner.step({ ...owner.spatialBoundary, destination: cell }));
+  const active = owner.snapshot;
+  expect(active.phase).toBe('battle');
+  expect(active.encounterEntry).toEqual({ origin, contact: cell, slot: 2 });
+  expect(currentFloor(active).position).toBe(origin);
+  expect(currentFloor(active).loot).toHaveLength(2);
+  expect(currentFloor(active).loot).toEqual(currentFloor(state).loot);
+  expect(active.ownership).toEqual(state.ownership);
+  owner.dispose();
+
+  const resumed = new DungeonSession(state, storage);
+  assert(resumed.continue(resumed.inspect()));
+  expect(resumed.snapshot).toEqual(active);
+  resumed.dispose();
+});
+
 it('restores a partial pickup and collects the remaining charm on discard', async () => {
   const { state, cell } = sharedGroundPile(5);
   const [first, second] = currentFloor(state).loot!;

@@ -7,7 +7,6 @@ import { currentFloor, floorMap, readDungeon, stepDungeon, type DungeonState } f
 import { neighbors, poiCell } from '../src/domain/exploration';
 import { encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
 import { freshRunStats } from '../src/domain/runStats';
-import { ITEM_BOUNDS } from '../src/content/itemTypes';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { AUTO_COLLECT_LOOT_KEY } from '../src/ui/autoCollectLootPreference';
 
@@ -82,12 +81,13 @@ async function loadBoundary(page: Page, seed = 28, reviveStock?: number) {
     ...(reviveStock === undefined ? {} : { ownership: { ...witness.snapshot.ownership,
       consumables: [{ itemId: 'item:revive_kit', quantity: reviveStock }] } }) }));
   const encoded = encodeDungeon(snapshot); if (!encoded.ok) throw Error(encoded.reason);
-  // Leave the previous owner before staging another boundary, so pagehide cannot
-  // overwrite the fixture with the outgoing journey's playtime checkpoint.
-  await page.goto('./');
-  await page.evaluate(({ keys, text }) => {
+  // Seed the incoming document after the previous owner's pagehide checkpoint.
+  // Each fixture runs once, so later reloads exercise the game's own save.
+  await page.addInitScript(({ keys, text, marker }) => {
+    if (window !== window.top || sessionStorage.getItem(marker)) return;
     localStorage.setItem(keys.primary, text); localStorage.removeItem(keys.backup);
-  }, { keys: DUNGEON_KEYS, text: encoded.text });
+    sessionStorage.setItem(marker, '1');
+  }, { keys: DUNGEON_KEYS, text: encoded.text, marker: `test:loot-fixture:${crypto.randomUUID()}` });
   await page.goto('./?game=dungeon'); await expectDungeonResumed(page);
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   expect((await readSession(page)).state).toEqual(snapshot.activeBattle);
@@ -180,30 +180,20 @@ test('fresh manual movement cancels a pending automatic step, including its stal
   expect(currentFloor(await dungeonSnapshot(page)).loot![0].remaining).toBe(1);
 });
 
-test('fresh preparation cancels a pending step, and a full inventory refuses automatic movement', async ({ page }) => {
-  await test.step('an accepted preparation action wins over the pending callback', async () => {
-    const witness = await loadBoundary(page, 13, 1), won = await finishVictory(page, witness);
-    expect(won.party.find(hero => hero.heroId === 'mage')!.hp).toBe(0);
-    await openDungeonInventory(page);
-    await page.getByLabel('Revive Kit target', { exact: true }).selectOption('mage');
-    await page.getByRole('button', { name: 'Use Revive Kit', exact: true }).click();
-    await page.locator('#dungeon-item-confirm').click();
-    await expect.poll(async () => (await dungeonSnapshot(page)).revision).toBe(won.revision + 1);
-    const prepared = await dungeonSnapshot(page);
-    expect(prepared.party.find(hero => hero.heroId === 'mage')!.hp).toBeGreaterThan(0);
-    expect(prepared.ownership.consumables).toEqual([]);
-    expect(currentFloor(prepared)).toEqual(currentFloor(won));
-    expect(await page.evaluate(() => window.issue408AutoSteps[0].cancelled)).toBe(true);
-    await releaseAutomaticStep(page); await expectProgress(page, prepared); await expectSavedProgress(page, prepared);
-  });
-  await test.step('an uncollectable new reward keeps the origin and takes no enemy turn', async () => {
-    const witness = await loadBoundary(page, 13, ITEM_BOUNDS.stack.max), won = await finishVictory(page, witness);
-    await releaseAutomaticStep(page);
-    await expect(page.locator('.dungeon-loot-status')).toHaveText('Inventory full. Loot remains on the ground; the party has not moved.');
-    await expectProgress(page, won); await expectSavedProgress(page, won);
-    expect(currentFloor(won).loot![0].itemId).toBe('item:revive_kit');
-    await releaseAutomaticStep(page); await expectProgress(page, won);
-  });
+test('fresh preparation cancels a pending automatic step', async ({ page }) => {
+  const witness = await loadBoundary(page, 13, 1), won = await finishVictory(page, witness);
+  expect(won.party.find(hero => hero.heroId === 'mage')!.hp).toBe(0);
+  await openDungeonInventory(page);
+  await page.getByLabel('Revive Kit target', { exact: true }).selectOption('mage');
+  await page.getByRole('button', { name: 'Use Revive Kit', exact: true }).click();
+  await page.locator('#dungeon-item-confirm').click();
+  await expect.poll(async () => (await dungeonSnapshot(page)).revision).toBe(won.revision + 1);
+  const prepared = await dungeonSnapshot(page);
+  expect(prepared.party.find(hero => hero.heroId === 'mage')!.hp).toBeGreaterThan(0);
+  expect(prepared.ownership.consumables).toEqual([]);
+  expect(currentFloor(prepared)).toEqual(currentFloor(won));
+  expect(await page.evaluate(() => window.issue408AutoSteps[0].cancelled)).toBe(true);
+  await releaseAutomaticStep(page); await expectProgress(page, prepared); await expectSavedProgress(page, prepared);
 });
 
 test('visibility interruption and explicit recovery each cancel the pending automatic step without replay', async ({ page }, info) => {

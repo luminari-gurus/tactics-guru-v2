@@ -4,7 +4,7 @@ import { MOVEMENT_DIRECTIONS } from '../src/domain/constants';
 import { previewMovement } from '../src/domain/grid';
 import { LEGACY_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
 import { atEncounter, priorDungeonEnvelope } from './helpers/dungeonFixtures';
-import {expectDungeonResumed,expectSameProgress} from './helpers/dungeonTraversal';
+import {openSavedDungeon,openDungeonWithStorage,expectDungeonResumed,expectSameProgress} from './helpers/dungeonTraversal';
 import {expect,railTest as test,type Page} from './helpers/dungeonEntropy';
 import {dungeonVictoryBoundary} from './helpers/dungeonFixtures';
 import {freshDungeon,startDungeonBattle,dungeonBattle,floorMap,type DungeonState} from '../src/domain/dungeon';
@@ -37,7 +37,7 @@ test('boxed-in hero can cancel Wait before acting and end immediately after acti
  const activeBattle = {...battle, units, activeIndex: battle.initiative.indexOf(actor.id)};
  const movement = previewMovement(activeBattle, actor.id, catalog);
  expect(movement.ok && movement.cells.map(cell => cell.cost)).toEqual([0]);
- await load(page, {...made.state, activeBattle});
+ await openSavedDungeon(page, {...made.state, activeBattle});
  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
  const before = await readSession(page);
  const wait = page.getByRole('button', {name: 'Wait / End turn', exact: true});
@@ -52,6 +52,12 @@ test('boxed-in hero can cancel Wait before acting and end immediately after acti
  await playCommand(page, {type:'drinkDraught', unitId:actor.id});
  const acted = (await readSession(page)).state;
  expect(acted.units.find(unit => unit.id === actor.id)?.hasActed).toBe(true);
+ await expect(page.locator('#battle-draught')).toHaveText('Healing Draught ×0 · None left');
+ await expect.poll(() => page.evaluate(key => JSON.parse(localStorage.getItem(key)!).payload.activeBattle.commandCount,
+  DUNGEON_KEYS.primary)).toBe(acted.commandCount);
+ await page.reload(); await expectDungeonResumed(page);
+ await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+ expect((await readSession(page)).state).toEqual(acted);
  if (isMobile) await wait.tap(); else await wait.click();
  await expect(dialog).toBeHidden();
  await expect.poll(async () => (await readSession(page)).state.commandCount).toBeGreaterThan(acted.commandCount);
@@ -63,7 +69,7 @@ test('dungeon statistics: confirmed replacement pauses pending enemy turns throu
  const battle=made.state.activeBattle!,order=battle.initiative;
  const activeIndex=order.findIndex((id,index)=>battle.units.find(unit=>unit.id===id)!.side==='player'&&battle.units.find(unit=>unit.id===order[(index+1)%order.length])!.side==='enemy');
  if(activeIndex<0)throw Error('Missing player-to-enemy boundary');
- await load(page,{...made.state,activeBattle:{...battle,activeIndex}});await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ await openSavedDungeon(page,{...made.state,activeBattle:{...battle,activeIndex}});await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  await page.evaluate(key=>new Promise<void>(granted=>{void navigator.locks.request(key,()=>new Promise<void>(release=>{(window as any).releaseHistoryBoundary=release;granted();}));}),RUN_RECORD_KEYS.primary);
  try {
   const oldId=(await snapshot(page)).id;await endTurn(page);
@@ -92,9 +98,9 @@ test('dungeon previous-format recovery preserves and exports both original slots
  const legacy=priorDungeonEnvelope(freshDungeon('legacy-browser',13,LEGACY_ENCOUNTER_POLICY),1);
  const texts={primary:` \n${legacy}\n `,backup:`\t${old}\n`};
  const keys=DUNGEON_KEYS;
- await page.goto('./');
- await page.evaluate(({keys,texts})=>{localStorage.setItem(keys.primary,texts.primary);localStorage.setItem(keys.backup,texts.backup);localStorage.setItem('issue164-unrelated','retain');},{keys,texts});
- await page.goto('./?game=dungeon');
+ await openDungeonWithStorage(page, {
+  [keys.primary]: texts.primary, [keys.backup]: texts.backup, 'issue164-unrelated': 'retain',
+ });
  const stored=()=>page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup),unrelated:localStorage.getItem('issue164-unrelated')}),keys);
  await expect(page.locator('#main-menu')).toBeVisible();
  await expect(page.getByRole('button',{name:'Continue',exact:true})).toBeDisabled();
@@ -112,9 +118,8 @@ test('dungeon previous-format recovery preserves and exports both original slots
  await page.reload();await expect(page.locator('#main-menu')).toBeVisible();expect(await stored()).toEqual({...texts,unrelated:'retain'});
 });
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
-async function load(page:Page,s:DungeonState){const saved=encodeDungeon(s);if(!saved.ok)throw Error(saved.reason);await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:saved.text});await page.goto('./?game=dungeon');await expectDungeonResumed(page);}
 test('restart during accepted presentation discards old callbacks and history',async({page})=>{
- const f=dungeonVictoryBoundary(1,0);if(!f)throw Error('legal victory fixture changed');await load(page,f.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ const f=dungeonVictoryBoundary(1,0);if(!f)throw Error('legal victory fixture changed');await openSavedDungeon(page,f.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const cmd=f.command,state=(await readSession(page)).state;if(cmd.type!=='useAbility')throw Error('expected finishing attack');
  await page.locator(`[data-action="${cmd.abilityId==='ability:basic_attack'?'basic':cmd.abilityId}"]`).click();const target=state.units.find(u=>u.id===('unitId'in cmd.target?cmd.target.unitId:'missileTargets'in cmd.target?cmd.target.missileTargets[0]:-1))!;
  await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
@@ -165,7 +170,7 @@ test('legal enemy defeat waits for its save and returns to the menu during a pen
    }));
   }),RUN_RECORD_KEYS.primary);
   await page.bringToFront();
-  await load(page,{...entry,activeBattle:before});
+  await openSavedDungeon(page,{...entry,activeBattle:before});
   await expect(page.locator('#game')).toHaveAttribute('data-phase','ended');
   expect((await snapshot(page)).phase).toBe('defeat');
   await expect(page.locator('#main-menu')).toHaveCount(0);
@@ -211,7 +216,7 @@ test('legal enemy defeat waits for its save and returns to the menu during a pen
  expect((await snapshot(page)).party.every(h=>h.hp>0)).toBe(true);expect((await snapshot(page)).floors).toHaveLength(1);
 });
 test('visibility interruption finishes an accepted terminal presentation exactly once',async({page})=>{
- const f=dungeonVictoryBoundary(1,0);if(!f)throw Error('fixture changed');await load(page,f.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ const f=dungeonVictoryBoundary(1,0);if(!f)throw Error('fixture changed');await openSavedDungeon(page,f.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const cmd=f.command,state=(await readSession(page)).state;if(cmd.type!=='useAbility')throw Error('expected attack');
  await page.locator(`[data-action="${cmd.abilityId==='ability:basic_attack'?'basic':cmd.abilityId}"]`).click();const target=state.units.find(u=>u.id===('unitId'in cmd.target?cmd.target.unitId:'missileTargets'in cmd.target?cmd.target.missileTargets[0]:-1))!;
  await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
@@ -238,7 +243,7 @@ test(`${departure} recovers the last four seconds exactly once across a held dun
     await holder.evaluate(() => { window.open('about:blank'); });
     page = await opened;
   }
-  await load(page, freshDungeon('reload-clock', 13, undefined, true));
+  await openSavedDungeon(page, freshDungeon('reload-clock', 13, undefined, true));
   await holder.evaluate(key => new Promise<void>(acquired => {
     void navigator.locks.request(key, () => new Promise<void>(release => {
       window.addEventListener('release-clock', () => release(), { once: true }); acquired();
@@ -272,7 +277,7 @@ test(`${departure} recovers the last four seconds exactly once across a held dun
   // Freeze only playtime; the origin Web Lock and both tabs are real.
   await context.addInitScript(()=>Object.defineProperty(performance,'now',{value:()=>0}));
   const initial = freshDungeon('exclusive-spatial-tabs',13,undefined,true);
-  await load(page,initial);
+  await openSavedDungeon(page,initial);
   const other = await context.newPage();await other.goto('./?game=dungeon'); await expectDungeonResumed(other);
   const floor = initial.floors[0], map = floorMap(floor.descriptor);
   const destination = neighbors(floor.position,map.width,map.height).find(n => map.cells[n] && !floor.exploration.pois.some(p => poiCell(p,map.width) === n))!;
