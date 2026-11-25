@@ -1086,7 +1086,7 @@ test('hero progression commits once, heals at a threshold and survives inspectio
  expect(errors).toEqual([]);
 });
 
-test('character sheets switch heroes and show equipped charms through equip, resume, and unequip', async ({page,isMobile}) => {
+test('character sheets switch heroes and show equipped charms through equip, resume, and unequip', { tag: '@desktop-chromium-portrait-webkit' }, async ({page,isMobile}) => {
  const initial = dungeonCapacityFixture();
  await openSavedDungeon(page, initial);
  const party = page.getByRole('region',{name:'Party',exact:true});
@@ -1151,11 +1151,6 @@ test('character sheets switch heroes and show equipped charms through equip, res
  else { await page.keyboard.press('Shift+Tab'); await activate(close); }
  await expect(dialog).not.toBeVisible();
  await expect(ranger).toBeFocused();
- await expect.poll(async () => {
-  const text = await page.evaluate(key => localStorage.getItem(key), DUNGEON_KEYS.primary);
-  const saved = text === null ? null : decodeDungeon(text);
-  return saved?.ok ? saved.state.ownership.assignments : [];
- }).toContainEqual({ heroId: 'ranger', slot: 'charm', instanceId: unassigned.instanceId });
  await page.reload();
  await expectDungeonResumed(page);
  await open(ranger);

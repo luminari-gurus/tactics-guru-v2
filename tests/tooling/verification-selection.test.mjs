@@ -75,6 +75,7 @@ test('routine verification clears each first-floor scenario once and checks both
       'legal enemy defeat waits for its save and returns to the menu during a pending history write',
     ]) assert.deepEqual(profilesFor(title), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('visibility interruption finishes an accepted terminal presentation exactly once'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('character sheets switch heroes and show equipped charms through equip, resume, and unequip'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('confirmed charm discard frees full capacity without cancelling or duplicating the pending reward'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('dungeon battle undo survives reload'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('saved dungeon downloads only after explicit recovery export'), [stage === 'chromium' ? desktop : portrait]);
