@@ -99,6 +99,10 @@ test('each engine clears one full floor per profile and checks both pickup modes
 
 test('menu save recovery runs on desktop Chromium and portrait WebKit', () => {
   const titles = [
+    'main menu: legacy battle and run slots are ignored through launch and dungeon Continue',
+    'main menu: New Game stays playable after retrying an unreadable dungeon save',
+    'main menu: dungeon departure after rejected movement retains unsaved play warning',
+    'main menu: dungeon departure after rejected movement retains failed replacement warning',
     'main menu: save recovery lists only the dungeon backup',
     'main menu: New Game confirms over the menu and preserves other save families',
     'main menu: changed dungeon save requires a fresh confirmation',
