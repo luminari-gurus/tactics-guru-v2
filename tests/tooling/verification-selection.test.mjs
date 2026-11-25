@@ -57,6 +57,8 @@ test('each engine clears one full floor per profile and checks both pickup modes
       [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('Guardian-first reward, map and encounter state survive claim and reload at depth 5'),
       [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('legal guardian reward, travel reload, backtracking and isolated saves'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('a claimed Revive Kit restores a fallen dungeon hero across Continue'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('reload before the pending step restores the ground pile without surprise movement or collection'), [desktop]);
     assert.deepEqual(profilesFor('ground loot: legal victory saves one item at contact and a manual pickup survives refusal and reload'), allProfiles);
     assert.deepEqual(profilesFor('ground loot: entering an occupied pile starts combat and closes inventory'), [stage === 'chromium' ? landscape : desktop]);
