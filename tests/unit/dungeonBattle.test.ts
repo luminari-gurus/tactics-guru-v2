@@ -1,6 +1,7 @@
+import { showsSnareBadge } from '../../src/phaser/abilityPresentation';
 import { HERO_PROGRESSION } from '../../src/content/progression';
 import { progressHero } from '../../src/domain/progression';
-import { atDownstairs, atEncounter, withLegacySight } from '../helpers/dungeonFixtures';
+import { atDownstairs, atEncounter, stagedMageAbility, withLegacySight } from '../helpers/dungeonFixtures';
 import { freshDungeon, floorDescriptor, floorMap, startDungeonBattle, readDungeon, travelDungeon } from '../../src/domain/dungeon';
 import { guardedBoundary } from '../helpers/guardedBoundary';
 import { combatStats } from '../../src/domain/effects';
@@ -18,6 +19,31 @@ import { EXPANDED_ENCOUNTER_POLICY, LEGACY_ENCOUNTER_POLICY } from '../../src/do
 import { priorDungeonEnvelope } from '../helpers/dungeonFixtures';
 import { freshExploration } from '../../src/domain/exploration';
 import { createDungeonStorage, DUNGEON_BACKUP_CHECKPOINT_KEY, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
+
+it.each(['ability:pinning_shot', 'ability:frost_snare'] as const)('projects Snared badges after restoring %s', abilityId => {
+  const { state, command } = stagedMageAbility('ability:frost_snare');
+  const initial = state.activeBattle!;
+  const mage = initial.units.find(unit => unit.defId === 'mage')!;
+  const ranger = initial.units.find(unit => unit.defId === 'ranger')!;
+  const actor = abilityId === 'ability:pinning_shot' ? ranger : mage;
+  // Both abilities need a legal target. Put the Ranger on the Mage's casting tile for Pin.
+  const units = actor === mage ? initial.units : initial.units.map(unit => {
+    if (unit === mage) return { ...unit, cell: ranger.cell };
+    if (unit === ranger) return { ...unit, cell: mage.cell };
+    return unit;
+  });
+  const before = { ...initial, units, activeIndex: initial.initiative.indexOf(actor.id) };
+  const cast = dispatch(before, { ...command, unitId: actor.id, abilityId }, dungeonBattle(state)!.catalog);
+  assert(cast.ok);
+  const saved = encodeDungeon({ ...state, activeBattle: cast.state });
+  assert(saved.ok);
+  const restored = decodeDungeon(saved.text);
+  assert(restored.ok && restored.state.activeBattle);
+  const restoredUnits = restored.state.activeBattle.units;
+  expect(restoredUnits.find(unit => unit.id === command.target.unitId)?.movementBlock).toEqual({ sourceId: actor.id, abilityId });
+  expect(restoredUnits.filter(unit => showsSnareBadge(unit, restoredUnits)).map(unit => unit.id))
+    .toEqual(abilityId === 'ability:frost_snare' ? [command.target.unitId] : []);
+});
 
 it.each([[10, 11], [10, 15]])('saves a draught in checkpoint/battle formats %i/%i and settles stock on either outcome', (checkpointFormat, battleFormat) => {
   const base = freshDungeon('draught-test', 13);

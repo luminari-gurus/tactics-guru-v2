@@ -1,4 +1,9 @@
-import type { BattleEvent } from '../domain/types';
+import { movementBlockSource } from '../domain/effects';
+import type { BattleEvent, UnitState } from '../domain/types';
+
+export function showsSnareBadge(unit: UnitState, units: readonly UnitState[]): boolean {
+  return unit.movementBlock?.abilityId === 'ability:frost_snare' && !!movementBlockSource(unit, units);
+}
 
 export type SignatureKind = 'guarded_strike' | 'high_shot' | 'magic_missile';
 export interface CombatFeedback {
