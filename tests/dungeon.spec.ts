@@ -21,7 +21,7 @@ import { playerDecision, fighterDecision } from './helpers/playerPolicy';
 import { journeyPreparation, shamanJourney } from './helpers/dungeonFixtures';
 import { dispatch } from '../src/domain/turns';
 import { previewMovement } from '../src/domain/grid';
-import type { Command, BattleEvent } from '../src/domain/types';
+import type { Command, BattleEvent, BattleState } from '../src/domain/types';
 import { movementBlockSource } from '../src/domain/effects';
 import { expectDungeonMovementVisible } from './helpers/dungeonLayout';
 import { BattleSession } from '../src/app/BattleSession';
@@ -358,18 +358,22 @@ for(const {saved,autoCollect,title} of [
   }
   if(saved)await page.screenshot({path:test.info().outputPath(`gameplay-battle-${slot}.png`)});
   const catalog=dungeonBattle(encounterEntry)!.catalog;
+  let state=(await readSession(page)).state;
   for(let step=0;step<500;step++){
-   const {state}=await readSession(page);
    const command=fighterDecision(state,catalog,taunted);
-   await playCommand(page,command);taunted ||= command.type==='useAbility'&&command.abilityId==='ability:taunt';
+   await playCommand(page,command,state);taunted ||= command.type==='useAbility'&&command.abilityId==='ability:taunt';
    const boundary=await page.waitForFunction(previousCount=>{
-    if((window as unknown as {issue408Return:DungeonState|null}).issue408Return)return 'finished';
+    if((window as unknown as {issue408Return:DungeonState|null}).issue408Return)return 'finished' as const;
     const game=document.querySelector<HTMLElement>('#game');
-    if(game?.dataset.phase==='player' && JSON.parse(game.dataset.session!).state.commandCount>previousCount)return 'player';
+    if(game?.dataset.phase==='player'){
+     const next:BattleState=JSON.parse(game.dataset.session!).state;
+     if(next.commandCount>previousCount)return next;
+    }
    },state.commandCount,{timeout:5000});
-   const finished=await boundary.jsonValue()==='finished';
+   const next=await boundary.jsonValue();
    await boundary.dispose();
-   if(finished)break;
+   if(next==='finished')break;
+   state=next!;
   }
   const finished=await page.evaluate(()=>(window as unknown as {issue408Return:DungeonState|null}).issue408Return);
   if(!finished)throw Error('Missing observed dungeon return');
