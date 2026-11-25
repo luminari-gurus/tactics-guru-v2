@@ -15,7 +15,7 @@ export const redundantProfileJourneys = [
   /^(?:mobile-portrait|portrait-webkit) .*@mobile-landscape(?: |$)/,
   /^(?:mobile-landscape|landscape-webkit) .*@mobile-portrait(?: |$)/,
   // Keep desktop Chromium and portrait WebKit for paired desktop and touch interactions.
-  /^(?:mobile-portrait|mobile-landscape|desktop-webkit|landscape-webkit) .*@desktop-chromium-portrait-webkit(?: |$)/,
+  /^(?:mobile-portrait|mobile-landscape|desktop-webkit|landscape-webkit|acceptance-webkit-landscape) .*@desktop-chromium-portrait-webkit(?: |$)/,
   // One real reload per engine verifies that boot leaves the automatic pickup unscheduled.
   /^(?:mobile-portrait|mobile-landscape|portrait-webkit|landscape-webkit) .*reload before the pending step restores the ground pile without surprise movement or collection$/,
   /^(?:mobile-portrait|mobile-landscape|portrait-webkit|landscape-webkit) .*saved menu dungeon keeps proof tools hidden across legal encounters$/,
