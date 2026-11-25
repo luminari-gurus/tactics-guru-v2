@@ -81,8 +81,8 @@ full-suite measurement against #200 remain part of #208.
 
 ## Coverage and build provenance
 
-`scripts/verification-batches.mjs` derives 14 timing rows from the
-13-stage `verify-full.mjs` plan. Preparation runs tooling, fast units (including
+`scripts/verification-batches.mjs` derives 15 timing rows from the
+14-stage `verify-full.mjs` plan. Preparation runs tooling, fast units (including
 content), both TypeScript scopes, real build integrations and the root bundle.
 It uploads that ordinary root output once, with source/input identity, a complete
 per-file SHA-256 inventory, the discovery plan and preparation receipts. Every
@@ -181,9 +181,10 @@ invented. API totals exclude the still-running aggregate job. Per-runner cross-w
 locking does not establish that unrelated host workloads are idle; coordinate
 those separately and document them in `conditions`.
 
-For standalone proof-scene performance work, capture with `npm run measure:fit`
-and evaluate against the documented budgets. The budget failures from PR #225
-and earlier failed runs remain in the historical receipts.
+Full capture runs the standalone proof-scene collector and evaluates the
+source-bound samples against the documented budgets. The evaluation JSON and
+its exit status are recorded separately. The budget failures from PR #225 and
+earlier failed runs remain in the historical receipts.
 
 `complete` describes accounted execution/coverage; `passed` also requires all
 current gates to pass. `baselineEligible` additionally requires a full scope and

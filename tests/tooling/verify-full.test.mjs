@@ -18,7 +18,7 @@ test('failed build blocks stale preview but still runs development checks and re
   const result = runStages(stages, stage => {
     visited.push(stage.id); return { exitCode: stage.id.startsWith('build-') ? 1 : 0 };
   });
-  for (const id of ['chromium', 'webkit-acceptance', 'webkit-exploration', 'assets-prefix-preview']) {
+  for (const id of ['chromium', 'webkit-acceptance', 'webkit-exploration', 'performance', 'assets-prefix-preview']) {
     assert.equal(result.results.find(r => r.id === id).status, 'blocked');
     assert.ok(!visited.includes(id));
   }
@@ -71,7 +71,7 @@ test('failed units or types block unchecked bundles while independent coverage c
       return { exitCode: stage.id === failed ? 1 : 0 };
     });
     for (const id of ['build-root', 'build-prefix', 'restore-root', 'chromium',
-      'webkit-acceptance', 'webkit-exploration', 'assets-prefix-preview']) {
+      'webkit-acceptance', 'webkit-exploration', 'performance', 'assets-prefix-preview']) {
       assert.equal(result.results.find(stage => stage.id === id).status, 'blocked', `${failed}: ${id}`);
       assert.ok(!visited.includes(id));
     }
@@ -103,7 +103,7 @@ test('aggregate refuses filters that could silently narrow required coverage', (
 test('stage environments clear inherited FIT_URL independently of the manual collector', async () => {
   const { execFileSync } = await import('node:child_process');
   const inherited = { FIT_URL: 'https://previous-deployment.example/game/' };
-  const env = stageEnvironment(stages.find(s => s.id === 'chromium'), '/reports', inherited);
+  const env = stageEnvironment(stages.find(s => s.id === 'performance'), '/reports', inherited);
   // Use the collector's real parser; the flag also supports Node 22.12's TS loader.
   const parser = new URL('../../scripts/measure-fit-options.ts', import.meta.url).href;
   const parsed = JSON.parse(execFileSync(process.execPath, [

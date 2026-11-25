@@ -37,6 +37,10 @@ test('whole-file batches partition canonical Chromium and preserve every remaini
   assert.deepEqual([...new Set([...stages.filter(stage => preparationIds.includes(stage.id)), ...jobStages].map(stage => stage.sourceStage))].sort(),
     [...new Set(stages.map(stage => stage.sourceStage))].sort());
   assert.equal(plan.scope, 'full');
+  const performance = plan.jobs.find(job => job.id === 'performance');
+  assert.equal(performance.stages[0].id, 'performance');
+  assert.deepEqual(performance.stages[0].needs, ['build-root']);
+  assert.ok(plan.requested.includes('performance'));
   const prefix = plan.jobs.find(job => job.id === 'prefix-assets');
   assert.deepEqual(prefix.stages.map(stage => stage.id), ['build-prefix', 'assets-prefix-preview', 'assets-prefix-dev', 'restore-root']);
   for (const job of plan.jobs.filter(job => !job.id.startsWith('chromium-'))) for (const row of job.stages) {

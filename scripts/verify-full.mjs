@@ -25,6 +25,7 @@ export const stages = [
   preview('webkit-exploration', ['-c', 'playwright.exploration.config.ts']),
   browser('assets-root-dev', ['-c', 'playwright.regression.config.ts', 'tests/public-asset-base.spec.ts', '--project=desktop'],
     { env: { PLAYWRIGHT_SERVER_MODE: 'dev' } }),
+  npm('performance', ['run', 'measure:fit'], { needs: ['build-root'] }),
   bundle('build-prefix', ['--', '--base=/prototype/']),
   browser('assets-prefix-preview', ['-c', 'playwright.prefix-assets.config.ts'],
     { needs: ['build-prefix'], env: { PLAYWRIGHT_BASE_PATH: '/prototype/' } }),
@@ -82,6 +83,8 @@ export function main(args = process.argv.slice(2)) {
   const result = runStages(stages, stage => {
     const log = join(directory, `${stage.id}.log`);
     const argv = [...stage.args];
+    const performanceCapture = join(directory, 'performance.json');
+    if (stage.id === 'performance') argv.push('--', performanceCapture);
     if (stage.browser) argv.push('--reporter=line,json', '--output', join(directory, `${stage.id}-artifacts`));
     console.log(`Running ${stage.id}; log: ${log}`);
     const fd = openSync(log, 'w');
@@ -90,7 +93,14 @@ export function main(args = process.argv.slice(2)) {
       const child = spawnSync(process.execPath, [process.env.npm_execpath, ...argv], {
         env: stageEnvironment(stage, directory), stdio: ['ignore', fd, fd],
       });
-      return { exitCode: child.status, signal: child.signal, error: child.error?.message, command: ['npm', ...argv], log };
+      const receipt = { exitCode: child.status, signal: child.signal, error: child.error?.message, command: ['npm', ...argv], log };
+      if (stage.id !== 'performance' || child.status !== 0) return receipt;
+
+      const evaluationPath = join(directory, 'performance-evaluation.json');
+      const evaluation = spawnSync(process.execPath, [
+        '--experimental-strip-types', 'scripts/evaluate-fit.ts', performanceCapture, evaluationPath,
+      ], { stdio: ['ignore', fd, fd] });
+      return { ...receipt, exitCode: evaluation.status, signal: evaluation.signal, error: evaluation.error?.message, evaluationPath };
     } finally { closeSync(fd); }
   }, results => {
     writeFileSync(join(directory, 'summary.json'), JSON.stringify({ source, results }, null, 2) + '\n');

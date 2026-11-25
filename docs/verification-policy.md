@@ -209,10 +209,11 @@ filters for the full Chromium Dungeon matrix.
 `npm run verify:full` executes the complete inventory sequentially: tooling,
 all fast units (including content), both type scopes, root/prefix build integrations,
 the root bundle and broad Chromium, WebKit menu and Dungeon coverage,
-desktop root-dev assets, and prefix build
+desktop root-dev assets, a standalone performance capture and budget evaluation,
+and prefix build
 and asset checks in preview and dev. The final stage restores the root bundle.
 Root preview assets run in the broad Chromium suite on all three profiles. The
-13 stages validate ordinary content and both
+14 stages validate ordinary content and both
 type scopes once before any ordinary bundle. Prefix and restored-root bundles
 reuse those successful prerequisites; neither is executed after unit/content or
 type failure. Independent dev checks and build integrations continue.
