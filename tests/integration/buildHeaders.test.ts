@@ -61,6 +61,7 @@ for (const base of ['/', '/tactics/']) {
       return links;
     };
     expect(preloads(base)).toEqual([]);
+    expect(preloads(`${base}dungeon`)).toEqual([]);
     for (const search of ['?game=dungeon', '?game=map', '?game=unknown', '?game=battle&game=run']) expect(preloads(base, search)).toEqual([]);
     for (const mode of ['battle', 'run']) {
       const direct = preloads(`${base}${mode}`);

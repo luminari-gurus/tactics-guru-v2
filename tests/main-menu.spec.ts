@@ -213,33 +213,30 @@ test('main menu: records replacing distinct saved and unsaved dungeon preserves 
   await page.screenshot({ path: info.outputPath('paired-records.png'), fullPage: true });
 });
 
-test('main menu: startup hides proof tools before application modules run',async({page})=>{
- let release!:()=>void;
- let held:Promise<void>;
- await page.route('**/*',async route=>{
-  if(route.request().resourceType()==='script'){await held;await route.abort();}
-  else if(route.request().resourceType()==='stylesheet')await route.abort();
-  else await route.continue();
- });
- try{
-  for(const route of ['', '?game=dungeon', 'dungeon']){
-   held=new Promise<void>(resolve=>{release=resolve;});
-   await page.goto('./'+route,{waitUntil:'commit'});
-   await expect(page.locator('#fit-status')).toBeVisible();
-   await expect(page.locator('#fit-status')).toHaveText('Loading');
-   await expect(page.getByRole('button',{name:'Restart proof scene',exact:true})).not.toBeVisible();
-   await expect(page.getByText('Board controls',{exact:true})).not.toBeVisible();
-   await expect(page.getByText('Measurements',{exact:true})).not.toBeVisible();
-   await expect(page.getByRole('complementary',{name:'Proof scene diagnostics'})).toHaveCount(0);
-   await expect(page.getByRole('complementary',{name:'Game status',exact:true})).toBeVisible();
-   await expect(page.locator('#fit-restart')).not.toBeVisible();
-   await expect(page.locator('#board-caption')).not.toBeVisible();
-   // WebKit waits for navigation to settle before capturing a screenshot.
-   // Reject the held modules after asserting the shell; no app code can run.
-   release();await page.waitForLoadState('load');
-   if(!route)await page.screenshot({path:test.info().outputPath('neutral-startup.png')});
-  }
- }finally{release();await page.unrouteAll({behavior:'wait'});}
+test('main menu: startup hides proof tools before application modules run',async({page,request})=>{
+ await page.route('**/*',route=>
+  ['script','stylesheet'].includes(route.request().resourceType()) ? route.abort() : route.continue());
+ const response=await page.goto('./');
+ if(!response)throw Error('Missing startup document response');
+ expect(response.ok()).toBe(true);
+ const shell=await response.text();
+ // All three entry URLs must serve the same unmounted document.
+ for(const path of ['./?game=dungeon','./dungeon']){
+  const entry=await request.get(path);
+  expect(entry.ok()).toBe(true);
+  expect(entry.headers()['content-type']).toBe(response.headers()['content-type']);
+  expect(await entry.text()).toBe(shell);
+ }
+ await expect(page.locator('#fit-status')).toBeVisible();
+ await expect(page.locator('#fit-status')).toHaveText('Loading');
+ await expect(page.getByRole('button',{name:'Restart proof scene',exact:true})).not.toBeVisible();
+ await expect(page.getByText('Board controls',{exact:true})).not.toBeVisible();
+ await expect(page.getByText('Measurements',{exact:true})).not.toBeVisible();
+ await expect(page.getByRole('complementary',{name:'Proof scene diagnostics'})).toHaveCount(0);
+ await expect(page.getByRole('complementary',{name:'Game status',exact:true})).toBeVisible();
+ await expect(page.locator('#fit-restart')).not.toBeVisible();
+ await expect(page.locator('#board-caption')).not.toBeVisible();
+ await page.screenshot({path:test.info().outputPath('neutral-startup.png')});
 });
 
 test('main menu: failed gameplay imports retain visible recovery without proof tools',async({page})=>{
