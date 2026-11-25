@@ -385,7 +385,9 @@ for(const [seed,outcome] of [[1,'playerLoss'],[2,'playerWin']] as const) test(`s
   const silent = await silentCheckpoints(page, seed);
   await startSeed(page,seed,true);
   for(let i=0;i<200;i++){
-    await expect.poll(async()=>(await session(page)).phase,{timeout:10000}).toMatch(/^(player|ended|error)$/);
+    await page.waitForFunction(() => document.querySelector(
+      '#game:is([data-phase="player"], [data-phase="ended"], [data-phase="error"])',
+    ) !== null, undefined, { timeout: 10_000 });
     (await audio(page)).recent.forEach(c=>heard.add(c));
     const s=await session(page);
     if (i < silent.length) {
