@@ -7,6 +7,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import type { Locator } from '@playwright/test';
 import { dungeonCapacityFixture, dungeonVictoryBoundary } from './helpers/dungeonFixtures';
 import { dungeonBattle, startDungeonBattle, acceptDungeonBattle, dungeonBoundary, dungeonItem, freshDungeon, type DungeonState } from '../src/domain/dungeon';
+import { progressHero } from '../src/domain/progression';
 import { decodeDungeon, encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { RUN_RECORD_KEYS } from '../src/persistence/runRecordsStorage';
@@ -103,6 +104,26 @@ async function historyRows(page:Page){return page.evaluate(keys=>{
 
 // UI witnesses straddle the Frost Snare gate; exact XP/HP/caster projections and
 // forged save rejection live in dungeonProgressionBoundary.test.ts.
+for(const [xp,level] of [[0,1],[180,3]])test(`menu dungeon restores Mage XP ${xp}, caster level and exact active boundary`,async({page})=>{
+ // Explicit boundary fixture; earned progression is covered by the extended journeys.
+ const fresh=freshDungeon(`menu-caster-${xp}`,190,undefined,true);
+ const progressed={...fresh,party:fresh.party.map(hero=>progressHero(hero.heroId,xp,1,dungeonContent.catalog))};
+ const started=startDungeonBattle(atEncounter(progressed));if(!started.ok)throw Error(started.reason);
+ const battle=started.state.activeBattle!,mage=battle.units.find(unit=>unit.defId==='mage')!;
+ const boundary={...started.state,activeBattle:{...battle,activeIndex:battle.initiative.indexOf(mage.id)}};
+ const encoded=encodeDungeon(boundary);if(!encoded.ok)throw Error(encoded.reason);
+ await page.addInitScript(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
+ await page.goto('./?game=dungeon');await expectDungeonResumed(page);
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ expectSameProgress(await snapshot(page),boundary);
+ const resumed=await readSession(page);
+ expect(resumed.state).toEqual(boundary.activeBattle);expect(resumed.events).toEqual([]);
+ await (await battleTool(page, '#battle-party')).click();
+ await expect(page.locator('#battle-dialog-message')).toContainText(`Level ${level}`);
+ await page.locator('#inspection-close').click();
+ await expect(page.locator('#battle-ability option[value="ability:frost_snare"]')).toHaveCount(level>=3?1:0);
+});
+
 test('desktop Rail keeps Frost Snare controls visible and its target picker clickable', async ({page,isMobile}) => {
   test.skip(isMobile, 'Desktop fine-pointer rail geometry');
   await page.setViewportSize({width:1280,height:720});
@@ -211,9 +232,6 @@ test('staged Mage Frost Snare cancels invalid casts and restores the active badg
  const expected=dispatch(fixture.state.activeBattle!,fixture.command,catalog);expect(expected.ok).toBe(true);if(!expected.ok)throw Error(expected.reason);
  await seed(page,fixture.state);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const before=await readSession(page);expect(before.state).toEqual(fixture.state.activeBattle);expect(before.events).toEqual([]);
- await (await battleTool(page, '#battle-party')).click();
- await expect(page.locator('#battle-dialog-message')).toContainText('Level 3');
- await page.locator('#inspection-close').click();
  await checkSnares(page,true);
  const target=before.state.units.find(u=>u.id===fixture.command.target.unitId)!;
  await page.locator('[data-action="ability:frost_snare"]').click();
@@ -242,7 +260,6 @@ test('staged Mage Frost Snare cancels invalid casts and restores the active badg
  await page.reload();await expectDungeonResumed(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const resumed=await readSession(page);expectSameProgress(await snapshot(page),saved);expect(resumed.state).toEqual(accepted.state);expect(resumed.events).toEqual([]);
  expect(await page.evaluate(keys=>keys.map(key=>localStorage.getItem(key)),[DUNGEON_KEYS.primary,DUNGEON_KEYS.backup])).toEqual(slots);
- await expect(page.locator('#battle-ability option[value="ability:frost_snare"]')).toHaveCount(1);
  await checkSnares(page,true);expect((await boardReport(page)).feedbackBounds).toEqual([]);
  await page.screenshot({path:test.info().outputPath('snared-resumed.png')});
  // Accepted Mage and Ranger Waits plus an unrelated Archer attack preserve Snare.
