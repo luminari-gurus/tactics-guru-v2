@@ -181,10 +181,13 @@ it('counts published exploration exactly once across reload and preserves counte
 const good = (r: DungeonResult) => { expect(r.ok).toBe(true); if (!r.ok) throw Error(r.reason); return r.state; };
 const fresh = () => freshDungeon('test-dungeon', 13);
 it.each(['issue-165/dungeon.json','issue-166/dungeon.json','issue-166/dungeon-main8.json'])('retains exact %s previous-format dungeon bytes for recovery/export without migration',fixture=>{
-  const raw=readFileSync(`tests/fixtures/saves/${fixture}`,'utf8'),data=new Map([[DUNGEON_KEYS.primary,raw],[DUNGEON_KEYS.backup,raw]]);
+  const raw=readFileSync(`tests/fixtures/saves/${fixture}`,'utf8'),primary = ' ' + raw, backup = raw + '\n', data=new Map([[DUNGEON_KEYS.primary,primary],[DUNGEON_KEYS.backup,backup]]);
   const storage={getItem:(key:string)=>data.get(key as typeof DUNGEON_KEYS.primary)??null,setItem:(key:string,value:string)=>{throw Error(`Unexpected write ${key} ${value.length}`);},removeItem:()=>{throw Error('Unexpected removal');}};
-  const store=createDungeonStorage(()=>storage),review=store.inspect();expect(review.primary).toEqual({status:'invalid',text:raw,reason:'incompatible'});
-  expect(store.save(fresh())).toEqual({ok:false,reason:'recoveryRequired'});expect(new DungeonSession(fresh(),store).exports(review).map(v=>v.text)).toContain(raw);expect(data.get(DUNGEON_KEYS.primary)).toBe(raw);
+  const store=createDungeonStorage(()=>storage),review=store.inspect();expect(review.primary).toEqual({status:'invalid',text:primary,reason:'incompatible'});
+  expect(review.backup).toEqual({status:'invalid',text:backup,reason:'incompatible'});
+  expect(store.save(fresh())).toEqual({ok:false,reason:'recoveryRequired'});expect(new DungeonSession(fresh(),store).exports(review)).toEqual([
+    { label: 'primary save', text: primary }, { label: 'backup save', text: backup },
+  ]);
 });
 it.each(['active', 'reward'])('loads the exact pre-consumable dungeon %s save and preserves its pending offer or battle', phase => {
   const text = readFileSync(`tests/fixtures/saves/issue-172/dungeon-${phase}.json`, 'utf8');
