@@ -236,7 +236,7 @@ test('visibility interruption finishes an accepted terminal presentation exactly
 });
 
 for (const departure of ['reload', 'close'] as const)
-test(`${departure} recovers the last four seconds exactly once across a held dungeon lock`, async ({page: original, context}) => {
+test(`${departure} recovers the last four seconds exactly once across a held dungeon lock`, { tag: '@desktop-chromium-portrait-webkit' }, async ({page: original, context}) => {
  const holder = await context.newPage();
  try {
   await holder.goto('./');
@@ -282,7 +282,7 @@ test(`${departure} recovers the last four seconds exactly once across a held dun
  } finally { await holder.close(); }
 });
 
- test('dungeon tabs serialize spatial publication and refuse the stale owner', async ({page,context}) => {
+test('dungeon tabs serialize spatial publication and refuse the stale owner', { tag: '@desktop-chromium-portrait-webkit' }, async ({page,context,isMobile}) => {
   // Freeze only playtime; the origin Web Lock and both tabs are real.
   await context.addInitScript(()=>Object.defineProperty(performance,'now',{value:()=>0}));
   const initial = freshDungeon('exclusive-spatial-tabs',13,undefined,true);
@@ -297,17 +297,21 @@ test(`${departure} recovers the last four seconds exactly once across a held dun
     void navigator.locks.request(key,async () => {state.dungeonLockHeld=true;await new Promise<void>(resolve => {state.releaseDungeonLock=resolve;});});
   },DUNGEON_KEYS.primary);
   await expect.poll(() => page.evaluate(() => (window as unknown as {dungeonLockHeld:boolean}).dungeonLockHeld)).toBe(true);
-  await page.locator('#dungeon-step-'+direction).click();
+  const step = async (tab: Page) => {
+    const button = tab.locator('#dungeon-step-'+direction);
+    if (isMobile) await button.tap(); else await button.click();
+  };
+  await step(page);
   await expect.poll(() => page.evaluate(async key =>
     (await navigator.locks.query()).pending?.filter(lock => lock.name === key).length, DUNGEON_KEYS.primary)).toBe(1);
-  await other.locator('#dungeon-step-'+direction).click();
+  await step(other);
   await expect(other.locator('.dungeon-status')).toContainText('another tab is saving');
   expect(await snapshot(page)).toEqual(initial); expect(await snapshot(other)).toEqual(initial);
   await page.evaluate(() => (window as unknown as {releaseDungeonLock:()=>void}).releaseDungeonLock());
   await expect.poll(async () => (await snapshot(page)).stats?.movesTaken).toBe(1);
   // Another attempt after the write is visible must also refuse the stale owner via CAS.
   await expect.poll(() => other.evaluate(key => JSON.parse(localStorage.getItem(key)!).payload.stats.movesTaken, DUNGEON_KEYS.primary)).toBe(1);
-  await other.locator('#dungeon-step-'+direction).click();
+  await step(other);
   await expect(other.locator('.dungeon-status')).toContainText('changed');
   expect(await snapshot(other)).toEqual(initial);
   const durable = await page.evaluate(keys => ({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup)}),DUNGEON_KEYS);

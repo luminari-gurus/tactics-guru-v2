@@ -73,6 +73,9 @@ test('routine verification clears each first-floor scenario once and checks both
     for (const title of [
       'dungeon statistics: confirmed replacement pauses pending enemy turns through history',
       'legal enemy defeat waits for its save and returns to the menu during a pending history write',
+      'reload recovers the last four seconds exactly once across a held dungeon lock',
+      'close recovers the last four seconds exactly once across a held dungeon lock',
+      'dungeon tabs serialize spatial publication and refuse the stale owner',
     ]) assert.deepEqual(profilesFor(title), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('visibility interruption finishes an accepted terminal presentation exactly once'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('character sheets switch heroes and show equipped charms through equip, resume, and unequip'), [stage === 'chromium' ? desktop : portrait]);

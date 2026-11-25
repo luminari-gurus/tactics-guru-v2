@@ -1783,12 +1783,20 @@ it('finishes the admitted dungeon clock checkpoint under its lock after disposal
  const m=memory(),storage=createDungeonStorage(()=>m),pending:(()=>void)[]=[];let now=0;
  const initial=freshDungeon('closing-clock',13,undefined,true);assert(storage.save(initial).ok);
  const owner=new DungeonSession(initial,storage,null,()=>now,task=>pending.push(task));
- assert(owner.continue(owner.inspect()));owner.setPlaytimeActive(true);now=1234;
+ assert(owner.continue(owner.inspect()));owner.setPlaytimeActive(true);now=4000;
  const flushed=owner.flushPlaytime();owner.dispose();
  expect(storage.inspect().primary.status).toBe('valid');
  while(pending.length)pending.shift()!();await flushed;
  const durable=storage.inspect().primary;assert(durable.status==='valid');
- expect(durable.state.stats?.activeMs).toBe(1234);
+ expect(durable.state.stats?.activeMs).toBe(4000);
+ const expected = { ...initial, stats: { ...initial.stats!, activeMs: 4000 } };
+ for (let i = 0; i < 2; i++) {
+  const resumed = new DungeonSession(initial, createDungeonStorage(() => m));
+  assert(resumed.continue(resumed.inspect()));
+  expect(resumed.snapshot).toEqual(expected);
+  resumed.dispose();
+ }
+ expect(storage.inspect().primary).toEqual(durable);
 });
 
 it('upgrades the rebased counter format 16 while preserving exact fog memory', () => {
