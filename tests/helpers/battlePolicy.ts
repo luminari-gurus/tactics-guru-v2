@@ -122,7 +122,7 @@ export async function endTurn(page: Page, activate: ActivateBattleControl = sele
   await confirmEndTurn(page, activate);
 }
 
-export async function playCommand(page:Page,command:Command){
+export async function playCommand(page:Page,command:Command,state?:BattleState){
   if(command.type==='endTurn')return endTurn(page);
   const skin=await combatSkin(page);
   if(command.type==='drinkDraught') {
@@ -132,7 +132,7 @@ export async function playCommand(page:Page,command:Command){
     else await confirm.click();
     return;
   }
-  const snapshot=(await readSession(page)).state;
+  const snapshot=state ?? (await readSession(page)).state;
   const cell=command.type==='move'?command.to:snapshot.units.find(u=>u.id===('unitId' in command.target?command.target.unitId:'missileTargets' in command.target?command.target.missileTargets[0]:-1))!.cell;
   if(skin==='radial'){
     await tapBoard(page, cell);
