@@ -39,7 +39,9 @@ for (const base of ['/', '/tactics/']) {
       const emitted = result.output.find(file => file.fileName === path);
       expect(emitted?.type, asset.id).toBe('asset');
       if (emitted?.type !== 'asset') throw new Error(`Missing versioned image: ${asset.id}`);
-      expect(Buffer.from(emitted.source)).toEqual(bytes);
+      const builtBytes = Buffer.from(emitted.source);
+      // Use the native byte comparison on success and retain the assertion diff on failure.
+      if (!builtBytes.equals(bytes)) expect(builtBytes, asset.id).toEqual(bytes);
       expect(asset.runtimePath.startsWith('/assets/')).toBe(false);
       return path;
     });
