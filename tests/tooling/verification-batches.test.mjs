@@ -31,7 +31,12 @@ function fixture() {
 const summarize = value => aggregate(value.plan, value.build, value.preparation, value.receipts);
 
 test('whole-file batches partition canonical Chromium and preserve every remaining stage', () => {
-  const plan = createPlan('capture', discovery);
+  const seen = new Set();
+  const plan = createPlan('capture', stage => {
+    assert.ok(!seen.has(stage), 'Repeated discovery for ' + stage.id);
+    seen.add(stage);
+    return discovery(stage);
+  });
   const jobStages = plan.jobs.flatMap(job => job.stages);
   assert.equal(plan.jobs.filter(job => job.id.startsWith('chromium-')).length, 9);
   assert.deepEqual([...new Set([...stages.filter(stage => preparationIds.includes(stage.id)), ...jobStages].map(stage => stage.sourceStage))].sort(),
