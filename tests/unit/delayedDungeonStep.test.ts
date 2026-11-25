@@ -12,10 +12,19 @@ it('leaves a visible interval then runs one action without replaying it', async 
   await vi.runAllTimersAsync(); expect(run).toHaveBeenCalledTimes(1);
 });
 
-it('cancels before the delay and does not resume merely because time passes', async () => {
+it('ignores repeated delivery of a cancelled timer callback', async () => {
   const step = new DelayedDungeonStep(), run = vi.fn();
-  step.schedule(run); step.cancel();
-  await vi.runAllTimersAsync(); expect(run).not.toHaveBeenCalled();
+  const schedule = vi.spyOn(globalThis, 'setTimeout');
+  try {
+    step.schedule(run);
+    const [callback] = schedule.mock.calls[0];
+    step.cancel();
+    expect(vi.getTimerCount()).toBe(0);
+    callback();
+    callback();
+    await vi.runAllTimersAsync();
+    expect(run).not.toHaveBeenCalled();
+  } finally { schedule.mockRestore(); }
 });
 
 it('invalidates an action already waiting for exclusive save access', async () => {
