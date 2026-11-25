@@ -5,6 +5,16 @@ import { neighbors, poiCell } from '../../src/domain/exploration';
 import { clearedDungeonSlots, floorMap } from '../../src/domain/dungeon';
 import { dungeonContactDetour } from './dungeonFixtures';
 import { DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
+export async function openDungeonWithStorage(page: Page, entries: Record<string, string>) {
+ await page.addInitScript(values => {
+  // Reload and recovery must read the checkpoint written by the application.
+  const marker = 'test:dungeon-fixture-installed';
+  if (window !== window.top || sessionStorage.getItem(marker)) return;
+  for (const [key, value] of Object.entries(values)) localStorage.setItem(key, value);
+  sessionStorage.setItem(marker, '1');
+ }, entries);
+ await page.goto('./?game=dungeon');
+}
 export async function dungeonSnapshot(page: Page): Promise<DungeonState> { return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!); }
 /** Steps and confirms apply asynchronously; return the first snapshot with a new dungeon or a newer
  * (or exactly `expected`) revision. */

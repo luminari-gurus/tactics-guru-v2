@@ -4,7 +4,7 @@ import { MOVEMENT_DIRECTIONS } from '../src/domain/constants';
 import { previewMovement } from '../src/domain/grid';
 import { LEGACY_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
 import { atEncounter, priorDungeonEnvelope } from './helpers/dungeonFixtures';
-import {expectDungeonResumed,expectSameProgress} from './helpers/dungeonTraversal';
+import {openDungeonWithStorage,expectDungeonResumed,expectSameProgress} from './helpers/dungeonTraversal';
 import {expect,railTest as test,type Page} from './helpers/dungeonEntropy';
 import {dungeonVictoryBoundary} from './helpers/dungeonFixtures';
 import {freshDungeon,startDungeonBattle,dungeonBattle,floorMap,type DungeonState} from '../src/domain/dungeon';
@@ -118,16 +118,6 @@ test('dungeon previous-format recovery preserves and exports both original slots
  await page.reload();await expect(page.locator('#main-menu')).toBeVisible();expect(await stored()).toEqual({...texts,unrelated:'retain'});
 });
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
-async function openDungeonWithStorage(page: Page, entries: Record<string, string>) {
- await page.addInitScript(values => {
-  // Reload and recovery must read the checkpoint written by the application.
-  const marker = 'test:lifecycle-fixture-installed';
-  if (window !== window.top || sessionStorage.getItem(marker)) return;
-  for (const [key, value] of Object.entries(values)) localStorage.setItem(key, value);
-  sessionStorage.setItem(marker, '1');
- }, entries);
- await page.goto('./?game=dungeon');
-}
 async function load(page: Page, state: DungeonState) {
  const saved = encodeDungeon(state);
  if (!saved.ok) throw Error(saved.reason);

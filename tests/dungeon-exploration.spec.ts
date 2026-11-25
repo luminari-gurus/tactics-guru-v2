@@ -4,7 +4,7 @@ import { expect,test } from './helpers/startupDiagnostics';
 import type { Locator, Page } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
-import { dungeonSnapshot, acceptedDungeonSnapshot, expectSameProgress, walkDungeon, expectDungeonResumed, openDungeonInventory } from './helpers/dungeonTraversal';
+import { openDungeonWithStorage, dungeonSnapshot, acceptedDungeonSnapshot, expectSameProgress, walkDungeon, expectDungeonResumed, openDungeonInventory } from './helpers/dungeonTraversal';
 import { currentSight, neighbors, poiCell } from '../src/domain/exploration';
 import { generateMap } from '../src/map/generate';
 import { freshDungeon, floorDescriptor, floorMap, readDungeon, dungeonSeed, stepDungeon, type DungeonState } from '../src/domain/dungeon';
@@ -30,10 +30,8 @@ test.beforeEach(async ({ context }) => { await installRailControls(context); });
 
 async function loadGroundLootBoundary(page: Page, state: DungeonState) {
  const encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
- await page.goto('./');
- await page.evaluate(({key,text,preferenceKey})=>{localStorage.setItem(preferenceKey,'off');localStorage.setItem(key,text);},
-  {key:DUNGEON_KEYS.primary,text:encoded.text,preferenceKey:AUTO_COLLECT_LOOT_KEY});
- await page.goto('./?game=dungeon');await expectDungeonResumed(page);
+ await openDungeonWithStorage(page, { [DUNGEON_KEYS.primary]: encoded.text, [AUTO_COLLECT_LOOT_KEY]: 'off' });
+ await expectDungeonResumed(page);
 }
 
 test('ground loot: legal victory saves one item at contact and a manual pickup survives refusal and reload',async({page,isMobile})=>{
