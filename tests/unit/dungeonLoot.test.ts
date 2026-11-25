@@ -164,6 +164,11 @@ describe('seeded dungeon ground loot', () => {
     assert(saved.ok);
     const restored = decodeDungeon(saved.text);
     assert(restored.ok);
+    expect(returned.depth).toBe(source.depth);
+    expect(returned.party).toEqual(source.party);
+    expect(returned.ownership).toEqual(source.ownership);
+    expect(currentFloor(returned).loot).toEqual(loot);
+    expect(restored.state).toEqual(returned);
     // Retrace the cleared floor to the victory origin, then step onto the reward.
     const back = path.slice(0, -1).reverse().concat(start.position);
     const collected = step(back.reduce(step, restored.state), contact);
