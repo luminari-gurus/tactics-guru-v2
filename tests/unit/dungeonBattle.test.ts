@@ -1,7 +1,7 @@
 import { showsSnareBadge } from '../../src/phaser/abilityPresentation';
 import { HERO_PROGRESSION } from '../../src/content/progression';
 import { progressHero } from '../../src/domain/progression';
-import { atDownstairs, atStairApproach, atEncounter, checkedDungeon, savedBiomeEncounter, snaredDefeatBoundary, stagedMageAbility, withLegacySight } from '../helpers/dungeonFixtures';
+import { atDownstairs, atStairApproach, atEncounter, checkedDungeon, guardianFirstRewardFixture, savedBiomeEncounter, snaredDefeatBoundary, stagedMageAbility, withLegacySight } from '../helpers/dungeonFixtures';
 import { freshDungeon, floorDescriptor, floorMap, startDungeonBattle, readDungeon, travelDungeon, stepDungeon } from '../../src/domain/dungeon';
 import { guardedBoundary } from '../helpers/guardedBoundary';
 import { combatStats } from '../../src/domain/effects';
@@ -591,6 +591,24 @@ it('clears a Wetlands floor through live traversal and resumes its saved encount
   expect(decodeDungeon(encoded.text)).toEqual(downstairs);
 }, 30000);
 
+function restoreDungeonSave(state: DungeonState) {
+  const saved = encodeDungeon(state); assert(saved.ok);
+  const restored = decodeDungeon(saved.text); assert(restored.ok);
+  expect(restored.state).toEqual(state);
+  return restored.state;
+}
+
+it('restores the floor-five guardian reward before and after claiming it', () => {
+  const pending = restoreDungeonSave(guardianFirstRewardFixture());
+  const offer = pending.offer!;
+  const claimed = checkedDungeon(dungeonItem(pending, { ...dungeonBoundary(pending), type: 'claimReward',
+    offerId: offer.id, itemId: offer.options[0].itemId }));
+  const restored = restoreDungeonSave(claimed);
+  expect(restored).toMatchObject({ depth: 5, phase: 'ready', offer: null, revision: pending.revision + 1 });
+  expect(restored.ownership).not.toEqual(pending.ownership);
+  expect(restored.floors[4].exploration.cleared).toEqual([2]);
+});
+
 it('wins a legal guardian-first battle and continues with an uncleared ordinary encounter', () => {
   let victory: DungeonState | undefined;
   for(let seed=1;seed<=30&&!victory;seed++) {
@@ -612,16 +630,10 @@ it('wins a legal guardian-first battle and continues with an uncleared ordinary 
   expect(victory).toBeDefined();if(!victory)throw Error('No legal guardian-first victory found');
   expect(victory.floors[0].exploration.cleared).toEqual([2]);
   expect(victory.offer).not.toBeNull();
-  const restore = (state: DungeonState) => {
-    const encoded = encodeDungeon(state); assert(encoded.ok);
-    const restored = decodeDungeon(encoded.text); assert(restored.ok);
-    expect(restored.state).toEqual(state);
-    return restored.state;
-  };
-  const pending = restore(victory);
+  const pending = restoreDungeonSave(victory);
   const claimed=dungeonItem(pending,{...dungeonBoundary(pending),type:'claimReward',offerId:pending.offer!.id,itemId:pending.offer!.options[0].itemId});
   if(!claimed.ok)throw Error(claimed.reason);
-  const resumed = restore(claimed.state);
+  const resumed = restoreDungeonSave(claimed.state);
   expect(resumed).toMatchObject({ depth: 1, phase: 'ready', offer: null, revision: pending.revision + 1 });
   expect(resumed.ownership).not.toEqual(pending.ownership);
   expect(resumed.floors[0].exploration).toEqual({ ...pending.floors[0].exploration, active: null });

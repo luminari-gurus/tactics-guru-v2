@@ -1,5 +1,4 @@
-import { dungeonOffer } from '../src/domain/dungeon';
-import { checkedDungeon, dungeonSightTransition, savedBiomeEncounter, sharedGroundPile } from './helpers/dungeonFixtures';
+import { checkedDungeon, guardianFirstRewardFixture, dungeonSightTransition, savedBiomeEncounter, sharedGroundPile } from './helpers/dungeonFixtures';
 import { expect,test } from './helpers/startupDiagnostics';
 import type { Locator, Page } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
@@ -16,7 +15,7 @@ import { installRailControls } from './helpers/forceRailControls';
 import { playerDecision } from './helpers/playerPolicy';
 import { dungeonBattle } from '../src/domain/dungeon';
 import { atCell, atEncounter, atStairApproach, dungeonCapacityFixture, dungeonContactApproach, dungeonVictoryBoundary, dungeonGroundVictoryBoundary } from './helpers/dungeonFixtures';
-import { freshExploration, movableExploration } from '../src/domain/exploration';
+import { freshExploration } from '../src/domain/exploration';
 import { encodeDungeon, utf8Bytes } from '../src/domain/dungeonSaveEnvelope';
 import { holdFinalRecordsWrite } from './helpers/recordsWriteGate';
 import { startBattleModuleFaultServer } from './helpers/battleModuleFaultServer';
@@ -1339,22 +1338,9 @@ test('warm maximum-size floor step responsiveness meets the established budget a
  expect(p95).toBeLessThanOrEqual(33.4);expect(frameP95).toBeLessThanOrEqual(33.4);
 });
 
-test('Guardian-first reward, map and encounter state survive claim and reload at depth 5',async({page})=>{
- const depth=5;
- // Structural reward boundary isolates marker rendering, not preceding combat.
- const fresh=freshDungeon('guardian-first',1,undefined,true);
- const floors=Array.from({length:depth},(_,i)=>{
-  const descriptor=floorDescriptor(fresh.seed,i+1),map=floorMap(descriptor);
-  return {descriptor,position:descriptor.upstairs,completed:i===depth-1?0:3,
-   exploration:freshExploration(descriptor.seed,descriptor.upstairs,map)};
- });
- const base=atEncounter({...fresh,depth,floors},2),floor=base.floors[depth-1],map=floorMap(floor.descriptor);
- const staged:DungeonState={...base,phase:'reward',floors:base.floors.map((f,i)=>i!==depth-1?f:{...floor,completed:1,
-  exploration:{...movableExploration(floor.exploration,floor.descriptor.seed,0,'ready'),cleared:[2],active:2,revealed:Array.from({length:map.cells.length},(_,i)=>i)}})};
- const reward=checkedDungeon(readDungeon({...staged,offer:dungeonOffer(staged)}));
- const encoded=encodeDungeon(reward);if(!encoded.ok)throw Error(encoded.reason);
- await page.goto('./');
- await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
+test('Guardian-first reward, map and encounter state survive claim and reload at depth 5',async({page,isMobile})=>{
+ const reward=guardianFirstRewardFixture();
+ const floor=reward.floors[reward.depth-1],map=floorMap(floor.descriptor);
  const rewardPanel=page.getByRole('region',{name:'Rewards',exact:true});
  const accessibleMap=page.getByRole('application',{name:/Floor \d+ map/});
  const checkMap=async()=>{
@@ -1365,22 +1351,16 @@ test('Guardian-first reward, map and encounter state survive claim and reload at
    await expect(page.locator(`#dungeon-map [data-poi="${poi.id}"]`)).toHaveCount(sight.includes(poiCell(poi, map.width)) ? 1 : 0);
   }
  };
- await page.goto('./?game=dungeon');await expectDungeonResumed(page);await checkMap();
+ await openSavedDungeon(page,reward);await checkMap();
  await expect(rewardPanel).toBeVisible();
  await expect(accessibleMap).toHaveAccessibleDescription(/Guardian · Goblins at row \d+, column \d+\. Reward pending\./);
- const pending=await dungeonSnapshot(page);
- expect(pending).toEqual(reward);
- await rewardPanel.getByRole('button',{name:/^Claim /}).first().click();
- await page.locator('#dungeon-item-confirm').click();
+ const claim=rewardPanel.getByRole('button',{name:/^Claim /}).first();
+ const confirm=page.locator('#dungeon-item-confirm');
+ if(isMobile){await claim.tap();await confirm.tap();}
+ else {await claim.click();await confirm.click();}
  await expect(rewardPanel).toHaveCount(0);
- await checkMap();
- const claimed=await dungeonSnapshot(page);
- expect(claimed.phase).toBe('ready');
- expect(claimed.revision).toBe(pending.revision+1);
- expect(claimed.ownership).not.toEqual(pending.ownership);
- expect(claimed.floors[depth-1].exploration.cleared).toEqual([2]);
+ await expect(accessibleMap).toHaveAccessibleDescription(/Guardian · Goblins at row \d+, column \d+\. Cleared\./);
  await page.reload();await expectDungeonResumed(page);await checkMap();
  await expect(rewardPanel).toHaveCount(0);
  await expect(accessibleMap).toHaveAccessibleDescription(/Guardian · Goblins at row \d+, column \d+\. Cleared\./);
- expectSameProgress(await dungeonSnapshot(page),claimed);
 });
