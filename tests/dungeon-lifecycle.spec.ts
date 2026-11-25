@@ -15,8 +15,11 @@ import { readFileSync } from 'node:fs';
 import { canonical, hashJson } from '../src/domain/contentIdentity';
 import { RUN_RECORD_KEYS } from '../src/persistence/runRecordsStorage';
 
-for (const hasActed of [true, false]) test(`boxed-in hero ${hasActed ? 'ends immediately after acting' : 'only warns about an unspent action'}`, async ({page, isMobile}) => {
- const made = startDungeonBattle(atEncounter(freshDungeon('boxed-in-wait', 1)));
+test('boxed-in hero can cancel Wait before acting and end immediately after acting', async ({page, isMobile}) => {
+ const base = freshDungeon('boxed-in-wait', 1);
+ const ready = {...base, party: base.party.map(hero => ({...hero, hp: hero.maxHp - 1})),
+  ownership: {...base.ownership, consumables: [{itemId: 'item:healing_draught' as const, quantity: 1}]}};
+ const made = startDungeonBattle(atEncounter(ready));
  if (!made.ok) throw Error(made.reason);
  const battle = made.state.activeBattle!;
  const catalog: ContentCatalog = dungeonBattle(made.state)!.catalog;
@@ -28,9 +31,9 @@ for (const hasActed of [true, false]) test(`boxed-in hero ${hasActed ? 'ends imm
  const placements = [origin, ...adjacent, ...walkable.filter(cell => cell !== origin && !adjacent.includes(cell))];
  const actor = battle.units.find(unit => unit.side === 'player')!;
  const units = [actor, ...battle.units.filter(unit => unit.id !== actor.id)].map((unit, index) => ({
-  ...unit, cell: {x: placements[index].x, y: placements[index].y}, hasActed: unit.id === actor.id && hasActed,
+  ...unit, cell: {x: placements[index].x, y: placements[index].y},
  })).sort((a, b) => a.id - b.id);
- const activeBattle = {...battle, units, activeIndex: battle.initiative.indexOf(actor.id), commandCount: hasActed ? 1 : 0};
+ const activeBattle = {...battle, units, activeIndex: battle.initiative.indexOf(actor.id)};
  const movement = previewMovement(activeBattle, actor.id, catalog);
  expect(movement.ok && movement.cells.map(cell => cell.cost)).toEqual([0]);
  await load(page, {...made.state, activeBattle});
@@ -39,16 +42,18 @@ for (const hasActed of [true, false]) test(`boxed-in hero ${hasActed ? 'ends imm
  const wait = page.getByRole('button', {name: 'Wait / End turn', exact: true});
  if (isMobile) await wait.tap(); else await wait.click();
  const dialog = page.getByRole('dialog', {name: 'End Turn?'});
- if (hasActed) {
-  await expect(dialog).toBeHidden();
-  await expect.poll(async () => (await readSession(page)).state.commandCount).toBeGreaterThan(before.state.commandCount);
- } else {
-  await expect(dialog).toHaveAccessibleDescription('This unit has not acted. End turn anyway?');
-  const cancel = dialog.getByRole('button', {name: 'Cancel', exact: true});
-  if (isMobile) await cancel.tap(); else await cancel.click();
-  await expect(dialog).toBeHidden();
-  expect(await readSession(page)).toEqual(before);
- }
+ await expect(dialog).toHaveAccessibleDescription('This unit has not acted. End turn anyway?');
+ const cancel = dialog.getByRole('button', {name: 'Cancel', exact: true});
+ if (isMobile) await cancel.tap(); else await cancel.click();
+ await expect(dialog).toBeHidden();
+ expect(await readSession(page)).toEqual(before);
+ // Drinking spends the action while keeping every adjacent cell occupied.
+ await playCommand(page, {type:'drinkDraught', unitId:actor.id});
+ const acted = (await readSession(page)).state;
+ expect(acted.units.find(unit => unit.id === actor.id)?.hasActed).toBe(true);
+ if (isMobile) await wait.tap(); else await wait.click();
+ await expect(dialog).toBeHidden();
+ await expect.poll(async () => (await readSession(page)).state.commandCount).toBeGreaterThan(acted.commandCount);
 });
 
 test('dungeon statistics: confirmed replacement pauses pending enemy turns through history',async({page},info)=>{
