@@ -107,6 +107,34 @@ export function dungeonGroundPileFixture(seed = 13, depth = 1): DungeonState {
   return checkedDungeon(readDungeon({ ...context, floors: [...floors.slice(0, -1), pile] }));
 }
 
+/** Explicit capacity/overlap staging; the complete saved journey proves earned loot separately. */
+export function sharedGroundPile(ownedCount: number, occupied = false) {
+ for(let seed=1;seed<=64;seed++) {
+  const base=freshDungeon(`ground-pile-${ownedCount}-${occupied}`,seed),depth=3;
+  const floors=Array.from({length:depth},(_,i)=>{
+   const descriptor=floorDescriptor(seed,i+1),map=floorMap(descriptor);
+   return {descriptor,position:descriptor.upstairs,completed:i===depth-1?2:3,
+    exploration:movableExploration(freshExploration(descriptor.seed,descriptor.upstairs,map),descriptor.seed,i===depth-1?2:3,'ready')};
+  });
+  const floor=floors[depth-1],map=floorMap(floor.descriptor),stairs=[floor.descriptor.upstairs,floor.descriptor.downstairs];
+  const cell=map.cells.findIndex((open,index)=>open===1&&!stairs.includes(index)&&
+   !floor.exploration.pois.some(p=>poiCell(p,map.width)===index)&&
+   neighbors(index,map.width,map.height).some(n=>map.cells[n]&&!stairs.includes(n)&&!floor.exploration.pois.some(p=>poiCell(p,map.width)===n)));
+  if(cell<0)continue;
+  const origin=neighbors(cell,map.width,map.height).find(n=>map.cells[n]&&!stairs.includes(n)&&!floor.exploration.pois.some(p=>poiCell(p,map.width)===n))!;
+  const loot=[0,1].map(slot=>dungeonLootReward({...base,depth},slot,slot,cell));
+  if(loot.some(item=>dungeonContent.items[item.itemId].kind!=='equipment'))continue;
+  const equipment=Array.from({length:ownedCount},(_,i)=>({instanceId:`${base.id}:floor:${Math.floor(i/3)+1}:reward:${i%3}:option:0`,itemId:'item:warding_charm' as const}));
+  const party=base.party.map(hero=>{const progressed=progressHero(hero.heroId,180,hero.hp,dungeonContent.catalog);return {...progressed,hp:progressed.maxHp};});
+  const state=checkedDungeon(readDungeon(atCell({...base,depth,party,
+   ownership:{consumables:[],equipment,assignments:[]},
+   floors:floors.map((f,index)=>index!==depth-1?f:{...f,loot,exploration:{...f.exploration,
+    pois:f.exploration.pois.map(p=>p.encounterSlot<2||occupied?{...p,x:cell%map.width,y:Math.floor(cell/map.width)}:p)}})},origin)));
+  return {state,cell,origin};
+ }
+ throw Error('No deterministic two-charm ground pile');
+}
+
 /** Structural capacity fixture; not evidence of a preceding legal full playthrough. */
 export function dungeonCapacityFixture(policy: DungeonEncounterPolicy = DUNGEON_ENCOUNTER_POLICY): DungeonState {
   for(let seed=1;seed<=100;seed++){
