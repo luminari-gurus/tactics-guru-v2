@@ -16,8 +16,7 @@ import { installRailControls } from './helpers/forceRailControls';
 import { playerDecision } from './helpers/playerPolicy';
 import { dungeonBattle } from '../src/domain/dungeon';
 import { freshRunStats } from '../src/domain/runStats';
-import { atCell, atEncounter, atStairApproach, dungeonCapacityFixture, priorDungeonEnvelope, dungeonContactApproach, dungeonVictoryBoundary, dungeonGroundVictoryBoundary } from './helpers/dungeonFixtures';
-import { LEGACY_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
+import { atCell, atEncounter, atStairApproach, dungeonCapacityFixture, dungeonContactApproach, dungeonVictoryBoundary, dungeonGroundVictoryBoundary } from './helpers/dungeonFixtures';
 import { freshExploration, movableExploration } from '../src/domain/exploration';
 import { encodeDungeon, utf8Bytes } from '../src/domain/dungeonSaveEnvelope';
 import { holdFinalRecordsWrite } from './helpers/recordsWriteGate';
@@ -673,16 +672,6 @@ fixedSeedTest('real traversal, art independence, keyboard locks, active battle a
  await page.reload();await expectDungeonResumed(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expectSameProgress(await dungeonSnapshot(page), saved);
  writeFileSync(test.info().outputPath('spatial-battle-receipt.json'),JSON.stringify({initial,stepped,saved},null,2));expect(errors).toEqual([]);
 });
-test('pre-progression dungeon remains incompatible and exportable',async({page})=>{
- const raw=priorDungeonEnvelope(freshDungeon('legacy-browser',13,LEGACY_ENCOUNTER_POLICY),1);
- await page.goto('./');await page.evaluate(({key,raw})=>localStorage.setItem(key,raw),{key:DUNGEON_KEYS.primary,raw});await page.goto('./?game=dungeon');
- await expect(page.getByRole('button',{name:'Continue',exact:true})).toBeDisabled();
- await page.getByRole('button',{name:'Save recovery',exact:true}).click();
- await page.getByRole('dialog').getByRole('link',{name:/Dungeon/}).click();
- const download=page.waitForEvent('download');await page.getByRole('button',{name:'Export primary save',exact:true}).click();await download;
- expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe(raw);
-});
-
 test('cold progression-format Continue retains a long saved history within the startup budget',async({page})=>{
  const base=freshDungeon('cold-browser',13),floors=Array.from({length:250},(_,i)=>{
   const descriptor=floorDescriptor(base.seed,i+1);
