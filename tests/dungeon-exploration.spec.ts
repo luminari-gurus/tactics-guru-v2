@@ -873,25 +873,6 @@ test('dungeon enemies move only after a player step and persist across reload', 
  await page.clock.runFor(5000);expect(await dungeonSnapshot(page)).toEqual(resumed);
 });
 
-test('walking onto a guardian before other enemies starts and resumes its own encounter', async ({page,isMobile})=>{
- const base=freshDungeon('unordered-guardian-browser',1),f=base.floors[0],target=poiCell(f.exploration.pois[2]);
- const map=generateMap(f.descriptor.seed,'rooms');
- const prior=neighbors(target,map.width,map.height).find(n=>map.cells[n]&&!f.exploration.pois.some(p=>poiCell(p,map.width)===n));
- if(prior===undefined)throw Error('No safe adjacent cell');
- const state=atCell(base,prior), encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
- await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
- await page.goto('./?game=dungeon');await expectDungeonResumed(page);
- const cell=page.locator(`#dungeon-map [data-cell="${target}"]`);if(isMobile)await cell.tap();else await cell.click();
- await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- const started=await dungeonSnapshot(page);expect(started.phase).toBe('battle');expect(started.floors[0].completed).toBe(0);
- expect(started.floors[0].exploration.active).toBe(2);
- expect(started.activeBattle!.seed).toBe(dungeonSeed(started.seed,started.depth,'battle',2));
- await expect(page.locator('#battle-heading h1')).toContainText('Guardian');
- await page.reload();await expectDungeonResumed(page);
- await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- expect((await dungeonSnapshot(page)).floors[0].exploration.active).toBe(2);
-});
-
 for (const depth of [5, 8]) test(`depth ${depth} saved floor renders and accepts a step after reload`, async ({page,isMobile,browserName}) => {
  const base=freshDungeon('large-floor-browser',19);
  const floors=Array.from({length:depth},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1),map=floorMap(descriptor);return {descriptor,position:descriptor.upstairs,completed:i===depth-1?0:3,exploration:freshExploration(descriptor.seed,descriptor.upstairs,map)};});
@@ -1020,8 +1001,8 @@ test('maximum-size floor step responsiveness meets the established budget', asyn
  expect((await dungeonSnapshot(page)).floors[4].position).toBe(first);expect(p95).toBeLessThanOrEqual(33.4);expect(frameP95).toBeLessThanOrEqual(33.4);
 });
 
-test('closing on a wandering encounter holds contact and saves the matching battle', async ({page,isMobile})=>{
- const slot=1;
+test('closing on the guardian first holds contact and resumes its battle', async ({page,isMobile})=>{
+ const slot=2;
  const {state,approach,target}=dungeonContactApproach(slot);
  const encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
  await page.goto('./');
@@ -1040,6 +1021,8 @@ test('closing on a wandering encounter holds contact and saves the matching batt
  else {await page.locator('#dungeon-map').focus();await page.keyboard.press(delta===-20?'w':delta===20?'s':delta===1?'d':'a');}
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const entered=await dungeonSnapshot(page);
+ await expect(page.locator('#battle-heading h1')).toContainText('Guardian');
+ expect(entered.floors[0].completed).toBe(0);
  expect(entered.phase).toBe('battle');
  expect(entered.floors[0].position).toBe(approach);
  expect(entered.encounterEntry).toEqual({origin:approach,contact:target,slot});
