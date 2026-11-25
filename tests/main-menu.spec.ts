@@ -309,7 +309,11 @@ test('main menu: read-only root, separate artwork and isolated loading',async({p
  }
 });
 test('main menu: legacy battle and run slots are ignored through launch and dungeon Continue',async({page})=>{
-  await page.goto('./');
+  await page.goto('./?game=dungeon&entry=continue');
+  await expect(page.locator('#main-menu')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Continue', exact: true })).toBeDisabled();
+  await expect(page).toHaveURL(new URL('./', test.info().project.use.baseURL!).href);
+  expect(await page.evaluate(() => Object.keys(localStorage).filter(key => key.includes(':dungeon:')))).toEqual([]);
   const seed = {
     [keys.battle.primary]: menuFixture('battle'),
     [keys.battle.backup]: 'damaged battle backup',
@@ -472,13 +476,6 @@ test('main menu: portrait composition scrolls at narrow, short and enlarged text
   await page.getByRole('link',{name:'Map inspection'}).scrollIntoViewIfNeeded();await expect(page.getByRole('link',{name:'Map inspection'})).toBeInViewport();
   await page.screenshot({path:test.info().outputPath(`menu-${width}x${height}.png`),fullPage:true});
  }
-});
-test('main menu: stale Continue returns to the menu without creating a dungeon save', async ({ page }) => {
-  await page.goto('./?game=dungeon&entry=continue');
-  await expect(page.locator('#main-menu')).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Continue', exact: true })).toBeDisabled();
-  await expect(page).toHaveURL(new URL('./', test.info().project.use.baseURL!).href);
-  expect(await page.evaluate(() => Object.keys(localStorage).filter(key => key.includes(':dungeon:')))).toEqual([]);
 });
 test('main menu: Continue opens recovery when a valid primary is paired with an unreadable backup',async({page})=>{
  const primary=menuFixture('dungeon');
