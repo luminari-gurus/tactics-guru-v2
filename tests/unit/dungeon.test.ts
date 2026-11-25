@@ -754,7 +754,9 @@ describe('dungeon floors', () => {
     const revived=good(dungeonItem(ready,command));
     expect(revived.ownership.consumables).toEqual([]);
     expect(dungeonItem(revived,command)).toEqual({ok:false,reason:'staleBoundary'});
-    const next=good(startDungeonBattle(atEncounter(revived)));
+    const saved = encodeDungeon(revived);
+    assert(saved.ok);
+    const next = walkWitness(good(decodeDungeon(saved.text)));
     expect(next.activeBattle!.units.find(u=>u.defId==='mage')?.hp).toBe(3);
     const defeated={...claimed,phase:'defeat' as const,party:claimed.party.map(hero=>({...hero,hp:0}))};
     expect(dungeonItem(defeated,{...command,...dungeonBoundary(defeated)})).toEqual({ok:false,reason:'wrongContext'});

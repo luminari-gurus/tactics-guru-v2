@@ -1016,7 +1016,7 @@ test('confirmed charm discard frees full capacity without cancelling or duplicat
  await expect(page.getByRole('button',{name:/^Discard /})).toHaveCount(0);
 });
 
-test('a claimed Revive Kit restores a fallen dungeon hero across Continue and next encounter',async({page,isMobile})=>{
+test('a claimed Revive Kit restores a fallen dungeon hero across Continue',async({page,isMobile})=>{
  const witness=dungeonVictoryBoundary(13);if(!witness)throw Error('Missing victory witness');
  const {snapshot:entry,command}=witness;
  const result=dispatch(entry.activeBattle,command,dungeonBattle(entry)!.catalog);if(!result.ok)throw Error(result.reason);
@@ -1038,9 +1038,6 @@ test('a claimed Revive Kit restores a fallen dungeon hero across Continue and ne
  await page.reload();await expectDungeonResumed(page);
  expect((await snapshot(page)).party[2].hp).toBe(3);
  await expect(mageHealth).toHaveAttribute('aria-valuetext','3 of 11 hit points, injured');
- await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
- await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- expect((await readSession(page)).state.units.find(u=>u.defId==='mage')?.hp).toBe(3);
 });
 
 test('an earned Healing Draught survives dungeon Continue and settles once after a legal battle',async({page,isMobile})=>{
