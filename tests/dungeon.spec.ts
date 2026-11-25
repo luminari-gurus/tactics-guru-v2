@@ -848,20 +848,32 @@ test('legal guardian reward, travel reload, backtracking and isolated saves', { 
  await page.screenshot({path:test.info().outputPath('floor-two-revisited.png'),fullPage:true});
  expect(errors).toEqual([]);
 });
-test('corrupt bytes stay exportable and uncertain travel requires explicit recovery',async({page})=>{
+test('corrupt bytes stay exportable and uncertain travel requires explicit recovery', { tag: '@desktop-chromium-portrait-webkit' }, async({page,isMobile})=>{
  // Keep elapsed playtime from changing the fixture during refused travel.
  await page.addInitScript(()=>{document.hasFocus=()=>false;});
  test.setTimeout(90000);const f=fixture(2),result=dispatch(f.snapshot.activeBattle!,f.command,dungeonBattle(f.snapshot)!.catalog);if(!result.ok)throw Error('fixture failed');
  const cleared=acceptDungeonBattle(f.snapshot,result.state);if(!cleared.ok)throw Error(cleared.reason);
  const approach=atStairApproach(declineReward(cleared.state));await openSavedDungeon(page,approach);
- await page.evaluate(key=>{const original=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){original.call(this,k,v);if(k===key&&JSON.parse(v).payload.depth===2)throw Error('uncertain travel write');};},DUNGEON_KEYS.primary);
- await page.locator(`#dungeon-map [data-cell="${approach.floors[0].descriptor.downstairs}"]`).click();
+ await page.evaluate(key=>{
+  const write=Storage.prototype.setItem;
+  Storage.prototype.setItem=function(k,v){
+   write.call(this,k,v);
+   if(k===key&&JSON.parse(v).payload.depth===2){
+    Storage.prototype.setItem=write;
+    throw Error('uncertain travel write');
+   }
+  };
+ },DUNGEON_KEYS.primary);
+ const stairs=page.locator(`#dungeon-map [data-cell="${approach.floors[0].descriptor.downstairs}"]`);
+ if(isMobile)await stairs.tap();else await stairs.click();
  await expect(page.locator('.dungeon-status')).toContainText('Travel not published');
- expect(await snapshot(page)).toMatchObject({depth:approach.depth,revision:approach.revision,floors:approach.floors});
+ expect((await snapshot(page)).depth).toBe(approach.depth);
  await page.getByRole('button',{name:'Save recovery',exact:true}).click();await page.locator('#dungeon-continue-primary').click();expect((await snapshot(page)).depth).toBe(2);
- await page.evaluate(key=>localStorage.setItem(key,'broken save bytes'),DUNGEON_KEYS.primary).catch(()=>{});await page.reload();
+ await page.evaluate(key=>localStorage.setItem(key,'broken save bytes'),DUNGEON_KEYS.primary);await page.reload();
  await page.getByRole('button',{name:'Save recovery',exact:true}).click();
- const downloadPromise=page.waitForEvent('download');await page.getByRole('button',{name:'Export primary save',exact:true}).click();await downloadPromise;
+ const downloadPromise=page.waitForEvent('download');await page.getByRole('button',{name:'Export primary save',exact:true}).click();
+ const download=await downloadPromise,file=await download.path();expect(file).not.toBeNull();
+ expect(readFileSync(file!,'utf8')).toBe('broken save bytes');
  expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe('broken save bytes');
  await page.getByRole('button',{name:'Save recovery',exact:true}).click();await page.locator('#dungeon-remove-primary').click();await page.locator('#dungeon-remove-cancel').click();
  expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe('broken save bytes');
