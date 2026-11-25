@@ -1561,9 +1561,10 @@ test('warm maximum-size floor step responsiveness meets the established budget a
  expect(p95).toBeLessThanOrEqual(33.4);expect(frameP95).toBeLessThanOrEqual(33.4);
 });
 
-for(const depth of [1,5])test(`Guardian-first reward, map and encounter state survive claim and reload at depth ${depth}`,async({page})=>{
+test('Guardian-first reward, map and encounter state survive claim and reload at depth 5',async({page})=>{
+ const depth=5;
  // Structural reward boundary isolates marker rendering, not preceding combat.
- const fresh=freshDungeon('guardian-first',1);
+ const fresh=freshDungeon('guardian-first',1,undefined,true);
  const floors=Array.from({length:depth},(_,i)=>{
   const descriptor=floorDescriptor(fresh.seed,i+1),map=floorMap(descriptor);
   return {descriptor,position:descriptor.upstairs,completed:i===depth-1?0:3,
@@ -1574,7 +1575,7 @@ for(const depth of [1,5])test(`Guardian-first reward, map and encounter state su
   exploration:{...movableExploration(floor.exploration,floor.descriptor.seed,0,'ready'),cleared:[2],active:2,revealed:Array.from({length:map.cells.length},(_,i)=>i)}})};
  const reward=checkedDungeon(readDungeon({...staged,offer:dungeonOffer(staged)}));
  const encoded=encodeDungeon(reward);if(!encoded.ok)throw Error(encoded.reason);
- await page.goto('./?game=dungeon');
+ await page.goto('./');
  await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
  const rewardPanel=page.getByRole('region',{name:'Rewards',exact:true});
  const accessibleMap=page.getByRole('application',{name:/Floor \d+ map/});
@@ -1586,7 +1587,7 @@ for(const depth of [1,5])test(`Guardian-first reward, map and encounter state su
    await expect(page.locator(`#dungeon-map [data-poi="${poi.id}"]`)).toHaveCount(sight.includes(poiCell(poi, map.width)) ? 1 : 0);
   }
  };
- await page.reload();await expectDungeonResumed(page);await checkMap();
+ await page.goto('./?game=dungeon');await expectDungeonResumed(page);await checkMap();
  await expect(rewardPanel).toBeVisible();
  await expect(accessibleMap).toHaveAccessibleDescription(/Guardian · Goblins at row \d+, column \d+\. Reward pending\./);
  const pending=await dungeonSnapshot(page);
@@ -1603,5 +1604,5 @@ for(const depth of [1,5])test(`Guardian-first reward, map and encounter state su
  await page.reload();await expectDungeonResumed(page);await checkMap();
  await expect(rewardPanel).toHaveCount(0);
  await expect(accessibleMap).toHaveAccessibleDescription(/Guardian · Goblins at row \d+, column \d+\. Cleared\./);
- expect(await dungeonSnapshot(page)).toEqual(claimed);
+ expectSameProgress(await dungeonSnapshot(page),claimed);
 });

@@ -435,8 +435,19 @@ it('wins a legal guardian-first battle and continues with an uncleared ordinary 
   expect(victory).toBeDefined();if(!victory)throw Error('No legal guardian-first victory found');
   expect(victory.floors[0].exploration.cleared).toEqual([2]);
   expect(victory.offer).not.toBeNull();
-  const claimed=dungeonItem(victory,{...dungeonBoundary(victory),type:'claimReward',offerId:victory.offer!.id,itemId:victory.offer!.options[0].itemId});
+  const restore = (state: DungeonState) => {
+    const encoded = encodeDungeon(state); assert(encoded.ok);
+    const restored = decodeDungeon(encoded.text); assert(restored.ok);
+    expect(restored.state).toEqual(state);
+    return restored.state;
+  };
+  const pending = restore(victory);
+  const claimed=dungeonItem(pending,{...dungeonBoundary(pending),type:'claimReward',offerId:pending.offer!.id,itemId:pending.offer!.options[0].itemId});
   if(!claimed.ok)throw Error(claimed.reason);
-  const next=startDungeonBattle(atEncounter(claimed.state,0));if(!next.ok)throw Error(next.reason);
+  const resumed = restore(claimed.state);
+  expect(resumed).toMatchObject({ depth: 1, phase: 'ready', offer: null, revision: pending.revision + 1 });
+  expect(resumed.ownership).not.toEqual(pending.ownership);
+  expect(resumed.floors[0].exploration).toEqual({ ...pending.floors[0].exploration, active: null });
+  const next=startDungeonBattle(atEncounter(resumed,0));if(!next.ok)throw Error(next.reason);
   expect(next.state.floors[0].exploration.active).toBe(0);
 });
