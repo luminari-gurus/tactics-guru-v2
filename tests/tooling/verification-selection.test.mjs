@@ -16,9 +16,8 @@ test('real discoveries preserve every retained ID with the approved desktop and 
   ]);
   assert.ok(after.selections['webkit-acceptance'].tests.every(row => row.file === 'main-menu.spec.ts'));
   const desktopOnly = comparison.mappings.filter(row => row.classification === 'desktop-only');
-  assert.equal(desktopOnly.filter(row => row.stage.startsWith('telemetry')).length, 16);
   assert.equal(desktopOnly.filter(row => row.stage === 'assets-root-dev').length, 6);
-  assert.equal(desktopOnly.length, 22);
+  assert.equal(desktopOnly.length, 6);
   const prefixTouchMappings = comparison.mappings.filter(row => row.classification === 'prefix-touch');
   assert.equal(prefixTouchMappings.filter(row => row.removed.project === 'mobile-landscape').length, 6);
   assert.equal(prefixTouchMappings.filter(row => row.removed.project === 'mobile-portrait').length, 2);
@@ -50,7 +49,7 @@ test('selection contract rejects missing, extra, duplicate, wrong-profile and de
   reject(value => value.selections.chromium.tests.push(value.selections.chromium.tests[0]));
   reject(value => value.selections['webkit-acceptance'].tests.pop());
   reject(value => value.selections['webkit-exploration'].tests.pop());
-  reject(value => value.selections['telemetry-development'].tests.pop());
+  reject(value => value.selections['assets-root-dev'].tests.pop());
   reject(value => { value.selections.chromium.projects[1].grepInvert = { source: '@unexpected', flags: '' }; });
   reject(value => { value.selections.chromium.projects[2].use.deviceScaleFactor = 1; });
   reject(value => { value.selections.chromium.tests[0].timeout++; });

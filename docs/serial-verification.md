@@ -82,7 +82,7 @@ full-suite measurement against #200 remain part of #208.
 ## Coverage and build provenance
 
 `scripts/verification-batches.mjs` derives the 20 timing rows from the existing
-15-stage `verify-full.mjs` plan. Preparation runs tooling, fast units (including
+13-stage `verify-full.mjs` plan. Preparation runs tooling, fast units (including
 content), both TypeScript scopes, real build integrations and the root bundle.
 It uploads that ordinary root output once, with source/input identity, a complete
 per-file SHA-256 inventory, the discovery plan and preparation receipts. Every
@@ -94,13 +94,11 @@ Nine whole-file groups partition Dungeon and shared menu and asset cases across
 the three Chromium profiles. Fresh discovery verifies their exact union with the
 current canonical selection and rejects missing, extra or duplicate test IDs.
 
-The other browser jobs cover WebKit menu and Dungeon, configured production and
-development telemetry, and root-dev assets. `prefix-assets` runs the canonical prefix build,
+The other browser jobs cover WebKit menu and Dungeon and root-dev assets. `prefix-assets` runs the canonical prefix build,
 prefix preview/dev consumers and final root restoration in one job. Failed prefix
 builds block only their preview consumer; dev coverage and eligible root
-restoration still run. Telemetry retains its own configured build/server, rather
-than treating the ordinary artifact as its instrumented build. Failed preparation
-gates block their consumers; independent dev/telemetry coverage can still run from
+restoration still run. Failed preparation
+gates block their consumers; independent dev asset coverage can still run from
 the retained preparation report.
 
 Each batch has its own 65-minute foreground budget and 85-minute job ceiling,

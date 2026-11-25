@@ -11,7 +11,7 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const reporter = fileURLToPath(import.meta.url);
 const json = value => JSON.stringify(value, (_, entry) => entry instanceof RegExp ? { source: entry.source, flags: entry.flags } : entry, 2) + '\n';
 export const desktopOnlyStages = new Set([
-  'telemetry-production', 'telemetry-development', 'assets-root-dev',
+  'assets-root-dev',
 ]);
 export const prefixTouchStages = new Set(['assets-prefix-preview', 'assets-prefix-dev']);
 function withoutProjectFilters(args) {
@@ -146,7 +146,7 @@ export function compareSelections(before, after) {
       mappings.push({ stage, removed: test, retained: target,
         classification: desktopReduced ? 'desktop-only' : 'prefix-touch',
         reason: desktopReduced
-          ? 'The root-dev asset checks and telemetry checks keep a desktop witness'
+          ? 'The root-dev asset checks keep a desktop witness'
           : 'Prefixed asset checks keep desktop coverage and touch audio also runs on Pixel portrait' });
     }
     for (const key of remaining.keys()) assert.ok(old.has(key), 'Unexpected extra selected ID');

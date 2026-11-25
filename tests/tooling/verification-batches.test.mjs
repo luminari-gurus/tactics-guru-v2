@@ -54,7 +54,7 @@ test('selection drift, missing and duplicate IDs fail closed', () => {
 });
 
 test('targeted runs and pilot cannot claim full coverage; unknown batch filters fail', () => {
-  assert.equal(createPlan('capture', discovery, 'telemetry-development').scope, 'partial');
+  assert.equal(createPlan('capture', discovery, 'assets-root-dev').scope, 'partial');
   assert.equal(createPlan('pilot', () => [testcase('pilot')]).scope, 'partial');
   assert.throws(() => createPlan('capture', discovery, 'typo'), /Unknown/);
   assert.throws(() => createPlan('capture', discovery, 'webkit-acceptance,webkit-acceptance'), /duplicate/);

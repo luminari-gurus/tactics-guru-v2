@@ -93,7 +93,7 @@ test('async timing scheduler preserves independent coverage and restoration afte
     }, rows => checkpoints.push(rows.length));
     assert.equal(results.length, stages.length);
     assert.equal(checkpoints.at(-1), stages.length);
-    for (const id of ['build-integration','telemetry-production', 'telemetry-development','assets-prefix-dev']) assert.ok(visited.includes(id));
+    for (const id of ['build-integration','assets-prefix-dev']) assert.ok(visited.includes(id));
     assert.equal(results.find(s => s.id === 'assets-prefix-preview').status, 'blocked');
     if (failed === 'build-prefix') assert.ok(visited.includes('restore-root'));
     else {
@@ -110,8 +110,7 @@ test('timed commands preserve selectors and explicit mode isolation from full ve
     PLAYWRIGHT_CHROMIUM_EXECUTABLE: '/chosen/browser', PLAYWRIGHT_JSON_OUTPUT_DIR: '/old' };
   const command = id => stageCommand(stages.find(s => s.id === id), '/receipts', inherited, '/npm-cli.js');
   assert.equal(command('chromium').env.FIT_URL, undefined);
-  assert.equal(command('telemetry-production').env.PLAYWRIGHT_TELEMETRY_DEV, undefined);
-  assert.equal(command('telemetry-development').env.PLAYWRIGHT_TELEMETRY_DEV, 'true');
+  assert.equal(command('chromium').env.PLAYWRIGHT_TELEMETRY_DEV, undefined);
   assert.equal(command('assets-prefix-preview').env.PLAYWRIGHT_BASE_PATH, '/prototype/');
   assert.equal(command('assets-prefix-preview').env.PLAYWRIGHT_SERVER_MODE, undefined);
   assert.equal(command('assets-root-dev').env.PLAYWRIGHT_SERVER_MODE, 'dev');

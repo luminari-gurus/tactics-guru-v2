@@ -24,7 +24,7 @@ that the target was met. Measure successful job durations before claiming succes
 | iPhone WebKit (1) | Dungeon creation, real action and active-battle resume |
 
 Playwright gameplay coverage is limited to Dungeon. The browser suites also cover
-the public menu, its Dungeon entry points, shared startup and privacy behavior,
+the public menu, its Dungeon entry points, shared startup behavior,
 and asset delivery to those surfaces. The exact PR selection contract checks all
 seven journeys and their devices.
 
@@ -61,7 +61,7 @@ Contents: [tiers](#choose-a-tier), [change matrix](#pr-readiness-selection-by-ch
 | --- | --- | --- |
 | Iteration | While changing one behavior | Run the smallest affected unit/test file and relevant browser case; use file/project/title filters. Record failures. This is feedback, not PR acceptance. |
 | PR readiness | Final affected inputs are frozen | Apply the change matrix below, include transitive consumers and meaningful negative cases, verify the final build identity, and account for reused evidence. Include required device/engine cases. |
-| Full regression | Deliberate broad compatibility investigation, release qualification, or explicit issue/caller requirement | Account for every routine suite in the inventory, including dev-only checks and distinct telemetry builds. Run extended journeys when an explicit acceptance gate or the affected behavior requires them. Reuse qualifying existing evidence; run invalidated coverage. |
+| Full regression | Deliberate broad compatibility investigation, release qualification, or explicit issue/caller requirement | Account for every routine suite in the inventory, including dev-only asset checks. Run extended journeys when an explicit acceptance gate or the affected behavior requires them. Reuse qualifying existing evidence; run invalidated coverage. |
 
 Choose the union of affected checks for mixed changes. A dependency or browser
 upgrade does not automatically select full regression; inspect its actual changes
@@ -86,7 +86,7 @@ Check imports, callers, fixtures and config before choosing exact tests.
 | Persistence / lifecycle | Relevant storage/envelope/session units, both TypeScript scopes and build; affected Dungeon reload, corruption, backup, stale-write, focus and actual BFCache cases. Include WebKit acceptance/exploration and legal complete journeys for affected routes. Shared save formats/admission require all storage/envelope/session units and affected core resume journeys. Add bounded engine-specific lifecycle checks for changed browser behavior. |
 | Dependency / security patch | Use the [small dependency patch](#small-dependency-patches) checks when impact is bounded. Runtime, browser and engine changes also select the rows for their affected behavior. A lockfile edit is not a blanket full-regression trigger. |
 | Assets / build / loading | Affected content/inventory/export units and `buildHeaders.test.ts` (both root/prefix builds), both TypeScript scopes and production build; affected asset/base-path, loading/failure and boot cases in relevant modes. Include visual desktop/mobile checks for changed art and audio delivery/unlock for audio changes. Inspect build-size deltas; collect performance captures for changed performance behavior, a material delta that threatens a documented budget, or explicit release/performance qualification. Bounded toolchain patches use the dependency row. |
-| Telemetry | Telemetry units, both TypeScript scopes, ordinary unconfigured build behavior and dedicated configured production + development telemetry suites. Cover opt-out and error mapping in the browser and exercise shared transport and event behavior in units. Shared bootstrap/transport consumers expand selection. Never reuse an ordinary build as proof of the instrumented build. |
+| Telemetry | Exercise shared transport, opt-out, error mapping and event behavior in units. Check both TypeScript scopes and build integration when changing configuration. |
 | Test tooling / CI / selection | Relevant tooling contracts, config discovery and exact before/after selected test IDs; execute affected modes/engines on the qualified runner. Changed harness/project/selection behavior requires exact discovery across affected configs, core runtime checks and bounded changed UI/engine witnesses, with explicit coverage mapping for removed execution. Preserve unchanged optional matrices by discovery and relevant-input comparison. A test-only edit can invalidate acceptance evidence. |
 
 Use complete legal journeys, not mocked unit tests, as browser interaction proof.
@@ -100,8 +100,7 @@ The broad Chromium matrix runs on desktop, native touch portrait and native
 touch landscape. WebKit menu acceptance runs on iPhone portrait and landscape.
 The WebKit Dungeon suite also includes desktop.
 
-Full regression runs configured production and development telemetry on desktop
-Chromium and checks root-dev assets on desktop. Prefix-preview and prefix-dev use
+Full regression checks root-dev assets on desktop Chromium. Prefix-preview and prefix-dev use
 `playwright.prefix-assets.config.ts` for desktop asset checks and Pixel portrait
 `@touch-audio` cases. Root-preview asset checks run on all three Chromium profiles.
 
@@ -138,7 +137,7 @@ diff and actual consumers, use PR readiness rather than full regression:
   already covers content validation and both TypeScript scopes; add the existing
   build integration tests and a focused boot/dev-server smoke as relevant.
 - Reuse valid unaffected unit/gameplay/device evidence under the rules below.
-  Add engine, lifecycle, telemetry or performance runs only when the changed
+  Add engine, lifecycle or performance runs only when the changed
   behavior, a failure or an explicit acceptance gate requires them.
 
 For example, a same-minor Vite editor-security patch normally needs audit,
@@ -166,7 +165,7 @@ suites or add release/performance qualification merely to finish a merge.
 Run from the repository root after `npm ci`. Production-preview checks require a
 successful `npm run build` for the selected source and base path. Do not serve an
 old `dist/` after a failed build. Run browser commands sequentially: most own port
-4173; telemetry owns 4288. The table distinguishes routine full regression from explicit extended coverage;
+4173. The table distinguishes routine full regression from explicit extended coverage;
 PR readiness selects the applicable rows under the change matrix.
 
 | Coverage | Current command | Mode and selection |
@@ -183,8 +182,6 @@ PR readiness selects the applicable rows under the change matrix.
 | Extended progression journeys | `npm run test:extended` and `npm run test:extended:webkit` | Explicit, non-routine complete Mage, Ranger and Fighter progression journeys across three Chromium and three WebKit profiles; run when their full progression behavior needs certification. |
 | WebKit menu acceptance | `npx --no-install playwright test -c playwright.device-acceptance.config.ts` | Public menu and Dungeon entry, history, recovery and layout on iPhone portrait and landscape. |
 | WebKit dungeon/exploration | `npx --no-install playwright test -c playwright.exploration.config.ts` | Dungeon, exploration, lifecycle files; desktop and two mobile orientations. |
-| Configured production telemetry | `npm run test:telemetry` | `telemetry.spec.ts`; dedicated instrumented build in `tmp/issue128-dist`. Full regression selects desktop Chromium only. Focused runs without `--project` still discover all three profiles. |
-| Configured development telemetry | `PLAYWRIGHT_TELEMETRY_DEV=true npm run test:telemetry` | Dedicated dev-server environment; distinct from production evidence. Full regression is likewise desktop-only. |
 | Root/prefix asset behavior | `npx --no-install playwright test -c playwright.regression.config.ts tests/public-asset-base.spec.ts` | Root preview in the broad Chromium suite keeps all three profiles. Full regression runs root-dev on desktop only, and prefix-preview/prefix-dev on desktop plus Pixel portrait `@touch-audio` cases; recipe below. |
 | Performance capture | `npm run measure:fit` | Isolated production proof-scene collector; this is not a substitute for runtime budget assertions in browser tests. Required for affected performance work and release qualification, not every docs/UI-copy edit. |
 
@@ -211,15 +208,14 @@ filters for the full Chromium Dungeon matrix.
 
 `npm run verify:full` executes the complete inventory sequentially: tooling,
 all fast units (including content), both type scopes, root/prefix build integrations,
-the root bundle and broad Chromium, WebKit menu and Dungeon coverage, desktop
-production and development telemetry, desktop root-dev assets, and prefix build
+the root bundle and broad Chromium, WebKit menu and Dungeon coverage,
+desktop root-dev assets, and prefix build
 and asset checks in preview and dev. The final stage restores the root bundle.
 Root preview assets run in the broad Chromium suite on all three profiles. The
-15 stages validate ordinary content and both
+13 stages validate ordinary content and both
 type scopes once before any ordinary bundle. Prefix and restored-root bundles
 reuse those successful prerequisites; neither is executed after unit/content or
-type failure. Independent dev suites and build integrations continue. Configured
-telemetry retains its separate build and validation because its flags differ.
+type failure. Independent dev checks and build integrations continue.
 `npm run verify:full -- --list` displays the stage plan without executing it.
 Aggregate filters are rejected; use the focused core or explicit regression commands instead.
 
@@ -227,8 +223,7 @@ Each stage gets its own log, browser JSON report and artifact directory under
 `tmp/verification/full-<timestamp>-<pid>/`. `summary.json` is updated after every
 stage with commands, exit status, failures or blocked prerequisites. The runner
 continues independent suites after failure and exits nonzero for any failed or
-blocked stage. A failed build blocks its preview consumers. Dev asset checks and
-independent telemetry builds still run. Record startup failures as incomplete
+blocked stage. A failed build blocks its preview consumers. Dev asset checks still run. Record startup failures as incomplete
 execution.
 
 The full command clears inherited server/base/telemetry mode flags and isolates

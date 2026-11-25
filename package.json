@@ -16,7 +16,6 @@
     "measure:fit": "node --experimental-strip-types scripts/measure-fit.ts",
     "validate:content": "vitest run tests/unit/content.test.ts tests/unit/authoredContent.test.ts tests/unit/authoredEncounters.test.ts tests/unit/items.test.ts tests/unit/rewards.test.ts tests/unit/battlefieldSources.test.ts tests/unit/battlefield.test.ts tests/unit/dungeonEncounters.test.ts",
     "telemetry:release": "node scripts/posthog-release.mjs",
-    "test:telemetry": "playwright test -c playwright.telemetry.config.ts",
     "setup:browsers": "playwright install --no-remove chromium webkit",
     "setup:browsers:linux": "playwright install --no-remove --with-deps chromium webkit",
     "check:browsers": "node scripts/browser-check.mjs",

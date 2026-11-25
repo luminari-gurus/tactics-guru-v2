@@ -22,7 +22,7 @@ test('failed build blocks stale preview but still runs development checks and re
     assert.equal(result.results.find(r => r.id === id).status, 'blocked');
     assert.ok(!visited.includes(id));
   }
-  for (const id of ['telemetry-production', 'telemetry-development', 'assets-prefix-dev', 'restore-root']) assert.ok(visited.includes(id));
+  for (const id of ['assets-prefix-dev', 'restore-root']) assert.ok(visited.includes(id));
   assert.equal(result.exitCode, 1);
 });
 
@@ -41,8 +41,8 @@ test('signals, spawn errors and exceptions remain failures; results are checkpoi
 test('all successful stages pass with only the supported browser stages', () => {
   assert.equal(runStages(stages, () => ({ exitCode: 0 })).exitCode, 0);
   assert.deepEqual(stages.filter(stage => stage.browser).map(stage => stage.id), [
-    'chromium', 'webkit-acceptance', 'webkit-exploration', 'telemetry-production',
-    'telemetry-development', 'assets-root-dev', 'assets-prefix-preview', 'assets-prefix-dev',
+    'chromium', 'webkit-acceptance', 'webkit-exploration',
+    'assets-root-dev', 'assets-prefix-preview', 'assets-prefix-dev',
   ]);
 });
 
@@ -75,25 +75,24 @@ test('failed units or types block unchecked bundles while independent coverage c
       assert.equal(result.results.find(stage => stage.id === id).status, 'blocked', `${failed}: ${id}`);
       assert.ok(!visited.includes(id));
     }
-    for (const id of ['build-integration', 'telemetry-production',
-      'telemetry-development', 'assets-root-dev', 'assets-prefix-dev']) assert.ok(visited.includes(id));
+    for (const id of ['build-integration', 'assets-root-dev', 'assets-prefix-dev']) assert.ok(visited.includes(id));
     assert.equal(result.exitCode, 1);
   }
 });
 
 test('explicit modes isolate inherited build/report flags but preserve browser selection', () => {
-  const env = stageEnvironment(stages.find(s => s.id === 'telemetry-development'), '/reports', {
+  const env = stageEnvironment(stages.find(s => s.id === 'assets-root-dev'), '/reports', {
     PLAYWRIGHT_BASE_PATH: '/wrong/', PLAYWRIGHT_SERVER_MODE: 'dev',
     PLAYWRIGHT_TELEMETRY_DEV: 'false', VITE_POSTHOG_ENABLED: 'true', POSTHOG_SOURCEMAPS: 'true',
     PLAYWRIGHT_JSON_OUTPUT_DIR: '/wrong/', PLAYWRIGHT_CHROMIUM_EXECUTABLE: '/browser',
   });
   assert.equal(env.PLAYWRIGHT_BASE_PATH, undefined);
-  assert.equal(env.PLAYWRIGHT_SERVER_MODE, undefined);
+  assert.equal(env.PLAYWRIGHT_SERVER_MODE, 'dev');
   assert.equal(env.VITE_POSTHOG_ENABLED, undefined);
   assert.equal(env.POSTHOG_SOURCEMAPS, undefined);
-  assert.equal(env.PLAYWRIGHT_TELEMETRY_DEV, 'true');
+  assert.equal(env.PLAYWRIGHT_TELEMETRY_DEV, undefined);
   assert.equal(env.PLAYWRIGHT_CHROMIUM_EXECUTABLE, '/browser');
-  assert.equal(env.PLAYWRIGHT_JSON_OUTPUT_FILE, join('/reports', 'telemetry-development.json'));
+  assert.equal(env.PLAYWRIGHT_JSON_OUTPUT_FILE, join('/reports', 'assets-root-dev.json'));
   assert.equal(env.PLAYWRIGHT_JSON_OUTPUT_DIR, undefined);
 });
 
