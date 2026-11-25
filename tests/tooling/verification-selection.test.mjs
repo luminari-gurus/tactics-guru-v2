@@ -63,6 +63,10 @@ test('routine verification clears each first-floor scenario once and checks both
     assert.deepEqual(profilesFor('ground loot: legal victory saves one item at contact and a manual pickup survives refusal and reload'), allProfiles);
     assert.deepEqual(profilesFor('ground loot: entering an occupied pile starts combat and closes inventory'), [stage === 'chromium' ? landscape : desktop]);
     assert.deepEqual(profilesFor('restart during accepted presentation discards old callbacks and history'), [stage === 'chromium' ? desktop : portrait]);
+    for (const title of [
+      'dungeon statistics: confirmed replacement pauses pending enemy turns through history',
+      'legal enemy defeat waits for its save and returns to the menu during a pending history write',
+    ]) assert.deepEqual(profilesFor(title), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('visibility interruption finishes an accepted terminal presentation exactly once'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('confirmed charm discard frees full capacity without cancelling or duplicating the pending reward'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('dungeon battle undo survives reload and a legal defeat journey'), [stage === 'chromium' ? desktop : portrait]);
