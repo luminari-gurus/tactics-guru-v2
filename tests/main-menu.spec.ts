@@ -346,7 +346,7 @@ test('main menu: legacy battle and run slots are ignored through launch and dung
   expect(await getValues(Object.keys(seed))).toEqual(seed);
 });
 
-test('main menu: save recovery lists only the dungeon backup',async({page})=>{
+test('main menu: save recovery lists only the dungeon backup', { tag: '@desktop-chromium-portrait-webkit' }, async({page})=>{
   await page.addInitScript(({keys,battle,run,dungeon})=>{
     localStorage.setItem(keys.battle.primary,battle);
     localStorage.setItem(keys.run.primary,run);
@@ -367,7 +367,7 @@ test('main menu: save recovery lists only the dungeon backup',async({page})=>{
     .toBe(JSON.parse(menuFixture('dungeon')).payload.id);
 });
 
-test('main menu: New Game confirms over the menu and preserves other save families',async({page})=>{
+test('main menu: New Game confirms over the menu and preserves other save families', { tag: '@desktop-chromium-portrait-webkit' }, async({page})=>{
  const text=menuFixture('dungeon');await page.addInitScript(({keys,text})=>{localStorage.setItem(keys.dungeon.backup,text);localStorage.setItem(keys.battle.primary,'battle sentinel');},{keys,text});
  await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();
  await expect(page.locator('#main-menu')).toBeVisible();await expect(page.getByRole('dialog')).toContainText('Start new dungeon?');
@@ -438,7 +438,7 @@ test.extend({pinDungeonSeed:13})('main menu: New Game stays playable after retry
  await expect(screen).toContainText('Playing unsaved.');
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.dungeon.primary)).toBe(corrupt);
 });
-test('main menu: changed dungeon save requires a fresh confirmation',async({page})=>{
+test('main menu: changed dungeon save requires a fresh confirmation', { tag: '@desktop-chromium-portrait-webkit' }, async({page})=>{
  const text=menuFixture('dungeon');await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:keys.dungeon.primary,text});
  await page.getByRole('button',{name:'New Game',exact:true}).click();
  await page.evaluate(key=>localStorage.setItem(key,'changed while confirming'),keys.dungeon.primary);
@@ -474,7 +474,7 @@ test('main menu: portrait composition scrolls at narrow, short and enlarged text
   await page.screenshot({path:test.info().outputPath(`menu-${width}x${height}.png`),fullPage:true});
  }
 });
-test('main menu: Continue opens recovery when a valid primary is paired with an unreadable backup',async({page})=>{
+test('main menu: Continue opens recovery when a valid primary is paired with an unreadable backup', { tag: '@desktop-chromium-portrait-webkit' }, async({page})=>{
  const primary=menuFixture('dungeon');
  await page.goto('./');
  await page.evaluate(({key,primary})=>localStorage.setItem(key,primary),{key:keys.dungeon.primary,primary});
@@ -500,7 +500,7 @@ test('main menu: Continue opens recovery when a valid primary is paired with an 
  await expect(page.locator('#main-menu')).toBeVisible();
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.dungeon.primary)).toBe(primary);
 });
-test('main menu: failed new-game write retains exportable recovery copies',async({page})=>{
+test('main menu: failed new-game write retains exportable recovery copies', { tag: '@desktop-chromium-portrait-webkit' }, async({page})=>{
  const text=menuFixture('dungeon');
  await page.addInitScript(({key,text})=>{
   localStorage.setItem(key,text);const original=Storage.prototype.setItem;

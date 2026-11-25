@@ -82,6 +82,22 @@ test('each engine clears one full floor per profile and checks both pickup modes
   }
 });
 
+test('menu save recovery runs on desktop Chromium and portrait WebKit', () => {
+  const titles = [
+    'main menu: save recovery lists only the dungeon backup',
+    'main menu: New Game confirms over the menu and preserves other save families',
+    'main menu: changed dungeon save requires a fresh confirmation',
+    'main menu: Continue opens recovery when a valid primary is paired with an unreadable backup',
+    'main menu: failed new-game write retains exportable recovery copies',
+  ];
+  for (const [stage, project] of [['chromium', 'desktop'], ['webkit-acceptance', 'acceptance-webkit-portrait']]) {
+    for (const title of titles) {
+      const selected = after.selections[stage].tests.filter(row => row.title === title);
+      assert.deepEqual(selected.map(row => row.project), [project]);
+    }
+  }
+});
+
 test('keyboard focus and shortcuts run on desktop while the touch target checks cover every profile', () => {
   for (const [stage, desktop] of [['chromium', 'desktop'], ['webkit-exploration', 'desktop-webkit']]) {
     const { tests, projects } = after.selections[stage];
