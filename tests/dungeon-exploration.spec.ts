@@ -143,11 +143,15 @@ test('ground loot: full capacity keeps same-cell rewards and retries on discard 
 
 test('ground loot: an occupied pile starts combat at the origin and preserves both rewards through resume',async({page,isMobile})=>{
  await page.addInitScript(()=>{document.hasFocus=()=>false;});
- const {state,cell,origin}=sharedGroundPile(0,true);await loadGroundLootBoundary(page,state);
+ const {state,cell,origin}=sharedGroundPile(1,true);await loadGroundLootBoundary(page,state);
  const tile=page.locator(`#dungeon-map [data-cell="${cell}"]`);
  await expect(tile).toHaveAttribute('data-loot','2');await expect(tile).toHaveAttribute('data-loot-overlay','true');await expect(tile).toHaveText('M');
+ await openDungeonInventory(page);
+ const discard=page.getByRole('button',{name:'Discard Warding Charm',exact:true});
+ await expect(discard).toBeVisible();
  if(isMobile)await tile.tap();else await tile.click();
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ await expect(discard).toHaveCount(0);
  const active=await dungeonSnapshot(page),floor=active.floors[active.depth-1];
  expect(active.phase).toBe('battle');expect(active.encounterEntry).toEqual({origin,contact:cell,slot:2});
  expect(floor.position).toBe(origin);expect(floor.loot).toEqual(state.floors[state.depth-1].loot);expect(active.ownership).toEqual(state.ownership);

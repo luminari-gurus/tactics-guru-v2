@@ -1012,8 +1012,6 @@ test('confirmed charm discard frees full capacity without cancelling or duplicat
  await openDungeonInventory(page);
  await page.getByRole('button',{name:/^Discard /}).first().click();await page.locator('#dungeon-discard-confirm').click();
  const prepared=await acceptedDungeonSnapshot(page,claimed);expect(prepared.phase).toBe('ready');expect(prepared.ownership.equipment).toHaveLength(5);
- await walkDungeon(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- await expect(page.getByRole('button',{name:/^Discard /})).toHaveCount(0);
 });
 
 test('a claimed Revive Kit restores a fallen dungeon hero across Continue',async({page,isMobile})=>{
