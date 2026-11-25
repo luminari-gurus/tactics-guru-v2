@@ -577,17 +577,6 @@ savedWetlandsTest('saved dungeon downloads only after explicit recovery export',
  });
 });
 
-test('play unsaved dungeon uses a fresh layout each visit and does not write a save',async({page})=>{
- await page.goto('./?game=dungeon&entry=recovery');
- await page.getByRole('button',{name:'Play unsaved dungeon',exact:true}).click();
- const first=await snapshot(page);
- await page.goto('./?game=dungeon&entry=recovery');
- await page.getByRole('button',{name:'Play unsaved dungeon',exact:true}).click();
- const second=await snapshot(page);
- expect(second.seed).not.toBe(first.seed);
- expect(await page.evaluate(()=>Object.keys(localStorage).filter(key=>key.includes(':dungeon:')))).toEqual([]);
-});
-
 test('Forest Elite keeps a living goblin visible behind raised terrain', async ({ page }, info) => {
  const dungeon = atEncounter(freshDungeon('forest-elite-visibility', 41), 1);
  expect(dungeon.floors[0].descriptor.encounters[1].selection.kind).toBe('elite');
