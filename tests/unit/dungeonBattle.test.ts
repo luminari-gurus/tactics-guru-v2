@@ -178,11 +178,16 @@ it('settles the last earned draught after playing the next encounter to completi
       battle.finishPresentation(step.token);
     } else {
       const command = !used && battle.preview(drink).ok ? drink : playerDecision(battle.state, source.catalog);
+      const before = battle.state, actor = battle.active;
       assert(battle.prepare(command).ok);
       const step = battle.confirm();
       assert(step);
       battle.finishPresentation(step.token);
-      if (command === drink) used = true;
+      if (command === drink) {
+        used = true;
+        expect(battle.state.rng).toEqual(before.rng);
+        expect(battle.state.units.find(unit => unit.id === actor.id)!.hp).toBeGreaterThan(actor.hp);
+      }
     }
     const accepted = acceptDungeonBattle(dungeon, battle.state);
     assert(accepted.ok);
