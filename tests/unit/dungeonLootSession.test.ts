@@ -75,8 +75,8 @@ it('keeps the uncollected victory pile and party position across consecutive res
   }
 });
 
-it('continues an occupied-pile battle at its origin with both rewards still on the ground', async () => {
-  const { state, cell, origin } = sharedGroundPile(1, true);
+it.each([1, 6])('continues an occupied-pile battle without collecting either reward with %i items in inventory', async owned => {
+  const { state, cell, origin } = sharedGroundPile(owned, true);
   const { storage, owner } = savedOwner(state);
   assert(await owner.step({ ...owner.spatialBoundary, destination: cell }));
   const active = owner.snapshot;

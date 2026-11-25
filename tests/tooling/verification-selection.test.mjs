@@ -57,6 +57,7 @@ test('each engine splits full-floor touch journeys and checks both pickup modes 
       [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('reload before the pending step restores the ground pile without surprise movement or collection'), [desktop]);
     assert.deepEqual(profilesFor('ground loot: legal victory saves one item at contact and a manual pickup survives refusal and reload'), allProfiles);
+    assert.deepEqual(profilesFor('ground loot: entering an occupied pile starts combat and closes inventory'), [stage === 'chromium' ? landscape : desktop]);
     assert.deepEqual(profilesFor('auto loot defaults on: one delayed ordinary step, pickup, enemy tick and durable resume'), allProfiles);
   }
 });
