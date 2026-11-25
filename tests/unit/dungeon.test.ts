@@ -8,7 +8,7 @@ import { assert, describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { dungeonCapacityFixture, dungeonVictoryBoundary, walkWitness } from '../helpers/dungeonFixtures';
 import { dungeonStairStatus, clearedDungeonSlots, freshDungeon, newDungeonSeed, stepDungeon, dungeonBattle, dungeonOffer, floorDescriptor, floorMap, FloorCache, dungeonSeed, readDungeon, travelDungeon, startDungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
-import { encodeDungeon, decodeDungeon, encodeDungeonRollback, utf8Bytes } from '../../src/domain/dungeonSaveEnvelope';
+import { encodeDungeon, decodeDungeon, encodeDungeonRollback, WALL_SIGHT_STATS_SAVE_FORMAT, utf8Bytes } from '../../src/domain/dungeonSaveEnvelope';
 import { dungeonContent, dungeonIdentity, previousDungeonIdentity } from '../../src/content/dungeon';
 import { bothDungeonSlotsMissing, createDungeonStorage, resumableDungeonSlot, serializeBrowserDungeonWrite, DUNGEON_BACKUP_CHECKPOINT_KEY, DUNGEON_KEYS, DUNGEON_RECENT_BACKUP_KEY } from '../../src/persistence/dungeonStorage';
 import { DungeonSession } from '../../src/app/DungeonSession';
@@ -535,6 +535,34 @@ describe('dungeon run history boundaries', () => {
     expect(session.phase).toBe('defeat'); await f.history.whenIdle();
     expect(f.rows()).toMatchObject([{ id: injured.id, outcome: 'defeat', recordedAt: 200, battlesWon: 0 }]);
     expect([f.m.getItem(DUNGEON_KEYS.primary), f.m.getItem(DUNGEON_KEYS.backup)]).toEqual(bytes);
+    session.dispose();
+  });
+  it('continues a counter-only save read-only and ranks only known statistics on replacement', async () => {
+    const f = fixture();
+    const raw = readFileSync('tests/fixtures/saves/issue-270/counter-dungeon-v1.json', 'utf8');
+    const old = JSON.parse(raw).payload;
+    f.m.setItem(DUNGEON_KEYS.primary, raw);
+    f.m.setItem(DUNGEON_KEYS.backup, raw);
+    const session = new DungeonSession(fresh(), f.storage, f.history);
+    assert(session.continue(session.inspect()));
+    await f.history.whenIdle();
+    const stats = { version: 2, coverage: 'whole-run', timeCoverage: 'since-upgrade',
+      enemiesKilled: old.stats.enemiesKilled, movesTaken: old.stats.movesTaken };
+    expect(session.snapshot.stats).toMatchObject(stats);
+    expect([f.m.getItem(DUNGEON_KEYS.primary), f.m.getItem(DUNGEON_KEYS.backup)]).toEqual([raw, raw]);
+
+    assert(await session.replace(session.inspect(), 'timed-new-dungeon', 14));
+    await f.history.whenIdle();
+    const history = selectedRunRecords(f.records.inspect());
+    assert(history);
+    expect(history.records).toMatchObject([{ id: old.id, stats }]);
+    expect(history.bests.dungeon.enemiesKilled?.id).toBe(old.id);
+    expect(history.bests.dungeon.movesTaken?.id).toBe(old.id);
+    expect(history.bests.dungeon.activeMs).toBeUndefined();
+    const next = JSON.parse(f.m.getItem(DUNGEON_KEYS.primary)!);
+    expect(next).toMatchObject({ format: WALL_SIGHT_STATS_SAVE_FORMAT, payload: {
+      id: 'timed-new-dungeon', stats: { version: 2, coverage: 'whole-run', timeCoverage: 'whole-run' },
+    } });
     session.dispose();
   });
   it('does not end a cleared floor or continued descent, and records the reviewed old journey rather than a placeholder', async () => {
