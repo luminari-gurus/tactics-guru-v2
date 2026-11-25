@@ -1,8 +1,8 @@
 import { showsSnareBadge } from '../../src/phaser/abilityPresentation';
 import { HERO_PROGRESSION } from '../../src/content/progression';
 import { progressHero } from '../../src/domain/progression';
-import { atDownstairs, atEncounter, savedBiomeEncounter, snaredDefeatBoundary, stagedMageAbility, withLegacySight } from '../helpers/dungeonFixtures';
-import { freshDungeon, floorDescriptor, floorMap, startDungeonBattle, readDungeon, travelDungeon } from '../../src/domain/dungeon';
+import { atDownstairs, atStairApproach, atEncounter, checkedDungeon, savedBiomeEncounter, snaredDefeatBoundary, stagedMageAbility, withLegacySight } from '../helpers/dungeonFixtures';
+import { freshDungeon, floorDescriptor, floorMap, startDungeonBattle, readDungeon, travelDungeon, stepDungeon } from '../../src/domain/dungeon';
 import { guardedBoundary } from '../helpers/guardedBoundary';
 import { combatStats } from '../../src/domain/effects';
 import { assert,expect,it } from 'vitest';
@@ -366,8 +366,35 @@ it('finds a legal earned Ranger level-three witness using both controls and reta
     for(const command of record.commands){const result=dispatch(state,command,catalog);if(!result.ok)throw Error(result.reason);state=result.state;}
     expect(state).toEqual(record.state);
   }
-  const fighter=healedFighterBoundary();expect(fighter.state.units.find(u=>u.defId==='fighter')!.secondWindUsed).toBe(true);
 },120000);
+
+it('carries the healed Fighter through automatic stairs and restores the next battle with fresh resources', () => {
+  const record = healedFighterBoundary();
+  expect(record.state.units.find(unit => unit.defId === 'fighter')!.secondWindUsed).toBe(true);
+  const won = checkedDungeon(acceptDungeonBattle(record.entry, record.state));
+  const ready = checkedDungeon(dungeonItem(won, {
+    ...dungeonBoundary(won), type: 'declineReward', offerId: won.offer!.id,
+  }));
+  const approach = atStairApproach(ready);
+  const arrived = checkedDungeon(stepDungeon(approach, {
+    id: approach.id, depth: approach.depth, revision: approach.revision, destination: approach.floors[0].descriptor.downstairs,
+  }));
+  expect(arrived).toMatchObject({ depth: 2, revision: approach.revision + 1 });
+  expect(arrived.party).toEqual(approach.party);
+  expect(arrived.ownership).toEqual(approach.ownership);
+  expect(arrived.party.every(hero => !Object.hasOwn(hero, 'secondWindUsed') && !Object.hasOwn(hero, 'tauntedBy'))).toBe(true);
+  const saved = encodeDungeon(arrived);
+  assert(saved.ok);
+  const resumed = decodeDungeon(saved.text);
+  assert(resumed.ok);
+  expect(resumed.state).toEqual(arrived);
+  const next = walkWitness(resumed.state);
+  const fighter = arrived.party.find(hero => hero.heroId === 'fighter')!;
+  expect(fighter.hp).toBeGreaterThan(0);
+  expect(fighter.learned).toContain('ability:second_wind');
+  expect(next.activeBattle!.units.find(unit => unit.defId === 'fighter')!.hp).toBe(fighter.hp);
+  expect(next.activeBattle!.units.every(unit => !unit.secondWindUsed && unit.tauntedBy === undefined)).toBe(true);
+});
 
 it('retains live Mark and Pin across dungeon continuation and keeps them out of the next encounter',()=>{
   const fresh=freshDungeon('ranger-save',190),entry={...fresh,party:fresh.party.map(h=>progressHero(h.heroId,180,2,dungeonContent.catalog))};
