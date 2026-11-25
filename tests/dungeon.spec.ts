@@ -225,7 +225,7 @@ test('Rail Magic Missile requires explicit confirmation before damaging an ally'
   expect(after.events).toEqual(expected.events);
 });
 
-test('staged Mage Frost Snare cancels invalid casts and restores the active badge',async({page})=>{
+test('staged Mage Frost Snare cancels invalid casts and restores the active badge',async({page,browserName},info)=>{
  const abilityId='ability:frost_snare';
  // The level/position boundary is deliberately staged. The extended journey alone proves earned XP.
  const fixture=stagedMageAbility(abilityId),catalog=dungeonBattle(fixture.state)!.catalog;
@@ -262,33 +262,14 @@ test('staged Mage Frost Snare cancels invalid casts and restores the active badg
  expect(await page.evaluate(keys=>keys.map(key=>localStorage.getItem(key)),[DUNGEON_KEYS.primary,DUNGEON_KEYS.backup])).toEqual(slots);
  await checkSnares(page,true);expect((await boardReport(page)).feedbackBounds).toEqual([]);
  await page.screenshot({path:test.info().outputPath('snared-resumed.png')});
- // Accepted Mage and Ranger Waits plus an unrelated Archer attack preserve Snare.
- for(const id of [3,2]) {
-  expect((await readSession(page)).state.initiative[(await readSession(page)).state.activeIndex]).toBe(id);
-  await playCommand(page,{type:'endTurn',unitId:id});await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-  await checkSnares(page,true);expect((await boardReport(page)).units.find((u:any)=>u.id===fixture.command.target.unitId).snare.visible).toBe(true);
- }
- expect((await readSession(page)).events.some(e=>e.type==='attackRolled'&&e.unitId===5)).toBe(true);
- await playCommand(page,{type:'endTurn',unitId:1});await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
- const expired=await readSession(page);await checkSnares(page,true);
- expect(expired.events).toContainEqual({type:'turnEnded',unitId:fixture.command.target.unitId});
- expect(expired.events).toContainEqual({type:'movementBlockExpired',unitId:fixture.command.target.unitId,sourceId:3,abilityId});
- expect((await boardReport(page)).units.every((u:any)=>!u.snare.visible)).toBe(true);
- await page.screenshot({path:test.info().outputPath('snared-expired.png')});
  await test.info().attach('staged-mage-boundary',{body:JSON.stringify({fixture:'staged level/position; not earned progression',command:fixture.command,before:before.state,after:accepted.state,events:accepted.events}),contentType:'application/json'});
-});
-
-test('Snared badge follows camera and narrow portrait landscape layouts without capturing input',async({page,browserName},info)=>{
- const f=stagedMageAbility('ability:frost_snare');await seed(page,f.state);
- await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await playCommand(page,f.command);
- await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const state=(await readSession(page)).state,size=page.viewportSize()!;
  for(const viewport of [{width:320,height:568},{width:568,height:320},size]) {
   await page.setViewportSize(viewport);await expect.poll(async()=>(await boardReport(page)).viewport).toEqual(viewport);
   await checkSnares(page,true);
   await page.screenshot({path:info.outputPath(`snared-${viewport.width}x${viewport.height}.png`)});
  }
- const r=await boardReport(page),badge=r.units.find((u:any)=>u.id===f.command.target.unitId).snare;
+ const r=await boardReport(page),badge=r.units.find((u:any)=>u.id===fixture.command.target.unitId).snare;
  const center={x:badge.screen.x,y:badge.screen.y};
  if(info.project.use.hasTouch)await page.touchscreen.tap(center.x,center.y);else await page.mouse.click(center.x,center.y);
  expect((await readSession(page)).state).toEqual(state);

@@ -64,6 +64,40 @@ it.each(['ability:pinning_shot', 'ability:frost_snare'] as const)('projects Snar
     .toEqual(abilityId === 'ability:frost_snare' ? [command.target.unitId] : []);
 });
 
+it('keeps the restored Snared badge through unrelated turns until the target ends its turn', () => {
+  const { state, command } = stagedMageAbility('ability:frost_snare');
+  const built = dungeonBattle(state)!;
+  const cast = dispatch(state.activeBattle!, command, built.catalog);
+  assert(cast.ok);
+  const saved = encodeDungeon({ ...state, activeBattle: cast.state });
+  assert(saved.ok);
+  const restored = decodeDungeon(saved.text);
+  assert(restored.ok && restored.state.activeBattle);
+  const battle = new BattleSession(built.catalog, restored.state.activeBattle, built.state.seed, undefined, false, built.battlefield);
+  const targetId = command.target.unitId;
+  const visible = () => battle.state.units.filter(unit => showsSnareBadge(unit, battle.state.units)).map(unit => unit.id);
+  const events = [];
+  for (const unitId of [3, 2, 1]) {
+    expect(visible()).toEqual([targetId]);
+    expect(battle.active.id).toBe(unitId);
+    assert(battle.prepare({ type: 'endTurn', unitId }).ok);
+    const wait = battle.confirm();
+    assert(wait);
+    battle.finishPresentation(wait.token);
+    while (battle.phase === 'enemy') {
+      const step = battle.nextEnemy();
+      assert(step);
+      events.push(...step.events);
+      battle.finishPresentation(step.token);
+    }
+  }
+  const archer = events.findIndex(event => event.type === 'attackRolled' && event.unitId === 5);
+  expect(archer).toBeGreaterThanOrEqual(0);
+  expect(events.slice(archer + 1)).toContainEqual({ type: 'turnEnded', unitId: targetId });
+  expect(events).toContainEqual({ type: 'movementBlockExpired', unitId: targetId, sourceId: command.unitId, abilityId: command.abilityId });
+  expect(visible()).toEqual([]);
+});
+
 it.each(['source', 'target'] as const)('removes the Snared badge on legal %s defeat', kind => {
   const fixture = snaredDefeatBoundary(kind);
   const before = fixture.state.activeBattle!.units;
