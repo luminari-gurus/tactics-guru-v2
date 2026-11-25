@@ -98,9 +98,9 @@ test('dungeon previous-format recovery preserves and exports both original slots
  const legacy=priorDungeonEnvelope(freshDungeon('legacy-browser',13,LEGACY_ENCOUNTER_POLICY),1);
  const texts={primary:` \n${legacy}\n `,backup:`\t${old}\n`};
  const keys=DUNGEON_KEYS;
- await page.goto('./');
- await page.evaluate(({keys,texts})=>{localStorage.setItem(keys.primary,texts.primary);localStorage.setItem(keys.backup,texts.backup);localStorage.setItem('issue164-unrelated','retain');},{keys,texts});
- await page.goto('./?game=dungeon');
+ await openDungeonWithStorage(page, {
+  [keys.primary]: texts.primary, [keys.backup]: texts.backup, 'issue164-unrelated': 'retain',
+ });
  const stored=()=>page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup),unrelated:localStorage.getItem('issue164-unrelated')}),keys);
  await expect(page.locator('#main-menu')).toBeVisible();
  await expect(page.getByRole('button',{name:'Continue',exact:true})).toBeDisabled();
@@ -118,7 +118,22 @@ test('dungeon previous-format recovery preserves and exports both original slots
  await page.reload();await expect(page.locator('#main-menu')).toBeVisible();expect(await stored()).toEqual({...texts,unrelated:'retain'});
 });
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
-async function load(page:Page,s:DungeonState){const saved=encodeDungeon(s);if(!saved.ok)throw Error(saved.reason);await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:saved.text});await page.goto('./?game=dungeon');await expectDungeonResumed(page);}
+async function openDungeonWithStorage(page: Page, entries: Record<string, string>) {
+ await page.addInitScript(values => {
+  // Reload and recovery must read the checkpoint written by the application.
+  const marker = 'test:lifecycle-fixture-installed';
+  if (window !== window.top || sessionStorage.getItem(marker)) return;
+  for (const [key, value] of Object.entries(values)) localStorage.setItem(key, value);
+  sessionStorage.setItem(marker, '1');
+ }, entries);
+ await page.goto('./?game=dungeon');
+}
+async function load(page: Page, state: DungeonState) {
+ const saved = encodeDungeon(state);
+ if (!saved.ok) throw Error(saved.reason);
+ await openDungeonWithStorage(page, { [DUNGEON_KEYS.primary]: saved.text });
+ await expectDungeonResumed(page);
+}
 test('restart during accepted presentation discards old callbacks and history',async({page})=>{
  const f=dungeonVictoryBoundary(1,0);if(!f)throw Error('legal victory fixture changed');await load(page,f.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const cmd=f.command,state=(await readSession(page)).state;if(cmd.type!=='useAbility')throw Error('expected finishing attack');
