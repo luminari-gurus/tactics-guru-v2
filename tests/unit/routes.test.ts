@@ -40,6 +40,8 @@ describe('base-aware menu routing', () => {
       const location = { href: `https://test.invalid${base}?game=dungeon&entry=${intent}#floor` };
       const history = { state: { preserved: true }, replaceState: vi.fn((_state: unknown, _unused: string, url: URL) => { location.href = String(url); }) };
       vi.stubGlobal('location', location); vi.stubGlobal('history', history);
+      const requested = new URL(location.href);
+      expect(resolveAppEntry(requested.pathname, requested.search, base)).toEqual({ route: 'dungeon', persistent: true });
       expect(consumeEntryIntent()).toBe(intent === 'unrecognized' ? null : intent);
       expect(location.href).toBe(`https://test.invalid${base}?game=dungeon#floor`);
       expect(history.replaceState.mock.calls[0][0]).toEqual({ preserved: true });
