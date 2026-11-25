@@ -18,9 +18,15 @@ test('real discoveries preserve every retained ID and special mode, with exactly
   assert.equal(radial[0].retained.project, 'mobile-portrait');
   assert.deepEqual(radial[0].effectiveUse.viewport, { width: 1280, height: 720 });
   const webkit = comparison.mappings.filter(row => row.classification === 'webkit-orientation');
-  assert.equal(webkit.length, 8);
-  assert.equal(webkit.filter(row => row.removed.project === 'acceptance-webkit-landscape').length, 7);
+  assert.equal(webkit.length, 16);
+  assert.equal(webkit.filter(row => row.removed.project === 'acceptance-webkit-landscape').length, 15);
   assert.equal(webkit.filter(row => row.removed.project === 'acceptance-webkit-portrait').length, 1);
+  const acceptance = after.selections['webkit-acceptance'].tests;
+  for (const route of ['fresh play', 'diagnostic play', 'Qbert']) {
+    const valid = acceptance.filter(row => row.file === 'battle-persistence.spec.ts'
+      && row.title === `testing routes: ${route} never accesses valid saved games`);
+    assert.deepEqual(valid.map(row => row.project).sort(), ['acceptance-webkit-landscape', 'acceptance-webkit-portrait']);
+  }
   const desktopOnly = comparison.mappings.filter(row => row.classification === 'desktop-only');
   assert.equal(desktopOnly.filter(row => row.stage.startsWith('telemetry')).length, 56);
   assert.equal(desktopOnly.filter(row => row.stage === 'assets-root-dev').length, 52);

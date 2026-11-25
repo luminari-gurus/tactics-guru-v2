@@ -28,9 +28,10 @@ const webkitOrientationCases = new Map([
     ['testing routes: an earned combat draught stays in the transient authored run', webkitPortrait],
   ])],
   ['battle-persistence.spec.ts', new Map(
-    ['missing', 'corrupt', 'backup-only', 'unavailable'].map(condition => [
-      `testing routes: fresh play never accesses ${condition} saved games`, webkitPortrait,
-    ]),
+    ['fresh play', 'diagnostic play', 'Qbert'].flatMap(route =>
+      ['missing', 'corrupt', 'backup-only', 'unavailable'].map(condition => [
+        `testing routes: ${route} never accesses ${condition} saved games`, webkitPortrait,
+      ])),
   )],
 ]);
 function withoutProjectFilters(args) {
@@ -215,7 +216,7 @@ export function compareSelections(before, after) {
   }
   assert.equal(mappings.filter(row => row.classification === '@canonical' || row.classification === '@fixed-viewport').length, 24,
     'Unexpected chromium reduction count');
-  assert.equal(mappings.filter(row => row.classification === 'webkit-orientation').length, 8,
+  assert.equal(mappings.filter(row => row.classification === 'webkit-orientation').length, 16,
     'Unexpected WebKit acceptance reduction count');
   return { beforeCount: before.selections.chromium.tests.length, afterCount: after.selections.chromium.tests.length, mappings };
 }
