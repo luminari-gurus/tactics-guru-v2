@@ -182,6 +182,20 @@ it('counts published exploration exactly once across reload and preserves counte
 });
 const good = (r: DungeonResult) => { expect(r.ok).toBe(true); if (!r.ok) throw Error(r.reason); return r.state; };
 const fresh = () => freshDungeon('test-dungeon', 13);
+// These histories share a seed. Cache only the durable descriptor and give each fixture its own copy.
+const historyDescriptors = new Map<string, ReturnType<typeof floorDescriptor>>();
+function historicalFloor(seed: number, depth: number, stair: 'upstairs' | 'downstairs', completed: number) {
+  const cache = new FloorCache(1);
+  const key = `${seed}:${depth}`;
+  let saved = historyDescriptors.get(key);
+  if (!saved) {
+    saved = floorDescriptor(seed, depth, cache);
+    historyDescriptors.set(key, saved);
+  }
+  const descriptor = structuredClone(saved);
+  const position = descriptor[stair];
+  return { descriptor, position, completed, exploration: freshExploration(descriptor.seed, position, floorMap(descriptor, cache)) };
+}
 it.each(['issue-165/dungeon.json','issue-166/dungeon.json','issue-166/dungeon-main8.json'])('retains exact %s previous-format dungeon bytes for recovery/export without migration',fixture=>{
   const raw=readFileSync(`tests/fixtures/saves/${fixture}`,'utf8'),primary = ' ' + raw, backup = raw + '\n', data=new Map([[DUNGEON_KEYS.primary,primary],[DUNGEON_KEYS.backup,backup]]);
   const storage={getItem:(key:string)=>data.get(key as typeof DUNGEON_KEYS.primary)??null,setItem:(key:string,value:string)=>{throw Error(`Unexpected write ${key} ${value.length}`);},removeItem:()=>{throw Error('Unexpected removal');}};
@@ -986,7 +1000,8 @@ describe('dungeon recovery limits', () => {
     expect(decodeDungeon(JSON.stringify({...value,digest:'sha256:'+'0'.repeat(64)}))).toEqual({ok:false,reason:'digest'});
   });
   it('preserves every visited floor until the byte budget explicitly refuses the candidate', async () => {
-    const base=fresh(),floors=Array.from({length:400},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1);return {descriptor,position:descriptor.downstairs,exploration:freshExploration(descriptor.seed,descriptor.downstairs,floorMap(descriptor)),completed:3};});
+    const base = fresh();
+    const floors = Array.from({ length: 400 }, (_, i) => historicalFloor(base.seed, i + 1, 'downstairs', 3));
     const s={...base,depth:400,floors,revision:4000};expect(readDungeon(s).ok).toBe(true);
     expect(encodeDungeon(s)).toEqual({ok:false,reason:'tooLarge'});expect(s.floors).toHaveLength(400);
     expect(s.phase).toBe('ready');expect(s.floors[0].descriptor).toEqual(base.floors[0].descriptor);
@@ -1009,10 +1024,8 @@ describe('pre-progression save preservation', () => {
 });
 describe('durable encounter policies', () => {
   it('cold-decodes a bounded progression-format history by resolving only the current floor', async () => {
-    const base=freshDungeon('cold-current',13),floors=Array.from({length:250},(_,i)=>{
-      const descriptor=floorDescriptor(base.seed,i+1);
-      return {descriptor,completed:i===249?0:3,position:descriptor.upstairs,exploration:freshExploration(descriptor.seed,descriptor.upstairs,floorMap(descriptor))};
-    });
+    const base = freshDungeon('cold-current', 13);
+    const floors = Array.from({ length: 250 }, (_, i) => historicalFloor(base.seed, i + 1, 'upstairs', i === 249 ? 0 : 3));
     const state={...base,depth:250,floors},encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
     expect(utf8Bytes(encoded.text)).toBeLessThan(1024*1024);
     vi.resetModules();
@@ -1044,10 +1057,8 @@ describe('durable encounter policies', () => {
   });
 
   it('reuses admitted facts across a long retained floor history', () => {
-    const base=fresh(),floors=Array.from({length:44},(_,i)=>{
-      const descriptor=floorDescriptor(base.seed,i+1);
-      return {descriptor,completed:3,position:descriptor.downstairs,exploration:freshExploration(descriptor.seed,descriptor.downstairs,floorMap(descriptor))};
-    });
+    const base = fresh();
+    const floors = Array.from({ length: 44 }, (_, i) => historicalFloor(base.seed, i + 1, 'downstairs', 3));
     const state={...base,depth:44,floors};
     good(readDungeon(state));
     const resolver=vi.spyOn(battlefields,'resolveBattlefield');
