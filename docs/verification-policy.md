@@ -191,6 +191,12 @@ Chromium BFCache history cases, main menu, and public asset paths. Run the separ
 extended configs for the full character progression journeys. Record meaningful
 engine and input skips so each assertion can be verified on its owning profile.
 
+Desktop Chromium and WebKit each run the complete saved first floor with manual
+loot collection. All six profiles run the saved automatic and unsaved manual
+journeys, including touch pickup in both mobile orientations. The dungeon loot
+session units check that a persisted pickup counts one party move and advances
+the enemy movement counter only while enemies remain.
+
 ### Focused commands and base paths
 
 ```sh
