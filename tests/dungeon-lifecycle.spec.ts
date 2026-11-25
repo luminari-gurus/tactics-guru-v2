@@ -2,7 +2,8 @@ import type { ContentCatalog } from '../src/content/types';
 import { neighbors, poiCell } from '../src/domain/exploration';
 import { MOVEMENT_DIRECTIONS } from '../src/domain/constants';
 import { previewMovement } from '../src/domain/grid';
-import { atEncounter } from './helpers/dungeonFixtures';
+import { LEGACY_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
+import { atEncounter, priorDungeonEnvelope } from './helpers/dungeonFixtures';
 import {expectDungeonResumed,expectSameProgress} from './helpers/dungeonTraversal';
 import {expect,railTest as test,type Page} from './helpers/dungeonEntropy';
 import {dungeonVictoryBoundary} from './helpers/dungeonFixtures';
@@ -87,13 +88,16 @@ test('dungeon previous-format recovery preserves and exports both original slots
  // the historical build. Recompute the digest so corruption is not the trigger.
  const {digest,...body}=JSON.parse(encoded.text);
  body.format=5;
- const old=canonical({...body,digest:hashJson(body)}),texts={primary:` \n${old}\n `,backup:`\t${old}\n`};
+ const old=canonical({...body,digest:hashJson(body)});
+ const legacy=priorDungeonEnvelope(freshDungeon('legacy-browser',13,LEGACY_ENCOUNTER_POLICY),1);
+ const texts={primary:` \n${legacy}\n `,backup:`\t${old}\n`};
  const keys=DUNGEON_KEYS;
  await page.goto('./');
  await page.evaluate(({keys,texts})=>{localStorage.setItem(keys.primary,texts.primary);localStorage.setItem(keys.backup,texts.backup);localStorage.setItem('issue164-unrelated','retain');},{keys,texts});
  await page.goto('./?game=dungeon');
  const stored=()=>page.evaluate(keys=>({primary:localStorage.getItem(keys.primary),backup:localStorage.getItem(keys.backup),unrelated:localStorage.getItem('issue164-unrelated')}),keys);
  await expect(page.locator('#main-menu')).toBeVisible();
+ await expect(page.getByRole('button',{name:'Continue',exact:true})).toBeDisabled();
  expect(await stored()).toEqual({...texts,unrelated:'retain'});
  await page.getByRole('button',{name:'Save recovery',exact:true}).click();
  await page.getByRole('dialog').getByRole('link',{name:/Dungeon/}).click();

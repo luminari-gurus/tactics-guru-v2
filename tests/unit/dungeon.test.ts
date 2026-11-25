@@ -882,7 +882,9 @@ describe('pre-progression save preservation', () => {
     const raw=format===3?canonical({...oldBody,digest:hashJson(oldBody)}):priorDungeonEnvelope(base,format);
     expect(decodeDungeon(raw)).toEqual({ok:false,reason:'incompatible'});
     const m=memory();m.setItem(DUNGEON_KEYS.primary,raw);
-    expect(createDungeonStorage(()=>m).inspect().primary.status).toBe('invalid');
+    const review=createDungeonStorage(()=>m).inspect();
+    expect(review.primary.status).toBe('invalid');
+    expect(resumableDungeonSlot(review)).toBeNull();
     expect(m.getItem(DUNGEON_KEYS.primary)).toBe(raw);
   });
 });
