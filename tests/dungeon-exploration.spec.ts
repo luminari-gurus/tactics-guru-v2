@@ -873,13 +873,14 @@ test('dungeon enemies move only after a player step and persist across reload', 
  await page.clock.runFor(5000);expect(await dungeonSnapshot(page)).toEqual(resumed);
 });
 
-for (const depth of [5, 8]) test(`depth ${depth} saved floor renders and accepts a step after reload`, async ({page,isMobile,browserName}) => {
+test('depth 8 saved floor renders and accepts a step after reload', async ({page,isMobile,browserName}) => {
+ const depth=8;
  const base=freshDungeon('large-floor-browser',19);
  const floors=Array.from({length:depth},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1),map=floorMap(descriptor);return {descriptor,position:descriptor.upstairs,completed:i===depth-1?0:3,exploration:freshExploration(descriptor.seed,descriptor.upstairs,map)};});
  const state={...base,depth,floors}, encoded=encodeDungeon(state); if(!encoded.ok)throw Error(encoded.reason);
  await page.goto('./'); await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
  await page.goto('./?game=dungeon'); await expectDungeonResumed(page);
- const map=page.locator('#dungeon-map'); await expect(map.locator('[data-cell]')).toHaveCount(36*(36 + depth - 5));
+ const map=page.locator('#dungeon-map'); await expect(map.locator('[data-cell]')).toHaveCount(36 * 39);
  const assertLayout=async()=>{
   await expectDungeonMovementVisible(page);
   const geometry=await map.evaluate(grid=>{
@@ -899,7 +900,7 @@ for (const depth of [5, 8]) test(`depth ${depth} saved floor renders and accepts
     screenOverflow:screen.scrollWidth-screen.clientWidth,
    };
   });
-  expect(geometry.count).toBe(36*(36 + depth - 5));
+  expect(geometry.count).toBe(36 * 39);
   expect(geometry.outside,'Every cell must fit inside the map border box').toBe(0);
   expect(geometry.squareError).toBeLessThan(.1);
   expect(geometry.overlappingControls,'Direction controls must not cover a visible map cell').toEqual([]);

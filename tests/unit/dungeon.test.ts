@@ -1375,6 +1375,27 @@ describe('versioned floor dimensions', () => {
       for (const poi of exploration.pois) expect(map.cells[poiCell(poi,size)]).toBe(1);
     }
   });
+  it('retains a step on the square fifth floor through save and reload', () => {
+    const base = freshDungeon('large-floor-browser', 19);
+    const depth = 5;
+    const floors = Array.from({ length: depth }, (_, i) => {
+      const descriptor = floorDescriptor(base.seed, i + 1);
+      const position = descriptor.upstairs;
+      const exploration = freshExploration(descriptor.seed, position, floorMap(descriptor));
+      return { descriptor, position, exploration, completed: i + 1 === depth ? 0 : 3 };
+    });
+    const state = good(readDungeon({ ...base, depth, floors }));
+    const floor = floors[depth - 1];
+    const map = floorMap(floor.descriptor);
+    const destination = neighbors(floor.position, map.width, map.height).find(cell =>
+      map.cells[cell] && !floor.exploration.pois.some(p => poiCell(p, map.width) === cell));
+    assert(destination !== undefined);
+    const moved = good(stepDungeon(state, { id: state.id, depth, revision: state.revision, destination }));
+    expect(moved.floors[depth - 1].position).toBe(destination);
+    const encoded = encodeDungeon(moved);
+    assert(encoded.ok);
+    expect(good(decodeDungeon(encoded.text))).toEqual(moved);
+  });
   it('resumes a saved square sixth floor and grows the next floor on descent', () => {
     const base = freshDungeon('deep-square-history', 19);
     const floors = Array.from({ length: 6 }, (_, i) => {
