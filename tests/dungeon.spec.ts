@@ -634,7 +634,10 @@ test('Shaman production journey shows ability details and restores Weakened afte
    await expect(page.getByRole('dialog')).toContainText('−2 accuracy');
    await page.screenshot({path:info.outputPath('shaman-weakened-inspection.png')});await page.locator('#inspection-close').click();
    expect(before.events.some(e=>e.type==='saveRolled'&&!e.saved)).toBe(true);
-   await expect.poll(()=>snapshot(page).then(state=>state.activeBattle)).toEqual(before.state);
+   await expect.poll(() => page.evaluate(key => {
+    const raw = localStorage.getItem(key);
+    return raw && JSON.parse(raw).payload.activeBattle;
+   }, DUNGEON_KEYS.primary)).toEqual(before.state);
    await page.reload();await expectDungeonResumed(page);
    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
    expect((await snapshot(page)).activeBattle).toEqual(before.state);
