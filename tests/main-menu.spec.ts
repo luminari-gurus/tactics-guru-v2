@@ -244,7 +244,7 @@ test('main menu: startup hides proof tools before application modules run',async
   else await route.continue();
  });
  try{
-  for(const route of ['', '?game=battle', '?game=run', '?game=dungeon', 'battle', 'run', 'dungeon', 'map', 'qbert']){
+  for(const route of ['', '?game=battle', '?game=run', '?game=dungeon', 'battle', 'run', 'dungeon', 'map']){
    held=new Promise<void>(resolve=>{release=resolve;});
    await page.goto('./'+route,{waitUntil:'commit'});
    await expect(page.locator('#fit-status')).toBeVisible();

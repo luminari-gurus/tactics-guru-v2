@@ -154,9 +154,7 @@ need their own source-bound comparison and updated contract, not rewritten histo
 Current whole-file serial assignments live in `scripts/verification-batches.json`.
 Keep each new browser test file in one batch for every applicable profile; the
 real discovery contract rejects omissions and duplicates. Historical timing reports
-remain immutable evidence and are not the runner's current configuration. The
-Q*bert suite is assigned to each profile's third batch without changing job IDs,
-workers, retries or budgets; this is coverage repair, not a new timing baseline.
+remain immutable evidence. Q*bert geometry and route contracts use unit coverage.
 
 ### Small dependency patches
 

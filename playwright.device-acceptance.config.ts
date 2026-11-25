@@ -21,13 +21,13 @@ export default defineConfig({ ...base,
     {
       name: 'acceptance-webkit-landscape',
       use: { ...devices['iPhone 13 landscape'], screen: undefined, launchOptions: {} },
-      // Keep valid storage here for each fresh-play, diagnostic and Qbert journey.
+      // Keep valid storage here for the fresh-play and diagnostic journeys.
       // Run preparation, native touch, and radial/layout checks still run in both projects.
       grepInvert: [
         unsupportedWebKitCases,
         /battle-loop\.spec\.ts complete legal authored battle seed 1 reaches playerLoss through controls and replays$/,
         /run-progression\.spec\.ts (legal run outcomes, earned rewards and fresh restart|testing routes: an earned combat draught stays in the transient authored run)$/,
-        /battle-persistence\.spec\.ts testing routes: (fresh play|diagnostic play|Qbert) never accesses (missing|corrupt|backup-only|unavailable) saved games$/,
+        /battle-persistence\.spec\.ts testing routes: (fresh play|diagnostic play) never accesses (missing|corrupt|backup-only|unavailable) saved games$/,
       ],
     },
   ],
