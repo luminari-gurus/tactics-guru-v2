@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Mobile final · Option C</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="reviewer">
+    <div>
+      <h1>Mobile final · Option C</h1>
+      <small>390×844. Radial hold with a tap fallback. Pan on immediate drag. End turn is a docked button, not a slice.</small>
+    </div>
+    <nav class="b-alt-nav">
+      <a href="mobile-c-final.html?state=idle">Idle</a> ·
+      <a href="mobile-c-final.html?state=move">Hold tile</a> ·
+      <a href="mobile-c-final.html?state=enemy">Hold enemy</a> ·
+      <a href="mobile-c-final.html?state=specials">Special sub-ring</a> ·
+      <a href="mobile-c-final.html?state=cancel">Cancel</a>
+    </nav>
+    <a href="index.html">All options</a>
+    <a id="export-link" href="mobile-c-final.html?state=idle&amp;export=1">Export view</a>
+  </header>
+  <main class="stage final-c">
+    <section class="board-photo c-board" aria-label="Battlefield">
+      <img class="scene" src="assets/board.png" alt="Forest Ruins board">
+      <div class="chip float-chip">
+        <img src="assets/fighter.png" alt="Fighter">
+        <div>
+          <p class="eyebrow">Round 1 · Your turn</p>
+          <h2>Fighter</h2>
+          <p class="hp">HP 18/18</p>
+          <div class="health"><span style="width:100%"></span></div>
+          <p class="meta" id="budget-line">Move ready · Action ready</p>
+        </div>
+      </div>
+      <div id="layer-idle">
+        <aside class="c-coach">
+          <strong>Hold is not the only path</strong>
+          Immediate drag pans. Hold 300ms on a unit or tile opens this menu + haptic.
+          A short tap opens the same menu — then tap a slice. Reduce Motion uses tap only.
+        </aside>
+      </div>
+      <div id="layer-move" hidden>
+        <span class="path-dot" style="left:42%;top:54%"></span>
+        <span class="path-dot" style="left:46%;top:58%"></span>
+        <button class="gold move-chip" type="button">Move here · 2 cost</button>
+        <span class="c-hold-ring on-tile" aria-hidden="true"></span>
+        <div class="c-radial on-tile" data-aim="move" aria-label="Hold radial">
+          <div class="c-disk"></div>
+          <button type="button" class="c-slice c-slice-n" disabled>Attack<span>Need an enemy</span></button>
+          <button type="button" class="c-slice c-slice-e" disabled>Special<span>Need an enemy</span></button>
+          <button type="button" class="c-slice c-slice-s">Inspect<span>Fighter</span></button>
+          <button type="button" class="c-slice c-slice-w" aria-pressed="true">Move<span>2 cost</span></button>
+          <div class="c-hub"><strong>Release to move</strong>2 cost</div>
+          <span class="c-press on-west" aria-hidden="true"></span>
+        </div>
+      </div>
+      <div id="layer-enemy" hidden>
+        <div class="target-ring" aria-hidden="true"></div>
+        <span class="c-hold-ring on-enemy" aria-hidden="true"></span>
+        <div class="c-radial on-enemy" data-aim="attack" aria-label="Hold radial">
+          <div class="c-disk"></div>
+          <button type="button" class="c-slice c-slice-n" aria-pressed="true">Attack<span>65% · 5 dmg</span></button>
+          <button type="button" class="c-slice c-slice-e">Special<span>2 legal · Guarded</span></button>
+          <button type="button" class="c-slice c-slice-s">Inspect<span>Goblin grunt</span></button>
+          <button type="button" class="c-slice c-slice-w">Move<span>Ready</span></button>
+          <div class="c-hub"><strong>Attack 65%</strong>5 dmg</div>
+          <span class="c-press on-north" aria-hidden="true"></span>
+        </div>
+      </div>
+      <div id="layer-specials" hidden>
+        <div class="target-ring" aria-hidden="true"></div>
+        <span class="c-hold-ring on-enemy" aria-hidden="true"></span>
+        <div class="c-radial on-enemy has-sub" data-aim="special" aria-label="Special sub-ring">
+          <div class="c-disk"></div>
+          <button type="button" class="c-slice c-slice-n">Attack<span>Basic</span></button>
+          <button type="button" class="c-slice c-slice-e" aria-pressed="true">Special<span>Sub-ring open</span></button>
+          <button type="button" class="c-slice c-slice-s">Inspect<span>Goblin grunt</span></button>
+          <button type="button" class="c-slice c-slice-w">Move<span>Reachable</span></button>
+          <div class="c-subring" aria-hidden="true"></div>
+          <button type="button" class="c-sub c-sub-1" aria-pressed="true">Guarded Strike<span>Last used · 55% · 5 dmg</span></button>
+          <button type="button" class="c-sub c-sub-2">Extended Strike<span>65% · range OK</span></button>
+          <div class="c-hub"><strong>Guarded 55%</strong>Release commits</div>
+          <span class="c-press on-guarded" aria-hidden="true"></span>
+        </div>
+      </div>
+      <div id="layer-cancel" hidden>
+        <div class="target-ring" aria-hidden="true"></div>
+        <span class="c-hold-ring on-enemy" aria-hidden="true"></span>
+        <div class="c-radial on-enemy" data-aim="cancel" aria-label="Cancel radial">
+          <div class="c-disk"></div>
+          <button type="button" class="c-slice c-slice-n ghost">Attack</button>
+          <button type="button" class="c-slice c-slice-e ghost">Special</button>
+          <button type="button" class="c-slice c-slice-s ghost">Inspect</button>
+          <button type="button" class="c-slice c-slice-w ghost">Move</button>
+          <div class="c-hub"><strong>Release to cancel</strong>Nothing commits</div>
+          <span class="c-press in-hub" aria-hidden="true"></span>
+        </div>
+      </div>
+    </section>
+    <footer class="c-dock">
+      <div class="c-gestures" aria-label="Gesture rules">
+        <span><em>Drag</em> pan</span>
+        <span><em>Hold 300ms</em> menu + haptic</span>
+        <span><em>Tap</em> opens the same menu</span>
+      </div>
+      <button type="button" class="c-end" id="end-turn">End turn</button>
+      <p class="c-a11y" id="a11y-line">TalkBack / VoiceOver: tap a cell, then a named slice. Reduce Motion skips the hold and uses tap. End turn is always a 48px button, never a slice.</p>
+    </footer>
+  </main>
+  <script src="export.js"></script>
+  <script>
+    const state = new URLSearchParams(location.search).get('state') || 'idle';
+    document.getElementById('export-link').href =
+      'mobile-c-final.html?state=' + encodeURIComponent(state) + '&export=1';
+    document.querySelectorAll('.b-alt-nav a').forEach((a) => {
+      if (a.href.includes('state=' + state)) a.setAttribute('aria-current', 'page');
+    });
+    const show = (id, on) => { document.getElementById(id).hidden = !on; };
+    show('layer-idle', state === 'idle');
+    show('layer-move', state === 'move');
+    show('layer-enemy', state === 'enemy');
+    show('layer-specials', state === 'specials');
+    show('layer-cancel', state === 'cancel');
+    const a11y = document.getElementById('a11y-line');
+    if (state === 'move') {
+      a11y.textContent = 'Empty reachable tile: Move is the default slice. Attack and Special stay disabled. Release on Move commits. Release in the hub cancels.';
+    } else if (state === 'enemy') {
+      a11y.textContent = 'Enemy: Attack is the default slice. Forecast updates while the finger is on a slice. Special expands into legal specials only.';
+    } else if (state === 'specials') {
+      a11y.textContent = 'Special sub-ring lists only legal previews. Last-used is preselected. Tap fallback: tap Special to expand, tap Guarded to commit.';
+    } else if (state === 'cancel') {
+      a11y.textContent = 'Cancel is the hub, not a slice — so it cannot be hit by accident on the rim. Same intent as desktop Esc.';
+    }
+  </script>
+</body>
+</html>

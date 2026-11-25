@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Desktop final · Option B</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="reviewer">
+    <div>
+      <h1>Desktop final · Option B</h1>
+      <small>1440×900. Action bar + Go + path chip. Target-first specials. Segmented is a secondary variant only.</small>
+    </div>
+    <nav class="b-alt-nav">
+      <a href="desktop-b-final.html?state=start">Turn start</a> ·
+      <a href="desktop-b-final.html?state=move">Path chip</a> ·
+      <a href="desktop-b-final.html?state=target">Enemy targeted</a> ·
+      <a href="desktop-b-final.html?state=spent">Action spent</a> ·
+      <a href="desktop-b-final.html?state=segment">Segment (secondary)</a>
+    </nav>
+    <a href="index.html">All options</a>
+    <a id="export-link" href="desktop-b-final.html?state=start&amp;export=1">Export view</a>
+  </header>
+  <main class="stage b-stage final-b">
+    <section class="board-photo b-board" aria-label="Battlefield">
+      <img class="scene" src="assets/board.png" alt="Forest Ruins board">
+      <div class="chip float-chip">
+        <img src="assets/fighter.png" alt="Fighter">
+        <div>
+          <p class="eyebrow" id="round-line">Round 1 · Your turn</p>
+          <h2>Fighter</h2>
+          <p class="hp">HP 18/18</p>
+          <div class="health"><span style="width:100%"></span></div>
+          <p class="meta" id="budget-line">AC 14 · Accuracy +4 · Move ready · Action ready</p>
+        </div>
+      </div>
+      <div id="layer-start">
+        <span class="tile-cursor" aria-hidden="true"></span>
+        <aside class="hover-tip board-hover">
+          <strong>Goblin grunt · hover</strong>
+          HP 12/12 · AC 12 · 2 specials in range
+          <span>Click to target. Forecast stays a ghost until click. Esc clears.</span>
+        </aside>
+      </div>
+      <div id="layer-move" hidden>
+        <span class="path-dot" style="left:42%;top:54%"></span>
+        <span class="path-dot" style="left:46%;top:58%"></span>
+        <button class="gold move-chip" type="button">Move here · 2 cost</button>
+      </div>
+      <div id="layer-target" hidden>
+        <div class="target-ring" aria-hidden="true"></div>
+        <aside class="forecast" id="forecast">
+          <strong>Guarded Strike → Goblin grunt</strong>
+          <span>Hit 55% · +2 vs AC 12 · 5 dmg · last-used, in range</span>
+        </aside>
+      </div>
+      <div id="layer-spent" hidden>
+        <p class="spent-banner">Move spent · Action spent · Wait ends the turn (no Go)</p>
+      </div>
+    </section>
+    <p class="keys-legend" id="keys-legend">
+      <strong>Keys</strong>
+      <span><kbd>M</kbd> Move</span>
+      <span><kbd>A</kbd> Attack</span>
+      <span><kbd>1</kbd>–<kbd>9</kbd> legal specials</span>
+      <span><kbd>S</kbd> cycle specials</span>
+      <span><kbd>W</kbd> Wait</span>
+      <span><kbd>Enter</kbd> Go</span>
+      <span><kbd>Esc</kbd> clear target</span>
+      <span>Arrows move the cell cursor</span>
+    </p>
+    <footer class="bar bar-start" id="bar" aria-label="Combat actions">
+      <div>
+        <p class="smart" id="smart-line">Smart default: Move</p>
+        <p class="meta" id="help-line">Hover an enemy for a ghost forecast. Click a teal tile or that enemy.</p>
+        <p class="hotkey" id="hotkey-line">Go stays here. Enter commits the current preview.</p>
+      </div>
+      <div class="valid-row" id="valid-row" hidden role="group" aria-label="Specials valid for this target">
+        <button type="button" id="spec-1" aria-pressed="true"><strong>Guarded Strike <kbd>1</kbd></strong><span>Last used · 55%</span></button>
+        <button type="button" id="spec-2" class="verb-tip-anchor"><strong>Extended Strike <kbd>2</kbd></strong><span>Range 1–5 · 65%</span></button>
+        <aside class="hover-tip bar-hover" id="bar-tip" hidden>
+          <strong>Extended Strike · hover</strong>
+          Range 1–5 · 65% hit · 5 dmg · legal on this target
+          <span>Hotkey 2. Tooltip names the special; the pressed border is the selection.</span>
+          <i class="tip-arrow" aria-hidden="true"></i>
+        </aside>
+      </div>
+      <div class="verbs-flex" id="segment-row" hidden>
+        <button type="button" id="seg-move"><strong>Move <kbd>M</kbd></strong><span>Reachable</span></button>
+        <button type="button" id="seg-attack"><strong>Attack <kbd>A</kbd></strong><span>Melee</span></button>
+        <div class="segment-group" role="group" aria-label="All owned specials">
+          <button type="button" aria-pressed="true"><strong>Guarded <kbd>1</kbd></strong><span>Last used</span></button>
+          <button type="button"><strong>Extended <kbd>2</kbd></strong><span>1–5</span></button>
+          <button type="button" disabled><strong>Far Shot</strong><span class="picker-reason">No range</span></button>
+        </div>
+        <button type="button"><strong>Wait <kbd>W</kbd></strong><span>End turn</span></button>
+      </div>
+      <div class="verbs" id="verbs">
+        <button type="button" id="verb-move" aria-pressed="true"><strong>Move <kbd>M</kbd></strong><span>Reachable tiles</span></button>
+        <button type="button" id="verb-attack"><strong>Attack <kbd>A</kbd></strong><span>Melee</span></button>
+        <button type="button" id="verb-special" class="ghost-special" disabled><strong>Specials</strong><span>Click an enemy</span></button>
+        <button type="button" id="verb-wait"><strong>Wait <kbd>W</kbd></strong><span>Ends turn now</span></button>
+      </div>
+      <button class="gold go" id="go" disabled>Go <kbd>Enter</kbd></button>
+    </footer>
+  </main>
+  <script src="export.js"></script>
+  <script>
+    const state = new URLSearchParams(location.search).get('state') || 'start';
+    document.getElementById('export-link').href =
+      'desktop-b-final.html?state=' + encodeURIComponent(state) + '&export=1';
+    document.querySelectorAll('.b-alt-nav a').forEach((a) => {
+      if (a.href.includes('state=' + state)) a.setAttribute('aria-current', 'page');
+    });
+    const show = (id, on) => { document.getElementById(id).hidden = !on; };
+    const bar = document.getElementById('bar');
+    const go = document.getElementById('go');
+    const moveBtn = document.getElementById('verb-move');
+    const attackBtn = document.getElementById('verb-attack');
+    const specialBtn = document.getElementById('verb-special');
+    const waitBtn = document.getElementById('verb-wait');
+    show('layer-start', state === 'start');
+    show('layer-move', state === 'move');
+    show('layer-target', state === 'target' || state === 'segment');
+    show('layer-spent', state === 'spent');
+    show('valid-row', state === 'target');
+    show('segment-row', state === 'segment');
+    show('verbs', state !== 'segment');
+    show('bar-tip', state === 'target');
+    bar.classList.toggle('bar-start', state === 'start' || state === 'move' || state === 'spent');
+    bar.classList.toggle('bar-target', state === 'target');
+    if (state === 'move') {
+      go.disabled = false;
+      document.getElementById('smart-line').textContent = 'Move preview · 2 cost';
+      document.getElementById('help-line').textContent = 'Path chip is the preview, not a second confirm. Enter or Go commits.';
+    } else if (state === 'target') {
+      go.disabled = false;
+      moveBtn.removeAttribute('aria-pressed');
+      specialBtn.hidden = true;
+      document.getElementById('verbs').classList.add('no-special');
+      document.getElementById('smart-line').textContent = 'Goblin grunt · last-used special preselected';
+      document.getElementById('help-line').textContent = 'Far Shot omitted. Hover Extended for the tooltip. Attack is one extra click.';
+      document.getElementById('hotkey-line').textContent = '1 / 2 pick a listed special · S cycles · Enter Go';
+    } else if (state === 'segment') {
+      go.disabled = false;
+      document.getElementById('forecast').innerHTML =
+        '<strong>Guarded Strike → Goblin grunt</strong><span>Secondary bar variant. All owned specials stay visible. Far Shot greyed.</span>';
+      document.getElementById('smart-line').textContent = 'Secondary · segmented row (not the desktop default)';
+      document.getElementById('help-line').textContent = 'Cheap alternative if the catalog stays at 2–3 specials. Switching costs the same as Attack.';
+      document.getElementById('hotkey-line').textContent = 'Left / Right in the segment · S cycles owned · Enter Go';
+    } else if (state === 'spent') {
+      document.getElementById('round-line').textContent = 'Round 1 · End the turn';
+      document.getElementById('budget-line').textContent = 'AC 14 · Accuracy +4 · Move spent · Action spent';
+      moveBtn.disabled = true;
+      moveBtn.removeAttribute('aria-pressed');
+      moveBtn.querySelector('span').textContent = 'Already moved';
+      attackBtn.disabled = true;
+      attackBtn.querySelector('span').textContent = 'Action spent';
+      specialBtn.disabled = true;
+      specialBtn.querySelector('span').textContent = 'Action spent';
+      waitBtn.setAttribute('aria-pressed', 'true');
+      go.disabled = true;
+      go.textContent = 'Go';
+      document.getElementById('smart-line').textContent = 'Nothing left to confirm';
+      document.getElementById('help-line').textContent = 'Wait / End turn commits immediately — same as today. Go stays put and stays disabled.';
+      document.getElementById('hotkey-line').textContent = 'W ends the turn';
+    }
+  </script>
+</body>
+</html>
