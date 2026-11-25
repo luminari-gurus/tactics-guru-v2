@@ -1,12 +1,13 @@
 import { checkedDungeon, guardianFirstRewardFixture, dungeonSightTransition, savedBiomeEncounter, sharedGroundPile } from './helpers/dungeonFixtures';
 import { expect,test } from './helpers/startupDiagnostics';
 import type { Locator, Page } from '@playwright/test';
-import { writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import { openSavedDungeon, openDungeonWithStorage, dungeonSnapshot, acceptedDungeonSnapshot, expectSameProgress, walkDungeon, expectDungeonResumed, openDungeonInventory } from './helpers/dungeonTraversal';
 import { currentSight, neighbors, poiCell } from '../src/domain/exploration';
 import { generateMap } from '../src/map/generate';
-import { freshDungeon, floorDescriptor, floorMap, readDungeon, dungeonSeed, type DungeonState } from '../src/domain/dungeon';
+import { freshDungeon, floorDescriptor, FloorCache, floorMap, readDungeon, dungeonSeed, type DungeonState } from '../src/domain/dungeon';
 import { dungeonContent, legacyDungeonIdentity } from '../src/content/dungeon';
 import { canonical, hashJson } from '../src/domain/contentIdentity';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
@@ -581,19 +582,38 @@ fixedSeedTest('real traversal, art independence, keyboard locks, active battle a
  await page.reload();await expectDungeonResumed(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expectSameProgress(await dungeonSnapshot(page), saved);
  writeFileSync(test.info().outputPath('spatial-battle-receipt.json'),JSON.stringify({initial,stepped,saved},null,2));expect(errors).toEqual([]);
 });
-test('cold progression-format Continue retains a long saved history within the startup budget',async({page})=>{
- const base=freshDungeon('cold-browser',13),floors=Array.from({length:250},(_,i)=>{
-  const descriptor=floorDescriptor(base.seed,i+1);
-  return {descriptor,completed:i===249?0:3,position:descriptor.upstairs,exploration:freshExploration(descriptor.seed,descriptor.upstairs,floorMap(descriptor))};
+// Playwright clears the project output directory at the start of each run.
+function coldHistorySave(outputDir: string): string {
+ const file = join(outputDir, 'cold-history-input.json');
+ if (existsSync(file)) return readFileSync(file, 'utf8');
+
+ const base = freshDungeon('cold-browser', 13);
+ const depth = 250;
+ const cache = new FloorCache(1);
+ const floors = Array.from({ length: depth }, (_, index) => {
+  const descriptor = floorDescriptor(base.seed, index + 1, cache);
+  const position = descriptor.upstairs;
+  const exploration = freshExploration(descriptor.seed, position, floorMap(descriptor, cache));
+  return { descriptor, completed: index + 1 === depth ? 0 : 3, position, exploration };
  });
- const encoded=encodeDungeon({...base,depth:250,floors});if(!encoded.ok)throw Error(encoded.reason);
- await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
+ const encoded = encodeDungeon({ ...base, depth, floors });
+ if (!encoded.ok) throw Error(encoded.reason);
+ mkdirSync(outputDir, { recursive: true });
+ const temporary = file + '.' + process.pid;
+ writeFileSync(temporary, encoded.text);
+ renameSync(temporary, file);
+ return encoded.text;
+}
+
+test('cold progression-format Continue retains a long saved history within the startup budget',async({page})=>{
+ const text = coldHistorySave(test.info().project.outputDir);
+ await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text});
  const begin=Date.now();await page.goto('./?game=dungeon');await expectDungeonResumed(page);
  await expect(page.locator('#dungeon-map')).toBeVisible();const coldUsableMs=Date.now()-begin;
  expect(coldUsableMs).toBeLessThanOrEqual(2500);
  const state=await dungeonSnapshot(page);expect(state.depth).toBe(250);expect(state.floors).toHaveLength(250);
- expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe(encoded.text);
- writeFileSync(test.info().outputPath('cold-current-history.json'),JSON.stringify({floors:250,bytes:utf8Bytes(encoded.text),coldUsableMs,budgetMs:2500,rawRetained:true}));
+ expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe(text);
+ writeFileSync(test.info().outputPath('cold-current-history.json'),JSON.stringify({floors:250,bytes:utf8Bytes(text),coldUsableMs,budgetMs:2500,rawRetained:true}));
  await page.screenshot({path:test.info().outputPath('cold-current-history.png')});
  const floor = state.floors[state.depth - 1], map = floorMap(floor.descriptor);
  const cells = page.locator('#dungeon-map [data-cell]');
