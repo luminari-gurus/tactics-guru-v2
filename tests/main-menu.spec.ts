@@ -540,6 +540,10 @@ for(const path of ['unsaved play','failed replacement'] as const)test(`main menu
  }
  const before=await page.locator('#game').getAttribute('data-dungeon-snapshot');
  expect(JSON.parse(before!).phase).toBe('ready');await expect(page.locator('#dungeon-map')).toBeVisible();
+ if(path==='unsaved play'){
+  expect(JSON.parse(before!).seed).toBe(13);
+  expect(await page.evaluate(()=>Object.keys(localStorage).filter(key=>key.includes(':dungeon:')))).toEqual([]);
+ }
  const blocked=await page.locator('.dungeon-directions button:disabled').first().getAttribute('aria-label');
  const arrows:Record<string,string>={North:'ArrowUp',East:'ArrowRight',South:'ArrowDown',West:'ArrowLeft'};
  await page.locator('#dungeon-map').press(arrows[blocked!]);
