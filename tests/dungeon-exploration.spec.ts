@@ -1,7 +1,7 @@
-import { checkedDungeon, guardianFirstRewardFixture, dungeonSightTransition, savedBiomeEncounter, sharedGroundPile } from './helpers/dungeonFixtures';
+import { checkedDungeon, coldDungeonHistory, guardianFirstRewardFixture, dungeonSightTransition, savedBiomeEncounter, sharedGroundPile } from './helpers/dungeonFixtures';
 import { expect,test } from './helpers/startupDiagnostics';
 import type { Locator, Page } from '@playwright/test';
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { openSavedDungeon, openDungeonWithStorage, dungeonSnapshot, acceptedDungeonSnapshot, expectSameProgress, walkDungeon, expectDungeonResumed, openDungeonInventory } from './helpers/dungeonTraversal';
 import { currentSight, neighbors, poiCell } from '../src/domain/exploration';
@@ -582,18 +582,15 @@ fixedSeedTest('real traversal, art independence, keyboard locks, active battle a
  writeFileSync(test.info().outputPath('spatial-battle-receipt.json'),JSON.stringify({initial,stepped,saved},null,2));expect(errors).toEqual([]);
 });
 test('cold progression-format Continue retains a long saved history within the startup budget',async({page})=>{
- const base=freshDungeon('cold-browser',13),floors=Array.from({length:250},(_,i)=>{
-  const descriptor=floorDescriptor(base.seed,i+1);
-  return {descriptor,completed:i===249?0:3,position:descriptor.upstairs,exploration:freshExploration(descriptor.seed,descriptor.upstairs,floorMap(descriptor))};
- });
- const encoded=encodeDungeon({...base,depth:250,floors});if(!encoded.ok)throw Error(encoded.reason);
- await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
+ const fixture = process.env.COLD_DUNGEON_HISTORY_FILE;
+ const text = fixture ? readFileSync(fixture, 'utf8') : coldDungeonHistory().text;
+ await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text});
  const begin=Date.now();await page.goto('./?game=dungeon');await expectDungeonResumed(page);
  await expect(page.locator('#dungeon-map')).toBeVisible();const coldUsableMs=Date.now()-begin;
  expect(coldUsableMs).toBeLessThanOrEqual(2500);
  const state=await dungeonSnapshot(page);expect(state.depth).toBe(250);expect(state.floors).toHaveLength(250);
- expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe(encoded.text);
- writeFileSync(test.info().outputPath('cold-current-history.json'),JSON.stringify({floors:250,bytes:utf8Bytes(encoded.text),coldUsableMs,budgetMs:2500,rawRetained:true}));
+ expect(await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary)).toBe(text);
+ writeFileSync(test.info().outputPath('cold-current-history.json'),JSON.stringify({floors:250,bytes:utf8Bytes(text),coldUsableMs,budgetMs:2500,rawRetained:true}));
  await page.screenshot({path:test.info().outputPath('cold-current-history.png')});
  const floor = state.floors[state.depth - 1], map = floorMap(floor.descriptor);
  const cells = page.locator('#dungeon-map [data-cell]');

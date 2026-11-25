@@ -65,7 +65,7 @@ export function stageEnvironment(stage, directory, inherited = process.env) {
   for (const key of Object.keys(env)) {
     if (key.startsWith('VITE_POSTHOG_') || key.startsWith('PLAYWRIGHT_JSON_') ||
         ['FIT_URL', 'POSTHOG_SOURCEMAPS', 'PLAYWRIGHT_BASE_PATH', 'PLAYWRIGHT_SERVER_MODE',
-          'PLAYWRIGHT_TELEMETRY_DEV'].includes(key)) delete env[key];
+          'PLAYWRIGHT_TELEMETRY_DEV', 'COLD_DUNGEON_HISTORY_FILE'].includes(key)) delete env[key];
   }
   return { ...env, ...stage.env,
     PLAYWRIGHT_JSON_OUTPUT_FILE: join(directory, `${stage.id}.json`) };
@@ -89,9 +89,14 @@ export function main(args = process.argv.slice(2)) {
     console.log(`Running ${stage.id}; log: ${log}`);
     const fd = openSync(log, 'w');
     try {
+      const env = stageEnvironment(stage, directory);
+      // Full-run browsers consume the exact save that passed the cold-decode unit check.
+      if (['units', 'chromium', 'webkit-exploration'].includes(stage.id)) {
+        env.COLD_DUNGEON_HISTORY_FILE = join(directory, 'cold-dungeon-history.json');
+      }
       // npm_execpath avoids a shell (and npm.cmd quoting) on every supported OS.
       const child = spawnSync(process.execPath, [process.env.npm_execpath, ...argv], {
-        env: stageEnvironment(stage, directory), stdio: ['ignore', fd, fd],
+        env, stdio: ['ignore', fd, fd],
       });
       const receipt = { exitCode: child.status, signal: child.signal, error: child.error?.message, command: ['npm', ...argv], log };
       if (stage.id !== 'performance' || child.status !== 0) return receipt;
