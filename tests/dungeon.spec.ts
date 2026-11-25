@@ -713,9 +713,7 @@ function fixture(slot: number) {
 function declineReward(state: DungeonState) {
  return checkedDungeon(dungeonItem(state, { ...dungeonBoundary(state), type: 'declineReward', offerId: state.offer!.id }));
 }
-fixedSeedTest('dungeon battle undo survives reload and a legal defeat journey', { tag: '@desktop-chromium-portrait-webkit' }, async({page,isMobile})=>{
- test.setTimeout(300000);
- // This case qualifies undo/reload/defeat; random-layout identity has its own case.
+fixedSeedTest('dungeon battle undo survives reload', { tag: '@desktop-chromium-portrait-webkit' }, async({page,isMobile})=>{
  await page.goto('./?game=dungeon&entry=new');
  await walkDungeon(page,undefined,isMobile?'touch':'keyboard');await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const entry=await snapshot(page);const restored=await playUndo(page,dungeonBattle(entry)!.catalog,isMobile);
@@ -725,38 +723,6 @@ fixedSeedTest('dungeon battle undo survives reload and a legal defeat journey', 
  await page.reload();await expectDungeonResumed(page);
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect((await readSession(page)).state).toEqual(restored);
  await expect(page.locator('#battle-undo')).toBeDisabled();
- const game=page.locator('#game');
- const inBattle=async()=>{
-  const text=await game.getAttribute('data-dungeon-snapshot');
-  return text!==null&&JSON.parse(text).phase==='battle';
- };
- for(let i=0;i<100;i++){
-  if(!await inBattle())break;
-  await expect(game).toHaveAttribute('data-phase','player');
-  await endTurn(page, selector=>isMobile?page.locator(selector).tap():page.locator(selector).click());
-  await expect.poll(async()=>!await inBattle()||(await game.getAttribute('data-phase'))==='player').toBe(true);
- }
- const summary=page.getByRole('dialog',{name:'Dungeon defeat',exact:true});
- await expect(summary).toBeVisible();
- await expect(summary).toContainText('Battles won');
- await expect(summary).toContainText('Active playtime');
- await expect.poll(()=>historyRows(page)).toMatchObject([{id:entry.id,outcome:'defeat'}]);
- const recorded=await historyRows(page);
- const savedSlots=()=>page.evaluate(keys=>[localStorage.getItem(keys.primary),localStorage.getItem(keys.backup)],DUNGEON_KEYS);
- const slots=await savedSlots();
- expect(JSON.parse(slots[0]!).payload.phase).toBe('defeat');
- await summary.getByRole('button',{name:'Hall of Records',exact:true}).click();
- await expect(page.getByRole('dialog',{name:'Hall of Records',exact:true})).toContainText('Dungeon · Defeat');
- await page.reload();
- await expect(summary).toHaveCount(0);
- expect(await historyRows(page)).toEqual(recorded);
- expect(await savedSlots()).toEqual(slots);
- await expect(page.getByRole('button',{name:'Continue',exact:true})).toBeDisabled();
- const newGame=page.getByRole('button',{name:'New Game',exact:true});
- if(isMobile)await newGame.tap();else{await newGame.focus();await page.keyboard.press('Enter');}
- await expect(page.getByRole('dialog',{name:'Start new dungeon?',exact:true})).toHaveCount(0);
- await expect(page.getByRole('heading',{name:/Dungeon · Floor 1/})).toBeVisible();
- expect(await historyRows(page)).toEqual(recorded);
 });
 savedWetlandsTest('read-only entry, keyboard new dungeon, real action and active resume',async({page,isMobile})=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));

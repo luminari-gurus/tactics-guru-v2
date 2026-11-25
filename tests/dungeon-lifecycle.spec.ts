@@ -181,6 +181,8 @@ test('legal enemy defeat waits for its save and returns to the menu during a pen
   const summary=page.getByRole('dialog',{name:'Dungeon defeat',exact:true});
   await expect(summary).toBeVisible();
   await expect(summary).toContainText('Deepest floor');
+  await expect(summary).toContainText('Battles won');
+  await expect(summary).toContainText('Active playtime');
   await summary.getByRole('button',{name:'Hall of Records',exact:true}).click();
   const records=page.getByRole('dialog',{name:'Hall of Records',exact:true});
   await expect(records).toContainText('No finished journeys recorded yet.');
@@ -188,6 +190,15 @@ test('legal enemy defeat waits for its save and returns to the menu during a pen
   await expect(records).toContainText('Dungeon · Defeat');
   await records.getByRole('button',{name:'Close',exact:true}).click();
  }finally{await lockOwner.close();}
+ const readRecords = () => page.evaluate(key => JSON.parse(localStorage.getItem(key)!).records, RUN_RECORD_KEYS.primary);
+ const readSlots = () => page.evaluate(keys => [localStorage.getItem(keys.primary), localStorage.getItem(keys.backup)], DUNGEON_KEYS);
+ const recorded = await readRecords(), slots = await readSlots();
+ expect(recorded).toMatchObject([{ id: entry.id, outcome: 'defeat' }]);
+ await page.reload();
+ await expect(page.locator('#main-menu')).toBeVisible();
+ await expect(page.getByRole('dialog', { name: 'Dungeon defeat', exact: true })).toHaveCount(0);
+ expect(await readRecords()).toEqual(recorded);
+ expect(await readSlots()).toEqual(slots);
  await page.goto('./?game=dungeon');
  await expect(page.locator('#main-menu')).toBeVisible();
  await expect(page.getByRole('button',{name:'Continue',exact:true})).toBeDisabled();
@@ -211,6 +222,7 @@ test('legal enemy defeat waits for its save and returns to the menu during a pen
  await expect(page.getByRole('dialog')).toHaveCount(0);
  expect((await snapshot(page)).id).not.toBe(entry.id);
  expect((await snapshot(page)).party.every(h=>h.hp>0)).toBe(true);expect((await snapshot(page)).floors).toHaveLength(1);
+ expect(await readRecords()).toEqual(recorded);
 });
 test('visibility interruption finishes an accepted terminal presentation exactly once', { tag: '@desktop-chromium-portrait-webkit' }, async({page})=>{
  const f=dungeonVictoryBoundary(1,0);if(!f)throw Error('fixture changed');await openSavedDungeon(page,f.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
