@@ -1,0 +1,76 @@
+name: Issue 208 battle boundary comparison
+on:
+  push:
+    branches: [work/issue-208-battle-boundary-verification]
+permissions:
+  contents: read
+concurrency:
+  group: tactics-browser-tactics-browser-01
+  queue: max
+  cancel-in-progress: false
+jobs:
+  compare:
+    if: github.repository == 'luminari-gurus/tactics-guru-v2'
+    runs-on: [self-hosted, tactics-browser, tactics-browser-01]
+    timeout-minutes: 35
+    steps:
+      - name: Check host disposition
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: b0962a1873e6d8b4a5c9dd55ba70ab6718e2400f
+          path: control
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          path: candidate
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.2'
+          cache: npm
+          cache-dependency-path: candidate/package-lock.json
+      - name: Build the control and candidate and install the pinned browsers
+        id: build
+        run: |
+          (cd control && npm ci && npm run build)
+          (cd candidate && npm ci && npm run setup:browsers && npm run build)
+      - name: Measure the three desktop control journeys
+        working-directory: control
+        run: |
+          mkdir -p verification-receipts
+          npx --no-install playwright test -c playwright.regression.config.ts tests/battle-audio.spec.ts tests/unit-health-bars.spec.ts --grep 'complete audible legal battle|real run reward healing' --project=desktop --reporter=list,json
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/desktop.json
+      - name: Measure the same three desktop candidate journeys
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        working-directory: candidate
+        run: |
+          mkdir -p verification-receipts
+          npx --no-install playwright test -c playwright.regression.config.ts tests/battle-audio.spec.ts tests/unit-health-bars.spec.ts --grep 'complete audible legal battle|real run reward healing' --project=desktop --reporter=list,json
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/desktop.json
+      - name: Verify the candidate in both mobile Chromium orientations
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        working-directory: candidate
+        run: |
+          mkdir -p verification-receipts
+          npx --no-install playwright test -c playwright.regression.config.ts tests/battle-audio.spec.ts tests/unit-health-bars.spec.ts --grep 'complete audible legal battle|real run reward healing' --project=mobile-portrait --project=mobile-landscape --reporter=list,json
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/mobile-chromium.json
+      - name: Verify the shared health-bar journey on both WebKit profiles
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        working-directory: candidate
+        run: |
+          mkdir -p verification-receipts
+          npx --no-install playwright test -c playwright.health-bars.config.ts --grep 'real run reward healing' --reporter=list,json
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: verification-receipts/health-webkit.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: battle-boundary-comparison
+          path: |
+            control/verification-receipts/
+            candidate/verification-receipts/
+          if-no-files-found: warn
