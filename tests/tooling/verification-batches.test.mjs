@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { definitions, createPlan, discover, exactCoverage, matchedCaseDigests, inventory, verifyBuild, runRows, aggregate, preparationIds, validateBrowserResult, validatePerformanceResult, validateScheduling, schedulingCompute, timingReport, quarantineCleanup, pilotOverlap, samplePilotClock, awaitPilotRunners } from '../../scripts/verification-batches.mjs';
+import { canDistributeBuild, definitions, createPlan, discover, exactCoverage, matchedCaseDigests, inventory, verifyBuild, runRows, aggregate, preparationIds, validateBrowserResult, validatePerformanceResult, validateScheduling, schedulingCompute, timingReport, quarantineCleanup, pilotOverlap, samplePilotClock, awaitPilotRunners } from '../../scripts/verification-batches.mjs';
 import { digest, compareReports } from '../../scripts/verification-report.mjs';
 import { stages } from '../../scripts/verification-timings.mjs';
 
@@ -256,6 +256,39 @@ test('browser acceptance rejects missing final reports, narrowed coverage, skips
     const changed = structuredClone(row); mutate(changed);
     assert.throws(() => validateBrowserResult(stage, changed));
   }
+});
+
+test('parallel-full assigns every stage once, measures performance on the root build and preserves canonical cases', () => {
+  const plan = createPlan('parallel-full', discovery);
+  assert.equal(plan.scope, 'full');
+  assert.deepEqual(plan.preparationIds, [...preparationIds, 'performance']);
+  assert.deepEqual(plan.requested, ['full-chromium', 'full-webkit-assets']);
+  const [chromium, other] = plan.jobs;
+  assert.deepEqual(chromium.stages.map(row => row.id), ['chromium']);
+  assert.deepEqual(other.stages.map(row => row.id), ['webkit-acceptance', 'webkit-exploration', 'assets-root-dev',
+    'build-prefix', 'assets-prefix-preview', 'assets-prefix-dev', 'restore-root']);
+  assert.deepEqual([...plan.preparationIds, ...plan.jobs.flatMap(job => job.stages.map(row => row.id))].sort(),
+    stages.map(stage => stage.id).sort());
+  for (const job of plan.jobs) for (const row of job.stages) {
+    const stage = stages.find(stage => stage.id === row.id);
+    assert.deepEqual(row, { ...stage, expected: stage.browser ? discovery(stage) : null });
+  }
+  assert.throws(() => createPlan('parallel-full', discovery, 'full-chromium'), /requires both/);
+});
+
+test('an isolated performance failure permits the browser jobs but fails the aggregate', () => {
+  const value = fixture();
+  value.plan.mode = 'parallel-full';
+  value.preparation.passed = false;
+  value.preparation.stages.push({ id: 'performance', status: 'failed' });
+  assert.equal(canDistributeBuild(value.plan.mode, value.preparation), true);
+  assert.ok(summarize(value).errors.includes('prepare: failed'));
+  assert.equal(canDistributeBuild('capture', value.preparation), false);
+  for (const patch of [{ complete: false }, { inputsUnchanged: false }, { error: 'interrupted' }]) {
+    assert.equal(canDistributeBuild(value.plan.mode, { ...value.preparation, ...patch }), false);
+  }
+  value.preparation.stages.find(stage => stage.id === 'build-root').status = 'failed';
+  assert.equal(canDistributeBuild(value.plan.mode, value.preparation), false);
 });
 
 test('parallel pilot matches serial pilot selection and requires both batches', () => {
