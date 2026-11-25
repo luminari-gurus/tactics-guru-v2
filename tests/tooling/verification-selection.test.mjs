@@ -51,6 +51,8 @@ test('each engine splits full-floor touch journeys and checks both pickup modes 
     const landscape = allProfiles.find(name => name.includes('landscape'));
     assert.deepEqual(profilesFor('testing dungeon legally clears a floor, descends and backtracks without accessing saves'), [desktop, landscape].sort());
     assert.deepEqual(profilesFor('saved menu dungeon auto-collects loot across a complete first floor'), [desktop, portrait].sort());
+    assert.deepEqual(profilesFor('closing on the guardian first holds contact and resumes its battle'),
+      [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('Guardian-first reward, map and encounter state survive claim and reload at depth 5'),
       [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('reload before the pending step restores the ground pile without surprise movement or collection'), [desktop]);
