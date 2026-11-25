@@ -363,7 +363,7 @@ test('main menu: save recovery lists only the dungeon backup',async({page})=>{
   await expect(dialog.locator('a')).toHaveText('Dungeon · backup (some progress may be lost) · recovery needed');
   await dialog.locator('a').click();
   await expect(page.getByRole('dialog')).toContainText('Dungeon save recovery');
-  await page.goto('./?game=dungeon');
+  await dialog.getByRole('button',{name:'Continue backup dungeon',exact:true}).click();
   await expect(page.locator('#dungeon-map')).toBeVisible();
   await expect(page.locator('.dungeon-status')).toContainText('Continued backup');
   expect(JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!).id)

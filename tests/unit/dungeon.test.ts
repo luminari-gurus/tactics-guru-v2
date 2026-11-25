@@ -793,6 +793,21 @@ describe('dungeon floors', () => {
   });
 });
 describe('dungeon persistence', () => {
+  it('automatically continues the backup when the primary is corrupt', () => {
+    const data = memory(), storage = createDungeonStorage(() => data);
+    const backup = freshDungeon('backup-to-continue', 13);
+    const encoded = encodeDungeon(backup);
+    assert(encoded.ok);
+    data.setItem(DUNGEON_KEYS.primary, 'broken');
+    data.setItem(DUNGEON_KEYS.backup, encoded.text);
+    const session = new DungeonSession(fresh(), storage);
+    assert(session.continue(session.inspect()));
+    expect(session.snapshot).toEqual(backup);
+    expect(session.status).toBe('Continued backup; some progress may be lost.');
+    expect(data.getItem(DUNGEON_KEYS.primary)).toBe('broken');
+    expect(data.getItem(DUNGEON_KEYS.backup)).toBe(encoded.text);
+    session.dispose();
+  });
   it('treats only both missing dungeon slots as empty', async () => {
     const missing={status:'missing' as const,text:null};
     const unavailable={status:'unavailable' as const,text:null};
