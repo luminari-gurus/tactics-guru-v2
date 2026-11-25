@@ -87,13 +87,19 @@ test('routine verification clears each first-floor scenario once and checks both
   }
 });
 
-test('menu save recovery runs on desktop Chromium and portrait WebKit', () => {
+test('menu save recovery and run history use desktop Chromium and portrait WebKit', () => {
   const titles = [
     'main menu: save recovery lists only the dungeon backup',
     'main menu: New Game confirms over the menu and preserves other save families',
     'main menu: changed dungeon save requires a fresh confirmation',
     'main menu: Continue opens recovery when a valid primary is paired with an unreadable backup',
     'main menu: failed new-game write retains exportable recovery copies',
+    'main menu: an unsaved defeat retries history after reload without replaying the summary',
+    'main menu: records display and reviewed export restore reset preserve active saves',
+    'main menu: records unavailable storage is honest and leaves gameplay navigation usable',
+    'main menu: records dungeon replacement withholds exploration until final history finishes',
+    'main menu: records replacing distinct saved and unsaved dungeon preserves both after interrupted history',
+    'main menu: records concurrent confirmed dungeon replacements retain one immutable old result',
   ];
   for (const [stage, project] of [['chromium', 'desktop'], ['webkit-acceptance', 'acceptance-webkit-portrait']]) {
     for (const title of titles) {
