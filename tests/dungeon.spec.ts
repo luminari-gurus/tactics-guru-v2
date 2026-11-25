@@ -166,7 +166,7 @@ test('desktop Rail keeps Frost Snare controls visible and its target picker clic
   expect((await readSession(page)).state).toEqual(fixture.state.activeBattle);
 });
 
-test('Rail Magic Missile requires explicit confirmation before damaging an ally',async({page,hasTouch})=>{
+test('Rail Magic Missile requires explicit confirmation before damaging an ally', { tag: '@desktop-chromium-portrait-webkit' }, async({page,hasTouch})=>{
   const fixture=stagedMageAbility('ability:magic_missile','player');
   await openSavedDungeon(page,fixture.state);
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
