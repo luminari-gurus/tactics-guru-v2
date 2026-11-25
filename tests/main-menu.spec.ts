@@ -1,6 +1,5 @@
 import { readFile } from 'node:fs/promises';
 import { menuFixture } from './helpers/menuFixtures';
-import { generateMap } from '../src/map/generate';
 import { readFileSync } from 'node:fs';
 import { type Page, type Locator } from '@playwright/test';
 import { test as base, expect } from './helpers/dungeonEntropy';
@@ -133,13 +132,14 @@ test('main menu: records unavailable storage is honest and leaves gameplay navig
   await expect(page.getByRole('button', { name: 'New Game', exact: true })).toBeEnabled();
   const newGame=async()=>{const target=page.getByRole('button',{name:'New Game',exact:true});if(isMobile)await target.tap();else await target.click();};
   await newGame();await expect(page.locator('#dungeon-map')).toBeVisible();
-  const previous=JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!).id;
+  const previous=JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);
   await page.getByRole('link',{name:'Main menu',exact:true}).last().click();await newGame();
   const confirm=page.getByRole('dialog').getByRole('button',{name:'Start new dungeon',exact:true});
   if(isMobile)await confirm.tap();else await confirm.click();
   await expect(page.locator('#dungeon-map')).toBeVisible();
   const current=JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);
-  expect(current.id).not.toBe(previous);
+  expect(current.id).not.toBe(previous.id);
+  expect(current.seed).not.toBe(previous.seed);
   expect(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!).payload.id,DUNGEON_KEYS.primary)).toBe(current.id);
   await expect(page.locator('#dungeon-screen')).toContainText('Run history could not be confirmed');
 });
@@ -439,17 +439,6 @@ test.extend({pinDungeonSeed:13})('main menu: New Game stays playable after retry
  await expect(map).toHaveAttribute('data-position',String(position+1));
  await expect(screen).toContainText('Playing unsaved.');
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.dungeon.primary)).toBe(corrupt);
-});
-test('main menu: New Game starts a fresh dungeon layout',async({page})=>{
- await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();
- await expect(page.locator('#dungeon-screen')).toContainText('Floor 1');
- const first=JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);
- await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();
- await page.getByRole('dialog').getByRole('button',{name:'Start new dungeon',exact:true}).click();
- await expect(page.locator('#dungeon-screen')).toContainText('Floor 1');
- const second=JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);
- expect(second.seed).not.toBe(first.seed);
- expect(generateMap(second.floors[0].descriptor.seed,'rooms').cells).not.toEqual(generateMap(first.floors[0].descriptor.seed,'rooms').cells);
 });
 test('main menu: an active dungeon save appearing during navigation requires confirmation',async({page})=>{
  const text=menuFixture('dungeon');

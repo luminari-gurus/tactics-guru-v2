@@ -6,7 +6,6 @@ import base from './playwright.regression.config';
 export const desktopJourneys = [
   'main menu: New Game starts immediately when no dungeon save exists',
   'main menu: failed gameplay imports retain visible recovery without proof tools',
-  'main menu: New Game starts a fresh dungeon layout',
   'fresh dungeon keeps the map and party in view and opens the selected character sheet',
   'read-only entry, keyboard new dungeon, real action and active resume',
 ];

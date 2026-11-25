@@ -612,6 +612,11 @@ describe('dungeon floors', () => {
     expect(newDungeonSeed(() => 0xffffffff, 0xffffffff)).toBe(0);
     expect(newDungeonSeed(() => -1)).toBe(0xffffffff);
   });
+  it('generates a different first-floor layout even when replacement entropy repeats', () => {
+    const first = freshDungeon('first', 7);
+    const replacement = freshDungeon('replacement', newDungeonSeed(() => first.seed, first.seed));
+    expect(floorMap(replacement.floors[0].descriptor).cells).not.toEqual(floorMap(first.floors[0].descriptor).cells);
+  });
   it('builds a legal first floor for thousands of seeds', () => {
     const failed: { seed: number; message: string }[] = [];
     const seeds = new Set<number>([0, 13, 14, 0xffffffff]);
