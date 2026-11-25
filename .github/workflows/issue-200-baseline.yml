@@ -149,6 +149,17 @@ jobs:
           retention-days: 30
           compression-level: 1
           if-no-files-found: warn
+      - name: Upload preparation metadata for aggregation
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue208-build-${{ github.run_id }}-${{ github.run_attempt }}-metadata
+          path: |
+            verification-receipts/serial/bundle/plan.json
+            verification-receipts/serial/bundle/build.json
+            verification-receipts/serial/bundle/preparation/receipt.json
+          retention-days: 30
+          if-no-files-found: warn
   batch:
     needs: prepare
     if: always() && !cancelled() && needs.prepare.outputs.matrix != ''
@@ -243,13 +254,14 @@ jobs:
           node-version: ${{ (inputs.mode == 'pilot' || (startsWith(inputs.mode, 'parallel-') || inputs.mode == 'serial-pair')) && env.PILOT_NODE_VERSION || '24' }}
       - uses: actions/download-artifact@v4
         with:
-          name: ${{ needs.prepare.outputs.bundle }}
+          name: ${{ needs.prepare.outputs.bundle }}-metadata
           path: verification-receipts/serial/bundle/
       - uses: actions/download-artifact@v4
         with:
           pattern: issue208-receipts-${{ github.run_id }}-*
           path: verification-receipts/serial/downloads/
       - name: Account for every expected batch, all attempts and scheduler overhead
+        if: ${{ !cancelled() }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: node scripts/verification-batches.mjs aggregate verification-receipts/serial/bundle verification-receipts/serial/downloads verification-receipts/serial/aggregate
