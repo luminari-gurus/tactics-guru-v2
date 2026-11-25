@@ -153,8 +153,14 @@ it.each(['before', 'after'] as const)('does not publish a pickup when the primar
   assert(owner.continue(review));
   expect(owner.snapshot).toEqual(primary.state);
   if (when === 'before') expect(await owner.step({ ...owner.spatialBoundary, destination: loot.cell })).toBe(true);
-  expect(currentFloor(owner.snapshot).loot![0].remaining).toBe(0);
-  expect(storage.inspect().primary.status).toBe('valid');
+  const collected = good(stepDungeon({ ...initial, stats: freshRunStats('since-upgrade') }, command));
+  expect(currentFloor(collected).loot![0].remaining).toBe(0);
+  expect(owner.snapshot).toEqual(collected);
+  owner.dispose();
+  const restored = new DungeonSession(initial, storage);
+  assert(restored.continue(restored.inspect()));
+  expect(restored.snapshot).toEqual(collected);
+  restored.dispose();
 });
 
 function fullStackOnPile() {
