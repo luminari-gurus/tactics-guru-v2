@@ -135,6 +135,20 @@ export function sharedGroundPile(ownedCount: number, occupied = false) {
  throw Error('No deterministic two-charm ground pile');
 }
 
+export function savedBiomeEncounter(biome: 'forest' | 'desert', kind: 'normal' | 'elite' | 'vault' | 'boss') {
+  const seeds = { forest: { normal: 0, elite: 9, vault: 0, boss: 0 }, desert: { normal: 1, elite: 2, vault: 1, boss: 1 } };
+  const seed = seeds[biome][kind];
+  const slot = kind === 'normal' ? 0 : kind === 'boss' ? 2 : 1;
+  const base = freshDungeon('biome-view', seed), descriptor = floorDescriptor(seed, 2);
+  if (descriptor.biome !== `${biome}-v1` || descriptor.encounters[slot].selection.kind !== kind) {
+    throw Error(`Seed ${seed} no longer selects the ${biome} ${kind} encounter`);
+  }
+  const floor = { descriptor, position: descriptor.upstairs, completed: slot,
+    exploration: freshExploration(descriptor.seed, descriptor.upstairs, floorMap(descriptor)) };
+  const state = checkedDungeon(readDungeon({ ...base, depth: 2, floors: [{ ...base.floors[0], completed: 3 }, floor] }));
+  return { slot, state };
+}
+
 /** Structural capacity fixture; not evidence of a preceding legal full playthrough. */
 export function dungeonCapacityFixture(policy: DungeonEncounterPolicy = DUNGEON_ENCOUNTER_POLICY): DungeonState {
   for(let seed=1;seed<=100;seed++){

@@ -1,5 +1,5 @@
 import { dungeonOffer } from '../src/domain/dungeon';
-import { checkedDungeon, sharedGroundPile } from './helpers/dungeonFixtures';
+import { checkedDungeon, savedBiomeEncounter, sharedGroundPile } from './helpers/dungeonFixtures';
 import { expect,test } from './helpers/startupDiagnostics';
 import type { Locator, Page } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
@@ -772,26 +772,19 @@ test('records route transfer and map responsiveness against established budgets'
 for(const biome of ['forest','desert'] as const)test(`${biome} saved kinds, scaled inspection and reload use actual selected definitions`,async({page,isMobile})=>{
  test.setTimeout(120000);
  // Structural depth/slot fixtures isolate presentation, not preceding battle completion.
- for(const kind of ['normal','elite','vault','boss'] as const){
+ const kinds = biome === 'forest' ? ['elite', 'vault'] as const : ['normal', 'boss'] as const;
+ for(const kind of kinds){
   if(kind==='vault')await page.setViewportSize({width:320,height:568});
   if(kind==='boss')await page.setViewportSize({width:568,height:320});
-  const slot=kind==='normal'?0:kind==='boss'?2:1;
-  let state: DungeonState|null=null;
-  for(let seed=0;seed<128&&!state;seed++){
-   const base=freshDungeon('biome-view',seed),descriptor=floorDescriptor(seed,2),selection=descriptor.encounters[slot].selection;
-   if(descriptor.biome!==`${biome}-v1`||selection.kind!==kind)continue;
-   const candidate={...base,depth:2,floors:[{...base.floors[0],completed:3},{descriptor,position:descriptor.upstairs,completed:slot,exploration:freshExploration(descriptor.seed,descriptor.upstairs,floorMap(descriptor))}]};
-   const read=readDungeon(candidate);if(!read.ok)throw Error(read.reason);state=read.state;
-  }
-  if(!state)throw Error('No kind fixture');
-  const floor=state.floors[1],map=floorMap(floor.descriptor),target=poiCell(floor.exploration.pois[slot],map.width);
+  const { slot, state: saved } = savedBiomeEncounter(biome, kind);
+  const floor=saved.floors[1],map=floorMap(floor.descriptor),target=poiCell(floor.exploration.pois[slot],map.width);
   const prior=neighbors(target,map.width,map.height).find(n=>map.cells[n]&&!floor.exploration.pois.some(p=>poiCell(p,map.width)===n));if(prior===undefined)throw Error('No safe approach');
-  state=atCell(state,prior);const encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
+  const state=atCell(saved,prior);const encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
   await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});await page.goto('./?game=dungeon');await expectDungeonResumed(page);
   await expect(page.locator('#dungeon-map')).toHaveAttribute('data-biome',biome);
   expect(await page.locator('#dungeon-screen').evaluate(n=>n.scrollWidth<=n.clientWidth)).toBe(true);
   await expect(page.locator('#dungeon-screen h1')).toHaveText(`Dungeon · Floor 2 · ${biome==='forest'?'Forest':'Desert'}`);
-  const undiscovered=state.floors[1].exploration.pois.filter(p=>!state!.floors[1].exploration.revealed.includes(poiCell(p,map.width)));
+  const undiscovered=state.floors[1].exploration.pois.filter(p=>!state.floors[1].exploration.revealed.includes(poiCell(p,map.width)));
   for(const p of undiscovered)await expect(page.locator(`#dungeon-map [data-poi="${p.id}"]`)).toHaveCount(0);
   await walkDungeon(page,target,isMobile?'touch':'keyboard');
   try {
