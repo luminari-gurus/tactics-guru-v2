@@ -336,6 +336,20 @@ function win(s: DungeonState) {
   return good(acceptDungeonBattle(s, { ...b, outcome: 'playerWin', units: b.units.map(u => u.side === 'enemy' ? { ...u, hp: 0 } : u) }));
 }
 
+it('commits a dungeon victory once when presentation completion is repeated', async () => {
+  const fixture = dungeonVictoryBoundary(1, 0); assert(fixture);
+  const dungeon = new DungeonSession(fixture.snapshot, null);
+  const battle = await dungeon.startEncounter(); assert(battle);
+  battle.prepare(fixture.command);
+  const step = battle.confirm(); assert(step);
+  const committed = dungeon.snapshot;
+  expect(committed.phase).toBe('reward');
+  battle.finishPresentation(step.token);
+  expect(battle.phase).toBe('ended');
+  battle.finishPresentation(step.token);
+  expect(dungeon.snapshot).toEqual(committed);
+});
+
 it.each([false, true])('versions final reward saves and keeps a rollback checkpoint (tracked: %s)', tracked => {
   const fixture = dungeonVictoryBoundary(5, 2); assert(fixture);
   const entry = tracked ? { ...fixture.snapshot, stats: freshRunStats() } : fixture.snapshot;

@@ -213,7 +213,7 @@ test('legal enemy defeat waits for its save and returns to the menu during a pen
  expect((await snapshot(page)).id).not.toBe(entry.id);
  expect((await snapshot(page)).party.every(h=>h.hp>0)).toBe(true);expect((await snapshot(page)).floors).toHaveLength(1);
 });
-test('visibility interruption finishes an accepted terminal presentation exactly once',async({page})=>{
+test('visibility interruption finishes an accepted terminal presentation exactly once', { tag: '@desktop-chromium-portrait-webkit' }, async({page})=>{
  const f=dungeonVictoryBoundary(1,0);if(!f)throw Error('fixture changed');await openSavedDungeon(page,f.snapshot);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const cmd=f.command,state=(await readSession(page)).state;if(cmd.type!=='useAbility')throw Error('expected attack');
  await page.locator(`[data-action="${cmd.abilityId==='ability:basic_attack'?'basic':cmd.abilityId}"]`).click();const target=state.units.find(u=>u.id===('unitId'in cmd.target?cmd.target.unitId:'missileTargets'in cmd.target?cmd.target.missileTargets[0]:-1))!;
@@ -221,7 +221,7 @@ test('visibility interruption finishes an accepted terminal presentation exactly
  await page.clock.install();await page.clock.pauseAt(new Date(Date.now()+1000));await page.locator('#battle-review').click({force:true});const committed=await snapshot(page);expect(committed.phase).toBe('reward');
  await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));});
  await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:false});document.dispatchEvent(new Event('visibilitychange'));});await page.clock.resume();
- await expect(page.locator('#dungeon-screen')).toBeVisible();expect(await snapshot(page)).toEqual(committed);await page.waitForTimeout(300);expect(await snapshot(page)).toEqual(committed);
+ await expect(page.locator('#dungeon-screen')).toBeVisible();expect(await snapshot(page)).toEqual(committed);
 });
 
 for (const departure of ['reload', 'close'] as const)
