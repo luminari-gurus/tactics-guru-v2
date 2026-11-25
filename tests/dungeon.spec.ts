@@ -685,6 +685,10 @@ test('Hobgoblin formation affects Shield Bash, displaces the hero and survives C
   const saved = await snapshot(page);
   expect(saved.activeBattle).toEqual(session.state);
 
+  await expect.poll(() => page.evaluate(key => {
+    const raw = localStorage.getItem(key);
+    return raw && JSON.parse(raw).payload.activeBattle;
+  }, DUNGEON_KEYS.primary)).toEqual(session.state);
   await page.reload();
   await expectDungeonResumed(page);
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
