@@ -61,6 +61,7 @@ test('each engine splits full-floor touch journeys and checks both pickup modes 
     assert.deepEqual(profilesFor('restart during accepted presentation discards old callbacks and history'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('visibility interruption finishes an accepted terminal presentation exactly once'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('dungeon previous-format recovery preserves and exports both original slots'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('interrupting automatic loot cancels the pending step without replay'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('auto loot Settings are accessible and persist; off waits at origin and re-enabling does not sweep old loot'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('fresh manual movement cancels a pending automatic step, including its stale callback'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('fresh preparation cancels a pending automatic step'), [stage === 'chromium' ? desktop : portrait]);

@@ -192,13 +192,8 @@ test('fresh preparation cancels a pending automatic step', { tag: '@desktop-chro
   await releaseAutomaticStep(page); await expectProgress(page, prepared); await expectSavedProgress(page, prepared);
 });
 
-test('interrupting automatic loot cancels the pending step without replay', async ({ page, isMobile, viewport }, info) => {
-  // Each engine covers both interruptions on desktop and one per touch orientation.
-  const interruptions = ['visibility', 'recovery'] as const;
-  const selected = isMobile && viewport
-    ? [viewport.width > viewport.height ? 'recovery' : 'visibility']
-    : interruptions;
-  for (const interruption of selected) await test.step(interruption, async () => {
+test('interrupting automatic loot cancels the pending step without replay', { tag: '@desktop-chromium-portrait-webkit' }, async ({ page }, info) => {
+  for (const interruption of ['visibility', 'recovery'] as const) await test.step(interruption, async () => {
     const witness = await loadBoundary(page), won = await finishVictory(page, witness);
     if (interruption === 'visibility') {
       // Synthetic visibility event isolates cancellation; this is not native tab/background proof.
