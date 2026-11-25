@@ -1431,9 +1431,8 @@ describe('versioned floor dimensions', () => {
       for (const poi of exploration.pois) expect(map.cells[poiCell(poi,size)]).toBe(1);
     }
   });
-  it('retains a step on the square fifth floor through save and reload', () => {
+  it.each([5, 8])('retains a step on floor %i through save and reload', depth => {
     const base = freshDungeon('large-floor-browser', 19);
-    const depth = 5;
     const floors = Array.from({ length: depth }, (_, i) => {
       const descriptor = floorDescriptor(base.seed, i + 1);
       const position = descriptor.upstairs;
