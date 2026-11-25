@@ -51,6 +51,7 @@ test('each engine splits full-floor touch journeys and checks both pickup modes 
     const landscape = allProfiles.find(name => name.includes('landscape'));
     assert.deepEqual(profilesFor('testing dungeon legally clears a floor, descends and backtracks without accessing saves'), [desktop, landscape].sort());
     assert.deepEqual(profilesFor('saved menu dungeon auto-collects loot across a complete first floor'), [desktop, portrait].sort());
+    assert.deepEqual(profilesFor('reload before the pending step restores the ground pile without surprise movement or collection'), [desktop]);
     assert.deepEqual(profilesFor('ground loot: legal victory saves one item at contact and a manual pickup survives refusal and reload'), allProfiles);
     assert.deepEqual(profilesFor('auto loot defaults on: one delayed ordinary step, pickup, enemy tick and durable resume'), allProfiles);
   }

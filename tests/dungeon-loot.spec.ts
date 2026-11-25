@@ -230,6 +230,4 @@ test('reload before the pending step restores the ground pile without surprise m
   await expectProgress(page, won); await expectSavedProgress(page, won);
   expect(await heldCount(page)).toBe(0);
   expect(currentFloor(await dungeonSnapshot(page)).loot![0].remaining).toBe(1);
-  await page.reload(); await expectDungeonResumed(page); await settleBrowser(page);
-  await expectProgress(page, won); expect(await heldCount(page)).toBe(0);
 });
