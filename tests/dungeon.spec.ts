@@ -9,6 +9,8 @@ import { dungeonCapacityFixture, dungeonVictoryBoundary } from './helpers/dungeo
 import { dungeonBattle, startDungeonBattle, acceptDungeonBattle, dungeonBoundary, dungeonItem, freshDungeon, type DungeonState } from '../src/domain/dungeon';
 import { progressHero } from '../src/domain/progression';
 import { decodeDungeon, encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
+import { BATTLE_STORAGE_KEYS } from '../src/persistence/battleStorage';
+import { RUN_STORAGE_KEYS } from '../src/persistence/runStorage';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { RUN_RECORD_KEYS } from '../src/persistence/runRecordsStorage';
 import { COMBAT_CONTROLS_KEY } from '../src/ui/combatControls';
@@ -992,8 +994,10 @@ test('a claimed Revive Kit restores a fallen dungeon hero across Continue',async
 });
 
 test('fresh dungeon keeps the map and party in view and opens the selected character sheet', async ({page,isMobile}) => {
+ const legacyKeys = [BATTLE_STORAGE_KEYS.primary, RUN_STORAGE_KEYS.primary];
  await page.route('**/battle/portraits/mage.png', route => route.abort());
  await page.goto('./');
+ await page.evaluate(keys => { for (const key of keys) localStorage.setItem(key, key); }, legacyKeys);
  const newGame = page.getByRole('button',{name:'New Game',exact:true});
  if (isMobile) await newGame.tap(); else await newGame.click();
  const map = page.locator('#dungeon-map'), party = page.getByRole('region',{name:'Party',exact:true});
@@ -1006,6 +1010,10 @@ test('fresh dungeon keeps the map and party in view and opens the selected chara
  expect(await page.locator('#dungeon-screen').evaluate(node => node.scrollWidth <= node.clientWidth)).toBe(true);
  const saveNote=page.locator('.dungeon-save-note');
  await expect(saveNote).toHaveText('Dungeon saved on this device');
+ await expect(page.locator('#dungeon-screen')).toContainText('Floor 1');
+ await expect(page.locator('dialog')).not.toBeVisible();
+ await expect.poll(() => page.evaluate(key => localStorage.getItem(key), DUNGEON_KEYS.primary)).not.toBeNull();
+ expect(await page.evaluate(keys => keys.map(key => localStorage.getItem(key)), legacyKeys)).toEqual(legacyKeys);
  // Header content is the title and floor progress; the quiet live region takes no layout space.
  const headerBottom=await page.locator('.dungeon-header').evaluate(header=>{
   const progress=header.querySelector<HTMLElement>('#dungeon-progress')!;
