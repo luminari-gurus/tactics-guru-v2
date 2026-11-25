@@ -197,6 +197,10 @@ journeys, including touch pickup in both mobile orientations. The dungeon loot
 session units check that a persisted pickup counts one party move and advances
 the enemy movement counter only while enemies remain.
 
+The seven deferred encounter-loading cases run on both desktop engines. Each also
+runs on one touch orientation per engine. Landscape retains the HTTP module-failure
+and reload check used by the startup diagnostics workflow.
+
 ### Focused commands and base paths
 
 ```sh

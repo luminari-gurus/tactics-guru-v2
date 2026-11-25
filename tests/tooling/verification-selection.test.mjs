@@ -56,6 +56,20 @@ test('each engine splits full-floor touch journeys and checks both pickup modes 
   }
 });
 
+test('deferred loading keeps each desktop case on one mobile orientation per engine', () => {
+  for (const stage of ['chromium', 'webkit-exploration']) {
+    const { tests } = after.selections[stage];
+    for (const [orientation, count] of [['portrait', 4], ['landscape', 3]]) {
+      const tagged = tests.filter(row => row.tags.includes('@mobile-' + orientation));
+      const desktop = tagged.filter(row => row.project.includes('desktop')).map(row => row.title).sort();
+      const mobile = tagged.filter(row => row.project.includes(orientation)).map(row => row.title).sort();
+      assert.equal(desktop.length, count);
+      assert.deepEqual(mobile, desktop);
+      assert.equal(tagged.length, count * 2);
+    }
+  }
+});
+
 test('selection contract rejects missing, extra, duplicate, wrong-profile and device configuration drift', () => {
   assert.ok(after);
   const reject = mutate => { const changed = structuredClone(after); mutate(changed); assert.throws(() => compareSelections(before, changed)); };

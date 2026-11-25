@@ -972,11 +972,8 @@ test('closing on the guardian first holds contact and resumes its battle', async
 
 const dungeonEngineModule=/\/(?:start|BattleScene)-[^/]+\.js(?:\?.*)?$|\/src\/phaser\/(?:start|BattleScene)\.ts(?:\?.*)?$/;
 async function loadEncounterWithoutEngine(page:Page,id:string,url='./?game=dungeon'){
- const initial=atEncounter(freshDungeon(id,1)),encoded=encodeDungeon(initial);
- if(!encoded.ok)throw Error(encoded.reason);
- await page.goto(new URL('./',new URL(url,test.info().project.use.baseURL)).href);
- await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
- await page.goto(url);await expectDungeonResumed(page);
+ const initial=atEncounter(freshDungeon(id,1));
+ await openSavedDungeon(page,initial,url);
  await expect(page.locator('#dungeon-map')).toBeVisible();
  await expect(page.locator('canvas')).toHaveCount(0);
  return initial;
@@ -996,7 +993,7 @@ async function finishRequestedDungeonModules(page:Page,requested:Set<string>){
  },urls);
 }
 
-test('unavailable battle modules preserve dungeon exploration, recovery and the saved encounter',async({page},info)=>{
+test('unavailable battle modules preserve dungeon exploration, recovery and the saved encounter', { tag: '@mobile-landscape' }, async({page},info)=>{
  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
  const server=await startBattleModuleFaultServer('dungeon-engine');
  try {
@@ -1029,7 +1026,7 @@ test('unavailable battle modules preserve dungeon exploration, recovery and the 
  }
 });
 
-test('delayed dungeon loading locks repeated entry and waits for recovery to close',async({page})=>{
+test('delayed dungeon loading locks repeated entry and waits for recovery to close', { tag: '@mobile-portrait' }, async({page})=>{
  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
  let release!:()=>void;const requests=new Set<string>();
  const gate=new Promise<void>(resolve=>{release=resolve;});
@@ -1057,7 +1054,7 @@ test('delayed dungeon loading locks repeated entry and waits for recovery to clo
  }finally {release();}
 });
 
-for(const interruption of ['restart','pagehide','visible'] as const)test(interruption==='visible'?'hidden dungeon engine resumes once when visible':`pending dungeon engine cannot mount after ${interruption}`,async({page})=>{
+for(const interruption of ['restart','pagehide','visible'] as const)test(interruption==='visible'?'hidden dungeon engine resumes once when visible':`pending dungeon engine cannot mount after ${interruption}`, { tag: interruption === 'visible' ? '@mobile-landscape' : '@mobile-portrait' }, async({page})=>{
  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
  let release!:()=>void;const requests=new Set<string>();
  const gate=new Promise<void>(resolve=>{release=resolve;});
@@ -1104,7 +1101,7 @@ for(const interruption of ['restart','pagehide','visible'] as const)test(interru
  }finally {release();}
 });
 
-test('pending dungeon engine cannot mount during the final replacement history write', async ({ page }) => {
+test('pending dungeon engine cannot mount during the final replacement history write', { tag: '@mobile-landscape' }, async ({ page }) => {
  let release!:()=>void; const requests=new Set<string>();
  const gate=new Promise<void>(resolve=>{release=resolve;});
  await page.route(dungeonEngineModule,async route=>{requests.add(route.request().url());await gate;await route.continue();});
@@ -1127,7 +1124,7 @@ test('pending dungeon engine cannot mount during the final replacement history w
  }finally {release();}
 });
 
-test('adopting a recovered dungeon invalidates the pending encounter load',async({page,isMobile})=>{
+test('adopting a recovered dungeon invalidates the pending encounter load', { tag: '@mobile-portrait' }, async({page,isMobile})=>{
  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
  let release!:()=>void;const requests=new Set<string>();
  const gate=new Promise<void>(resolve=>{release=resolve;});
