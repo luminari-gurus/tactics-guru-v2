@@ -9,6 +9,8 @@ const baseURL = `http://127.0.0.1:4173${basePath}`;
 // saved automatic pickup on portrait, and unsaved manual pickup on landscape.
 export const redundantProfileJourneys = [
   /^(?:mobile-portrait|mobile-landscape|portrait-webkit|landscape-webkit) .*@desktop-keyboard(?: |$)/,
+  // Frost Snare exercises wheel zoom, native Chromium pinch, and WebKit pointer gestures.
+  /^(?:mobile-landscape|desktop-webkit|portrait-webkit) .*staged Mage Frost Snare cancels invalid casts and restores the active badge$/,
   // Cover an occupied loot tile with a landscape Chromium tap and a desktop WebKit click.
   /^(?:desktop|mobile-portrait|portrait-webkit|landscape-webkit) .*ground loot: entering an occupied pile starts combat and closes inventory$/,
   // Tagged loading scenarios run on both desktops and one touch orientation per engine.
