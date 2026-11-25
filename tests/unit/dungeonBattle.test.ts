@@ -20,6 +20,25 @@ import { priorDungeonEnvelope } from '../helpers/dungeonFixtures';
 import { freshExploration } from '../../src/domain/exploration';
 import { createDungeonStorage, DUNGEON_BACKUP_CHECKPOINT_KEY, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
 
+it.each(['ability:frost_snare', 'ability:magic_missile'] as const)('replays and restores a staged Mage cast of %s', abilityId => {
+  const { state, command } = stagedMageAbility(abilityId);
+  const built = dungeonBattle(state)!;
+  const battle = new BattleSession(built.catalog, state.activeBattle!, built.state.seed, undefined, false, built.battlefield);
+  assert(battle.prepare(command).ok);
+  const step = battle.confirm(); assert(step);
+  const history = battle.continuation!;
+  expect(replayCommandSequence(history.snapshot, history.commands, built.catalog))
+    .toEqual({ ok: true, state: step.after, events: step.events });
+  if (abilityId === 'ability:magic_missile') expect(step.events.filter(event => event.type === 'missileRolled')).toHaveLength(2);
+  const accepted = acceptDungeonBattle(state, step.after); assert(accepted.ok);
+  const saved = encodeDungeon(accepted.state); assert(saved.ok);
+  const restored = decodeDungeon(saved.text); assert(restored.ok && restored.state.activeBattle);
+  expect(restored.state).toEqual(accepted.state);
+  const resumed = new BattleSession(built.catalog, restored.state.activeBattle, built.state.seed);
+  expect(resumed.state).toEqual(step.after);
+  expect(resumed.events).toEqual([]);
+});
+
 it.each(['ability:pinning_shot', 'ability:frost_snare'] as const)('projects Snared badges after restoring %s', abilityId => {
   const { state, command } = stagedMageAbility('ability:frost_snare');
   const initial = state.activeBattle!;

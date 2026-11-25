@@ -17,7 +17,7 @@ import { AUTO_COLLECT_LOOT_KEY } from '../src/ui/autoCollectLootPreference';
 import { endTurn, battleTool, readSession,playCommand,playUndo,checkActivePlaytime,checkBackgroundPlaytime } from './helpers/battlePolicy';
 import { playerDecision, fighterDecision } from './helpers/playerPolicy';
 import { journeyPreparation, healedFighterBoundary, shamanJourney } from './helpers/dungeonFixtures';
-import { dispatch, replayCommandSequence } from '../src/domain/turns';
+import { dispatch } from '../src/domain/turns';
 import { previewMovement } from '../src/domain/grid';
 import { generateMap } from '../src/map/generate';
 import type { Command, BattleEvent } from '../src/domain/types';
@@ -235,40 +235,34 @@ test('Rail Magic Missile requires explicit confirmation before damaging an ally'
   expect(after.events).toEqual(expected.events);
 });
 
-for(const abilityId of ['ability:frost_snare','ability:magic_missile'] as const)test(`staged Mage ${abilityId} accepts exact effects replay and saved active reload`,async({page})=>{
+test('staged Mage Frost Snare cancels invalid casts and restores the active badge',async({page})=>{
+ const abilityId='ability:frost_snare';
  // The level/position boundary is deliberately staged. The extended journey alone proves earned XP.
  const fixture=stagedMageAbility(abilityId),catalog=dungeonBattle(fixture.state)!.catalog;
  const expected=dispatch(fixture.state.activeBattle!,fixture.command,catalog);expect(expected.ok).toBe(true);if(!expected.ok)throw Error(expected.reason);
  await seed(page,fixture.state);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const before=await readSession(page);expect(before.state).toEqual(fixture.state.activeBattle);expect(before.events).toEqual([]);
- if(abilityId==='ability:frost_snare') {
-  await checkSnares(page,true);
-  const target=before.state.units.find(u=>u.id===fixture.command.target.unitId)!;
-  await page.locator('[data-action="ability:frost_snare"]').click();
-  await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
-  await page.locator('#battle-cancel').click();await checkSnares(page,true);
-  expect((await readSession(page)).state).toEqual(before.state);
-  await page.locator('[data-action="ability:frost_snare"]').click();await page.locator('canvas').focus();
-  // Native target selection moved the cursor; deliberately navigate back to the caster.
-  const caster=before.state.units.find(u=>u.id===fixture.command.unitId)!;
-  for(let i=0;i<Math.abs(caster.cell.x-target.cell.x);i++)await page.keyboard.press(caster.cell.x>target.cell.x?'ArrowRight':'ArrowLeft');
-  for(let i=0;i<Math.abs(caster.cell.y-target.cell.y);i++)await page.keyboard.press(caster.cell.y>target.cell.y?'ArrowDown':'ArrowUp');
-  await page.keyboard.press('Enter');await expect(page.locator('#battle-review')).toBeDisabled();
-  await checkSnares(page,true);expect((await readSession(page)).state).toEqual(before.state);
-  await page.locator('#battle-cancel').click();
- }
+ await checkSnares(page,true);
+ const target=before.state.units.find(u=>u.id===fixture.command.target.unitId)!;
+ await page.locator('[data-action="ability:frost_snare"]').click();
+ await page.locator('#battle-target').selectOption(`${target.cell.x},${target.cell.y}`);
+ await page.locator('#battle-cancel').click();await checkSnares(page,true);
+ expect((await readSession(page)).state).toEqual(before.state);
+ await page.locator('[data-action="ability:frost_snare"]').click();await page.locator('canvas').focus();
+ // Native target selection moved the cursor; deliberately navigate back to the caster.
+ const caster=before.state.units.find(u=>u.id===fixture.command.unitId)!;
+ for(let i=0;i<Math.abs(caster.cell.x-target.cell.x);i++)await page.keyboard.press(caster.cell.x>target.cell.x?'ArrowRight':'ArrowLeft');
+ for(let i=0;i<Math.abs(caster.cell.y-target.cell.y);i++)await page.keyboard.press(caster.cell.y>target.cell.y?'ArrowDown':'ArrowUp');
+ await page.keyboard.press('Enter');await expect(page.locator('#battle-review')).toBeDisabled();
+ await checkSnares(page,true);expect((await readSession(page)).state).toEqual(before.state);
+ await page.locator('#battle-cancel').click();
  await playCommand(page,fixture.command);
  await expect.poll(async()=>(await readSession(page)).state.commandCount).toBe(before.state.commandCount+1);
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const accepted=await readSession(page);expect(accepted.state).toEqual(expected.state);expect(accepted.events).toEqual(expected.events);
- const history=accepted.replay??accepted.continuation!;
- expect(replayCommandSequence('initial' in history?history.initial:history.snapshot,history.commands,catalog))
-   .toEqual({ok:true,state:accepted.state,events:accepted.events});
- if(abilityId==='ability:frost_snare') {
-   await checkSnares(page,true);await page.screenshot({path:test.info().outputPath('snared-cast.png')});
-   expect(accepted.state.rng).toEqual(before.state.rng);expect(accepted.state.units.map(u=>u.hp)).toEqual(before.state.units.map(u=>u.hp));
-   expect(accepted.events).toContainEqual({type:'movementBlocked',unitId:fixture.command.target.unitId,sourceId:fixture.command.unitId,abilityId});
- } else expect(accepted.events.filter(e=>e.type==='missileRolled')).toHaveLength(2);
+ await checkSnares(page,true);await page.screenshot({path:test.info().outputPath('snared-cast.png')});
+ expect(accepted.state.rng).toEqual(before.state.rng);expect(accepted.state.units.map(u=>u.hp)).toEqual(before.state.units.map(u=>u.hp));
+ expect(accepted.events).toContainEqual({type:'movementBlocked',unitId:fixture.command.target.unitId,sourceId:fixture.command.unitId,abilityId});
  // Opening recovery flushes active playtime before capturing the exact save bytes.
  await page.getByRole('button',{name:'Save recovery',exact:true}).click();
  await expect(page.getByRole('heading',{name:'Dungeon save recovery',exact:true})).toBeVisible();
@@ -276,23 +270,21 @@ for(const abilityId of ['ability:frost_snare','ability:magic_missile'] as const)
  await page.reload();await expectDungeonResumed(page);await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
  const resumed=await readSession(page);expectSameProgress(await snapshot(page),saved);expect(resumed.state).toEqual(accepted.state);expect(resumed.events).toEqual([]);
  expect(await page.evaluate(keys=>keys.map(key=>localStorage.getItem(key)),[DUNGEON_KEYS.primary,DUNGEON_KEYS.backup])).toEqual(slots);
- if(abilityId==='ability:frost_snare') {
-  await checkSnares(page,true);expect((await boardReport(page)).feedbackBounds).toEqual([]);
-  await page.screenshot({path:test.info().outputPath('snared-resumed.png')});
-  // Accepted Mage and Ranger Waits plus an unrelated Archer attack preserve Snare.
-  for(const id of [3,2]) {
-   expect((await readSession(page)).state.initiative[(await readSession(page)).state.activeIndex]).toBe(id);
-   await playCommand(page,{type:'endTurn',unitId:id});await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-   await checkSnares(page,true);expect((await boardReport(page)).units.find((u:any)=>u.id===fixture.command.target.unitId).snare.visible).toBe(true);
-  }
-  expect((await readSession(page)).events.some(e=>e.type==='attackRolled'&&e.unitId===5)).toBe(true);
-  await playCommand(page,{type:'endTurn',unitId:1});await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-  const expired=await readSession(page);await checkSnares(page,true);
-  expect(expired.events).toContainEqual({type:'turnEnded',unitId:fixture.command.target.unitId});
-  expect(expired.events).toContainEqual({type:'movementBlockExpired',unitId:fixture.command.target.unitId,sourceId:3,abilityId});
-  expect((await boardReport(page)).units.every((u:any)=>!u.snare.visible)).toBe(true);
-  await page.screenshot({path:test.info().outputPath('snared-expired.png')});
+ await checkSnares(page,true);expect((await boardReport(page)).feedbackBounds).toEqual([]);
+ await page.screenshot({path:test.info().outputPath('snared-resumed.png')});
+ // Accepted Mage and Ranger Waits plus an unrelated Archer attack preserve Snare.
+ for(const id of [3,2]) {
+  expect((await readSession(page)).state.initiative[(await readSession(page)).state.activeIndex]).toBe(id);
+  await playCommand(page,{type:'endTurn',unitId:id});await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  await checkSnares(page,true);expect((await boardReport(page)).units.find((u:any)=>u.id===fixture.command.target.unitId).snare.visible).toBe(true);
  }
+ expect((await readSession(page)).events.some(e=>e.type==='attackRolled'&&e.unitId===5)).toBe(true);
+ await playCommand(page,{type:'endTurn',unitId:1});await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+ const expired=await readSession(page);await checkSnares(page,true);
+ expect(expired.events).toContainEqual({type:'turnEnded',unitId:fixture.command.target.unitId});
+ expect(expired.events).toContainEqual({type:'movementBlockExpired',unitId:fixture.command.target.unitId,sourceId:3,abilityId});
+ expect((await boardReport(page)).units.every((u:any)=>!u.snare.visible)).toBe(true);
+ await page.screenshot({path:test.info().outputPath('snared-expired.png')});
  await test.info().attach('staged-mage-boundary',{body:JSON.stringify({fixture:'staged level/position; not earned progression',command:fixture.command,before:before.state,after:accepted.state,events:accepted.events}),contentType:'application/json'});
 });
 
