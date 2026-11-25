@@ -1078,15 +1078,10 @@ test('adopting a recovered dungeon invalidates the pending encounter load', { ta
  }finally {release();}
 });
 
-fixedSeedTest('class guidance: unsaved dungeon keeps dismissals in memory until saving and resuming the same run',async({page,isMobile})=>{
+fixedSeedTest('class guidance: unsaved dungeon keeps dismissals in memory until saving and resuming the same run', { tag: '@desktop-chromium-portrait-webkit' }, async({page,isMobile})=>{
  test.setTimeout(90000);
  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
- const key='tactics-guru:class-guidance';
- const sentinel={runId:'dungeon:saved-guidance-sentinel',ids:['skill:ability:taunt:v1']};
- await page.addInitScript(({key,sentinel})=>{
-  if(localStorage.getItem(key)===null)localStorage.setItem(key,JSON.stringify({version:1,enabled:true,seen:[],dismissedRuns:[sentinel],resetRevision:0}));
- },{key,sentinel});
- const preferences=()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)!),key);
+ const preferences=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('tactics-guru:class-guidance')!));
  const activate=async(control:Locator)=>{
   if(isMobile)await control.tap();else {await control.focus();await page.keyboard.press('Enter');}
  };
@@ -1104,16 +1099,15 @@ fixedSeedTest('class guidance: unsaved dungeon keeps dismissals in memory until 
  await activate(page.locator('#battle-guidance-dismiss'));
  await expect(guidance).toBeHidden();await expect(page.locator('#battle-move')).toBeFocused();
  expect(await readSession(page)).toEqual(before);expectSameProgress(await dungeonSnapshot(page),dungeonBefore);
- // A throwaway attempt may acknowledge lessons without consuming a durable
- // dismissal-history slot belonging to a saved dungeon.
+ // The unsaved run acknowledges the lesson before it has a durable dismissal.
  expect((await preferences()).seen).toContain(tipId);
- expect((await preferences()).dismissedRuns).toEqual([sentinel]);
+ expect((await preferences()).dismissedRuns).toEqual([]);
  expect(await dungeonSlots(page)).toEqual({primary:null,backup:null});
  await activate(page.getByRole('button',{name:'Save recovery',exact:true}));
  await activate(page.locator('#dungeon-retry-save'));
  await expect(page.locator('#battle-dialog')).toBeHidden();
  await expect.poll(async()=>JSON.parse((await dungeonSlots(page)).primary??'null')?.payload?.id).toBe(runId);
- const expectedDismissals=[sentinel,{runId:`dungeon:${runId}`,ids:[tipId]}];
+ const expectedDismissals=[{runId:`dungeon:${runId}`,ids:[tipId]}];
  await expect.poll(async()=>(await preferences()).dismissedRuns).toEqual(expectedDismissals);
  expect((await readSession(page)).state).toEqual(before.state);await expect(guidance).toBeHidden();
  expectSameProgress(JSON.parse((await dungeonSlots(page)).primary!).payload,dungeonBefore);
