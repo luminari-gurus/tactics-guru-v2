@@ -17,8 +17,11 @@ const prefixIds = ['build-prefix', 'assets-prefix-preview', 'assets-prefix-dev',
 const pilotRunners = { 'pilot-chromium': 'unraid-tactics-01', 'pilot-webkit': 'unraid-tactics-02' };
 
 const pairRunners = { 'chromium-desktop-2': 'unraid-tactics-01', 'webkit-acceptance': 'unraid-tactics-02' };
+const fullRunners = { 'full-chromium': 'unraid-tactics-01', 'full-webkit-assets': 'unraid-tactics-02' };
 const isPair = mode => mode === 'parallel-pair' || mode === 'serial-pair';
-const isParallel = mode => mode === 'parallel-pilot' || mode === 'parallel-pair';
+const isParallel = mode => ['parallel-pilot', 'parallel-pair', 'parallel-full'].includes(mode);
+const runnerAssignments = mode => mode === 'parallel-full' ? fullRunners : isPair(mode) ? pairRunners : pilotRunners;
+const preparationFor = mode => mode === 'parallel-full' ? [...preparationIds, 'performance'] : preparationIds;
 
 const key = test => JSON.stringify([test.project, test.id]);
 
@@ -35,6 +38,13 @@ export function exactCoverage(expected, actual) {
 }
 
 export function definitions(mode = 'capture') {
+  if (mode === 'parallel-full') {
+    const remaining = stages.filter(stage => !preparationFor(mode).includes(stage.id));
+    return [
+      { id: 'full-chromium', stages: remaining.filter(stage => stage.id === 'chromium') },
+      { id: 'full-webkit-assets', stages: remaining.filter(stage => stage.id !== 'chromium') },
+    ];
+  }
   if (isPair(mode)) {
     const capture = definitions('capture');
     return Object.keys(pairRunners).map(id => {
@@ -86,15 +96,15 @@ export function createPlan(mode, discoverCases = discover, filter = '') {
   const canonical = Array.from(canonicalCases, ([stage, tests]) => ({ id: stage.id, tests }));
   const jobs = batches.map(job => ({ ...job, stages: job.stages.map(stage => ({ ...stage,
     expected: stage.browser ? (canonicalCases.get(stage) ?? discoverCases(stage)) : null })) }));
-  if (mode === 'capture') for (const stage of canonical) {
+  if (mode === 'capture' || mode === 'parallel-full') for (const stage of canonical) {
     const selected = jobs.flatMap(job => job.stages.filter(row => row.sourceStage === stage.id).flatMap(row => row.expected ?? []));
     exactCoverage(stage.tests, selected);
   }
-  invariant((!isPair(mode) && mode !== 'parallel-pilot') || !filter, 'Parallel pilot requires both browser batches');
+  invariant((!isPair(mode) && !isParallel(mode)) || !filter, 'Parallel pilot requires both browser batches');
   const requested = filter ? filter.split(',') : jobs.map(job => job.id);
   invariant(requested.length === new Set(requested).size && requested.every(id => jobs.some(job => job.id === id)), 'Unknown or duplicate batch selection');
-  return { schemaVersion: 1, mode, scope: mode === 'capture' && requested.length === jobs.length ? 'full' : 'partial',
-    requested, canonical, jobs, preparationIds, stageIds: stages.map(stage => stage.id) };
+  return { schemaVersion: 1, mode, scope: (mode === 'capture' || mode === 'parallel-full') && requested.length === jobs.length ? 'full' : 'partial',
+    requested, canonical, jobs, preparationIds: preparationFor(mode), stageIds: stages.map(stage => stage.id) };
 }
 
 export function inventory(directory) {
@@ -121,8 +131,7 @@ function environment() {
 }
 
 function parallelRunner(plan, report) {
-  if (isPair(plan.mode)) return pairRunners[report.batchId];
-  return plan.mode === 'parallel-pilot' ? pilotRunners[report.batchId] : undefined;
+  return isPair(plan.mode) || isParallel(plan.mode) ? runnerAssignments(plan.mode)[report.batchId] : undefined;
 }
 
 function verifyRuntime(plan, report) {
@@ -331,6 +340,16 @@ async function runReceipt(plan, id, rows, prerequisites, out, buildHash, sampleC
   return report;
 }
 
+// A completed performance measurement can fail its budget while the ordinary build
+// is still valid. Keep that failure in the preparation receipt for the aggregate.
+export function canDistributeBuild(mode, report) {
+  if (report.passed) return true;
+  if (mode !== 'parallel-full' || !report.complete || !report.inputsUnchanged || report.error) return false;
+  const performance = report.stages.find(stage => stage.id === 'performance');
+  return performance?.status === 'failed' && preparationIds.every(id =>
+    report.stages.some(stage => stage.id === id && stage.status === 'passed'));
+}
+
 export function aggregate(plan, build, preparation, receipts) {
   const errors = [], history = [], latest = [];
   let complete = true;
@@ -351,7 +370,7 @@ export function aggregate(plan, build, preparation, receipts) {
     catch (error) { errors.push(`${id}: ${error.message}`); complete = false; }
     if (!report.complete || !report.inputsUnchanged) { errors.push(`${id}: incomplete/changed inputs`); complete = false; }
     if (!report.passed || report.stages.some(stage => stage.status !== 'passed')) errors.push(`${id}: failed`);
-    const expectedStages = id === 'prepare' ? preparationIds : plan.jobs.find(job => job.id === id).stages.map(stage => stage.id);
+    const expectedStages = id === 'prepare' ? preparationFor(plan.mode) : plan.jobs.find(job => job.id === id).stages.map(stage => stage.id);
     if (JSON.stringify(report.stages.map(stage => stage.id)) !== JSON.stringify(expectedStages)) { errors.push(`${id}: stage coverage mismatch`); complete = false; }
     if (id !== 'prepare') for (const stage of plan.jobs.find(job => job.id === id).stages.filter(stage => stage.browser)) {
       const actual = report.stages.find(row => row.id === stage.id);
@@ -416,7 +435,7 @@ export function schedulingCompute(jobs) {
 export function timingReport(plan, summary) {
   const actual = (summary.latest ?? []).flatMap(receipt => receipt.stages);
   const jobs = plan.jobs.filter(job => plan.requested.includes(job.id));
-  const selected = plan.mode !== 'capture' ? [...stages.filter(stage => preparationIds.includes(stage.id)), ...jobs.flatMap(job => job.stages)]
+  const selected = plan.mode !== 'capture' ? [...stages.filter(stage => preparationFor(plan.mode).includes(stage.id)), ...jobs.flatMap(job => job.stages)]
     : stages.filter(stage => preparationIds.includes(stage.id) || jobs.some(job => job.stages.some(row => row.sourceStage === stage.id)));
   const rows = selected.map(stage => {
     const parts = stage.id === 'chromium'
@@ -496,7 +515,7 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
       });
       invariant(response.ok, `Actions artifact listing failed: HTTP ${response.status}`);
       return (await response.json()).artifacts;
-    }, { ids: Object.keys(isPair(process.env.SERIAL_MODE) ? pairRunners : pilotRunners) });
+    }, { ids: Object.keys(runnerAssignments(process.env.SERIAL_MODE)) });
     console.log(`Both pilot runners ready. Scheduled browser launch: ${release}`);
     return 0;
   }
@@ -512,8 +531,8 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
     if (command === 'discover') return 0;
     if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `matrix=${JSON.stringify({ include: plan.requested.map(id => ({ id,
       ...(parallelRunner(plan, { batchId: id }) ? { runner: parallelRunner(plan, { batchId: id }).replace('unraid-tactics-', 'tactics-browser-') } : {}) })) })}\n`);
-    const report = await runReceipt(plan, 'prepare', stages.filter(stage => preparationIds.includes(stage.id)), [], join(bundle, 'preparation'));
-    if (!report.passed) return 1;
+    const report = await runReceipt(plan, 'prepare', stages.filter(stage => plan.preparationIds.includes(stage.id)), [], join(bundle, 'preparation'));
+    if (!canDistributeBuild(plan.mode, report)) return 1;
     cpSync(join(root, 'dist'), join(bundle, 'dist'), { recursive: true });
     const files = inventory(join(bundle, 'dist'));
     invariant(files.some(file => file.path === 'index.html'), 'Missing built index.html');
@@ -540,7 +559,7 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
     const source = sourceIdentity(root);
     invariant(plan.planHash === digest(JSON.stringify({ ...plan, planHash: undefined })), 'Invalid plan hash');
     invariant(source.commit === plan.source.commit && source.inputHash === plan.source.inputHash, 'Source differs from preparation');
-    if (isPair(plan.mode)) invariant(build, 'Matched batches require a verified production build');
+    if (isPair(plan.mode) || plan.mode === 'parallel-full') invariant(build, 'Matched batches require a verified production build');
     if (build) verifyBuild(plan, build, join(bundle, 'dist'), source);
     const sampleClock = isParallel(plan.mode) ? pilotClockSampler() : undefined;
     if (command === 'ready') {
@@ -550,7 +569,7 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
       verifyRuntime(plan, ready);
       ready.browsers = await browserMetadata(stages);
       verifyBrowsers(plan, ready);
-      for (const stage of job.stages) exactCoverage(stage.expected, discover(stage));
+      for (const stage of job.stages.filter(stage => stage.browser)) exactCoverage(stage.expected, discover(stage));
       ready.clock = { before: await sampleClock() };
       ready.readyAt = new Date().toISOString();
       const out = resolve(outputArgument);
