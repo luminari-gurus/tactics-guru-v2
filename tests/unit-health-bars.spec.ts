@@ -8,6 +8,7 @@ import { HEALTH_BAR, healthColor, healthFraction } from '../src/phaser/healthBar
 import { playCommand, playerDecision, readSession, confirmRestart } from './helpers/battlePolicy';
 import { runContext } from './helpers/runItemFixtures';
 import { runBattleCatalog, type RunSnapshot } from '../src/domain/runSaveEnvelope';
+import { COMBAT_PACE_KEY } from '../src/ui/combatPacePreference';
 
 const report=async(page:Page)=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
 const ready=(page:Page)=>expect(page.locator('#game')).toHaveAttribute('data-phase','player');
@@ -147,13 +148,23 @@ for(const defeat of [false,true])test(`health follows ${defeat?'defeat':'damage'
 });
 
 test('real run reward healing carries into the next encounter without old bars',async({page},info)=>{
-  test.setTimeout(240000);await page.goto('./run');await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();await ready(page);
+  test.setTimeout(240000);
+  // This journey checks settled health bars. The presentation tests sample Normal pace.
+  await page.addInitScript(key => {
+    localStorage.setItem(key, JSON.stringify({ version: 1, pace: 'fast' }));
+  }, COMBAT_PACE_KEY);
+  await page.goto('./run');await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();await ready(page);
   for(let turn=0;turn<300;turn++) {
     const current:RunSnapshot=JSON.parse((await page.locator('#game').getAttribute('data-run-snapshot'))!);
     if(current.items.run.phase!=='battle')break;
-    await ready(page);const state=(await readSession(page)).state;check(await report(page),state);
+    const { phase, state } = await readSession(page);
+    expect(phase).toBe('player');
+    check(await report(page),state);
     await playCommand(page,playerDecision(state,runBattleCatalog(current.items,runContext)!));
-    await expect.poll(async()=>await page.locator('#game').getAttribute('data-phase')??'boundary').toMatch(/player|ended|boundary/);
+    // Wait for the run screen to mount after a terminal battle.
+    await page.waitForFunction(() => document.querySelector(
+      '#game[data-phase="player"], #run-screen:not([hidden])',
+    ) !== null, undefined, { timeout: 5_000 });
   }
   await expect(page.getByRole('heading',{name:'Choose one reward'})).toBeVisible();
   await page.getByRole('button',{name:'Claim Healing Draught',exact:true}).click();await page.locator('#item-confirm').click();
