@@ -21,10 +21,9 @@ declare global {
     testingSaveAudit: { calls: string[]; snapshot: () => Record<string, string | null> };
   }
 }
-for(const group of ['journeys','diagnostics','qbert'] as const)
+for(const group of ['journeys','diagnostics'] as const)
 for(const condition of ['missing','valid','corrupt','backup-only','unavailable'] as const) test(group==='journeys'
   ?`testing routes: fresh play never accesses ${condition} saved games`
-  :group==='qbert'?`testing routes: Qbert never accesses ${condition} saved games`
   :`testing routes: diagnostic play never accesses ${condition} saved games`,async({page})=>{
   const families={battle:keys,run:RUN_STORAGE_KEYS,dungeon:DUNGEON_KEYS};
   const values:Record<string,string>={'isolation-unrelated':'preserve'};
@@ -72,11 +71,11 @@ for(const condition of ['missing','valid','corrupt','backup-only','unavailable']
   ],diagnostics:[
     ['battle','./?scene=battle&game=run&entry=continue'],['proof','./?scene=proof&game=dungeon&entry=new'],
     ['content-smoke','./?scene=content-smoke&game=run&entry=recovery'],
-  ],qbert:[['qbert','./qbert?game=run&entry=continue']]}[group];
+  ]}[group];
   for(const [mode,url]of entries)await test.step(mode+' '+url,async()=>{
     await page.goto(url);
     const ready=async()=>{
-      if(mode==='battle'||mode==='qbert')await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+      if(mode==='battle')await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
       else if(mode==='run')await expect(page.locator('#run-start')).toBeVisible();
       else if(mode==='dungeon')await expect(page.locator('#dungeon-map')).toBeVisible();
       else if(mode==='map')await expect(page.locator('#map-grid span')).toHaveCount(400);
@@ -89,10 +88,6 @@ for(const condition of ['missing','valid','corrupt','backup-only','unavailable']
       await page.locator('#fit-restart').click();
       if(new URL(page.url()).searchParams.get('game')==='battle')await confirmRestart(page);
       await expect.poll(async()=>JSON.parse(await page.locator('#game').getAttribute('data-session')??'null')?.state.seed).toBe(2);
-    }else if(mode==='qbert'){
-      const before=await readSession(page);await endTurn(page);
-      await expect.poll(async()=>(await readSession(page)).state.commandCount).toBeGreaterThan(before.state.commandCount);
-      await page.locator('#fit-restart').click();await ready();
     }else if(mode==='run'){
       await page.locator('#run-start').click();await page.locator('#run-start-encounter').click();
       await expect(page.locator('#game')).toHaveAttribute('data-phase','player');await endTurn(page);

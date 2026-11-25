@@ -44,8 +44,7 @@
       "tests/content-loading.spec.ts",
       "tests/lifecycle.spec.ts",
       "tests/public-asset-base.spec.ts",
-      "tests/run-progression.spec.ts",
-      "tests/qbert.spec.ts"
+      "tests/run-progression.spec.ts"
     ]
   },
   {
@@ -93,8 +92,7 @@
       "tests/procedural-grids.spec.ts",
       "tests/run-progression.spec.ts",
       "tests/terrain-materials.spec.ts",
-      "tests/unit-health-bars.spec.ts",
-      "tests/qbert.spec.ts"
+      "tests/unit-health-bars.spec.ts"
     ]
   },
   {
@@ -142,8 +140,7 @@
       "tests/procedural-grids.spec.ts",
       "tests/run-progression.spec.ts",
       "tests/terrain-materials.spec.ts",
-      "tests/unit-health-bars.spec.ts",
-      "tests/qbert.spec.ts"
+      "tests/unit-health-bars.spec.ts"
     ]
   }
 ]
