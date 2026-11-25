@@ -41,6 +41,17 @@ test('real discoveries preserve every retained ID with the approved desktop and 
   }
 });
 
+test('full-floor journeys keep saved manual pickup on desktop and touch pickup on mobile', () => {
+  for (const [stage, desktop] of [['chromium', 'desktop'], ['webkit-exploration', 'desktop-webkit']]) {
+    const { tests, projects } = after.selections[stage];
+    const profilesFor = title => tests.filter(row => row.title === title).map(row => row.project).sort();
+    const allProfiles = projects.map(project => project.name).sort();
+    assert.deepEqual(profilesFor('saved menu dungeon keeps proof tools hidden across legal encounters'), [desktop]);
+    assert.deepEqual(profilesFor('testing dungeon legally clears a floor, descends and backtracks without accessing saves'), allProfiles);
+    assert.deepEqual(profilesFor('saved menu dungeon auto-collects loot across a complete first floor'), allProfiles);
+  }
+});
+
 test('selection contract rejects missing, extra, duplicate, wrong-profile and device configuration drift', () => {
   assert.ok(after);
   const reject = mutate => { const changed = structuredClone(after); mutate(changed); assert.throws(() => compareSelections(before, changed)); };

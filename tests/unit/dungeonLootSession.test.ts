@@ -3,8 +3,9 @@ import { DungeonSession } from '../../src/app/DungeonSession';
 import { dungeonContent } from '../../src/content/dungeon';
 import { acceptDungeonBattle, currentFloor, dungeonBoundary, readDungeon, startDungeonBattle, stepDungeon,
   type DungeonResult, type DungeonState } from '../../src/domain/dungeon';
+import { freshRunStats } from '../../src/domain/runStats';
 import { createDungeonStorage, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
-import { atCell, dungeonContactApproach } from '../helpers/dungeonFixtures';
+import { atCell, dungeonContactApproach, dungeonGroundPileFixture } from '../helpers/dungeonFixtures';
 
 const good = (result: DungeonResult) => { assert(result.ok, result.ok ? '' : result.reason); return result.state; };
 function memory() {
@@ -36,8 +37,12 @@ function savedOwner(initial: DungeonState, serializeWrite?: (task: () => void, u
   return { data, storage, owner };
 }
 
-it('saves movement, ownership and depleted loot together; duplicate steps and reload cannot grant twice', async () => {
-  const initial = victory(), { storage, owner } = savedOwner(initial), loot = currentFloor(initial).loot![0];
+it.each([
+  { floor: 'active', makeState: victory, enemySteps: 1 },
+  { floor: 'cleared', makeState: dungeonGroundPileFixture, enemySteps: 0 },
+])('persists a manual pickup once on $floor floors, including after reload', async ({ makeState, enemySteps }) => {
+  const initial = { ...makeState(), stats: freshRunStats('since-upgrade') };
+  const { storage, owner } = savedOwner(initial), loot = currentFloor(initial).loot![0];
   const before = storage.inspect().primary; assert(before.status === 'valid');
   expect(currentFloor(before.state).loot![0].remaining).toBe(1);
   const command = { ...owner.spatialBoundary, destination: loot.cell };
@@ -46,6 +51,10 @@ it('saves movement, ownership and depleted loot together; duplicate steps and re
   expect(owner.status).toContain(`Picked up ${dungeonContent.items[loot.itemId].label}`);
   const accepted = owner.snapshot, saved = storage.inspect().primary; assert(saved.status === 'valid');
   expect(saved.state).toEqual(accepted);
+  expect(accepted.stats!.movesTaken).toBe(initial.stats.movesTaken + 1);
+  expect(currentFloor(accepted).exploration.movement!.step)
+    .toBe(currentFloor(initial).exploration.movement!.step + enemySteps);
+  expect(accepted.party).toEqual(initial.party);
   expect(await owner.step(command)).toBe(false); expect(owner.snapshot).toEqual(accepted);
   owner.dispose();
   const resumed = new DungeonSession(initial, storage); assert(resumed.continue(resumed.inspect()));
