@@ -14,7 +14,7 @@ import { readRewardOffer, rewardOffer, type RewardOffer } from './rewards';
 import type { RunHero } from './run';
 import { resolveBattlefield, sameBattlefield, layoutSeed, type BattlefieldDescriptor } from './battlefield';
 import { createBattle } from './turns';
-import { readBattleState } from './battle';
+import { hasHealGoblinCap, readBattleState } from './battle';
 import type { BattleState } from './types';
 import { DUNGEON_ENCOUNTER_POLICY, EXPANDED_ENCOUNTER_POLICY, LEGACY_ENCOUNTER_POLICY, dungeonBiome, legacyDungeonEncounter, selectDungeonEncounter, readDungeonEncounterSelection,
   encounterBattleCatalog, projectDungeonEnemies, type EncounterSelection, type DungeonEncounterPolicy } from './dungeonEncounters';
@@ -202,7 +202,11 @@ function pickupDungeonLoot(s: DungeonState): DungeonState {
   floors[s.depth - 1] = { ...floor, loot: floor.loot!.map(loot => pickup.collected.has(loot.id) ? { ...loot, remaining: 0 } : loot) };
   return { ...s, floors, ownership: pickup.ownership };
 }
-export function dungeonBattle(s: DungeonState, cappedHealing = false) {
+/** Rebuild the encounter origin using the active save's rules, or current rules for a new entry. */
+export function dungeonBattle(s: DungeonState) {
+  return buildDungeonBattle(s, !s.activeBattle || hasHealGoblinCap(s.activeBattle.units));
+}
+function buildDungeonBattle(s: DungeonState, cappedHealing: boolean) {
   const slot = activeDungeonSlot(s);
   if (slot >= 3) return null;
   const plan = currentFloor(s).descriptor.encounters[slot];
@@ -391,7 +395,8 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
       (state.phase === 'battle' ? exp.cleared!.includes(active) : !exp.cleared!.includes(active)))) return fail('invalidEncounterPosition');
   const admitted = entered ? { ...state, encounterEntry: { ...state.encounterEntry! } } : state;
   if (state.phase === 'battle') {
-    const battle = dungeonBattle(state);
+    // The snapshot is still untrusted. Resolve its catalog before reading any of its units.
+    const battle = buildDungeonBattle(state, false);
     const read = battle && readBattleState(state.activeBattle, battle.catalog);
     if (!battle || !read?.ok || !matchesDraughtStock(read.state.draughts, state.ownership, items) || !sameBattlefield(state.battlefield, battle.battlefield) ||
       read.state.seed !== battle.state.seed || read.state.mapId !== battle.state.mapId ||
@@ -437,7 +442,7 @@ export function startDungeonBattle(s: DungeonState, destination?: number): Dunge
   const floors = [...s.floors];
   floors[s.depth-1] = {...f, exploration:{...exploration,active:poi.encounterSlot}};
   const staged = {...s,floors, ...(destination !== undefined ? { encounterEntry: { origin: f.position, contact, slot: poi.encounterSlot } } : {})};
-  const battle = dungeonBattle(staged, true);
+  const battle = dungeonBattle(staged);
   return battle ? advance(staged, { phase: 'battle', activeBattle: battle.state, battlefield: battle.battlefield }) : fail('invalidBattle');
 }
 /** Only the session owning this active battle may call this accepted-state boundary. */

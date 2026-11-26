@@ -348,7 +348,7 @@ it('chooses Hex instead of a third heal in the seeded Elite encounter with an in
 it('rebuilds a capped replay and reproduces the uninterrupted suffix after resuming at one cast', async () => {
   const witness = shamanJourney(189);
   const { entry, replay, commands } = witness;
-  const built = dungeonBattle(entry, hasHealGoblinCap(replay.initial.units));
+  const built = dungeonBattle(entry);
   assert(built);
   const { battlefield, ...record } = replay;
   const read = readReplay(record, built.catalog);
@@ -371,7 +371,8 @@ it('rebuilds a capped replay and reproduces the uninterrupted suffix after resum
   const saved = decoded.state.activeBattle;
   expect(saved.units.find(unit => unit.id === 6)?.healGoblinRemaining).toBe(1);
   expect(acceptDungeonBattle(decoded.state, built.state)).toEqual({ ok: false, reason: 'invalidBattle' });
-  expect(acceptDungeonBattle(decoded.state, dungeonBattle(entry)!.state)).toEqual({ ok: false, reason: 'invalidBattle' });
+  const uncapped = { ...saved, units: saved.units.map(({ healGoblinRemaining: _, ...unit }) => unit) };
+  expect(acceptDungeonBattle(decoded.state, uncapped)).toEqual({ ok: false, reason: 'invalidBattle' });
   const continued = await new DungeonSession(decoded.state, null).startEncounter();
   assert(continued);
   expect(continued.state).toEqual(saved);
