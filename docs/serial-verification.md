@@ -1,6 +1,6 @@
 # Resumable serial verification (#208 phase A)
 
-The manual `issue-200-baseline.yml` workflow has six modes:
+The manual `issue-200-baseline.yml` workflow has seven modes:
 
 - `qualify` (default): bounded tooling, diagnostics, build, two-engine smoke and
   timeout-recovery checks. It does not launch a baseline.
@@ -161,8 +161,8 @@ same test in different root/prefix/dev modes is not deduplicated. Native blob ZI
 remain separate so a cross-mode HTML merge cannot overwrite those distinctions.
 
 Resuming the same run requires unchanged source and the original build artifact.
-After source changes or artifact expiry, start a new plan. In `parallel-pilot`
-and `parallel-pair`, both batches must publish readiness in the same attempt.
+After source changes or artifact expiry, start a new plan. In `parallel-pilot`,
+`parallel-pair` and `parallel-full`, both batches must publish readiness in the same attempt.
 Dispatch a fresh run or rerun all jobs together. A targeted rerun of one batch
 will time out waiting for its peer's readiness artifact.
 
