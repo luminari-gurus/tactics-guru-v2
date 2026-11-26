@@ -81,6 +81,15 @@ const admittedEncounters = new Map<string, true>();
 function admissionKey(seed: number, selection: EncounterSelection, battlefield: BattlefieldDescriptor) {
   return hashJson({ seed, selection, battlefield });
 }
+// Only normalized descriptors enter this cache. Historical encounters must still
+// resolve their battlefield geometry the first time their floor becomes current.
+const checkedDescriptors = new WeakMap<FloorDescriptor, { seed: number; policy: DungeonEncounterPolicy; current: boolean }>();
+function freezeDescriptorParts(value: object): void {
+  for (const part of Object.values(value)) {
+    if (part !== null && typeof part === 'object') freezeDescriptorParts(part);
+  }
+  Object.freeze(value);
+}
 function rememberAdmission(key: string) {
   admittedEncounters.delete(key); admittedEncounters.set(key, true);
   if (admittedEncounters.size > 128) admittedEncounters.delete(admittedEncounters.keys().next().value!);
@@ -243,7 +252,10 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
     if (!biome || policy === LEGACY_ENCOUNTER_POLICY && biome.id !== 'grassland' ||
       policy === DUNGEON_ENCOUNTER_POLICY && biome.id !== 'forest' && biome.id !== 'desert') return fail('invalidFloor');
     let descriptor: FloorDescriptor;
-    {
+    const cached = checkedDescriptors.get(f.descriptor as unknown as FloorDescriptor);
+    if (cached?.seed === input.seed && cached.policy === policy && (cached.current || i + 1 !== input.depth)) {
+      descriptor = f.descriptor as unknown as FloorDescriptor;
+    } else {
       if (!isDenseArray(f.descriptor.encounters, 3) || f.descriptor.encounters.length !== 3) return fail('invalidSelection');
       const encounters: FloorDescriptor['encounters'][number][] = [];
       for (const [slot, plan] of f.descriptor.encounters.entries()) {
@@ -275,8 +287,10 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
         }
       }
       descriptor = { ...f.descriptor, encounters } as unknown as FloorDescriptor;
-      if (policy !== LEGACY_ENCOUNTER_POLICY && i > 0 && descriptor.biome === floors[i - 1].descriptor.biome) return fail('invalidBiomeProgression');
+      freezeDescriptorParts(descriptor);
+      checkedDescriptors.set(descriptor, { seed: input.seed, policy, current: i + 1 === input.depth });
     }
+    if (policy !== LEGACY_ENCOUNTER_POLICY && i > 0 && descriptor.biome === floors[i - 1].descriptor.biome) return fail('invalidBiomeProgression');
     const exploration = readExploration(f.exploration, descriptor.seed, f.position, floorMap(descriptor));
     if (!exploration || exploration.version === 'exploration-v2' && exploration.cleared!.length !== f.completed) return fail('invalidExploration');
     if (exploration.version === 'exploration-v2' && i + 1 !== input.depth && exploration.active !== null) return fail('invalidExploration');

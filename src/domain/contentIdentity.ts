@@ -16,21 +16,25 @@ export function canonical(value: unknown): string {
 const rotate = (x: number, n: number): number => (x >>> n) | (x << (32 - n));
 /** Canonical sorted-key JSON, UTF-8, SHA-256. No browser crypto or Node dependencies. */
 export function hashJson(value: unknown): string {
-  const encoded = encodeURIComponent(canonical(value));
-  const bytes: number[] = [];
-  for (let i = 0; i < encoded.length; i++) {
-    if (encoded[i] === '%') { bytes.push(Number.parseInt(encoded.slice(i + 1, i + 3), 16)); i += 2; }
-    else bytes.push(encoded.charCodeAt(i));
-  }
-  const length = bytes.length;
-  bytes.push(0x80);
-  while (bytes.length % 64 !== 56) bytes.push(0);
-  const bits = length * 8;
-  const high = Math.floor(bits / 0x100000000), low = bits >>> 0;
-  for (const word of [high,low]) for (const shift of [24,16,8,0]) bytes.push((word >>> shift) & 255);
-  const hash: number[] = [...INITIAL];
+  return hashCanonical(canonical(value));
+}
+
+/** Hash an already serialized canonical JSON document. */
+export function hashCanonical(json: string): string {
+  // Save envelopes are predominantly ASCII, which is already its UTF-8 byte sequence.
+  const binary = /[^\x00-\x7f]/.test(json)
+    ? encodeURIComponent(json).replace(/%([0-9A-F]{2})/g, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)))
+    : json;
+  const length = binary.length;
+  const bytes = new Uint8Array(Math.ceil((length + 9) / 64) * 64);
+  for (let i = 0; i < length; i++) bytes[i] = binary.charCodeAt(i);
+  bytes[length] = 0x80;
+  const tail = new DataView(bytes.buffer);
+  tail.setUint32(bytes.length - 8, Math.floor(length * 8 / 0x100000000));
+  tail.setUint32(bytes.length - 4, length * 8);
+  const hash = [...INITIAL];
+  const w = new Uint32Array(64);
   for (let offset = 0; offset < bytes.length; offset += 64) {
-    const w: number[] = [];
     for (let i = 0; i < 16; i++) {
       const p = offset + i * 4;
       w[i] = ((bytes[p] << 24) | (bytes[p+1] << 16) | (bytes[p+2] << 8) | bytes[p+3]) >>> 0;
