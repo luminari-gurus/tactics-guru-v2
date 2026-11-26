@@ -172,7 +172,7 @@ test('aggregate reports preparation stages and the tooling result when the plan 
     const run = spawnSync(process.execPath, ['--input-type=module', '-e',
       'const { main } = await import(process.argv[1]); process.exitCode = await main(process.argv.slice(2));',
       script, 'aggregate', bundle, join(directory, 'receipts'), output],
-    { env: { ...process.env, GITHUB_STEP_SUMMARY: stepSummary, SERIAL_FULL_TOOLING_RESULT: 'failure' } });
+    { env: { ...process.env, GITHUB_STEP_SUMMARY: stepSummary, SERIAL_FULL_TOOLING_RESULT: 'failure', SERIAL_FULL_BATCH_RESULT: 'skipped' } });
     assert.equal(run.status, 1, run.stderr?.toString());
     const report = JSON.parse(readFileSync(join(output, 'summary.json'), 'utf8'));
     assert.equal(report.passed, false);
@@ -180,7 +180,7 @@ test('aggregate reports preparation stages and the tooling result when the plan 
     assert.equal(report.baselineEligible, false);
     assert.deepEqual(report.latest, [preparation]);
     const summary = readFileSync(join(output, 'summary.md'), 'utf8');
-    assert.match(summary, /tooling: latest Actions job result was failure/);
+    assert.match(summary, /Browser shards skipped\. tooling: latest Actions job result was failure/);
     assert.match(summary, /Preparation \/ units: failed \(Unit test failed\)/);
     assert.match(summary, /Preparation \/ build-root: blocked/);
     assert.equal(readFileSync(stepSummary, 'utf8'), summary);
@@ -284,7 +284,7 @@ test('a failed setup/upload on a newer Actions attempt cannot reuse an older pas
   assert.equal(validateScheduling(value.plan, summary, scheduler).length, 1);
 });
 
-test('full scheduling reports a newer tooling failure and explains skipped browser jobs', () => {
+test('a tooling failure skips the parent batch before matrix expansion and retains older receipts as history', () => {
   const plan = createPlan('parallel-full', discovery);
   const names = ['prepare', ...plan.requested.map(id => `batch (${id})`)];
   const startedAt = '2026-10-22T00:00:00Z', completedAt = '2026-10-22T00:00:02Z';
@@ -292,11 +292,20 @@ test('full scheduling reports a newer tooling failure and explains skipped brows
   const summary = { latest: ['prepare', ...plan.requested].map(batchId => ({ batchId, startedAt, finishedAt: completedAt })) };
   const scheduler = { jobs: [...names.map(name => job(name)), job('tooling')] };
   assert.deepEqual(validateScheduling(plan, summary, scheduler), []);
-  scheduler.jobs.push(job('tooling', 2, 'failure'), ...names.slice(1).map(name => job(name, 2, 'skipped')));
-  assert.deepEqual(validateScheduling(plan, { latest: summary.latest.slice(0, 1) }, scheduler), [
-    'tooling: latest Actions job result was failure; full browser shards require successful tooling',
-    ...plan.requested.map(id => `${id}: skipped; tooling prerequisite did not succeed`),
-  ]);
+  scheduler.jobs.push(job('tooling', 2, 'failure'), job('batch', 2, 'skipped'));
+  assert.match(validateScheduling(plan, summary, scheduler)[0], /tooling: latest Actions job result was failure/);
+  const skipReason = 'Browser shards skipped after tooling failed';
+  const value = fixture();
+  const oldReceipts = value.receipts.map((report, i) => ({ ...report, batchId: plan.requested[i] }));
+  const result = aggregate({ ...value.plan, ...plan }, value.build, value.preparation, oldReceipts, skipReason);
+  assert.equal(result.passed, false);
+  assert.equal(result.complete, false);
+  assert.equal(result.baselineEligible, false);
+  assert.ok(result.errors.includes(skipReason));
+  assert.ok(!result.errors.some(error => /missing receipt|overlapping/.test(error)));
+  assert.deepEqual(result.latest.map(report => report.batchId), ['prepare']);
+  assert.deepEqual(result.history.slice(1).map(report => report.batchId), plan.requested);
+  assert.deepEqual(validateScheduling(plan, result, scheduler, true), []);
 });
 
 test('Actions copied successful snapshots can reuse old receipts without double-counting compute', () => {
@@ -478,6 +487,7 @@ test('full parallel browsers require the independent tooling job on the second r
   assert.match(job('batch'), /inputs.mode != 'parallel-full' \|\| needs.tooling.result == 'success'/);
   assert.match(job('aggregate'), /needs: \[prepare, batch, tooling\]/);
   assert.match(job('aggregate'), /SERIAL_FULL_TOOLING_RESULT: .*needs\.tooling\.result/);
+  assert.match(job('aggregate'), /SERIAL_FULL_BATCH_RESULT: .*needs\.batch\.result/);
 });
 
 test('full discovery binds exact cases to preparation from the same source and runtime', () => {

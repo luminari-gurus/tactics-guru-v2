@@ -324,6 +324,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           SERIAL_FULL_TOOLING_RESULT: ${{ inputs.mode == 'parallel-full' && needs.tooling.result || '' }}
+          SERIAL_FULL_BATCH_RESULT: ${{ inputs.mode == 'parallel-full' && needs.batch.result || '' }}
         run: node scripts/verification-batches.mjs aggregate verification-receipts/serial/bundle verification-receipts/serial/downloads verification-receipts/serial/aggregate
       - uses: actions/upload-artifact@v4
         if: always()
