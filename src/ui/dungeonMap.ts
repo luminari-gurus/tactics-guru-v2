@@ -78,7 +78,8 @@ export class DungeonMap {
   private readonly resize = new ResizeObserver(() => this.scheduleLayout(false, true));
   private layoutFrame = 0;
   private layoutDirty = true;
-  private revealPlayer = false;
+  private revealPlayerX = false;
+  private revealPlayerY = false;
   private layoutSize = { width: 0, height: 0 };
   private layoutParent: HTMLElement | null = null;
   private layoutScreen: HTMLElement | null = null;
@@ -166,7 +167,7 @@ export class DungeonMap {
       const clampedTop = Math.min(this.viewportScroll.top, this.viewport.scrollHeight - height);
       // A manual pan supersedes a queued follow. A resize that clamps the old offset still follows.
       if (left !== clampedLeft || top !== clampedTop) {
-        this.revealPlayer = false;
+        this.revealPlayerX = this.revealPlayerY = false;
         this.layoutSize = { width, height };
       }
       this.viewportScroll = { left, top };
@@ -199,7 +200,8 @@ export class DungeonMap {
   }
   /** Fit controls to the visible screen; scroll only the map window when following movement. */
   private scheduleLayout(reveal: boolean, refit = false) {
-    this.revealPlayer ||= reveal;
+    this.revealPlayerX ||= reveal;
+    this.revealPlayerY ||= reveal;
     this.layoutDirty ||= refit;
     if (!this.live || this.layoutFrame) return;
     this.layoutFrame = requestAnimationFrame(() => {
@@ -215,18 +217,19 @@ export class DungeonMap {
         this.layoutDirty = false;
         this.fitViewport();
       }
-      if (!this.revealPlayer || !this.state || !this.map || !this.layoutGeometry) return;
-      this.revealPlayer = false;
+      const followX = this.revealPlayerX, followY = this.revealPlayerY;
+      if ((!followX && !followY) || !this.state || !this.map || !this.layoutGeometry) return;
+      this.revealPlayerX = this.revealPlayerY = false;
       const position = currentFloor(this.state).position, geometry = this.layoutGeometry;
       const left = geometry.left + position % this.map.width * geometry.columnStride;
       const top = geometry.top + Math.floor(position / this.map.width) * geometry.rowStride;
       const margin = Math.max(geometry.cellWidth, geometry.cellHeight);
       let { left: scrollLeft, top: scrollTop } = this.viewportScroll;
       // Ordinary visible steps use cached geometry instead of flushing the freshly updated HUD layout.
-      if (left - margin < scrollLeft) scrollLeft = left - margin;
-      else if (left + geometry.cellWidth + margin > scrollLeft + geometry.width) scrollLeft = left + geometry.cellWidth + margin - geometry.width;
-      if (top - margin < scrollTop) scrollTop = top - margin;
-      else if (top + geometry.cellHeight + margin > scrollTop + geometry.height) scrollTop = top + geometry.cellHeight + margin - geometry.height;
+      if (followX && left - margin < scrollLeft) scrollLeft = left - margin;
+      else if (followX && left + geometry.cellWidth + margin > scrollLeft + geometry.width) scrollLeft = left + geometry.cellWidth + margin - geometry.width;
+      if (followY && top - margin < scrollTop) scrollTop = top - margin;
+      else if (followY && top + geometry.cellHeight + margin > scrollTop + geometry.height) scrollTop = top + geometry.cellHeight + margin - geometry.height;
       scrollLeft = Math.max(0, Math.min(geometry.maxLeft, scrollLeft));
       scrollTop = Math.max(0, Math.min(geometry.maxTop, scrollTop));
       if (scrollLeft !== this.viewportScroll.left || scrollTop !== this.viewportScroll.top) {
@@ -265,7 +268,9 @@ export class DungeonMap {
     const size = { width: this.viewport.clientWidth, height: this.viewport.clientHeight };
     // Resize notifications can arrive after a player has started inspecting the map.
     // Follow once for an actual size change, not again for a delayed duplicate event.
-    this.revealPlayer ||= size.width !== this.layoutSize.width || size.height !== this.layoutSize.height;
+    // A delayed height adjustment must not undo a horizontal pan, or vice versa.
+    this.revealPlayerX ||= size.width !== this.layoutSize.width;
+    this.revealPlayerY ||= size.height !== this.layoutSize.height;
     this.layoutSize = size;
     const grid = this.grid.getBoundingClientRect(), view = this.viewport.getBoundingClientRect();
     const style = getComputedStyle(this.grid);
