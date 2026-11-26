@@ -12,24 +12,26 @@ import { fighterDecision, rangerDecision, mageDecision } from './helpers/playerP
 import { journeyPreparation, rangerJourney, selectMageJourney, fighterJourney, FIGHTER_JOURNEY_SEED } from './helpers/dungeonFixtures';
 
 async function dungeonEvidence(page:Page, attribute:string) {
- return page.locator('#game').evaluate((game,key)=>JSON.parse(game.getAttribute(key)??sessionStorage.getItem(key)!),attribute);
+ return JSON.parse((await page.locator('#game').getAttribute(attribute))!);
 }
 async function snapshot(page:Page):Promise<DungeonState>{return dungeonEvidence(page,'data-dungeon-snapshot');}
 async function seed(page:Page,s:DungeonState){
- // Retain the terminal battle trace for replay checks across the menu navigation.
- await page.addInitScript(()=>window.addEventListener('pagehide',()=>{
-  const game=document.querySelector('#game'),snapshot=game?.getAttribute('data-dungeon-snapshot');
-  if(!snapshot||JSON.parse(snapshot).phase!=='defeat')return;
-  sessionStorage.setItem('data-dungeon-snapshot',snapshot);
-  const record=game?.getAttribute('data-dungeon-battle-record');
-  if(record)sessionStorage.setItem('data-dungeon-battle-record',record);
- },{once:true}));
  const encoded=encodeDungeon(s);if(!encoded.ok)throw Error(encoded.reason);await page.goto('./');await page.evaluate(({key,text,preferenceKey})=>{localStorage.setItem(preferenceKey,'off');localStorage.setItem(key,text);}, {key:DUNGEON_KEYS.primary,text:encoded.text,preferenceKey:AUTO_COLLECT_LOOT_KEY});await page.goto('./?game=dungeon');await expectDungeonResumed(page);}
+
+async function continueDefeat(page:Page, touch:boolean) {
+ const screen=page.locator('#dungeon-screen');
+ await expect(screen.getByRole('heading',{name:'Dungeon defeat',exact:true})).toBeVisible();
+ const final=await snapshot(page);
+ const continueButton=screen.getByRole('button',{name:'Continue',exact:true});
+ if(touch)await continueButton.tap();else await continueButton.press('Enter');
+ await expect(page.getByRole('dialog',{name:'Dungeon defeat',exact:true})).toBeVisible();
+ return final;
+}
 
 /** Read fresh progress from the same public DOM records without transferring full histories for polling. */
 async function mageProgress(page:Page) {
  return page.locator('#game').evaluate(game=>{
-  const dungeonPhase=JSON.parse(game.getAttribute('data-dungeon-snapshot')??sessionStorage.getItem('data-dungeon-snapshot')!).phase;
+  const dungeonPhase=JSON.parse(game.getAttribute('data-dungeon-snapshot')!).phase;
   if(dungeonPhase!=='battle')return {dungeonPhase,sessionPhase:null,commandCount:null};
   const session=JSON.parse(game.getAttribute('data-session')!);
   return {dungeonPhase,sessionPhase:session.phase,commandCount:session.state.commandCount};
@@ -88,8 +90,7 @@ test('Mage legal progression journey earns level three uses Frost Snare and mult
    else throw Error('Unexpected preparation command');await page.locator('#dungeon-item-confirm').click();
   }
  }
- await expect(page.getByRole('dialog',{name:'Dungeon defeat',exact:true})).toBeVisible();
- const final=await snapshot(page);writeFileSync(test.info().outputPath('mage-production-journey.json'),JSON.stringify({seed:witness.seed,range:selection.range,attempts:selection.attempts,selectionMs,records,final,used,blocked,expired}));
+ const final=await continueDefeat(page,isMobile);writeFileSync(test.info().outputPath('mage-production-journey.json'),JSON.stringify({seed:witness.seed,range:selection.range,attempts:selection.attempts,selectionMs,records,final,used,blocked,expired}));
  expect(final.phase).toBe('defeat');expect(final.party).toEqual(witness.state.party);expect(used).toEqual({snare:true,missiles:true});expect(blocked&&expired).toBe(true);expect(errors).toEqual([]);
  await page.screenshot({path:test.info().outputPath('mage-terminal-journey.png'),fullPage:true});
 });
@@ -143,8 +144,7 @@ test('Ranger legal progression journey earns level three uses Mark and Pin and r
    else throw Error('Unexpected preparation command');await page.locator('#dungeon-item-confirm').click();
   }
  }
- await expect(page.getByRole('dialog',{name:'Dungeon defeat',exact:true})).toBeVisible();
- const final=await snapshot(page);writeFileSync(test.info().outputPath('ranger-production-journey.json'),JSON.stringify({seed:12,records,final,used,consumed}));
+ const final=await continueDefeat(page,isMobile);writeFileSync(test.info().outputPath('ranger-production-journey.json'),JSON.stringify({seed:12,records,final,used,consumed}));
  expect(final.phase).toBe('defeat');expect(final.party).toEqual(witness.state.party);expect(used).toEqual({mark:true,pin:true});expect(consumed).toBe(true);expect(errors).toEqual([]);
  await page.screenshot({path:test.info().outputPath('ranger-terminal-journey.png'),fullPage:true});
 });
@@ -204,8 +204,7 @@ test('Fighter legal progression journey earns level three uses both abilities an
   }
   if(depth<witness.state.depth){const s=await snapshot(page);await walkDungeon(page,s.floors[depth-1].descriptor.downstairs,isMobile?'touch':'keyboard');expect((await snapshot(page)).depth).toBe(depth+1);}
  }
- await expect(page.getByRole('dialog',{name:'Dungeon defeat',exact:true})).toBeVisible();
- const final=await snapshot(page);expect(final.floors.map(f=>f.completed)).toEqual([3,2]);expect(final.phase).toBe('defeat');expect(final.party.find(h=>h.heroId==='fighter')!.level).toBeGreaterThanOrEqual(3);expect(healed).toBe(true);expect(taunted).toBe(true);expect(errors).toEqual([]);
+ const final=await continueDefeat(page,isMobile);expect(final.floors.map(f=>f.completed)).toEqual([3,2]);expect(final.phase).toBe('defeat');expect(final.party.find(h=>h.heroId==='fighter')!.level).toBeGreaterThanOrEqual(3);expect(healed).toBe(true);expect(taunted).toBe(true);expect(errors).toEqual([]);
  expect(final.party).toEqual(witness.state.party);
  writeFileSync(test.info().outputPath('fighter-production-journey.json'),JSON.stringify({seed:witness.seed,records,final,healed,taunted}));await page.screenshot({path:test.info().outputPath('fighter-terminal-journey.png'),fullPage:true});
 });

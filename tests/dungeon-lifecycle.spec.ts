@@ -1,3 +1,4 @@
+import type { Locator } from '@playwright/test';
 import type { ContentCatalog } from '../src/content/types';
 import { neighbors, poiCell } from '../src/domain/exploration';
 import { MOVEMENT_DIRECTIONS } from '../src/domain/constants';
@@ -11,7 +12,7 @@ import {freshDungeon,startDungeonBattle,dungeonBattle,floorMap,type DungeonState
 import {BattleSession} from '../src/app/BattleSession';
 import {encodeDungeon} from '../src/domain/dungeonSaveEnvelope';
 import {DUNGEON_KEYS} from '../src/persistence/dungeonStorage';
-import {endTurn, playCommand,readSession} from './helpers/battlePolicy';
+import {downloadCombatLog,endTurn,playCommand,readSession} from './helpers/battlePolicy';
 import { readFileSync } from 'node:fs';
 import { canonical, hashJson } from '../src/domain/contentIdentity';
 import { RUN_RECORD_KEYS } from '../src/persistence/runRecordsStorage';
@@ -168,10 +169,24 @@ test('legal enemy defeat waits for its save and returns to the menu during a pen
   }),RUN_RECORD_KEYS.primary);
   await page.bringToFront();
   await openSavedDungeon(page,{...entry,activeBattle:before});
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','ended');
+  const defeat=page.locator('#dungeon-screen');
+  const heading=defeat.getByRole('heading',{name:'Dungeon defeat',exact:true});
+  const continueButton=defeat.getByRole('button',{name:'Continue',exact:true});
+  const activate=(button: Locator)=>isMobile?button.tap():button.press('Enter');
+  await expect(heading).toBeFocused();
   expect((await snapshot(page)).phase).toBe('defeat');
   await expect(page.locator('#main-menu')).toHaveCount(0);
-  await page.getByRole('button',{name:'Save recovery',exact:true}).click();
+  const log=await downloadCombatLog(page,activate);
+  expect(log.groups.at(-1)?.entries.at(-1)).toMatchObject({
+   type:'battleEnded',result:{outcome:'playerLoss'},text:'Defeat',
+  });
+  await expect(continueButton).toBeVisible();
+  await expect(page.locator('#main-menu')).toHaveCount(0);
+  expect(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!).payload.phase,DUNGEON_KEYS.primary)).toBe('battle');
+  await activate(continueButton);
+  await expect(heading).toBeVisible();
+  await expect(page.locator('#main-menu')).toHaveCount(0);
+  await activate(defeat.getByRole('button',{name:'Save recovery',exact:true}));
   await expect(page.getByRole('dialog',{name:'Saving journey',exact:true})).toBeVisible();
   await page.evaluate(()=>window.dispatchEvent(new Event('test-release-defeat-write')));
   const inBattleRecovery=page.getByRole('dialog',{name:'Dungeon save recovery',exact:true});
@@ -183,6 +198,7 @@ test('legal enemy defeat waits for its save and returns to the menu during a pen
   await expect(summary).toContainText('Deepest floor');
   await expect(summary).toContainText('Battles won');
   await expect(summary).toContainText('Active playtime');
+  await expect(page.getByRole('button',{name:'Export combat log',exact:true})).toHaveCount(0);
   await summary.getByRole('button',{name:'Hall of Records',exact:true}).click();
   const records=page.getByRole('dialog',{name:'Hall of Records',exact:true});
   await expect(records).toContainText('No finished journeys recorded yet.');

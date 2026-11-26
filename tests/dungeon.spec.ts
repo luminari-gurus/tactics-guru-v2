@@ -16,7 +16,7 @@ import { RUN_RECORD_KEYS } from '../src/persistence/runRecordsStorage';
 import { COMBAT_CONTROLS_KEY } from '../src/ui/combatControls';
 import { COMBAT_PACE_KEY } from '../src/ui/combatPacePreference';
 import { AUTO_COLLECT_LOOT_KEY } from '../src/ui/autoCollectLootPreference';
-import { endTurn, battleTool, readSession,playCommand,playUndo,checkActivePlaytime,checkBackgroundPlaytime } from './helpers/battlePolicy';
+import { endTurn, battleTool, downloadCombatLog, readSession,playCommand,playUndo,checkActivePlaytime,checkBackgroundPlaytime } from './helpers/battlePolicy';
 import { playerDecision, fighterDecision } from './helpers/playerPolicy';
 import { journeyPreparation, shamanJourney } from './helpers/dungeonFixtures';
 import { dispatch } from '../src/domain/turns';
@@ -625,16 +625,6 @@ test('Forest Elite keeps a living goblin visible behind raised terrain', async (
  await page.screenshot({ path: info.outputPath('forest-elite-archer.png') });
  for (const x of [5, 6]) expect(board.fadedTerrain ?? []).toContainEqual({ x, y: 3, columnAlpha: 0.3, surfaceAlpha: 0.3 });
 });
-
-async function downloadCombatLog(page: Page, activate: (button: Locator) => Promise<void>, name = 'Export combat log') {
- const button = page.getByRole('button',{name,exact:true});
- const [download] = await Promise.all([page.waitForEvent('download'), activate(button)]);
- expect(download.suggestedFilename()).toBe('tactics-guru-combat-log.json');
- const path = await download.path();
- if (!path) throw Error('Combat log download has no file');
- await test.info().attach('combat-log.json', { path, contentType: 'application/json' });
- return JSON.parse(readFileSync(path, 'utf8')) as { groups: { entries: { text: string }[] }[] };
-}
 
 test('battle log filters and keeps history across Hide and reopen', async ({ page, isMobile }) => {
  test.setTimeout(90_000);
