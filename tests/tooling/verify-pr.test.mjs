@@ -37,12 +37,12 @@ test('ordinary Playwright discovery and the PR alias have identical bounded sele
   assert.deepEqual(ordinary, explicit);
 });
 
-test('PR workflow cancels superseded runs only for the same PR', () => {
+test('only first attempts of automatic PR verification can supersede runs for the same PR', () => {
   const workflow = readFileSync(new URL('../../.github/workflows/pr-verification.yml', import.meta.url), 'utf8').replaceAll('\r\n', '\n');
   const concurrency = workflow.match(/^concurrency:\n((?:  [^\n]*\n)+)/m)?.[1];
   assert.deepEqual(concurrency?.trimEnd().split('\n'), [
-    "  group: pr-verification-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || format('manual-{0}', github.run_id) }}",
-    "  cancel-in-progress: ${{ github.event_name == 'pull_request' }}",
+    "  group: pr-verification-${{ github.event_name == 'pull_request' && github.run_attempt == '1' && format('pr-{0}', github.event.pull_request.number) || format('run-{0}', github.run_id) }}",
+    "  cancel-in-progress: ${{ github.event_name == 'pull_request' && github.run_attempt == '1' }}",
   ]);
 });
 
