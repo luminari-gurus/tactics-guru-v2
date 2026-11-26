@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process';
 import { appendFileSync, closeSync, cpSync, existsSync, mkdirSync, openSync, readFileSync, readdirSync, unlinkSync, writeFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import os from 'node:os';
 import { setTimeout as delay } from 'node:timers/promises';
@@ -17,8 +17,11 @@ const prefixIds = ['build-prefix', 'assets-prefix-preview', 'assets-prefix-dev',
 const pilotRunners = { 'pilot-chromium': 'unraid-tactics-01', 'pilot-webkit': 'unraid-tactics-02' };
 
 const pairRunners = { 'chromium-desktop-2': 'unraid-tactics-01', 'webkit-acceptance': 'unraid-tactics-02' };
+const fullRunners = { 'full-chromium': 'unraid-tactics-01', 'full-webkit-assets': 'unraid-tactics-02' };
 const isPair = mode => mode === 'parallel-pair' || mode === 'serial-pair';
-const isParallel = mode => mode === 'parallel-pilot' || mode === 'parallel-pair';
+const isParallel = mode => ['parallel-pilot', 'parallel-pair', 'parallel-full'].includes(mode);
+const runnerAssignments = mode => mode === 'parallel-full' ? fullRunners : isPair(mode) ? pairRunners : pilotRunners;
+const preparationFor = mode => mode === 'parallel-full' ? [...preparationIds, 'performance'] : preparationIds;
 
 const key = test => JSON.stringify([test.project, test.id]);
 
@@ -35,6 +38,13 @@ export function exactCoverage(expected, actual) {
 }
 
 export function definitions(mode = 'capture') {
+  if (mode === 'parallel-full') {
+    const remaining = stages.filter(stage => !preparationFor(mode).includes(stage.id));
+    return [
+      { id: 'full-chromium', stages: remaining.filter(stage => stage.id === 'chromium') },
+      { id: 'full-webkit-assets', stages: remaining.filter(stage => stage.id !== 'chromium') },
+    ];
+  }
   if (isPair(mode)) {
     const capture = definitions('capture');
     return Object.keys(pairRunners).map(id => {
@@ -48,9 +58,9 @@ export function definitions(mode = 'capture') {
   const webkit = stages.find(stage => stage.id === 'webkit-acceptance');
   if (mode !== 'capture') return [
     { id: 'pilot-chromium', stages: [{ ...chromium, id: 'pilot-chromium', args: [...chromium.args,
-      'tests/boot.spec.ts', '-g', 'boots a Phaser scene and fits the viewport after resize$'] }] },
+      'tests/main-menu.spec.ts', '-g', 'main menu: New Game starts immediately when no dungeon save exists$'] }] },
     { id: 'pilot-webkit', stages: [{ ...webkit, id: 'pilot-webkit', args: [...webkit.args,
-      '--project=acceptance-webkit-portrait', 'tests/battle-loop.spec.ts', '-g', 'complete legal authored battle seed'] }] },
+      'tests/main-menu.spec.ts', '-g', 'main menu: New Game starts immediately when no dungeon save exists$'] }] },
   ];
   const batches = read(join(root, 'scripts/verification-batches.json'));
   const chromiumJobs = batches.map(batch => ({ id: 'chromium-' + batch.id,
@@ -79,18 +89,22 @@ export function discover(stage, cwd = root) {
 }
 
 export function createPlan(mode, discoverCases = discover, filter = '') {
-  const jobs = definitions(mode).map(job => ({ ...job, stages: job.stages.map(stage => ({ ...stage,
-    expected: stage.browser ? discoverCases(stage) : null })) }));
-  const canonical = stages.filter(stage => stage.browser).map(stage => ({ id: stage.id, tests: discoverCases(stage) }));
-  if (mode === 'capture') for (const stage of canonical) {
+  const batches = definitions(mode);
+  // Unpartitioned jobs use the canonical stage object. Filtered Chromium and
+  // pilot stages have their own selectors and need independent discovery.
+  const canonicalCases = new Map(stages.filter(stage => stage.browser).map(stage => [stage, discoverCases(stage)]));
+  const canonical = Array.from(canonicalCases, ([stage, tests]) => ({ id: stage.id, tests }));
+  const jobs = batches.map(job => ({ ...job, stages: job.stages.map(stage => ({ ...stage,
+    expected: stage.browser ? (canonicalCases.get(stage) ?? discoverCases(stage)) : null })) }));
+  if (mode === 'capture' || mode === 'parallel-full') for (const stage of canonical) {
     const selected = jobs.flatMap(job => job.stages.filter(row => row.sourceStage === stage.id).flatMap(row => row.expected ?? []));
     exactCoverage(stage.tests, selected);
   }
-  invariant((!isPair(mode) && mode !== 'parallel-pilot') || !filter, 'Parallel pilot requires both browser batches');
+  invariant((!isPair(mode) && !isParallel(mode)) || !filter, 'Parallel pilot requires both browser batches');
   const requested = filter ? filter.split(',') : jobs.map(job => job.id);
   invariant(requested.length === new Set(requested).size && requested.every(id => jobs.some(job => job.id === id)), 'Unknown or duplicate batch selection');
-  return { schemaVersion: 1, mode, scope: mode === 'capture' && requested.length === jobs.length ? 'full' : 'partial',
-    requested, canonical, jobs, preparationIds, stageIds: stages.map(stage => stage.id) };
+  return { schemaVersion: 1, mode, scope: (mode === 'capture' || mode === 'parallel-full') && requested.length === jobs.length ? 'full' : 'partial',
+    requested, canonical, jobs, preparationIds: preparationFor(mode), stageIds: stages.map(stage => stage.id) };
 }
 
 export function inventory(directory) {
@@ -100,6 +114,37 @@ export function inventory(directory) {
     return entry.isDirectory() ? inventory(path).map(file => ({ ...file, path: entry.name + '/' + file.path }))
       : [{ path: entry.name, sha256: digest(readFileSync(path)) }];
   });
+}
+
+// Match both path and bytes so generated overrides of public files still travel with the build.
+export function packParallelBuild(directory, publicDir, packed, files) {
+  const originals = new Map(inventory(publicDir).map(file => [file.path, file.sha256]));
+  const fromPublic = [];
+  mkdirSync(packed, { recursive: true });
+  for (const file of files) {
+    if (originals.get(file.path) === file.sha256) {
+      fromPublic.push(file.path);
+    } else {
+      cpSync(join(directory, file.path), join(packed, file.path));
+    }
+  }
+  return fromPublic;
+}
+
+export function restorePublicBuildFiles(directory, publicDir, fromPublic) {
+  // Older complete artifacts carry every byte. Repeated readiness checks can reuse restored files.
+  if (!fromPublic?.length) return;
+  const missing = new Set(fromPublic);
+  for (const file of inventory(directory)) missing.delete(file.path);
+  if (!missing.size) return;
+  // Walk local source paths, never use an artifact-supplied path as a copy destination.
+  for (const file of inventory(publicDir)) {
+    if (!missing.delete(file.path)) continue;
+    const target = join(directory, file.path);
+    mkdirSync(dirname(target), { recursive: true });
+    cpSync(join(publicDir, file.path), target);
+  }
+  invariant(!missing.size, 'Missing public build input');
 }
 
 export function verifyBuild(plan, build, directory, source) {
@@ -117,8 +162,7 @@ function environment() {
 }
 
 function parallelRunner(plan, report) {
-  if (isPair(plan.mode)) return pairRunners[report.batchId];
-  return plan.mode === 'parallel-pilot' ? pilotRunners[report.batchId] : undefined;
+  return isPair(plan.mode) || isParallel(plan.mode) ? runnerAssignments(plan.mode)[report.batchId] : undefined;
 }
 
 function verifyRuntime(plan, report) {
@@ -178,11 +222,16 @@ export function pilotOverlap(receipts, ids = Object.keys(pilotRunners)) {
   const webkit = receipts.find(report => report.batchId === ids[1]);
   if (chromium?.attempt !== webkit?.attempt) return 0;
   const webkitCases = pilotIntervals(webkit);
-  return Math.max(0, ...pilotIntervals(chromium).flatMap(left => webkitCases.map(right => Math.min(
-    left.end - left.start, right.end - right.start,
-    left.end + left.minOffset - (right.start + right.maxOffset),
-    right.end + right.minOffset - (left.start + left.maxOffset),
-  ))));
+  let maximum = 0;
+  for (const left of pilotIntervals(chromium)) {
+    for (const right of webkitCases) {
+      const overlap = Math.min(left.end - left.start, right.end - right.start,
+        left.end + left.minOffset - (right.start + right.maxOffset),
+        right.end + right.minOffset - (left.start + left.maxOffset));
+      maximum = Math.max(maximum, overlap);
+    }
+  }
+  return maximum;
 }
 
 function receipt(plan, id) {
@@ -327,9 +376,20 @@ async function runReceipt(plan, id, rows, prerequisites, out, buildHash, sampleC
   return report;
 }
 
-export function aggregate(plan, build, preparation, receipts) {
+// A completed performance measurement can fail its budget while the ordinary build
+// is still valid. Keep that failure in the preparation receipt for the aggregate.
+export function canDistributeBuild(mode, report) {
+  if (report.passed) return true;
+  if (mode !== 'parallel-full' || !report.complete || !report.inputsUnchanged || report.error) return false;
+  const performance = report.stages.find(stage => stage.id === 'performance');
+  return performance?.status === 'failed' && preparationIds.every(id =>
+    report.stages.some(stage => stage.id === id && stage.status === 'passed'));
+}
+
+export function aggregate(plan, build, preparation, receipts, batchSkipReason) {
   const errors = [], history = [], latest = [];
-  let complete = true;
+  let complete = !batchSkipReason;
+  if (batchSkipReason) errors.push(batchSkipReason);
   const expectedJobs = ['prepare', ...plan.requested];
   for (const id of expectedJobs) {
     const attempts = (id === 'prepare' ? [preparation] : receipts.filter(report => report.batchId === id)).filter(Boolean)
@@ -337,6 +397,7 @@ export function aggregate(plan, build, preparation, receipts) {
     invariant(new Set(attempts.map(report => report.attempt)).size === attempts.length, `Duplicate attempts for ${id}`);
     history.push(...attempts.map(report => ({ batchId: id, attempt: report.attempt, passed: report.passed, stages: report.stages, error: report.error,
       source: report.source, planHash: report.planHash, buildHash: report.buildHash, runId: report.runId })));
+    if (batchSkipReason && id !== 'prepare') continue;
     const report = attempts.at(-1);
     if (!report) { errors.push(`${id}: missing receipt`); complete = false; continue; }
     latest.push(report);
@@ -347,7 +408,7 @@ export function aggregate(plan, build, preparation, receipts) {
     catch (error) { errors.push(`${id}: ${error.message}`); complete = false; }
     if (!report.complete || !report.inputsUnchanged) { errors.push(`${id}: incomplete/changed inputs`); complete = false; }
     if (!report.passed || report.stages.some(stage => stage.status !== 'passed')) errors.push(`${id}: failed`);
-    const expectedStages = id === 'prepare' ? preparationIds : plan.jobs.find(job => job.id === id).stages.map(stage => stage.id);
+    const expectedStages = id === 'prepare' ? preparationFor(plan.mode) : plan.jobs.find(job => job.id === id).stages.map(stage => stage.id);
     if (JSON.stringify(report.stages.map(stage => stage.id)) !== JSON.stringify(expectedStages)) { errors.push(`${id}: stage coverage mismatch`); complete = false; }
     if (id !== 'prepare') for (const stage of plan.jobs.find(job => job.id === id).stages.filter(stage => stage.browser)) {
       const actual = report.stages.find(row => row.id === stage.id);
@@ -364,7 +425,7 @@ export function aggregate(plan, build, preparation, receipts) {
   const unexpected = receipts.filter(report => !plan.requested.includes(report.batchId));
   if (unexpected.length) { errors.push('Unexpected batch receipts'); complete = false; }
   const overlapMs = isParallel(plan.mode) ? pilotOverlap(latest, plan.requested) : null;
-  if (overlapMs === 0) errors.push('Parallel pilot could not establish overlapping passing browser cases within the clock offset bounds');
+  if (overlapMs === 0 && !batchSkipReason) errors.push('Parallel pilot could not establish overlapping passing browser cases within the clock offset bounds');
   const starts = latest.map(report => Date.parse(report.startedAt)), ends = latest.map(report => Date.parse(report.finishedAt));
   return { schemaVersion: 1, source: plan.source, planHash: plan.planHash, scope: plan.scope,
     complete, passed: errors.length === 0,
@@ -385,11 +446,16 @@ function findReceipts(directory) {
   });
 }
 
-export function validateScheduling(plan, summary, scheduler) {
+export function validateScheduling(plan, summary, scheduler, batchSkipped = false) {
   const errors = [];
-  for (const id of ['prepare', ...plan.requested]) {
+  const latestJob = name => scheduler.jobs.filter(job => job.name === name).sort((left, right) => left.attempt - right.attempt).at(-1);
+  const tooling = plan.mode === 'parallel-full' ? latestJob('tooling') : undefined;
+  const toolingResult = tooling?.status === 'completed' ? tooling.conclusion : tooling?.status ?? 'missing';
+  const toolingFailed = plan.mode === 'parallel-full' && toolingResult !== 'success';
+  if (toolingFailed && !batchSkipped) errors.push(toolingFailure(toolingResult));
+  for (const id of ['prepare', ...(batchSkipped ? [] : plan.requested)]) {
     const name = id === 'prepare' ? 'prepare' : `batch (${id})`;
-    const latest = scheduler.jobs.filter(job => job.name === name).sort((left, right) => left.attempt - right.attempt).at(-1);
+    const latest = latestJob(name);
     const report = summary.latest?.find(receipt => receipt.batchId === id);
     const start = Date.parse(latest?.startedAt), end = Date.parse(latest?.completedAt);
     const receiptStart = Date.parse(report?.startedAt), receiptEnd = Date.parse(report?.finishedAt);
@@ -399,6 +465,10 @@ export function validateScheduling(plan, summary, scheduler) {
     }
   }
   return errors;
+}
+
+function toolingFailure(result) {
+  return `tooling: latest Actions job result was ${result || 'unknown'}; full browser shards require successful tooling`;
 }
 
 export function schedulingCompute(jobs) {
@@ -412,7 +482,7 @@ export function schedulingCompute(jobs) {
 export function timingReport(plan, summary) {
   const actual = (summary.latest ?? []).flatMap(receipt => receipt.stages);
   const jobs = plan.jobs.filter(job => plan.requested.includes(job.id));
-  const selected = plan.mode !== 'capture' ? [...stages.filter(stage => preparationIds.includes(stage.id)), ...jobs.flatMap(job => job.stages)]
+  const selected = plan.mode !== 'capture' ? [...stages.filter(stage => preparationFor(plan.mode).includes(stage.id)), ...jobs.flatMap(job => job.stages)]
     : stages.filter(stage => preparationIds.includes(stage.id) || jobs.some(job => job.stages.some(row => row.sourceStage === stage.id)));
   const rows = selected.map(stage => {
     const parts = stage.id === 'chromium'
@@ -479,24 +549,97 @@ function pilotClockSampler() {
   });
 }
 
+async function runArtifacts(name) {
+  const { GITHUB_API_URL, GITHUB_REPOSITORY, GITHUB_RUN_ID, GITHUB_TOKEN } = process.env;
+  invariant(GITHUB_API_URL && GITHUB_REPOSITORY && GITHUB_RUN_ID && GITHUB_TOKEN, 'Artifact lookup requires Actions run identity and read access');
+  const url = new URL(`${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts`);
+  url.searchParams.set('name', name);
+  const response = await fetch(url, {
+    headers: { Authorization: `Bearer ${GITHUB_TOKEN}`, Accept: 'application/vnd.github+json' },
+    signal: AbortSignal.timeout(10000),
+  });
+  invariant(response.ok, `Actions artifact listing failed: HTTP ${response.status}`);
+  return (await response.json()).artifacts;
+}
+
+export function bindFullDiscovery(discovery, preparation) {
+  const { planHash, ...discovered } = discovery;
+  invariant(discovered.mode === 'parallel-full' && planHash === digest(JSON.stringify(discovered)), 'Invalid full discovery plan');
+  invariant(!discovered.source.dirty && !preparation.source.dirty &&
+    discovered.source.commit === preparation.source.commit && discovered.source.inputHash === preparation.source.inputHash,
+  'Discovery source differs from preparation');
+  for (const field of ['node', 'platform', 'arch', 'versions']) {
+    invariant(JSON.stringify(discovered.environment[field]) === JSON.stringify(preparation.environment[field]), `Discovery ${field} differs from preparation`);
+  }
+  const cases = new Map(discovered.canonical.map(stage => [stage.id, stage.tests]));
+  const plan = { ...createPlan('parallel-full', stage => {
+    const tests = cases.get(stage.id);
+    invariant(tests?.length && tests.every(test => test.project && test.id), `Missing discovery for ${stage.id}`);
+    return tests;
+  }), source: preparation.source, environment: preparation.environment, browsers: preparation.browsers };
+  invariant(JSON.stringify(plan.canonical) === JSON.stringify(discovered.canonical), 'Unexpected canonical discovery stages');
+  return { ...plan, planHash: digest(JSON.stringify(plan)) };
+}
+
+function writePlan(bundle, plan, publishMatrix) {
+  save(join(bundle, 'plan.json'), plan);
+  if (publishMatrix && process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `matrix=${JSON.stringify({ include: plan.requested.map(id => ({ id,
+    ...(parallelRunner(plan, { batchId: id }) ? { runner: parallelRunner(plan, { batchId: id }).replace('unraid-tactics-', 'tactics-browser-') } : {}) })) })}\n`);
+}
+
+function distributeBuild(bundle, plan, report) {
+  if (!canDistributeBuild(plan.mode, report)) return 1;
+  const directory = join(root, 'dist'), packed = join(bundle, 'dist');
+  const files = inventory(directory);
+  let fromPublic;
+  if (plan.mode === 'parallel-full') fromPublic = packParallelBuild(directory, join(root, 'public'), packed, files);
+  else cpSync(directory, packed, { recursive: true });
+  invariant(files.some(file => file.path === 'index.html'), 'Missing built index.html');
+  save(join(bundle, 'build.json'), { source: plan.source, planHash: plan.planHash, files, fromPublic, hash: digest(JSON.stringify(files)) });
+  return 0;
+}
+
 export async function main([command, bundleArgument, batchId, outputArgument]) {
   if (command === 'await-pilot') {
-    const { GITHUB_API_URL, GITHUB_REPOSITORY, GITHUB_RUN_ID, GITHUB_RUN_ATTEMPT, GITHUB_TOKEN } = process.env;
-    invariant(GITHUB_API_URL && GITHUB_REPOSITORY && GITHUB_RUN_ID && GITHUB_RUN_ATTEMPT && GITHUB_TOKEN, 'Parallel pilot requires Actions run identity and artifact read access');
-    const release = await awaitPilotRunners(GITHUB_RUN_ID, GITHUB_RUN_ATTEMPT, async name => {
-      const url = new URL(`${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts`);
-      url.searchParams.set('name', name);
-      const response = await fetch(url, {
-        headers: { Authorization: `Bearer ${GITHUB_TOKEN}`, Accept: 'application/vnd.github+json' },
-        signal: AbortSignal.timeout(10000),
-      });
-      invariant(response.ok, `Actions artifact listing failed: HTTP ${response.status}`);
-      return (await response.json()).artifacts;
-    }, { ids: Object.keys(isPair(process.env.SERIAL_MODE) ? pairRunners : pilotRunners) });
+    const { GITHUB_RUN_ID, GITHUB_RUN_ATTEMPT } = process.env;
+    invariant(GITHUB_RUN_ID && GITHUB_RUN_ATTEMPT, 'Parallel pilot requires Actions run identity');
+    const release = await awaitPilotRunners(GITHUB_RUN_ID, GITHUB_RUN_ATTEMPT, runArtifacts,
+      { ids: Object.keys(runnerAssignments(process.env.SERIAL_MODE)) });
     console.log(`Both pilot runners ready. Scheduled browser launch: ${release}`);
     return 0;
   }
+  if (command === 'await-discovery') {
+    const deadline = Date.now() + 120000;
+    while (Date.now() < deadline) {
+      if ((await runArtifacts(bundleArgument)).some(artifact => artifact.name === bundleArgument && !artifact.expired)) return 0;
+      await delay(2000);
+    }
+    throw Error('The tooling job did not publish full discovery for this attempt');
+  }
   const bundle = resolve(bundleArgument ?? 'verification-receipts/serial/bundle');
+  if (command === 'prepare-build') {
+    invariant(process.env.SERIAL_MODE === 'parallel-full' && !process.env.SERIAL_BATCHES, 'Separate preparation requires an unfiltered full parallel run');
+    const source = sourceIdentity(root);
+    mkdirSync(bundle, { recursive: true });
+    save(join(bundle, 'preparation-start.json'), { source, startedAt: new Date().toISOString(), runId: process.env.GITHUB_RUN_ID ?? 'local' });
+    const plan = { mode: 'parallel-full', source, environment: environment(), browsers: await browserMetadata(stages) };
+    // The preparation stages depend on source and browser identity. Their receipt
+    // is bound to the exact discovery plan before either shard receives the build.
+    const report = await runReceipt(plan, 'prepare', stages.filter(stage => preparationFor(plan.mode).includes(stage.id)), [], join(bundle, 'preparation'));
+    return canDistributeBuild(plan.mode, report) ? 0 : 1;
+  }
+  if (command === 'seal-build') {
+    const receiptPath = join(bundle, 'preparation/receipt.json');
+    const report = read(receiptPath);
+    const source = sourceIdentity(root);
+    invariant(!existsSync(join(bundle, 'plan.json')) && !report.planHash && report.inputsUnchanged &&
+      !source.dirty && report.source.commit === source.commit && report.source.inputHash === source.inputHash,
+    'Cannot bind changed or already sealed preparation');
+    const plan = bindFullDiscovery(read(batchId), report);
+    writePlan(bundle, plan, true);
+    save(receiptPath, { ...report, planHash: plan.planHash });
+    return distributeBuild(bundle, plan, report);
+  }
   if (command === 'discover' || command === 'prepare') {
     invariant(!existsSync(join(bundle, 'plan.json')) && !existsSync(join(bundle, 'dist')), 'Refusing to overwrite a prior plan/build');
     mkdirSync(bundle, { recursive: true });
@@ -504,18 +647,15 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
     const plan = { ...createPlan(process.env.SERIAL_MODE ?? 'capture', discover, process.env.SERIAL_BATCHES ?? ''),
       source: sourceIdentity(root), environment: environment(), browsers: await browserMetadata(command === 'prepare' ? stages : []) };
     plan.planHash = digest(JSON.stringify(plan));
-    save(join(bundle, 'plan.json'), plan);
+    writePlan(bundle, plan, command === 'prepare');
     if (command === 'discover') return 0;
-    if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `matrix=${JSON.stringify({ include: plan.requested.map(id => ({ id,
-      ...(parallelRunner(plan, { batchId: id }) ? { runner: parallelRunner(plan, { batchId: id }).replace('unraid-tactics-', 'tactics-browser-') } : {}) })) })}\n`);
-    const report = await runReceipt(plan, 'prepare', stages.filter(stage => preparationIds.includes(stage.id)), [], join(bundle, 'preparation'));
-    if (!report.passed) return 1;
-    cpSync(join(root, 'dist'), join(bundle, 'dist'), { recursive: true });
-    const files = inventory(join(bundle, 'dist'));
-    invariant(files.some(file => file.path === 'index.html'), 'Missing built index.html');
-    save(join(bundle, 'build.json'), { source: plan.source, planHash: plan.planHash, files, hash: digest(JSON.stringify(files)) });
-    return 0;
+    const report = await runReceipt(plan, 'prepare', stages.filter(stage => plan.preparationIds.includes(stage.id)), [], join(bundle, 'preparation'));
+    return distributeBuild(bundle, plan, report);
   }
+  // The workflow reports a skipped parent before Actions expands the browser matrix.
+  const toolingResult = process.env.SERIAL_FULL_TOOLING_RESULT;
+  const batchSkipReason = toolingResult && toolingResult !== 'success' && process.env.SERIAL_FULL_BATCH_RESULT === 'skipped'
+    ? `Browser shards skipped. ${toolingFailure(toolingResult)}` : undefined;
   let plan;
   try {
     plan = read(join(bundle, 'plan.json'));
@@ -523,8 +663,23 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
   } catch (error) {
     if (command !== 'aggregate') throw error;
     const out = resolve(outputArgument); mkdirSync(out, { recursive: true });
-    save(join(out, 'summary.json'), { passed: false, complete: false, baselineEligible: false, errors: ['Missing or invalid preparation plan: ' + String(error)] });
-    const summary = '# Serial verification failed\n\nMissing or invalid preparation plan. Inspect the preparation artifact and logs.\n';
+    const errors = ['Missing or invalid preparation plan: ' + String(error)];
+    if (toolingResult && toolingResult !== 'success') errors.push(batchSkipReason ?? toolingFailure(toolingResult));
+    const latest = [];
+    try {
+      const preparation = read(join(bundle, 'preparation/receipt.json'));
+      if (preparation?.batchId === 'prepare' && Array.isArray(preparation.stages)) {
+        latest.push(preparation);
+        if (preparation.error) errors.push('Preparation: ' + preparation.error);
+        for (const stage of preparation.stages) {
+          if (stage?.status === 'failed' || stage?.status === 'blocked') {
+            errors.push(`Preparation / ${stage.id}: ${stage.status}${stage.error ? ' (' + stage.error + ')' : ''}`);
+          }
+        }
+      }
+    } catch { /* The missing plan is sufficient to fail even without a readable receipt. */ }
+    save(join(out, 'summary.json'), { passed: false, complete: false, baselineEligible: false, errors, latest });
+    const summary = '# Serial verification failed\n\n' + errors.map(message => '- ' + message).join('\n') + '\n';
     writeFileSync(join(out, 'summary.md'), summary);
     if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
     return 1;
@@ -536,8 +691,13 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
     const source = sourceIdentity(root);
     invariant(plan.planHash === digest(JSON.stringify({ ...plan, planHash: undefined })), 'Invalid plan hash');
     invariant(source.commit === plan.source.commit && source.inputHash === plan.source.inputHash, 'Source differs from preparation');
-    if (isPair(plan.mode)) invariant(build, 'Matched batches require a verified production build');
-    if (build) verifyBuild(plan, build, join(bundle, 'dist'), source);
+    if (isPair(plan.mode) || plan.mode === 'parallel-full') invariant(build, 'Matched batches require a verified production build');
+    if (build) {
+      if (command === 'ready' && plan.mode === 'parallel-full') {
+        restorePublicBuildFiles(join(bundle, 'dist'), join(root, 'public'), build.fromPublic);
+      }
+      verifyBuild(plan, build, join(bundle, 'dist'), source);
+    }
     const sampleClock = isParallel(plan.mode) ? pilotClockSampler() : undefined;
     if (command === 'ready') {
       const ready = receipt(plan, batchId);
@@ -546,7 +706,7 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
       verifyRuntime(plan, ready);
       ready.browsers = await browserMetadata(stages);
       verifyBrowsers(plan, ready);
-      for (const stage of job.stages) exactCoverage(stage.expected, discover(stage));
+      for (const stage of job.stages.filter(stage => stage.browser)) exactCoverage(stage.expected, discover(stage));
       ready.clock = { before: await sampleClock() };
       ready.readyAt = new Date().toISOString();
       const out = resolve(outputArgument);
@@ -565,12 +725,15 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
     let result;
     try {
       result = aggregate(plan, existsSync(join(bundle, 'build.json')) ? read(join(bundle, 'build.json')) : null,
-        read(join(bundle, 'preparation/receipt.json')), findReceipts(resolve(batchId)));
-    } catch (error) { result = { passed: false, complete: false, baselineEligible: false, errors: [String(error)] }; }
+        read(join(bundle, 'preparation/receipt.json')), findReceipts(resolve(batchId)), batchSkipReason);
+    } catch (error) {
+      result = { passed: false, complete: false, baselineEligible: false, errors: [String(error)] };
+      if (batchSkipReason) result.errors.push(batchSkipReason);
+    }
     try {
       result.scheduling = await scheduling();
       if (result.scheduling) {
-        const errors = validateScheduling(plan, result, result.scheduling);
+        const errors = validateScheduling(plan, result, result.scheduling, Boolean(batchSkipReason));
         if (errors.length) { result.errors.push(...errors); result.passed = false; result.complete = false; result.baselineEligible = false; }
       }
     } catch (error) {
@@ -600,7 +763,7 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
     if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
     return result.passed ? 0 : 1;
   }
-  throw Error('Usage: verify:batches discover|prepare <bundle> | ready|run <bundle> <batch> <out> | await-pilot | aggregate <bundle> <receipts> <out>');
+  throw Error('Usage: verify:batches discover|prepare|prepare-build <bundle> | seal-build <bundle> <discovery-plan> | ready|run <bundle> <batch> <out> | await-pilot | await-discovery <artifact> | aggregate <bundle> <receipts> <out>');
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

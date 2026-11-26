@@ -4,27 +4,24 @@ import { captureSelections, compareSelections, discoverSelection, desktopOnlySta
 import { createPlan, exactCoverage } from '../../scripts/verification-batches.mjs';
 
 let before, after;
-test('real discoveries preserve every retained ID and special mode, with exactly 24 chromium and the approved desktop-only mappings', () => {
+test('real discoveries preserve every retained ID with the approved desktop and prefix mappings', () => {
   before = captureSelections({ allProfiles: true });
   after = captureSelections();
   const comparison = compareSelections(before, after);
-  assert.equal(comparison.beforeCount - comparison.afterCount, 24);
-  assert.equal(comparison.mappings.filter(row => row.classification === '@canonical').length, 18);
-  assert.equal(comparison.mappings.filter(row => row.effectiveUse?.hasTouch).length, 6);
-  const radial = comparison.mappings.filter(row => row.removed.file === 'battle-radial.spec.ts');
-  assert.equal(radial.length, 1);
-  assert.equal(radial[0].classification, '@fixed-viewport');
-  assert.equal(radial[0].removed.project, 'mobile-landscape');
-  assert.equal(radial[0].retained.project, 'mobile-portrait');
-  assert.deepEqual(radial[0].effectiveUse.viewport, { width: 1280, height: 720 });
+  assert.equal(comparison.beforeCount, comparison.afterCount);
+  assert.deepEqual([...new Set(after.selections.chromium.tests.map(row => row.file))].sort(), [
+    'battle-persistence.spec.ts', 'dungeon-exploration.spec.ts', 'dungeon-lifecycle.spec.ts',
+    'dungeon-loot.spec.ts', 'dungeon.spec.ts', 'guarded-effects.spec.ts', 'main-menu.spec.ts',
+    'public-asset-base.spec.ts',
+  ]);
+  assert.ok(after.selections['webkit-acceptance'].tests.every(row => row.file === 'main-menu.spec.ts'));
   const desktopOnly = comparison.mappings.filter(row => row.classification === 'desktop-only');
-  assert.equal(desktopOnly.filter(row => row.stage.startsWith('telemetry')).length, 56);
-  assert.equal(desktopOnly.filter(row => row.stage === 'assets-root-dev').length, 52);
-  assert.equal(desktopOnly.length, 108);
+  assert.equal(desktopOnly.filter(row => row.stage === 'assets-root-dev').length, 6);
+  assert.equal(desktopOnly.length, 6);
   const prefixTouchMappings = comparison.mappings.filter(row => row.classification === 'prefix-touch');
-  assert.equal(prefixTouchMappings.filter(row => row.removed.project === 'mobile-landscape').length, 52);
-  assert.equal(prefixTouchMappings.filter(row => row.removed.project === 'mobile-portrait').length, 46);
-  assert.equal(prefixTouchMappings.length, 98);
+  assert.equal(prefixTouchMappings.filter(row => row.removed.project === 'mobile-landscape').length, 6);
+  assert.equal(prefixTouchMappings.filter(row => row.removed.project === 'mobile-portrait').length, 2);
+  assert.equal(prefixTouchMappings.length, 8);
   assert.ok(prefixTouchMappings.filter(row => row.removed.project === 'mobile-landscape'
     && (row.removed.tags ?? []).includes('@touch-audio')).every(row => row.retained.project === 'mobile-portrait'));
   assert.ok(prefixTouchMappings.filter(row => !(row.removed.tags ?? []).includes('@touch-audio'))
@@ -39,8 +36,161 @@ test('real discoveries preserve every retained ID and special mode, with exactly
       ['desktop', 'mobile-landscape', 'mobile-portrait']);
     assert.deepEqual([...new Set(tests.map(row => row.project))].sort(), ['desktop', 'mobile-portrait']);
     const portrait = tests.filter(row => row.project === 'mobile-portrait');
-    assert.equal(portrait.length, 3);
+    assert.equal(portrait.length, 2);
     assert.ok(portrait.every(row => row.tags.includes('@touch-audio')));
+  }
+});
+
+test('battle-log journey and control checks have separate case identities on the intended profiles', () => {
+  for (const [stage, fullProject, shortProjects] of [
+    ['chromium', 'desktop', ['mobile-landscape', 'mobile-portrait']],
+    ['webkit-exploration', 'portrait-webkit', ['desktop-webkit', 'landscape-webkit']],
+  ]) {
+    const cases = after.selections[stage].tests;
+    const profiles = title => cases.filter(row => row.title === title).map(row => row.project).sort();
+    assert.deepEqual(profiles('battle log filters and keeps history across Hide and reopen'), [fullProject]);
+    assert.deepEqual(profiles('battle log controls fit and reset the filter when reopened'), shortProjects);
+  }
+});
+
+test('routine verification clears each first-floor scenario once and checks both pickup modes in every orientation', () => {
+  for (const [stage, desktop] of [['chromium', 'desktop'], ['webkit-exploration', 'desktop-webkit']]) {
+    const { tests, projects } = after.selections[stage];
+    const profilesFor = title => tests.filter(row => row.title === title).map(row => row.project).sort();
+    const allProfiles = projects.map(project => project.name).sort();
+    assert.deepEqual(profilesFor('saved menu dungeon keeps proof tools hidden across legal encounters'), stage === 'chromium' ? [] : [desktop]);
+    const portrait = allProfiles.find(name => name.includes('portrait'));
+    const landscape = allProfiles.find(name => name.includes('landscape'));
+    assert.deepEqual(profilesFor('staged Mage Frost Snare cancels invalid casts and restores the active badge'),
+      stage === 'chromium' ? [desktop, portrait].sort() : [landscape]);
+    assert.deepEqual(profilesFor('testing dungeon legally clears a floor, descends and backtracks without accessing saves'), stage === 'chromium' ? [] : [landscape]);
+    assert.deepEqual(profilesFor('saved menu dungeon auto-collects loot across a complete first floor'), stage === 'chromium' ? [portrait] : []);
+    assert.deepEqual(profilesFor('closing on the guardian first holds contact and resumes its battle'),
+      [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('Guardian-first reward, map and encounter state survive claim and reload at depth 5'),
+      [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('legal guardian reward, travel reload, backtracking and isolated saves'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('a claimed Revive Kit restores a fallen dungeon hero across Continue'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('read-only entry, keyboard new dungeon, real action and active resume'),
+      [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('reload before the pending step restores the ground pile without surprise movement or collection'), [desktop]);
+    assert.deepEqual(profilesFor('ground loot: legal victory saves one item at contact and a manual pickup survives refusal and reload'), allProfiles);
+    for (const title of [
+      'map markers respect stair availability, discovery and saved floor state',
+      'live markers follow current sight across movement, art changes and reload',
+      'stairs travel once per entry with keyboard, compass and cell controls, and stay on arrival and restore',
+    ]) assert.deepEqual(profilesFor(title), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('ground loot: full capacity keeps same-cell rewards and retries on discard without moving enemies'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('ground loot: entering an occupied pile starts combat and closes inventory'), [stage === 'chromium' ? landscape : desktop]);
+    assert.deepEqual(profilesFor('restart during accepted presentation discards old callbacks and history'), [stage === 'chromium' ? desktop : portrait]);
+    for (const title of [
+      'dungeon statistics: confirmed replacement pauses pending enemy turns through history',
+      'legal enemy defeat waits for its save and returns to the menu during a pending history write',
+    ]) assert.deepEqual(profilesFor(title), [stage === 'chromium' ? desktop : portrait]);
+    for (const title of [
+      'reload recovers the last four seconds exactly once across a held dungeon lock',
+      'close recovers the last four seconds exactly once across a held dungeon lock',
+      'dungeon tabs serialize spatial publication and refuse the stale owner',
+    ]) assert.deepEqual(profilesFor(title), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('visibility interruption finishes an accepted terminal presentation exactly once'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('character sheets switch heroes and show equipped charms through equip, resume, and unequip'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('confirmed charm discard frees full capacity without cancelling or duplicating the pending reward'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('dungeon battle undo survives reload'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('saved dungeon downloads only after explicit recovery export'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('class guidance: unsaved dungeon keeps dismissals in memory until saving and resuming the same run'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('Shaman production journey uses Hex and ally healing, reloads Weakened and replays a complete legal battle'), []);
+    assert.deepEqual(profilesFor('resumed Shaman Hex shows the Weakened hero and accuracy penalty'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('a second dungeon encounter reuses the engine after a legal victory without reloading'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('declining a dungeon reward preserves inventory and updates stair progress'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('corrupt bytes stay exportable and uncertain travel requires explicit recovery'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('dungeon previous-format recovery preserves and exports both original slots'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('interrupting automatic loot cancels the pending step without replay'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('auto loot Settings are accessible and persist; off waits at origin and re-enabling does not sweep old loot'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('fresh manual movement cancels a pending automatic step, including its stale callback'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('Snared badge clears on legal source defeat'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('Hobgoblin formation affects Shield Bash, displaces the hero and survives Continue'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('fresh preparation cancels a pending automatic step'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('hero progression commits once, heals at a threshold and survives inspection and reload'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('auto loot defaults on: one delayed ordinary step, pickup, enemy tick and durable resume'), [stage === 'chromium' ? desktop : portrait]);
+  }
+});
+
+test('Guarded keeps desktop and touch lifecycles plus a short landscape layout check', () => {
+  const profiles = title => after.selections.chromium.tests.filter(row => row.title === title).map(row => row.project).sort();
+  assert.deepEqual(profiles('shared Guarded lifecycle: dungeon miss'), ['desktop', 'mobile-portrait']);
+  assert.deepEqual(profiles('landscape touch keeps the resumed Guarded badge visible and noninteractive'), ['mobile-landscape']);
+});
+
+test('menu save recovery and run history use desktop Chromium and portrait WebKit', () => {
+  const titles = [
+    'main menu: legacy battle and run slots are ignored through launch and dungeon Continue',
+    'main menu: New Game stays playable after retrying an unreadable dungeon save',
+    'main menu: dungeon departure after rejected movement retains unsaved play warning',
+    'main menu: dungeon departure after rejected movement retains failed replacement warning',
+    'main menu: save recovery lists only the dungeon backup',
+    'main menu: New Game confirms over the menu and preserves other save families',
+    'main menu: changed dungeon save requires a fresh confirmation',
+    'main menu: Continue opens recovery when a valid primary is paired with an unreadable backup',
+    'main menu: failed new-game write retains exportable recovery copies',
+    'main menu: an unsaved defeat retries history after reload without replaying the summary',
+    'main menu: records display and reviewed export restore reset preserve active saves',
+    'main menu: records unavailable storage is honest and leaves gameplay navigation usable',
+    'main menu: records dungeon replacement withholds exploration until final history finishes',
+    'main menu: records replacing distinct saved and unsaved dungeon preserves both after interrupted history',
+    'main menu: records concurrent confirmed dungeon replacements retain one immutable old result',
+  ];
+  for (const [stage, project] of [['chromium', 'desktop'], ['webkit-acceptance', 'acceptance-webkit-portrait']]) {
+    for (const title of titles) {
+      const selected = after.selections[stage].tests.filter(row => row.title === title);
+      assert.deepEqual(selected.map(row => row.project), [project]);
+    }
+  }
+});
+
+test('battle confirmations cover keyboard and touch activation', () => {
+  for (const [stage, profile] of [['chromium', 'desktop'], ['webkit-exploration', 'portrait-webkit']]) {
+    for (const title of [
+      'Rail Magic Missile requires explicit confirmation before damaging an ally',
+      'boxed-in hero can cancel Wait before acting and end immediately after acting',
+    ]) {
+      const cases = after.selections[stage].tests.filter(row => row.title === title);
+      assert.deepEqual(cases.map(row => row.project), [profile]);
+    }
+  }
+});
+
+test('keyboard focus and shortcuts run on desktop while the touch target checks cover every profile', () => {
+  for (const [stage, desktop] of [['chromium', 'desktop'], ['webkit-exploration', 'desktop-webkit']]) {
+    const { tests, projects } = after.selections[stage];
+    const keyboard = tests.filter(row => row.tags.includes('@desktop-keyboard'));
+    assert.deepEqual(keyboard.map(row => [row.project, row.title]).sort(), [
+      [desktop, 'compass keeps keyboard focus when movement disables the activated direction'],
+      [desktop, 'map shortcuts work on entry and outside the map without taking over other controls'],
+    ]);
+    const touchTargets = tests.filter(row => row.title === 'map-edge direction controls, focus, touch targets and unavailable states');
+    assert.deepEqual(touchTargets.map(row => row.project).sort(), projects.map(project => project.name).sort());
+  }
+});
+
+test('deferred loading keeps each desktop case on one mobile orientation per engine', () => {
+  for (const stage of ['chromium', 'webkit-exploration']) {
+    const { tests } = after.selections[stage];
+    for (const [orientation, count] of [['portrait', 4], ['landscape', 3]]) {
+      const tagged = tests.filter(row => row.file.endsWith('dungeon-exploration.spec.ts') && row.tags.includes('@mobile-' + orientation));
+      const desktop = tagged.filter(row => row.project.includes('desktop')).map(row => row.title).sort();
+      const mobile = tagged.filter(row => row.project.includes(orientation)).map(row => row.title).sort();
+      assert.equal(desktop.length, count);
+      assert.deepEqual(mobile, desktop);
+      assert.equal(tagged.length, count * 2);
+    }
+  }
+});
+
+test('enlarged menu checks run on desktop Chromium and one mobile profile per engine', () => {
+  const title = 'main menu: portrait composition scrolls at narrow, short and enlarged text sizes';
+  for (const [stage, expected] of [['chromium', ['desktop', 'mobile-portrait']], ['webkit-acceptance', ['acceptance-webkit-portrait']]]) {
+    const selected = after.selections[stage].tests.filter(row => row.title === title);
+    assert.deepEqual(selected.map(row => row.project).sort(), expected);
   }
 });
 
@@ -51,9 +201,9 @@ test('selection contract rejects missing, extra, duplicate, wrong-profile and de
   reject(value => value.selections.chromium.tests.push({ ...value.selections.chromium.tests[0], id: 'unexpected' }));
   reject(value => value.selections.chromium.tests.push(value.selections.chromium.tests[0]));
   reject(value => value.selections['webkit-acceptance'].tests.pop());
-  reject(value => value.selections.fixtures.tests.pop());
-  reject(value => value.selections['telemetry-development'].tests.pop());
-  reject(value => { value.selections.chromium.projects[1].grepInvert = null; });
+  reject(value => value.selections['webkit-exploration'].tests.pop());
+  reject(value => value.selections['assets-root-dev'].tests.pop());
+  reject(value => { value.selections.chromium.projects[1].grepInvert = { source: '@unexpected', flags: '' }; });
   reject(value => { value.selections.chromium.projects[2].use.deviceScaleFactor = 1; });
   reject(value => { value.selections.chromium.tests[0].timeout++; });
 });
@@ -62,13 +212,13 @@ test('new unclassified cases keep all existing profiles without rewriting histor
   const original = structuredClone(before), candidate = structuredClone(after);
   for (const project of original.selections.chromium.projects) {
     const example = original.selections.chromium.tests.find(row => row.project === project.name);
-    const added = { ...example, id: 'new-' + project.name, file: 'assets.spec.ts',
-      title: 'new unclassified case', titlePath: ['assets.spec.ts', 'new unclassified case'], tags: [] };
+    const added = { ...example, id: 'new-' + project.name, file: 'dungeon.spec.ts',
+      title: 'new unclassified case', titlePath: ['dungeon.spec.ts', 'new unclassified case'], tags: [] };
     original.selections.chromium.tests.push(added);
     candidate.selections.chromium.tests.push(added);
   }
   const compared = compareSelections(original, candidate);
-  assert.equal(compared.beforeCount - compared.afterCount, 24);
+  assert.equal(compared.beforeCount, compared.afterCount);
 });
 
 test('real nine-batch discovery partitions the entire reduced default selection', () => {
@@ -81,36 +231,33 @@ test('real nine-batch discovery partitions the entire reduced default selection'
 });
 
 
-test('health-bars keeps iPhone WebKit; Chromium health coverage stays in the default suite', () => {
-  assert.ok(after);
-  assert.deepEqual(after.selections['health-bars'].projects.map(project => project.name),
-    ['health-iphone-portrait', 'health-iphone-landscape']);
-  const titles = [...new Set(after.selections['health-bars'].tests.map(row => row.title))].sort();
-  assert.ok(titles.length > 0);
-  for (const project of ['desktop', 'mobile-landscape', 'mobile-portrait']) {
-    const chromiumTitles = after.selections.chromium.tests
-      .filter(row => row.file === 'unit-health-bars.spec.ts' && row.project === project)
-      .map(row => row.title).sort();
-    assert.deepEqual(chromiumTitles, titles);
-  }
-  const assets = after.selections.chromium.tests.filter(row => row.file === 'public-asset-base.spec.ts');
-  assert.deepEqual([...new Set(assets.map(row => row.project))].sort(),
-    ['desktop', 'mobile-landscape', 'mobile-portrait']);
-});
-
 test('long progression journeys are excluded from routine selection and remain available on all extended profiles', () => {
   const titles = ['Mage legal progression', 'Ranger legal progression', 'Fighter legal progression'];
-  const routine = captureSelections();
   for (const stage of ['chromium', 'webkit-exploration']) {
-    assert.equal(routine.selections[stage].tests.filter(row => titles.some(title => row.title.startsWith(title))).length, 0);
+    assert.equal(after.selections[stage].tests.filter(row => titles.some(title => row.title.startsWith(title))).length, 0);
   }
   for (const config of ['playwright.extended.config.ts', 'playwright.extended-webkit.config.ts']) {
     const selection = discoverSelection(['-c', config]);
-    assert.equal(selection.tests.length, 9);
+    assert.equal(selection.tests.length, 21);
     for (const project of selection.projects) {
       const cases = selection.tests.filter(row => row.project === project.name);
-      assert.equal(cases.length, 3);
-      for (const title of titles) assert.equal(cases.filter(row => row.title.startsWith(title)).length, 1);
+      assert.equal(cases.length, 7);
+      assert.deepEqual(cases.filter(row => row.tags.includes('@full-first-floor')).map(row => row.title).sort(), [
+        'saved menu dungeon auto-collects loot across a complete first floor',
+        'saved menu dungeon keeps proof tools hidden across legal encounters',
+        'testing dungeon legally clears a floor, descends and backtracks without accessing saves',
+      ]);
+      for (const title of [...titles, 'Shaman production journey']) assert.equal(cases.filter(row => row.title.startsWith(title)).length, 1);
+    }
+  }
+});
+
+test('saved biome inspection runs on desktop Chromium and portrait WebKit', () => {
+  for (const [stage, profile] of [['chromium', 'desktop'], ['webkit-exploration', 'portrait-webkit']]) {
+    for (const biome of ['forest', 'desert']) {
+      const title = `${biome} saved kinds, scaled inspection and reload use actual selected definitions`;
+      const cases = after.selections[stage].tests.filter(row => row.title === title);
+      assert.deepEqual(cases.map(row => row.project), [profile]);
     }
   }
 });

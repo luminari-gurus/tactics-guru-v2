@@ -1,15 +1,16 @@
 import { assert, describe, expect, it } from 'vitest';
+import { dispatch } from '../../src/domain/turns';
 import { dungeonContent } from '../../src/content/dungeon';
 import { canonical, hashJson } from '../../src/domain/contentIdentity';
 import {
-  acceptDungeonBattle, collectableDungeonLoot, currentFloor, dungeonBoundary, dungeonItem, dungeonLootReward,
+  acceptDungeonBattle, dungeonBattle, collectableDungeonLoot, currentFloor, dungeonBoundary, dungeonItem, dungeonLootReward,
   dungeonOffer, floorMap, readDungeon, startDungeonBattle, stepDungeon, type DungeonLoot, type DungeonState,
 } from '../../src/domain/dungeon';
 import { decodeDungeon, encodeDungeon } from '../../src/domain/dungeonSaveEnvelope';
 import { neighbors, poiCell } from '../../src/domain/exploration';
 import { freshRunStats } from '../../src/domain/runStats';
 import { createDungeonStorage } from '../../src/persistence/dungeonStorage';
-import { atCell, atStairApproach, checkedDungeon, dungeonContactApproach, dungeonGroundPileFixture } from '../helpers/dungeonFixtures';
+import { atCell, atStairApproach, checkedDungeon, dungeonContactApproach, dungeonGroundPileFixture, dungeonGroundVictoryBoundary } from '../helpers/dungeonFixtures';
 
 const step = (state: DungeonState, destination: number) => checkedDungeon(stepDungeon(state, {
   id: state.id, depth: state.depth, revision: state.revision, destination,
@@ -128,6 +129,55 @@ describe('seeded dungeon ground loot', () => {
     const admitted = checkedDungeon(readDungeon(staged));
     const used = checkedDungeon(dungeonItem(admitted, { ...dungeonBoundary(admitted), type: 'useItem', itemId: 'item:healing_draught', heroId: 'fighter' }));
     expect(currentFloor(used).loot).toEqual(floor.loot); expect(used.ownership.consumables).toEqual([]);
+  });
+
+  it('walks from a legal final victory to the stairs without collecting its reward', () => {
+    const witness = dungeonGroundVictoryBoundary(5, 2);
+    assert(witness);
+    const final = dispatch(witness.snapshot.activeBattle, witness.command, dungeonBattle(witness.snapshot)!.catalog);
+    assert(final.ok);
+    const source = checkedDungeon(acceptDungeonBattle(witness.snapshot, final.state));
+    const loot = currentFloor(source).loot;
+    const start = currentFloor(source);
+    expect(source.phase).toBe('ready');
+    expect(source.offer).toBeNull();
+    expect(start.completed).toBe(3);
+    const contact = witness.snapshot.encounterEntry!.contact;
+    const map = floorMap(start.descriptor), target = start.descriptor.downstairs;
+    expect([contact, start.position]).not.toContain(target);
+    const previous = new Map<number, number>([[start.position, -1]]);
+    const queue = [start.position];
+    for (let i = 0; i < queue.length && !previous.has(target); i++) {
+     for (const cell of neighbors(queue[i], map.width, map.height)) {
+      if (!map.cells[cell] || cell === contact || previous.has(cell)) continue;
+      previous.set(cell, queue[i]);
+      queue.push(cell);
+     }
+    }
+    if (!previous.has(target)) throw Error('No route to the stairs around the uncollected loot');
+    const path: number[] = [];
+    for (let cell = target; cell !== start.position; cell = previous.get(cell)!) path.unshift(cell);
+    const descended = path.reduce(step, source);
+    expect(loot?.at(-1)?.remaining).toBe(1);
+    expect(descended.ownership).toEqual(source.ownership);
+    expect(descended.depth).toBe(2); expect(descended.floors[0].loot).toEqual(loot);
+    const upstairs = atStairApproach(descended, 'ascend');
+    const returned = step(upstairs, currentFloor(upstairs).descriptor.upstairs);
+    const saved = encodeDungeon(returned);
+    assert(saved.ok);
+    const restored = decodeDungeon(saved.text);
+    assert(restored.ok);
+    expect(returned.depth).toBe(source.depth);
+    expect(returned.party).toEqual(source.party);
+    expect(returned.ownership).toEqual(source.ownership);
+    expect(currentFloor(returned).loot).toEqual(loot);
+    expect(restored.state).toEqual(returned);
+    // Retrace the cleared floor to the victory origin, then step onto the reward.
+    const back = path.slice(0, -1).reverse().concat(start.position);
+    const collected = step(back.reduce(step, restored.state), contact);
+    expect(currentFloor(collected).completed).toBe(3);
+    expect(currentFloor(collected).loot?.at(-1)?.remaining).toBe(0);
+    expect(collected.party).toEqual(source.party);
   });
 
   it('allows final-floor descent with uncollected loot and restores the exact pile on return', () => {

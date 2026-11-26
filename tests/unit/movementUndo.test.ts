@@ -99,8 +99,8 @@ it('replays and saves undo in a run battle without changing its entry state', as
   if(saved.ok){const loaded=decodeRunSave(saved.text,runContext);expect(loaded.ok).toBe(true);if(loaded.ok)expect(loaded.state.activeBattle).toEqual(s.state);}
 });
 
-it('retains the restored position in a dungeon save and reconstructs its history', async () => {
-  const {freshDungeon,startDungeonBattle,dungeonBattle}=await import('../../src/domain/dungeon');
+it('replays dungeon undo and resumes the saved position through a legal defeat', async () => {
+  const {freshDungeon,startDungeonBattle,dungeonBattle,acceptDungeonBattle}=await import('../../src/domain/dungeon');
   const {atEncounter}=await import('../helpers/dungeonFixtures');
   const {encodeDungeon,decodeDungeon}=await import('../../src/domain/dungeonSaveEnvelope');
   const {replayCommandSequence}=await import('../../src/domain/turns');
@@ -115,7 +115,24 @@ it('retains the restored position in a dungeon save and reconstructs its history
   const replay=replayCommandSequence(s.replay!.initial,s.replay!.commands,s.catalog);expect(replay.ok).toBe(true);
   if(replay.ok){expect(replay.state).toEqual(s.state);expect(replay.events).toEqual(s.events);}
   const saved=encodeDungeon({...started.state,activeBattle:s.state});expect(saved.ok).toBe(true);
-  if(saved.ok){const loaded=decodeDungeon(saved.text);expect(loaded.ok).toBe(true);if(loaded.ok)expect(loaded.state.activeBattle).toEqual(s.state);}
+  if (!saved.ok) throw Error(saved.reason);
+  const loaded = decodeDungeon(saved.text);
+  if (!loaded.ok) throw Error(loaded.reason);
+  expect(loaded.state.activeBattle).toEqual(s.state);
+  const restored = BattleSession.fromSnapshot(built.catalog, loaded.state.activeBattle, undefined, built.battlefield);
+  if (!restored.ok) throw Error('Cannot restore dungeon battle');
+  const battle = restored.session;
+  expect(battle.canUndoMove).toBe(false);
+  for (let step = 0; step < 500 && battle.state.outcome === 'ongoing'; step++) {
+    if (battle.phase === 'player') {
+      expect(battle.prepare({ type: 'endTurn', unitId: battle.active.id }).ok).toBe(true);
+    }
+    const action = battle.phase === 'enemy' ? battle.nextEnemy() : battle.confirm();
+    if (!action) throw Error('Resumed battle stalled');
+    battle.finishPresentation(action.token);
+  }
+  expect(battle.state.outcome).toBe('playerLoss');
+  expect(acceptDungeonBattle(loaded.state, battle.state)).toMatchObject({ ok: true, state: { phase: 'defeat' } });
 });
 
 it('does not offer undo for a move made after an accepted action', async () => {

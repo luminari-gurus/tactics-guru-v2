@@ -1,13 +1,13 @@
 import Phaser from 'phaser';
 import type { CellPosition, ContentCatalog, MapId } from '../content/types';
 import type { BattleEvent, BattleState } from '../domain/types';
-import { guardedEffect, movementBlockSource } from '../domain/effects';
+import { guardedEffect } from '../domain/effects';
 import { buildBoardPresentation, OCCUPANT_LAYER } from '../geometry/boardPresentation';
 import { CANOPY_ART, canopyBounds, canopyOccludes, unitArtSize, unitBounds, unitOverlayOffsets } from '../geometry/canopy';
 import { boardBounds, fitBoard, orderTiles, projectTile, tileFaces, BASE_THICKNESS, ELEVATION_STEP, MAX_BOARD_SCALE, TILE_HEIGHT, TILE_WIDTH, type BoardRegion, type Bounds, type Point, type Tile } from '../geometry/iso';
 import { constrainView, DRAG_THRESHOLD, faceContainsPoint, MAX_ZOOM, pickTileCandidates, screenToBoard, type View } from '../geometry/picking';
 import { HEALTH_BAR, HEALTH_COLORS, healthArc, healthBarScale, healthColor, healthFraction } from './healthBar';
-import { abilityPresentation, type SignatureKind } from './abilityPresentation';
+import { abilityPresentation, showsSnareBadge, type SignatureKind } from './abilityPresentation';
 import { combatPresentationTiming, type CombatPresentationTiming } from './combatPace';
 import { criticalImpacts, drawCriticalImpact, type CriticalImpact } from './criticalImpact';
 import type { TargetOverlay, HoverPreview } from '../ui/targetPreview';
@@ -359,8 +359,7 @@ export class BoardRenderer {
       this.drawHealth(unit.id, healthFraction(unit.hp, definition.stats.maxHp), unit.hp > 0);
       this.placeHealth(unit.id, position, unitDepth);
       this.guardBadges.get(unit.id)!.setVisible(guardedEffect(unit) !== null);
-      this.snareBadges.get(unit.id)!.setVisible(unit.movementBlock?.abilityId === 'ability:frost_snare'
-        && !!movementBlockSource(unit, snapshot.units));
+      this.snareBadges.get(unit.id)!.setVisible(showsSnareBadge(unit, snapshot.units));
       this.placeBadges(unit.id, position, unitDepth);
       const ring = this.rings.get(unit.id)!.clear().setDepth(depth + 2.25).setVisible(unit.hp > 0);
       ring.lineStyle(unit.id === activeId ? 3 : 2, unit.id === activeId ? ACTIVE_COLOR : unit.side === 'player' ? 0x6ddbf5 : 0xf17a73)

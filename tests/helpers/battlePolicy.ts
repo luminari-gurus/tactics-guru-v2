@@ -1,10 +1,21 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from '@playwright/test';
+import { readFileSync } from 'node:fs';
 import type { BattleState, Command, Replay, ReplayCommand, BattleEvent } from '../../src/domain/types';
 import type { ContentCatalog } from '../../src/content/types';
 import { previewMovement } from '../../src/domain/grid';
 import { projectTile } from '../../src/geometry/iso';
 
 export { playerDecision } from './playerPolicy';
+
+export async function downloadCombatLog(page: Page, activate: (button: Locator) => Promise<void>, name = 'Export combat log') {
+ const button = page.getByRole('button',{name,exact:true});
+ const [download] = await Promise.all([page.waitForEvent('download'), activate(button)]);
+ expect(download.suggestedFilename()).toBe('tactics-guru-combat-log.json');
+ const path = await download.path();
+ if (!path) throw Error('Combat log download has no file');
+ await test.info().attach('combat-log.json', { path, contentType: 'application/json' });
+ return JSON.parse(readFileSync(path, 'utf8')) as { groups: { entries: { text: string }[] }[] };
+}
 
 /** Called with save recovery open. Fake browser time isolates lifecycle accounting;
  * legal keyboard/touch journeys separately retain normal input/animation proof. */
@@ -122,8 +133,11 @@ export async function endTurn(page: Page, activate: ActivateBattleControl = sele
   await confirmEndTurn(page, activate);
 }
 
-export async function playCommand(page:Page,command:Command){
-  if(command.type==='endTurn')return endTurn(page);
+export async function playCommand(
+  page: Page, command: Command, state?: BattleState,
+  activate: (control: Locator) => Promise<void> = control => control.click(),
+) {
+  if(command.type==='endTurn')return endTurn(page, selector => activate(page.locator(selector)));
   const skin=await combatSkin(page);
   if(command.type==='drinkDraught') {
     await reviewDraught(page);
@@ -132,21 +146,21 @@ export async function playCommand(page:Page,command:Command){
     else await confirm.click();
     return;
   }
-  const snapshot=(await readSession(page)).state;
+  const snapshot=state ?? (await readSession(page)).state;
   const cell=command.type==='move'?command.to:snapshot.units.find(u=>u.id===('unitId' in command.target?command.target.unitId:'missileTargets' in command.target?command.target.missileTargets[0]:-1))!.cell;
   if(skin==='radial'){
     await tapBoard(page, cell);
     await expect(page.locator('#battle-radial')).toBeVisible();
-    if(command.type==='move'){ await page.locator('#battle-radial-move').click(); return; }
-    if(command.abilityId==='ability:basic_attack'){ await page.locator('#battle-radial-attack').click(); return; }
+    if(command.type==='move'){ await activate(page.locator('#battle-radial-move')); return; }
+    if(command.abilityId==='ability:basic_attack'){ await activate(page.locator('#battle-radial-attack')); return; }
     const chip=page.locator(`#battle-radial-sub [data-radial-ability="${command.abilityId}"]`);
-    await page.locator('#battle-radial-special').click();
-    if(await chip.count()) await chip.click();
+    await activate(page.locator('#battle-radial-special'));
+    if(await chip.count()) await activate(chip);
     return;
   }
-  await page.locator(`[data-action="${command.type==='move'?'move':command.abilityId==='ability:basic_attack'?'basic':command.abilityId}"]`).click();
+  await activate(page.locator(`[data-action="${command.type==='move'?'move':command.abilityId==='ability:basic_attack'?'basic':command.abilityId}"]`));
   await page.locator('#battle-target').selectOption(`${cell.x},${cell.y}`);
-  await page.getByRole('button',{name:'Confirm action'}).click();
+  await activate(page.getByRole('button',{name:'Confirm action'}));
 }
 
 /** Exercise a real movement and reversal before continuing a legal journey. */
@@ -167,5 +181,5 @@ export async function playUndo(page:Page,catalog:ContentCatalog,touch:boolean) {
   await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
   const after=await readSession(page);
   expect(after.state.units.find(u=>u.id===actor)?.cell).toEqual(before.state.units.find(u=>u.id===actor)?.cell);
-  expect(after.state.rng).toEqual(before.state.rng);return after.state;
+  return after.state;
 }

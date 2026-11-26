@@ -1,3 +1,4 @@
+import { dungeonStairLabel } from '../../src/ui/dungeonStairLabel';
 import { describe, expect, it, vi } from 'vitest';
 import { dungeonStairStatus, freshDungeon, stepDungeon, readDungeon, startDungeonBattle, acceptDungeonBattle, travelDungeon, currentFloor, floorMap } from '../../src/domain/dungeon';
 import { currentSight, encounterPois, freshExploration, neighbors, poiCell, readExploration, reveal } from '../../src/domain/exploration';
@@ -5,7 +6,7 @@ import { generateMap } from '../../src/map/generate';
 import { encodeDungeon, decodeDungeon } from '../../src/domain/dungeonSaveEnvelope';
 import { legacyDungeonIdentity } from '../../src/content/dungeon';
 import { canonical, hashJson } from '../../src/domain/contentIdentity';
-import { atEncounter, atCell, atStairApproach, dungeonCapacityFixture, priorDungeonPayload } from '../helpers/dungeonFixtures';
+import { atEncounter, atCell, dungeonSightTransition, atStairApproach, dungeonCapacityFixture, priorDungeonPayload } from '../helpers/dungeonFixtures';
 import { LEGACY_ENCOUNTER_POLICY } from '../../src/domain/dungeonEncounters';
 import { DungeonSession } from '../../src/app/DungeonSession';
 import { createDungeonStorage, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
@@ -15,6 +16,17 @@ const command=(s:ReturnType<typeof fresh>,destination:number)=>({id:s.id,depth:s
 const legacy=(s:ReturnType<typeof fresh>)=>priorDungeonPayload(s, 1);
 const envelope=(payload:unknown)=>{const body={kind:'tactics-guru:dungeon',format:1,identity:legacyDungeonIdentity,payload};return canonical({...body,digest:hashJson(body)});};
 describe('exploration placement and validation', () => {
+ it.each([true, false])('encounter movement changes marker visibility (entering: %s)', entering => {
+  const { before, after, slot } = dungeonSightTransition(entering);
+  const start = currentFloor(before), end = currentFloor(after), map = floorMap(start.descriptor);
+  const oldCell = poiCell(start.exploration.pois[slot], map.width);
+  const newCell = poiCell(end.exploration.pois[slot], map.width);
+  const sight = currentSight(end.position, map);
+  expect(after.phase).toBe('ready');
+  expect(currentSight(start.position, map).includes(oldCell)).toBe(!entering);
+  expect(sight.includes(oldCell)).toBe(!entering);
+  expect(sight.includes(newCell)).toBe(entering);
+ });
  it('reproduces connected distinct markers without changing terrain for 100 seeds', async () => {
   for(let seed=0;seed<100;seed++){const map=generateMap(seed,'rooms'),before=canonical(map),pois=encounterPois(seed,map);expect(pois).toEqual(encounterPois(seed));expect(new Set(pois.map(p => poiCell(p))).size).toBe(3);for(const p of pois){expect(map.cells[poiCell(p)]).toBe(1);expect([map.cells.indexOf(1),map.cells.lastIndexOf(1)]).not.toContain(poiCell(p));}expect(canonical(map)).toBe(before);}
   expect(()=>encounterPois(1,{...generateMap(1,'rooms'),cells:Array(400).fill(0)})).toThrow();
@@ -140,11 +152,16 @@ describe('movement onto stairs', () => {
   expect(currentFloor(second).position).toBe(currentFloor(second).descriptor.upstairs);
   expect(second.party).toEqual(before.party);expect(second.ownership).toEqual(before.ownership);
   expect(stepDungeon(second,down)).toEqual({ok:false,reason:'staleBoundary'});
-  const encoded=encodeDungeon(second);if(!encoded.ok)throw Error(encoded.reason);
-  expect(decodeDungeon(encoded.text)).toEqual({ok:true,state:second});
-  expect(new DungeonSession(second).snapshot).toEqual(second);
-  const approach=atStairApproach(second,'ascend');
-  const off=good(stepDungeon(second,command(second,currentFloor(approach).position)));
+  const restoreArrival = (arrival: typeof second) => {
+   const encoded = encodeDungeon(arrival); if (!encoded.ok) throw Error(encoded.reason);
+   const decoded = decodeDungeon(encoded.text); if (!decoded.ok) throw Error(decoded.reason);
+   const restored = new DungeonSession(decoded.state).snapshot;
+   expect(restored).toEqual(arrival);
+   return restored;
+  };
+  const restoredSecond = restoreArrival(second);
+  const approach=atStairApproach(restoredSecond,'ascend');
+  const off=good(stepDungeon(restoredSecond,command(restoredSecond,currentFloor(approach).position)));
   expect(off.depth).toBe(2);
   const first=good(stepDungeon(off,command(off,currentFloor(off).descriptor.upstairs)));
   expect(first.depth).toBe(1);expect(first.revision).toBe(second.revision+2);
@@ -152,7 +169,8 @@ describe('movement onto stairs', () => {
   expect(dungeonStairStatus(first,'ascend')).toBe('floorOne');
   expect(currentFloor(first).position).toBe(currentFloor(first).descriptor.downstairs);
   expect(first.party).toEqual(before.party);expect(first.ownership).toEqual(before.ownership);
-  const away=atStairApproach(first),reentered=good(stepDungeon(first,command(first,currentFloor(away).position)));
+  const restoredFirst = restoreArrival(first);
+  const away=atStairApproach(restoredFirst),reentered=good(stepDungeon(restoredFirst,command(restoredFirst,currentFloor(away).position)));
   const revisit=good(stepDungeon(reentered,command(reentered,currentFloor(reentered).descriptor.downstairs)));
   expect(revisit.depth).toBe(2);expect(currentFloor(revisit)).toEqual(first.floors[1]);
   expect(canonical(before)).toBe(original);
@@ -163,6 +181,17 @@ describe('movement onto stairs', () => {
   expect(atUp.depth).toBe(1);
   const locked=atStairApproach(initial),atDown=good(stepDungeon(locked,command(locked,currentFloor(locked).descriptor.downstairs)));
   expect(atDown.depth).toBe(1);expect(currentFloor(atDown).completed).toBe(0);
+  expect(currentFloor(atUp).position).toBe(currentFloor(initial).descriptor.upstairs);
+  expect(currentFloor(atDown).position).toBe(currentFloor(initial).descriptor.downstairs);
+  expect(atUp.revision).toBe(upApproach.revision + 1);
+  expect(atDown.revision).toBe(locked.revision + 1);
+  expect(dungeonStairLabel(atUp, 'ascend')).toBe('Upstairs: unavailable on floor 1');
+  expect(dungeonStairLabel(atDown, 'descend')).toBe('Downstairs: locked · clear 3 more encounters');
+  for (const arrival of [atUp, atDown]) {
+   const encoded=encodeDungeon(arrival);if(!encoded.ok)throw Error(encoded.reason);
+   const restored=decodeDungeon(encoded.text);if(!restored.ok)throw Error(restored.reason);
+   expect(new DungeonSession(restored.state).snapshot).toEqual(arrival);
+  }
   const ready=atStairApproach(cleared()),entry=command(ready,currentFloor(ready).descriptor.downstairs);
   for(const phase of ['battle','reward','defeat'] as const)expect(stepDungeon({...ready,phase},entry)).toEqual({ok:false,reason:'wrongPhase'});
   const limited={...ready,revision:Number.MAX_SAFE_INTEGER};

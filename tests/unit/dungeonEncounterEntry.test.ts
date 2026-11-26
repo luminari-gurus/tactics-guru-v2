@@ -3,7 +3,7 @@ import { assert, describe, expect, it } from 'vitest';
 import { DungeonSession } from '../../src/app/DungeonSession';
 import { canonical, hashJson } from '../../src/domain/contentIdentity';
 import {
-  acceptDungeonBattle, currentFloor, dungeonBoundary, dungeonItem, floorMap, freshDungeon,
+  acceptDungeonBattle, currentFloor, dungeonBoundary, dungeonItem, dungeonSeed, floorMap, freshDungeon,
   readDungeon, startDungeonBattle, stepDungeon, type DungeonState,
 } from '../../src/domain/dungeon';
 import { decodeDungeon, encodeDungeon } from '../../src/domain/dungeonSaveEnvelope';
@@ -39,9 +39,21 @@ describe('dungeon interrupted encounter entry', () => {
     const { state, target } = contact(slot);
     const tracked = { ...state, stats: { ...freshRunStats(), movesTaken: 7 } };
     const before = structuredClone(tracked), floor = currentFloor(tracked);
-    const entered = step(tracked, target), after = currentFloor(entered);
+    expect(tracked.phase).toBe('ready');
+    expect(poiCell(floor.exploration.pois[slot])).toBe(target);
+    expect(floor.exploration.visited).not.toContain(target);
+    expect(floor.exploration.movement?.step).toBe(1);
+    const adjacentSave = encodeDungeon(tracked);
+    assert(adjacentSave.ok);
+    const restored = decodeDungeon(adjacentSave.text);
+    assert(restored.ok);
+    expect(restored.state).toEqual(tracked);
+    const entered = step(restored.state, target), after = currentFloor(entered);
+    expect(after.exploration.active).toBe(slot);
+    expect(entered.activeBattle?.seed).toBe(dungeonSeed(tracked.seed, tracked.depth, 'battle', slot));
     expect(entered.phase).toBe('battle');
     expect(entered.encounterEntry).toEqual({ origin: floor.position, contact: target, slot });
+    expect(after.completed).toBe(0);
     expect(after.position).toBe(floor.position);
     expect(after.exploration.visited).toEqual(floor.exploration.visited);
     expect(after.exploration.revealed).toEqual(floor.exploration.revealed);
@@ -49,7 +61,7 @@ describe('dungeon interrupted encounter entry', () => {
     expect(after.exploration.pois).toEqual(floor.exploration.pois);
     expect(entered.stats?.movesTaken).toBe(7);
     expect(entered.revision).toBe(tracked.revision + 1);
-    expect(tracked).toEqual(before);
+    expect(restored.state).toEqual(before);
     expect(stepDungeon(entered, { id: entered.id, depth: entered.depth, revision: tracked.revision, destination: target }))
       .toEqual({ ok: false, reason: 'staleBoundary' });
     expect(startDungeonBattle(entered, target)).toEqual({ ok: false, reason: 'wrongPhase' });

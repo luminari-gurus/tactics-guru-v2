@@ -68,9 +68,8 @@ In PostHog's activity/events view, filter on `release` and event name, then `rou
 ## Local verification
 
 - `npm run test:unit -- tests/unit/telemetry.test.ts` checks config gates, sanitization and session boundaries.
-- `npm run test:telemetry` builds an isolated opted-in preview with fake credentials and mocks all ingestion, exercising desktop and both Pixel 7 orientations. It requires no PostHog account. Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` if using an installed browser.
-- `PLAYWRIGHT_TELEMETRY_DEV=true npm run test:telemetry -- --grep 'blocked ingestion|uncaught|recovery inspections|failed parser|prevents parser'` verifies explicit development opt-in with the same fake token/mocked ingestion, separately from the built preview. Development source paths are deliberately excluded from outgoing stack frames.
-- The regular `npm test` uses the normal default-off build; it excludes the explicit opt-in suite.
+- Dungeon and its main menu have collection disabled. Use the controlled
+  development procedure above to verify collection in enabled routes.
 - Uploads require separate authorization and CI credentials. CLI dry-run skips processing as well as uploading and therefore cannot establish symbolication.
 
 

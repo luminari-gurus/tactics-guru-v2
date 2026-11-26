@@ -1,10 +1,11 @@
 import { assert, expect, it } from 'vitest';
 import { DungeonSession } from '../../src/app/DungeonSession';
 import { dungeonContent } from '../../src/content/dungeon';
-import { acceptDungeonBattle, currentFloor, dungeonBoundary, readDungeon, startDungeonBattle, stepDungeon,
+import { acceptDungeonBattle, currentFloor, dungeonBoundary, freshDungeon, readDungeon, startDungeonBattle, stepDungeon,
   type DungeonResult, type DungeonState } from '../../src/domain/dungeon';
+import { freshRunStats } from '../../src/domain/runStats';
 import { createDungeonStorage, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
-import { atCell, dungeonContactApproach } from '../helpers/dungeonFixtures';
+import { atCell, dungeonCapacityFixture, dungeonContactApproach, dungeonGroundPileFixture, sharedGroundPile } from '../helpers/dungeonFixtures';
 
 const good = (result: DungeonResult) => { assert(result.ok, result.ok ? '' : result.reason); return result.state; };
 function memory() {
@@ -36,8 +37,12 @@ function savedOwner(initial: DungeonState, serializeWrite?: (task: () => void, u
   return { data, storage, owner };
 }
 
-it('saves movement, ownership and depleted loot together; duplicate steps and reload cannot grant twice', async () => {
-  const initial = victory(), { storage, owner } = savedOwner(initial), loot = currentFloor(initial).loot![0];
+it.each([
+  { floor: 'active', makeState: victory, enemySteps: 1 },
+  { floor: 'cleared', makeState: dungeonGroundPileFixture, enemySteps: 0 },
+])('persists a manual pickup once on $floor floors, including after reload', async ({ makeState, enemySteps }) => {
+  const initial = { ...makeState(), stats: freshRunStats('since-upgrade') };
+  const { storage, owner } = savedOwner(initial), loot = currentFloor(initial).loot![0];
   const before = storage.inspect().primary; assert(before.status === 'valid');
   expect(currentFloor(before.state).loot![0].remaining).toBe(1);
   const command = { ...owner.spatialBoundary, destination: loot.cell };
@@ -46,11 +51,104 @@ it('saves movement, ownership and depleted loot together; duplicate steps and re
   expect(owner.status).toContain(`Picked up ${dungeonContent.items[loot.itemId].label}`);
   const accepted = owner.snapshot, saved = storage.inspect().primary; assert(saved.status === 'valid');
   expect(saved.state).toEqual(accepted);
+  expect(accepted.stats!.movesTaken).toBe(initial.stats.movesTaken + 1);
+  expect(currentFloor(accepted).exploration.movement!.step)
+    .toBe(currentFloor(initial).exploration.movement!.step + enemySteps);
+  expect(accepted.party).toEqual(initial.party);
   expect(await owner.step(command)).toBe(false); expect(owner.snapshot).toEqual(accepted);
   owner.dispose();
   const resumed = new DungeonSession(initial, storage); assert(resumed.continue(resumed.inspect()));
   expect(resumed.snapshot).toEqual(accepted);
   expect(currentFloor(resumed.snapshot).loot![0]).toEqual({ ...loot, remaining: 0 });
+});
+
+it('keeps the uncollected victory pile and party position across consecutive restores', () => {
+  const won = victory(28);
+  const { storage, owner } = savedOwner(won);
+  owner.dispose();
+  const initial = freshDungeon('unused-start', 1);
+  for (let restore = 0; restore < 2; restore++) {
+    const resumed = new DungeonSession(initial, storage);
+    assert(resumed.continue(resumed.inspect()));
+    expect(resumed.snapshot).toEqual(won);
+    resumed.dispose();
+  }
+});
+
+it.each([1, 6])('continues an occupied-pile battle without collecting either reward with %i items in inventory', async owned => {
+  const { state, cell, origin } = sharedGroundPile(owned, true);
+  const { storage, owner } = savedOwner(state);
+  assert(await owner.step({ ...owner.spatialBoundary, destination: cell }));
+  const active = owner.snapshot;
+  expect(active.phase).toBe('battle');
+  expect(active.encounterEntry).toEqual({ origin, contact: cell, slot: 2 });
+  expect(currentFloor(active).position).toBe(origin);
+  expect(currentFloor(active).loot).toHaveLength(2);
+  expect(currentFloor(active).loot).toEqual(currentFloor(state).loot);
+  expect(active.ownership).toEqual(state.ownership);
+  owner.dispose();
+
+  const resumed = new DungeonSession(state, storage);
+  assert(resumed.continue(resumed.inspect()));
+  expect(resumed.snapshot).toEqual(active);
+  resumed.dispose();
+});
+
+it.each([
+  { owned: 5, pickedUp: 1, warning: '1 item remains' },
+  { owned: 6, pickedUp: 0, warning: '2 items remain' },
+])('restores a shared pile with $owned owned items and collects one charm per discard', async ({ owned, pickedUp, warning }) => {
+  const { state, cell } = sharedGroundPile(owned);
+  const loot = currentFloor(state).loot!;
+  const { storage, owner } = savedOwner(state);
+  assert(await owner.step({ ...owner.spatialBoundary, destination: cell }));
+  const entered = owner.snapshot;
+  const expectedLoot = (count: number) => loot.map((item, index) => ({ ...item, remaining: index < count ? 0 : 1 }));
+  let equipment = [...state.ownership.equipment, ...loot.slice(0, pickedUp).map(item => ({ instanceId: item.id, itemId: item.itemId }))];
+  expect(currentFloor(entered).loot).toEqual(expectedLoot(pickedUp));
+  expect(entered.ownership).toEqual({ ...state.ownership, equipment });
+  expect(owner.status).toContain(`Inventory full: ${warning} on the ground.`);
+  owner.dispose();
+
+  const resumed = new DungeonSession(state, storage);
+  assert(resumed.continue(resumed.inspect()));
+  expect(resumed.snapshot).toEqual(entered);
+  for (const [index, item] of loot.entries()) {
+    if (index < pickedUp) continue;
+    const discarded = state.ownership.equipment[index].instanceId;
+    assert(await resumed.dispatch({ ...dungeonBoundary(resumed.snapshot), type: 'discardEquipment', instanceId: discarded }));
+    equipment = [...equipment.filter(ownedItem => ownedItem.instanceId !== discarded), { instanceId: item.id, itemId: item.itemId }];
+    expect(currentFloor(resumed.snapshot)).toEqual({ ...currentFloor(entered), position: cell, loot: expectedLoot(index + 1) });
+    expect(resumed.snapshot.ownership).toEqual({ ...state.ownership, equipment });
+    expect(resumed.snapshot.party).toEqual(entered.party);
+    expect(resumed.status).toContain(`Picked up ${dungeonContent.items[item.itemId].label}`);
+  }
+  const collected = resumed.snapshot;
+  resumed.dispose();
+  const restored = new DungeonSession(state, storage);
+  assert(restored.continue(restored.inspect()));
+  expect(restored.snapshot).toEqual(collected);
+  restored.dispose();
+});
+
+it('restores a Ranger charm assignment and saves its removal without changing the Fighter charm', async () => {
+  const initial = dungeonCapacityFixture();
+  const { owner, storage } = savedOwner(initial);
+  const rangerCharm = { heroId: 'ranger', slot: 'charm', instanceId: initial.ownership.equipment[1].instanceId } as const;
+  assert(await owner.dispatch({ ...dungeonBoundary(owner.snapshot), type: 'equipItem', ...rangerCharm }));
+  const equipped = { ...initial.ownership, assignments: [...initial.ownership.assignments, rangerCharm] };
+  expect(owner.snapshot.ownership).toEqual(equipped);
+  owner.dispose();
+
+  const resumed = new DungeonSession(initial, storage);
+  assert(resumed.continue(resumed.inspect()));
+  expect(resumed.snapshot.ownership).toEqual(equipped);
+  assert(await resumed.dispatch({ ...dungeonBoundary(resumed.snapshot), type: 'unequipItem', ...rangerCharm }));
+  expect(resumed.snapshot.ownership).toEqual(initial.ownership);
+  const saved = storage.inspect().primary;
+  assert(saved.status === 'valid');
+  expect(saved.state.ownership).toEqual(initial.ownership);
+  resumed.dispose();
 });
 
 it.each(['before', 'after'] as const)('does not publish a pickup when the primary write fails %s committing', async when => {
@@ -75,8 +173,14 @@ it.each(['before', 'after'] as const)('does not publish a pickup when the primar
   assert(owner.continue(review));
   expect(owner.snapshot).toEqual(primary.state);
   if (when === 'before') expect(await owner.step({ ...owner.spatialBoundary, destination: loot.cell })).toBe(true);
-  expect(currentFloor(owner.snapshot).loot![0].remaining).toBe(0);
-  expect(storage.inspect().primary.status).toBe('valid');
+  const collected = good(stepDungeon({ ...initial, stats: freshRunStats('since-upgrade') }, command));
+  expect(currentFloor(collected).loot![0].remaining).toBe(0);
+  expect(owner.snapshot).toEqual(collected);
+  owner.dispose();
+  const restored = new DungeonSession(initial, storage);
+  assert(restored.continue(restored.inspect()));
+  expect(restored.snapshot).toEqual(collected);
+  restored.dispose();
 });
 
 function fullStackOnPile() {

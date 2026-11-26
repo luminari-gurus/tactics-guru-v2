@@ -3,16 +3,17 @@ import { hasHealGoblinCap, readReplay } from '../../src/domain/battle';
 import { hashJson } from '../../src/domain/contentIdentity';
 import type { Replay } from '../../src/domain/types';
 import { DungeonSession } from '../../src/app/DungeonSession';
+import { showsSnareBadge } from '../../src/phaser/abilityPresentation';
 import { HERO_PROGRESSION } from '../../src/content/progression';
 import { progressHero } from '../../src/domain/progression';
-import { atDownstairs, atEncounter, withLegacySight } from '../helpers/dungeonFixtures';
-import { freshDungeon, floorDescriptor, floorMap, startDungeonBattle, readDungeon, travelDungeon } from '../../src/domain/dungeon';
+import { atDownstairs, atStairApproach, atEncounter, checkedDungeon, guardianFirstRewardFixture, savedBiomeEncounter, snaredDefeatBoundary, stagedMageAbility, withLegacySight } from '../helpers/dungeonFixtures';
+import { freshDungeon, floorDescriptor, floorMap, startDungeonBattle, readDungeon, travelDungeon, stepDungeon } from '../../src/domain/dungeon';
 import { guardedBoundary } from '../helpers/guardedBoundary';
 import { combatStats } from '../../src/domain/effects';
 import { assert,expect,it } from 'vitest';
 import { previewSupportAbility } from '../../src/domain/combat';
-import { dungeonJourney, dungeonVictoryBoundary, rangerJourney, selectMageJourney, MAGE_JOURNEY_SEEDS, FIGHTER_JOURNEY_SEED, healedFighterBoundary, shamanJourney, fighterJourney } from '../helpers/dungeonFixtures';
-import { dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState } from '../../src/domain/dungeon';
+import { dungeonJourney, dungeonVictoryBoundary, walkWitness, rangerJourney, selectMageJourney, MAGE_JOURNEY_SEEDS, FIGHTER_JOURNEY_SEED, healedFighterBoundary, shamanJourney, fighterJourney } from '../helpers/dungeonFixtures';
+import { dungeonStairStatus, dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState } from '../../src/domain/dungeon';
 import { BattleSession } from '../../src/app/BattleSession';
 import { playerDecision } from '../helpers/playerPolicy';
 import { encodeDungeon,decodeDungeon } from '../../src/domain/dungeonSaveEnvelope';
@@ -23,6 +24,101 @@ import { EXPANDED_ENCOUNTER_POLICY, LEGACY_ENCOUNTER_POLICY } from '../../src/do
 import { priorDungeonEnvelope } from '../helpers/dungeonFixtures';
 import { freshExploration } from '../../src/domain/exploration';
 import { createDungeonStorage, DUNGEON_BACKUP_CHECKPOINT_KEY, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
+
+it.each(['ability:frost_snare', 'ability:magic_missile'] as const)('replays and restores a staged Mage cast of %s', abilityId => {
+  const { state, command } = stagedMageAbility(abilityId);
+  const built = dungeonBattle(state)!;
+  const battle = new BattleSession(built.catalog, state.activeBattle!, built.state.seed, undefined, false, built.battlefield);
+  assert(battle.prepare(command).ok);
+  const step = battle.confirm(); assert(step);
+  const history = battle.continuation!;
+  expect(replayCommandSequence(history.snapshot, history.commands, built.catalog))
+    .toEqual({ ok: true, state: step.after, events: step.events });
+  if (abilityId === 'ability:magic_missile') expect(step.events.filter(event => event.type === 'missileRolled')).toHaveLength(2);
+  const accepted = acceptDungeonBattle(state, step.after); assert(accepted.ok);
+  const saved = encodeDungeon(accepted.state); assert(saved.ok);
+  const restored = decodeDungeon(saved.text); assert(restored.ok && restored.state.activeBattle);
+  expect(restored.state).toEqual(accepted.state);
+  const resumed = new BattleSession(built.catalog, restored.state.activeBattle, built.state.seed);
+  expect(resumed.state).toEqual(step.after);
+  expect(resumed.events).toEqual([]);
+});
+
+it.each(['ability:pinning_shot', 'ability:frost_snare'] as const)('projects Snared badges after restoring %s', abilityId => {
+  const { state, command } = stagedMageAbility('ability:frost_snare');
+  const initial = state.activeBattle!;
+  const mage = initial.units.find(unit => unit.defId === 'mage')!;
+  const ranger = initial.units.find(unit => unit.defId === 'ranger')!;
+  const actor = abilityId === 'ability:pinning_shot' ? ranger : mage;
+  // Both abilities need a legal target. Put the Ranger on the Mage's casting tile for Pin.
+  const units = actor === mage ? initial.units : initial.units.map(unit => {
+    if (unit === mage) return { ...unit, cell: ranger.cell };
+    if (unit === ranger) return { ...unit, cell: mage.cell };
+    return unit;
+  });
+  const before = { ...initial, units, activeIndex: initial.initiative.indexOf(actor.id) };
+  const cast = dispatch(before, { ...command, unitId: actor.id, abilityId }, dungeonBattle(state)!.catalog);
+  assert(cast.ok);
+  const saved = encodeDungeon({ ...state, activeBattle: cast.state });
+  assert(saved.ok);
+  const restored = decodeDungeon(saved.text);
+  assert(restored.ok && restored.state.activeBattle);
+  const restoredUnits = restored.state.activeBattle.units;
+  expect(restoredUnits.find(unit => unit.id === command.target.unitId)?.movementBlock).toEqual({ sourceId: actor.id, abilityId });
+  expect(restoredUnits.filter(unit => showsSnareBadge(unit, restoredUnits)).map(unit => unit.id))
+    .toEqual(abilityId === 'ability:frost_snare' ? [command.target.unitId] : []);
+});
+
+it('keeps the restored Snared badge through unrelated turns until the target ends its turn', () => {
+  const { state, command } = stagedMageAbility('ability:frost_snare');
+  const built = dungeonBattle(state)!;
+  const cast = dispatch(state.activeBattle!, command, built.catalog);
+  assert(cast.ok);
+  const saved = encodeDungeon({ ...state, activeBattle: cast.state });
+  assert(saved.ok);
+  const restored = decodeDungeon(saved.text);
+  assert(restored.ok && restored.state.activeBattle);
+  const battle = new BattleSession(built.catalog, restored.state.activeBattle, built.state.seed, undefined, false, built.battlefield);
+  const targetId = command.target.unitId;
+  const visible = () => battle.state.units.filter(unit => showsSnareBadge(unit, battle.state.units)).map(unit => unit.id);
+  const events = [];
+  for (const unitId of [3, 2, 1]) {
+    expect(visible()).toEqual([targetId]);
+    expect(battle.active.id).toBe(unitId);
+    assert(battle.prepare({ type: 'endTurn', unitId }).ok);
+    const wait = battle.confirm();
+    assert(wait);
+    battle.finishPresentation(wait.token);
+    while (battle.phase === 'enemy') {
+      const step = battle.nextEnemy();
+      assert(step);
+      events.push(...step.events);
+      battle.finishPresentation(step.token);
+    }
+  }
+  const archer = events.findIndex(event => event.type === 'attackRolled' && event.unitId === 5);
+  expect(archer).toBeGreaterThanOrEqual(0);
+  expect(events.slice(archer + 1)).toContainEqual({ type: 'turnEnded', unitId: targetId });
+  expect(events).toContainEqual({ type: 'movementBlockExpired', unitId: targetId, sourceId: command.unitId, abilityId: command.abilityId });
+  expect(visible()).toEqual([]);
+});
+
+it.each(['source', 'target'] as const)('removes the Snared badge on legal %s defeat', kind => {
+  const fixture = snaredDefeatBoundary(kind);
+  const before = fixture.state.activeBattle!.units;
+  expect(showsSnareBadge(before.find(unit => unit.id === fixture.targetId)!, before)).toBe(true);
+  const replay = replayCommandSequence(fixture.initial, fixture.commands, dungeonBattle(fixture.state)!.catalog);
+  assert(replay.ok);
+  expect(replay.state).toEqual(fixture.expected);
+  expect(replay.events).toContainEqual({
+    type: 'movementBlockExpired', unitId: fixture.targetId, sourceId: 3, abilityId: 'ability:frost_snare',
+  });
+  const after = replay.state.units;
+  expect(after.find(unit => unit.id === fixture.defeatedId)?.hp).toBe(0);
+  const target = after.find(unit => unit.id === fixture.targetId)!;
+  expect(target.movementBlock).toBeUndefined();
+  expect(showsSnareBadge(target, after)).toBe(false);
+});
 
 it.each([[10, 11], [10, 15]])('saves a draught in checkpoint/battle formats %i/%i and settles stock on either outcome', (checkpointFormat, battleFormat) => {
   const base = freshDungeon('draught-test', 13);
@@ -96,6 +192,53 @@ it.each([[10, 11], [10, 15]])('saves a draught in checkpoint/battle formats %i/%
     expect(finished.state.activeBattle).toBeNull();
     expect(acceptDungeonBattle(finished.state, state)).toEqual({ ok: false, reason: 'staleBoundary' });
   }
+});
+
+it('settles the last earned draught after playing the next encounter to completion', () => {
+  const witness = dungeonVictoryBoundary(13);
+  assert(witness);
+  const won = dispatch(witness.snapshot.activeBattle, witness.command, dungeonBattle(witness.snapshot)!.catalog);
+  assert(won.ok);
+  const reward = acceptDungeonBattle(witness.snapshot, won.state);
+  assert(reward.ok && reward.state.offer);
+  const claimed = dungeonItem(reward.state, {
+    ...dungeonBoundary(reward.state), type: 'claimReward', offerId: reward.state.offer.id, itemId: 'item:healing_draught',
+  });
+  assert(claimed.ok);
+  let dungeon = walkWitness(claimed.state);
+  const source = dungeonBattle(dungeon)!;
+  const battle = new BattleSession(source.catalog, dungeon.activeBattle!, source.state.seed, undefined, true, source.battlefield);
+  let used = false;
+  for (let i = 0; i < 500 && battle.state.outcome === 'ongoing'; i++) {
+    const drink = { type: 'drinkDraught', unitId: battle.active.id } as const;
+    if (battle.phase === 'enemy') {
+      const step = battle.nextEnemy();
+      assert(step);
+      battle.finishPresentation(step.token);
+    } else {
+      const command = !used && battle.preview(drink).ok ? drink : playerDecision(battle.state, source.catalog);
+      const before = battle.state, actor = battle.active;
+      assert(battle.prepare(command).ok);
+      const step = battle.confirm();
+      assert(step);
+      battle.finishPresentation(step.token);
+      if (command === drink) {
+        used = true;
+        expect(battle.state.rng).toEqual(before.rng);
+        expect(battle.state.units.find(unit => unit.id === actor.id)!.hp).toBeGreaterThan(actor.hp);
+      }
+    }
+    const accepted = acceptDungeonBattle(dungeon, battle.state);
+    assert(accepted.ok);
+    dungeon = accepted.state;
+  }
+  expect(used).toBe(true);
+  expect(dungeon.activeBattle).toBeNull();
+  expect(dungeon.ownership.consumables).toEqual([]);
+  expect(acceptDungeonBattle(dungeon, battle.state)).toEqual({ ok: false, reason: 'staleBoundary' });
+  const encoded = encodeDungeon(dungeon);
+  assert(encoded.ok);
+  expect(decodeDungeon(encoded.text)).toEqual({ ok: true, state: dungeon });
 });
 
 it('completes production Shaman Hex and healing through the real session with exact command/event/RNG replay',()=>{
@@ -355,8 +498,35 @@ it('finds a legal earned Ranger level-three witness using both controls and reta
     for(const command of record.commands){const result=dispatch(state,command,catalog);if(!result.ok)throw Error(result.reason);state=result.state;}
     expect(state).toEqual(record.state);
   }
-  const fighter=healedFighterBoundary();expect(fighter.state.units.find(u=>u.defId==='fighter')!.secondWindUsed).toBe(true);
 },120000);
+
+it('carries the healed Fighter through automatic stairs and restores the next battle with fresh resources', () => {
+  const record = healedFighterBoundary();
+  expect(record.state.units.find(unit => unit.defId === 'fighter')!.secondWindUsed).toBe(true);
+  const won = checkedDungeon(acceptDungeonBattle(record.entry, record.state));
+  const ready = checkedDungeon(dungeonItem(won, {
+    ...dungeonBoundary(won), type: 'declineReward', offerId: won.offer!.id,
+  }));
+  const approach = atStairApproach(ready);
+  const arrived = checkedDungeon(stepDungeon(approach, {
+    id: approach.id, depth: approach.depth, revision: approach.revision, destination: approach.floors[0].descriptor.downstairs,
+  }));
+  expect(arrived).toMatchObject({ depth: 2, revision: approach.revision + 1 });
+  expect(arrived.party).toEqual(approach.party);
+  expect(arrived.ownership).toEqual(approach.ownership);
+  expect(arrived.party.every(hero => !Object.hasOwn(hero, 'secondWindUsed') && !Object.hasOwn(hero, 'tauntedBy'))).toBe(true);
+  const saved = encodeDungeon(arrived);
+  assert(saved.ok);
+  const resumed = decodeDungeon(saved.text);
+  assert(resumed.ok);
+  expect(resumed.state).toEqual(arrived);
+  const next = walkWitness(resumed.state);
+  const fighter = arrived.party.find(hero => hero.heroId === 'fighter')!;
+  expect(fighter.hp).toBeGreaterThan(0);
+  expect(fighter.learned).toContain('ability:second_wind');
+  expect(next.activeBattle!.units.find(unit => unit.defId === 'fighter')!.hp).toBe(fighter.hp);
+  expect(next.activeBattle!.units.every(unit => !unit.secondWindUsed && unit.tauntedBy === undefined)).toBe(true);
+});
 
 it('retains live Mark and Pin across dungeon continuation and keeps them out of the next encounter',()=>{
   const fresh=freshDungeon('ranger-save',190),entry={...fresh,party:fresh.party.map(h=>progressHero(h.heroId,180,2,dungeonContent.catalog))};
@@ -399,10 +569,7 @@ it('restores bounded healing and Taunt without refreshing them and resets battle
   const old=JSON.stringify({...JSON.parse(encoded.text),format:4});expect(decodeDungeon(old)).toEqual({ok:false,reason:'incompatible'});
 });
 it('legally reaches guardian victory with next-command/RNG equivalence after save/resume',()=>{
-  let fixture:ReturnType<typeof dungeonVictoryBoundary>=null,seed=0;
-  for(seed=1;seed<=50&&!fixture;seed++)fixture=dungeonVictoryBoundary(seed,2);
-  expect(fixture).not.toBeNull();if(!fixture)return;
-  expect(seed-1).toBeGreaterThan(0);
+  const fixture = dungeonVictoryBoundary(5, 2); assert(fixture);
   const encoded=encodeDungeon(fixture.snapshot);expect(encoded.ok).toBe(true);if(!encoded.ok)return;
   const decoded=decodeDungeon(encoded.text);expect(decoded.ok).toBe(true);if(!decoded.ok)return;
   const catalog=dungeonBattle(fixture.snapshot)!.catalog;
@@ -411,10 +578,29 @@ it('legally reaches guardian victory with next-command/RNG equivalence after sav
   if(a.ok){expect(a.state.outcome).toBe('playerWin');const result=acceptDungeonBattle(decoded.state,a.state);expect(result.ok).toBe(true);if(result.ok){expect(result.state.phase).toBe('reward');expect(result.state.floors[0].completed).toBe(3);}}
 },120000);
 
+it('restores the first reward and keeps descent locked after it is claimed', () => {
+  const fixture = dungeonVictoryBoundary(1, 0); assert(fixture);
+  const entry = fixture.snapshot;
+  const victory = dispatch(entry.activeBattle!, fixture.command, dungeonBattle(entry)!.catalog);
+  assert(victory.ok && victory.state.outcome === 'playerWin');
+  const pending = acceptDungeonBattle(entry, victory.state); assert(pending.ok);
+  const encoded = encodeDungeon(pending.state); assert(encoded.ok);
+  const restored = decodeDungeon(encoded.text); assert(restored.ok);
+  expect(restored.state).toEqual(pending.state);
+  expect(dungeonStairStatus(restored.state, 'descend')).toBe('reward');
+  const offer = restored.state.offer; assert(offer);
+  const claimed = dungeonItem(restored.state, {
+    ...dungeonBoundary(restored.state), type: 'claimReward', offerId: offer.id, itemId: offer.options[0].itemId,
+  });
+  assert(claimed.ok);
+  expect(claimed.state).toMatchObject({ phase: 'ready', offer: null });
+  expect(claimed.state.ownership).not.toEqual(restored.state.ownership);
+  expect(claimed.state.floors[0].completed).toBe(1);
+  expect(dungeonStairStatus(claimed.state, 'descend')).toBe('encounters');
+});
+
 it('retains the accepted-command history through every legal encounter',()=>{
-  let fixture:ReturnType<typeof dungeonVictoryBoundary>=null;
-  for(let seed=1;seed<=50&&!fixture;seed++)fixture=dungeonVictoryBoundary(seed,2);
-  expect(fixture).not.toBeNull();if(!fixture)return;
+  const fixture = dungeonVictoryBoundary(5, 2); assert(fixture);
   for(const value of fixture.histories){
     const {replay:record,entry}=value as {replay:import('../../src/domain/types').Replay;entry:import('../../src/domain/dungeon').DungeonState};
     const catalog=dungeonBattle(entry)!.catalog;
@@ -424,13 +610,13 @@ it('retains the accepted-command history through every legal encounter',()=>{
   }
 },120000);
 
-it('continues a legally reached Guarded dungeon boundary through exact save/resume and expiry', () => {
-  let reached = false;
-  for (let seed = 1; seed <= 10 && !reached; seed++) {
+it.each([{ seed: 1, outcome: 'hit' }, { seed: 5, outcome: 'miss' }])(
+  'continues a legal Guarded $outcome through exact dungeon save/resume and expiry', ({ seed, outcome }) => {
     const started = startDungeonBattle(atEncounter(freshDungeon('guarded-save', seed))); if (!started.ok) throw Error(started.reason);
     const built = dungeonBattle(started.state)!;
-    let fixture; try { fixture = guardedBoundary(built.catalog, started.state.activeBattle!); } catch { continue; }
+    const fixture = guardedBoundary(built.catalog, started.state.activeBattle!);
     const cast = dispatch(fixture.before, fixture.command, built.catalog); if (!cast.ok) throw Error(cast.reason);
+    expect(cast.events.find(event => event.type === 'attackRolled')).toMatchObject({ result: outcome });
     const snapshot = { ...started.state, activeBattle: cast.state };
     const encoded = encodeDungeon(snapshot); if (!encoded.ok) throw Error(encoded.reason);
     const decoded = decodeDungeon(encoded.text); if (!decoded.ok) throw Error(decoded.reason);
@@ -448,11 +634,28 @@ it('continues a legally reached Guarded dungeon boundary through exact save/resu
       const bad = { ...snapshot, activeBattle: { ...cast.state, units: cast.state.units.map((u, i) => i ? u : { ...u, [field]: [] }) } };
       expect(readDungeon(bad).ok).toBe(false);
     }
-    reached = true;
-  }
-  expect(reached).toBe(true);
-});
+  });
 
+
+for (const biome of ['forest', 'desert'] as const) {
+  it.each(['normal', 'elite', 'vault', 'boss'] as const)(`restores the selected ${biome} %s encounter and enemy stats`, kind => {
+    const { slot, state } = savedBiomeEncounter(biome, kind);
+    const started = startDungeonBattle(atEncounter(state, slot)); assert(started.ok);
+    const built = dungeonBattle(started.state)!;
+    const encoded = encodeDungeon(started.state); assert(encoded.ok);
+    const restored = decodeDungeon(encoded.text); assert(restored.ok && restored.state.activeBattle);
+    expect(restored.state).toEqual(started.state);
+    const rebuilt = dungeonBattle(restored.state)!;
+    expect(restored.state.floors[1].descriptor.encounters[slot].selection).toMatchObject({ kind });
+    const enemies = restored.state.activeBattle.units.filter(unit => unit.side === 'enemy');
+    expect(enemies.length).toBeGreaterThan(0);
+    for (const enemy of enemies) {
+      const id = enemy.defId as keyof typeof built.catalog.enemies;
+      expect(enemy.hp).toBe(built.catalog.enemies[id].stats.maxHp);
+      expect(combatStats(enemy, rebuilt.catalog).armorClass).toBe(built.catalog.enemies[id].stats.armorClass);
+    }
+  });
+}
 
 it('uses the same scaled catalog for inspection, attack preview, AI, actual damage and replay', () => {
   const base = freshDungeon('scaled-consumers', 1);
@@ -506,6 +709,14 @@ it('clears a Wetlands floor through live traversal and resumes its saved encount
   expect(witness.records.map(record => record.state.outcome)).toEqual(['playerWin', 'playerWin', 'playerWin']);
   expect(witness.state.floors[0].completed).toBe(3);
 
+  for (const { entry } of witness.records) {
+    const { selection } = dungeonBattle(entry)!;
+    expect(selection).toMatchObject({ biome: 'wetlands', policy: EXPANDED_ENCOUNTER_POLICY });
+    const enemies = selection.encounter.roster.filter(spawn => spawn.side === 'enemies');
+    expect(entry.activeBattle!.units.filter(unit => unit.side === 'enemy').map(unit => unit.defId))
+      .toEqual(enemies.map(spawn => spawn.unitId));
+  }
+
   const entry = witness.records[0].entry;
   const encodedBattle = encodeDungeon(entry);
   assert(encodedBattle.ok);
@@ -519,6 +730,24 @@ it('clears a Wetlands floor through live traversal and resumes its saved encount
   assert(encoded.ok);
   expect(decodeDungeon(encoded.text)).toEqual(downstairs);
 }, 30000);
+
+function restoreDungeonSave(state: DungeonState) {
+  const saved = encodeDungeon(state); assert(saved.ok);
+  const restored = decodeDungeon(saved.text); assert(restored.ok);
+  expect(restored.state).toEqual(state);
+  return restored.state;
+}
+
+it('restores the floor-five guardian reward before and after claiming it', () => {
+  const pending = restoreDungeonSave(guardianFirstRewardFixture());
+  const offer = pending.offer!;
+  const claimed = checkedDungeon(dungeonItem(pending, { ...dungeonBoundary(pending), type: 'claimReward',
+    offerId: offer.id, itemId: offer.options[0].itemId }));
+  const restored = restoreDungeonSave(claimed);
+  expect(restored).toMatchObject({ depth: 5, phase: 'ready', offer: null, revision: pending.revision + 1 });
+  expect(restored.ownership).not.toEqual(pending.ownership);
+  expect(restored.floors[4].exploration.cleared).toEqual([2]);
+});
 
 it('wins a legal guardian-first battle and continues with an uncleared ordinary encounter', () => {
   let victory: DungeonState | undefined;
@@ -541,8 +770,13 @@ it('wins a legal guardian-first battle and continues with an uncleared ordinary 
   expect(victory).toBeDefined();if(!victory)throw Error('No legal guardian-first victory found');
   expect(victory.floors[0].exploration.cleared).toEqual([2]);
   expect(victory.offer).not.toBeNull();
-  const claimed=dungeonItem(victory,{...dungeonBoundary(victory),type:'claimReward',offerId:victory.offer!.id,itemId:victory.offer!.options[0].itemId});
+  const pending = restoreDungeonSave(victory);
+  const claimed=dungeonItem(pending,{...dungeonBoundary(pending),type:'claimReward',offerId:pending.offer!.id,itemId:pending.offer!.options[0].itemId});
   if(!claimed.ok)throw Error(claimed.reason);
-  const next=startDungeonBattle(atEncounter(claimed.state,0));if(!next.ok)throw Error(next.reason);
+  const resumed = restoreDungeonSave(claimed.state);
+  expect(resumed).toMatchObject({ depth: 1, phase: 'ready', offer: null, revision: pending.revision + 1 });
+  expect(resumed.ownership).not.toEqual(pending.ownership);
+  expect(resumed.floors[0].exploration).toEqual({ ...pending.floors[0].exploration, active: null });
+  const next=startDungeonBattle(atEncounter(resumed,0));if(!next.ok)throw Error(next.reason);
   expect(next.state.floors[0].exploration.active).toBe(0);
 });

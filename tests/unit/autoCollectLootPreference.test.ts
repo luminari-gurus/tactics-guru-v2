@@ -16,12 +16,16 @@ it('defaults on and persists the independent preference without changing other s
   const storage = memory();
   storage.setItem('tactics-guru:combat-controls', 'radial');
   storage.setItem('tactics-guru:routine-cutscenes', 'off');
+  storage.setItem('tactics-guru:telemetry-opt-out', 'true');
+  const writes = vi.spyOn(storage, 'setItem');
   expect(readAutoCollectLootPreference(storage)).toBe(true);
   expect(writeAutoCollectLootPreference(false, storage)).toBe(true);
   expect(storage.getItem(AUTO_COLLECT_LOOT_KEY)).toBe('off');
   expect(readAutoCollectLootPreference(storage)).toBe(false);
   expect(writeAutoCollectLootPreference(true, storage)).toBe(true);
   expect(readAutoCollectLootPreference(storage)).toBe(true);
+  expect(writes.mock.calls).toEqual([[AUTO_COLLECT_LOOT_KEY, 'off'], [AUTO_COLLECT_LOOT_KEY, 'on']]);
+  expect(storage.getItem('tactics-guru:telemetry-opt-out')).toBe('true');
   expect(storage.getItem('tactics-guru:combat-controls')).toBe('radial');
   expect(storage.getItem('tactics-guru:routine-cutscenes')).toBe('off');
 });

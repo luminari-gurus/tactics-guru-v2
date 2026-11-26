@@ -1,4 +1,5 @@
 import { assert, expect, it } from 'vitest';
+import { ownedAbilities } from '../../src/ui/battleActions';
 import { BattleSession } from '../../src/app/BattleSession';
 import { dungeonContent } from '../../src/content/dungeon';
 import { dungeonBattle, freshDungeon, startDungeonBattle } from '../../src/domain/dungeon';
@@ -33,6 +34,9 @@ for (const [xp, level, maxHp] of [[0, 1, 11], [59, 1, 11], [60, 2, 15],
     expect(continued.session.events).toEqual([]);
     expect(continued.session.replay).toBeNull();
     expect(restored.catalog.abilities['ability:magic_missile']).toMatchObject({ kind: 'magicMissile', casterLevel: level });
+    const options = ownedAbilities(continued.session).map(ability => ability.id);
+    expect(options).toContain('ability:magic_missile');
+    expect(options.includes('ability:frost_snare')).toBe(level >= 3);
     expect(Boolean(restored.catalog.abilities['ability:frost_snare'])).toBe(level >= 3);
     expect(encodeDungeon(decoded.state)).toEqual(encoded);
 

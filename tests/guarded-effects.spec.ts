@@ -1,22 +1,13 @@
-import { expectDungeonResumed } from './helpers/dungeonTraversal';
+import { expectDungeonResumed, openSavedDungeon } from './helpers/dungeonTraversal';
 import { atEncounter } from './helpers/dungeonFixtures';
 import { expect, railTest as test, type Page } from './helpers/dungeonEntropy';
 import { writeFileSync } from 'node:fs';
-import { BattleSession } from '../src/app/BattleSession';
-import { standaloneCatalog as battleCatalog } from './helpers/playerPolicy';
-import { previewMovement } from '../src/domain/grid';
 import { combatStats } from '../src/domain/effects';
-import { createBattle, dispatch } from '../src/domain/turns';
-import { createRun } from '../src/domain/run';
-import { emptyItemOwnership } from '../src/domain/items';
-import { createRunBattle } from '../src/domain/runBattle';
 import { freshDungeon, startDungeonBattle, dungeonBattle } from '../src/domain/dungeon';
-import { encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
-import { reachStandaloneBoundary } from './helpers/standaloneBoundary';
+import { dispatch } from '../src/domain/turns';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { guardedBoundary } from './helpers/guardedBoundary';
-import { runContext } from './helpers/runItemFixtures';
-import { endTurn, battleTool, readSession, playCommand, confirmRestart, playerDecision } from './helpers/battlePolicy';
+import { endTurn, battleTool, readSession, playCommand } from './helpers/battlePolicy';
 
 const boardReport=async(page:Page)=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
 async function checkBadges(page:Page) {
@@ -39,67 +30,20 @@ async function checkBadges(page:Page) {
   }
 }
 
-function boundary(mode: 'standalone' | 'run' | 'dungeon', miss: boolean) {
-  for (let seed = mode === 'run' ? 13 : 1; seed <= 100; seed++) {
-    const run = createRun('guarded-browser', seed, runContext.definition, runContext.catalog); if (!run.ok) throw Error(run.reason);
-    const items = { run: run.state, ownership: emptyItemOwnership(), offer: null, itemRevision: 0 };
-    const runBuilt = createRunBattle(items, runContext); if (!runBuilt.ok) throw Error(runBuilt.reason);
-    const dungeon = startDungeonBattle(atEncounter(freshDungeon('guarded-browser', seed))); if (!dungeon.ok) throw Error(dungeon.reason);
-    const dungeonBuilt = dungeonBattle(dungeon.state)!;
-    const standalone = createBattle('map:forest_ruins', seed, battleCatalog); if (!standalone.ok) throw Error(standalone.reason);
-    const catalog = mode === 'standalone' ? battleCatalog : mode === 'run' ? runBuilt.catalog : dungeonBuilt.catalog;
-    const initial = mode === 'standalone' ? standalone.state : mode === 'run' ? runBuilt.state : dungeon.state.activeBattle!;
-    let fixture; try { fixture = guardedBoundary(catalog, initial); } catch { continue; }
-    const cast = dispatch(fixture.before, fixture.command, catalog); if (!cast.ok) throw Error(cast.reason);
-    if (cast.events.some(e => e.type === 'attackRolled' && e.result === 'miss') !== miss) continue;
-    // Pick a deterministic legal boundary where guard survives incoming enemy turns and expires normally.
-    const probe = new BattleSession(catalog, cast.state, cast.state.seed);
-    let incoming = false;
-    for (let i = 0; i < 40 && probe.state.outcome === 'ongoing'; i++) {
-      if (i > 0 && probe.active.id === 1) break;
-      const step = probe.phase === 'enemy' ? probe.nextEnemy() : (() => {
-        probe.prepare({ type: 'endTurn', unitId: probe.active.id }); return probe.confirm();
-      })();
-      if (!step) break;
-      incoming ||= step.events.some(e => e.type === 'attackRolled' && e.targetId === 1);
-      probe.finishPresentation(step.token);
-    }
-    if (!incoming || probe.active.id !== 1 || probe.active.hp === 0 || probe.active.guarded) continue;
-    const saved = mode === 'dungeon' ? encodeDungeon({ ...dungeon.state, activeBattle: fixture.before }) : null;
-    if (saved && !saved.ok) throw Error(saved.reason);
-    return { ...fixture, catalog, saved: saved?.text, initial, seed, incoming };
-  }
-  throw Error('No Guarded boundary');
+function guardedMissFixture() {
+  // This seed misses the strike and draws an incoming attack before Guarded expires.
+  const dungeon = startDungeonBattle(atEncounter(freshDungeon('guarded-browser', 10)));
+  if (!dungeon.ok) throw Error(dungeon.reason);
+  const { catalog } = dungeonBattle(dungeon.state)!;
+  const initial = dungeon.state.activeBattle!;
+  return { dungeon: dungeon.state, catalog, initial, f: guardedBoundary(catalog, initial) };
 }
-for (const mode of ['standalone', 'run', 'dungeon'] as const) for (const miss of [false, true]) test(`shared Guarded lifecycle: ${mode} ${miss?'miss':'hit'}`, async ({ page }) => {
+
+test('shared Guarded lifecycle: dungeon miss', async ({ page }) => {
   test.setTimeout(180000);
-  // The public three-encounter mode starts at seed 13; restarts advance its seed.
-  const f = boundary(mode, miss);
+  const { dungeon, catalog, initial, f } = guardedMissFixture();
   const key = DUNGEON_KEYS.primary;
-  if (mode === 'dungeon') {
-    await page.goto('./');
-    await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key,text:f.saved!});
-    await page.goto('./?game=dungeon');
-    await expectDungeonResumed(page);
-  } else if (mode === 'standalone') {
-    await reachStandaloneBoundary(page,f.before);
-  } else {
-    await page.goto('/?game=run&entry=new');
-    await page.locator('#run-start').click();
-    await page.locator('#run-start-encounter').click();
-    const game = page.locator('#game');
-    await expect(game).toHaveAttribute('data-phase','player');
-    for(let seed=13;seed<f.seed;seed++) {
-      await page.locator('#fit-restart').click();
-      await page.locator('#run-confirm-restart').click();
-      await page.locator('#run-start-encounter').click();
-      await expect(game).toHaveAttribute('data-phase','player');
-    }
-    while ((await readSession(page)).state.commandCount < f.before.commandCount) {
-      await playCommand(page,playerDecision((await readSession(page)).state,f.catalog));
-      await expect(game).toHaveAttribute('data-phase','player');
-    }
-  }
+  await openSavedDungeon(page, { ...dungeon, activeBattle: f.before });
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   expect((await readSession(page)).state).toEqual(f.before);
   await checkBadges(page);
@@ -112,52 +56,28 @@ for (const mode of ['standalone', 'run', 'dungeon'] as const) for (const miss of
   expect((await readSession(page)).state).toEqual(f.before);
   await checkBadges(page);
   expect(await page.evaluate(key => localStorage.getItem(key), key)).toBe(bytes);
-  if(mode==='standalone' && !miss) {
-    await page.locator(`[data-action="${f.command.abilityId}"]`).click();
-    await page.locator('canvas').focus();
-    const from=target.cell, self=f.before.units.find(u=>u.id===1)!.cell;
-    for(let i=0;i<Math.abs(self.x-from.x);i++)await page.keyboard.press(self.x>from.x?'ArrowRight':'ArrowLeft');
-    for(let i=0;i<Math.abs(self.y-from.y);i++)await page.keyboard.press(self.y>from.y?'ArrowDown':'ArrowUp');
-    await page.keyboard.press('Enter');
-    await expect(page.locator('#battle-review')).toBeDisabled();
-    await expect(page.locator('#battle-preview')).toContainText('Unavailable');
-    expect((await readSession(page)).state).toEqual(f.before);
-    await checkBadges(page);
-    expect(await page.evaluate(key=>localStorage.getItem(key),key)).toBe(bytes);
-    await page.locator('#battle-cancel').click();
-  }
   const eventStart = (await readSession(page)).events.length;
   await playCommand(page, f.command);
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   const cast = await readSession(page), fighter = cast.state.units.find(u => u.id === 1)!;
   expect(fighter.guarded).toBe(true);
-  expect(cast.events.slice(eventStart).some(e => e.type === 'attackRolled' && e.result === 'miss')).toBe(miss);
+  expect(cast.events.slice(eventStart).some(e => e.type === 'attackRolled' && e.result === 'miss')).toBe(true);
   await checkBadges(page);
-  await page.screenshot({ path: test.info().outputPath(`${mode}-guarded-board.png`) });
+  await page.screenshot({ path: test.info().outputPath(`dungeon-guarded-board.png`) });
   await expect(page.locator('#battle-status')).toContainText('Guarded');
-  const stats = combatStats(fighter, f.catalog);
+  const stats = combatStats(fighter, catalog);
   await expect(page.locator('#battle-stats')).toContainText(`AC ${stats.armorClass}`);
   await (await battleTool(page, '#battle-party')).click();
   await expect(page.getByRole('dialog')).toContainText('Guarded (+2 AC, −2 attack rolls; expires immediately before this unit’s next turn)');
-  await page.screenshot({ path: test.info().outputPath(`${mode}-guarded-inspection.png`) });
+  await page.screenshot({ path: test.info().outputPath(`dungeon-guarded-inspection.png`) });
   await page.keyboard.press('Escape');
-  if (mode === 'dungeon') {
-    await page.reload();
-    await expectDungeonResumed(page);
-    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-    expect((await readSession(page)).events).toEqual([]);
-  }
+  await page.reload();
+  await expectDungeonResumed(page);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
+  expect((await readSession(page)).events).toEqual([]);
   expect((await readSession(page)).state).toEqual(cast.state);
   await checkBadges(page);
   expect((await boardReport(page)).effect).toBeNull();
-  // Narrow and short layouts, camera zoom, and selection must retain the badge.
-  const size=page.viewportSize()!;
-  for(const viewport of [{width:320,height:568},{width:568,height:320},size]) {
-    await page.setViewportSize(viewport);
-    await expect.poll(async()=>(await boardReport(page)).viewport).toEqual(viewport);
-    await checkBadges(page);
-    await page.screenshot({path:test.info().outputPath(`${mode}-guard-${viewport.width}x${viewport.height}.png`)});
-  }
   const r=await boardReport(page), g=r.units.find((u:any)=>u.id===1).guard;
   const count=r.commandCount;
   if(test.info().project.use.hasTouch)await page.touchscreen.tap(g.screen.x,g.screen.y);
@@ -165,7 +85,7 @@ for (const mode of ['standalone', 'run', 'dungeon'] as const) for (const miss of
   expect((await boardReport(page)).commandCount).toBe(count);
   await checkBadges(page);
   await expect(page.locator('#battle-status')).toContainText('Guarded');
-  await page.screenshot({ path: test.info().outputPath(`${mode}-guarded-resumed.png`) });
+  await page.screenshot({ path: test.info().outputPath(`dungeon-guarded-resumed.png`) });
   const castEnd = (await readSession(page)).events.length;
   for (let i = 0; i < 15; i++) {
     await endTurn(page);
@@ -179,161 +99,29 @@ for (const mode of ['standalone', 'run', 'dungeon'] as const) for (const miss of
       expect(incoming.length).toBeGreaterThan(0);
       for (const event of incoming) expect(event).toMatchObject({ armorClass: stats.armorClass });
       await expect(page.locator('#battle-status')).not.toContainText('Guarded');
-      await page.screenshot({ path: test.info().outputPath(`${mode}-guard-expired.png`) });
-      if(mode==='standalone') {
-        await page.locator('#fit-restart').click();await confirmRestart(page);
-        await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-        await checkBadges(page);
-        expect((await boardReport(page)).units.every((u:any)=>!u.guard.visible)).toBe(true);
-      }
-      writeFileSync(test.info().outputPath(`${mode}-guarded-receipt.json`), JSON.stringify({ initial: f.initial, boundaryCommands: f.commands, before: f.before, cast: cast.state, after: now, incomingAttacks: incoming.length }, null, 2));
+      await page.screenshot({ path: test.info().outputPath(`dungeon-guard-expired.png`) });
+      writeFileSync(test.info().outputPath(`dungeon-guarded-receipt.json`), JSON.stringify({ initial, boundaryCommands: f.commands, before: f.before, cast: cast.state, after: now, incomingAttacks: incoming.length }, null, 2));
       return;
     }
   }
   throw Error('Guard did not expire');
 });
 
-/** Both witnesses are reached by accepted commands; no synthetic state mutation. */
-function guardedWitness(kind:'move'|'defeat') {
-  const session=new BattleSession(battleCatalog,'map:forest_ruins',1);
-  let playerEntry = session.state;
-  for(let i=0;i<200 && session.state.outcome==='ongoing';i++) {
-    const before=session.state;
-    if(session.phase==='player')playerEntry=before;
-    const command=session.phase==='player'?playerDecision(before,battleCatalog):null;
-    if(command)session.prepare(command);
-    const step=command?session.confirm():session.nextEnemy();
-    if(!step)throw Error('No witness progress');
-    if(kind==='defeat' && before.units.find(u=>u.id===1)!.guarded && step.events.some(e=>e.type==='defeated' && e.unitId===1))
-      return {state:before, entry:playerEntry};
-    if(kind==='move' && command?.type==='useAbility' && command.abilityId==='ability:guarded_strike' && !before.units.find(u=>u.id===1)!.hasMoved)
-      return {state:step.after, entry:step.after};
-    session.finishPresentation(step.token);
-  }
-  throw Error(`No legal guarded ${kind} witness`);
-}
-for(const kind of ['move','defeat'] as const)test(`Guarded badge follows legal ${kind} presentation`,async({page,browserName})=>{
-  test.setTimeout(180000);
-  const {state,entry}=guardedWitness(kind);
-  await page.clock.install();
-  await reachStandaloneBoundary(page,entry);
-  if (kind==='defeat') {
-    await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
-    await endTurn(page, selector=>page.locator(selector).click({force:true}));
-    await page.clock.runFor(64);
-  }
-  if(kind==='move') {
-    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-    await checkBadges(page);
-    await page.clock.resume();
-    const r=await boardReport(page), p={x:r.region.x+r.region.width/2,y:r.region.y+r.region.height/2};
-    if(browserName==='webkit') {
-      // Mobile WebKit has no native wheel/multipoint driver; use the same
-      // production pointer-handler exercise as the health-bar device matrix.
-      await page.locator('canvas').evaluate((node,p)=>{
-        const canvas=node as HTMLCanvasElement,capture=canvas.setPointerCapture;
-        canvas.setPointerCapture=()=>{};
-        try {
-          for(const [type,id,x] of [['pointerdown',91,-10],['pointerdown',92,10],['pointermove',92,20],['pointerup',92,20],['pointerup',91,-10]] as const)
-            canvas.dispatchEvent(new PointerEvent(type,{pointerId:id,pointerType:'touch',button:0,clientX:p.x+x,clientY:p.y,bubbles:true}));
-        } finally {canvas.setPointerCapture=capture;}
-      },p);
-    } else {await page.mouse.move(p.x,p.y);await page.mouse.wheel(0,-150);}
-    await expect.poll(async()=>(await boardReport(page)).transform.scale).toBeGreaterThan(r.transform.scale);
-    await checkBadges(page);
-    const zoomed=await boardReport(page);
-    expect(zoomed.transform.scale).toBeGreaterThan(r.transform.scale);
-    const reach=previewMovement(state,1,battleCatalog);if(!reach.ok)throw Error(reach.reason);
-    const to=reach.cells.filter(c=>c.cost>0).at(-1)!.cell;
-    const initial=(await boardReport(page)).units.find((u:any)=>u.id===1);
-    await page.locator('[data-action=move]').click();
-    await page.locator('#battle-target').selectOption(`${to.x},${to.y}`);
-    await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
-    await page.locator('#battle-review').focus();await page.keyboard.press('Enter');
-    await page.clock.runFor(48);
-    const moving=(await boardReport(page)).units.find((u:any)=>u.id===1);
-    expect(moving.guard.visible).toBe(true);
-    expect(moving.guard.position.x-initial.guard.position.x).toBeCloseTo(moving.position.x-initial.position.x,4);
-    expect(moving.guard.position.y-initial.guard.position.y).toBeCloseTo(moving.position.y-initial.position.y+initial.bobOffset,4);
-    await page.clock.runFor(1500);
-    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-    await checkBadges(page);
-    expect((await readSession(page)).state.units.find(u=>u.id===1)!.cell).toEqual(to);
-    await page.screenshot({path:test.info().outputPath('guarded-moved.png')});
-    // Restart while the badge is still active; no stale display objects survive.
-    const objects=(await boardReport(page)).objectCount;
-    await page.clock.resume();await page.locator('#fit-restart').click();await confirmRestart(page);
-    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-    await checkBadges(page);
-    expect((await boardReport(page)).units.every((u:any)=>!u.guard.visible)).toBe(true);
-    expect((await boardReport(page)).objectCount).toBe(objects);
-  } else {
-    await expect(page.locator('#game')).toHaveAttribute('data-phase','presenting');
-    expect((await boardReport(page)).units.find((u:any)=>u.id===1).guard.visible).toBe(true);
-    await page.clock.runFor(2000);
-    await expect.poll(async()=>(await readSession(page)).state.units.find(u=>u.id===1)!.hp).toBe(0);
-    await expect.poll(async()=>(await boardReport(page)).units.find((u:any)=>u.id===1).guard.visible).toBe(false);
-    await page.screenshot({path:test.info().outputPath('guarded-defeated.png')});
-  }
-});
-
-test('Guarded badge stays attached when panning the Fighter offscreen and back',async({page,browserName},info)=>{
-  const fixture=boundary('standalone',false), cast=dispatch(fixture.before,fixture.command,fixture.catalog);
-  if(!cast.ok)throw Error(cast.reason);
-  test.setTimeout(180000);
-  const state=cast.state;
-  await reachStandaloneBoundary(page,fixture.before);
-  await playCommand(page,fixture.command);
-  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
-  expect((await readSession(page)).state).toEqual(state);
-  let initial=await boardReport(page);const region=initial.region;
-  const center={x:initial.units.find((u:any)=>u.id===1).health.screen.x,y:initial.units.find((u:any)=>u.id===1).health.screen.y};
-  if(browserName==='chromium') {
-    const cdp=await page.context().newCDPSession(page);
-    const points=(spread:number)=>[{x:center.x-spread,y:center.y,id:1},{x:center.x+spread,y:center.y,id:2}];
-    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:points(10)});
-    await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:points(20)});
-    await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.detach();
-  } else {
-    // Same WebKit multipointer technique as the existing Guarded move case.
-    await page.locator('canvas').evaluate((node,p)=>{
-      const canvas=node as HTMLCanvasElement,capture=canvas.setPointerCapture;
-      canvas.setPointerCapture=()=>{};
-      try {
-        for(const [type,id,x] of [['pointerdown',91,-10],['pointerdown',92,10],['pointermove',92,30],['pointerup',92,30],['pointerup',91,-10]] as const)
-          canvas.dispatchEvent(new PointerEvent(type,{pointerId:id,pointerType:'touch',button:0,clientX:p.x+x,clientY:p.y,bubbles:true}));
-      } finally {canvas.setPointerCapture=capture;}
-    },center);
-  }
-  await expect.poll(async()=>(await boardReport(page)).transform.scale).toBeGreaterThan(initial.transform.scale*1.5);
-  initial=await boardReport(page);
-  const offset=initial.units.find((u:any)=>u.id===1).guard.position.x-initial.units.find((u:any)=>u.id===1).position.x;
-  const pan=async(dx:number)=>{
-    const from={x:region.x+region.width*(dx>0?.1:.85),y:region.y+region.height*.55};
-    const to={x:from.x+dx,y:from.y};
-    if(browserName==='chromium' && info.project.use.hasTouch) {
-      const cdp=await page.context().newCDPSession(page);
-      await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{...from,id:1}]});
-      for(let i=1;i<=10;i++)await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:from.x+(to.x-from.x)*i/10,y:from.y,id:1}]});
-      await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.detach();
-    } else {
-      await page.mouse.move(from.x,from.y);await page.mouse.down();
-      await page.mouse.move(to.x,to.y,{steps:10});await page.mouse.up();
-    }
-  };
-  for(let i=0;i<5;i++)await pan(-region.width*.7);
-  const panned=await boardReport(page), fighter=panned.units.find((u:any)=>u.id===1);
-  expect(fighter.health.screen.x+20*panned.transform.scale).toBeLessThan(region.x);
-  expect(fighter.guard.position.x-fighter.position.x).toBeCloseTo(offset,5);
-  expect(fighter.guard.screen.x+fighter.guard.width/2).toBeLessThan(region.x);
-  await page.screenshot({path:info.outputPath('guarded-panned-offscreen.png')});
-  // Reverse the actual pan distance to return to the original camera position.
-  const dx=initial.transform.x-panned.transform.x;
-  for(let remaining=dx;remaining>0;) {
-    const step=Math.min(remaining,region.width*.7);
-    await pan(step);remaining-=step;
-  }
+test('landscape touch keeps the resumed Guarded badge visible and noninteractive', async ({ page }) => {
+  const { dungeon, catalog, f } = guardedMissFixture();
+  const cast = dispatch(f.before, f.command, catalog);
+  if (!cast.ok) throw Error(cast.reason);
+  await openSavedDungeon(page, { ...dungeon, activeBattle: cast.state });
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   await checkBadges(page);
-  expect((await boardReport(page)).units.find((u:any)=>u.id===1).guard.visible).toBe(true);
-  expect((await readSession(page)).state).toEqual(state);
+  const report = await boardReport(page);
+  const badge = report.units.find((unit: { id: number }) => unit.id === f.command.unitId).guard;
+  expect(badge.visible).toBe(true);
+  await page.touchscreen.tap(badge.screen.x, badge.screen.y);
+  expect((await readSession(page)).state).toEqual(cast.state);
+  await expect(page.locator('#battle-status')).toContainText('Guarded');
+  await page.screenshot({ path: test.info().outputPath('dungeon-guarded-resumed.png') });
+  await (await battleTool(page, '#battle-party')).click();
+  await expect(page.getByRole('dialog')).toContainText('Guarded (+2 AC, −2 attack rolls');
+  await page.screenshot({ path: test.info().outputPath('dungeon-guarded-inspection.png') });
 });

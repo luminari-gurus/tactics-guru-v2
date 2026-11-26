@@ -1,4 +1,5 @@
-import { assert, expect, it } from 'vitest';
+import { assert, beforeAll, describe, expect, it } from 'vitest';
+import type { BattleSession } from '../../src/app/BattleSession';
 import { RunItemSession } from '../../src/app/RunItemSession';
 import { activeSnapshot, preparedSnapshot, rewardSnapshot, runContext } from '../helpers/runItemFixtures';
 import { createRunStorage, RUN_STORAGE_KEYS } from '../../src/persistence/runStorage';
@@ -187,43 +188,67 @@ it.each(['changed', 'removed'] as const)('the waiting first write after backup C
   expect(owner.hasUnsavedProgress).toBe(true);
 });
 
-it.each(['granted', 'superseded by a reward claim', 'sampled after the next encounter starts', 'refused'] as const)('keeps run level-up feedback when its waiting save is %s', scenario => {
-  const f = historyFixture(), { pending, serialize, grantAll } = heldRunWrites(); let now = 0;
-  const fresh = freshRunSnapshot('level-feedback', 13, runContext, true);
-  // One normal victory (30 XP) crosses the 60 XP threshold.
-  const initial = { ...fresh, items: { ...fresh.items, run: { ...fresh.items.run, party: fresh.items.run.party.map(hero => ({ ...hero, xp: 59 })) } } };
-  const owner = new RunItemSession(initial, runContext, f.storage, serialize, null, () => now);
-  owner.startNew(); const battle = owner.startEncounter()!;
-  for (let i = 0; i < 500 && battle.state.outcome === 'ongoing'; i++) {
-    grantAll();
-    const step = battle.phase === 'enemy' ? battle.nextEnemy()
-      : (battle.prepare(playerDecision(battle.state, battle.catalog)), battle.confirm());
-    assert(step); battle.finishPresentation(step.token);
+describe('run level-up feedback', () => {
+  let beforeVictory: string;
+
+  function playTurn(battle: BattleSession) {
+    if (battle.phase === 'player') assert(battle.prepare(playerDecision(battle.state, battle.catalog)).ok);
+    const step = battle.phase === 'enemy' ? battle.nextEnemy() : battle.confirm();
+    assert(step);
+    battle.finishPresentation(step.token);
   }
-  expect(battle.state.outcome).toBe('playerWin');
-  const feedback = levelUpFeedback(initial.items.run.party, owner.snapshot.items.run.party);
-  expect(feedback).toContain('reached level 2');
-  expect(owner.status).toBe(`Saving run… ${feedback}`);
-  if (scenario !== 'granted' && scenario !== 'refused') {
-    const offer = owner.snapshot.items.offer!;
-    assert(owner.dispatch({ ...owner.boundary(), type: 'claimReward', offerId: offer.id, itemId: offer.options[0].itemId }).ok);
+
+  beforeAll(() => {
+    const fresh = freshRunSnapshot('level-feedback', 13, runContext, true);
+    // One normal victory (30 XP) crosses the 60 XP threshold.
+    const initial = { ...fresh, items: { ...fresh.items, run: { ...fresh.items.run, party: fresh.items.run.party.map(hero => ({ ...hero, xp: 59 })) } } };
+    const f = historyFixture();
+    const owner = new RunItemSession(initial, runContext, f.storage);
+    owner.startNew();
+    const battle = owner.startEncounter()!;
+    for (let i = 0; i < 500 && battle.state.outcome === 'ongoing'; i++) playTurn(battle);
+    expect(battle.state.outcome).toBe('playerWin');
+    // Storage rotation retains the last accepted state before the winning command.
+    const backup = f.data.get(RUN_STORAGE_KEYS.backup);
+    assert(backup);
+    beforeVictory = backup;
+    owner.dispose();
+  }, 30000);
+
+  it.each(['granted', 'superseded by a reward claim', 'sampled after the next encounter starts', 'refused'] as const)('keeps run level-up feedback when its waiting save is %s', scenario => {
+    const f = historyFixture(), { pending, serialize, grantAll } = heldRunWrites(); let now = 0;
+    f.data.set(RUN_STORAGE_KEYS.primary, beforeVictory);
+    const owner = new RunItemSession(freshRunSnapshot('placeholder', 13, runContext), runContext, f.storage, serialize, null, () => now);
+    assert(owner.continue(owner.inspect()));
+    const partyBefore = owner.snapshot.items.run.party;
+    const battle = owner.startEncounter()!;
+    expect(battle.state.outcome).toBe('ongoing');
+    playTurn(battle);
+    expect(battle.state.outcome).toBe('playerWin');
+    const feedback = levelUpFeedback(partyBefore, owner.snapshot.items.run.party);
+    expect(feedback).toContain('reached level 2');
     expect(owner.status).toBe(`Saving run… ${feedback}`);
-  }
-  if (scenario === 'sampled after the next encounter starts') {
-    assert(owner.startEncounter()); owner.setPlaytimeActive(true);
-    now = 1234; owner.setPlaytimeActive(false);
-  }
-  if (scenario === 'refused') while (pending.length) pending.shift()!.refuse();
-  else grantAll();
-  expect(owner.status).toBe(scenario === 'refused'
-    ? `Progress unsaved: exclusive save access unavailable. Open Save recovery to export. ${feedback}`
-    : `Run saved on this device. ${feedback}`);
-  expect(owner.hasUnsavedProgress).toBe(scenario === 'refused');
-  if (scenario === 'sampled after the next encounter starts') {
-    const saved = f.storage.load(); assert(saved.ok && saved.selected);
-    expect(saved.selected.state.stats?.activeMs).toBe(1234);
-  }
-}, 30000); // Plays a complete legal battle.
+    if (scenario !== 'granted' && scenario !== 'refused') {
+      const offer = owner.snapshot.items.offer!;
+      assert(owner.dispatch({ ...owner.boundary(), type: 'claimReward', offerId: offer.id, itemId: offer.options[0].itemId }).ok);
+      expect(owner.status).toBe(`Saving run… ${feedback}`);
+    }
+    if (scenario === 'sampled after the next encounter starts') {
+      assert(owner.startEncounter()); owner.setPlaytimeActive(true);
+      now = 1234; owner.setPlaytimeActive(false);
+    }
+    if (scenario === 'refused') while (pending.length) pending.shift()!.refuse();
+    else grantAll();
+    expect(owner.status).toBe(scenario === 'refused'
+      ? `Progress unsaved: exclusive save access unavailable. Open Save recovery to export. ${feedback}`
+      : `Run saved on this device. ${feedback}`);
+    expect(owner.hasUnsavedProgress).toBe(scenario === 'refused');
+    if (scenario === 'sampled after the next encounter starts') {
+      const saved = f.storage.load(); assert(saved.ok && saved.selected);
+      expect(saved.selected.state.stats?.activeMs).toBe(1234);
+    }
+  });
+});
 
 it('excludes preparation, paused dialogs and closed time across owner reconstruction', async () => {
   const f = historyFixture(), initial = freshRunSnapshot('clock-resume', 13, runContext, true); let now = 0;

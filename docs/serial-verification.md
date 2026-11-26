@@ -1,6 +1,6 @@
 # Resumable serial verification (#208 phase A)
 
-The manual `issue-200-baseline.yml` workflow has six modes:
+The manual `issue-200-baseline.yml` workflow has seven modes:
 
 - `qualify` (default): bounded tooling, diagnostics, build, two-engine smoke and
   timeout-recovery checks. It does not launch a baseline.
@@ -12,10 +12,24 @@ The manual `issue-200-baseline.yml` workflow has six modes:
   cases. See [Two-runner pilot](#two-runner-pilot).
 - `serial-pair` and `parallel-pair`: compare two full browser batches on the
   same pair of VMs. See [Matched two-runner comparison](#matched-two-runner-comparison-208).
+- `parallel-full` runs the full manifest on two isolated runners. VM 01 builds
+  the root artifact and measures performance before releasing either browser job.
+  The build artifact lists byte-identical checkout assets in `build.json` under
+  `fromPublic`. Each runner restores those files from `public/` and verifies the
+  SHA-256 manifest for the complete build before running the browser checks.
+  VM 02 discovers the browser case manifest and runs the verification-tooling
+  and batch tests during preparation. VM 01 binds the build and receipt to the
+  same-attempt manifest after checking its source and tooling versions. Each
+  browser job checks its own selection against the manifest and requires the
+  tooling tests to pass. VM 01 then runs Chromium while VM 02 runs WebKit and the asset checks, including
+  the prefix rebuild and root restoration. Each browser uses one worker. The
+  aggregate checks the complete case list, build identity, overlap and performance
+  result. A completed over-budget measurement still allows browser results to be collected.
 - `capture`: prepare once, then run all 19 serial jobs, or a deliberately selected
   comma-separated `batches` subset. A subset cannot qualify the full baseline.
 
-All six modes are available on `main`. Use `work/issue-208-matched-pair` to
+All seven modes are available on `main`. Use `work/208-full-parallel` to qualify
+`parallel-full` before merging. Use `work/issue-208-matched-pair` to
 dispatch the two matched-pair modes before merging. The older
 `work/issue-208-serial-batches` branch supports `qualify`, `pilot`,
 `parallel-pilot` and `capture`. `work/issue-200-verification-timings` supports
@@ -32,11 +46,13 @@ Push-triggered full verification has no dispatch inputs and selects VM 01.
 `max-parallel: 1`, one Playwright worker and `fail-fast: false` keep browser jobs
 serial without starving later jobs
 after an ordinary test failure. Manual runs are not automatically superseded;
-cancel an obsolete run explicitly. Automatic PR verification shares the selected
-VM reservation. All four browser workflows use `queue: max` with
-`cancel-in-progress: false`: up to 100 waiting runs are preserved rather than a
-new arrival replacing the pending run. Beyond that documented queue bound, new
-runs are canceled. This preserves serialization, not a queue-time guarantee.
+cancel an obsolete run explicitly. PR verification checks the current PR head before
+canceling queued or running verification for other commits of that PR, including
+reruns. Each PR job also rechecks the head before runner setup, which handles a
+job-only retry that reuses an earlier cancellation check. All verification
+jobs share VM 01's reservation with the other browser workflows. The per-VM group uses `queue: max` and
+`cancel-in-progress: false` to preserve up to 100 waiting jobs or runs. Beyond
+that bound, new entries are canceled.
 
 Before using this workflow, an administrator must add `tactics-browser-01` only
 to VM 01 and `tactics-browser-02` only to VM 02, alongside the shared labels, and
@@ -81,8 +97,8 @@ full-suite measurement against #200 remain part of #208.
 
 ## Coverage and build provenance
 
-`scripts/verification-batches.mjs` derives the 20 timing rows from the existing
-19-stage `verify-full.mjs` plan. Preparation runs tooling, fast units (including
+`scripts/verification-batches.mjs` derives 15 timing rows from the
+14-stage `verify-full.mjs` plan. Preparation runs tooling, fast units (including
 content), both TypeScript scopes, real build integrations and the root bundle.
 It uploads that ordinary root output once, with source/input identity, a complete
 per-file SHA-256 inventory, the discovery plan and preparation receipts. Every
@@ -90,21 +106,15 @@ consumer verifies the plan, exact checkout/input hash and downloaded build bytes
 before copying `dist`. Builds from another commit, altered/missing files and
 stale local `dist` are rejected.
 
-The historical nine whole-file/project groups from the #200 investigation supply
-the Chromium partition. They are not test-level shards and do not alter fixtures,
-assertions or project configuration. Fresh discovery must prove their exact union
-equals the current canonical selection, with zero missing, extra or duplicate IDs.
-At main `b749ba4`, this includes **693** cases (231 per profile), not the historical
-687. WebKit exploration similarly now selects 57 cases rather than 51.
+Nine whole-file groups partition Dungeon and shared menu and asset cases across
+the three Chromium profiles. Fresh discovery verifies their exact union with the
+current canonical selection and rejects missing, extra or duplicate test IDs.
 
-The other jobs retain fixtures, explicit dev placement, both WebKit matrices,
-health bars, separate production/development telemetry, root dev assets and the
-local performance collector. `prefix-assets` runs the canonical prefix build,
+The other browser jobs cover WebKit menu and Dungeon and root-dev assets. `prefix-assets` runs the canonical prefix build,
 prefix preview/dev consumers and final root restoration in one job. Failed prefix
 builds block only their preview consumer; dev coverage and eligible root
-restoration still run. Telemetry retains its own configured build/server, rather
-than treating the ordinary artifact as its instrumented build. Failed preparation
-gates block their consumers; independent dev/telemetry coverage can still run from
+restoration still run. Failed preparation
+gates block their consumers; independent dev asset coverage can still run from
 the retained preparation report.
 
 Each batch has its own 65-minute foreground budget and 85-minute job ceiling,
@@ -156,8 +166,8 @@ same test in different root/prefix/dev modes is not deduplicated. Native blob ZI
 remain separate so a cross-mode HTML merge cannot overwrite those distinctions.
 
 Resuming the same run requires unchanged source and the original build artifact.
-After source changes or artifact expiry, start a new plan. In `parallel-pilot`
-and `parallel-pair`, both batches must publish readiness in the same attempt.
+After source changes or artifact expiry, start a new plan. In `parallel-pilot`,
+`parallel-pair` and `parallel-full`, both batches must publish readiness in the same attempt.
 Dispatch a fresh run or rerun all jobs together. A targeted rerun of one batch
 will time out waiting for its peer's readiness artifact.
 
@@ -187,12 +197,10 @@ invented. API totals exclude the still-running aggregate job. Per-runner cross-w
 locking does not establish that unrelated host workloads are idle; coordinate
 those separately and document them in `conditions`.
 
-The performance job runs both the collector and the existing `evaluate-fit.ts`.
-Collection success alone cannot pass a sample that violates unchanged performance
-limits. Evaluation JSON and its nonzero result are retained separately. The two
-budget failures in PR #225's Windows capture remain historical failures; that
-capture is not a self-hosted comparison baseline. Both earlier 100-minute failed
-captures and the hosted failure remain recorded in every aggregate.
+Full capture runs the standalone proof-scene collector and evaluates the
+source-bound samples against the documented budgets. The evaluation JSON and
+its exit status are recorded separately. The budget failures from PR #225 and
+earlier failed runs remain in the historical receipts.
 
 `complete` describes accounted execution/coverage; `passed` also requires all
 current gates to pass. `baselineEligible` additionally requires a full scope and

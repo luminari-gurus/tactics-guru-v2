@@ -6,9 +6,9 @@ import { DEFAULT_BEHAVIORS, stepMovement } from '../../src/map/movement';
 import { HERO_PROGRESSION } from '../../src/content/progression';
 import { assert, describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { dungeonCapacityFixture, dungeonVictoryBoundary } from '../helpers/dungeonFixtures';
+import { dungeonCapacityFixture, dungeonVictoryBoundary, walkWitness } from '../helpers/dungeonFixtures';
 import { dungeonStairStatus, clearedDungeonSlots, freshDungeon, newDungeonSeed, stepDungeon, dungeonBattle, dungeonOffer, floorDescriptor, floorMap, FloorCache, dungeonSeed, readDungeon, travelDungeon, startDungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
-import { encodeDungeon, decodeDungeon, encodeDungeonRollback, utf8Bytes } from '../../src/domain/dungeonSaveEnvelope';
+import { encodeDungeon, decodeDungeon, encodeDungeonRollback, WALL_SIGHT_STATS_SAVE_FORMAT, utf8Bytes } from '../../src/domain/dungeonSaveEnvelope';
 import { dungeonContent, dungeonIdentity, previousDungeonIdentity } from '../../src/content/dungeon';
 import { bothDungeonSlotsMissing, createDungeonStorage, resumableDungeonSlot, serializeBrowserDungeonWrite, DUNGEON_BACKUP_CHECKPOINT_KEY, DUNGEON_KEYS, DUNGEON_RECENT_BACKUP_KEY } from '../../src/persistence/dungeonStorage';
 import { DungeonSession } from '../../src/app/DungeonSession';
@@ -22,6 +22,27 @@ import { RunHistory } from '../../src/app/RunHistory';
 import { createRunRecordsStorage, RUN_RECORD_KEYS, selectedRunRecords } from '../../src/persistence/runRecordsStorage';
 import * as battlefields from '../../src/domain/battlefield';
 import { freshRunStats } from '../../src/domain/runStats';
+
+it.each([
+  { behavior: 'chase', slot: 1, expected: { x: 4, y: 7 } },
+  { behavior: 'block', slot: 2, expected: { x: 5, y: 8 } },
+])('saves the $behavior enemy at the correct cell after a dungeon step', ({ slot, expected }) => {
+  const base = freshDungeon('pursuit', 0);
+  const floor = base.floors[0];
+  const exploration = movableExploration(floor.exploration, floor.descriptor.seed, 0, 'ready');
+  // The player walks south from (6,7) to (6,8), two columns east of the pursuing enemy.
+  const pois = exploration.pois.map((poi, index) => ({
+    ...poi, ...(index === slot ? { x: 4, y: 8 } : index === 0 ? { x: 14, y: 12 } : { x: 13, y: 13 }),
+  }));
+  const width = floorMap(floor.descriptor).width;
+  const state = atCell({ ...base, floors: [{ ...floor, exploration: { ...exploration, pois } }] }, 7 * width + 6);
+  const result = stepDungeon(state, { id: state.id, revision: state.revision, depth: 1, destination: 8 * width + 6 });
+  assert(result.ok);
+  expect(result.state.floors[0].exploration.pois[slot]).toMatchObject(expected);
+  const save = encodeDungeon(result.state);
+  assert(save.ok);
+  expect(decodeDungeon(save.text)).toEqual({ ok: true, state: result.state });
+});
 
 it('projects stair eligibility for both exploration versions without changing state or travel rejections', () => {
   const base = freshDungeon('stair-status', 1), descriptor = floorDescriptor(base.seed, 2);
@@ -71,6 +92,32 @@ it('checkpoints eligible exploration time without counting paused or closed sess
   now = 100000; owner = new DungeonSession(initial, storage, null, () => now);
   assert(owner.continue(owner.inspect())); owner.setPlaytimeActive(true); now += 250;
   (await owner.flushPlaytime()); expect(owner.snapshot.stats?.activeMs).toBe(750);
+});
+
+it('starts legacy reward playtime at the first exploration checkpoint after decline', async () => {
+  let now = 0;
+  const initial = dungeonCapacityFixture(), data = memory(), storage = createDungeonStorage(() => data);
+  assert(storage.save(initial).ok);
+  const session = new DungeonSession(initial, storage, null, () => now);
+  assert(session.continue(session.inspect()));
+  assert(await session.dispatch({ ...dungeonBoundary(initial), type: 'declineReward', offerId: initial.offer!.id }));
+  const declined = session.snapshot;
+  expect(declined).toMatchObject({ phase: 'ready', offer: null, ownership: initial.ownership });
+  expect(declined.revision).toBe(initial.revision + 1);
+  expect(declined.stats).toBeUndefined();
+  session.setPlaytimeActive(true);
+  now = 250;
+  await session.flushPlaytime();
+  const saved = storage.inspect().primary; assert(saved.status === 'valid');
+  expect(saved.state).toEqual({ ...declined, stats: { ...freshRunStats('since-upgrade'), activeMs: 250 } });
+  session.dispose();
+  const resumed = new DungeonSession(initial, storage, null, () => now);
+  assert(resumed.continue(resumed.inspect()));
+  expect(resumed.snapshot).toEqual(saved.state);
+  const entered = walkWitness(resumed.snapshot);
+  expect(entered.phase).toBe('battle');
+  expect(entered.activeBattle?.outcome).toBe('ongoing');
+  resumed.dispose();
 });
 
 it('clears an unsaved status when a later clock checkpoint recovers storage', async () => {
@@ -135,11 +182,28 @@ it('counts published exploration exactly once across reload and preserves counte
 });
 const good = (r: DungeonResult) => { expect(r.ok).toBe(true); if (!r.ok) throw Error(r.reason); return r.state; };
 const fresh = () => freshDungeon('test-dungeon', 13);
+// These histories share a seed. Cache only the durable descriptor and give each fixture its own copy.
+const historyDescriptors = new Map<string, ReturnType<typeof floorDescriptor>>();
+function historicalFloor(seed: number, depth: number, stair: 'upstairs' | 'downstairs', completed: number) {
+  const cache = new FloorCache(1);
+  const key = `${seed}:${depth}`;
+  let saved = historyDescriptors.get(key);
+  if (!saved) {
+    saved = floorDescriptor(seed, depth, cache);
+    historyDescriptors.set(key, saved);
+  }
+  const descriptor = structuredClone(saved);
+  const position = descriptor[stair];
+  return { descriptor, position, completed, exploration: freshExploration(descriptor.seed, position, floorMap(descriptor, cache)) };
+}
 it.each(['issue-165/dungeon.json','issue-166/dungeon.json','issue-166/dungeon-main8.json'])('retains exact %s previous-format dungeon bytes for recovery/export without migration',fixture=>{
-  const raw=readFileSync(`tests/fixtures/saves/${fixture}`,'utf8'),data=new Map([[DUNGEON_KEYS.primary,raw],[DUNGEON_KEYS.backup,raw]]);
+  const raw=readFileSync(`tests/fixtures/saves/${fixture}`,'utf8'),primary = ' ' + raw, backup = raw + '\n', data=new Map([[DUNGEON_KEYS.primary,primary],[DUNGEON_KEYS.backup,backup]]);
   const storage={getItem:(key:string)=>data.get(key as typeof DUNGEON_KEYS.primary)??null,setItem:(key:string,value:string)=>{throw Error(`Unexpected write ${key} ${value.length}`);},removeItem:()=>{throw Error('Unexpected removal');}};
-  const store=createDungeonStorage(()=>storage),review=store.inspect();expect(review.primary).toEqual({status:'invalid',text:raw,reason:'incompatible'});
-  expect(store.save(fresh())).toEqual({ok:false,reason:'recoveryRequired'});expect(new DungeonSession(fresh(),store).exports(review).map(v=>v.text)).toContain(raw);expect(data.get(DUNGEON_KEYS.primary)).toBe(raw);
+  const store=createDungeonStorage(()=>storage),review=store.inspect();expect(review.primary).toEqual({status:'invalid',text:primary,reason:'incompatible'});
+  expect(review.backup).toEqual({status:'invalid',text:backup,reason:'incompatible'});
+  expect(store.save(fresh())).toEqual({ok:false,reason:'recoveryRequired'});expect(new DungeonSession(fresh(),store).exports(review)).toEqual([
+    { label: 'primary save', text: primary }, { label: 'backup save', text: backup },
+  ]);
 });
 it.each(['active', 'reward'])('loads the exact pre-consumable dungeon %s save and preserves its pending offer or battle', phase => {
   const text = readFileSync(`tests/fixtures/saves/issue-172/dungeon-${phase}.json`, 'utf8');
@@ -288,6 +352,55 @@ function win(s: DungeonState) {
   return good(acceptDungeonBattle(s, { ...b, outcome: 'playerWin', units: b.units.map(u => u.side === 'enemy' ? { ...u, hp: 0 } : u) }));
 }
 
+it('commits level-up healing and victory statistics once when presentation completion is repeated', async () => {
+  const fixture = dungeonVictoryBoundary(1, 1); assert(fixture);
+  const data = memory(), storage = createDungeonStorage(() => data);
+  assert(storage.save(fixture.snapshot).ok);
+  const dungeon = new DungeonSession(fixture.snapshot, storage);
+  assert(dungeon.continue(dungeon.inspect()));
+  const battle = await dungeon.startEncounter(); assert(battle);
+  battle.prepare(fixture.command);
+  const step = battle.confirm(); assert(step);
+  const committed = dungeon.snapshot;
+  const expected = good(acceptDungeonBattle(fixture.snapshot, battle.state));
+  expect(committed).toEqual({ ...expected, stats: expect.objectContaining({
+    coverage: 'since-upgrade', enemiesKilled: 1, movesTaken: 0,
+    boundary: { battle: 1, command: battle.state.commandCount },
+  }) });
+  const leveled = committed.party.filter((hero, i) => hero.level > fixture.snapshot.party[i].level);
+  expect(leveled.length).toBeGreaterThan(0);
+  for (const hero of leveled) expect(hero.hp).toBe(hero.maxHp);
+  expect(committed.phase).toBe('reward');
+  battle.finishPresentation(step.token);
+  expect(battle.phase).toBe('ended');
+  battle.finishPresentation(step.token);
+  expect(dungeon.snapshot).toEqual(committed);
+});
+
+it('discards a pending victory presentation when replacing a saved dungeon', async () => {
+  const fixture = dungeonVictoryBoundary(1, 0); assert(fixture);
+  const data = memory();
+  const storage = createDungeonStorage(() => data);
+  assert(storage.save(fixture.snapshot).ok);
+  const dungeon = new DungeonSession(fixture.snapshot, storage);
+  assert(dungeon.continue(dungeon.inspect()));
+  const battle = await dungeon.startEncounter(); assert(battle);
+  battle.prepare(fixture.command);
+  const step = battle.confirm(); assert(step);
+  expect(battle.phase).toBe('presenting');
+  expect(dungeon.completedBattle).toBeTruthy();
+
+  assert(await dungeon.replace(dungeon.inspect(), 'replacement-dungeon', fixture.snapshot.seed + 1));
+  const replacement = dungeon.snapshot;
+  const saved = data.getItem(DUNGEON_KEYS.primary);
+  expect(replacement.ownership).toEqual({ consumables: [], equipment: [], assignments: [] });
+  battle.finishPresentation(step.token);
+  expect(battle.phase).toBe('disposed');
+  expect(dungeon.completedBattle).toBeNull();
+  expect(dungeon.snapshot).toEqual(replacement);
+  expect(data.getItem(DUNGEON_KEYS.primary)).toBe(saved);
+});
+
 it.each([false, true])('versions final reward saves and keeps a rollback checkpoint (tracked: %s)', tracked => {
   const fixture = dungeonVictoryBoundary(5, 2); assert(fixture);
   const entry = tracked ? { ...fixture.snapshot, stats: freshRunStats() } : fixture.snapshot;
@@ -299,6 +412,11 @@ it.each([false, true])('versions final reward saves and keeps a rollback checkpo
   const claimed = good(dungeonItem(pending, {
     ...dungeonBoundary(pending), type: 'claimReward', offerId: offer.id, itemId: charm.itemId,
   }));
+  expect(claimed.phase).toBe('ready');
+  expect(claimed.offer).toBeNull();
+  expect(claimed.ownership.equipment.map(item => item.itemId)).toEqual([
+    ...pending.ownership.equipment.map(item => item.itemId), charm.itemId,
+  ]);
   const declined = good(dungeonItem(pending, {
     ...dungeonBoundary(pending), type: 'declineReward', offerId: offer.id,
   }));
@@ -492,6 +610,34 @@ describe('dungeon run history boundaries', () => {
     expect([f.m.getItem(DUNGEON_KEYS.primary), f.m.getItem(DUNGEON_KEYS.backup)]).toEqual(bytes);
     session.dispose();
   });
+  it('continues a counter-only save read-only and ranks only known statistics on replacement', async () => {
+    const f = fixture();
+    const raw = readFileSync('tests/fixtures/saves/issue-270/counter-dungeon-v1.json', 'utf8');
+    const old = JSON.parse(raw).payload;
+    f.m.setItem(DUNGEON_KEYS.primary, raw);
+    f.m.setItem(DUNGEON_KEYS.backup, raw);
+    const session = new DungeonSession(fresh(), f.storage, f.history);
+    assert(session.continue(session.inspect()));
+    await f.history.whenIdle();
+    const stats = { version: 2, coverage: 'whole-run', timeCoverage: 'since-upgrade',
+      enemiesKilled: old.stats.enemiesKilled, movesTaken: old.stats.movesTaken };
+    expect(session.snapshot.stats).toMatchObject(stats);
+    expect([f.m.getItem(DUNGEON_KEYS.primary), f.m.getItem(DUNGEON_KEYS.backup)]).toEqual([raw, raw]);
+
+    assert(await session.replace(session.inspect(), 'timed-new-dungeon', 14));
+    await f.history.whenIdle();
+    const history = selectedRunRecords(f.records.inspect());
+    assert(history);
+    expect(history.records).toMatchObject([{ id: old.id, stats }]);
+    expect(history.bests.dungeon.enemiesKilled?.id).toBe(old.id);
+    expect(history.bests.dungeon.movesTaken?.id).toBe(old.id);
+    expect(history.bests.dungeon.activeMs).toBeUndefined();
+    const next = JSON.parse(f.m.getItem(DUNGEON_KEYS.primary)!);
+    expect(next).toMatchObject({ format: WALL_SIGHT_STATS_SAVE_FORMAT, payload: {
+      id: 'timed-new-dungeon', stats: { version: 2, coverage: 'whole-run', timeCoverage: 'whole-run' },
+    } });
+    session.dispose();
+  });
   it('does not end a cleared floor or continued descent, and records the reviewed old journey rather than a placeholder', async () => {
     const f = fixture(), cleared = atStairApproach(clearFloor(fresh())); assert(f.storage.save(cleared).ok);
     const session = new DungeonSession(freshDungeon('placeholder', 14), f.storage, f.history);
@@ -528,7 +674,8 @@ describe('dungeon run history boundaries', () => {
     expect(f.rows()).toMatchObject([{ id: initial.id, outcome: 'abandoned', battlesWon: 0 }]);
   });
   it.each(['accepted', 'stale', 'partial'] as const)('records the distinct saved and admitted unsaved dungeon only when replacement is %s', async result => {
-    const f = fixture(), saved = fresh(), live = freshDungeon('unsaved-live-dungeon', 23);
+    const f = fixture(), saved = { ...fresh(), stats: { ...freshRunStats(), movesTaken: 6, activeMs: 5000 } };
+    const live = freshDungeon('unsaved-live-dungeon', 23, undefined, true);
     assert(f.storage.save(saved).ok);
     const session = new DungeonSession(live, f.storage, f.history);
     session.playUnsaved(); const before = session.snapshot, review = session.inspect();
@@ -541,9 +688,10 @@ describe('dungeon run history boundaries', () => {
     if (result === 'accepted') {
       const rows = f.rows(); expect(rows).toHaveLength(2);
       expect(rows).toEqual(expect.arrayContaining([
-        expect.objectContaining({ id: saved.id, outcome: 'abandoned' }),
-        expect.objectContaining({ id: live.id, outcome: 'abandoned' }),
+        expect.objectContaining({ id: saved.id, outcome: 'abandoned', stats: expect.objectContaining({ movesTaken: 6, activeMs: 5000 }) }),
+        expect.objectContaining({ id: live.id, outcome: 'abandoned', stats: expect.objectContaining({ movesTaken: 0 }) }),
       ]));
+      expect(selectedRunRecords(f.records.inspect())?.bests.dungeon.movesTaken?.id).toBe(saved.id);
       assert(session.continue(session.inspect())); await f.history.whenIdle(); expect(f.rows()).toEqual(rows);
     } else { expect(f.rows()).toEqual([]); expect(session.snapshot).toEqual(before); }
   });
@@ -573,6 +721,14 @@ describe('dungeon floors', () => {
     expect(newDungeonSeed(() => 5, 7)).toBe(5);
     expect(newDungeonSeed(() => 0xffffffff, 0xffffffff)).toBe(0);
     expect(newDungeonSeed(() => -1)).toBe(0xffffffff);
+  });
+  it.each([
+    { draw: 7, previous: 7, scenario: 'replacement with repeated entropy' },
+    { draw: 8, previous: undefined, scenario: 'independent fresh visit' },
+  ])('generates a different first-floor layout for a $scenario', ({ draw, previous }) => {
+    const first = freshDungeon('first', 7);
+    const next = freshDungeon('next', newDungeonSeed(() => draw, previous));
+    expect(floorMap(next.floors[0].descriptor).cells).not.toEqual(floorMap(first.floors[0].descriptor).cells);
   });
   it('builds a legal first floor for thousands of seeds', () => {
     const failed: { seed: number; message: string }[] = [];
@@ -701,13 +857,30 @@ describe('dungeon floors', () => {
     const revived=good(dungeonItem(ready,command));
     expect(revived.ownership.consumables).toEqual([]);
     expect(dungeonItem(revived,command)).toEqual({ok:false,reason:'staleBoundary'});
-    const next=good(startDungeonBattle(atEncounter(revived)));
+    const saved = encodeDungeon(revived);
+    assert(saved.ok);
+    const next = walkWitness(good(decodeDungeon(saved.text)));
     expect(next.activeBattle!.units.find(u=>u.defId==='mage')?.hp).toBe(3);
     const defeated={...claimed,phase:'defeat' as const,party:claimed.party.map(hero=>({...hero,hp:0}))};
     expect(dungeonItem(defeated,{...command,...dungeonBoundary(defeated)})).toEqual({ok:false,reason:'wrongContext'});
   });
 });
 describe('dungeon persistence', () => {
+  it('automatically continues the backup when the primary is corrupt', () => {
+    const data = memory(), storage = createDungeonStorage(() => data);
+    const backup = freshDungeon('backup-to-continue', 13);
+    const encoded = encodeDungeon(backup);
+    assert(encoded.ok);
+    data.setItem(DUNGEON_KEYS.primary, 'broken');
+    data.setItem(DUNGEON_KEYS.backup, encoded.text);
+    const session = new DungeonSession(fresh(), storage);
+    assert(session.continue(session.inspect()));
+    expect(session.snapshot).toEqual(backup);
+    expect(session.status).toBe('Continued backup; some progress may be lost.');
+    expect(data.getItem(DUNGEON_KEYS.primary)).toBe('broken');
+    expect(data.getItem(DUNGEON_KEYS.backup)).toBe(encoded.text);
+    session.dispose();
+  });
   it('treats only both missing dungeon slots as empty', async () => {
     const missing={status:'missing' as const,text:null};
     const unavailable={status:'unavailable' as const,text:null};
@@ -745,14 +918,29 @@ describe('dungeon persistence', () => {
     expect((await enterStairs(session))).toBe(false);expect(session.snapshot).toEqual(before);expect(store.inspect().primary.status).toBe('valid');
     m.setItem=write;expect((await session.retry(session.inspect()))).toBe(true);expect((await enterStairs(session))).toBe(true);expect(session.snapshot.depth).toBe(2);
   });
-  it('requires explicit recovery after uncertain primary writes', async () => {
-    const m=memory(),store=createDungeonStorage(()=>m),s=atStairApproach(clearFloor(fresh()));store.save(s);const session=new DungeonSession(s,store);
-    const read=m.getItem;let failRead=false;
-    m.setItem=(k,v)=>{m.values.set(k,v);if(k===DUNGEON_KEYS.primary)failRead=true;};
-    m.getItem=k=>{if(failRead&&k===DUNGEON_KEYS.primary)throw Error('readback');return read(k);};
-    expect((await enterStairs(session))).toBe(false);expect(session.snapshot.depth).toBe(1);
-    failRead=false;expect((await enterStairs(session))).toBe(false);
-    expect(session.continue(session.inspect())).toBe(true);expect(session.snapshot.depth).toBe(2);
+  it.each(['write throws after commit', 'readback fails'])('requires explicit travel recovery when the primary %s', async failure => {
+    const m=memory(),store=createDungeonStorage(()=>m),s=atStairApproach(clearFloor(fresh()));
+    expect(store.save(s).ok).toBe(true);
+    const session=new DungeonSession(s,store),before=session.snapshot;
+    const read=m.getItem,write=m.setItem;
+    let failRead=false;
+    m.setItem=(key,value)=>{
+      write(key,value);
+      if(key!==DUNGEON_KEYS.primary)return;
+      if(failure==='write throws after commit')throw Error('uncertain travel write');
+      failRead=true;
+    };
+    m.getItem=key=>{if(failRead&&key===DUNGEON_KEYS.primary)throw Error('readback');return read(key);};
+    expect(await enterStairs(session)).toBe(false);
+    expect(session.snapshot).toEqual(before);
+    m.setItem=write;m.getItem=read;
+    expect(await enterStairs(session)).toBe(false);
+    expect(session.snapshot).toEqual(before);
+    const review=session.inspect();
+    assert(review.primary.status==='valid');
+    expect(review.primary.state.depth).toBe(2);
+    expect(session.continue(review)).toBe(true);
+    expect(session.snapshot).toEqual(review.primary.state);
   });
   it('allows explicit unsaved battles but blocks travel and disposes stale sessions', async () => {
     const session=new DungeonSession(atStairApproach(clearFloor(fresh())),createDungeonStorage(()=>null));session.playUnsaved();
@@ -812,7 +1000,8 @@ describe('dungeon recovery limits', () => {
     expect(decodeDungeon(JSON.stringify({...value,digest:'sha256:'+'0'.repeat(64)}))).toEqual({ok:false,reason:'digest'});
   });
   it('preserves every visited floor until the byte budget explicitly refuses the candidate', async () => {
-    const base=fresh(),floors=Array.from({length:400},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1);return {descriptor,position:descriptor.downstairs,exploration:freshExploration(descriptor.seed,descriptor.downstairs,floorMap(descriptor)),completed:3};});
+    const base = fresh();
+    const floors = Array.from({ length: 400 }, (_, i) => historicalFloor(base.seed, i + 1, 'downstairs', 3));
     const s={...base,depth:400,floors,revision:4000};expect(readDungeon(s).ok).toBe(true);
     expect(encodeDungeon(s)).toEqual({ok:false,reason:'tooLarge'});expect(s.floors).toHaveLength(400);
     expect(s.phase).toBe('ready');expect(s.floors[0].descriptor).toEqual(base.floors[0].descriptor);
@@ -827,16 +1016,16 @@ describe('pre-progression save preservation', () => {
     const raw=format===3?canonical({...oldBody,digest:hashJson(oldBody)}):priorDungeonEnvelope(base,format);
     expect(decodeDungeon(raw)).toEqual({ok:false,reason:'incompatible'});
     const m=memory();m.setItem(DUNGEON_KEYS.primary,raw);
-    expect(createDungeonStorage(()=>m).inspect().primary.status).toBe('invalid');
+    const review=createDungeonStorage(()=>m).inspect();
+    expect(review.primary.status).toBe('invalid');
+    expect(resumableDungeonSlot(review)).toBeNull();
     expect(m.getItem(DUNGEON_KEYS.primary)).toBe(raw);
   });
 });
 describe('durable encounter policies', () => {
   it('cold-decodes a bounded progression-format history by resolving only the current floor', async () => {
-    const base=freshDungeon('cold-current',13),floors=Array.from({length:250},(_,i)=>{
-      const descriptor=floorDescriptor(base.seed,i+1);
-      return {descriptor,completed:i===249?0:3,position:descriptor.upstairs,exploration:freshExploration(descriptor.seed,descriptor.upstairs,floorMap(descriptor))};
-    });
+    const base = freshDungeon('cold-current', 13);
+    const floors = Array.from({ length: 250 }, (_, i) => historicalFloor(base.seed, i + 1, 'upstairs', i === 249 ? 0 : 3));
     const state={...base,depth:250,floors},encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
     expect(utf8Bytes(encoded.text)).toBeLessThan(1024*1024);
     vi.resetModules();
@@ -868,10 +1057,8 @@ describe('durable encounter policies', () => {
   });
 
   it('reuses admitted facts across a long retained floor history', () => {
-    const base=fresh(),floors=Array.from({length:44},(_,i)=>{
-      const descriptor=floorDescriptor(base.seed,i+1);
-      return {descriptor,completed:3,position:descriptor.downstairs,exploration:freshExploration(descriptor.seed,descriptor.downstairs,floorMap(descriptor))};
-    });
+    const base = fresh();
+    const floors = Array.from({ length: 44 }, (_, i) => historicalFloor(base.seed, i + 1, 'downstairs', 3));
     const state={...base,depth:44,floors};
     good(readDungeon(state));
     const resolver=vi.spyOn(battlefields,'resolveBattlefield');
@@ -985,6 +1172,8 @@ describe('confirmed dungeon charm disposal', () => {
     const encoded=encodeDungeon(discarded);if(!encoded.ok)throw Error(encoded.reason);expect(decodeDungeon(encoded.text)).toEqual({ok:true,state:discarded});
     const claimed=good(dungeonItem(discarded,{...dungeonBoundary(discarded),type:'claimReward',offerId:discarded.offer!.id,itemId:discarded.offer!.options[0].itemId}));
     expect(claimed.ownership.equipment).toHaveLength(6);expect(claimed.phase).toBe('ready');expect(claimed.offer).toBeNull();expect(claimed.ownership.equipment.some(e=>e.instanceId===instanceId)).toBe(false);
+    const stored=encodeDungeon(claimed);assert(stored.ok);
+    expect(decodeDungeon(stored.text)).toEqual({ok:true,state:claimed});
   });
   it('rejects unowned/malformed/battle/defeat commands without mutation', async () => {
     const original=dungeonCapacityFixture(),instanceId=original.ownership.equipment[0].instanceId,command={...dungeonBoundary(original),type:'discardEquipment' as const,instanceId};
@@ -1305,6 +1494,14 @@ describe('versioned floor dimensions', () => {
     const floors=Array.from({length:5},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1),map=floorMap(descriptor);return {descriptor,position:descriptor.upstairs,completed:3,exploration:freshExploration(descriptor.seed,descriptor.upstairs,map)};});
     const state=good(readDungeon({...base,depth:5,floors}));
     const encoded=encodeDungeon(state);assert(encoded.ok);
+    const reread = good(readDungeon(state));
+    expect(reread.floors[0]).toBe(state.floors[0]);
+    expect(Object.isFrozen(reread.floors[0].exploration.revealed)).toBe(true);
+    expect(Object.isFrozen(floors[0].exploration.revealed)).toBe(false);
+    expect(encodeDungeon(structuredClone(state))).toEqual(encoded);
+    expect(readDungeon({ ...state, floors: [state.floors[1], state.floors[0], ...state.floors.slice(2)] }).ok).toBe(false);
+    const brokenHistory = [{ ...state.floors[0], position: -1 }, ...state.floors.slice(1)];
+    expect(readDungeon({ ...state, floors: brokenHistory }).ok).toBe(false);
     for(const patch of [{mapHash:'sha256:'+'0'.repeat(64)},{upstairs:state.floors[4].descriptor.upstairs+1},{downstairs:state.floors[4].descriptor.downstairs-1}]){
       const altered={...state,floors:state.floors.map((floor,i)=>i===4?{...floor,descriptor:{...floor.descriptor,...patch}}:floor)};
       expect(readDungeon(altered).ok).toBe(false);
@@ -1326,6 +1523,26 @@ describe('versioned floor dimensions', () => {
       expect(new Set(exploration.pois.map(p=>poiCell(p,size))).size).toBe(3);
       for (const poi of exploration.pois) expect(map.cells[poiCell(poi,size)]).toBe(1);
     }
+  });
+  it.each([5, 8])('retains a step on floor %i through save and reload', depth => {
+    const base = freshDungeon('large-floor-browser', 19);
+    const floors = Array.from({ length: depth }, (_, i) => {
+      const descriptor = floorDescriptor(base.seed, i + 1);
+      const position = descriptor.upstairs;
+      const exploration = freshExploration(descriptor.seed, position, floorMap(descriptor));
+      return { descriptor, position, exploration, completed: i + 1 === depth ? 0 : 3 };
+    });
+    const state = good(readDungeon({ ...base, depth, floors }));
+    const floor = floors[depth - 1];
+    const map = floorMap(floor.descriptor);
+    const destination = neighbors(floor.position, map.width, map.height).find(cell =>
+      map.cells[cell] && !floor.exploration.pois.some(p => poiCell(p, map.width) === cell));
+    assert(destination !== undefined);
+    const moved = good(stepDungeon(state, { id: state.id, depth, revision: state.revision, destination }));
+    expect(moved.floors[depth - 1].position).toBe(destination);
+    const encoded = encodeDungeon(moved);
+    assert(encoded.ok);
+    expect(good(decodeDungeon(encoded.text))).toEqual(moved);
   });
   it('resumes a saved square sixth floor and grows the next floor on descent', () => {
     const base = freshDungeon('deep-square-history', 19);
@@ -1588,12 +1805,20 @@ it('finishes the admitted dungeon clock checkpoint under its lock after disposal
  const m=memory(),storage=createDungeonStorage(()=>m),pending:(()=>void)[]=[];let now=0;
  const initial=freshDungeon('closing-clock',13,undefined,true);assert(storage.save(initial).ok);
  const owner=new DungeonSession(initial,storage,null,()=>now,task=>pending.push(task));
- assert(owner.continue(owner.inspect()));owner.setPlaytimeActive(true);now=1234;
+ assert(owner.continue(owner.inspect()));owner.setPlaytimeActive(true);now=4000;
  const flushed=owner.flushPlaytime();owner.dispose();
  expect(storage.inspect().primary.status).toBe('valid');
  while(pending.length)pending.shift()!();await flushed;
  const durable=storage.inspect().primary;assert(durable.status==='valid');
- expect(durable.state.stats?.activeMs).toBe(1234);
+ expect(durable.state.stats?.activeMs).toBe(4000);
+ const expected = { ...initial, stats: { ...initial.stats!, activeMs: 4000 } };
+ for (let i = 0; i < 2; i++) {
+  const resumed = new DungeonSession(initial, createDungeonStorage(() => m));
+  assert(resumed.continue(resumed.inspect()));
+  expect(resumed.snapshot).toEqual(expected);
+  resumed.dispose();
+ }
+ expect(storage.inspect().primary).toEqual(durable);
 });
 
 it('upgrades the rebased counter format 16 while preserving exact fog memory', () => {
@@ -1632,4 +1857,25 @@ it.each([['primary','granted'],['primary','refused'],['backup','granted'],['back
  while(pending.length)pending.shift()!();expect(await save).toBe(false);
  expect([m.getItem(DUNGEON_KEYS.primary),m.getItem(DUNGEON_KEYS.backup)]).toEqual(bytes);
  expect(owner.snapshot).toEqual(continued);expect(owner.hasUnsavedProgress).toBe(false);expect(owner.status).toBe(status);
+});
+
+it('keeps the landing clear for the first step after restoring a fresh descent', () => {
+  // Seed 6074 used to place the Desert Guardian immediately east of the landing.
+  const base = freshDungeon('safe-arrival', 6074);
+  const cleared = atDownstairs({ ...base, floors: [{ ...base.floors[0], completed: 3 }] });
+  const arrived = good(travelDungeon(cleared, 'descend', cleared.revision));
+  const floor = arrived.floors[1];
+  const map = floorMap(floor.descriptor);
+  const landing = [floor.position, ...neighbors(floor.position, map.width, map.height)];
+  expect(floor.position).toBe(floor.descriptor.upstairs);
+  for (const poi of floor.exploration.pois) expect(landing).not.toContain(poiCell(poi, map.width));
+  const encoded = encodeDungeon(arrived);
+  assert(encoded.ok);
+  const restored = decodeDungeon(encoded.text);
+  assert(restored.ok);
+  const state = restored.state;
+  const east = floor.position + 1;
+  const moved = good(stepDungeon(state, { id: state.id, depth: state.depth, revision: state.revision, destination: east }));
+  expect(moved).toMatchObject({ depth: 2, phase: 'ready', activeBattle: null, party: base.party });
+  expect(moved.floors[1].position).toBe(east);
 });

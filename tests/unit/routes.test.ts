@@ -40,6 +40,8 @@ describe('base-aware menu routing', () => {
       const location = { href: `https://test.invalid${base}?game=dungeon&entry=${intent}#floor` };
       const history = { state: { preserved: true }, replaceState: vi.fn((_state: unknown, _unused: string, url: URL) => { location.href = String(url); }) };
       vi.stubGlobal('location', location); vi.stubGlobal('history', history);
+      const requested = new URL(location.href);
+      expect(resolveAppEntry(requested.pathname, requested.search, base)).toEqual({ route: 'dungeon', persistent: true });
       expect(consumeEntryIntent()).toBe(intent === 'unrecognized' ? null : intent);
       expect(location.href).toBe(`https://test.invalid${base}?game=dungeon#floor`);
       expect(history.replaceState.mock.calls[0][0]).toEqual({ preserved: true });
@@ -55,4 +57,15 @@ it('marks unknown paths for a base-aware menu redirect', () => {
   for (const base of ['/', '/prototype/']) {
     expect(resolveAppEntry(`${base}nonexistent`, '', base)).toEqual({ route: 'menu', persistent: false, redirectToMenu: true });
   }
+});
+
+it('replaces an invalid game query with the menu URL before mounting', async () => {
+  vi.resetModules();
+  const history = { state: { preserved: true }, replaceState: vi.fn() };
+  vi.stubGlobal('history', history);
+  vi.stubGlobal('location', { pathname: '/', search: '?game=zzz' });
+
+  const { appEntry } = await import('../../src/app/entry');
+  expect(appEntry.route).toBe('menu');
+  expect(history.replaceState.mock.calls).toEqual([[history.state, '', '/']]);
 });

@@ -39,7 +39,9 @@ for (const base of ['/', '/tactics/']) {
       const emitted = result.output.find(file => file.fileName === path);
       expect(emitted?.type, asset.id).toBe('asset');
       if (emitted?.type !== 'asset') throw new Error(`Missing versioned image: ${asset.id}`);
-      expect(Buffer.from(emitted.source)).toEqual(bytes);
+      const builtBytes = Buffer.from(emitted.source);
+      // Use the native byte comparison on success and retain the assertion diff on failure.
+      if (!builtBytes.equals(bytes)) expect(builtBytes, asset.id).toEqual(bytes);
       expect(asset.runtimePath.startsWith('/assets/')).toBe(false);
       return path;
     });
@@ -61,6 +63,7 @@ for (const base of ['/', '/tactics/']) {
       return links;
     };
     expect(preloads(base)).toEqual([]);
+    expect(preloads(`${base}dungeon`)).toEqual([]);
     for (const search of ['?game=dungeon', '?game=map', '?game=unknown', '?game=battle&game=run']) expect(preloads(base, search)).toEqual([]);
     for (const mode of ['battle', 'run']) {
       const direct = preloads(`${base}${mode}`);

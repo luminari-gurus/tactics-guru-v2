@@ -1,3 +1,4 @@
+import { freshRunStats } from '../../src/domain/runStats';
 import { freshExploration, movableExploration, neighbors, poiCell, reveal, visit } from '../../src/domain/exploration';
 import { freshDungeon, floorDescriptor, floorMap, dungeonOffer, dungeonLootReward, readDungeon, startDungeonBattle, dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, travelDungeon, stepDungeon, clearedDungeonSlots, type DungeonState, type DungeonResult, type DungeonItemCommand } from '../../src/domain/dungeon';
 import { generateMap } from '../../src/map/generate';
@@ -107,6 +108,63 @@ export function dungeonGroundPileFixture(seed = 13, depth = 1): DungeonState {
   return checkedDungeon(readDungeon({ ...context, floors: [...floors.slice(0, -1), pile] }));
 }
 
+/** Explicit capacity/overlap staging; the complete saved journey proves earned loot separately. */
+export function sharedGroundPile(ownedCount: number, occupied = false) {
+ for(let seed=1;seed<=64;seed++) {
+  const base=freshDungeon(`ground-pile-${ownedCount}-${occupied}`,seed),depth=3;
+  const floors=Array.from({length:depth},(_,i)=>{
+   const descriptor=floorDescriptor(seed,i+1),map=floorMap(descriptor);
+   return {descriptor,position:descriptor.upstairs,completed:i===depth-1?2:3,
+    exploration:movableExploration(freshExploration(descriptor.seed,descriptor.upstairs,map),descriptor.seed,i===depth-1?2:3,'ready')};
+  });
+  const floor=floors[depth-1],map=floorMap(floor.descriptor),stairs=[floor.descriptor.upstairs,floor.descriptor.downstairs];
+  const cell=map.cells.findIndex((open,index)=>open===1&&!stairs.includes(index)&&
+   !floor.exploration.pois.some(p=>poiCell(p,map.width)===index)&&
+   neighbors(index,map.width,map.height).some(n=>map.cells[n]&&!stairs.includes(n)&&!floor.exploration.pois.some(p=>poiCell(p,map.width)===n)));
+  if(cell<0)continue;
+  const origin=neighbors(cell,map.width,map.height).find(n=>map.cells[n]&&!stairs.includes(n)&&!floor.exploration.pois.some(p=>poiCell(p,map.width)===n))!;
+  const loot=[0,1].map(slot=>dungeonLootReward({...base,depth},slot,slot,cell));
+  if(loot.some(item=>dungeonContent.items[item.itemId].kind!=='equipment'))continue;
+  const equipment=Array.from({length:ownedCount},(_,i)=>({instanceId:`${base.id}:floor:${Math.floor(i/3)+1}:reward:${i%3}:option:0`,itemId:'item:warding_charm' as const}));
+  const party=base.party.map(hero=>{const progressed=progressHero(hero.heroId,180,hero.hp,dungeonContent.catalog);return {...progressed,hp:progressed.maxHp};});
+  const state=checkedDungeon(readDungeon(atCell({...base,depth,party,
+   ownership:{consumables:[],equipment,assignments:[]},
+   floors:floors.map((f,index)=>index!==depth-1?f:{...f,loot,exploration:{...f.exploration,
+    pois:f.exploration.pois.map(p=>p.encounterSlot<2||occupied?{...p,x:cell%map.width,y:Math.floor(cell/map.width)}:p)}})},origin)));
+  return {state,cell,origin};
+ }
+ throw Error('No deterministic two-charm ground pile');
+}
+
+export function guardianFirstRewardFixture(): DungeonState {
+ const depth=5;
+ // Structural reward boundary isolates marker rendering, not preceding combat.
+ const fresh=freshDungeon('guardian-first',1,undefined,true);
+ const floors=Array.from({length:depth},(_,i)=>{
+  const descriptor=floorDescriptor(fresh.seed,i+1),map=floorMap(descriptor);
+  return {descriptor,position:descriptor.upstairs,completed:i===depth-1?0:3,
+   exploration:freshExploration(descriptor.seed,descriptor.upstairs,map)};
+ });
+ const base=atEncounter({...fresh,depth,floors},2),floor=base.floors[depth-1],map=floorMap(floor.descriptor);
+ const staged:DungeonState={...base,phase:'reward',floors:base.floors.map((f,i)=>i!==depth-1?f:{...floor,completed:1,
+  exploration:{...movableExploration(floor.exploration,floor.descriptor.seed,0,'ready'),cleared:[2],active:2,revealed:Array.from({length:map.cells.length},(_,i)=>i)}})};
+ return checkedDungeon(readDungeon({...staged,offer:dungeonOffer(staged)}));
+}
+
+export function savedBiomeEncounter(biome: 'forest' | 'desert', kind: 'normal' | 'elite' | 'vault' | 'boss') {
+  const seeds = { forest: { normal: 0, elite: 9, vault: 0, boss: 0 }, desert: { normal: 1, elite: 2, vault: 1, boss: 1 } };
+  const seed = seeds[biome][kind];
+  const slot = kind === 'normal' ? 0 : kind === 'boss' ? 2 : 1;
+  const base = freshDungeon('biome-view', seed), descriptor = floorDescriptor(seed, 2);
+  if (descriptor.biome !== `${biome}-v1` || descriptor.encounters[slot].selection.kind !== kind) {
+    throw Error(`Seed ${seed} no longer selects the ${biome} ${kind} encounter`);
+  }
+  const floor = { descriptor, position: descriptor.upstairs, completed: slot,
+    exploration: freshExploration(descriptor.seed, descriptor.upstairs, floorMap(descriptor)) };
+  const state = checkedDungeon(readDungeon({ ...base, depth: 2, floors: [{ ...base.floors[0], completed: 3 }, floor] }));
+  return { slot, state };
+}
+
 /** Structural capacity fixture; not evidence of a preceding legal full playthrough. */
 export function dungeonCapacityFixture(policy: DungeonEncounterPolicy = DUNGEON_ENCOUNTER_POLICY): DungeonState {
   for(let seed=1;seed<=100;seed++){
@@ -126,6 +184,14 @@ export function atCell(s: DungeonState, position: number): DungeonState {
   floors[s.depth-1] = { ...f, position, exploration: visit(f.exploration,position,floorMap(f.descriptor)) };
   return { ...s, floors };
 }
+// On seed 1 these legal steps move an encounter into or out of current sight.
+export function dungeonSightTransition(entering: boolean) {
+  const [position, destination, slot] = entering ? [47, 48, 1] : [307, 306, 0];
+  const before = atCell({ ...freshDungeon('sight-movement', 1), stats: freshRunStats('since-upgrade') }, position);
+  const after = checkedDungeon(stepDungeon(before, { id: before.id, depth: before.depth, revision: before.revision, destination }));
+  return { before, after, slot };
+}
+
 export function atEncounter(s: DungeonState, slot = s.floors[s.depth-1].completed): DungeonState {
   return slot >= 3 ? s : atCell(s, poiCell(s.floors[s.depth-1].exploration.pois[slot], s.floors[s.depth-1].descriptor.size ?? 20));
 }
@@ -226,7 +292,7 @@ export function fighterJourney(seed:number, policy: DungeonEncounterPolicy = DUN
 }
 
 /** Follow the nearest live marker with actual player steps and enemy movement. */
-function walkWitness(initial:DungeonState):DungeonState {
+export function walkWitness(initial:DungeonState):DungeonState {
   let state=initial;
   const seen = new Set<string>(); let detour: number[] = [];
   for(let attempt=0;attempt<400;attempt++) {

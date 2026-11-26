@@ -1,11 +1,13 @@
-import { assert, expect, it } from 'vitest';
+import { assert, expect, it, vi } from 'vitest';
 import { dungeonBattleCatalog, dungeonEncounterCatalog, dungeonEncounterCatalogIdentity, hobgoblinDungeonBattleCatalog, hobgoblinDungeonEncounterCatalog, readDungeonEncounterCatalog, ENCOUNTER_KINDS } from '../../src/content/dungeonEncounters';
 import { desertRunCatalog } from '../../src/content/desertCatalog';
 import { CONTENT_BOUNDS, ENEMY_IDS, HERO_IDS } from '../../src/content/constants';
-import { PARTY_SCALING_POLICY, EXPANDED_ENCOUNTER_POLICY, dungeonBiome, encounterBattleCatalog, readDungeonEncounterSelection, encounterSelectionSeed, projectDungeonEnemies, scaleEnemyStat, selectDungeonEncounter } from '../../src/domain/dungeonEncounters';
+import { ENDLESS_SCALING_POLICY, PARTY_SCALING_POLICY, EXPANDED_ENCOUNTER_POLICY, dungeonBiome, encounterBattleCatalog, readDungeonEncounterSelection, encounterSelectionSeed, projectDungeonEnemies, scaleEnemyStat, selectDungeonEncounter } from '../../src/domain/dungeonEncounters';
 import { resolveBattlefield, layoutSeed } from '../../src/domain/battlefield';
 import { createBattle } from '../../src/domain/turns';
-import { dungeonSeed, freshDungeon } from '../../src/domain/dungeon';
+import * as encounterRules from '../../src/domain/dungeonEncounters';
+import { atEncounter } from '../helpers/dungeonFixtures';
+import { dungeonSeed, freshDungeon, floorDescriptor, floorMap, startDungeonBattle, dungeonBattle } from '../../src/domain/dungeon';
 import { freshExploration } from '../../src/domain/exploration';
 import { seedRng } from '../../src/domain/rng';
 import { battleCatalog } from '../../src/content/catalog';
@@ -226,8 +228,8 @@ it('round-trips a new dungeon in every biome and rejects selection identities fr
 
 it('paces fresh expanded enemies against guaranteed floor XP and preserves saved projections', () => {
   const fresh = selectDungeonEncounter(42, 5, 0, EXPANDED_ENCOUNTER_POLICY);
-  expect(fresh.scalingPolicy).toBe(PARTY_SCALING_POLICY);
-  for (const scalingPolicy of [PARTY_SCALING_POLICY, 'enemy-depth-v1'] as const) {
+  expect(fresh.scalingPolicy).toBe(ENDLESS_SCALING_POLICY);
+  for (const scalingPolicy of [ENDLESS_SCALING_POLICY, PARTY_SCALING_POLICY, 'enemy-depth-v1'] as const) {
     const saved = { ...fresh, scalingPolicy };
     expect(readDungeonEncounterSelection(saved, 5, 0, fresh.biome, fresh.policy)).toEqual(saved);
   }
@@ -245,4 +247,47 @@ it('paces fresh expanded enemies against guaranteed floor XP and preserves saved
   const wounded = projectDungeonEnemies(5, 'normal', undefined, PARTY_SCALING_POLICY, 2.25).enemies.goblin_grunt.stats;
   expect(wounded.maxHp).toBeLessThan(stats(5).maxHp);
   expect(wounded.maxHp).toBeGreaterThan(solo.maxHp);
+});
+
+it('keeps adding endurance across deep floors without increasing late-game damage', () => {
+  const projected = (depth: number) => projectDungeonEnemies(depth, 'normal', undefined, ENDLESS_SCALING_POLICY).enemies.goblin_grunt.stats;
+  const depths = [5, 25, 250, 2500, 8192, Number.MAX_SAFE_INTEGER];
+  for (const [i, depth] of depths.entries()) {
+    expect(projected(depth).power).toBe(projected(5).power);
+    if (i) expect(projected(depth).maxHp).toBeGreaterThan(projected(depths[i - 1]).maxHp);
+  }
+});
+
+it('starts and restores a battle whose scaled enemies exceed the authored HP limit', () => {
+  const catalogFor = encounterRules.encounterBattleCatalog;
+  const fixture = vi.spyOn(encounterRules, 'encounterBattleCatalog').mockImplementation(selection => {
+    const catalog = catalogFor(selection);
+    const enemies = { ...catalog.enemies };
+    for (const [id, enemy] of Object.entries(enemies)) {
+      enemies[id] = { ...enemy, stats: { ...enemy.stats, maxHp: 70 } };
+    }
+    return { ...catalog, enemies };
+  });
+  try {
+    const policy = EXPANDED_ENCOUNTER_POLICY;
+    const base = freshDungeon('high-hp', 19, policy);
+    const floors = Array.from({ length: 9 }, (_, i) => {
+      const descriptor = floorDescriptor(base.seed, i + 1, undefined, policy);
+      const position = descriptor.upstairs;
+      return { descriptor, position, completed: i < 8 ? 3 : 0,
+        exploration: freshExploration(descriptor.seed, position, floorMap(descriptor)) };
+    });
+    const entry = startDungeonBattle(atEncounter({ ...base, floors, depth: 9 }));
+    assert(entry.ok, JSON.stringify(entry));
+    const enemy = entry.state.activeBattle!.units.find(unit => unit.side === 'enemy')!;
+    expect(enemy.hp).toBe(105);
+    const encoded = encodeDungeon(entry.state);
+    assert(encoded.ok);
+    const restored = decodeDungeon(encoded.text);
+    assert(restored.ok);
+    expect(restored.state.activeBattle).toEqual(entry.state.activeBattle);
+    expect(dungeonBattle(restored.state)?.state.units.find(unit => unit.id === enemy.id)?.hp).toBe(105);
+  } finally {
+    fixture.mockRestore();
+  }
 });

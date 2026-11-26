@@ -1,4 +1,10 @@
 import { defineConfig } from '@playwright/test';
 import base from './playwright.regression.config';
 
-export default defineConfig({ ...base, testMatch: '**/dungeon-extended.spec.ts', testIgnore: [] });
+export default defineConfig({
+  ...base,
+  testMatch: ['**/dungeon-extended.spec.ts', '**/dungeon.spec.ts'],
+  testIgnore: [],
+  grep: /dungeon-extended\.spec\.ts|Shaman production journey|@full-first-floor/,
+  grepInvert: [],
+});

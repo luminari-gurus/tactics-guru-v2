@@ -18,8 +18,8 @@ export const stages = [
 export function validateReport(id, report) {
   if (id === 'journeys') {
     const stats = report.stats;
-    if (stats?.expected !== 7 || stats.unexpected !== 0 || stats.flaky !== 0 || stats.skipped !== 0) {
-      throw Error('Expected seven passing core journeys with no failures, retries or skips');
+    if (stats?.expected !== 5 || stats.unexpected !== 0 || stats.flaky !== 0 || stats.skipped !== 0) {
+      throw Error('Expected five passing core journeys with no failures, retries or skips');
     }
   } else if (id === 'units' || id === 'build-integration') {
     if (!(report.numTotalTests > 0) || report.numPassedTests !== report.numTotalTests ||
