@@ -15,6 +15,7 @@ import { BATTLE_KEYS, ownedAbilities, actionCommand, actionTargets, friendlyFire
 import { mountCombatControlsPreference, type CombatSkin } from './combatControls';
 import { draughtsSpent } from '../domain/draughts';
 import { BattleTurnQueue } from './battleTurnQueue';
+import { BattleLog, type BattleLogSnapshot } from './battleLog';
 import { BattleClassGuidance } from './battleClassGuidance';
 import type { ClassGuidanceRun } from './classGuidance';
 import { mountClassGuidancePreferences } from './classGuidancePreferences';
@@ -52,7 +53,7 @@ export function eventText(event: BattleEvent, name: (id:number)=>string): string
     case 'moved': { const cell=event.path.at(-1)!; return `${name(event.unitId)} moves to (${cell.x}, ${cell.y})`; }
     case 'pushed': return `${name(event.unitId)} is pushed to (${event.path[1].x}, ${event.path[1].y})`;
     case 'abilityUsed': return `${name(event.unitId)} uses ${displayName(event.abilityId)}`;
-    case 'attackRolled': return `${name(event.unitId)}: ${event.result} (${event.natural} + ${event.bonus} vs AC ${event.armorClass})`;
+    case 'attackRolled': return `${name(event.unitId)}: ${event.result} (${event.natural} + ${event.bonus} vs AC ${event.armorClass}) against ${name(event.targetId)}`;
     case 'saveRolled': return `${name(event.unitId)} Will save ${event.saved ? 'succeeds' : 'fails'} (${event.natural} + ${event.modifier} = ${event.total} vs DC ${event.dc} · ${saveFaceCounts(event.modifier,event.dc).savedFaces*5}% save chance)`;
     case 'weakened': return `${name(event.unitId)} Weakened by ${name(event.sourceId)} (−2 accuracy until its next turn ends or source/target defeat)`;
     case 'weakenedExpired': return `${name(event.unitId)} Weakened expires`;
@@ -68,12 +69,11 @@ export function eventText(event: BattleEvent, name: (id:number)=>string): string
     case 'markExpired': return `${name(event.unitId)} Mark expires`;
     case 'movementBlocked': return `${name(event.unitId)} ${event.abilityId === 'ability:frost_snare' ? 'Snared' : 'Pinned'} by ${name(event.sourceId)} until its next turn ends or source/target defeat · no damage or roll`;
     case 'movementBlockExpired': return `${name(event.unitId)} ${event.abilityId === 'ability:frost_snare' ? 'Snare' : 'Pin'} expires`;
-    case 'missileRolled': return `Missile ${event.missile}: ${event.damage} force damage`;
+    case 'missileRolled': return `Missile ${event.missile}: ${event.damage} force damage to ${name(event.targetId)}`;
     case 'battleEnded': return event.outcome==='playerWin'?'Victory':'Defeat';
     default: return '';
   }
 }
-const LOG_LIMIT=40;
 export function unitFeedback(session:BattleSession, unit:UnitState) {
   const def=unit.side==='player'?session.catalog.heroes[unit.defId]:session.catalog.enemies[unit.defId];
   const guard=guardedEffect(unit)?GUARDED_STRIKE_TRADEOFF:null;
@@ -120,13 +120,13 @@ export class BattleHud {
   private readonly disposeGuidancePreferences: () => void;
   private readonly disposePacePreference: () => void;
   private readonly abort=new AbortController();
-  private readonly log:string[]=[];
-  constructor(private readonly session:BattleSession, private readonly callbacks:{action:(a:Action)=>void;target:(c:CellPosition|null)=>void;confirm:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void;inspect:(invoker:HTMLElement)=>void;inspectTarget:(id:number)=>void;danger:()=>void;plan:()=>void;undo:()=>void;draught:()=>void;log:(lines:readonly string[],invoker:HTMLElement)=>void}, guidance?:ClassGuidanceRun) {
+  private readonly log: BattleLog;
+  constructor(private readonly session:BattleSession, private readonly callbacks:{action:(a:Action)=>void;target:(c:CellPosition|null)=>void;confirm:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void;inspect:(invoker:HTMLElement)=>void;inspectTarget:(id:number)=>void;danger:()=>void;plan:()=>void;undo:()=>void;draught:()=>void;log:(snapshot:BattleLogSnapshot,invoker:HTMLElement)=>void}, guidance?:ClassGuidanceRun) {
     this.turnQueue = new BattleTurnQueue(this.actorRoot, session.catalog);
     this.openingEnemyTurn = !session.resumed && session.phase === 'enemy';
     // Snapshot construction has no command events. Establish the current turn
     // before appending any AI actions, including when continuing a saved battle.
-    this.append([{ type: 'turnStarted', unitId: session.active.id, round: session.state.round }]);
+    this.log = new BattleLog(session.state, session.resumed, displayName, eventText);
     this.actorRoot.hidden=false;
     this.actorRoot.innerHTML=`<p id="battle-active" aria-live="polite"></p><div class="battle-identity"><div id="battle-portraits"></div><div><h2 id="battle-actor-name" aria-live="polite"></h2><p id="battle-hp"></p><div class="battle-health" aria-hidden="true"><span></span></div><p id="battle-stats"></p><p id="battle-status"></p></div></div><p id="battle-budgets"></p>`;
     this.stats = this.actorRoot.querySelector('#battle-stats')!;
@@ -164,7 +164,7 @@ export class BattleHud {
     party.addEventListener('click',()=>callbacks.inspect(party),{signal});
     this.root.querySelector('#battle-inspect-target')!.addEventListener('click',event=>{const id=(event.currentTarget as HTMLElement).dataset.unitId;if(id)callbacks.inspectTarget(Number(id));},{signal});
     const log = this.root.querySelector<HTMLButtonElement>('#battle-log-open')!;
-    log.addEventListener('click',()=>callbacks.log(this.log,log),{signal});
+    log.addEventListener('click',()=>callbacks.log(this.log.snapshot(),log),{signal});
     this.ability=this.root.querySelector('#battle-ability')!;
     this.ability.addEventListener('change',()=>{if(this.ability.value)callbacks.action(this.ability.value as Action);},{signal});
     this.root.querySelector('.battle-actions')!.addEventListener('click',event=>{
@@ -488,9 +488,8 @@ export class BattleHud {
     this.target.replaceChildren(new Option('Choose target',''),...targetOptions);
     this.target.value=selected?`${selected.x},${selected.y}`:'';this.target.disabled=!enabled || !action;
   }
-  append(events:readonly BattleEvent[]) {
-    for(const e of events) {const text=eventText(e,id=>displayName(this.session.state.units.find(u=>u.id===id)!.defId)+` #${id}`);if(text)this.log.push(text);}
-    this.log.splice(0,Math.max(0,this.log.length-LOG_LIMIT));
+  append(before: BattleState, events: readonly BattleEvent[]) {
+    this.log.append(before, events);
   }
   dispose(){this.abort.abort();this.classGuidance.dispose();this.disposePacePreference();this.disposeGuidancePreferences();this.turnQueue.dispose();this.planCancel.remove();this.root.replaceChildren();this.actorRoot.replaceChildren();this.actorRoot.hidden=true;}
 }

@@ -2,7 +2,7 @@ import { EXPANDED_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
 import { dungeonContent } from '../src/content/dungeon';
 import { openSavedDungeon, walkDungeon, acceptedDungeonSnapshot, settledDungeonSnapshot, expectSameProgress, reenterDungeonStair, expectDungeonResumed, openDungeonInventory, collectDungeonEncounterLoot } from './helpers/dungeonTraversal';
 import { atEncounter, atStairApproach, checkedDungeon, hobgoblinDungeonBoundary, stagedMageAbility, snaredDefeatBoundary } from './helpers/dungeonFixtures';
-import { expect,railTest as test,type Page } from './helpers/dungeonEntropy';
+import { expect, railTest as test, test as dungeonTest, type Page } from './helpers/dungeonEntropy';
 import { readFileSync, writeFileSync } from 'node:fs';
 import type { Locator } from '@playwright/test';
 import { dungeonCapacityFixture, dungeonVictoryBoundary } from './helpers/dungeonFixtures';
@@ -630,6 +630,168 @@ test('Forest Elite keeps a living goblin visible behind raised terrain', async (
  expect(archer.tile).toEqual({ x: 5, y: 2, elevation: 0 });
  await page.screenshot({ path: info.outputPath('forest-elite-archer.png') });
  for (const x of [5, 6]) expect(board.fadedTerrain ?? []).toContainEqual({ x, y: 3, columnAlpha: 0.3, surfaceAlpha: 0.3 });
+});
+
+async function downloadCombatLog(page: Page, activate: (button: Locator) => Promise<void>) {
+ const button = page.getByRole('button',{name:'Export combat log',exact:true});
+ const [download] = await Promise.all([page.waitForEvent('download'), activate(button)]);
+ expect(download.suggestedFilename()).toBe('tactics-guru-combat-log.json');
+ const path = await download.path();
+ if (!path) throw Error('Combat log download has no file');
+ await test.info().attach('combat-log.json', { path, contentType: 'application/json' });
+ return JSON.parse(readFileSync(path, 'utf8')) as { groups: { entries: { text: string }[] }[] };
+}
+
+test('battle log filters and keeps history across Hide and reopen', async ({ page, isMobile }) => {
+ test.setTimeout(90_000);
+ if (!isMobile) await page.setViewportSize({width:1280,height:800});
+ await page.addInitScript(key => {
+   localStorage.setItem(key,JSON.stringify({version:1,pace:'fast'}));
+ },COMBAT_PACE_KEY);
+ // Resume after the Fighter's first Guarded Strike. Its next End Turn lets the
+ // Shaman heal and the Grunt attack while the Fighter's Weakened status expires.
+ const witness = shamanJourney(189);
+ const { catalog, state: initial } = dungeonBattle(witness.entry)!;
+ const guarded = witness.commands.findIndex(command => command.type === 'useAbility' && command.abilityId === 'ability:guarded_strike');
+ expect(guarded).toBeGreaterThanOrEqual(0);
+ let state = initial;
+ for (const command of witness.commands.slice(0,guarded+1)) {
+   const next = dispatch(state,command,catalog);
+   if (!next.ok) throw Error(next.reason);
+   state = next.state;
+ }
+ await openSavedDungeon(page,checkedDungeon(acceptDungeonBattle(witness.entry,state)));
+ const game = page.locator('#game');
+ await expect(game).toHaveAttribute('data-phase','player',{timeout:15_000});
+
+ const activate = async (button: Locator) => {
+   if (isMobile) await button.tap();
+   else await button.press('Enter');
+ };
+ const dialog = page.getByRole('dialog',{name:'Battle log',exact:true});
+ const filters = dialog.getByRole('group',{name:'Filter battle log'});
+ const filterButton = (name: string) => filters.getByRole('button',{name,exact:true});
+ const hide = dialog.getByRole('button',{name:'Hide',exact:true});
+ const groups = dialog.locator('#battle-log > li > strong');
+ const lines = dialog.locator('#battle-log > li > ol > li');
+ const openLog = async () => {
+   const launcher = await battleTool(page,'#battle-log-open');
+   await activate(launcher);
+   await expect(filters.getByRole('button',{pressed:true})).toHaveText('All');
+   return launcher;
+ };
+ const selectFilter = async (name: string) => {
+   await activate(filterButton(name));
+   await expect(filters.getByRole('button',{pressed:true})).toHaveText(name);
+ };
+
+ let launcher = await openLog();
+ await expect(lines).toHaveText([/^Round 2: Fighter #1's turn$/]);
+ if (!isMobile) {
+   await filterButton('All').press('Tab');
+   await expect(filterButton('Actions')).toBeFocused();
+ }
+ await selectFilter('Status & Saves');
+ await expect(lines).toHaveCount(0);
+ await expect(dialog.getByRole('status')).toHaveText('No events for this filter.');
+ await activate(hide);
+ await expect(dialog).toBeHidden();
+ if (!isMobile) await expect(launcher).toBeFocused();
+
+ await endTurn(page,selector => activate(page.locator(selector)));
+ await expect.poll(async () => (await readSession(page)).state.commandCount).toBeGreaterThan(state.commandCount);
+ await expect(game).toHaveAttribute('data-phase','player',{timeout:15_000});
+ const before = await readSession(page);
+ launcher = await openLog();
+ await expect(lines).toContainText([/^Round 2:/,/Fighter #1 waits/,/Weakened expires/,/uses Heal Goblin/,/heals \d+ HP/,/: miss \(/]);
+ await expect(groups).toContainText([/Round 2 · Fighter #1 · End turn/, /Goblin Shaman.* · Heal Goblin/]);
+ const history = await lines.allTextContents();
+ const damageLine = /(heals \d+ HP|: miss \()/;
+ const statusLine = / expires$/;
+ await selectFilter('Actions');
+ await expect(lines).toHaveText(history.filter(line => !damageLine.test(line) && !statusLine.test(line)));
+ await selectFilter('All');
+ await expect(lines).toHaveText(history);
+ await selectFilter('Damage & Healing');
+ await expect(lines).toHaveText(history.filter(line => damageLine.test(line)));
+ await selectFilter('Status & Saves');
+ await expect(lines).toHaveText(history.filter(line => statusLine.test(line)));
+ await expect(groups).toContainText([/Round 2 · Fighter #1 · End turn/]);
+
+ const exported = await downloadCombatLog(page,activate);
+ expect(exported).toMatchObject({
+   format:'tactics-guru-combat-log', version:1,
+   build:{commit:expect.stringMatching(/^[0-9a-f]{40}$/),dirty:expect.any(Boolean)},
+   versions:before.state.versions, history:{limit:40,resumed:true,truncated:false},
+ });
+ expect(exported.groups.flatMap(group => group.entries.map(entry => entry.text))).toEqual(history);
+ expect(exported.groups).toContainEqual(expect.objectContaining({
+   actor:expect.objectContaining({name:expect.stringMatching(/Goblin Shaman/)}),
+   action:expect.objectContaining({abilityId:'ability:heal_goblin'}),
+   entries:expect.arrayContaining([expect.objectContaining({
+     type:'healed', unit:expect.objectContaining({name:expect.stringMatching(/Goblin Grunt/)}),
+     result:{healing:expect.any(Number),hp:expect.any(Number)},
+   })]),
+ }));
+ await expect(filters.getByRole('button',{pressed:true})).toHaveText('Status & Saves');
+ await expect.poll(() => dialog.evaluate(element => element.matches(':modal'))).toBe(true);
+ if (!isMobile) await expect(dialog.getByRole('button',{name:'Export combat log'})).toBeFocused();
+ expect(await readSession(page)).toEqual(before);
+
+ if (!isMobile) await page.setViewportSize({width:360,height:600});
+ await expect.poll(() => dialog.evaluate(element =>
+   element.scrollWidth <= element.clientWidth && [...element.querySelectorAll('button')].every(button => {
+     const {width,height} = button.getBoundingClientRect();
+     return width >= 44 && height >= 44;
+   }),
+ )).toBe(true);
+ if (isMobile) await activate(hide);
+ else {
+   await page.keyboard.press('w');
+   await expect(hide).toBeVisible();
+   await page.keyboard.press('Escape');
+ }
+ await expect(dialog).toBeHidden();
+ if (!isMobile) await expect(launcher).toBeFocused();
+ expect(await readSession(page)).toEqual(before);
+
+ await openLog();
+ await expect(lines).toHaveText(history);
+ expect(await readSession(page)).toEqual(before);
+ await activate(hide);
+ await settledDungeonSnapshot(page);
+ await page.reload();
+ await expectDungeonResumed(page);
+ await expect(game).toHaveAttribute('data-phase','player',{timeout:15_000});
+ expect((await readSession(page)).state).toEqual(before.state);
+ await openLog();
+ await expect(lines).toHaveText([new RegExp(`^Round ${before.state.round}: .+'s turn$`)]);
+ await expect(lines).toHaveCount(1);
+});
+
+dungeonTest('combat log exports when local storage is unavailable', { tag: '@desktop-chromium-portrait-webkit' }, async ({page,isMobile}) => {
+ test.setTimeout(90_000);
+ await page.addInitScript(() => {
+   Object.defineProperty(window,'localStorage',{get(){throw new DOMException('denied','SecurityError');}});
+ });
+ await page.goto('./dungeon');
+ await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player',{timeout:15_000});
+ if (isMobile) await expect(page.locator('body')).toHaveClass(/battle-skin-radial/);
+ const before = await readSession(page);
+ const activate = (button: Locator) => isMobile ? button.tap() : button.press('Enter');
+ await activate(await battleTool(page,'#battle-log-open'));
+ const dialog = page.getByRole('dialog',{name:'Battle log',exact:true});
+ const log = await downloadCombatLog(page,activate);
+ expect(log).toMatchObject({
+   format:'tactics-guru-combat-log', versions:before.state.versions,
+   history:{limit:40,resumed:false,truncated:false},
+ });
+ expect(log.groups.at(-1)?.entries.at(-1)).toMatchObject({type:'turnStarted'});
+ await expect(dialog).toBeVisible();
+ await activate(dialog.getByRole('button',{name:'Hide',exact:true}));
+ await expect(dialog).toBeHidden();
+ expect(await readSession(page)).toEqual(before);
 });
 
 test('resumed Shaman Hex shows the Weakened hero and accuracy penalty', { tag: '@desktop-chromium-portrait-webkit' }, async ({ page }) => {
