@@ -634,6 +634,35 @@ test('map input stays inert while hidden and retains discovery through resize an
  await page.evaluate(()=>Object.defineProperty(document,'hidden',{configurable:true,value:false}));const size=page.viewportSize()!;await page.setViewportSize({width:size.height,height:size.width});expect(await dungeonSnapshot(page)).toEqual(before);
  await page.screenshot({path:test.info().outputPath('exploration-rotated-fallback.png'),fullPage:true});
 });
+const acceptanceTimeoutMs = 5000;
+
+async function acceptedMovementFrames({ first, second, id, depth, initialRevision, acceptanceTimeoutMs }: {
+ first: number; second: number; id: string; depth: number; initialRevision: number; acceptanceTimeoutMs: number;
+}) {
+  const samples:number[]=[];
+  const nextFrame=(deadline:number)=>new Promise<number>((resolve,reject)=>{
+   let frame=0;
+   const timer=setTimeout(()=>{cancelAnimationFrame(frame);reject(Error('Timed out waiting for an accepted movement frame'));},Math.max(0,deadline-performance.now()));
+   frame=requestAnimationFrame(now=>{clearTimeout(timer);resolve(now);});
+  });
+  let previous=await nextFrame(performance.now()+acceptanceTimeoutMs);
+  for(let i=0;i<40;i++){
+   const destination=i%2===0?second:first,expectedRevision=initialRevision+i+1;
+   const deadline=performance.now()+acceptanceTimeoutMs;
+   document.querySelector<HTMLElement>(`#dungeon-map [data-cell="${destination}"]`)!.click();
+   for(;;){
+    const now=await nextFrame(deadline);
+    samples.push((Math.round(now*1000)-Math.round(previous*1000))/1000);previous=now;
+    const current=JSON.parse(document.querySelector<HTMLElement>('#game')!.dataset.dungeonSnapshot!) as DungeonState;
+    if(current.id!==id||current.depth!==depth||current.phase!=='ready'||current.revision>expectedRevision)
+     throw Error('Unexpected dungeon boundary while measuring accepted movement');
+    if(current.revision===expectedRevision&&current.floors[depth-1].position===destination)break;
+    if(performance.now()>=deadline)throw Error(`Movement revision ${expectedRevision} was not published`);
+   }
+  }
+  return samples;
+}
+
 test('records route transfer and map responsiveness against established budgets',async({page,request})=>{
  const begin=Date.now();await page.goto('./');
  await expect(page.locator('#main-menu')).toBeVisible();const coldUsableMs=Date.now()-begin;
@@ -659,18 +688,27 @@ test('records route transfer and map responsiveness against established budgets'
     document.querySelector<HTMLElement>('#dungeon-map')?.dataset.position===String(destination);
   },{revision:start.revision+i+1,destination,key:DUNGEON_KEYS.primary});
  }
- const frames=await page.evaluate(async({a,b})=>{
-   const idle:number[]=[],steps:number[]=[];
-   for(const [count,output] of [[30,idle],[40,steps]] as const){let previous=await new Promise<number>(r=>requestAnimationFrame(r));for(let i=0;i<count;i++){if(output===steps)document.querySelector<HTMLElement>(`#dungeon-map [data-cell="${i%2===0?b:a}"]`)!.click();const now=await new Promise<number>(r=>requestAnimationFrame(r));output.push((Math.round(now*1000)-Math.round(previous*1000))/1000);previous=now;}}
-   const p=(v:number[],q:number)=>[...v].sort((a,b)=>a-b)[Math.ceil(v.length*q)-1];return {idle,steps,idleP50:p(idle,.5),idleP95:p(idle,.95),stepP95:p(steps,.95)};
- },{a:f.position,b:neighbor});
+ const idle=await page.evaluate(async()=>{
+  const samples:number[]=[];
+  let previous=await new Promise<number>(resolve=>requestAnimationFrame(resolve));
+  for(let i=0;i<30;i++){
+   const now=await new Promise<number>(resolve=>requestAnimationFrame(resolve));
+   samples.push((Math.round(now*1000)-Math.round(previous*1000))/1000);
+   previous=now;
+  }
+  return samples;
+ });
+ const steps=await page.evaluate(acceptedMovementFrames,{first:f.position,second:neighbor,id:start.id,depth:start.depth,initialRevision:start.revision+20,acceptanceTimeoutMs});
+ const percentile=(values:number[],q:number)=>[...values].sort((a,b)=>a-b)[Math.ceil(values.length*q)-1];
+ const frames={idle,steps,idleP50:percentile(idle,.5),idleP95:percentile(idle,.95),stepP95:percentile(steps,.95)};
  await page.locator('#dungeon-art').selectOption('legacy-8bit');if(f.descriptor.biome==='desert-v1')await expect(page.locator('#dungeon-map-feedback')).toContainText('fallback');else await expect(page.locator('#dungeon-map-feedback')).not.toContainText('fallback');
  const resources=await page.evaluate(()=>performance.getEntriesByType('resource').map(e=>({name:e.name,encodedBodySize:(e as PerformanceResourceTiming).encodedBodySize})));
  const code=[];for(const r of resources.filter(r=>/\.(js|css)$/.test(r.name))){const response=await request.get(r.name),body=await response.body();code.push({url:new URL(r.name).pathname,raw:body.length,gzip:gzipSync(body).length});}
  timings.sort((a,b)=>a-b);const p95=timings[Math.ceil(timings.length*.95)-1],gzip=code.reduce((n,r)=>n+r.gzip,0),assets=resources.filter(r=>!r.name.match(/\.(js|css)$/)).reduce((n,r)=>n+r.encodedBodySize,0);
  const diagnostics=await page.evaluate(()=>window.fitDiagnostics()),saveBytes=utf8Bytes((await page.evaluate(key=>localStorage.getItem(key),DUNGEON_KEYS.primary))??'');
  const receipt={frames,frameBudgets:{idleP50:16.7,idleP95:20,stepP95:33.4},framePasses:{idleP50:frames.idleP50<=16.7,idleP95:frames.idleP95<=20,stepP95:frames.stepP95<=33.4},commit:diagnostics.build.commit,dirty:diagnostics.build.dirty,viewport:diagnostics.viewport,userAgent:diagnostics.userAgent,floorCreationMs,descriptorBytes:utf8Bytes(canonical(f.descriptor)),saveBytes,coldUsableMs,stepP95Ms:p95,codeGzipBytes:gzip,observedAssetBytes:assets,budgets:{coldUsableMs:2500,stepP95Ms:33.4,codeGzipBytes:400000,assetBytes:1500000},passes:{cold:coldUsableMs<=2500,step:p95<=33.4,code:gzip<=400000,assets:assets<=1500000},code,timings,resources};
- writeFileSync(test.info().outputPath('exploration-performance.json'),JSON.stringify(receipt,null,2));expect(timings).toHaveLength(20);expect((await dungeonSnapshot(page)).floors[0].position).toBe(f.position);
+ writeFileSync(test.info().outputPath('exploration-performance.json'),JSON.stringify(receipt,null,2));expect(timings).toHaveLength(20);const stepped=await dungeonSnapshot(page);
+ expect(stepped.floors[0].position).toBe(f.position);expect(stepped.revision).toBe(start.revision+60);
  expect.soft(coldUsableMs,'Cold exploration readiness').toBeLessThanOrEqual(2500);
  expect.soft(p95,'Synchronous exploration step P95').toBeLessThanOrEqual(33.4);
  expect.soft(gzip,'Compressed exploration route code').toBeLessThanOrEqual(400000);
@@ -1306,31 +1344,7 @@ test('warm maximum-size floor step responsiveness meets the established budget a
   await expect.poll(async()=>{const current=await dungeonSnapshot(page);return {id:current.id,depth:current.depth,phase:current.phase,revision:current.revision,position:current.floors[4].position};})
    .toEqual({id:adopted.id,depth:5,phase:'ready',revision:adopted.revision+i+1,position:destination});
  }
- const acceptanceTimeoutMs=5000;
- const frames=await page.evaluate(async({a,b,id,initialRevision,acceptanceTimeoutMs})=>{
-  const samples:number[]=[];
-  const nextFrame=(deadline:number)=>new Promise<number>((resolve,reject)=>{
-   let frame=0;
-   const timer=setTimeout(()=>{cancelAnimationFrame(frame);reject(Error('Timed out waiting for an accepted movement frame'));},Math.max(0,deadline-performance.now()));
-   frame=requestAnimationFrame(now=>{clearTimeout(timer);resolve(now);});
-  });
-  let previous=await nextFrame(performance.now()+acceptanceTimeoutMs);
-  for(let i=0;i<40;i++){
-   const destination=i%2===0?b:a,expectedRevision=initialRevision+i+1;
-   const deadline=performance.now()+acceptanceTimeoutMs;
-   document.querySelector<HTMLElement>(`#dungeon-map [data-cell="${destination}"]`)!.click();
-   for(;;){
-    const now=await nextFrame(deadline);
-    samples.push((Math.round(now*1000)-Math.round(previous*1000))/1000);previous=now;
-    const current=JSON.parse(document.querySelector<HTMLElement>('#game')!.dataset.dungeonSnapshot!) as DungeonState;
-    if(current.id!==id||current.depth!==5||current.phase!=='ready'||current.revision>expectedRevision)
-     throw Error('Unexpected dungeon boundary while measuring accepted movement');
-    if(current.revision===expectedRevision&&current.floors[4].position===destination)break;
-    if(performance.now()>=deadline)throw Error(`Movement revision ${expectedRevision} was not published`);
-   }
-  }
-  return samples;
- },{a:first,b:second,id:adopted.id,initialRevision:adopted.revision+20,acceptanceTimeoutMs});
+ const frames=await page.evaluate(acceptedMovementFrames,{first,second,id:adopted.id,depth:adopted.depth,initialRevision:adopted.revision+20,acceptanceTimeoutMs});
  const percentile=(values:number[],q:number)=>[...values].sort((a,b)=>a-b)[Math.ceil(values.length*q)-1];
  const p95=percentile(times,.95),frameP95=percentile(frames,.95),stepped=await dungeonSnapshot(page);
  const after={canvas:await canvasIdentity(),grid:await visibleGrid()};

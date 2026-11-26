@@ -370,6 +370,15 @@ test('parallel pilot requires passing case overlap beyond the measured clock unc
   const webkit = receipt('pilot-webkit', 1000);
   assert.equal(pilotOverlap([chromium, { ...webkit, attempt: 2 }]), 0);
   assert.equal(pilotOverlap([chromium, { ...webkit, clock: {} }]), 0);
+
+  // Only the last pair overlaps across these 160,000 candidate pairs.
+  const manyCases = (batchId, offset) => {
+    const report = receipt(batchId, offset);
+    const tests = report.stages[0].summary.tests;
+    report.stages[0].summary.tests = Array(399).fill(tests[0]).concat(receipt(batchId, 3000).stages[0].summary.tests);
+    return report;
+  };
+  assert.equal(pilotOverlap([manyCases('pilot-chromium', -3000), manyCases('pilot-webkit', 9000)]), 3000);
 });
 
 test('workflow defaults to serial and pins the manual pilot to distinct per-VM locks', () => {

@@ -222,11 +222,16 @@ export function pilotOverlap(receipts, ids = Object.keys(pilotRunners)) {
   const webkit = receipts.find(report => report.batchId === ids[1]);
   if (chromium?.attempt !== webkit?.attempt) return 0;
   const webkitCases = pilotIntervals(webkit);
-  return Math.max(0, ...pilotIntervals(chromium).flatMap(left => webkitCases.map(right => Math.min(
-    left.end - left.start, right.end - right.start,
-    left.end + left.minOffset - (right.start + right.maxOffset),
-    right.end + right.minOffset - (left.start + left.maxOffset),
-  ))));
+  let maximum = 0;
+  for (const left of pilotIntervals(chromium)) {
+    for (const right of webkitCases) {
+      const overlap = Math.min(left.end - left.start, right.end - right.start,
+        left.end + left.minOffset - (right.start + right.maxOffset),
+        right.end + right.minOffset - (left.start + left.maxOffset));
+      maximum = Math.max(maximum, overlap);
+    }
+  }
+  return maximum;
 }
 
 function receipt(plan, id) {
