@@ -974,13 +974,6 @@ test('legal guardian reward, travel reload, backtracking and isolated saves', { 
  const s=await snapshot(page),result=dispatch(f.snapshot.activeBattle!,f.command,dungeonBattle(f.snapshot)!.catalog);expect(result.ok).toBe(true);
  if(result.ok){const expected=acceptDungeonBattle(f.snapshot,result.state);expect(expected.ok).toBe(true);if(expected.ok){expect(s).toEqual({...expected.state,stats:expect.objectContaining({coverage:'since-upgrade',enemiesKilled:1,movesTaken:0})});expect(s.stats?.boundary).toEqual({battle:slot,command:result.state.commandCount});}}
  const rewards=page.getByRole('region',{name:'Rewards',exact:true});
- await expect(rewards).toBeVisible();
- const exportName = 'Export last battle log';
- await expect(page.getByRole('button',{name:exportName,exact:true})).toBeVisible();
- const terminalLog = await downloadCombatLog(page,button=>isMobile?button.tap():button.press('Enter'),exportName);
- expect(terminalLog.groups.at(-1)?.entries.at(-1)).toMatchObject({
-   type:'battleEnded', result:{outcome:'playerWin'}, text:'Victory',
- });
  const progress=page.locator('#dungeon-encounter-progress'),stairs=page.locator('#dungeon-stair-descend');
  const status=page.locator('.dungeon-status');
  await expect(progress).toHaveText(`Encounters: ${slot+1} / 3 cleared`);
@@ -988,6 +981,11 @@ test('legal guardian reward, travel reload, backtracking and isolated saves', { 
  await expect(page.locator('#dungeon-stair-ascend')).toHaveText('Upstairs: unavailable on floor 1');
  await expect(rewards).toBeInViewport({ratio:1});
  await expect(status).toContainText('Dungeon saved on this device');
+ const exportName = 'Export last battle log';
+ const terminalLog = await downloadCombatLog(page,button=>isMobile?button.tap():button.press('Enter'),exportName);
+ expect(terminalLog.groups.at(-1)?.entries.at(-1)).toMatchObject({
+   type:'battleEnded', result:{outcome:'playerWin'}, text:'Victory',
+ });
  await page.reload();await expectDungeonResumed(page);expectSameProgress(await snapshot(page),s);
  await expect(page.getByRole('button',{name:exportName,exact:true})).toHaveCount(0);
  await expect(progress).toHaveText(`Encounters: ${slot+1} / 3 cleared`);
