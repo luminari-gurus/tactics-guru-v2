@@ -2,7 +2,7 @@ import { assert, expect, it, vi } from 'vitest';
 import { dungeonBattleCatalog, dungeonEncounterCatalog, dungeonEncounterCatalogIdentity, hobgoblinDungeonBattleCatalog, hobgoblinDungeonEncounterCatalog, readDungeonEncounterCatalog, ENCOUNTER_KINDS } from '../../src/content/dungeonEncounters';
 import { desertRunCatalog } from '../../src/content/desertCatalog';
 import { CONTENT_BOUNDS, ENEMY_IDS, HERO_IDS } from '../../src/content/constants';
-import { ENDLESS_SCALING_POLICY, PARTY_SCALING_POLICY, EXPANDED_ENCOUNTER_POLICY, FULL_BIOME_ENCOUNTER_POLICY, dungeonBiome, encounterBattleCatalog, readDungeonEncounterSelection, encounterSelectionSeed, projectDungeonEnemies, scaleEnemyStat, selectDungeonEncounter } from '../../src/domain/dungeonEncounters';
+import { ENDLESS_SCALING_POLICY, ENEMY_SCALING_POLICY, PARTY_SCALING_POLICY, EXPANDED_ENCOUNTER_POLICY, FULL_BIOME_ENCOUNTER_POLICY, dungeonBiome, encounterBattleCatalog, readDungeonEncounterSelection, encounterSelectionSeed, projectDungeonEnemies, scaleEnemyStat, selectDungeonEncounter } from '../../src/domain/dungeonEncounters';
 import { resolveBattlefield, layoutSeed } from '../../src/domain/battlefield';
 import { createBattle } from '../../src/domain/turns';
 import * as encounterRules from '../../src/domain/dungeonEncounters';
@@ -233,6 +233,20 @@ it.each([
   const selection = selectDungeonEncounter(0, 1, 0, policy);
   expect(readDungeonEncounterSelection({ ...selection, catalogIdentity: dungeonEncounterCatalogIdentity() },
     1, 0, selection.biome, policy)).toBeNull();
+});
+
+it('requires endless scaling in v3 saves', () => {
+  const state = freshDungeon('v3-scaling-policy', 17, FULL_BIOME_ENCOUNTER_POLICY, true);
+  const floor = state.floors[0];
+  for (const [slot, plan] of floor.descriptor.encounters.entries()) {
+    const { selection } = plan;
+    assert(selection.policy === FULL_BIOME_ENCOUNTER_POLICY);
+    expect(selection.scalingPolicy).toBe(ENDLESS_SCALING_POLICY);
+    for (const scalingPolicy of [ENEMY_SCALING_POLICY, PARTY_SCALING_POLICY]) {
+      const edited = { ...selection, scalingPolicy };
+      expect(readDungeonEncounterSelection(edited, 1, slot, selection.biome, selection.policy)).toBeNull();
+    }
+  }
 });
 
 it('paces fresh expanded enemies against guaranteed floor XP and preserves saved projections', () => {

@@ -71,7 +71,12 @@ export function readDungeonEncounterSelection(input: unknown, depth: number, slo
   const expanded = policy === DUNGEON_ENCOUNTER_POLICY ? undefined : expandedPolicies[policy];
   if (!hasShape(input, ['policy', 'catalogIdentity', 'biome', 'kind', 'depth', 'poolId', 'mapId', 'compositionId', 'bossId', 'scalingPolicy', 'encounter']) ||
     input.policy !== policy || input.depth !== depth || input.biome !== biome ||
-    (input.scalingPolicy !== ENEMY_SCALING_POLICY && !(expanded && (input.scalingPolicy === PARTY_SCALING_POLICY || input.scalingPolicy === ENDLESS_SCALING_POLICY))) || (slot === 0 ? input.kind !== 'normal' : slot === 2 ? input.kind !== 'boss' : !['elite', 'vault'].includes(input.kind as string))) return null;
+    (slot === 0 ? input.kind !== 'normal' : slot === 2 ? input.kind !== 'boss' : !['elite', 'vault'].includes(input.kind as string))) return null;
+  const { scalingPolicy } = input;
+  if (policy === FULL_BIOME_ENCOUNTER_POLICY
+    ? scalingPolicy !== ENDLESS_SCALING_POLICY
+    : scalingPolicy !== ENEMY_SCALING_POLICY &&
+      !(expanded && (scalingPolicy === PARTY_SCALING_POLICY || scalingPolicy === ENDLESS_SCALING_POLICY))) return null;
   const hasHobgoblins = !expanded && input.catalogIdentity === hobgoblinEncounterIdentity;
   const catalogIdentity = expanded?.identity ?? (hasHobgoblins ? hobgoblinEncounterIdentity : dungeonEncounterIdentity);
   if (input.catalogIdentity !== catalogIdentity) return null;
@@ -87,7 +92,7 @@ export function readDungeonEncounterSelection(input: unknown, depth: number, slo
   if (input.poolId !== pool.id || input.bossId !== (boss?.id ?? null) || !map || !composition || !map.compositionIds.includes(composition.id)) return null;
   const expected: DungeonEncounterSelection = { policy, catalogIdentity, biome: definition.id,
     kind: input.kind as EncounterKind, depth, poolId: pool.id, mapId: map.id, compositionId: composition.id, bossId: boss?.id ?? null,
-    scalingPolicy: input.scalingPolicy as ScalingPolicy, encounter: { id: `encounter:${map.id}`, source: { ...map.source }, roster: composition.roster.map(s => ({ ...s })) } };
+    scalingPolicy: scalingPolicy as ScalingPolicy, encounter: { id: `encounter:${map.id}`, source: { ...map.source }, roster: composition.roster.map(s => ({ ...s })) } };
   const content = expanded?.content ?? (hasHobgoblins ? hobgoblinDungeonBattleCatalog : dungeonBattleCatalog);
   return readBattlefieldEncounter(input.encounter, content).ok && canonical(input) === canonical(expected) ? expected : null;
 }
