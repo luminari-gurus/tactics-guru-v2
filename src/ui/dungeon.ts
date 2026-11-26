@@ -274,6 +274,7 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
     after.append(button('Start new dungeon',actions.restart,false,'dungeon-restart'));
     const nav=el('nav');for(const [path,label] of [['run','Three-battle scenario'],['battle','Single battle'],['map','Map prototype']]){const a=el('a',label);a.href=`${import.meta.env.BASE_URL}${path}`;a.id=`dungeon-link-${path}`;nav.append(a);}after.append(nav);
   }
+  mapView.fitPendingViewport();
   if (active && focusId && (document.activeElement !== active || active.matches(':disabled'))) {
     const target = root.querySelector<HTMLElement>(`#${CSS.escape(focusId)}`);
     const focusTarget = target && !target.matches(':disabled') ? target : root.querySelector<HTMLElement>('#dungeon-map');

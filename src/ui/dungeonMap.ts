@@ -198,6 +198,13 @@ export class DungeonMap {
     if (this.lootStatus.textContent !== lootStatus) this.lootStatus.textContent = lootStatus;
     this.state = state; this.map = map; this.draw(); this.scheduleLayout(moved, refit);
   }
+  /** Establish the map height after the surrounding HUD mounts, before controls can take focus. */
+  fitPendingViewport() {
+    if (this.layoutDirty && this.root.isConnected) {
+      this.layoutDirty = false;
+      this.fitViewport();
+    }
+  }
   /** Fit controls to the visible screen; scroll only the map window when following movement. */
   private scheduleLayout(reveal: boolean, refit = false) {
     this.revealPlayerX ||= reveal;
