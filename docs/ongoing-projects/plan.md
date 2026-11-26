@@ -1,62 +1,42 @@
-# Issue #483 — Repair the dungeon counter migration browser assertion
+# Issue #404 — Combat log filters and Hide
 
-- Issue [#483](https://github.com/luminari-gurus/tactics-guru-v2/issues/483), claimed by [@moshehbenavraham](https://github.com/moshehbenavraham) in the [issue comment](https://github.com/luminari-gurus/tactics-guru-v2/issues/483#issuecomment-7126376882)
-- Implementation [PR #486](https://github.com/luminari-gurus/tactics-guru-v2/pull/486) from `branch/issue-483-dungeon-counter-migration`
-- Planning base `960eb8d3ef594d4fc93e40ae04d53b7bf75bc5b2` on `main`, reviewed November 24, 2026 (Asia/Jerusalem)
-- Previous handoff [#482 radial battle controls](issue-482-radial-controls-regressions-plan.md)
-- OpenSpec [issue-483-dungeon-counter-migration](../../openspec/changes/issue-483-dungeon-counter-migration/proposal.md)
+- [GitHub issue #404](https://github.com/luminari-gurus/tactics-guru-v2/issues/404) · [claim](https://github.com/luminari-gurus/tactics-guru-v2/issues/404#issuecomment-7188578414)
+- Branch `branch/issue-404-combat-log-filters` · planning base `153fb6dfed965769459c031f549d90b486654640` · November 26, 2026 (Asia/Jerusalem)
+- [Previous handoff for #483](issue-483-dungeon-counter-migration-plan.md)
 
-## Implementation status
+## Outcome
 
-Implementation authorized November 24, 2026, including OpenSpec tracking. The published planning branch was clean at `8e73e851` and has incorporated `main` at `1a4b0af1`. The intervening changes cover matched-batch tooling and leave the affected migration and browser inputs identical to the planning base. A Linux verification checkout and reports are under `/home/aiwithapex/projects/tactics-483-verification.giz3lM` in WSL Ubuntu. The baseline runs on the literal planning base.
+During battle, players can open Battle log, choose **All**, **Actions**, **Damage & Healing**, or **Status & Saves**, then hide and reopen the log. Switching back to All displays the same history in the same order. Hide and Escape return focus through the existing dialog path and leave the battle in its prior state. The log opens on All.
 
-The baseline root preview at `960eb8d3` built on Node `24.15.0` with the locked Playwright `1.64.1`. Discovery selected exactly the two WebKit cases. Both failed at the expected assertion with 13 expected and 17 received, one worker and zero retries. `base-webkit.json` and `base-webkit-artifacts/` retain the two failures. The sorted distribution file-manifest digest is `00f6eb16dfa505e729c661e4664b5b5ad0692d84e57b6d3657449235ebe994fd`.
+The backlog review covered all 43 open issues and 15 open PRs, including issues without the `ready for work` label. This issue had a clear player-facing gap, a small implementation surface in the shared battle screen, and no overlapping branch or PR. Current main already has the pinned Rail controls relevant to #403 and the obstructed-enemy visibility fix relevant to #417. The separate grouping and export work belongs to [#179](https://github.com/luminari-gurus/tactics-guru-v2/issues/179).
 
-The two-file fix imports the existing format identifier and compares it to the saved envelope. Diff review confirmed the original fixture, legacy assertions, and production encoder and decoder logic are preserved. All three OpenSpec tasks are complete.
+## Implementation
 
-## Verification results
+1. Keep the existing event formatter and 40-entry cap in [BattleHud](../../src/ui/hud.ts). Store each visible entry as its `BattleEvent` type and formatted text. Preserve the initial turn header, append order, omitted initiative-roll lines and current battle-session lifetime. Classify by event type so follow-up grouping and export can consume the same ordered entries.
+2. Add a small `src/ui/battleLog.ts` module for the typed entry and filter view. **Actions** includes turn, movement, push, ability use, and battle-end lines. **Damage & Healing** includes attack outcomes, missile rolls, damage, defeats and healing. **Status & Saves** includes saving throws and status application, consumption and expiry. **All** displays every retained line. Give an empty filter a short empty-state message. The [legacy view](https://github.com/luminari-gurus/tactics-guru/blob/e9433f6b608ae6b2d95418615cce9cf17dadcf74/scripts/view/BattleView.gd#L2333-L2358) also filters the ordered history by category.
+3. In [BattleScene](../../src/phaser/BattleScene.ts), pass the filtered content to the existing native dialog through its supported DOM-content path. Use four toggle buttons styled as tabs with an announced selected state and the existing dialog keyboard cycle. Rename `#log-close` to **Hide** in visible copy, retaining its ID and existing release and focus callbacks. Keep the shared Rail/Radial launcher and make the filter row wrap with usable touch targets in [the battle stylesheet](../../src/style.css).
 
-The implementation at clean source `c1cb22cd2de7ebcbfaaa8b078f54e996fce4c43b` passed in WSL Ubuntu x86-64 with Node `24.15.0`, npm `12.0.2`, and Playwright `1.64.1` (Chromium `156.0.8078.4` and WebKit `27.2`). The literal fixture and lockfile matched the baseline. The ordinary PR command produced the root distribution used for both focused browser runs. Its sorted file-manifest SHA-256 was `6771259523fdc33ae60a621570a85e887aa865e00275ed36a311085ea61df8f0`.
+### Ablation decisions
 
-- `npm run test:unit -- tests/unit/dungeon.test.ts` passed all 131 cases. Output is in `dungeon-units.log`.
-- `npm run verify:pr` passed in 143.3 seconds. It covered tooling, 1,590 unit and content cases, both TypeScript scopes, two build integrations, the production bundle, and seven browser smoke journeys. The source-bound receipt is `checkout/verification-receipts/pr/1795517959739-2529883/summary.json` within the WSL evidence directory above.
-- Discovery and execution agreed for the migration case in `tests/main-menu.spec.ts`. WebKit portrait and landscape passed 2/2. Chromium desktop, mobile portrait, and mobile landscape passed 3/3. Both runs used one worker, zero retries, and emulated mobile profiles. The JSON reports and discovery lists are `final-webkit.json`, `final-chromium.json`, and `final-*-list.txt`.
-- `openspec validate issue-483-dungeon-counter-migration --strict` and `git diff --check` passed. Subsequent edits only updated the verification handoff, OpenSpec task, and historical links. The original #208 matched comparison remains recorded as failed.
+One bounded history supplies all four views. Filtering derives the displayed rows directly from retained entries, which preserves the cap and order. The existing formatter, dialog and HUD launcher already handle copy, focus, input locking, close/reopen and scene teardown. This increment stays in the presentation layer, so combat decisions, saves, replay and telemetry continue through their existing paths. Issue #179 owns round grouping, downloads and any longer-lived history.
 
-## Selection
+## Proof
 
-Reviewed all 42 open issues, including unlabeled items, five open PRs, active branch refs, and GitHub Projects visible to the authenticated account. No Projects were returned for the repository, organization, or account. #483 had no assignee, linked branch, implementation PR, or formal dependency. [#208](https://github.com/luminari-gurus/tactics-guru-v2/issues/208) and [PR #481](https://github.com/luminari-gurus/tactics-guru-v2/pull/481) reference the failure as part of their P1 verification work. The separate radial-control repair for the other six recorded failures, [PR #484](https://github.com/luminari-gurus/tactics-guru-v2/pull/484), is in the planning base.
-
-The [serial](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/45306223119) and [parallel](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/45306284527) receipts show the same counter case failing in WebKit portrait and landscape at `9fc9d44`, with zero retries. The issue records expected format 13 and observed format 17. The inspected migration, storage, test, fixture, package and WebKit config paths are identical between that head and the planning base. This is the smallest verified repair that removes a known obstacle to rerunning the matched comparison. A new green comparison and the full verification timing target remain with #208.
-
-## Outcome and implementation
-
-Make the existing [browser migration case](../../tests/main-menu.spec.ts#L735) assert the canonical envelope format for the fresh dungeon written after accepting replacement. The old save is read and recorded during that journey. The envelope check at the end is for the newly created dungeon.
-
-1. The [dungeon session replacement](../../src/app/DungeonSession.ts#L375) calls `freshDungeon` with tracking enabled. [Fresh exploration](../../src/domain/exploration.ts#L62) goes through `visit`, which sets wall sight. [The encoder](../../src/domain/dungeonSaveEnvelope.ts#L38) therefore uses `WALL_SIGHT_STATS_SAVE_FORMAT` (17) before any active encounter-entry or ground-loot state exists. Export that existing named constant from `src/domain/dungeonSaveEnvelope.ts`. Keep its value and encoder/decoder behavior intact.
-2. Add the constant to the existing envelope import in `tests/main-menu.spec.ts` and use it for the new primary save’s exact format assertion. Keep the literal [format-12 counter fixture](../../tests/fixtures/saves/issue-270/counter-dungeon-v1.json), byte-for-byte startup checks for both slots, and old/new identity checks. Retain the assertions for preserved kill and move counts, partial legacy time, the old record and counter bests, exclusion from the playtime best, and whole-run time coverage in the new save.
-
-## Ablation and scope
-
-Reuse the one named format definition and the existing browser journey. The envelope assertion checks which format the browser persisted. Simply decoding any supported format would lose that check. Exporting the existing constant avoids a second format literal or a helper. The [dungeon unit tests](../../tests/unit/dungeon.test.ts) still independently pin formats 12, 13, and 17 for their respective states. OpenSpec tracks the two-file implementation with `skip_specs: true` because the acceptance contract and application behavior are unchanged.
-
-## Proof for the implementation PR
-
-1. Preserve the historical failures above. Use a root production preview of the literal planning base with one worker and zero retries to confirm that both WebKit profiles reach the stale assertion. If the base fails earlier, retain that report and diagnose the difference before attributing it. Use the same fixture, dependencies, browser versions and conditions for the final comparison.
-2. Run the existing dungeon units and ordinary PR verification on the final fix. The unit file covers reading the literal counter-only save, preserving partial time, and writing the applicable legacy and wall-sight formats. The PR tier covers both type scopes, the production build and the routine smoke journeys. Run the focused Playwright case against that final root build. Add `--list` to each Playwright command first to verify exactly two WebKit and three Chromium profile/case IDs. Both WebKit orientations and both Chromium mobile orientations are emulated.
+- Add a focused unit case for event classification, including attack misses, healing, status expiry, and an ordered mixed list. Check that each filter is a read-only projection and All preserves the order.
+- Add one focused case to [tests/dungeon.spec.ts](../../tests/dungeon.spec.ts) titled `battle log filters and keeps history across Hide and reopen`. Reuse the seeded Shaman encounter and legal commands used by the existing Shaman journey to generate mixed history. Assert the exact retained lines on All before and after switching filters, matching and excluded lines for each category, and a meaningful empty state. Exercise keyboard activation, Escape and focus return on desktop, and actual taps in portrait and landscape. Verify the log closes and reopens in the same encounter without spending an action, and that a narrow or resized viewport keeps the controls reachable. Use the existing Battle tools disclosure helper so the journey follows the active layout.
+- Run the existing Shaman production case as a companion check for human-readable saves and the stable close hook. Run the focused case across Chromium and WebKit configurations before preparing the implementation PR. Use [the verification policy](../verification-policy.md) to record the final commit, served build, projects, test IDs, results and any failures. Playwright device emulation covers the device requirement.
 
 ~~~sh
-npm run test:unit -- tests/unit/dungeon.test.ts
+npm run test:unit -- tests/unit/battleLog.test.ts
 npm run verify:pr
-
-case_name='counter-only dungeon upgrades known counters without inventing complete playtime'
-npx --no-install playwright test -c playwright.device-acceptance.config.ts tests/main-menu.spec.ts -g "$case_name" --workers=1 --retries=0
-npx --no-install playwright test -c playwright.regression.config.ts tests/main-menu.spec.ts -g "$case_name" --workers=1 --retries=0
+npx --no-install playwright test -c playwright.regression.config.ts tests/dungeon.spec.ts -g 'battle log filters and keeps history across Hide and reopen'
+npx --no-install playwright test -c playwright.exploration.config.ts tests/dungeon.spec.ts -g 'battle log filters and keeps history across Hide and reopen'
+npx --no-install playwright test -c playwright.extended.config.ts tests/dungeon.spec.ts --project=desktop -g 'Shaman production journey'
 git diff --check
 ~~~
 
-3. Retain final reports and failures with commit, build, profile and test IDs per the [verification policy](../verification-policy.md). Scope browser execution to the changed case and the ordinary PR tier. A focused pass leaves the original matched runs recorded as failed. Once all five profile/case combinations and the remaining checks pass, open one PR with `Closes #483` and `Refs #208`.
+Open one implementation PR with `Closes #404` after the acceptance checks pass. Reference #179 for the typed entry handoff.
 
 ## Estimate and open questions
 
-Allow 20–35 minutes for implementation, focused comparison, and ordinary PR checks with dependencies and browser binaries available. Any self-hosted CI queue adds elapsed time. There are no open product or design questions.
+Estimated Codex implementation and targeted verification time is **60–90 minutes** with dependencies and browser binaries available. Self-hosted CI queue time is additional. There are no blocking product questions. The first legal seed-189 sequence that produces the required mixed and empty filter states will be confirmed during implementation.
