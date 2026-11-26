@@ -446,9 +446,18 @@ function findReceipts(directory) {
 
 export function validateScheduling(plan, summary, scheduler) {
   const errors = [];
+  const latestJob = name => scheduler.jobs.filter(job => job.name === name).sort((left, right) => left.attempt - right.attempt).at(-1);
+  const tooling = plan.mode === 'parallel-full' ? latestJob('tooling') : undefined;
+  const toolingResult = tooling?.status === 'completed' ? tooling.conclusion : tooling?.status ?? 'missing';
+  const toolingFailed = plan.mode === 'parallel-full' && toolingResult !== 'success';
+  if (toolingFailed) errors.push(toolingFailure(toolingResult));
   for (const id of ['prepare', ...plan.requested]) {
     const name = id === 'prepare' ? 'prepare' : `batch (${id})`;
-    const latest = scheduler.jobs.filter(job => job.name === name).sort((left, right) => left.attempt - right.attempt).at(-1);
+    const latest = latestJob(name);
+    if (toolingFailed && id !== 'prepare' && latest?.conclusion === 'skipped') {
+      errors.push(`${id}: skipped; tooling prerequisite did not succeed`);
+      continue;
+    }
     const report = summary.latest?.find(receipt => receipt.batchId === id);
     const start = Date.parse(latest?.startedAt), end = Date.parse(latest?.completedAt);
     const receiptStart = Date.parse(report?.startedAt), receiptEnd = Date.parse(report?.finishedAt);
@@ -458,6 +467,10 @@ export function validateScheduling(plan, summary, scheduler) {
     }
   }
   return errors;
+}
+
+function toolingFailure(result) {
+  return `tooling: latest Actions job result was ${result || 'unknown'}; full browser shards require successful tooling`;
 }
 
 export function schedulingCompute(jobs) {
@@ -649,6 +662,8 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
     if (command !== 'aggregate') throw error;
     const out = resolve(outputArgument); mkdirSync(out, { recursive: true });
     const errors = ['Missing or invalid preparation plan: ' + String(error)];
+    const toolingResult = process.env.SERIAL_FULL_TOOLING_RESULT;
+    if (toolingResult && toolingResult !== 'success') errors.push(toolingFailure(toolingResult));
     const latest = [];
     try {
       const preparation = read(join(bundle, 'preparation/receipt.json'));

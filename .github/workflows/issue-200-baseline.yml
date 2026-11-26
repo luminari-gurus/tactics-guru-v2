@@ -295,7 +295,7 @@ jobs:
           if-no-files-found: warn
   aggregate:
     name: Serial verification aggregate
-    needs: [prepare, batch]
+    needs: [prepare, batch, tooling]
     if: always() && github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || (endsWith(inputs.mode, '-pair') && github.ref == 'refs/heads/work/issue-208-matched-pair') || (inputs.mode == 'parallel-full' && github.ref == 'refs/heads/work/208-full-parallel') || github.ref == 'refs/heads/work/issue-208-serial-batches' || ((inputs.mode == 'pilot' || inputs.mode == 'parallel-pilot') && github.ref == 'refs/heads/work/issue-208-parallel-pilot'))
     runs-on: [self-hosted, tactics-browser, "${{ (startsWith(inputs.mode, 'parallel-') || inputs.mode == 'serial-pair') && 'tactics-browser-01' || inputs.runner || 'tactics-browser-01' }}"]
     concurrency:
@@ -323,6 +323,7 @@ jobs:
         if: ${{ !cancelled() }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          SERIAL_FULL_TOOLING_RESULT: ${{ inputs.mode == 'parallel-full' && needs.tooling.result || '' }}
         run: node scripts/verification-batches.mjs aggregate verification-receipts/serial/bundle verification-receipts/serial/downloads verification-receipts/serial/aggregate
       - uses: actions/upload-artifact@v4
         if: always()
