@@ -1,3 +1,4 @@
+import { HEAL_GOBLIN_CAST_LIMIT } from '../src/domain/constants';
 import { EXPANDED_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
 import { dungeonContent } from '../src/content/dungeon';
 import { openSavedDungeon, walkDungeon, acceptedDungeonSnapshot, settledDungeonSnapshot, expectSameProgress, reenterDungeonStair, expectDungeonResumed, openDungeonInventory, collectDungeonEncounterLoot } from './helpers/dungeonTraversal';
@@ -856,7 +857,7 @@ test('Shaman production journey uses Hex and ally healing, reloads Weakened and 
  await (await battleTool(page, '#battle-party')).click();await page.locator('#inspect-unit-6').click();
  await expect(page.getByRole('dialog')).toContainText('Weakening Hex range 2–4');
  await expect(page.getByRole('dialog')).toContainText('Heal Goblin range 1–4');
- await expect(page.getByRole('dialog')).toContainText('Heal Goblin: 2/2 casts remaining');
+ await expect(page.getByRole('dialog')).toContainText(`Heal Goblin: ${HEAL_GOBLIN_CAST_LIMIT}/${HEAL_GOBLIN_CAST_LIMIT} casts remaining`);
  await expect(page.getByRole('dialog')).toContainText('Fighter #1 50%');
  await expect(page.getByRole('dialog')).toContainText('Ranger #2 45%');
  await expect(page.getByRole('dialog')).toContainText('Mage #3 55%');
@@ -864,7 +865,7 @@ test('Shaman production journey uses Hex and ally healing, reloads Weakened and 
  const inspectCasts = async (remaining: number, screenshot: string) => {
   await (await battleTool(page, '#battle-party')).click();
   await page.locator('#inspect-unit-6').click();
-  await expect(page.getByRole('dialog')).toContainText(`Heal Goblin: ${remaining}/2 casts remaining`);
+  await expect(page.getByRole('dialog')).toContainText(`Heal Goblin: ${remaining}/${HEAL_GOBLIN_CAST_LIMIT} casts remaining`);
   await page.screenshot({ path: info.outputPath(screenshot) });
   await page.locator('#inspection-close').click();
  };
@@ -911,7 +912,7 @@ test('Shaman production journey uses Hex and ally healing, reloads Weakened and 
    await inspectCasts(0, 'shaman-casts-exhausted.png');
    inspectedExhaustion = true;
   }
-  await playCommand(page,playerDecision(before.state,catalog));
+  await playCommand(page,playerDecision(before.state,catalog),before.state);
   await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||(await readSession(page)).state.commandCount>before.state.commandCount;}).toBe(true);
  }
  expect({ reloadedWeakened, reloadedAtOneCast, inspectedExhaustion }).toEqual({

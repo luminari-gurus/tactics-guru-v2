@@ -12,4 +12,4 @@ The existing [Shaman combat contract](../issue-166-goblin-shaman/specs/shaman-co
 
 ## Compatibility
 
-Capture a real pre-change save and replay and verify both against the final implementation. Clients from before #476 reject a capped active snapshot under their exact-shape reader. See the [handoff](../../../docs/ongoing-projects/plan.md) for proof and commands.
+Capture a real pre-change save and replay and verify both against the final implementation. Clients from before #476 reject a capped active snapshot under their exact-shape reader. See the [handoff](../../../docs/ongoing-projects/issue-476-heal-goblin-cap-plan.md) for proof and commands.
