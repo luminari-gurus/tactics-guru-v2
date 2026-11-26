@@ -1,10 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { canDistributeBuild, definitions, createPlan, discover, exactCoverage, matchedCaseDigests, inventory, verifyBuild, runRows, aggregate, preparationIds, validateBrowserResult, validatePerformanceResult, validateScheduling, schedulingCompute, timingReport, quarantineCleanup, pilotOverlap, samplePilotClock, awaitPilotRunners } from '../../scripts/verification-batches.mjs';
+import { canDistributeBuild, definitions, createPlan, discover, exactCoverage, matchedCaseDigests, inventory, packParallelBuild, restorePublicBuildFiles, verifyBuild, runRows, aggregate, preparationIds, validateBrowserResult, validatePerformanceResult, validateScheduling, schedulingCompute, timingReport, quarantineCleanup, pilotOverlap, samplePilotClock, awaitPilotRunners } from '../../scripts/verification-batches.mjs';
 import { digest, compareReports } from '../../scripts/verification-report.mjs';
 import { stages } from '../../scripts/verification-timings.mjs';
 
@@ -108,6 +108,34 @@ test('artifact validation rejects altered files, missing files, wrong source and
     rmSync(join(directory, 'index.html'));
     assert.throws(() => verifyBuild(plan, build, directory, source), /hash mismatch/);
   } finally { rmSync(directory, { recursive: true, force: true }); }
+});
+
+test('parallel transfer restores only identical public assets and verifies every resulting byte', () => {
+  const root = mkdtempSync(join(tmpdir(), 'tg-parallel-transfer-'));
+  try {
+    const dist = join(root, 'dist'), assets = join(root, 'public'), packed = join(root, 'packed');
+    for (const dir of [dist, assets]) mkdirSync(join(dir, 'art'), { recursive: true });
+    for (const dir of [dist, assets]) writeFileSync(join(dir, 'art', 'shared.png'), 'shared');
+    writeFileSync(join(assets, 'unused'), 'checkout only');
+    writeFileSync(join(assets, 'index.html'), 'original');
+    writeFileSync(join(dist, 'index.html'), 'generated');
+    const source = { commit: 'abc', inputHash: 'inputs' };
+    const plan = { source }; plan.planHash = digest(JSON.stringify(plan));
+    const files = inventory(dist);
+    const build = { source, files, planHash: plan.planHash, hash: digest(JSON.stringify(files)) };
+    const omitted = packParallelBuild(dist, assets, packed, files);
+    assert.deepEqual(omitted, ['art/shared.png']);
+    assert.deepEqual(inventory(packed).map(file => file.path), ['index.html']);
+    restorePublicBuildFiles(packed, assets, omitted);
+    verifyBuild(plan, build, packed, source);
+    writeFileSync(join(packed, 'art', 'shared.png'), 'damaged');
+    restorePublicBuildFiles(packed, assets, omitted);
+    assert.throws(() => verifyBuild(plan, build, packed, source), /hash mismatch/);
+    rmSync(join(packed, 'art', 'shared.png'));
+    writeFileSync(join(assets, 'art', 'shared.png'), 'different checkout bytes');
+    restorePublicBuildFiles(packed, assets, omitted);
+    assert.throws(() => verifyBuild(plan, build, packed, source), /hash mismatch/);
+  } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
 test('failed prerequisites block only consumers; prefix failure still restores root', async () => {

@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process';
 import { appendFileSync, closeSync, cpSync, existsSync, mkdirSync, openSync, readFileSync, readdirSync, unlinkSync, writeFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import os from 'node:os';
 import { setTimeout as delay } from 'node:timers/promises';
@@ -114,6 +114,37 @@ export function inventory(directory) {
     return entry.isDirectory() ? inventory(path).map(file => ({ ...file, path: entry.name + '/' + file.path }))
       : [{ path: entry.name, sha256: digest(readFileSync(path)) }];
   });
+}
+
+// Match both path and bytes so generated overrides of public files still travel with the build.
+export function packParallelBuild(directory, publicDir, packed, files) {
+  const originals = new Map(inventory(publicDir).map(file => [file.path, file.sha256]));
+  const fromPublic = [];
+  mkdirSync(packed, { recursive: true });
+  for (const file of files) {
+    if (originals.get(file.path) === file.sha256) {
+      fromPublic.push(file.path);
+    } else {
+      cpSync(join(directory, file.path), join(packed, file.path));
+    }
+  }
+  return fromPublic;
+}
+
+export function restorePublicBuildFiles(directory, publicDir, fromPublic) {
+  // Older complete artifacts carry every byte. Repeated readiness checks can reuse restored files.
+  if (!fromPublic?.length) return;
+  const missing = new Set(fromPublic);
+  for (const file of inventory(directory)) missing.delete(file.path);
+  if (!missing.size) return;
+  // Walk local source paths, never use an artifact-supplied path as a copy destination.
+  for (const file of inventory(publicDir)) {
+    if (!missing.delete(file.path)) continue;
+    const target = join(directory, file.path);
+    mkdirSync(dirname(target), { recursive: true });
+    cpSync(join(publicDir, file.path), target);
+  }
+  invariant(!missing.size, 'Missing public build input');
 }
 
 export function verifyBuild(plan, build, directory, source) {
@@ -533,10 +564,13 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
       ...(parallelRunner(plan, { batchId: id }) ? { runner: parallelRunner(plan, { batchId: id }).replace('unraid-tactics-', 'tactics-browser-') } : {}) })) })}\n`);
     const report = await runReceipt(plan, 'prepare', stages.filter(stage => plan.preparationIds.includes(stage.id)), [], join(bundle, 'preparation'));
     if (!canDistributeBuild(plan.mode, report)) return 1;
-    cpSync(join(root, 'dist'), join(bundle, 'dist'), { recursive: true });
-    const files = inventory(join(bundle, 'dist'));
+    const directory = join(root, 'dist'), packed = join(bundle, 'dist');
+    const files = inventory(directory);
+    let fromPublic;
+    if (plan.mode === 'parallel-full') fromPublic = packParallelBuild(directory, join(root, 'public'), packed, files);
+    else cpSync(directory, packed, { recursive: true });
     invariant(files.some(file => file.path === 'index.html'), 'Missing built index.html');
-    save(join(bundle, 'build.json'), { source: plan.source, planHash: plan.planHash, files, hash: digest(JSON.stringify(files)) });
+    save(join(bundle, 'build.json'), { source: plan.source, planHash: plan.planHash, files, fromPublic, hash: digest(JSON.stringify(files)) });
     return 0;
   }
   let plan;
@@ -560,7 +594,12 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
     invariant(plan.planHash === digest(JSON.stringify({ ...plan, planHash: undefined })), 'Invalid plan hash');
     invariant(source.commit === plan.source.commit && source.inputHash === plan.source.inputHash, 'Source differs from preparation');
     if (isPair(plan.mode) || plan.mode === 'parallel-full') invariant(build, 'Matched batches require a verified production build');
-    if (build) verifyBuild(plan, build, join(bundle, 'dist'), source);
+    if (build) {
+      if (command === 'ready' && plan.mode === 'parallel-full') {
+        restorePublicBuildFiles(join(bundle, 'dist'), join(root, 'public'), build.fromPublic);
+      }
+      verifyBuild(plan, build, join(bundle, 'dist'), source);
+    }
     const sampleClock = isParallel(plan.mode) ? pilotClockSampler() : undefined;
     if (command === 'ready') {
       const ready = receipt(plan, batchId);

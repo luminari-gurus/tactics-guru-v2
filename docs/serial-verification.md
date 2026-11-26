@@ -14,6 +14,9 @@ The manual `issue-200-baseline.yml` workflow has six modes:
   same pair of VMs. See [Matched two-runner comparison](#matched-two-runner-comparison-208).
 - `parallel-full` runs the full manifest on two isolated runners. VM 01 builds
   the root artifact and measures performance before releasing either browser job.
+  The build artifact lists byte-identical checkout assets in `build.json` under
+  `fromPublic`. Each runner restores those files from `public/` and verifies the
+  SHA-256 manifest for the complete build before running the browser checks.
   VM 01 then runs Chromium while VM 02 runs WebKit and the asset checks, including
   the prefix rebuild and root restoration. Each browser uses one worker. The
   aggregate checks the complete case list, build identity, overlap and performance
