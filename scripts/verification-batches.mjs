@@ -538,24 +538,97 @@ function pilotClockSampler() {
   });
 }
 
+async function runArtifacts(name) {
+  const { GITHUB_API_URL, GITHUB_REPOSITORY, GITHUB_RUN_ID, GITHUB_TOKEN } = process.env;
+  invariant(GITHUB_API_URL && GITHUB_REPOSITORY && GITHUB_RUN_ID && GITHUB_TOKEN, 'Artifact lookup requires Actions run identity and read access');
+  const url = new URL(`${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts`);
+  url.searchParams.set('name', name);
+  const response = await fetch(url, {
+    headers: { Authorization: `Bearer ${GITHUB_TOKEN}`, Accept: 'application/vnd.github+json' },
+    signal: AbortSignal.timeout(10000),
+  });
+  invariant(response.ok, `Actions artifact listing failed: HTTP ${response.status}`);
+  return (await response.json()).artifacts;
+}
+
+export function bindFullDiscovery(discovery, preparation) {
+  const { planHash, ...discovered } = discovery;
+  invariant(discovered.mode === 'parallel-full' && planHash === digest(JSON.stringify(discovered)), 'Invalid full discovery plan');
+  invariant(!discovered.source.dirty && !preparation.source.dirty &&
+    discovered.source.commit === preparation.source.commit && discovered.source.inputHash === preparation.source.inputHash,
+  'Discovery source differs from preparation');
+  for (const field of ['node', 'platform', 'arch', 'versions']) {
+    invariant(JSON.stringify(discovered.environment[field]) === JSON.stringify(preparation.environment[field]), `Discovery ${field} differs from preparation`);
+  }
+  const cases = new Map(discovered.canonical.map(stage => [stage.id, stage.tests]));
+  const plan = { ...createPlan('parallel-full', stage => {
+    const tests = cases.get(stage.id);
+    invariant(tests?.length && tests.every(test => test.project && test.id), `Missing discovery for ${stage.id}`);
+    return tests;
+  }), source: preparation.source, environment: preparation.environment, browsers: preparation.browsers };
+  invariant(JSON.stringify(plan.canonical) === JSON.stringify(discovered.canonical), 'Unexpected canonical discovery stages');
+  return { ...plan, planHash: digest(JSON.stringify(plan)) };
+}
+
+function writePlan(bundle, plan, publishMatrix) {
+  save(join(bundle, 'plan.json'), plan);
+  if (publishMatrix && process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `matrix=${JSON.stringify({ include: plan.requested.map(id => ({ id,
+    ...(parallelRunner(plan, { batchId: id }) ? { runner: parallelRunner(plan, { batchId: id }).replace('unraid-tactics-', 'tactics-browser-') } : {}) })) })}\n`);
+}
+
+function distributeBuild(bundle, plan, report) {
+  if (!canDistributeBuild(plan.mode, report)) return 1;
+  const directory = join(root, 'dist'), packed = join(bundle, 'dist');
+  const files = inventory(directory);
+  let fromPublic;
+  if (plan.mode === 'parallel-full') fromPublic = packParallelBuild(directory, join(root, 'public'), packed, files);
+  else cpSync(directory, packed, { recursive: true });
+  invariant(files.some(file => file.path === 'index.html'), 'Missing built index.html');
+  save(join(bundle, 'build.json'), { source: plan.source, planHash: plan.planHash, files, fromPublic, hash: digest(JSON.stringify(files)) });
+  return 0;
+}
+
 export async function main([command, bundleArgument, batchId, outputArgument]) {
   if (command === 'await-pilot') {
-    const { GITHUB_API_URL, GITHUB_REPOSITORY, GITHUB_RUN_ID, GITHUB_RUN_ATTEMPT, GITHUB_TOKEN } = process.env;
-    invariant(GITHUB_API_URL && GITHUB_REPOSITORY && GITHUB_RUN_ID && GITHUB_RUN_ATTEMPT && GITHUB_TOKEN, 'Parallel pilot requires Actions run identity and artifact read access');
-    const release = await awaitPilotRunners(GITHUB_RUN_ID, GITHUB_RUN_ATTEMPT, async name => {
-      const url = new URL(`${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts`);
-      url.searchParams.set('name', name);
-      const response = await fetch(url, {
-        headers: { Authorization: `Bearer ${GITHUB_TOKEN}`, Accept: 'application/vnd.github+json' },
-        signal: AbortSignal.timeout(10000),
-      });
-      invariant(response.ok, `Actions artifact listing failed: HTTP ${response.status}`);
-      return (await response.json()).artifacts;
-    }, { ids: Object.keys(runnerAssignments(process.env.SERIAL_MODE)) });
+    const { GITHUB_RUN_ID, GITHUB_RUN_ATTEMPT } = process.env;
+    invariant(GITHUB_RUN_ID && GITHUB_RUN_ATTEMPT, 'Parallel pilot requires Actions run identity');
+    const release = await awaitPilotRunners(GITHUB_RUN_ID, GITHUB_RUN_ATTEMPT, runArtifacts,
+      { ids: Object.keys(runnerAssignments(process.env.SERIAL_MODE)) });
     console.log(`Both pilot runners ready. Scheduled browser launch: ${release}`);
     return 0;
   }
+  if (command === 'await-discovery') {
+    const deadline = Date.now() + 120000;
+    while (Date.now() < deadline) {
+      if ((await runArtifacts(bundleArgument)).some(artifact => artifact.name === bundleArgument && !artifact.expired)) return 0;
+      await delay(2000);
+    }
+    throw Error('The tooling job did not publish full discovery for this attempt');
+  }
   const bundle = resolve(bundleArgument ?? 'verification-receipts/serial/bundle');
+  if (command === 'prepare-build') {
+    invariant(process.env.SERIAL_MODE === 'parallel-full' && !process.env.SERIAL_BATCHES, 'Separate preparation requires an unfiltered full parallel run');
+    const source = sourceIdentity(root);
+    mkdirSync(bundle, { recursive: true });
+    save(join(bundle, 'preparation-start.json'), { source, startedAt: new Date().toISOString(), runId: process.env.GITHUB_RUN_ID ?? 'local' });
+    const plan = { mode: 'parallel-full', source, environment: environment(), browsers: await browserMetadata(stages) };
+    // The preparation stages depend on source and browser identity. Their receipt
+    // is bound to the exact discovery plan before either shard receives the build.
+    const report = await runReceipt(plan, 'prepare', stages.filter(stage => preparationFor(plan.mode).includes(stage.id)), [], join(bundle, 'preparation'));
+    return canDistributeBuild(plan.mode, report) ? 0 : 1;
+  }
+  if (command === 'seal-build') {
+    const receiptPath = join(bundle, 'preparation/receipt.json');
+    const report = read(receiptPath);
+    const source = sourceIdentity(root);
+    invariant(!existsSync(join(bundle, 'plan.json')) && !report.planHash && report.inputsUnchanged &&
+      !source.dirty && report.source.commit === source.commit && report.source.inputHash === source.inputHash,
+    'Cannot bind changed or already sealed preparation');
+    const plan = bindFullDiscovery(read(batchId), report);
+    writePlan(bundle, plan, true);
+    save(receiptPath, { ...report, planHash: plan.planHash });
+    return distributeBuild(bundle, plan, report);
+  }
   if (command === 'discover' || command === 'prepare') {
     invariant(!existsSync(join(bundle, 'plan.json')) && !existsSync(join(bundle, 'dist')), 'Refusing to overwrite a prior plan/build');
     mkdirSync(bundle, { recursive: true });
@@ -563,20 +636,10 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
     const plan = { ...createPlan(process.env.SERIAL_MODE ?? 'capture', discover, process.env.SERIAL_BATCHES ?? ''),
       source: sourceIdentity(root), environment: environment(), browsers: await browserMetadata(command === 'prepare' ? stages : []) };
     plan.planHash = digest(JSON.stringify(plan));
-    save(join(bundle, 'plan.json'), plan);
+    writePlan(bundle, plan, command === 'prepare');
     if (command === 'discover') return 0;
-    if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `matrix=${JSON.stringify({ include: plan.requested.map(id => ({ id,
-      ...(parallelRunner(plan, { batchId: id }) ? { runner: parallelRunner(plan, { batchId: id }).replace('unraid-tactics-', 'tactics-browser-') } : {}) })) })}\n`);
     const report = await runReceipt(plan, 'prepare', stages.filter(stage => plan.preparationIds.includes(stage.id)), [], join(bundle, 'preparation'));
-    if (!canDistributeBuild(plan.mode, report)) return 1;
-    const directory = join(root, 'dist'), packed = join(bundle, 'dist');
-    const files = inventory(directory);
-    let fromPublic;
-    if (plan.mode === 'parallel-full') fromPublic = packParallelBuild(directory, join(root, 'public'), packed, files);
-    else cpSync(directory, packed, { recursive: true });
-    invariant(files.some(file => file.path === 'index.html'), 'Missing built index.html');
-    save(join(bundle, 'build.json'), { source: plan.source, planHash: plan.planHash, files, fromPublic, hash: digest(JSON.stringify(files)) });
-    return 0;
+    return distributeBuild(bundle, plan, report);
   }
   let plan;
   try {
@@ -667,7 +730,7 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
     if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
     return result.passed ? 0 : 1;
   }
-  throw Error('Usage: verify:batches discover|prepare <bundle> | ready|run <bundle> <batch> <out> | await-pilot | aggregate <bundle> <receipts> <out>');
+  throw Error('Usage: verify:batches discover|prepare|prepare-build <bundle> | seal-build <bundle> <discovery-plan> | ready|run <bundle> <batch> <out> | await-pilot | await-discovery <artifact> | aggregate <bundle> <receipts> <out>');
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

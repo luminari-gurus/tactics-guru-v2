@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { canDistributeBuild, definitions, createPlan, discover, exactCoverage, matchedCaseDigests, inventory, packParallelBuild, restorePublicBuildFiles, verifyBuild, runRows, aggregate, preparationIds, validateBrowserResult, validatePerformanceResult, validateScheduling, schedulingCompute, timingReport, quarantineCleanup, pilotOverlap, samplePilotClock, awaitPilotRunners } from '../../scripts/verification-batches.mjs';
+import { bindFullDiscovery, canDistributeBuild, definitions, createPlan, discover, exactCoverage, matchedCaseDigests, inventory, packParallelBuild, restorePublicBuildFiles, verifyBuild, runRows, aggregate, preparationIds, validateBrowserResult, validatePerformanceResult, validateScheduling, schedulingCompute, timingReport, quarantineCleanup, pilotOverlap, samplePilotClock, awaitPilotRunners } from '../../scripts/verification-batches.mjs';
 import { digest, compareReports } from '../../scripts/verification-report.mjs';
 import { stages } from '../../scripts/verification-timings.mjs';
 
@@ -422,10 +422,31 @@ test('full parallel browsers require the independent tooling job on the second r
   const job = id => workflow.split(`\n  ${id}:\n`)[1].split(/\n  [\w-]+:\n/)[0];
   assert.match(job('tooling'), /inputs.mode == 'parallel-full'/);
   assert.match(job('tooling'), /group: tactics-browser-tactics-browser-02/);
+  assert.match(job('tooling'), /-- discover verification-receipts\/serial\/discovery-plan/);
+  assert.match(job('tooling'), /name: issue208-discovery-/);
   assert.match(job('tooling'), /npm run test:verification-tooling && npm run test:verification-batches/);
   assert.match(job('prepare'), /if: inputs.mode != 'parallel-full'\s+run: npm run test:verification-tooling && npm run test:verification-batches/);
+  assert.doesNotMatch(job('prepare'), /^    needs:/m);
+  assert.match(job('prepare'), /-- prepare-build[\s\S]+-- await-discovery[\s\S]+-- seal-build/);
   assert.match(job('batch'), /needs: \[prepare, tooling\]/);
   assert.match(job('batch'), /inputs.mode != 'parallel-full' \|\| needs.tooling.result == 'success'/);
+});
+
+test('full discovery binds exact cases to preparation from the same source and runtime', () => {
+  const expected = createPlan('parallel-full', discovery);
+  const source = { commit: 'commit', inputHash: 'inputs', dirty: false };
+  const environment = { node: '24', platform: 'linux', arch: 'x64', versions: { vite: '8' } };
+  const manifest = { ...expected, source, environment: { ...environment, runner: 'vm02' }, browsers: {} };
+  const seal = manifest => ({ ...manifest, planHash: digest(JSON.stringify(manifest)) });
+  const preparation = { source, environment: { ...environment, runner: 'vm01' }, browsers: { webkit: { version: '27' } } };
+  const plan = bindFullDiscovery(seal(manifest), preparation);
+  assert.deepEqual(plan.jobs, expected.jobs);
+  assert.deepEqual(plan.browsers, preparation.browsers);
+  assert.equal(plan.environment.runner, 'vm01');
+  assert.throws(() => bindFullDiscovery({ ...seal(manifest), canonical: [] }, preparation), /Invalid full discovery plan/);
+  assert.throws(() => bindFullDiscovery(seal({ ...manifest, canonical: manifest.canonical.slice(1) }), preparation), /Missing discovery/);
+  assert.throws(() => bindFullDiscovery(seal(manifest), { ...preparation, source: { ...source, inputHash: 'other' } }), /Discovery source differs/);
+  assert.throws(() => bindFullDiscovery(seal(manifest), { ...preparation, environment: { ...environment, node: '22' } }), /Discovery node differs/);
 });
 
 test('browser workflows share a non-cancelling lock for the selected VM', () => {

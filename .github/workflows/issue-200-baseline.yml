@@ -130,6 +130,15 @@ jobs:
           cache: npm
       - run: npm ci
         timeout-minutes: 10
+      - name: Discover the full browser case manifest
+        run: npm run verify:batches -- discover verification-receipts/serial/discovery-plan
+        timeout-minutes: 3
+      - uses: actions/upload-artifact@v4
+        with:
+          name: issue208-discovery-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/serial/discovery-plan/plan.json
+          retention-days: 30
+          if-no-files-found: error
       - run: npm run test:verification-tooling && npm run test:verification-batches
         timeout-minutes: 5
   prepare:
@@ -141,7 +150,7 @@ jobs:
       cancel-in-progress: false
     timeout-minutes: 35
     outputs:
-      matrix: ${{ steps.prepare.outputs.matrix }}
+      matrix: ${{ steps.seal.outputs.matrix || steps.prepare.outputs.matrix }}
       bundle: issue208-build-${{ github.run_id }}-${{ github.run_attempt }}
     steps:
       - name: Record setup start and check host disposition
@@ -165,9 +174,30 @@ jobs:
         run: npm run test:verification-tooling && npm run test:verification-batches
         timeout-minutes: 5
       - name: Discover exact coverage and build the ordinary artifact once
+        if: inputs.mode != 'parallel-full'
         id: prepare
         run: timeout --signal=TERM --kill-after=15s 15m npm run verify:batches -- prepare verification-receipts/serial/bundle
         timeout-minutes: 16
+      - name: Build and measure while tooling discovers the browser cases
+        if: inputs.mode == 'parallel-full'
+        run: timeout --signal=TERM --kill-after=15s 15m npm run verify:batches -- prepare-build verification-receipts/serial/bundle
+        timeout-minutes: 16
+      - name: Wait for the same-attempt browser case manifest
+        if: inputs.mode == 'parallel-full'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: npm run verify:batches -- await-discovery "issue208-discovery-${{ github.run_id }}-${{ github.run_attempt }}"
+        timeout-minutes: 3
+      - uses: actions/download-artifact@v4
+        if: inputs.mode == 'parallel-full'
+        with:
+          name: issue208-discovery-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/serial/discovery-plan/
+      - name: Bind the build and receipt to the exact browser case manifest
+        if: inputs.mode == 'parallel-full'
+        id: seal
+        run: npm run verify:batches -- seal-build verification-receipts/serial/bundle verification-receipts/serial/discovery-plan/plan.json
+        timeout-minutes: 3
       - uses: actions/upload-artifact@v4
         if: always()
         with:
