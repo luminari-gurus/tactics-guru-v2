@@ -240,10 +240,12 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
     const looted = f !== null && typeof f === 'object' && Object.hasOwn(f, 'loot');
     if (!hasShape(f, ['descriptor','position','completed','exploration', ...(looted ? ['loot'] : [])]) || !hasShape(f.descriptor, f.descriptor && typeof f.descriptor === 'object' && 'size' in f.descriptor ? ['depth','seed','template','generator','size', ...('height' in f.descriptor ? ['height'] : []),'biome','mapHash','upstairs','downstairs','encounters'] : ['depth','seed','template','generator','biome','mapHash','upstairs','downstairs','encounters']) ||
       !safeCount(f.completed) || f.completed > 3 || !safeCount(f.position) ||
-      f.descriptor.depth !== i + 1 || f.descriptor.seed !== dungeonSeed(input.seed, i + 1, 'floor') || f.descriptor.template !== DUNGEON_TEMPLATE ||
+      f.descriptor.depth !== i + 1 || f.descriptor.template !== DUNGEON_TEMPLATE ||
       !(f.descriptor.generator === 'rooms-v1' && f.descriptor.size === undefined || (f.descriptor.generator === 'sector-graph-v1' || f.descriptor.generator === 'arena-v1') && f.descriptor.size === floorSize(i + 1) && (f.descriptor.height === undefined || f.descriptor.height === extraFloorHeight(i + 1))) || typeof f.descriptor.mapHash !== 'string' || !/^sha256:[a-f0-9]{64}$/.test(f.descriptor.mapHash) ||
       !safeCount(f.descriptor.upstairs) || !safeCount(f.descriptor.downstairs) || f.descriptor.upstairs >= f.descriptor.downstairs ||
       (i < input.floors.length - 1 && f.completed !== 3)) return fail('invalidFloor');
+    const cached = checkedDescriptors.get(f.descriptor as unknown as FloorDescriptor);
+    if (cached?.seed !== input.seed && f.descriptor.seed !== dungeonSeed(input.seed, i + 1, 'floor')) return fail('invalidFloor');
     const width = Number(f.descriptor.size ?? 20);
     const area = width * Number(f.descriptor.height ?? width);
     if (f.position >= area || f.descriptor.downstairs >= area) return fail('invalidFloor');
@@ -252,7 +254,6 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
     if (!biome || policy === LEGACY_ENCOUNTER_POLICY && biome.id !== 'grassland' ||
       policy === DUNGEON_ENCOUNTER_POLICY && biome.id !== 'forest' && biome.id !== 'desert') return fail('invalidFloor');
     let descriptor: FloorDescriptor;
-    const cached = checkedDescriptors.get(f.descriptor as unknown as FloorDescriptor);
     if (cached?.seed === input.seed && cached.policy === policy && (cached.current || i + 1 !== input.depth)) {
       descriptor = f.descriptor as unknown as FloorDescriptor;
     } else {
@@ -287,6 +288,10 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
         }
       }
       descriptor = { ...f.descriptor, encounters } as unknown as FloorDescriptor;
+      if (i + 1 === input.depth) {
+        const { encounters, ...geometry } = descriptor;
+        if (canonical(geometry) !== canonical(floorGeometry(input.seed, input.depth, descriptor.biome, undefined, descriptor.generator, geometry.height))) return fail('invalidFloor');
+      }
       freezeDescriptorParts(descriptor);
       rememberCanonicalEncoding(descriptor);
       checkedDescriptors.set(descriptor, { seed: input.seed, policy, current: i + 1 === input.depth });
@@ -341,8 +346,6 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
   }
   if (!['ready','battle','reward','defeat'].includes(input.phase as string)) return fail('invalidPhase');
   const state = { ...input, ...(stats ? { stats } : {}), encounterPolicy: policy, floors, party, ownership: owned.ownership } as unknown as DungeonState;
-  const { encounters, ...geometry } = currentFloor(state).descriptor;
-  if (canonical(geometry) !== canonical(floorGeometry(state.seed, state.depth, currentFloor(state).descriptor.biome, undefined, currentFloor(state).descriptor.generator, geometry.height))) return fail('invalidFloor');
   const slot = dungeonSlot(state), alive = party.some(h => h.hp > 0);
   if ((state.phase === 'defeat') === alive || state.phase === 'battle' && slot === 3 ||
     state.phase === 'reward' && (slot < 1 || currentFloor(state).loot?.some(loot => loot.rewardIndex === slot - 1)) ||

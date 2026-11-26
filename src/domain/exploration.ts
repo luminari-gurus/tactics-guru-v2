@@ -1,6 +1,6 @@
 import { generateMap, encounterCandidates, type GeneratedMap } from '../map/generate';
 import type { OverworldMarker } from '../map/state';
-import { hashJson, canonical } from './contentIdentity';
+import { hashJson } from './contentIdentity';
 import { nextUint32, seedRng, isRngState, type RngState } from './rng';
 import { hasShape, isDenseArray } from './validation';
 
@@ -77,6 +77,15 @@ export function movableExploration(exploration: Exploration, seed: number, compl
     active: phase === 'battle' ? completed : phase === 'reward' ? completed-1 : null,
     movement: { rng: seedRng((seed ^ 0x4d4f5645) >>> 0), step: 0 } };
 }
+// Fixed encounters on a generated floor depend only on the frozen geometry and seed.
+const fixedEncounters = new WeakMap<GeneratedMap, { seed: number; pois: EncounterPoi[] }>();
+function fixedFloorEncounters(seed: number, map: GeneratedMap) {
+  const cached = fixedEncounters.get(map);
+  if (cached?.seed === seed) return cached.pois;
+  const pois = encounterPois(seed, map);
+  if (Object.isFrozen(map) && Object.isFrozen(map.cells)) fixedEncounters.set(map, { seed, pois });
+  return pois;
+}
 export function readExploration(value: unknown, seed: number, position: number, map = generateMap(seed)): Exploration | null {
   if (!value || typeof value !== 'object') return null;
   const v = value as Record<string,unknown>;
@@ -96,9 +105,13 @@ export function readExploration(value: unknown, seed: number, position: number, 
   const memory = { ...(wallAware ? { sightVersion: WALL_SIGHT_VERSION } as const : {}),
     revealed: [...value.revealed], visited: [...value.visited] };
   if (!movable) {
-    const pois = encounterPois(seed,map);
-    if (canonical(value.pois) !== canonical(pois)) return null;
-    return { version: EXPLORATION_VERSION, pois, ...memory };
+    const pois = fixedFloorEncounters(seed, map);
+    if (!value.pois.every((actual, i) => {
+      const expected = pois[i];
+      return actual.id === expected.id && actual.kind === expected.kind && actual.encounterSlot === expected.encounterSlot &&
+        actual.x === expected.x && actual.y === expected.y;
+    })) return null;
+    return { version: EXPLORATION_VERSION, pois: pois.map(poi => ({ ...poi })), ...memory };
   }
   if (!isDenseArray(value.cleared,3) || !value.cleared.every((n,i)=>typeof n === 'number' && Number.isInteger(n) && n >= 0 && n < 3 && (i===0 || n > (value.cleared as number[])[i-1])) ||
       !(value.active === null || typeof value.active === 'number' && Number.isInteger(value.active) && value.active >= 0 && value.active < 3) ||
