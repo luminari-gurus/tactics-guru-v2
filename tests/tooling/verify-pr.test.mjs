@@ -37,19 +37,39 @@ test('ordinary Playwright discovery and the PR alias have identical bounded sele
   assert.deepEqual(ordinary, explicit);
 });
 
-test('every shared browser workflow preserves pending checks without concurrent execution', () => {
-  const validate = workflow => {
-    const concurrency = workflow.replaceAll('\r\n', '\n').split('\nconcurrency:\n')[1]?.split(/\n\S/)[0];
-    assert.match(concurrency, /^  group: tactics-browser-/m);
-    assert.match(concurrency, /^  queue: max$/m);
-    assert.match(concurrency, /^  cancel-in-progress: false$/m);
-  };
-  for (const file of ['pr-verification.yml', 'browser-setup.yml', 'issue-200-baseline.yml', 'issue-219-process-cleanup.yml']) {
+test('PR workflow cancels superseded runs only for the same PR', () => {
+  const workflow = readFileSync(new URL('../../.github/workflows/pr-verification.yml', import.meta.url), 'utf8').replaceAll('\r\n', '\n');
+  const concurrency = workflow.match(/^concurrency:\n((?:  [^\n]*\n)+)/m)?.[1];
+  assert.deepEqual(concurrency?.trimEnd().split('\n'), [
+    "  group: pr-verification-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || format('manual-{0}', github.run_id) }}",
+    "  cancel-in-progress: ${{ github.event_name == 'pull_request' }}",
+  ]);
+});
+
+test('shared runner locks preserve pending checks without concurrent execution', () => {
+  const workflowLock = /^concurrency:\n((?:  [^\n]*\n)+)/m;
+  const jobLock = /^  verify:\n(?:    [^\n]*\n)*?    concurrency:\n((?:      [^\n]*\n)+)/m;
+  for (const [file, lock] of [
+    ['pr-verification.yml', jobLock],
+    ['browser-setup.yml', workflowLock],
+    ['issue-200-baseline.yml', workflowLock],
+    ['issue-219-process-cleanup.yml', workflowLock],
+  ]) {
     const source = readFileSync(new URL('../../.github/workflows/' + file, import.meta.url), 'utf8').replaceAll('\r\n', '\n');
+    const validate = workflow => {
+      const concurrency = workflow.replaceAll('\r\n', '\n').match(lock)?.[1];
+      assert.ok(concurrency, `Missing runner lock in ${file}`);
+      assert.match(concurrency, /^ +group: tactics-browser-/m);
+      assert.match(concurrency, /^ +queue: max$/m);
+      assert.match(concurrency, /^ +cancel-in-progress: false$/m);
+      if (file === 'pr-verification.yml') {
+        assert.match(concurrency, /^ +group: tactics-browser-tactics-browser-01$/m);
+      }
+    };
     for (const workflow of [source, source.replaceAll('\n', '\r\n')]) {
       validate(workflow);
       assert.throws(() => validate(workflow.replace('queue: max', 'queue: single')));
-      assert.throws(() => validate(workflow.replace(/  queue: max\r?\n/, '')));
+      assert.throws(() => validate(workflow.replace(/^ +queue: max\r?\n/m, '')));
       assert.throws(() => validate(workflow.replace('cancel-in-progress: false', 'cancel-in-progress: true')));
     }
   }
