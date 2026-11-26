@@ -648,8 +648,22 @@ export async function main([command, bundleArgument, batchId, outputArgument]) {
   } catch (error) {
     if (command !== 'aggregate') throw error;
     const out = resolve(outputArgument); mkdirSync(out, { recursive: true });
-    save(join(out, 'summary.json'), { passed: false, complete: false, baselineEligible: false, errors: ['Missing or invalid preparation plan: ' + String(error)] });
-    const summary = '# Serial verification failed\n\nMissing or invalid preparation plan. Inspect the preparation artifact and logs.\n';
+    const errors = ['Missing or invalid preparation plan: ' + String(error)];
+    const latest = [];
+    try {
+      const preparation = read(join(bundle, 'preparation/receipt.json'));
+      if (preparation?.batchId === 'prepare' && Array.isArray(preparation.stages)) {
+        latest.push(preparation);
+        if (preparation.error) errors.push('Preparation: ' + preparation.error);
+        for (const stage of preparation.stages) {
+          if (stage?.status === 'failed' || stage?.status === 'blocked') {
+            errors.push(`Preparation / ${stage.id}: ${stage.status}${stage.error ? ' (' + stage.error + ')' : ''}`);
+          }
+        }
+      }
+    } catch { /* The missing plan is sufficient to fail even without a readable receipt. */ }
+    save(join(out, 'summary.json'), { passed: false, complete: false, baselineEligible: false, errors, latest });
+    const summary = '# Serial verification failed\n\n' + errors.map(message => '- ' + message).join('\n') + '\n';
     writeFileSync(join(out, 'summary.md'), summary);
     if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
     return 1;

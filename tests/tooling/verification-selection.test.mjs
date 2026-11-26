@@ -41,6 +41,18 @@ test('real discoveries preserve every retained ID with the approved desktop and 
   }
 });
 
+test('battle-log journey and control checks have separate case identities on the intended profiles', () => {
+  for (const [stage, fullProject, shortProjects] of [
+    ['chromium', 'desktop', ['mobile-landscape', 'mobile-portrait']],
+    ['webkit-exploration', 'portrait-webkit', ['desktop-webkit', 'landscape-webkit']],
+  ]) {
+    const cases = after.selections[stage].tests;
+    const profiles = title => cases.filter(row => row.title === title).map(row => row.project).sort();
+    assert.deepEqual(profiles('battle log filters and keeps history across Hide and reopen'), [fullProject]);
+    assert.deepEqual(profiles('battle log controls fit and reset the filter when reopened'), shortProjects);
+  }
+});
+
 test('routine verification clears each first-floor scenario once and checks both pickup modes in every orientation', () => {
   for (const [stage, desktop] of [['chromium', 'desktop'], ['webkit-exploration', 'desktop-webkit']]) {
     const { tests, projects } = after.selections[stage];

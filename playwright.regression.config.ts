@@ -20,6 +20,8 @@ export const redundantProfileJourneys = [
   /^(?:mobile-landscape|landscape-webkit|acceptance-webkit-landscape) .*@mobile-portrait(?: |$)/,
   // Keep desktop Chromium and portrait WebKit for paired desktop and touch interactions.
   /^(?:mobile-portrait|mobile-landscape|desktop-webkit|landscape-webkit|acceptance-webkit-landscape) .*@desktop-chromium-portrait-webkit(?: |$)/,
+  // The full battle-log journey also verifies these controls on its two profiles.
+  /^(?:desktop|portrait-webkit) .*@battle-log-controls(?: |$)/,
   // One real reload per engine verifies that boot leaves the automatic pickup unscheduled.
   /^(?:mobile-portrait|mobile-landscape|portrait-webkit|landscape-webkit) .*reload before the pending step restores the ground pile without surprise movement or collection$/,
   // Each saved/manual, saved/automatic and unsaved journey runs once in routine CI.

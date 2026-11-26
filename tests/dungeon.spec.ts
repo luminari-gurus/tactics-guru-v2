@@ -642,7 +642,7 @@ async function downloadCombatLog(page: Page, activate: (button: Locator) => Prom
  return JSON.parse(readFileSync(path, 'utf8')) as { groups: { entries: { text: string }[] }[] };
 }
 
-test('battle log filters and keeps history across Hide and reopen', async ({ page, isMobile }) => {
+async function openResumedBattleLog(page: Page, isMobile: boolean) {
  test.setTimeout(90_000);
  if (!isMobile) await page.setViewportSize({width:1280,height:800});
  await page.addInitScript(key => {
@@ -694,7 +694,7 @@ test('battle log filters and keeps history across Hide and reopen', async ({ pag
    )).toBe(true);
  };
 
- let launcher = await openLog();
+ const launcher = await openLog();
  await expect(lines).toHaveText([/^Round 2: Fighter #1's turn$/]);
  if (!isMobile) {
    await filterButton('All').press('Tab');
@@ -708,20 +708,24 @@ test('battle log filters and keeps history across Hide and reopen', async ({ pag
  await expect(dialog).toBeHidden();
  if (!isMobile) await expect(launcher).toBeFocused();
 
- // Keep the full keyboard and touch sequences on desktop Chromium and portrait
- // WebKit. Other routine profiles keep their actual viewport and activation checks.
- if (['mobile-portrait','mobile-landscape','desktop-webkit','landscape-webkit'].includes(test.info().project.name)) {
-   await openLog();
-   await expect(lines).toHaveText([/^Round 2: Fighter #1's turn$/]);
-   expect(await readSession(page)).toEqual(resumed);
-   return;
- }
+ return { state, game, resumed, activate, dialog, filters, hide, groups, lines, openLog, selectFilter, expectControlsFit };
+}
 
+test('battle log controls fit and reset the filter when reopened', { tag: '@battle-log-controls' }, async ({ page, isMobile }) => {
+ const { openLog, lines, resumed } = await openResumedBattleLog(page, isMobile);
+ await openLog();
+ await expect(lines).toHaveText([/^Round 2: Fighter #1's turn$/]);
+ expect(await readSession(page)).toEqual(resumed);
+});
+
+test('battle log filters and keeps history across Hide and reopen', { tag: '@desktop-chromium-portrait-webkit' }, async ({ page, isMobile }) => {
+ const { state, game, activate, dialog, filters, hide, groups, lines, openLog, selectFilter, expectControlsFit } =
+   await openResumedBattleLog(page, isMobile);
  await endTurn(page,selector => activate(page.locator(selector)));
  await expect.poll(async () => (await readSession(page)).state.commandCount).toBeGreaterThan(state.commandCount);
  await expect(game).toHaveAttribute('data-phase','player',{timeout:15_000});
  const before = await readSession(page);
- launcher = await openLog();
+ const launcher = await openLog();
  await expect(lines).toContainText([/^Round 2:/,/Fighter #1 waits/,/Weakened expires/,/uses Heal Goblin/,/heals \d+ HP/,/: miss \(/]);
  await expect(groups).toContainText([/Round 2 · Fighter #1 · End turn/, /Goblin Shaman.* · Heal Goblin/]);
  const history = await lines.allTextContents();

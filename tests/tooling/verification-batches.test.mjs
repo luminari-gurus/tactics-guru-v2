@@ -156,6 +156,36 @@ test('interrupt stops later work and checkpoints already recorded failures', asy
   assert.equal(rows.length, 1); assert.deepEqual(checkpoints, [1]); assert.equal(rows[0].status, 'failed');
 });
 
+test('aggregate reports failed preparation stages when the plan was never sealed', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'verification-unsealed-'));
+  try {
+    const bundle = join(directory, 'bundle');
+    const output = join(directory, 'aggregate');
+    const preparation = { batchId: 'prepare', stages: [
+      { id: 'units', status: 'failed', error: 'Unit test failed' },
+      { id: 'build-root', status: 'blocked', blockedBy: ['units'] },
+    ] };
+    mkdirSync(join(bundle, 'preparation'), { recursive: true });
+    writeFileSync(join(bundle, 'preparation/receipt.json'), JSON.stringify(preparation));
+    const script = new URL('../../scripts/verification-batches.mjs', import.meta.url).href;
+    const stepSummary = join(directory, 'step-summary.md');
+    const run = spawnSync(process.execPath, ['--input-type=module', '-e',
+      'const { main } = await import(process.argv[1]); process.exitCode = await main(process.argv.slice(2));',
+      script, 'aggregate', bundle, join(directory, 'receipts'), output],
+    { env: { ...process.env, GITHUB_STEP_SUMMARY: stepSummary } });
+    assert.equal(run.status, 1, run.stderr?.toString());
+    const report = JSON.parse(readFileSync(join(output, 'summary.json'), 'utf8'));
+    assert.equal(report.passed, false);
+    assert.equal(report.complete, false);
+    assert.equal(report.baselineEligible, false);
+    assert.deepEqual(report.latest, [preparation]);
+    const summary = readFileSync(join(output, 'summary.md'), 'utf8');
+    assert.match(summary, /Preparation \/ units: failed \(Unit test failed\)/);
+    assert.match(summary, /Preparation \/ build-root: blocked/);
+    assert.equal(readFileSync(stepSummary, 'utf8'), summary);
+  } finally { rmSync(directory, { recursive: true, force: true }); }
+});
+
 test('aggregate accepts exact complete receipts and records attempts/compute', () => {
   const result = summarize(fixture());
   assert.equal(result.passed, true); assert.equal(result.baselineEligible, true);
