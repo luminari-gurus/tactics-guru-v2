@@ -32,11 +32,12 @@ Push-triggered full verification has no dispatch inputs and selects VM 01.
 `max-parallel: 1`, one Playwright worker and `fail-fast: false` keep browser jobs
 serial without starving later jobs
 after an ordinary test failure. Manual runs are not automatically superseded;
-cancel an obsolete run explicitly. Automatic PR verification shares the selected
-VM reservation. All four browser workflows use `queue: max` with
-`cancel-in-progress: false`: up to 100 waiting runs are preserved rather than a
-new arrival replacing the pending run. Beyond that documented queue bound, new
-runs are canceled. This preserves serialization, not a queue-time guarantee.
+cancel an obsolete run explicitly. A new automatic PR verification run cancels
+older runs for the same PR, including those waiting for VM 01. The verification
+job still shares VM 01's reservation with manual PR verification and other browser
+workflows. The per-VM group uses `queue: max` and `cancel-in-progress: false`
+to preserve up to 100 waiting jobs or runs. Beyond that bound, new entries are
+canceled.
 
 Before using this workflow, an administrator must add `tactics-browser-01` only
 to VM 01 and `tactics-browser-02` only to VM 02, alongside the shared labels, and
