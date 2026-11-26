@@ -7,7 +7,7 @@ import type { ItemCatalog, ItemId, ItemOwnership } from '../content/itemTypes';
 import { generateFrozenMap, type GeneratedMap } from '../map/generate';
 import { applyBiome, BIOMES } from '../map/biomes';
 import { DEFAULT_BEHAVIORS, stepMovement } from '../map/movement';
-import { canonical, hashJson } from './contentIdentity';
+import { canonical, hashJson, rememberCanonicalEncoding } from './contentIdentity';
 import { hasShape, isDenseArray } from './validation';
 import { emptyItemOwnership, readItemOwnership, changePreparation, projectOwnedCatalog, grantOwnedItem, settleDraughts, type ItemCommand } from './items';
 import { readRewardOffer, rewardOffer, type RewardOffer } from './rewards';
@@ -288,6 +288,7 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
       }
       descriptor = { ...f.descriptor, encounters } as unknown as FloorDescriptor;
       freezeDescriptorParts(descriptor);
+      rememberCanonicalEncoding(descriptor);
       checkedDescriptors.set(descriptor, { seed: input.seed, policy, current: i + 1 === input.depth });
     }
     if (policy !== LEGACY_ENCOUNTER_POLICY && i > 0 && descriptor.biome === floors[i - 1].descriptor.biome) return fail('invalidBiomeProgression');

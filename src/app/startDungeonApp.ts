@@ -190,7 +190,10 @@ async function recovery(){
  choices.push({id:'dungeon-close-recovery',label:'Close',run:close});
  const removalHint=removingDungeonSaveWouldReopenRun(review,'primary')||removingDungeonSaveWouldReopenRun(review,'backup')
   ? ' Remove the earlier checkpoint before removing the defeated save.' : '';
- dialogs.showChoices('Dungeon save recovery',`primary: ${review.primary.status}. backup: ${review.backup.status}. ${session.status}${removalHint}`,choices,close,{focusTitle:true});
+ dialogs.showChoices('Dungeon save recovery',`primary: ${review.primary.status}. backup: ${review.backup.status}. ${session.status}${removalHint}`,choices,close,{
+  focusTitle:true,
+  returnFocus: playing ? undefined : () => screen.querySelector<HTMLElement>('h1'),
+ });
  screen.scrollTop=scrollTop;
 }
 function presentationBlocked(){return document.hidden||dialogs.open||replacing;}

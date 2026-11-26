@@ -31,6 +31,7 @@ export function requiresFinalRewardSupport(state: DungeonState): boolean {
 }
 /** No DOM dependency in the authoritative save reader. Lone surrogates count as replacement characters. */
 export function utf8Bytes(text: string) {
+  if (!/[^\x00-\x7f]/.test(text)) return text.length;
   let n = 0;
   for (const char of text) { const c = char.codePointAt(0)!; n += c < 128 ? 1 : c < 2048 ? 2 : c < 65536 ? 3 : 4; }
   return n;

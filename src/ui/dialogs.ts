@@ -43,9 +43,10 @@ export class BattleDialogs {
   }
   showChoices(title:string,message:string|HTMLElement,choices:readonly DialogChoice[],cancel:(()=>void)|null=null,
     options:{focusTitle?:boolean; returnFocus?:()=>HTMLElement|null}={}) {
-    if(!this.open){
+    if(options.returnFocus)this.returnFocus=options.returnFocus;
+    else if(!this.open){
       const prior=document.activeElement as HTMLElement|null;
-      this.returnFocus=options.returnFocus??(()=>prior);
+      this.returnFocus=()=>prior;
     }
     this.choices=choices;this.cancel=cancel;
     const heading=this.element.querySelector<HTMLHeadingElement>('#battle-dialog-title')!;
