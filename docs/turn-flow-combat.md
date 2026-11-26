@@ -70,6 +70,14 @@ The outcome is checked after each attack: no living player is `playerLoss`, othe
 
 Each command re-validates its snapshot against the content version. `contentVersion` hashes each catalog object once, so the longest accepted log (10 000 Waits by six units on a 32 × 32 map) replays in about 0.5 s on the development host; before the cache it took about 89 s. Catalogs are immutable: to change content, build a new catalog rather than editing one that has been hashed. Do not enforce this with a deep `Object.freeze`. PR #44's review tried it, and that replay took about 1.8 s instead of 0.5 s, because V8 is slower on frozen arrays.
 
+## Battle log and export
+
+**Battle log** groups the latest 40 visible events by round, acting unit and action. Filters narrow the display while keeping the context for each matching result. History begins at encounter entry or Continue and stays in memory until reload or the end of the encounter. After Continue, the first line marks the restored turn.
+
+**Export combat log** downloads `tactics-guru-combat-log.json` with the complete retained excerpt, including events hidden by the current filter. The version 1 file contains the source build commit and dirty flag, the battle's rules, RNG and content version identifiers, history flags for resume and truncation, and the ordered action groups. Each group records the actor and includes readable lines and structured results such as rolls, damage, healing and remaining HP.
+
+The download is a troubleshooting excerpt. Save contents, seeds, RNG state and browser identifiers stay outside it. The log uses no storage or network, and each download requires an explicit player action.
+
 ## Historical #7 scope and handoff
 
 The following scope, handoff and verification describe #7 at its delivery, not current runtime. Current abilities and effects are documented in [signature abilities](signature-abilities.md), enemy behavior in [enemy turns](enemy-turns.md), and live persistence in [battle storage](battle-storage.md).

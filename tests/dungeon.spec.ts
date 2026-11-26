@@ -2,7 +2,7 @@ import { EXPANDED_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
 import { dungeonContent } from '../src/content/dungeon';
 import { openSavedDungeon, walkDungeon, acceptedDungeonSnapshot, settledDungeonSnapshot, expectSameProgress, reenterDungeonStair, expectDungeonResumed, openDungeonInventory, collectDungeonEncounterLoot } from './helpers/dungeonTraversal';
 import { atEncounter, atStairApproach, checkedDungeon, hobgoblinDungeonBoundary, stagedMageAbility, snaredDefeatBoundary } from './helpers/dungeonFixtures';
-import { expect,railTest as test,type Page } from './helpers/dungeonEntropy';
+import { expect, railTest as test, test as dungeonTest, type Page } from './helpers/dungeonEntropy';
 import { readFileSync, writeFileSync } from 'node:fs';
 import type { Locator } from '@playwright/test';
 import { dungeonCapacityFixture, dungeonVictoryBoundary } from './helpers/dungeonFixtures';
@@ -626,6 +626,16 @@ test('Forest Elite keeps a living goblin visible behind raised terrain', async (
  for (const x of [5, 6]) expect(board.fadedTerrain ?? []).toContainEqual({ x, y: 3, columnAlpha: 0.3, surfaceAlpha: 0.3 });
 });
 
+async function downloadCombatLog(page: Page, activate: (button: Locator) => Promise<void>) {
+ const button = page.getByRole('button',{name:'Export combat log',exact:true});
+ const [download] = await Promise.all([page.waitForEvent('download'), activate(button)]);
+ expect(download.suggestedFilename()).toBe('tactics-guru-combat-log.json');
+ const path = await download.path();
+ if (!path) throw Error('Combat log download has no file');
+ await test.info().attach('combat-log.json', { path, contentType: 'application/json' });
+ return JSON.parse(readFileSync(path, 'utf8')) as { groups: { entries: { text: string }[] }[] };
+}
+
 test('battle log filters and keeps history across Hide and reopen', async ({ page, isMobile }) => {
  test.setTimeout(90_000);
  if (!isMobile) await page.setViewportSize({width:1280,height:800});
@@ -656,7 +666,8 @@ test('battle log filters and keeps history across Hide and reopen', async ({ pag
  const filters = dialog.getByRole('group',{name:'Filter battle log'});
  const filterButton = (name: string) => filters.getByRole('button',{name,exact:true});
  const hide = dialog.getByRole('button',{name:'Hide',exact:true});
- const lines = dialog.locator('#battle-log > li');
+ const groups = dialog.locator('#battle-log > li > strong');
+ const lines = dialog.locator('#battle-log > li > ol > li');
  const openLog = async () => {
    const launcher = await battleTool(page,'#battle-log-open');
    await activate(launcher);
@@ -687,6 +698,7 @@ test('battle log filters and keeps history across Hide and reopen', async ({ pag
  const before = await readSession(page);
  launcher = await openLog();
  await expect(lines).toContainText([/^Round 2:/,/Fighter #1 waits/,/Weakened expires/,/uses Heal Goblin/,/heals \d+ HP/,/: miss \(/]);
+ await expect(groups).toContainText([/Round 2 · Fighter #1 · End turn/, /Goblin Shaman.* · Heal Goblin/]);
  const history = await lines.allTextContents();
  const damageLine = /(heals \d+ HP|: miss \()/;
  const statusLine = / expires$/;
@@ -698,6 +710,27 @@ test('battle log filters and keeps history across Hide and reopen', async ({ pag
  await expect(lines).toHaveText(history.filter(line => damageLine.test(line)));
  await selectFilter('Status & Saves');
  await expect(lines).toHaveText(history.filter(line => statusLine.test(line)));
+ await expect(groups).toContainText([/Round 2 · Fighter #1 · End turn/]);
+
+ const exported = await downloadCombatLog(page,activate);
+ expect(exported).toMatchObject({
+   format:'tactics-guru-combat-log', version:1,
+   build:{commit:expect.stringMatching(/^[0-9a-f]{40}$/),dirty:expect.any(Boolean)},
+   versions:before.state.versions, history:{limit:40,resumed:true,truncated:false},
+ });
+ expect(exported.groups.flatMap(group => group.entries.map(entry => entry.text))).toEqual(history);
+ expect(exported.groups).toContainEqual(expect.objectContaining({
+   actor:expect.objectContaining({name:expect.stringMatching(/Goblin Shaman/)}),
+   action:expect.objectContaining({abilityId:'ability:heal_goblin'}),
+   entries:expect.arrayContaining([expect.objectContaining({
+     type:'healed', unit:expect.objectContaining({name:expect.stringMatching(/Goblin Grunt/)}),
+     result:{healing:expect.any(Number),hp:expect.any(Number)},
+   })]),
+ }));
+ await expect(filters.getByRole('button',{pressed:true})).toHaveText('Status & Saves');
+ await expect.poll(() => dialog.evaluate(element => element.matches(':modal'))).toBe(true);
+ if (!isMobile) await expect(dialog.getByRole('button',{name:'Export combat log'})).toBeFocused();
+ expect(await readSession(page)).toEqual(before);
 
  if (!isMobile) await page.setViewportSize({width:360,height:600});
  await expect.poll(() => dialog.evaluate(element =>
@@ -718,6 +751,40 @@ test('battle log filters and keeps history across Hide and reopen', async ({ pag
 
  await openLog();
  await expect(lines).toHaveText(history);
+ expect(await readSession(page)).toEqual(before);
+ await activate(hide);
+ await settledDungeonSnapshot(page);
+ await page.reload();
+ await expectDungeonResumed(page);
+ await expect(game).toHaveAttribute('data-phase','player',{timeout:15_000});
+ expect((await readSession(page)).state).toEqual(before.state);
+ await openLog();
+ await expect(lines).toHaveText([new RegExp(`^Round ${before.state.round}: .+'s turn$`)]);
+ await expect(lines).toHaveCount(1);
+});
+
+dungeonTest('combat log exports when local storage is unavailable', { tag: '@desktop-chromium-portrait-webkit' }, async ({page,isMobile}) => {
+ test.setTimeout(90_000);
+ await page.addInitScript(() => {
+   Object.defineProperty(window,'localStorage',{get(){throw new DOMException('denied','SecurityError');}});
+ });
+ await page.goto('./dungeon');
+ await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
+ await expect(page.locator('#game')).toHaveAttribute('data-phase','player',{timeout:15_000});
+ if (isMobile) await expect(page.locator('body')).toHaveClass(/battle-skin-radial/);
+ const before = await readSession(page);
+ const activate = (button: Locator) => isMobile ? button.tap() : button.press('Enter');
+ await activate(await battleTool(page,'#battle-log-open'));
+ const dialog = page.getByRole('dialog',{name:'Battle log',exact:true});
+ const log = await downloadCombatLog(page,activate);
+ expect(log).toMatchObject({
+   format:'tactics-guru-combat-log', versions:before.state.versions,
+   history:{limit:40,resumed:false,truncated:false},
+ });
+ expect(log.groups.at(-1)?.entries.at(-1)).toMatchObject({type:'turnStarted'});
+ await expect(dialog).toBeVisible();
+ await activate(dialog.getByRole('button',{name:'Hide',exact:true}));
+ await expect(dialog).toBeHidden();
  expect(await readSession(page)).toEqual(before);
 });
 
