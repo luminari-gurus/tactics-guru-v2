@@ -12,7 +12,7 @@ import { measurements, setBattleAudioDiagnostics } from '../diagnostics/browser'
 import type { Point, BoardRegion } from '../geometry/iso';
 import { BattleHud, unitFeedback } from '../ui/hud';
 import { BattleDialogs } from '../ui/dialogs';
-import { createBattleLogContent } from '../ui/battleLog';
+import { createBattleLogContent, downloadBattleLog } from '../ui/battleLog';
 import { menuReturnLink } from '../ui/menuReturn';
 import { track } from '../telemetry/telemetry';
 import { hoverPreview } from '../ui/targetPreview';
@@ -245,7 +245,7 @@ export class BattleScene extends Phaser.Scene {
       if(!step){refresh();return;}
       presentationStart=step.before;
       if(followPlan){planInFlight=true;planInterrupted=false;}
-      clear(followPlan);selection.selectedCell=null;removeInput.reset();hud.append(step.events);audio.present(step.token,step.events);
+      clear(followPlan);selection.selectedCell=null;removeInput.reset();hud.append(step.before, step.events);audio.present(step.token,step.events);
       refresh();animation=board.animate(step.before,step.after,step.events);
       const moving=step.events.some(event=>event.type==='moved' || event.type==='pushed');movingPresentation=moving;
       if(moving)measurements.workload('move',performance.now());
@@ -330,8 +330,10 @@ export class BattleScene extends Phaser.Scene {
       },
       danger:()=>{if(session.phase==='player' && !dialogs.open){selection.toggleDanger();refresh();}},
       target:cell=>{board.resetPicking();hovered=null;select(cell);},confirm,cancel,inspect:invoker=>inspect(undefined,invoker),inspectTarget:inspect,
-      log:(entries,invoker)=>{
-        dialogs.showChoices('Battle log',createBattleLogContent([...entries]),[
+      log:(snapshot,invoker)=>{
+        const versions = session.state.versions;
+        dialogs.showChoices('Battle log',createBattleLogContent(snapshot.entries),[
+          {id:'log-export',label:'Export combat log',keepOpen:true,run:()=>downloadBattleLog(snapshot,__BUILD_INFO__,versions)},
           {id:'log-close',label:'Hide',run:releaseRadial},
         ],releaseRadial,readOnlyTool(invoker));
       },

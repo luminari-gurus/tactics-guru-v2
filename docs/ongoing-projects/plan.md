@@ -4,6 +4,10 @@
 - Assignee `moshehbenavraham` · planning base `f3a0d2c4c43aa4dfb8bcdeea68456f0d888056ad` · November 26, 2026
 - [Previous handoff for #404](issue-404-combat-log-filters-plan.md)
 
+## Implementation status
+
+Implementation authorized November 26, 2026. The local worktree and published development branch are dedicated to #179. The [OpenSpec change](../../openspec/changes/issue-179-combat-log-export/proposal.md) tracks the grouped view, retention and download. The Linux verification checkout is `/home/aiwithapex/projects/tactics-179-verification.JyttLs/checkout`. Dependencies installed there with `npm ci --prefer-offline` after the strictly offline install found an uncached package. The history model, modal download and combat guide are implemented. Three focused unit cases and both type scopes passed against the implementation files before the browser assertions were added. The browser pass and ordinary PR checks are pending.
+
 ## Outcome
 
 Players can read recent combat by round, acting unit and action in the existing Battle log, then explicitly download that same retained history as readable, indented JSON. The file identifies the source build and combat rules. Existing filters, Hide, Escape and focus return stay available in both Rail and Radial.
