@@ -18,7 +18,7 @@ import { COMBAT_PACE_KEY } from '../src/ui/combatPacePreference';
 import { AUTO_COLLECT_LOOT_KEY } from '../src/ui/autoCollectLootPreference';
 import { endTurn, battleTool, readSession,playCommand,playUndo,checkActivePlaytime,checkBackgroundPlaytime } from './helpers/battlePolicy';
 import { playerDecision, fighterDecision } from './helpers/playerPolicy';
-import { journeyPreparation, shamanJourney, walkWitness } from './helpers/dungeonFixtures';
+import { journeyPreparation, shamanJourney } from './helpers/dungeonFixtures';
 import { dispatch } from '../src/domain/turns';
 import { previewMovement } from '../src/domain/grid';
 import type { Command, BattleEvent, BattleState } from '../src/domain/types';
@@ -632,86 +632,85 @@ test('battle log filters and keeps history across Hide and reopen', async ({ pag
  await page.addInitScript(key => {
    localStorage.setItem(key,JSON.stringify({version:1,pace:'fast'}));
  },COMBAT_PACE_KEY);
- const entry = walkWitness(freshDungeon('battle-log-filters',189));
- const catalog = dungeonBattle(entry)!.catalog;
- await openSavedDungeon(page,entry);
+ // Resume after the Fighter's first Guarded Strike. Its next End Turn lets the
+ // Shaman heal and the Grunt attack while the Fighter's Weakened status expires.
+ const witness = shamanJourney(189);
+ const { catalog, state: initial } = dungeonBattle(witness.entry)!;
+ const guarded = witness.commands.findIndex(command => command.type === 'useAbility' && command.abilityId === 'ability:guarded_strike');
+ expect(guarded).toBeGreaterThanOrEqual(0);
+ let state = initial;
+ for (const command of witness.commands.slice(0,guarded+1)) {
+   const next = dispatch(state,command,catalog);
+   if (!next.ok) throw Error(next.reason);
+   state = next.state;
+ }
+ await openSavedDungeon(page,checkedDungeon(acceptDungeonBattle(witness.entry,state)));
  const game = page.locator('#game');
  await expect(game).toHaveAttribute('data-phase','player',{timeout:15_000});
 
  const activate = async (button: Locator) => {
    if (isMobile) await button.tap();
-   else { await button.focus(); await page.keyboard.press('Enter'); }
+   else await button.press('Enter');
  };
  const dialog = page.getByRole('dialog',{name:'Battle log',exact:true});
  const filters = dialog.getByRole('group',{name:'Filter battle log'});
- const all = filters.getByRole('button',{name:'All',exact:true});
- const actions = filters.getByRole('button',{name:'Actions',exact:true});
- const damage = filters.getByRole('button',{name:'Damage & Healing',exact:true});
- const status = filters.getByRole('button',{name:'Status & Saves',exact:true});
+ const filterButton = (name: string) => filters.getByRole('button',{name,exact:true});
  const hide = dialog.getByRole('button',{name:'Hide',exact:true});
  const lines = dialog.locator('#battle-log > li');
  const openLog = async () => {
    const launcher = await battleTool(page,'#battle-log-open');
    await activate(launcher);
-   await expect(dialog).toBeVisible();
-   await expect(all).toHaveAttribute('aria-pressed','true');
+   await expect(filters.getByRole('button',{pressed:true})).toHaveText('All');
    return launcher;
  };
- const selectFilter = async (filter: Locator) => {
-   await activate(filter);
-   await expect(filter).toHaveAttribute('aria-pressed','true');
-   await expect(filters.locator('[aria-pressed="true"]')).toHaveCount(1);
+ const selectFilter = async (name: string) => {
+   await activate(filterButton(name));
+   await expect(filters.getByRole('button',{pressed:true})).toHaveText(name);
  };
 
  let launcher = await openLog();
- await expect(lines.first()).toHaveText(/^Round 1:/);
+ await expect(lines).toHaveText([/^Round 2: Fighter #1's turn$/]);
  if (!isMobile) {
-   await all.focus();
-   await page.keyboard.press('Tab');
-   await expect(actions).toBeFocused();
+   await filterButton('All').press('Tab');
+   await expect(filterButton('Actions')).toBeFocused();
  }
- await selectFilter(status);
+ await selectFilter('Status & Saves');
  await expect(lines).toHaveCount(0);
  await expect(dialog.getByRole('status')).toHaveText('No events for this filter.');
  await activate(hide);
  await expect(dialog).toBeHidden();
  if (!isMobile) await expect(launcher).toBeFocused();
 
- // The first four player decisions at seed 189 bring a Shaman save and a Mage damage roll into the log.
- for (let decision = 0; decision < 4; decision++) {
-   const { state } = await readSession(page);
-   await playCommand(page,playerDecision(state,catalog),state,activate);
-   await expect.poll(async () => (await readSession(page)).state.commandCount).toBeGreaterThan(state.commandCount);
-   await expect(game).toHaveAttribute('data-phase','player');
- }
+ await endTurn(page,selector => activate(page.locator(selector)));
+ await expect.poll(async () => (await readSession(page)).state.commandCount).toBeGreaterThan(state.commandCount);
+ await expect(game).toHaveAttribute('data-phase','player',{timeout:15_000});
  const before = await readSession(page);
  launcher = await openLog();
- await expect(lines).toContainText([/^Round 1:/,/uses Weakening Hex/,/Will save fails/,/Weakened by/,/uses Magic Missile/,/^Missile 1:/,/takes \d+ damage/]);
+ await expect(lines).toContainText([/^Round 2:/,/Fighter #1 waits/,/Weakened expires/,/uses Heal Goblin/,/heals \d+ HP/,/: miss \(/]);
  const history = await lines.allTextContents();
- const damageLine = /(^Missile \d+:|takes \d+ damage)/;
- const statusLine = /(Will save|Weakened by)/;
- await selectFilter(actions);
+ const damageLine = /(heals \d+ HP|: miss \()/;
+ const statusLine = / expires$/;
+ await selectFilter('Actions');
  await expect(lines).toHaveText(history.filter(line => !damageLine.test(line) && !statusLine.test(line)));
- await selectFilter(damage);
+ await selectFilter('Damage & Healing');
  await expect(lines).toHaveText(history.filter(line => damageLine.test(line)));
- await selectFilter(status);
+ await selectFilter('Status & Saves');
  await expect(lines).toHaveText(history.filter(line => statusLine.test(line)));
- await selectFilter(all);
+ await selectFilter('All');
  await expect(lines).toHaveText(history);
 
- await selectFilter(status);
+ await selectFilter('Status & Saves');
  if (!isMobile) await page.setViewportSize({width:360,height:600});
- await expect.poll(() => dialog.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
- for (const control of [all,actions,damage,status,hide]) {
-   await expect.poll(() => control.evaluate(element => {
-     const {width,height} = element.getBoundingClientRect();
+ await expect.poll(() => dialog.evaluate(element =>
+   element.scrollWidth <= element.clientWidth && [...element.querySelectorAll('button')].every(button => {
+     const {width,height} = button.getBoundingClientRect();
      return width >= 44 && height >= 44;
-   })).toBe(true);
- }
+   }),
+ )).toBe(true);
  if (isMobile) await activate(hide);
  else {
    await page.keyboard.press('w');
-   await expect(dialog).toHaveAccessibleName('Battle log');
+   await expect(hide).toBeVisible();
    await page.keyboard.press('Escape');
  }
  await expect(dialog).toBeHidden();

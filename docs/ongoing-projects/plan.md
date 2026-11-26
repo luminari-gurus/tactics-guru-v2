@@ -10,9 +10,9 @@
 
 Implementation authorized November 26, 2026. The existing issue branch is checked out in its dedicated worktree. The OpenSpec proposal, behavior delta, design and tasks are ready. The Linux verification checkout is at `/home/aiwithapex/projects/tactics-404-verification.i5PD90/checkout`.
 
-The four filters and Hide are wired into the existing dialog. The focused unit test passed. At seed 189 the first player turn has an empty Status & Saves filter. Four legal player decisions then produce Weakening Hex and Magic Missile outcomes. The focused browser case starts from the legally reached encounter boundary with Fast combat pace. The separate Shaman companion owns full exploration and battle traversal.
+The four filters and Hide are wired into the existing dialog. The focused unit test passed. The browser case resumes seed 189 after the Fighter’s first Guarded Strike, using a checkpoint replayed through legal commands and Fast combat pace. Its log starts with the current turn header, so Status & Saves is empty. One real End Turn then expires Weakened and prompts Shaman healing and a Grunt attack. The Shaman companion still walks the dungeon and plays the complete normal-paced encounter.
 
-The first exact-source WSL run of `npm run verify:pr` stopped during units with 29 test timeouts and two timing-related assertions. Its original receipts are retained under `checkout/verification-receipts/pr/1795687950112-591259/`. The separate root build passed content validation and both TypeScript scopes. The first Chromium attempt reached the new assertions on one profile and timed out before completing on all three, so its logs and traces are retained. Later runs will record results separately.
+The first exact-source WSL run of `npm run verify:pr` stopped during units with 29 test timeouts and two timing-related assertions. Its original receipts are retained under `checkout/verification-receipts/pr/1795687950112-591259/`. The separate root build passed content validation and both TypeScript scopes. The first Chromium attempt reached the new assertions on one profile and timed out before completing on all three, so its logs and traces are retained. A second attempt from the encounter entrance retained the desktop trace showing the empty state and focus return succeeded before setup consumed the case budget. The revised fixture starts one legal turn before the mixed history. Later runs will record results separately.
 
 ## Outcome
 
@@ -49,4 +49,4 @@ Open one implementation PR with `Closes #404` after the acceptance checks pass. 
 
 ## Estimate and open questions
 
-Estimated Codex implementation and targeted verification time is **60–90 minutes** with dependencies and browser binaries available. Self-hosted CI queue time is additional. There are no blocking product questions. The first legal seed-189 sequence that produces the required mixed and empty filter states will be confirmed during implementation.
+Estimated Codex implementation and targeted verification time is **60–90 minutes** with dependencies and browser binaries available. Self-hosted CI queue time is additional. There are no blocking product questions. The seed-189 checkpoint and the subsequent mixed history are documented in the implementation status.
