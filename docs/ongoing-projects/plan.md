@@ -10,7 +10,9 @@
 
 Implementation authorized November 26, 2026. The existing issue branch is checked out in its dedicated worktree. The OpenSpec proposal, behavior delta, design and tasks are ready. The Linux verification checkout is at `/home/aiwithapex/projects/tactics-404-verification.i5PD90/checkout`.
 
-The four filters and Hide are wired into the existing dialog. The focused unit test passed. At seed 189 the first player turn has an empty Status & Saves filter. Four legal player decisions then produce Weakening Hex and Magic Missile outcomes, which give the browser test a short mixed-history witness.
+The four filters and Hide are wired into the existing dialog. The focused unit test passed. At seed 189 the first player turn has an empty Status & Saves filter. Four legal player decisions then produce Weakening Hex and Magic Missile outcomes. The focused browser case starts from the legally reached encounter boundary with Fast combat pace. The separate Shaman companion owns full exploration and battle traversal.
+
+The first exact-source WSL run of `npm run verify:pr` stopped during units with 29 test timeouts and two timing-related assertions. Its original receipts are retained under `checkout/verification-receipts/pr/1795687950112-591259/`. The separate root build passed content validation and both TypeScript scopes. The first Chromium attempt reached the new assertions on one profile and timed out before completing on all three, so its logs and traces are retained. Later runs will record results separately.
 
 ## Outcome
 

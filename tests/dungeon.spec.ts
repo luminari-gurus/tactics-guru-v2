@@ -18,7 +18,7 @@ import { COMBAT_PACE_KEY } from '../src/ui/combatPacePreference';
 import { AUTO_COLLECT_LOOT_KEY } from '../src/ui/autoCollectLootPreference';
 import { endTurn, battleTool, readSession,playCommand,playUndo,checkActivePlaytime,checkBackgroundPlaytime } from './helpers/battlePolicy';
 import { playerDecision, fighterDecision } from './helpers/playerPolicy';
-import { journeyPreparation, shamanJourney } from './helpers/dungeonFixtures';
+import { journeyPreparation, shamanJourney, walkWitness } from './helpers/dungeonFixtures';
 import { dispatch } from '../src/domain/turns';
 import { previewMovement } from '../src/domain/grid';
 import type { Command, BattleEvent, BattleState } from '../src/domain/types';
@@ -627,11 +627,16 @@ test('Forest Elite keeps a living goblin visible behind raised terrain', async (
 });
 
 test('battle log filters and keeps history across Hide and reopen', async ({ page, isMobile }) => {
+ test.setTimeout(60_000);
  if (!isMobile) await page.setViewportSize({width:1280,height:800});
- await openSavedDungeon(page,freshDungeon('battle-log-filters',189));
- await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
+ await page.addInitScript(key => {
+   localStorage.setItem(key,JSON.stringify({version:1,pace:'fast'}));
+ },COMBAT_PACE_KEY);
+ const entry = walkWitness(freshDungeon('battle-log-filters',189));
+ const catalog = dungeonBattle(entry)!.catalog;
+ await openSavedDungeon(page,entry);
  const game = page.locator('#game');
- await expect(game).toHaveAttribute('data-phase','player');
+ await expect(game).toHaveAttribute('data-phase','player',{timeout:15_000});
 
  const activate = async (button: Locator) => {
    if (isMobile) await button.tap();
@@ -672,7 +677,6 @@ test('battle log filters and keeps history across Hide and reopen', async ({ pag
  await expect(dialog).toBeHidden();
  if (!isMobile) await expect(launcher).toBeFocused();
 
- const catalog = dungeonBattle(await snapshot(page))!.catalog;
  // The first four player decisions at seed 189 bring a Shaman save and a Mage damage roll into the log.
  for (let decision = 0; decision < 4; decision++) {
    const { state } = await readSession(page);
