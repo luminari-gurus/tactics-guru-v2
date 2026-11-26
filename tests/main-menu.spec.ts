@@ -21,7 +21,7 @@ const test = base.extend<{ applicationLoadDiagnostics: ApplicationLoadDiagnostic
 });
 const keys={battle:BATTLE_STORAGE_KEYS,run:RUN_STORAGE_KEYS,dungeon:DUNGEON_KEYS};
 
-test('main menu: an unsaved defeat retries history after reload without replaying the summary', async ({ page }) => {
+test('main menu: an unsaved defeat retries history after reload without replaying the summary', { tag: '@desktop-chromium-portrait-webkit' }, async ({ page }) => {
   const lockOwner = await page.context().newPage();
   try {
     await lockOwner.goto('./');
@@ -55,7 +55,7 @@ test('main menu: an unsaved defeat retries history after reload without replayin
   } finally { await lockOwner.close(); }
 });
 
-test('main menu: records display and reviewed export restore reset preserve active saves', async ({ page, isMobile }, info) => {
+test('main menu: records display and reviewed export restore reset preserve active saves', { tag: '@desktop-chromium-portrait-webkit' }, async ({ page, isMobile }, info) => {
   const rows: RunRecord[] = [
     { mode: 'run', id: 'authored-example', outcome: 'defeat', recordedAt: Date.UTC(2026, 10, 10, 12), battlesWon: 1, floorsCleared: null, deepestFloor: null },
     { mode: 'dungeon', id: 'dungeon-example', outcome: 'abandoned', recordedAt: Date.UTC(2026, 10, 10, 13), battlesWon: 6, floorsCleared: 2, deepestFloor: 3 },
@@ -102,7 +102,7 @@ test('main menu: records display and reviewed export restore reset preserve acti
   await activate('Close'); await expect(page.getByRole('button', { name: 'Hall of Records', exact: true })).toBeFocused();
 });
 
-test('main menu: records unavailable storage is honest and leaves gameplay navigation usable', async ({ page, isMobile }) => {
+test('main menu: records unavailable storage is honest and leaves gameplay navigation usable', { tag: '@desktop-chromium-portrait-webkit' }, async ({ page, isMobile }) => {
   await page.addInitScript(slots => {
     const original = Storage.prototype.getItem;
     Storage.prototype.getItem = function(key) {
@@ -132,7 +132,7 @@ test('main menu: records unavailable storage is honest and leaves gameplay navig
   await expect(page.locator('#dungeon-screen')).toContainText('Run history could not be confirmed');
 });
 
-test('main menu: records dungeon replacement withholds exploration until final history finishes', async ({ page }) => {
+test('main menu: records dungeon replacement withholds exploration until final history finishes', { tag: '@desktop-chromium-portrait-webkit' }, async ({ page }) => {
   await page.goto('./'); await page.getByRole('button', { name: 'New Game', exact: true }).click();
   await expect(page.locator('#dungeon-map')).toBeVisible();
   const map = await page.locator('#dungeon-map').elementHandle(); if (!map) throw Error('Missing exploration map');
@@ -158,7 +158,7 @@ test('main menu: records dungeon replacement withholds exploration until final h
   await expect.poll(async () => JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!).revision).toBe(revision + 1);
 });
 
-test('main menu: records replacing distinct saved and unsaved dungeon preserves both after interrupted history', async ({ page, isMobile }, info) => {
+test('main menu: records replacing distinct saved and unsaved dungeon preserves both after interrupted history', { tag: '@desktop-chromium-portrait-webkit' }, async ({ page, isMobile }, info) => {
   const mode = 'dungeon', slots = keys.dungeon, savedPayload = {...JSON.parse(menuFixture(mode)).payload,
     stats:{...freshRunStats(),enemiesKilled:0,movesTaken:6,activeMs:5000}};
   const encoded=encodeDungeon(savedPayload);
@@ -380,7 +380,7 @@ test('main menu: New Game confirms over the menu and preserves other save famili
   .toMatchObject([{id:JSON.parse(text).payload.id,mode:'dungeon',outcome:'abandoned'}]);
 });
 
-test('main menu: records concurrent confirmed dungeon replacements retain one immutable old result',async({page,context,isMobile})=>{
+test('main menu: records concurrent confirmed dungeon replacements retain one immutable old result', { tag: '@desktop-chromium-portrait-webkit' }, async({page,context,isMobile})=>{
  const saved=menuFixture('dungeon'),id=JSON.parse(saved).payload.id;
  await page.goto('./');await page.evaluate(({keys,saved})=>{
   localStorage.setItem(keys.primary,saved);localStorage.setItem(keys.backup,saved);

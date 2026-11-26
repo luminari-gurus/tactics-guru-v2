@@ -1,10 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { definitions, createPlan, discover, exactCoverage, matchedCaseDigests, inventory, verifyBuild, runRows, aggregate, preparationIds, validateBrowserResult, validatePerformanceResult, validateScheduling, schedulingCompute, timingReport, quarantineCleanup, pilotOverlap, samplePilotClock, awaitPilotRunners } from '../../scripts/verification-batches.mjs';
+import { bindFullDiscovery, canDistributeBuild, definitions, createPlan, discover, exactCoverage, matchedCaseDigests, inventory, packParallelBuild, restorePublicBuildFiles, verifyBuild, runRows, aggregate, preparationIds, validateBrowserResult, validatePerformanceResult, validateScheduling, schedulingCompute, timingReport, quarantineCleanup, pilotOverlap, samplePilotClock, awaitPilotRunners } from '../../scripts/verification-batches.mjs';
 import { digest, compareReports } from '../../scripts/verification-report.mjs';
 import { stages } from '../../scripts/verification-timings.mjs';
 
@@ -110,6 +110,34 @@ test('artifact validation rejects altered files, missing files, wrong source and
   } finally { rmSync(directory, { recursive: true, force: true }); }
 });
 
+test('parallel transfer restores only identical public assets and verifies every resulting byte', () => {
+  const root = mkdtempSync(join(tmpdir(), 'tg-parallel-transfer-'));
+  try {
+    const dist = join(root, 'dist'), assets = join(root, 'public'), packed = join(root, 'packed');
+    for (const dir of [dist, assets]) mkdirSync(join(dir, 'art'), { recursive: true });
+    for (const dir of [dist, assets]) writeFileSync(join(dir, 'art', 'shared.png'), 'shared');
+    writeFileSync(join(assets, 'unused'), 'checkout only');
+    writeFileSync(join(assets, 'index.html'), 'original');
+    writeFileSync(join(dist, 'index.html'), 'generated');
+    const source = { commit: 'abc', inputHash: 'inputs' };
+    const plan = { source }; plan.planHash = digest(JSON.stringify(plan));
+    const files = inventory(dist);
+    const build = { source, files, planHash: plan.planHash, hash: digest(JSON.stringify(files)) };
+    const omitted = packParallelBuild(dist, assets, packed, files);
+    assert.deepEqual(omitted, ['art/shared.png']);
+    assert.deepEqual(inventory(packed).map(file => file.path), ['index.html']);
+    restorePublicBuildFiles(packed, assets, omitted);
+    verifyBuild(plan, build, packed, source);
+    writeFileSync(join(packed, 'art', 'shared.png'), 'damaged');
+    restorePublicBuildFiles(packed, assets, omitted);
+    assert.throws(() => verifyBuild(plan, build, packed, source), /hash mismatch/);
+    rmSync(join(packed, 'art', 'shared.png'));
+    writeFileSync(join(assets, 'art', 'shared.png'), 'different checkout bytes');
+    restorePublicBuildFiles(packed, assets, omitted);
+    assert.throws(() => verifyBuild(plan, build, packed, source), /hash mismatch/);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
 test('failed prerequisites block only consumers; prefix failure still restores root', async () => {
   const rows = definitions().find(job => job.id === 'prefix-assets').stages;
   const prerequisites = preparationIds.map(id => ({ id, status: 'passed' }));
@@ -126,6 +154,37 @@ test('interrupt stops later work and checkpoints already recorded failures', asy
   const rows = await runRows([{ id: 'first' }, { id: 'next' }], [], async () => { abort.abort(); return { status: 'failed' }; },
     results => checkpoints.push(results.length), abort.signal);
   assert.equal(rows.length, 1); assert.deepEqual(checkpoints, [1]); assert.equal(rows[0].status, 'failed');
+});
+
+test('aggregate reports preparation stages and the tooling result when the plan was never sealed', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'verification-unsealed-'));
+  try {
+    const bundle = join(directory, 'bundle');
+    const output = join(directory, 'aggregate');
+    const preparation = { batchId: 'prepare', stages: [
+      { id: 'units', status: 'failed', error: 'Unit test failed' },
+      { id: 'build-root', status: 'blocked', blockedBy: ['units'] },
+    ] };
+    mkdirSync(join(bundle, 'preparation'), { recursive: true });
+    writeFileSync(join(bundle, 'preparation/receipt.json'), JSON.stringify(preparation));
+    const script = new URL('../../scripts/verification-batches.mjs', import.meta.url).href;
+    const stepSummary = join(directory, 'step-summary.md');
+    const run = spawnSync(process.execPath, ['--input-type=module', '-e',
+      'const { main } = await import(process.argv[1]); process.exitCode = await main(process.argv.slice(2));',
+      script, 'aggregate', bundle, join(directory, 'receipts'), output],
+    { env: { ...process.env, GITHUB_STEP_SUMMARY: stepSummary, SERIAL_FULL_TOOLING_RESULT: 'failure', SERIAL_FULL_BATCH_RESULT: 'skipped' } });
+    assert.equal(run.status, 1, run.stderr?.toString());
+    const report = JSON.parse(readFileSync(join(output, 'summary.json'), 'utf8'));
+    assert.equal(report.passed, false);
+    assert.equal(report.complete, false);
+    assert.equal(report.baselineEligible, false);
+    assert.deepEqual(report.latest, [preparation]);
+    const summary = readFileSync(join(output, 'summary.md'), 'utf8');
+    assert.match(summary, /Browser shards skipped\. tooling: latest Actions job result was failure/);
+    assert.match(summary, /Preparation \/ units: failed \(Unit test failed\)/);
+    assert.match(summary, /Preparation \/ build-root: blocked/);
+    assert.equal(readFileSync(stepSummary, 'utf8'), summary);
+  } finally { rmSync(directory, { recursive: true, force: true }); }
 });
 
 test('aggregate accepts exact complete receipts and records attempts/compute', () => {
@@ -225,6 +284,30 @@ test('a failed setup/upload on a newer Actions attempt cannot reuse an older pas
   assert.equal(validateScheduling(value.plan, summary, scheduler).length, 1);
 });
 
+test('a tooling failure skips the parent batch before matrix expansion and retains older receipts as history', () => {
+  const plan = createPlan('parallel-full', discovery);
+  const names = ['prepare', ...plan.requested.map(id => `batch (${id})`)];
+  const startedAt = '2026-10-22T00:00:00Z', completedAt = '2026-10-22T00:00:02Z';
+  const job = (name, attempt = 1, conclusion = 'success') => ({ name, attempt, status: 'completed', conclusion, startedAt, completedAt });
+  const summary = { latest: ['prepare', ...plan.requested].map(batchId => ({ batchId, startedAt, finishedAt: completedAt })) };
+  const scheduler = { jobs: [...names.map(name => job(name)), job('tooling')] };
+  assert.deepEqual(validateScheduling(plan, summary, scheduler), []);
+  scheduler.jobs.push(job('tooling', 2, 'failure'), job('batch', 2, 'skipped'));
+  assert.match(validateScheduling(plan, summary, scheduler)[0], /tooling: latest Actions job result was failure/);
+  const skipReason = 'Browser shards skipped after tooling failed';
+  const value = fixture();
+  const oldReceipts = value.receipts.map((report, i) => ({ ...report, batchId: plan.requested[i] }));
+  const result = aggregate({ ...value.plan, ...plan }, value.build, value.preparation, oldReceipts, skipReason);
+  assert.equal(result.passed, false);
+  assert.equal(result.complete, false);
+  assert.equal(result.baselineEligible, false);
+  assert.ok(result.errors.includes(skipReason));
+  assert.ok(!result.errors.some(error => /missing receipt|overlapping/.test(error)));
+  assert.deepEqual(result.latest.map(report => report.batchId), ['prepare']);
+  assert.deepEqual(result.history.slice(1).map(report => report.batchId), plan.requested);
+  assert.deepEqual(validateScheduling(plan, result, scheduler, true), []);
+});
+
 test('Actions copied successful snapshots can reuse old receipts without double-counting compute', () => {
   const value = fixture(), summary = summarize(value);
   const original = { name: 'prepare', attempt: 1, status: 'completed', conclusion: 'success',
@@ -256,6 +339,39 @@ test('browser acceptance rejects missing final reports, narrowed coverage, skips
     const changed = structuredClone(row); mutate(changed);
     assert.throws(() => validateBrowserResult(stage, changed));
   }
+});
+
+test('parallel-full assigns every stage once, measures performance on the root build and preserves canonical cases', () => {
+  const plan = createPlan('parallel-full', discovery);
+  assert.equal(plan.scope, 'full');
+  assert.deepEqual(plan.preparationIds, [...preparationIds, 'performance']);
+  assert.deepEqual(plan.requested, ['full-chromium', 'full-webkit-assets']);
+  const [chromium, other] = plan.jobs;
+  assert.deepEqual(chromium.stages.map(row => row.id), ['chromium']);
+  assert.deepEqual(other.stages.map(row => row.id), ['webkit-acceptance', 'webkit-exploration', 'assets-root-dev',
+    'build-prefix', 'assets-prefix-preview', 'assets-prefix-dev', 'restore-root']);
+  assert.deepEqual([...plan.preparationIds, ...plan.jobs.flatMap(job => job.stages.map(row => row.id))].sort(),
+    stages.map(stage => stage.id).sort());
+  for (const job of plan.jobs) for (const row of job.stages) {
+    const stage = stages.find(stage => stage.id === row.id);
+    assert.deepEqual(row, { ...stage, expected: stage.browser ? discovery(stage) : null });
+  }
+  assert.throws(() => createPlan('parallel-full', discovery, 'full-chromium'), /requires both/);
+});
+
+test('an isolated performance failure permits the browser jobs but fails the aggregate', () => {
+  const value = fixture();
+  value.plan.mode = 'parallel-full';
+  value.preparation.passed = false;
+  value.preparation.stages.push({ id: 'performance', status: 'failed' });
+  assert.equal(canDistributeBuild(value.plan.mode, value.preparation), true);
+  assert.ok(summarize(value).errors.includes('prepare: failed'));
+  assert.equal(canDistributeBuild('capture', value.preparation), false);
+  for (const patch of [{ complete: false }, { inputsUnchanged: false }, { error: 'interrupted' }]) {
+    assert.equal(canDistributeBuild(value.plan.mode, { ...value.preparation, ...patch }), false);
+  }
+  value.preparation.stages.find(stage => stage.id === 'build-root').status = 'failed';
+  assert.equal(canDistributeBuild(value.plan.mode, value.preparation), false);
 });
 
 test('parallel pilot matches serial pilot selection and requires both batches', () => {
@@ -309,6 +425,15 @@ test('parallel pilot requires passing case overlap beyond the measured clock unc
   const webkit = receipt('pilot-webkit', 1000);
   assert.equal(pilotOverlap([chromium, { ...webkit, attempt: 2 }]), 0);
   assert.equal(pilotOverlap([chromium, { ...webkit, clock: {} }]), 0);
+
+  // Only the last pair overlaps across these 160,000 candidate pairs.
+  const manyCases = (batchId, offset) => {
+    const report = receipt(batchId, offset);
+    const tests = report.stages[0].summary.tests;
+    report.stages[0].summary.tests = Array(399).fill(tests[0]).concat(receipt(batchId, 3000).stages[0].summary.tests);
+    return report;
+  };
+  assert.equal(pilotOverlap([manyCases('pilot-chromium', -3000), manyCases('pilot-webkit', 9000)]), 3000);
 });
 
 test('workflow defaults to serial and pins the manual pilot to distinct per-VM locks', () => {
@@ -330,7 +455,7 @@ test('workflow defaults to serial and pins the manual pilot to distinct per-VM l
   const rendezvous = workflow.indexOf('npm run verify:batches -- await-pilot');
   const execute = workflow.indexOf('65m npm run verify:batches -- run');
   assert.ok(preflight > 0 && preflight < publishReadiness && publishReadiness < rendezvous && rendezvous < execute);
-  const jobs = ['qualify', 'prepare', 'batch'].map(id => workflow.split(`\n  ${id}:\n`)[1].split(/\n  [a-z]+:\n/)[0]);
+  const jobs = ['qualify', 'tooling', 'prepare', 'batch'].map(id => workflow.split(`\n  ${id}:\n`)[1].split(/\n  [a-z]+:\n/)[0]);
   jobs.push(...['browser-setup.yml', 'issue-219-process-cleanup.yml'].map(file =>
     readFileSync(new URL('../../.github/workflows/' + file, import.meta.url), 'utf8')));
   for (const job of jobs) {
@@ -345,6 +470,41 @@ test('workflow defaults to serial and pins the manual pilot to distinct per-VM l
       assert.equal(spawnSync('sh', ['-c', guard], options).status, 1);
     } finally { rmSync(directory, { recursive: true, force: true }); }
   }
+});
+
+test('full parallel browsers require the independent tooling job on the second reserved VM', () => {
+  const workflow = readFileSync(new URL('../../.github/workflows/issue-200-baseline.yml', import.meta.url), 'utf8');
+  const job = id => workflow.split(`\n  ${id}:\n`)[1].split(/\n  [\w-]+:\n/)[0];
+  assert.match(job('tooling'), /inputs.mode == 'parallel-full'/);
+  assert.match(job('tooling'), /group: tactics-browser-tactics-browser-02/);
+  assert.match(job('tooling'), /-- discover verification-receipts\/serial\/discovery-plan/);
+  assert.match(job('tooling'), /name: issue208-discovery-/);
+  assert.match(job('tooling'), /npm run test:verification-tooling && npm run test:verification-batches/);
+  assert.match(job('prepare'), /if: inputs.mode != 'parallel-full'\s+run: npm run test:verification-tooling && npm run test:verification-batches/);
+  assert.doesNotMatch(job('prepare'), /^    needs:/m);
+  assert.match(job('prepare'), /-- prepare-build[\s\S]+-- await-discovery[\s\S]+-- seal-build/);
+  assert.match(job('batch'), /needs: \[prepare, tooling\]/);
+  assert.match(job('batch'), /inputs.mode != 'parallel-full' \|\| needs.tooling.result == 'success'/);
+  assert.match(job('aggregate'), /needs: \[prepare, batch, tooling\]/);
+  assert.match(job('aggregate'), /SERIAL_FULL_TOOLING_RESULT: .*needs\.tooling\.result/);
+  assert.match(job('aggregate'), /SERIAL_FULL_BATCH_RESULT: .*needs\.batch\.result/);
+});
+
+test('full discovery binds exact cases to preparation from the same source and runtime', () => {
+  const expected = createPlan('parallel-full', discovery);
+  const source = { commit: 'commit', inputHash: 'inputs', dirty: false };
+  const environment = { node: '24', platform: 'linux', arch: 'x64', versions: { vite: '8' } };
+  const manifest = { ...expected, source, environment: { ...environment, runner: 'vm02' }, browsers: {} };
+  const seal = manifest => ({ ...manifest, planHash: digest(JSON.stringify(manifest)) });
+  const preparation = { source, environment: { ...environment, runner: 'vm01' }, browsers: { webkit: { version: '27' } } };
+  const plan = bindFullDiscovery(seal(manifest), preparation);
+  assert.deepEqual(plan.jobs, expected.jobs);
+  assert.deepEqual(plan.browsers, preparation.browsers);
+  assert.equal(plan.environment.runner, 'vm01');
+  assert.throws(() => bindFullDiscovery({ ...seal(manifest), canonical: [] }, preparation), /Invalid full discovery plan/);
+  assert.throws(() => bindFullDiscovery(seal({ ...manifest, canonical: manifest.canonical.slice(1) }), preparation), /Missing discovery/);
+  assert.throws(() => bindFullDiscovery(seal(manifest), { ...preparation, source: { ...source, inputHash: 'other' } }), /Discovery source differs/);
+  assert.throws(() => bindFullDiscovery(seal(manifest), { ...preparation, environment: { ...environment, node: '22' } }), /Discovery node differs/);
 });
 
 test('browser workflows share a non-cancelling lock for the selected VM', () => {
@@ -367,7 +527,7 @@ test('browser workflows share a non-cancelling lock for the selected VM', () => 
     const targets = [serialTarget];
     let group = 'tactics-browser-' + runner;
     if (file === 'issue-200-baseline.yml') {
-      targets.push('ubuntu-latest');
+      targets.push('ubuntu-latest', '[self-hosted, tactics-browser, tactics-browser-02]');
       group = "tactics-browser-${{ (startsWith(inputs.mode, 'parallel-') || inputs.mode == 'serial-pair') && inputs.extra_job == 'none' && 'parallel-pilot' || inputs.runner || 'tactics-browser-01' }}";
       for (const pilotRunner of ["'tactics-browser-01'", 'matrix.runner']) {
         targets.push(`[self-hosted, tactics-browser, "\${{ (startsWith(inputs.mode, 'parallel-') || inputs.mode == 'serial-pair') && ${pilotRunner} || inputs.runner || 'tactics-browser-01' }}"]`);
@@ -388,7 +548,8 @@ test('automatic PR checks retain the shared VM reservation and durable pending q
   const source = readFileSync(new URL('../../.github/workflows/pr-verification.yml', import.meta.url), 'utf8').replaceAll('\r\n', '\n');
   for (const input of [source, source.replaceAll('\n', '\r\n')]) {
     const workflow = input.replaceAll('\r\n', '\n');
-    const concurrency = workflow.split('\nconcurrency:\n')[1]?.split(/\n\S/)[0];
+    const concurrency = workflow.match(/^  verify:\n(?:    [^\n]*\n)*?    concurrency:\n((?:      [^\n]*\n)+)/m)?.[1];
+    assert.ok(concurrency, 'Missing shared runner reservation in the verify job');
     assert.match(concurrency, /group: tactics-browser-tactics-browser-01/);
     assert.match(concurrency, /queue: max/);
     assert.match(concurrency, /cancel-in-progress: false/);

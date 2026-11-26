@@ -1,6 +1,6 @@
 # Resumable serial verification (#208 phase A)
 
-The manual `issue-200-baseline.yml` workflow has six modes:
+The manual `issue-200-baseline.yml` workflow has seven modes:
 
 - `qualify` (default): bounded tooling, diagnostics, build, two-engine smoke and
   timeout-recovery checks. It does not launch a baseline.
@@ -12,10 +12,24 @@ The manual `issue-200-baseline.yml` workflow has six modes:
   cases. See [Two-runner pilot](#two-runner-pilot).
 - `serial-pair` and `parallel-pair`: compare two full browser batches on the
   same pair of VMs. See [Matched two-runner comparison](#matched-two-runner-comparison-208).
+- `parallel-full` runs the full manifest on two isolated runners. VM 01 builds
+  the root artifact and measures performance before releasing either browser job.
+  The build artifact lists byte-identical checkout assets in `build.json` under
+  `fromPublic`. Each runner restores those files from `public/` and verifies the
+  SHA-256 manifest for the complete build before running the browser checks.
+  VM 02 discovers the browser case manifest and runs the verification-tooling
+  and batch tests during preparation. VM 01 binds the build and receipt to the
+  same-attempt manifest after checking its source and tooling versions. Each
+  browser job checks its own selection against the manifest and requires the
+  tooling tests to pass. VM 01 then runs Chromium while VM 02 runs WebKit and the asset checks, including
+  the prefix rebuild and root restoration. Each browser uses one worker. The
+  aggregate checks the complete case list, build identity, overlap and performance
+  result. A completed over-budget measurement still allows browser results to be collected.
 - `capture`: prepare once, then run all 19 serial jobs, or a deliberately selected
   comma-separated `batches` subset. A subset cannot qualify the full baseline.
 
-All six modes are available on `main`. Use `work/issue-208-matched-pair` to
+All seven modes are available on `main`. Use `work/208-full-parallel` to qualify
+`parallel-full` before merging. Use `work/issue-208-matched-pair` to
 dispatch the two matched-pair modes before merging. The older
 `work/issue-208-serial-batches` branch supports `qualify`, `pilot`,
 `parallel-pilot` and `capture`. `work/issue-200-verification-timings` supports
@@ -152,8 +166,8 @@ same test in different root/prefix/dev modes is not deduplicated. Native blob ZI
 remain separate so a cross-mode HTML merge cannot overwrite those distinctions.
 
 Resuming the same run requires unchanged source and the original build artifact.
-After source changes or artifact expiry, start a new plan. In `parallel-pilot`
-and `parallel-pair`, both batches must publish readiness in the same attempt.
+After source changes or artifact expiry, start a new plan. In `parallel-pilot`,
+`parallel-pair` and `parallel-full`, both batches must publish readiness in the same attempt.
 Dispatch a fresh run or rerun all jobs together. A targeted rerun of one batch
 will time out waiting for its peer's readiness artifact.
 

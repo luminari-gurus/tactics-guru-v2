@@ -239,8 +239,8 @@ dialog button { touch-action: manipulation; }
   .battle-mode #battle-heading p { display:none; }
   .battle-mode #battle-heading h1 { font-size:1.2rem; margin:0; }
   .battle-mode #battle-board-caption { padding:5px 12px; }
-  .battle-mode #battle-class-guidance { margin:10px 0 6px; }
-  .battle-mode #battle-actor, .battle-mode #battle-scroll { padding:10px 12px; }
+  .battle-mode #battle-class-guidance { margin:6px 0 4px; }
+  .battle-mode #battle-actor, .battle-mode #battle-scroll { padding:8px 12px; }
   .battle-mode .battle-identity { grid-template-columns:40px minmax(0,1fr); gap:8px; }
   .battle-mode .battle-portrait { display:block; width:40px; height:40px; }
   .battle-mode #battle-active { margin:0 0 4px; }

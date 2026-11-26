@@ -64,7 +64,7 @@ test('boxed-in hero can cancel Wait before acting and end immediately after acti
  await expect.poll(async () => (await readSession(page)).state.commandCount).toBeGreaterThan(acted.commandCount);
 });
 
-test('dungeon statistics: confirmed replacement pauses pending enemy turns through history',async({page},info)=>{
+test('dungeon statistics: confirmed replacement pauses pending enemy turns through history', { tag: '@desktop-chromium-portrait-webkit' }, async({page},info)=>{
  test.setTimeout(60000);
  const made=startDungeonBattle(atEncounter(freshDungeon('enemy-replacement',1)));if(!made.ok)throw Error(made.reason);
  const battle=made.state.activeBattle!,order=battle.initiative;
@@ -134,7 +134,7 @@ test('restart during accepted presentation discards old callbacks and history', 
  expect({...checkpoint,stats:{...checkpoint.stats,activeMs:fresh.stats!.activeMs}}).toEqual(fresh);
  await page.reload();await expectDungeonResumed(page);expectSameProgress(await snapshot(page),checkpoint);
 });
-test('legal enemy defeat waits for its save and returns to the menu during a pending history write',async({page,isMobile})=>{
+test('legal enemy defeat waits for its save and returns to the menu during a pending history write', { tag: '@desktop-chromium-portrait-webkit' }, async({page,isMobile})=>{
  const made=startDungeonBattle(atEncounter(freshDungeon('dungeon-defeat-fixture',1)));if(!made.ok)throw Error(made.reason);const entry=made.state,built=dungeonBattle(entry)!;
  const session=new BattleSession(built.catalog,entry.activeBattle!,entry.activeBattle!.seed,undefined,true,built.battlefield);let before=entry.activeBattle!;
  for(let i=0;i<400&&session.state.outcome==='ongoing';i++){

@@ -1494,6 +1494,14 @@ describe('versioned floor dimensions', () => {
     const floors=Array.from({length:5},(_,i)=>{const descriptor=floorDescriptor(base.seed,i+1),map=floorMap(descriptor);return {descriptor,position:descriptor.upstairs,completed:3,exploration:freshExploration(descriptor.seed,descriptor.upstairs,map)};});
     const state=good(readDungeon({...base,depth:5,floors}));
     const encoded=encodeDungeon(state);assert(encoded.ok);
+    const reread = good(readDungeon(state));
+    expect(reread.floors[0]).toBe(state.floors[0]);
+    expect(Object.isFrozen(reread.floors[0].exploration.revealed)).toBe(true);
+    expect(Object.isFrozen(floors[0].exploration.revealed)).toBe(false);
+    expect(encodeDungeon(structuredClone(state))).toEqual(encoded);
+    expect(readDungeon({ ...state, floors: [state.floors[1], state.floors[0], ...state.floors.slice(2)] }).ok).toBe(false);
+    const brokenHistory = [{ ...state.floors[0], position: -1 }, ...state.floors.slice(1)];
+    expect(readDungeon({ ...state, floors: brokenHistory }).ok).toBe(false);
     for(const patch of [{mapHash:'sha256:'+'0'.repeat(64)},{upstairs:state.floors[4].descriptor.upstairs+1},{downstairs:state.floors[4].descriptor.downstairs-1}]){
       const altered={...state,floors:state.floors.map((floor,i)=>i===4?{...floor,descriptor:{...floor.descriptor,...patch}}:floor)};
       expect(readDungeon(altered).ok).toBe(false);

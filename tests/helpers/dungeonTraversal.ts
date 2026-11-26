@@ -6,6 +6,9 @@ import { neighbors, poiCell } from '../../src/domain/exploration';
 import { clearedDungeonSlots, floorMap } from '../../src/domain/dungeon';
 import { dungeonContactDetour } from './dungeonFixtures';
 import { DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
+// Most accepted steps publish on the next frame. Back off if storage or combat takes longer.
+const dungeonStepPoll = { intervals: [16, 32, 64, 100, 250, 500, 1000] };
+
 export async function openDungeonWithStorage(page: Page, entries: Record<string, string>, url = './?game=dungeon') {
  await page.addInitScript(({ values, marker }) => {
   // Reload and recovery must read the checkpoint written by the application.
@@ -31,7 +34,7 @@ export async function acceptedDungeonSnapshot(page: Page, before: Pick<DungeonSt
     const ok = !!s && (!before || s.id !== before.id || (expected === undefined ? s.revision > before.revision : s.revision === expected));
     if (ok) accepted = s;
     return ok;
-  }).toBe(true);
+  }, dungeonStepPoll).toBe(true);
   return accepted!;
 }
 /** Drain storage writes queued behind the dungeon save lock before asserting that nothing changed. */
@@ -105,7 +108,7 @@ export async function walkDungeon(page: Page, target?: number, mode: 'keyboard'|
       current=await dungeonSnapshot(page);
       return current.floors[s.depth-1].position===n || (current.phase==='battle' &&
         current.encounterEntry?.origin===f.position && current.encounterEntry.contact===n);
-    }).toBe(true);
+    }, dungeonStepPoll).toBe(true);
     path.push(n);
     if(current.phase==='battle') {
       expect(current.floors[s.depth-1].position).toBe(f.position);
