@@ -1,10 +1,21 @@
 import { test, expect, type Locator, type Page } from '@playwright/test';
+import { readFileSync } from 'node:fs';
 import type { BattleState, Command, Replay, ReplayCommand, BattleEvent } from '../../src/domain/types';
 import type { ContentCatalog } from '../../src/content/types';
 import { previewMovement } from '../../src/domain/grid';
 import { projectTile } from '../../src/geometry/iso';
 
 export { playerDecision } from './playerPolicy';
+
+export async function downloadCombatLog(page: Page, activate: (button: Locator) => Promise<void>, name = 'Export combat log') {
+ const button = page.getByRole('button',{name,exact:true});
+ const [download] = await Promise.all([page.waitForEvent('download'), activate(button)]);
+ expect(download.suggestedFilename()).toBe('tactics-guru-combat-log.json');
+ const path = await download.path();
+ if (!path) throw Error('Combat log download has no file');
+ await test.info().attach('combat-log.json', { path, contentType: 'application/json' });
+ return JSON.parse(readFileSync(path, 'utf8')) as { groups: { entries: { text: string }[] }[] };
+}
 
 /** Called with save recovery open. Fake browser time isolates lifecycle accounting;
  * legal keyboard/touch journeys separately retain normal input/animation proof. */

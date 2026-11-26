@@ -32,7 +32,7 @@ export interface RunBattleHost {
   catalog: ContentCatalog; session: BattleSession; dialogs: BattleDialogs;
   guidance?: ClassGuidanceRun;
   sound: { enabled: boolean }; modalTransition: () => void;
-  ended: () => void; restart: () => void;
+  ended: (exportBattleLog: () => void) => void; restart: () => void;
 }
 export const FIRST_BATTLE_MAP_ID = 'map:forest_ruins';
 /** Alternate standalone (non-persistent) testing battle on another map, e.g. /qbert. */
@@ -146,7 +146,15 @@ export class BattleScene extends Phaser.Scene {
       game.dataset.session=JSON.stringify({state:session.state,replay:session.replay,continuation:session.continuation,events:session.events,pending:session.pending,phase:session.phase});
       if(session.phase!=='player' || (dialogs.open && !keepRadialDuringDialog))radial.hide();
       if(radial.mode!=='hold')restoreCaptionHeight();
-      if(ready && !dialogs.open && session.phase==='ended' && !outcomeShown){outcomeShown=true;if(this.host){queueMicrotask(()=>{if(live)this.host?.ended();});return;}dialogs.showChoices(session.state.outcome==='playerWin'?'Victory':'Defeat','Battle complete. Restart for a fresh battle.',[{id:'dialog-restart',label:'Restart battle',run:()=>this.requestRestart()},...(returnToMenu?[{id:'save-main-menu',label:'Main menu',run:returnToMenu}]:[])],()=>{});}
+      if(ready && !dialogs.open && session.phase==='ended' && !outcomeShown){
+        outcomeShown=true;
+        if(this.host){
+          const exportBattleLog = downloadBattleLog.bind(null,hud.logSnapshot(),__BUILD_INFO__,session.state.versions);
+          queueMicrotask(()=>{if(live)this.host?.ended(exportBattleLog);});
+          return;
+        }
+        dialogs.showChoices(session.state.outcome==='playerWin'?'Victory':'Defeat','Battle complete. Restart for a fresh battle.',[{id:'dialog-restart',label:'Restart battle',run:()=>this.requestRestart()},...(returnToMenu?[{id:'save-main-menu',label:'Main menu',run:returnToMenu}]:[])],()=>{});
+      }
     };
     const openRadial=(cell:CellPosition, mode:'hold'|'tap', origin:Point)=>{
       session.clearPrepared();

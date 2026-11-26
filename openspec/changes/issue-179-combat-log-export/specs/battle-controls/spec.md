@@ -27,3 +27,12 @@ Battle log SHALL offer a keyboard- and touch-accessible download of the full ret
 #### Scenario: Dismiss after exporting
 - **WHEN** the player uses Hide or Escape after a download
 - **THEN** the existing focus return and input lock behavior is preserved
+
+#### Scenario: Export after Dungeon victory
+- **WHEN** the last action wins a Dungeon encounter
+- **THEN** Dungeon returns automatically and offers the final log until the next encounter, dungeon replacement, or reload
+
+#### Scenario: Export before leaving Dungeon defeat
+- **WHEN** the last action defeats the party in Dungeon
+- **THEN** the defeat screen offers the final log and waits for Continue before returning to the main menu
+- **AND** Continue honors pending saves and their recovery path while export stays in memory

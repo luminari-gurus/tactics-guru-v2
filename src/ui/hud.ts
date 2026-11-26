@@ -164,7 +164,7 @@ export class BattleHud {
     party.addEventListener('click',()=>callbacks.inspect(party),{signal});
     this.root.querySelector('#battle-inspect-target')!.addEventListener('click',event=>{const id=(event.currentTarget as HTMLElement).dataset.unitId;if(id)callbacks.inspectTarget(Number(id));},{signal});
     const log = this.root.querySelector<HTMLButtonElement>('#battle-log-open')!;
-    log.addEventListener('click',()=>callbacks.log(this.log.snapshot(),log),{signal});
+    log.addEventListener('click',()=>callbacks.log(this.logSnapshot(),log),{signal});
     this.ability=this.root.querySelector('#battle-ability')!;
     this.ability.addEventListener('change',()=>{if(this.ability.value)callbacks.action(this.ability.value as Action);},{signal});
     this.root.querySelector('.battle-actions')!.addEventListener('click',event=>{
@@ -488,6 +488,10 @@ export class BattleHud {
     this.target.replaceChildren(new Option('Choose target',''),...targetOptions);
     this.target.value=selected?`${selected.x},${selected.y}`:'';this.target.disabled=!enabled || !action;
   }
+  logSnapshot(): BattleLogSnapshot {
+    return this.log.snapshot();
+  }
+
   append(before: BattleState, events: readonly BattleEvent[]) {
     this.log.append(before, events);
   }

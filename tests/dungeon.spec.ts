@@ -16,7 +16,7 @@ import { RUN_RECORD_KEYS } from '../src/persistence/runRecordsStorage';
 import { COMBAT_CONTROLS_KEY } from '../src/ui/combatControls';
 import { COMBAT_PACE_KEY } from '../src/ui/combatPacePreference';
 import { AUTO_COLLECT_LOOT_KEY } from '../src/ui/autoCollectLootPreference';
-import { endTurn, battleTool, readSession,playCommand,playUndo,checkActivePlaytime,checkBackgroundPlaytime } from './helpers/battlePolicy';
+import { endTurn, battleTool, downloadCombatLog, readSession,playCommand,playUndo,checkActivePlaytime,checkBackgroundPlaytime } from './helpers/battlePolicy';
 import { playerDecision, fighterDecision } from './helpers/playerPolicy';
 import { journeyPreparation, shamanJourney } from './helpers/dungeonFixtures';
 import { dispatch } from '../src/domain/turns';
@@ -632,16 +632,6 @@ test('Forest Elite keeps a living goblin visible behind raised terrain', async (
  for (const x of [5, 6]) expect(board.fadedTerrain ?? []).toContainEqual({ x, y: 3, columnAlpha: 0.3, surfaceAlpha: 0.3 });
 });
 
-async function downloadCombatLog(page: Page, activate: (button: Locator) => Promise<void>) {
- const button = page.getByRole('button',{name:'Export combat log',exact:true});
- const [download] = await Promise.all([page.waitForEvent('download'), activate(button)]);
- expect(download.suggestedFilename()).toBe('tactics-guru-combat-log.json');
- const path = await download.path();
- if (!path) throw Error('Combat log download has no file');
- await test.info().attach('combat-log.json', { path, contentType: 'application/json' });
- return JSON.parse(readFileSync(path, 'utf8')) as { groups: { entries: { text: string }[] }[] };
-}
-
 async function openResumedBattleLog(page: Page, isMobile: boolean) {
  test.setTimeout(90_000);
  if (!isMobile) await page.setViewportSize({width:1280,height:800});
@@ -1045,7 +1035,13 @@ test('legal guardian reward, travel reload, backtracking and isolated saves', { 
  await expect(page.locator('#dungeon-stair-ascend')).toHaveText('Upstairs: unavailable on floor 1');
  await expect(rewards).toBeInViewport({ratio:1});
  await expect(status).toContainText('Dungeon saved on this device');
+ const exportName = 'Export last battle log';
+ const terminalLog = await downloadCombatLog(page,button=>isMobile?button.tap():button.press('Enter'),exportName);
+ expect(terminalLog.groups.at(-1)?.entries.at(-1)).toMatchObject({
+   type:'battleEnded', result:{outcome:'playerWin'}, text:'Victory',
+ });
  await page.reload();await expectDungeonResumed(page);expectSameProgress(await snapshot(page),s);
+ await expect(page.getByRole('button',{name:exportName,exact:true})).toHaveCount(0);
  await expect(progress).toHaveText(`Encounters: ${slot+1} / 3 cleared`);
  await expect(stairs).toHaveText('Downstairs: locked · resolve reward');
  await page.screenshot({path:test.info().outputPath(`floor-progress-reward-${slot}.png`),fullPage:true});

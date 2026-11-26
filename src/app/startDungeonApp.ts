@@ -46,6 +46,7 @@ const screen=el('main');screen.id='dungeon-screen';screen.dataset.boot='loading'
 const shell=document.querySelector<HTMLElement>('#battle-shell')!,panel=document.querySelector<HTMLElement>('#fit-panel')!,container=document.querySelector<HTMLElement>('#game')!,status=document.querySelector<HTMLElement>('#fit-status')!,controls=document.querySelector<HTMLElement>('#battle-controls')!,restart=document.querySelector<HTMLButtonElement>('#fit-restart')!,persistence=document.querySelector<HTMLElement>('#battle-persistence')!;
 let live=true,playing=false,startup=true,reviewing=false,loading=false,loadError=false,loadGeneration=0,host:RunBattleHost|null=null;
 let replacing=false;
+let defeatScreen: HTMLElement | null = null;
 let engine: ReturnType<typeof import('../phaser/start').createGame> | null = null;
 let deferredStart: (()=>void) | null = null;
 let pendingVictory: DungeonAutoCollectIntent | null = null;
@@ -78,8 +79,8 @@ function returnLink(){
  const link=menuReturnLink(()=>!startup&&session.hasUnsavedProgress,recovery,storage?()=>pauseForReview():undefined);
  link.addEventListener('click',event=>{
   if(session.phase!=='defeat'||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+  // The defeat screen owns departure once the last action has been accepted.
   event.preventDefault();event.stopImmediatePropagation();
-  void finishDefeat(loadGeneration);
  },{capture:true});
  return link;
 }
@@ -95,9 +96,17 @@ function evidence(state:DungeonState=session.snapshot){
   publishedBattleRecord=session.completedBattle;
  }
 }
-function stop(){cancelAutomaticStep();loadGeneration++;deferredStart=null;loading=false;loadError=false;playing=false;host=null;engine?.scene.stop('battle');engine?.pause();controls.hidden=true;container.style.visibility='hidden';playtime?.sync();}
+function stop(){cancelAutomaticStep();clearBattleLogExport();defeatScreen=null;loadGeneration++;deferredStart=null;loading=false;loadError=false;playing=false;host=null;engine?.scene.stop('battle');engine?.pause();controls.hidden=true;container.style.visibility='hidden';playtime?.sync();}
 const goToMenu = () => location.replace(routeHref('menu', import.meta.env.BASE_URL));
 const explorationTools = el('div');
+const lastBattleExport = el('button','Export last battle log');
+lastBattleExport.type='button';
+lastBattleExport.hidden=true;
+explorationTools.append(lastBattleExport);
+function clearBattleLogExport(){
+ lastBattleExport.onclick=null;
+ lastBattleExport.hidden=true;
+}
 const sandboxNotice = storage ? null : testingProgress('dungeon');
 if (sandboxNotice) explorationTools.append(sandboxNotice);
 explorationTools.append(returnLink());
@@ -108,6 +117,11 @@ function render(){
  if(!shell.hidden)shell.hidden=true;
  if(!panel.hidden)panel.hidden=true;
  if(screen.hidden)screen.hidden=false;
+ if(defeatScreen){
+  if(defeatScreen.parentElement!==screen)screen.replaceChildren(defeatScreen);
+  playtime?.sync();
+  return;
+ }
  if(replacing){
   const title=el('h1','Starting new dungeon');title.tabIndex=-1;
   const message=el('p','Preparing your next journey.');message.setAttribute('role','status');
@@ -207,9 +221,20 @@ function failedLoad(generation:number){
  if(!live||generation!==loadGeneration)return;
  stop();loadError=true;render();screen.querySelector<HTMLElement>('#dungeon-load-error')?.focus();
 }
+function showDefeat(exportBattleLog: () => void){
+ stop();
+ const generation=loadGeneration;
+ const title=el('h1','Dungeon defeat');title.tabIndex=-1;
+ const actions=el('div');
+ actions.append(button('Export combat log',exportBattleLog),button('Continue',()=>void finishDefeat(generation)));
+ if(storage)actions.append(button('Save recovery',recovery));
+ defeatScreen=el('section');
+ defeatScreen.append(title,el('p','Export this battle’s log before returning to the main menu.'),actions);
+ render();title.focus();
+}
 let finishingDefeat=false;
 async function finishDefeat(generation:number){
- if(finishingDefeat)return;
+ if(finishingDefeat||!defeatScreen||!live||generation!==loadGeneration)return;
  finishingDefeat=true;
  try {
   await session.flushPlaytime();
@@ -250,21 +275,25 @@ async function start(){
    if(!live||generation!==loadGeneration)return;
    try {
     currentEngine.resume();
+    clearBattleLogExport();
     loading=false;playing=true;screen.hidden=true;shell.hidden=false;panel.hidden=false;controls.hidden=false;container.style.visibility='visible';
     const state=session.snapshot,title=`Dungeon · Floor ${state.depth} · ${dungeonBiomeLabel(state)} · ${dungeonEncounterLabel(state,state.floors[state.depth-1].exploration.active ?? state.floors[state.depth-1].completed)}`;
     document.querySelector<HTMLElement>('#battle-heading h1')!.textContent=title;
     document.querySelector<HTMLElement>('#board-caption')!.textContent='Tap to select · Drag to pan · Wheel/pinch to zoom · Arrows and Enter to select';
     restart.textContent='Start new dungeon';persistence.hidden=false;persistence.replaceChildren(...(storage?[button('Save recovery',recovery)]:[]),el('span',session.status), returnLink());
-    host={catalog:battle.catalog,session:battle,dialogs,sound,guidance:guidanceForRun(state.id),modalTransition:()=>{},ended:()=>{
+    host={catalog:battle.catalog,session:battle,dialogs,sound,guidance:guidanceForRun(state.id),modalTransition:()=>{},ended:exportBattleLog=>{
      if(!live||!playing||generation!==loadGeneration)return;
      // This callback follows encounter-return presentation (including #397's
      // cutscene completion). Capture once before stop invalidates old work.
-     const intent=pendingVictory;
      if(session.phase==='defeat') {
-      void finishDefeat(generation);
+      showDefeat(exportBattleLog);
       return;
      }
-     stop();render();screen.querySelector<HTMLElement>('h1')?.focus();
+     const intent=pendingVictory;
+     stop();
+     lastBattleExport.onclick=exportBattleLog;
+     lastBattleExport.hidden=false;
+     render();screen.querySelector<HTMLElement>('h1')?.focus();
      const returnedGeneration=loadGeneration;
      if(intent&&activeExploration())automaticStep.schedule(isCurrent=>
       session.autoCollect(intent,()=>isCurrent()&&returnedGeneration===loadGeneration&&activeExploration()));
@@ -291,13 +320,13 @@ session.onVictory=intent=>{
  if(live&&playing&&!document.hidden&&!dialogs.open&&!reviewing&&!replacing&&readAutoCollectLootPreference())pendingVictory=intent;
 };
 session.onChange=()=>{if(!startup||replacing)render();};restart.addEventListener('click',()=>{restart.focus();requestNew();});
-// New exploration input takes priority even when the save lock has queued the
-// automatic step. Repeated held keys remain suppressed by DungeonMap itself.
-document.addEventListener('pointerdown',()=>{if(!playing)cancelAutomaticStep();},{capture:true,signal:automaticStepEvents.signal});
-document.addEventListener('keydown',event=>{if(!playing&&!event.repeat)cancelAutomaticStep();},{capture:true,signal:automaticStepEvents.signal});
+// Exploration input cancels the pending step, including while it waits for
+// the save lock. Exporting the completed log is read-only.
+document.addEventListener('pointerdown',event=>{if(!playing&&event.target!==lastBattleExport)cancelAutomaticStep();},{capture:true,signal:automaticStepEvents.signal});
+document.addEventListener('keydown',event=>{if(!playing&&!event.repeat&&event.target!==lastBattleExport)cancelAutomaticStep();},{capture:true,signal:automaticStepEvents.signal});
 document.addEventListener('click',event=>{
  // Accessibility activation can emit click without pointerdown or keydown.
- if(!playing||event.target instanceof Element&&event.target.closest('a[href]'))cancelAutomaticStep();
+ if((!playing&&event.target!==lastBattleExport)||event.target instanceof Element&&event.target.closest('a[href]'))cancelAutomaticStep();
 },{capture:true,signal:automaticStepEvents.signal});
 document.addEventListener('keydown',e=>{if(e.repeat&&(e.key==='Enter'||e.key===' ')){e.preventDefault();e.stopImmediatePropagation();}},true);
 window.addEventListener('pagehide',()=>{cancelAutomaticStep();automaticStep.dispose();automaticStepEvents.abort();playtime?.dispose();live=false;stopGuidanceWatch();session.dispose();mapView.dispose();stop();engine?.destroy(true);dialogs.dispose();},{once:true});

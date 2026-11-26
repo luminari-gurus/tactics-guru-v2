@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
 import { expect, railTest as test } from './helpers/startupDiagnostics';
-import { playCommand, readSession } from './helpers/battlePolicy';
+import { battleTool, playCommand, readSession } from './helpers/battlePolicy';
 import { checkedDungeon, dungeonGroundVictoryBoundary } from './helpers/dungeonFixtures';
 import { expectDungeonResumed, dungeonSnapshot, openDungeonInventory, walkDungeon } from './helpers/dungeonTraversal';
 import { currentFloor, floorMap, readDungeon, stepDungeon, type DungeonState } from '../src/domain/dungeon';
@@ -109,10 +109,16 @@ async function finishVictory(page: Page, witness: Awaited<ReturnType<typeof load
 
 test.beforeEach(async ({ page }) => { await holdAutomaticStep(page); });
 
-test('auto loot defaults on: one delayed ordinary step, pickup, enemy tick and durable resume', { tag: '@desktop-chromium-portrait-webkit' }, async ({ page }, info) => {
+test('auto loot defaults on: one delayed ordinary step, pickup, enemy tick and durable resume', { tag: '@desktop-chromium-portrait-webkit' }, async ({ page, isMobile }, info) => {
   const witness = await loadBoundary(page);
   expect(await page.evaluate(key => localStorage.getItem(key), AUTO_COLLECT_LOOT_KEY)).toBeNull();
   const won = await finishVictory(page, witness), entry = witness.snapshot.encounterEntry!;
+  const exportLog = page.getByRole('button', { name: 'Export last battle log', exact: true });
+  const download = page.waitForEvent('download');
+  if (isMobile) await exportLog.tap();
+  else await exportLog.press('Enter');
+  expect((await download).suggestedFilename()).toBe('tactics-guru-combat-log.json');
+  expect(await page.evaluate(() => window.issue408AutoSteps[0].cancelled)).toBe(false);
   const expected = checkedDungeon(stepDungeon(won, { id: won.id, depth: won.depth, revision: won.revision, destination: entry.contact }));
   await releaseAutomaticStep(page);
   await expect.poll(async () => currentFloor(await dungeonSnapshot(page)).position).toBe(entry.contact);
@@ -126,6 +132,24 @@ test('auto loot defaults on: one delayed ordinary step, pickup, enemy tick and d
   await expectSavedProgress(page, collected);
   await info.attach('one-automatic-step', { body: JSON.stringify({ evidence: 'real final HUD command with only the post-victory 400 ms callback held', entry, won, collected }), contentType: 'application/json' });
   await page.locator('#dungeon-screen').screenshot({ path: info.outputPath('auto-loot-collected.png') });
+});
+
+test('the next Dungeon encounter starts a fresh log and retires the victory export', { tag: '@desktop-chromium-portrait-webkit' }, async ({ page, isMobile }) => {
+  const witness = await loadBoundary(page);
+  await finishVictory(page, witness);
+  const lastExport = page.locator('button').filter({ hasText: /^Export last battle log$/ });
+  await expect(lastExport).toBeVisible();
+  await releaseAutomaticStep(page);
+
+  await walkDungeon(page, undefined, isMobile ? 'touch' : 'keyboard');
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  await expect(lastExport).toHaveJSProperty('hidden', true);
+  const launcher = await battleTool(page, '#battle-log-open');
+  if (isMobile) await launcher.tap();
+  else await launcher.press('Enter');
+  const currentLog = page.getByRole('dialog', { name: 'Battle log', exact: true });
+  await expect(currentLog.locator('#battle-log')).toContainText(/Round 1/);
+  await expect(currentLog.getByText('Victory', { exact: true })).toHaveCount(0);
 });
 
 test('auto loot Settings are accessible and persist; off waits at origin and re-enabling does not sweep old loot', { tag: '@desktop-chromium-portrait-webkit' }, async ({ page, isMobile }, info) => {
