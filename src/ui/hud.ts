@@ -15,6 +15,7 @@ import { BATTLE_KEYS, ownedAbilities, actionCommand, actionTargets, friendlyFire
 import { mountCombatControlsPreference, type CombatSkin } from './combatControls';
 import { draughtsSpent } from '../domain/draughts';
 import { BattleTurnQueue } from './battleTurnQueue';
+import type { BattleLogEntry } from './battleLog';
 import { BattleClassGuidance } from './battleClassGuidance';
 import type { ClassGuidanceRun } from './classGuidance';
 import { mountClassGuidancePreferences } from './classGuidancePreferences';
@@ -120,8 +121,8 @@ export class BattleHud {
   private readonly disposeGuidancePreferences: () => void;
   private readonly disposePacePreference: () => void;
   private readonly abort=new AbortController();
-  private readonly log:string[]=[];
-  constructor(private readonly session:BattleSession, private readonly callbacks:{action:(a:Action)=>void;target:(c:CellPosition|null)=>void;confirm:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void;inspect:(invoker:HTMLElement)=>void;inspectTarget:(id:number)=>void;danger:()=>void;plan:()=>void;undo:()=>void;draught:()=>void;log:(lines:readonly string[],invoker:HTMLElement)=>void}, guidance?:ClassGuidanceRun) {
+  private readonly log:BattleLogEntry[]=[];
+  constructor(private readonly session:BattleSession, private readonly callbacks:{action:(a:Action)=>void;target:(c:CellPosition|null)=>void;confirm:()=>void;cancel:()=>void;wait:()=>void;sound:()=>void;retrySound:()=>void;inspect:(invoker:HTMLElement)=>void;inspectTarget:(id:number)=>void;danger:()=>void;plan:()=>void;undo:()=>void;draught:()=>void;log:(entries:readonly BattleLogEntry[],invoker:HTMLElement)=>void}, guidance?:ClassGuidanceRun) {
     this.turnQueue = new BattleTurnQueue(this.actorRoot, session.catalog);
     this.openingEnemyTurn = !session.resumed && session.phase === 'enemy';
     // Snapshot construction has no command events. Establish the current turn
@@ -489,7 +490,7 @@ export class BattleHud {
     this.target.value=selected?`${selected.x},${selected.y}`:'';this.target.disabled=!enabled || !action;
   }
   append(events:readonly BattleEvent[]) {
-    for(const e of events) {const text=eventText(e,id=>displayName(this.session.state.units.find(u=>u.id===id)!.defId)+` #${id}`);if(text)this.log.push(text);}
+    for(const e of events) {const text=eventText(e,id=>displayName(this.session.state.units.find(u=>u.id===id)!.defId)+` #${id}`);if(text)this.log.push({type:e.type,text});}
     this.log.splice(0,Math.max(0,this.log.length-LOG_LIMIT));
   }
   dispose(){this.abort.abort();this.classGuidance.dispose();this.disposePacePreference();this.disposeGuidancePreferences();this.turnQueue.dispose();this.planCancel.remove();this.root.replaceChildren();this.actorRoot.replaceChildren();this.actorRoot.hidden=true;}

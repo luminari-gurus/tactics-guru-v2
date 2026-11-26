@@ -4,6 +4,14 @@
 - Branch `branch/issue-404-combat-log-filters` · planning base `153fb6dfed965769459c031f549d90b486654640` · November 26, 2026 (Asia/Jerusalem)
 - [Previous handoff for #483](issue-483-dungeon-counter-migration-plan.md)
 
+- OpenSpec [battle-controls change](../../openspec/changes/issue-404-combat-log-filters/proposal.md)
+
+## Implementation status
+
+Implementation authorized November 26, 2026. The existing issue branch is checked out in its dedicated worktree. The OpenSpec proposal, behavior delta, design and tasks are ready. The Linux verification checkout is at `/home/aiwithapex/projects/tactics-404-verification.i5PD90/checkout`.
+
+The four filters and Hide are wired into the existing dialog. The focused unit test passed. At seed 189 the first player turn has an empty Status & Saves filter. Four legal player decisions then produce Weakening Hex and Magic Missile outcomes, which give the browser test a short mixed-history witness.
+
 ## Outcome
 
 During battle, players can open Battle log, choose **All**, **Actions**, **Damage & Healing**, or **Status & Saves**, then hide and reopen the log. Switching back to All displays the same history in the same order. Hide and Escape return focus through the existing dialog path and leave the battle in its prior state. The log opens on All.

@@ -12,6 +12,7 @@ import { measurements, setBattleAudioDiagnostics } from '../diagnostics/browser'
 import type { Point, BoardRegion } from '../geometry/iso';
 import { BattleHud, unitFeedback } from '../ui/hud';
 import { BattleDialogs } from '../ui/dialogs';
+import { createBattleLogContent } from '../ui/battleLog';
 import { menuReturnLink } from '../ui/menuReturn';
 import { track } from '../telemetry/telemetry';
 import { hoverPreview } from '../ui/targetPreview';
@@ -329,12 +330,10 @@ export class BattleScene extends Phaser.Scene {
       },
       danger:()=>{if(session.phase==='player' && !dialogs.open){selection.toggleDanger();refresh();}},
       target:cell=>{board.resetPicking();hovered=null;select(cell);},confirm,cancel,inspect:invoker=>inspect(undefined,invoker),inspectTarget:inspect,
-      log:(lines,invoker)=>{
-        dialogs.showChoices('Battle log',lines.length?'':'No events yet.',[{id:'log-close',label:'Close log',run:releaseRadial}],
-          releaseRadial, readOnlyTool(invoker));
-        const list=document.createElement('ol');list.id='battle-log';list.setAttribute('aria-label','Battle log');
-        list.append(...lines.map(text=>{const item=document.createElement('li');item.textContent=text;return item;}));
-        dialogs.element.querySelector('#battle-dialog-message')!.append(list);
+      log:(entries,invoker)=>{
+        dialogs.showChoices('Battle log',createBattleLogContent([...entries]),[
+          {id:'log-close',label:'Hide',run:releaseRadial},
+        ],releaseRadial,readOnlyTool(invoker));
       },
       wait:()=>{
         if(!live || !ready || document.hidden || dialogs.open || session.phase!=='player')return;

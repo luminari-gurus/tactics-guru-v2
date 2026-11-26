@@ -626,6 +626,101 @@ test('Forest Elite keeps a living goblin visible behind raised terrain', async (
  for (const x of [5, 6]) expect(board.fadedTerrain ?? []).toContainEqual({ x, y: 3, columnAlpha: 0.3, surfaceAlpha: 0.3 });
 });
 
+test('battle log filters and keeps history across Hide and reopen', async ({ page, isMobile }) => {
+ if (!isMobile) await page.setViewportSize({width:1280,height:800});
+ await openSavedDungeon(page,freshDungeon('battle-log-filters',189));
+ await walkDungeon(page,undefined,isMobile?'touch':'keyboard');
+ const game = page.locator('#game');
+ await expect(game).toHaveAttribute('data-phase','player');
+
+ const activate = async (button: Locator) => {
+   if (isMobile) await button.tap();
+   else { await button.focus(); await page.keyboard.press('Enter'); }
+ };
+ const dialog = page.getByRole('dialog',{name:'Battle log',exact:true});
+ const filters = dialog.getByRole('group',{name:'Filter battle log'});
+ const all = filters.getByRole('button',{name:'All',exact:true});
+ const actions = filters.getByRole('button',{name:'Actions',exact:true});
+ const damage = filters.getByRole('button',{name:'Damage & Healing',exact:true});
+ const status = filters.getByRole('button',{name:'Status & Saves',exact:true});
+ const hide = dialog.getByRole('button',{name:'Hide',exact:true});
+ const lines = dialog.locator('#battle-log > li');
+ const openLog = async () => {
+   const launcher = await battleTool(page,'#battle-log-open');
+   await activate(launcher);
+   await expect(dialog).toBeVisible();
+   await expect(all).toHaveAttribute('aria-pressed','true');
+   return launcher;
+ };
+ const selectFilter = async (filter: Locator) => {
+   await activate(filter);
+   await expect(filter).toHaveAttribute('aria-pressed','true');
+   await expect(filters.locator('[aria-pressed="true"]')).toHaveCount(1);
+ };
+
+ let launcher = await openLog();
+ await expect(lines.first()).toHaveText(/^Round 1:/);
+ if (!isMobile) {
+   await all.focus();
+   await page.keyboard.press('Tab');
+   await expect(actions).toBeFocused();
+ }
+ await selectFilter(status);
+ await expect(lines).toHaveCount(0);
+ await expect(dialog.getByRole('status')).toHaveText('No events for this filter.');
+ await activate(hide);
+ await expect(dialog).toBeHidden();
+ if (!isMobile) await expect(launcher).toBeFocused();
+
+ const catalog = dungeonBattle(await snapshot(page))!.catalog;
+ // The first four player decisions at seed 189 bring a Shaman save and a Mage damage roll into the log.
+ for (let decision = 0; decision < 4; decision++) {
+   const { state } = await readSession(page);
+   await playCommand(page,playerDecision(state,catalog),state,activate);
+   await expect.poll(async () => (await readSession(page)).state.commandCount).toBeGreaterThan(state.commandCount);
+   await expect(game).toHaveAttribute('data-phase','player');
+ }
+ const before = await readSession(page);
+ launcher = await openLog();
+ await expect(lines).toContainText([/^Round 1:/,/uses Weakening Hex/,/Will save fails/,/Weakened by/,/uses Magic Missile/,/^Missile 1:/,/takes \d+ damage/]);
+ const history = await lines.allTextContents();
+ const damageLine = /(^Missile \d+:|takes \d+ damage)/;
+ const statusLine = /(Will save|Weakened by)/;
+ await selectFilter(actions);
+ await expect(lines).toHaveText(history.filter(line => !damageLine.test(line) && !statusLine.test(line)));
+ await selectFilter(damage);
+ await expect(lines).toHaveText(history.filter(line => damageLine.test(line)));
+ await selectFilter(status);
+ await expect(lines).toHaveText(history.filter(line => statusLine.test(line)));
+ await selectFilter(all);
+ await expect(lines).toHaveText(history);
+
+ await selectFilter(status);
+ if (!isMobile) await page.setViewportSize({width:360,height:600});
+ await expect.poll(() => dialog.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
+ for (const control of [all,actions,damage,status,hide]) {
+   await expect.poll(() => control.evaluate(element => {
+     const {width,height} = element.getBoundingClientRect();
+     return width >= 44 && height >= 44;
+   })).toBe(true);
+ }
+ if (isMobile) await activate(hide);
+ else {
+   await page.keyboard.press('w');
+   await expect(dialog).toHaveAccessibleName('Battle log');
+   await page.keyboard.press('Escape');
+ }
+ await expect(dialog).toBeHidden();
+ if (!isMobile) await expect(launcher).toBeFocused();
+ expect(await readSession(page)).toEqual(before);
+
+ await openLog();
+ await expect(lines).toHaveText(history);
+ await activate(hide);
+ await expect(dialog).toBeHidden();
+ expect(await readSession(page)).toEqual(before);
+});
+
 test('Shaman production journey uses Hex and ally healing, reloads Weakened and replays a complete legal battle', { tag: '@desktop-chromium-portrait-webkit' }, async({page,isMobile},info)=>{
  test.setTimeout(120000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  const witness=shamanJourney(189),catalog=dungeonBattle(witness.entry)!.catalog;
