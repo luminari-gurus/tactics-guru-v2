@@ -32,11 +32,11 @@ Push-triggered full verification has no dispatch inputs and selects VM 01.
 `max-parallel: 1`, one Playwright worker and `fail-fast: false` keep browser jobs
 serial without starving later jobs
 after an ordinary test failure. Manual runs are not automatically superseded;
-cancel an obsolete run explicitly. First attempts of automatic PR verification
-share a group per PR. A newly queued first attempt cancels its predecessor,
-including one waiting for VM 01. Reruns and manual dispatches use their own
-workflow-run groups. All verification jobs share VM 01's reservation with the
-other browser workflows. The per-VM group uses `queue: max` and
+cancel an obsolete run explicitly. PR verification checks the current PR head before
+canceling queued or running verification for other commits of that PR, including
+reruns. Each PR job also rechecks the head before runner setup, which handles a
+job-only retry that reuses an earlier cancellation check. All verification
+jobs share VM 01's reservation with the other browser workflows. The per-VM group uses `queue: max` and
 `cancel-in-progress: false` to preserve up to 100 waiting jobs or runs. Beyond
 that bound, new entries are canceled.
 

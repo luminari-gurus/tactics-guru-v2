@@ -37,13 +37,61 @@ test('ordinary Playwright discovery and the PR alias have identical bounded sele
   assert.deepEqual(ordinary, explicit);
 });
 
-test('only first attempts of automatic PR verification can supersede runs for the same PR', () => {
+test('supersession cancels only active stale verification for the same PR', async () => {
   const workflow = readFileSync(new URL('../../.github/workflows/pr-verification.yml', import.meta.url), 'utf8').replaceAll('\r\n', '\n');
-  const concurrency = workflow.match(/^concurrency:\n((?:  [^\n]*\n)+)/m)?.[1];
-  assert.deepEqual(concurrency?.trimEnd().split('\n'), [
-    "  group: pr-verification-${{ github.event_name == 'pull_request' && github.run_attempt == '1' && format('pr-{0}', github.event.pull_request.number) || format('run-{0}', github.run_id) }}",
-    "  cancel-in-progress: ${{ github.event_name == 'pull_request' && github.run_attempt == '1' }}",
-  ]);
+  const scripts = [...workflow.matchAll(/^          script: \|\n((?:\n| {12}[^\n]*\n)+)/gm)];
+  const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
+  const cancel = new AsyncFunction('github', 'context', 'core', scripts[0][1]);
+  const guard = new AsyncFunction('github', 'context', 'core', scripts[1][1]);
+  const repo = { owner: 'owner', repo: 'game' };
+  const pr = { id: 12, number: 7, head: { sha: 'current', ref: 'change', repo: { id: 42 } } };
+  const context = { repo, payload: { pull_request: pr }, runId: 20 };
+  const oldRetry = { id: 10, head_sha: 'old', head_repository: { id: 42 }, pull_requests: [{ id: 12 }], run_attempt: 2 };
+  const queuedRun = { ...oldRetry, id: 11, run_attempt: 1 };
+  const cancelled = [];
+  const output = [];
+  const failures = [];
+  const core = { setOutput: (...args) => output.push(args), setFailed: message => failures.push(message) };
+  let liveHead = 'current';
+  const get = async args => {
+    assert.deepEqual(args, { ...repo, pull_number: 7 });
+    return { data: { state: 'open', head: { sha: liveHead } } };
+  };
+  const listWorkflowRuns = () => {};
+  const github = {
+    rest: {
+      pulls: { get },
+      actions: { listWorkflowRuns, cancelWorkflowRun: async ({ run_id }) => cancelled.push(run_id) },
+    },
+    paginate: async (method, { status, ...filters }) => {
+      assert.equal(method, listWorkflowRuns);
+      assert.deepEqual(filters, { ...repo, workflow_id: 'pr-verification.yml',
+        event: 'pull_request', branch: 'change', per_page: 100 });
+      if (status === 'queued') return [queuedRun];
+      if (status === 'pending') return [queuedRun];
+      if (status !== 'in_progress') return [];
+      return [oldRetry, { ...oldRetry, id: 22, head_sha: 'current' },
+        { ...oldRetry, id: 23, pull_requests: [{ id: 13 }] },
+        { ...oldRetry, id: 24, head_repository: { id: 43 } }];
+    },
+  };
+
+  await cancel(github, context, core);
+  assert.deepEqual(cancelled, [11, 10]);
+  assert.deepEqual(output, [['current', true]]);
+  await guard(github, context, core);
+  assert.deepEqual(failures, []);
+
+  const originalPaginate = github.paginate;
+  github.paginate = async (...args) => {
+    liveHead = 'newer';
+    return originalPaginate(...args);
+  };
+  await cancel(github, context, core);
+  assert.deepEqual(cancelled, [11, 10]);
+  assert.deepEqual(output, [['current', true]]);
+  await guard(github, context, core);
+  assert.deepEqual(failures, ['This PR commit has been superseded.']);
 });
 
 test('shared runner locks preserve pending checks without concurrent execution', () => {
