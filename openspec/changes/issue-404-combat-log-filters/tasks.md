@@ -6,5 +6,5 @@
 
 ## 2. Verify the shared battle screen
 
-- [ ] 2.1 Exercise filters, ordering, Hide, reopen, focus and action preservation through a legal dungeon encounter in Chromium and WebKit.
-- [ ] 2.2 Pass the Shaman log companion and ordinary PR checks, validate OpenSpec, and record the tested commit and build in the handoff.
+- [x] 2.1 Exercise filters, ordering, Hide, reopen, focus and action preservation through a legal dungeon encounter in Chromium and WebKit.
+- [x] 2.2 Pass the Shaman log companion and ordinary PR checks, validate OpenSpec, and record the tested commit and build in the handoff.

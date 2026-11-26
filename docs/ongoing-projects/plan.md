@@ -12,7 +12,15 @@ Implementation authorized November 26, 2026. The existing issue branch is checke
 
 The four filters and Hide are wired into the existing dialog. The focused unit test passed. The browser case resumes seed 189 after the Fighter’s first Guarded Strike, using a checkpoint replayed through legal commands and Fast combat pace. Its log starts with the current turn header, so Status & Saves is empty. One real End Turn then expires Weakened and prompts Shaman healing and a Grunt attack. The Shaman companion still walks the dungeon and plays the complete normal-paced encounter.
 
-The first exact-source WSL run of `npm run verify:pr` stopped during units with 29 test timeouts and two timing-related assertions. Its original receipts are retained under `checkout/verification-receipts/pr/1795687950112-591259/`. The separate root build passed content validation and both TypeScript scopes. The first Chromium attempt reached the new assertions on one profile and timed out before completing on all three, so its logs and traces are retained. A second attempt from the encounter entrance retained the desktop trace showing the empty state and focus return succeeded before setup consumed the case budget. The revised fixture starts one legal turn before the mixed history. Later runs will record results separately.
+### Verification evidence
+
+The seven focused browser cases ran at clean source `dba6160ead3c3f8d0c0eeda2e0bb3bce0e4a6ef6` in WSL Ubuntu x86-64 with Node `24.15.0`, npm `12.0.2` and Playwright `1.64.1`. The browser revisions were Chromium `156.0.8078.4` (1248) and WebKit `27.2` (2370). They served the root production build from `bf899e754c79dc2f0cb0a40ca914ebc38d0520b7` after checking that runtime, assets, lockfile and build configuration matched the tested source. The sorted distribution manifest SHA-256 was `a2f9381578cc5a8c93fb8c34a0c7b42947832439e81046f86fc7fe89df7d18c1`. The lockfile SHA-256 was `e4768389a179a65df5f04502dab87e8875b465b939e55493d5820a7dc99a74ed`.
+
+- Chromium desktop and touch portrait/landscape passed the new case in 155.5 seconds total. WebKit desktop and touch portrait/landscape passed in 30.8 seconds total. Every case passed on its first attempt in those final runs. The reports `chromium-final.json` and `webkit-final.json` record the exact Playwright case IDs.
+- The full Shaman companion passed on portrait WebKit in 58.0 seconds. It confirmed the existing log text and close hook, Weakening Hex, healing, reload and deterministic replay. Its report is `shaman-webkit.json`. The earlier desktop Chromium case reached the log checks and captured `shaman-will-save-log.png`, then hit its 120-second budget later in the battle. Its incomplete report and trace remain in `shaman-companion.json` and `shaman-companion-artifacts/`.
+- Local focused units, content validation and both TypeScript scopes passed. The initial ordinary WSL run failed on 29 unit timeouts and two timing assertions. Its receipt remains in `checkout/verification-receipts/pr/1795687950112-591259/`. The earlier incomplete Chromium trials remain in `chromium*` reports and artifact subdirectories. The final browser case uses one legal player decision and a 90-second case budget. All final focused runs used one worker, zero retries and root preview.
+- GitHub’s ordinary PR workflow passed on attempt 2, with 1,649 unit cases, both type scopes, two build integrations and all five core journeys. Its merge checkout `5c8132eb5acf9531e27388d0db7a29357d7ab2f5` has the same tree as `dba6160e`. Attempt 1 passed through the bundle and four journeys, then recorded a Chromium graphics probe timeout before application startup in the remaining journey. Both attempts are retained in the local `github-ci/` evidence directory. [Passing CI attempt](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/45801643014/attempts/2) · [Initial CI attempt](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/45801643014/attempts/1)
+- OpenSpec strict validation and the Git diff whitespace check passed. The documentation handoff and task checkboxes are the only edits after the tested runtime and browser case.
 
 ## Outcome
 
@@ -42,10 +50,11 @@ npm run verify:pr
 npx --no-install playwright test -c playwright.regression.config.ts tests/dungeon.spec.ts -g 'battle log filters and keeps history across Hide and reopen'
 npx --no-install playwright test -c playwright.exploration.config.ts tests/dungeon.spec.ts -g 'battle log filters and keeps history across Hide and reopen'
 npx --no-install playwright test -c playwright.extended.config.ts tests/dungeon.spec.ts --project=desktop -g 'Shaman production journey'
+npx --no-install playwright test -c playwright.extended-webkit.config.ts tests/dungeon.spec.ts --project=portrait-webkit -g 'Shaman production journey'
 git diff --check
 ~~~
 
-Open one implementation PR with `Closes #404` after the acceptance checks pass. Reference #179 for the typed entry handoff.
+PR #628 was opened as a draft during verification. It uses `Closes #404` and references #179 for the typed entry handoff.
 
 ## Estimate and open questions
 
