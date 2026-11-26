@@ -72,6 +72,10 @@ test('routine verification clears each first-floor scenario once and checks both
     assert.deepEqual(profilesFor('ground loot: entering an occupied pile starts combat and closes inventory'), [stage === 'chromium' ? landscape : desktop]);
     assert.deepEqual(profilesFor('restart during accepted presentation discards old callbacks and history'), [stage === 'chromium' ? desktop : portrait]);
     for (const title of [
+      'dungeon statistics: confirmed replacement pauses pending enemy turns through history',
+      'legal enemy defeat waits for its save and returns to the menu during a pending history write',
+    ]) assert.deepEqual(profilesFor(title), [stage === 'chromium' ? desktop : portrait]);
+    for (const title of [
       'reload recovers the last four seconds exactly once across a held dungeon lock',
       'close recovers the last four seconds exactly once across a held dungeon lock',
       'dungeon tabs serialize spatial publication and refuse the stale owner',
@@ -105,7 +109,7 @@ test('Guarded keeps desktop and touch lifecycles plus a short landscape layout c
   assert.deepEqual(profiles('landscape touch keeps the resumed Guarded badge visible and noninteractive'), ['mobile-landscape']);
 });
 
-test('menu save recovery runs on desktop Chromium and portrait WebKit', () => {
+test('menu save recovery and run history use desktop Chromium and portrait WebKit', () => {
   const titles = [
     'main menu: legacy battle and run slots are ignored through launch and dungeon Continue',
     'main menu: New Game stays playable after retrying an unreadable dungeon save',
@@ -116,6 +120,12 @@ test('menu save recovery runs on desktop Chromium and portrait WebKit', () => {
     'main menu: changed dungeon save requires a fresh confirmation',
     'main menu: Continue opens recovery when a valid primary is paired with an unreadable backup',
     'main menu: failed new-game write retains exportable recovery copies',
+    'main menu: an unsaved defeat retries history after reload without replaying the summary',
+    'main menu: records display and reviewed export restore reset preserve active saves',
+    'main menu: records unavailable storage is honest and leaves gameplay navigation usable',
+    'main menu: records dungeon replacement withholds exploration until final history finishes',
+    'main menu: records replacing distinct saved and unsaved dungeon preserves both after interrupted history',
+    'main menu: records concurrent confirmed dungeon replacements retain one immutable old result',
   ];
   for (const [stage, project] of [['chromium', 'desktop'], ['webkit-acceptance', 'acceptance-webkit-portrait']]) {
     for (const title of titles) {
