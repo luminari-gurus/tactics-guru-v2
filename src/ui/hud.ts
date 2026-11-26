@@ -5,7 +5,7 @@ import type { AbilityId, CellPosition } from '../content/types';
 import type { BattleEvent, BattleState, UnitState, Command } from '../domain/types';
 import { previewTacticalPlan } from '../domain/tacticalPlan';
 import { previewMovement } from '../domain/grid';
-import { D20_SIDES, NATURAL_AUTO_MISS, NATURAL_CRITICAL } from '../domain/constants';
+import { D20_SIDES, HEAL_GOBLIN_CAST_LIMIT, NATURAL_AUTO_MISS, NATURAL_CRITICAL } from '../domain/constants';
 import type { BattleSession, ActionPreview } from '../app/BattleSession';
 import type { BattleAudioSnapshot } from '../phaser/BattleAudio';
 import { publicAssetUrl } from './publicAssetUrl';
@@ -87,10 +87,12 @@ export function unitFeedback(session:BattleSession, unit:UnitState) {
     ...(pinner?[`${unit.movementBlock!.abilityId === 'ability:frost_snare' ? 'Snared by Mage' : 'Pinned by Ranger'} #${pinner.id} (movement blocked; no damage or roll; expires after this unit’s next turn ends or source/target defeat)`]:[]),
     ...(weakener?[`Weakened by Goblin Shaman #${weakener.id} (−2 accuracy; expires after this unit’s next turn ends or source/target defeat)`]:[]),
     ...(unit.defId==='fighter' && Object.values(session.catalog.abilities).some(a=>a.kind==='secondWind' && a.owners.includes(unit.defId))?[`Second Wind ${unit.secondWindUsed?'0':'1'}/1 use this battle`]:[])];
+  const healCasts = unit.healGoblinRemaining === undefined ? '' :
+    ` Heal Goblin: ${unit.healGoblinRemaining}/${HEAL_GOBLIN_CAST_LIMIT} casts remaining.`;
   const support = unit.defId === 'goblin_shaman' ? `Basic Attack range 1. Weakening Hex range 2–4, clear LOS: d20 + target Will vs DC ${10+def.stats.power}; −2 accuracy on failure until target turn end or source/target defeat. Will save chances: ${session.state.units.filter(u=>u.side!==unit.side&&u.hp>0).map(u=>{
     const target=u.side==='player'?session.catalog.heroes[u.defId]:session.catalog.enemies[u.defId];
     return `${displayName(u.defId)} #${u.id} ${weakenedImmune(u,session.catalog)?'immune to Weakened':`${saveFaceCounts(target.stats.will,10+def.stats.power).savedFaces*5}%`}`;
-  }).join(', ')}. Heal Goblin range 1–4, clear LOS: injured living allied grunt, archer or Shaman, heal up to 4 HP, no revival/self heal, no roll. Each ability uses one action.` :
+  }).join(', ')}. Heal Goblin range 1–4, clear LOS: injured living allied grunt, archer or Shaman, heal up to 4 HP, no revival/self heal, no roll. Each ability uses one action.${healCasts}` :
     unit.defId === 'hobgoblin_warrior' ? 'Shield Bash pushes a surviving target one tile directly away on a hit if the destination is clear. Formation Fighting grants +1 accuracy beside a living Hobgoblin.' : '';
   const stats=combatStats(unit,session.catalog);
   return {def,name:displayName(unit.defId),...stats,accuracy:stats.accuracy+formation,support,

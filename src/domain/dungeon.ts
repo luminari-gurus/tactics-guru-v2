@@ -14,7 +14,7 @@ import { readRewardOffer, rewardOffer, type RewardOffer } from './rewards';
 import type { RunHero } from './run';
 import { resolveBattlefield, sameBattlefield, layoutSeed, type BattlefieldDescriptor } from './battlefield';
 import { createBattle } from './turns';
-import { readBattleState } from './battle';
+import { hasHealGoblinCap, readBattleState } from './battle';
 import type { BattleState } from './types';
 import { DUNGEON_ENCOUNTER_POLICY, EXPANDED_ENCOUNTER_POLICY, LEGACY_ENCOUNTER_POLICY, dungeonBiome, legacyDungeonEncounter, selectDungeonEncounter, readDungeonEncounterSelection,
   encounterBattleCatalog, projectDungeonEnemies, type EncounterSelection, type DungeonEncounterPolicy } from './dungeonEncounters';
@@ -23,7 +23,7 @@ import { encounterHpLimit } from './effects';
 import { draughtHealing, enterWithDraughts, matchesDraughtStock } from './draughts';
 import { boundedStat, freshRunStats, readRunStats, type RunStats } from './runStats';
 import { nextUint32, seedRng } from './rng';
-import { UINT32_RANGE } from './constants';
+import { HEAL_GOBLIN_CAST_LIMIT, UINT32_RANGE } from './constants';
 
 export interface FloorDescriptor {
   readonly depth: number; readonly seed: number; readonly template: typeof DUNGEON_TEMPLATE;
@@ -202,7 +202,11 @@ function pickupDungeonLoot(s: DungeonState): DungeonState {
   floors[s.depth - 1] = { ...floor, loot: floor.loot!.map(loot => pickup.collected.has(loot.id) ? { ...loot, remaining: 0 } : loot) };
   return { ...s, floors, ownership: pickup.ownership };
 }
+/** Rebuild the encounter origin using the active save's rules, or current rules for a new entry. */
 export function dungeonBattle(s: DungeonState) {
+  return buildDungeonBattle(s, !s.activeBattle || hasHealGoblinCap(s.activeBattle.units));
+}
+function buildDungeonBattle(s: DungeonState, cappedHealing: boolean) {
   const slot = activeDungeonSlot(s);
   if (slot >= 3) return null;
   const plan = currentFloor(s).descriptor.encounters[slot];
@@ -218,8 +222,12 @@ export function dungeonBattle(s: DungeonState) {
   const catalog = { ...projected, maps: { ...projected.maps, [map.id]: map } };
   const created = createBattle(map.id, dungeonSeed(s.seed, s.depth, 'battle', slot), catalog);
   if (!created.ok) return null;
-  const checked = readBattleState({ ...created.state, ...enterWithDraughts(s.ownership, dungeonContent.items), units: created.state.units.map(u => u.side === 'player'
-    ? { ...u, hp: s.party.find(h => h.heroId === u.defId)!.hp } : u) }, catalog);
+  const units = created.state.units.map(unit => {
+    if (unit.side === 'player') return { ...unit, hp: s.party.find(hero => hero.heroId === unit.defId)!.hp };
+    if (cappedHealing && unit.defId === 'goblin_shaman') return { ...unit, healGoblinRemaining: HEAL_GOBLIN_CAST_LIMIT };
+    return unit;
+  });
+  const checked = readBattleState({ ...created.state, ...enterWithDraughts(s.ownership, dungeonContent.items), units }, catalog);
   return checked.ok ? { state: checked.state, catalog, battlefield: resolved.descriptor, selection: plan.selection } : null;
 }
 /** Validate unknown save data before it can reach generation or battle construction. */
@@ -387,7 +395,8 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
       (state.phase === 'battle' ? exp.cleared!.includes(active) : !exp.cleared!.includes(active)))) return fail('invalidEncounterPosition');
   const admitted = entered ? { ...state, encounterEntry: { ...state.encounterEntry! } } : state;
   if (state.phase === 'battle') {
-    const battle = dungeonBattle(state);
+    // The snapshot is still untrusted. Resolve its catalog before reading any of its units.
+    const battle = buildDungeonBattle(state, false);
     const read = battle && readBattleState(state.activeBattle, battle.catalog);
     if (!battle || !read?.ok || !matchesDraughtStock(read.state.draughts, state.ownership, items) || !sameBattlefield(state.battlefield, battle.battlefield) ||
       read.state.seed !== battle.state.seed || read.state.mapId !== battle.state.mapId ||
@@ -438,9 +447,14 @@ export function startDungeonBattle(s: DungeonState, destination?: number): Dunge
 }
 /** Only the session owning this active battle may call this accepted-state boundary. */
 export function acceptDungeonBattle(s: DungeonState, battle: BattleState): DungeonResult {
-  if (s.phase !== 'battle') return fail('staleBoundary');
+  if (s.phase !== 'battle' || !s.activeBattle) return fail('staleBoundary');
   const checked = readDungeon({ ...s, activeBattle: battle });
   if (!checked.ok) return checked;
+  for (const [index, unit] of s.activeBattle.units.entries()) {
+    const before = unit.healGoblinRemaining;
+    const after = checked.state.activeBattle!.units[index].healGoblinRemaining;
+    if (before !== after && (before === undefined || after === undefined || after > before)) return fail('invalidBattle');
+  }
   if (battle.outcome === 'ongoing') return advance(s, { activeBattle: battle });
   const ownership = settleDraughts(s.ownership, battle.draughts);
   if (!ownership) return fail('invalidBattle');

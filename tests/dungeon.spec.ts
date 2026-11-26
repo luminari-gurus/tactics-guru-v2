@@ -1,3 +1,4 @@
+import { HEAL_GOBLIN_CAST_LIMIT } from '../src/domain/constants';
 import { EXPANDED_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
 import { dungeonContent } from '../src/content/dungeon';
 import { openSavedDungeon, walkDungeon, acceptedDungeonSnapshot, settledDungeonSnapshot, expectSameProgress, reenterDungeonStair, expectDungeonResumed, openDungeonInventory, collectDungeonEncounterLoot } from './helpers/dungeonTraversal';
@@ -856,17 +857,26 @@ test('Shaman production journey uses Hex and ally healing, reloads Weakened and 
  await (await battleTool(page, '#battle-party')).click();await page.locator('#inspect-unit-6').click();
  await expect(page.getByRole('dialog')).toContainText('Weakening Hex range 2–4');
  await expect(page.getByRole('dialog')).toContainText('Heal Goblin range 1–4');
+ await expect(page.getByRole('dialog')).toContainText(`Heal Goblin: ${HEAL_GOBLIN_CAST_LIMIT}/${HEAL_GOBLIN_CAST_LIMIT} casts remaining`);
  await expect(page.getByRole('dialog')).toContainText('Fighter #1 50%');
  await expect(page.getByRole('dialog')).toContainText('Ranger #2 45%');
  await expect(page.getByRole('dialog')).toContainText('Mage #3 55%');
  await page.screenshot({path:info.outputPath('shaman-abilities-inspection.png')});await page.locator('#inspection-close').click();
- let reloaded=false;let prefixCommands:readonly Command[]=[],prefixEvents:readonly BattleEvent[]=[];
+ const inspectCasts = async (remaining: number, screenshot: string) => {
+  await (await battleTool(page, '#battle-party')).click();
+  await page.locator('#inspect-unit-6').click();
+  await expect(page.getByRole('dialog')).toContainText(`Heal Goblin: ${remaining}/${HEAL_GOBLIN_CAST_LIMIT} casts remaining`);
+  await page.screenshot({ path: info.outputPath(screenshot) });
+  await page.locator('#inspection-close').click();
+ };
+ let reloadedWeakened = false, reloadedAtOneCast = false, inspectedExhaustion = false;
+ let prefixCommands: readonly Command[] = [], prefixEvents: readonly BattleEvent[] = [];
  for(let step=0;(await snapshot(page)).phase==='battle'&&step<500;step++) {
   await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||(await readSession(page)).phase==='player';}).toBe(true);
   if((await snapshot(page)).phase!=='battle')break;
   const before=await readSession(page),weak=before.state.units.find(u=>u.weakenedBy!==undefined);
-  if(weak&&!reloaded) {
-   const saved=await snapshot(page);
+  const reloadWeakened = weak !== undefined && !reloadedWeakened;
+  if (weak && reloadWeakened) {
    await (await battleTool(page, '#battle-log-open')).click();await expect(page.getByRole('dialog')).toContainText('Will save fails');
    await expect(page.getByRole('dialog')).toContainText('50% save chance');
    await page.screenshot({path:info.outputPath('shaman-will-save-log.png')});await page.locator('#log-close').click();
@@ -874,19 +884,40 @@ test('Shaman production journey uses Hex and ally healing, reloads Weakened and 
    await expect(page.getByRole('dialog')).toContainText('Weakened by Goblin Shaman #6');
    await expect(page.getByRole('dialog')).toContainText('−2 accuracy');
    await page.screenshot({path:info.outputPath('shaman-weakened-inspection.png')});await page.locator('#inspection-close').click();
+   expect(before.events.some(event => event.type === 'saveRolled' && !event.saved)).toBe(true);
+  }
+  const remaining = before.state.units.find(unit => unit.id === 6)?.healGoblinRemaining;
+  const reloadAtOneCast = remaining === 1 && !reloadedAtOneCast;
+  if (reloadWeakened || reloadAtOneCast) {
+   if (reloadAtOneCast) await inspectCasts(1, 'shaman-one-cast.png');
+   const saved = await settledDungeonSnapshot(page);
+   const bytes = await page.evaluate(key => localStorage.getItem(key), DUNGEON_KEYS.primary);
+   const decoded = decodeDungeon(bytes!);
+   expect(decoded.ok && decoded.state.activeBattle).toEqual(saved.activeBattle);
+   expect(saved.activeBattle).toEqual(before.state);
    const commands=before.replay?.commands??before.continuation!.commands;
    if(commands.some(c=>c.type==='undoMove'))throw Error('Unexpected undo in Shaman witness');
-   prefixCommands=commands as readonly Command[];prefixEvents=before.events;
-   expect(prefixEvents.some(e=>e.type==='saveRolled'&&!e.saved)).toBe(true);
+   prefixCommands = [...prefixCommands, ...commands as readonly Command[]];
+   prefixEvents = [...prefixEvents, ...before.events];
    await page.reload();await expectDungeonResumed(page);
    await expect(page.locator('#game')).toHaveAttribute('data-phase','player');
    expect((await snapshot(page)).activeBattle).toEqual(saved.activeBattle);
-   expect((await readSession(page)).events).toEqual([]);reloaded=true;continue;
+   expect((await readSession(page)).events).toEqual([]);
+   if (reloadAtOneCast) await inspectCasts(1, 'shaman-one-cast-after-continue.png');
+   if (reloadWeakened) reloadedWeakened = true;
+   if (reloadAtOneCast) reloadedAtOneCast = true;
+   continue;
   }
-  await playCommand(page,playerDecision(before.state,catalog));
+  if (remaining === 0 && !inspectedExhaustion) {
+   await inspectCasts(0, 'shaman-casts-exhausted.png');
+   inspectedExhaustion = true;
+  }
+  await playCommand(page,playerDecision(before.state,catalog),before.state);
   await expect.poll(async()=>{const s=await snapshot(page);return s.phase!=='battle'||(await readSession(page)).state.commandCount>before.state.commandCount;}).toBe(true);
  }
- expect(reloaded).toBe(true);
+ expect({ reloadedWeakened, reloadedAtOneCast, inspectedExhaustion }).toEqual({
+  reloadedWeakened: true, reloadedAtOneCast: true, inspectedExhaustion: true,
+ });
  const record=JSON.parse((await page.locator('#game').getAttribute('data-dungeon-battle-record'))!);
  const commands=[...prefixCommands,...(record.replay?.commands??record.continuation.commands)],events=[...prefixEvents,...record.events];
  // The HUD submits one automatic missile as unitId; the pure policy uses its equivalent one-entry array.
@@ -898,7 +929,7 @@ test('Shaman production journey uses Hex and ally healing, reloads Weakened and 
  expect({state:replayed,events:replayEvents}).toEqual({state:record.state,events});
  expect(record.state.outcome).toBe('playerWin');expect((await snapshot(page)).party.every(h=>!Object.hasOwn(h,'weakenedBy'))).toBe(true);
  expect(errors).toEqual([]);
- writeFileSync(info.outputPath('shaman-production-journey.json'),JSON.stringify({seed:189,entry:witness.entry,commands,events,state:record.state,reloaded,final:await snapshot(page)},null,2));
+ writeFileSync(info.outputPath('shaman-production-journey.json'),JSON.stringify({seed:189,entry:witness.entry,commands,events,state:record.state,reloadedWeakened,reloadedAtOneCast,final:await snapshot(page)},null,2));
  await page.screenshot({path:info.outputPath('shaman-terminal.png'),fullPage:true});
 });
 
