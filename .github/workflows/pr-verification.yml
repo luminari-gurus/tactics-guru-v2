@@ -10,15 +10,19 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: tactics-browser-tactics-browser-01
-  queue: max
-  cancel-in-progress: false
+  group: pr-verification-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || format('manual-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   verify:
     # Never execute untrusted fork code on a persistent self-hosted machine.
     if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: [self-hosted, tactics-browser, tactics-browser-01]
     timeout-minutes: 10
+    concurrency:
+      # Share VM 01 with manual browser workflows without cancelling them.
+      group: tactics-browser-tactics-browser-01
+      queue: max
+      cancel-in-progress: false
     steps:
       - name: Check host disposition
         run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
