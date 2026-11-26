@@ -17,6 +17,7 @@ import { validateContent } from '../../src/content/validate';
 import { decodeDungeon, encodeDungeon } from '../../src/domain/dungeonSaveEnvelope';
 import { BIOMES } from '../../src/map/biomes';
 import { WINTER_TUNDRA_FAMILY_IDS } from '../../src/content/winterTundraFamily';
+import { SUNSCORCHED_DESERT_FAMILY_IDS } from '../../src/content/sunscorchedDesertFamily';
 
 it('admits every pool pairing, including generated guardian fallback and all survivor subsets', () => {
   const checked = readDungeonEncounterCatalog(hobgoblinDungeonEncounterCatalog, hobgoblinDungeonBattleCatalog); assert(checked.ok, JSON.stringify(checked));
@@ -191,7 +192,7 @@ it('admits the expanded catalog and reaches every enabled enemy, composition and
   expect([...startingBiomes].sort()).toEqual(BIOMES.map(biome => biome.id).sort());
   expect([...kinds].sort()).toEqual(BIOMES.flatMap(biome => ENCOUNTER_KINDS.map(kind => `${biome.id}:${kind}`)).sort());
   expect([...seen.keys()].sort()).toEqual(checked.catalog.compositions.map(composition => composition.id).sort());
-  const catalogOnlyEnemies = new Set<string>(WINTER_TUNDRA_FAMILY_IDS);
+  const catalogOnlyEnemies = new Set<string>([...WINTER_TUNDRA_FAMILY_IDS, ...SUNSCORCHED_DESERT_FAMILY_IDS]);
   const enabledEnemies = ENEMY_IDS.filter(id => !catalogOnlyEnemies.has(id));
   expect([...new Set([...seen.values()].flatMap(selection => selection.encounter.roster
     .filter(spawn => spawn.side === 'enemies').map(spawn => spawn.unitId)))].sort()).toEqual(enabledEnemies.sort());
