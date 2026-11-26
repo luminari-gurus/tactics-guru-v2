@@ -8,19 +8,34 @@ import { canonical, hashJson } from './contentIdentity';
 import { rollDie, seedRng } from './rng';
 import { battlefieldEncounters } from '../content/encounters';
 import { hasShape } from './validation';
-import { BIOMES } from '../map/biomes';
+import { BIOMES, EXPANDED_BIOMES } from '../map/biomes';
 import {
   expandedDungeonBattleCatalog, expandedDungeonEncounterCatalog, expandedDungeonEncounterIdentity, expandedEncounterBattleCatalog,
+  fullBiomeDungeonBattleCatalog, fullBiomeDungeonEncounterCatalog, fullBiomeDungeonEncounterIdentity,
 } from '../content/expandedDungeonEncounters';
 
 export const DUNGEON_ENCOUNTER_POLICY = 'dungeon-encounters-v1';
 export const EXPANDED_ENCOUNTER_POLICY = 'dungeon-encounters-v2';
+export const FULL_BIOME_ENCOUNTER_POLICY = 'dungeon-encounters-v3';
 export const ENEMY_SCALING_POLICY = 'enemy-depth-v1';
 export const LEGACY_ENCOUNTER_POLICY = 'legacy-fixed-v1';
 export const PARTY_SCALING_POLICY = 'enemy-party-v1';
 export const ENDLESS_SCALING_POLICY = 'enemy-party-v2';
 type ScalingPolicy = typeof ENDLESS_SCALING_POLICY | typeof ENEMY_SCALING_POLICY | typeof PARTY_SCALING_POLICY;
-type SeededEncounterPolicy = typeof DUNGEON_ENCOUNTER_POLICY | typeof EXPANDED_ENCOUNTER_POLICY;
+const expandedPolicies = {
+  [EXPANDED_ENCOUNTER_POLICY]: {
+    biomes: EXPANDED_BIOMES, catalog: expandedDungeonEncounterCatalog,
+    identity: expandedDungeonEncounterIdentity, content: expandedDungeonBattleCatalog,
+  },
+  [FULL_BIOME_ENCOUNTER_POLICY]: {
+    biomes: BIOMES, catalog: fullBiomeDungeonEncounterCatalog,
+    identity: fullBiomeDungeonEncounterIdentity, content: fullBiomeDungeonBattleCatalog,
+  },
+};
+type SeededEncounterPolicy = typeof DUNGEON_ENCOUNTER_POLICY | keyof typeof expandedPolicies;
+export function isSeededEncounterPolicy(value: unknown): value is SeededEncounterPolicy {
+  return value === DUNGEON_ENCOUNTER_POLICY || (typeof value === 'string' && Object.hasOwn(expandedPolicies, value));
+}
 export type DungeonEncounterPolicy = SeededEncounterPolicy | typeof LEGACY_ENCOUNTER_POLICY;
 export interface DungeonEncounterSelection {
   readonly policy: SeededEncounterPolicy; readonly catalogIdentity: string;
@@ -34,9 +49,9 @@ export interface LegacyEncounterSelection {
 }
 export type EncounterSelection = DungeonEncounterSelection | LegacyEncounterSelection;
 export function encounterBattleCatalog(selection: EncounterSelection): ContentCatalog {
-  if (selection.policy === EXPANDED_ENCOUNTER_POLICY) {
+  if (selection.policy !== LEGACY_ENCOUNTER_POLICY && selection.policy !== DUNGEON_ENCOUNTER_POLICY) {
     const { source, roster } = selection.encounter;
-    return expandedEncounterBattleCatalog(roster, source.kind === 'authored' ? source.mapId : undefined);
+    return expandedEncounterBattleCatalog(roster, source.kind === 'authored' ? source.mapId : undefined, expandedPolicies[selection.policy].content);
   }
   return selection.policy === DUNGEON_ENCOUNTER_POLICY && selection.mapId === 'hobgoblin_formation'
     ? hobgoblinDungeonBattleCatalog : dungeonBattleCatalog;
@@ -53,16 +68,16 @@ export function readDungeonEncounterSelection(input: unknown, depth: number, slo
     const expected = legacyDungeonEncounter(depth, slot);
     return hasShape(input, ['policy', 'depth', 'kind', 'encounter']) && readBattlefieldEncounter(input.encounter, dungeonBattleCatalog).ok && canonical(input) === canonical(expected) ? expected : null;
   }
+  const expanded = policy === DUNGEON_ENCOUNTER_POLICY ? undefined : expandedPolicies[policy];
   if (!hasShape(input, ['policy', 'catalogIdentity', 'biome', 'kind', 'depth', 'poolId', 'mapId', 'compositionId', 'bossId', 'scalingPolicy', 'encounter']) ||
     input.policy !== policy || input.depth !== depth || input.biome !== biome ||
-    (input.scalingPolicy !== ENEMY_SCALING_POLICY && !(policy === EXPANDED_ENCOUNTER_POLICY && (input.scalingPolicy === PARTY_SCALING_POLICY || input.scalingPolicy === ENDLESS_SCALING_POLICY))) || (slot === 0 ? input.kind !== 'normal' : slot === 2 ? input.kind !== 'boss' : !['elite', 'vault'].includes(input.kind as string))) return null;
-  const expanded = policy === EXPANDED_ENCOUNTER_POLICY;
+    (input.scalingPolicy !== ENEMY_SCALING_POLICY && !(expanded && (input.scalingPolicy === PARTY_SCALING_POLICY || input.scalingPolicy === ENDLESS_SCALING_POLICY))) || (slot === 0 ? input.kind !== 'normal' : slot === 2 ? input.kind !== 'boss' : !['elite', 'vault'].includes(input.kind as string))) return null;
   const hasHobgoblins = !expanded && input.catalogIdentity === hobgoblinEncounterIdentity;
-  const catalogIdentity = expanded ? expandedDungeonEncounterIdentity : hasHobgoblins ? hobgoblinEncounterIdentity : dungeonEncounterIdentity;
+  const catalogIdentity = expanded?.identity ?? (hasHobgoblins ? hobgoblinEncounterIdentity : dungeonEncounterIdentity);
   if (input.catalogIdentity !== catalogIdentity) return null;
   if ((hasHobgoblins || input.mapId === 'hobgoblin_formation') &&
     (depth < 2 || slot !== 1 || biome !== 'forest' || input.mapId !== 'hobgoblin_formation')) return null;
-  const catalog = expanded ? expandedDungeonEncounterCatalog : hasHobgoblins ? hobgoblinDungeonEncounterCatalog : dungeonEncounterCatalog;
+  const catalog = expanded?.catalog ?? (hasHobgoblins ? hobgoblinDungeonEncounterCatalog : dungeonEncounterCatalog);
   const definition = catalog.biomes.find(b => b.id === biome);
   if (!definition) return null;
   const boss = slot === 2 ? catalog.bosses.find(b => b.id === definition.bossId)! : null;
@@ -73,7 +88,7 @@ export function readDungeonEncounterSelection(input: unknown, depth: number, slo
   const expected: DungeonEncounterSelection = { policy, catalogIdentity, biome: definition.id,
     kind: input.kind as EncounterKind, depth, poolId: pool.id, mapId: map.id, compositionId: composition.id, bossId: boss?.id ?? null,
     scalingPolicy: input.scalingPolicy as ScalingPolicy, encounter: { id: `encounter:${map.id}`, source: { ...map.source }, roster: composition.roster.map(s => ({ ...s })) } };
-  const content = expanded ? expandedDungeonBattleCatalog : hasHobgoblins ? hobgoblinDungeonBattleCatalog : dungeonBattleCatalog;
+  const content = expanded?.content ?? (hasHobgoblins ? hobgoblinDungeonBattleCatalog : dungeonBattleCatalog);
   return readBattlefieldEncounter(input.encounter, content).ok && canonical(input) === canonical(expected) ? expected : null;
 }
 const depthOk = (depth: number) => Number.isSafeInteger(depth) && depth >= 1;
@@ -84,7 +99,7 @@ export function encounterSelectionSeed(seed: number, depth: number, slot: number
 }
 export function dungeonBiome(seed: number, depth: number, policy: SeededEncounterPolicy = DUNGEON_ENCOUNTER_POLICY): DungeonBiome {
   if (!depthOk(depth)) throw new RangeError('Invalid depth');
-  const biomes = policy === EXPANDED_ENCOUNTER_POLICY ? BIOMES.map(biome => biome.id) : ['forest', 'desert'] as const;
+  const biomes = policy === DUNGEON_ENCOUNTER_POLICY ? ['forest', 'desert'] as const : expandedPolicies[policy].biomes.map(biome => biome.id);
   const first = rollDie(seedRng(encounterSelectionSeed(seed, 1, 0, 'biome', policy)), biomes.length).value - 1;
   return biomes[(first + (depth - 1) % biomes.length) % biomes.length];
 }
@@ -92,11 +107,11 @@ export function dungeonBiome(seed: number, depth: number, policy: SeededEncounte
 export function selectDungeonEncounter(seed: number, depth: number, slot: number, policy: SeededEncounterPolicy = DUNGEON_ENCOUNTER_POLICY): DungeonEncounterSelection {
   const choose = <T>(values: readonly T[], purpose: 'kind' | 'map' | 'composition'): T =>
     values[rollDie(seedRng(encounterSelectionSeed(seed, depth, slot, purpose, policy)), values.length).value - 1];
-  const expanded = policy === EXPANDED_ENCOUNTER_POLICY;
+  const expanded = policy === DUNGEON_ENCOUNTER_POLICY ? undefined : expandedPolicies[policy];
   const biome = dungeonBiome(seed, depth, policy);
   const useHobgoblins = biome === 'forest' && depth >= 2 && slot === 1 &&
     rollDie(seedRng(encounterSelectionSeed(seed, depth, slot, 'hobgoblin', policy)), 3).value === 1;
-  const catalog = expanded ? expandedDungeonEncounterCatalog : useHobgoblins ? hobgoblinDungeonEncounterCatalog : dungeonEncounterCatalog;
+  const catalog = expanded?.catalog ?? (useHobgoblins ? hobgoblinDungeonEncounterCatalog : dungeonEncounterCatalog);
   const definition = catalog.biomes.find(b => b.id === biome)!;
   // Validate the slot even when every selected pool contains only one definition.
   encounterSelectionSeed(seed, depth, slot, 'kind', policy);
@@ -107,7 +122,7 @@ export function selectDungeonEncounter(seed: number, depth: number, slot: number
     choose(pool.maps.filter(choice => choice.id !== 'hobgoblin_formation').sort((a,b) => a.id < b.id ? -1 : 1), 'map');
   const compositionId = choose([...map.compositionIds].sort(), 'composition');
   const composition = catalog.compositions.find(c => c.id === compositionId)!;
-  const catalogIdentity = expanded ? expandedDungeonEncounterIdentity : useHobgoblins ? hobgoblinEncounterIdentity : dungeonEncounterIdentity;
+  const catalogIdentity = expanded?.identity ?? (useHobgoblins ? hobgoblinEncounterIdentity : dungeonEncounterIdentity);
   return { policy, catalogIdentity, biome, kind, depth, poolId: pool.id, mapId: map.id,
     compositionId, bossId: boss?.id ?? null, scalingPolicy: expanded ? ENDLESS_SCALING_POLICY : ENEMY_SCALING_POLICY,
     encounter: { id: `encounter:${map.id}`, source: { ...map.source }, roster: composition.roster.map(s => ({ ...s })) } };

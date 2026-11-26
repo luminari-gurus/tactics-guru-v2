@@ -26,6 +26,10 @@ const artwork: Record<Terrain, string> = {
   'ember-wastes-blocked': 'ember-wastes-blocked.png',
   'winter-tundra-open': 'winter-tundra-open.png',
   'winter-tundra-blocked': 'winter-tundra-blocked.png',
+  'storm-coast-open': 'desert-open.png',
+  'storm-coast-blocked': 'wetlands-blocked.png',
+  'shattered-citadel-open': 'quarry-open.png',
+  'shattered-citadel-blocked': 'quarry-blocked.png',
 };
 export type ArtTreatment = { url?: string; fallback?: 'loading' | 'failed' };
 

@@ -163,6 +163,10 @@ body:has(#dungeon-screen:not([hidden])) #battle-heading { display: none; }
 #dungeon-map [data-terrain="ember-wastes-blocked"] { background-color: #682f24; }
 #dungeon-map [data-terrain="winter-tundra-open"] { background-color: #a6b9c8; }
 #dungeon-map [data-terrain="winter-tundra-blocked"] { background-color: #416784; }
+#dungeon-map [data-terrain="storm-coast-open"] { background-color: #a18e65; }
+#dungeon-map [data-terrain="storm-coast-blocked"] { background-color: #28576a; }
+#dungeon-map [data-terrain="shattered-citadel-open"] { background-color: #7c7670; }
+#dungeon-map [data-terrain="shattered-citadel-blocked"] { background-color: #424147; }
 #dungeon-map .explore-hidden { background-color: #111a24; }
 #dungeon-map .explore-remembered { position: relative; isolation: isolate; }
 #dungeon-map .explore-remembered::before {

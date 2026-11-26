@@ -1,4 +1,4 @@
-import { EXPANDED_ENCOUNTER_POLICY } from '../domain/dungeonEncounters';
+import { FULL_BIOME_ENCOUNTER_POLICY } from '../domain/dungeonEncounters';
 import { levelUpFeedback } from '../domain/progression';
 import { BattleSession } from './BattleSession';
 import { stepDungeon, type ExplorationCommand, acceptDungeonBattle, dungeonBattle, dungeonItem, freshDungeon, readDungeon, startDungeonBattle, type DungeonState, type DungeonItemCommand } from '../domain/dungeon';
@@ -374,7 +374,7 @@ export class DungeonSession {
   }
   private replaceNow(review: DungeonInspection, id: string, seed: number) {
     if (!this.storage || this.disposed || review !== this.review || id === this.current.id || seed === this.current.seed) return false;
-    const next = freshDungeon(id, seed, EXPANDED_ENCOUNTER_POLICY, true);
+    const next = freshDungeon(id, seed, FULL_BIOME_ENCOUNTER_POLICY, true);
     this.retainExports(review);
     const result = this.storage.replace(review, next);
     this.review = null;

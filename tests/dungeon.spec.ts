@@ -1,5 +1,5 @@
 import { HEAL_GOBLIN_CAST_LIMIT } from '../src/domain/constants';
-import { EXPANDED_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
+import { FULL_BIOME_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
 import { dungeonContent } from '../src/content/dungeon';
 import { openSavedDungeon, walkDungeon, acceptedDungeonSnapshot, settledDungeonSnapshot, expectSameProgress, reenterDungeonStair, expectDungeonResumed, openDungeonInventory, collectDungeonEncounterLoot } from './helpers/dungeonTraversal';
 import { atEncounter, atStairApproach, checkedDungeon, hobgoblinDungeonBoundary, stagedMageAbility, snaredDefeatBoundary } from './helpers/dungeonFixtures';
@@ -28,8 +28,8 @@ import { expectDungeonMovementVisible } from './helpers/dungeonLayout';
 import { BattleSession } from '../src/app/BattleSession';
 
 const fixedSeedTest = test.extend({ pinDungeonSeed: 28 });
-// Fresh saved runs avoid the initial dormant seed. Seed 5 clears Wetlands with the Fighter policy.
-const savedWetlandsSeed = 5;
+// Fresh saved runs avoid the initial dormant seed. Seed 10 clears Wetlands with the Fighter policy.
+const savedWetlandsSeed = 10;
 const savedWetlandsTest = test.extend({ pinDungeonSeed: savedWetlandsSeed - 1 });
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
 const boardReport=async(page:Page)=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
@@ -1008,7 +1008,7 @@ savedWetlandsTest('read-only entry, keyboard new dungeon, real action and active
  await newGame.focus();await page.keyboard.press('Enter');
  await expect(map).toBeVisible();
  const exploration=await snapshot(page);
- expect(exploration.encounterPolicy).toBe(EXPANDED_ENCOUNTER_POLICY);
+ expect(exploration.encounterPolicy).toBe(FULL_BIOME_ENCOUNTER_POLICY);
  await expect(map).toHaveAttribute('data-biome', 'wetlands');
  await page.getByRole('link',{name:'Main menu',exact:true}).click();
  await expect(menu).toBeVisible();await expect(resume).toBeEnabled();
