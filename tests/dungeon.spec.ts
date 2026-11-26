@@ -515,10 +515,11 @@ savedWetlandsTest('saved dungeon downloads only after explicit recovery export',
  const battle=(await readSession(page)).state;
  // Battle commands publish before their queued save settles. Compare export and
  // reload against the durable bytes for this exact accepted boundary.
- const boundary=await settledDungeonSnapshot(page),saved=await stored();
- expect(boundary.activeBattle).toEqual(battle);
+ await expect.poll(async()=>(await snapshot(page)).activeBattle).toEqual(battle);
+ const boundary=await snapshot(page);
+ await expect.poll(async()=>JSON.parse((await stored()).primary ?? 'null')?.payload).toEqual(boundary);
+ const saved=await stored();
  expect(saved.primary).not.toBeNull();expect(saved.backup).not.toBeNull();
- expect(JSON.parse(saved.primary!).payload).toEqual(boundary);
  const unchanged=async()=>{
   expect(await stored()).toEqual(saved);
   expect(await snapshot(page)).toEqual(boundary);
