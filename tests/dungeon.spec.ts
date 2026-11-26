@@ -512,8 +512,13 @@ savedWetlandsTest('saved dungeon downloads only after explicit recovery export',
   expect(enemyTurn,'the legal witness must cross an enemy turn and return to player control').toBe(true);
  });
 
- const saved=await stored(),boundary=await snapshot(page),battle=(await readSession(page)).state;
+ const battle=(await readSession(page)).state;
+ // Battle commands publish before their queued save settles. Compare export and
+ // reload against the durable bytes for this exact accepted boundary.
+ const boundary=await settledDungeonSnapshot(page),saved=await stored();
+ expect(boundary.activeBattle).toEqual(battle);
  expect(saved.primary).not.toBeNull();expect(saved.backup).not.toBeNull();
+ expect(JSON.parse(saved.primary!).payload).toEqual(boundary);
  const unchanged=async()=>{
   expect(await stored()).toEqual(saved);
   expect(await snapshot(page)).toEqual(boundary);
