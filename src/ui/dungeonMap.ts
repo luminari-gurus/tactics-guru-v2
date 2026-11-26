@@ -1,4 +1,4 @@
-import { EXPANDED_ENCOUNTER_POLICY } from '../domain/dungeonEncounters';
+import { DUNGEON_ENCOUNTER_POLICY, LEGACY_ENCOUNTER_POLICY } from '../domain/dungeonEncounters';
 import type { DungeonFloor, DungeonState } from '../domain/dungeon';
 import { currentFloor, clearedDungeonSlots, dungeonStairStatus } from '../domain/dungeon';
 import { dungeonContent } from '../content/dungeon';
@@ -16,7 +16,7 @@ export function dungeonEncounterLabel(s: DungeonState, slot: number): string {
   const { kind } = selection;
   if (kind !== 'boss') return `${kind[0].toUpperCase()}${kind.slice(1)} encounter ${slot + 1}`;
   const leader = selection.encounter.roster.find(spawn => spawn.side === 'enemies');
-  if (selection.policy !== EXPANDED_ENCOUNTER_POLICY || !leader || leader.unitId.startsWith('goblin_')) return 'Guardian · Goblins';
+  if (selection.policy === LEGACY_ENCOUNTER_POLICY || selection.policy === DUNGEON_ENCOUNTER_POLICY || !leader || leader.unitId.startsWith('goblin_')) return 'Guardian · Goblins';
   return `Guardian · ${leader.unitId.replace(/_boss$/, '').replaceAll('_', ' ').replace(/\b\w/g, letter => letter.toUpperCase())}`;
 }
 

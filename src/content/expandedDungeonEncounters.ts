@@ -11,6 +11,10 @@ import { goblinFamilyBattleContent } from './goblinFamily';
 import { graveyardFamilyBattleContent } from './graveyardFamily';
 import { quarryFamilyBattleContent } from './quarryFamily';
 import { wetlandsFamilyBattleContent } from './wetlandsFamily';
+import { winterTundraFamilyBattleContent } from './winterTundraFamily';
+import { sunscorchedDesertFamilyBattleContent } from './sunscorchedDesertFamily';
+import { stormCoastFamilyBattleContent } from './stormCoastFamily';
+import { shatteredCitadelFamilyBattleContent } from './shatteredCitadelFamily';
 import { ruinedApproach } from './ruinedApproach';
 import type { ContentCatalog, EnemyId, MapRecord, SpawnRecord, TerrainId } from './types';
 
@@ -124,14 +128,16 @@ function buildArena(pack: ArenaPack, id: string, rosters: readonly Roster[]) {
   });
 }
 
-const arenas = packs.map(pack => {
+function biomeArenas(pack: ArenaPack, arenaId = pack.biome.replaceAll('-', '_')) {
   const id = pack.biome.replaceAll('-', '_');
   return {
     biome: pack.biome, poolId: id, bossId: `${id}_guardian`,
-    patrol: buildArena(pack, `${id}_patrol`, pack.patrols),
-    guardian: buildArena(pack, `${id}_guardian_arena`, pack.guardians),
+    patrol: buildArena(pack, `${arenaId}_patrol`, pack.patrols),
+    guardian: buildArena(pack, `${arenaId}_guardian_arena`, pack.guardians),
   };
-});
+}
+
+const arenas = packs.map(pack => biomeArenas(pack));
 
 // Keep registry order aligned with the approved attack owner lists. Battles
 // project only the optional units and textures used by the saved roster.
@@ -178,23 +184,129 @@ export const expandedDungeonEncounterCatalog: DungeonEncounterCatalog = {
 };
 export const expandedDungeonEncounterIdentity = dungeonEncounterCatalogIdentity(expandedDungeonEncounterCatalog);
 
-export function expandedEncounterBattleCatalog(roster: readonly SpawnRecord[], mapId?: MapRecord['id']): ContentCatalog {
+const newArenas = [
+  biomeArenas({
+    biome: 'winter-tundra', ground: 'stone', obstacle: 'water',
+    patrols: [
+      ['frost_gnawer', 'drift_archer', 'snowblind_crow'],
+      ['icebound_raider', 'rime_shaman', 'glacier_ram'],
+      ['yeti_bruiser', 'ice_wraith'],
+      ['frostforge_sentinel', 'aurora_seer'],
+    ],
+    guardians: [['hroth_whitehorn_king', 'frost_gnawer']],
+  }, 'tundra_family'),
+  biomeArenas({
+    biome: 'storm-coast', ground: 'sand', obstacle: 'water',
+    patrols: [
+      ['salt_rat', 'gull_harrier', 'net_caster'],
+      ['tide_crab', 'stormcaller_acolyte'],
+      ['reef_stalker', 'siren_shade'],
+      ['barnacle_golem', 'deckbreaker'],
+      ['blackwake_captain', 'salt_rat'],
+    ],
+    guardians: [['admiral_blackwake', 'gull_harrier']],
+  }),
+  biomeArenas({
+    biome: 'shattered-citadel', ground: 'stone', obstacle: 'rock',
+    patrols: [
+      ['ruin_squire', 'crossbow_levy', 'rubble_imp'],
+      ['gate_warden', 'siege_engineer'],
+      ['banner_knight', 'arcane_bailiff'],
+      ['gargoyle_sentinel', 'crownless_champion'],
+      ['iron_ram', 'ruin_squire'],
+    ],
+    guardians: [['crownless_regent', 'rubble_imp']],
+  }),
+];
+
+const desertRosters: readonly Roster[] = [
+  ['sand_jackal', 'dune_archer', 'mirage_pup'],
+  ['saltbone_howler', 'dune_jackal', 'sand_bandit'],
+  ['scarab_swarm', 'mirage_adept', 'camel_lancer'],
+  ['sand_mummy', 'glass_viper'],
+  ['obelisk_guardian', 'sandstorm_djinn'],
+  ['caravan_reaver', 'mirage_pup'],
+  ['sirocco_jackal_king', 'sand_jackal'],
+  ['saffron_colossus', 'mirage_pup'],
+];
+const desertSpawns = dungeonEncounterCatalog.compositions.find(composition => composition.id === 'desert_2')!.roster;
+const desertCompositions = desertRosters.map((units, index): DungeonComposition => {
+  const roster: SpawnRecord[] = desertSpawns.filter(spawn => spawn.side === 'heroes');
+  const enemySpawns = desertSpawns.filter(spawn => spawn.side === 'enemies');
+  units.forEach((unitId, slot) => {
+    if (unitId) roster.push({ ...enemySpawns[slot], side: 'enemies', unitId });
+  });
+  return { id: `sunscorched_desert_${index + 1}`, roster };
+});
+
+export const fullBiomeDungeonBattleCatalog = [
+  winterTundraFamilyBattleContent, sunscorchedDesertFamilyBattleContent,
+  stormCoastFamilyBattleContent, shatteredCitadelFamilyBattleContent,
+].reduce<ContentCatalog>((catalog, addFamily) => addFamily(catalog), {
+  ...expandedDungeonBattleCatalog,
+  maps: {
+    ...expandedDungeonBattleCatalog.maps,
+    ...Object.fromEntries(newArenas.flatMap(({ patrol, guardian }) =>
+      [...patrol, ...guardian].map(({ map }) => [map.id, map]))),
+  },
+});
+
+const addedBiomes = newArenas.filter(arena => arena.biome !== 'winter-tundra');
+export const fullBiomeDungeonEncounterCatalog: DungeonEncounterCatalog = {
+  ...expandedDungeonEncounterCatalog,
+  version: 3,
+  biomes: [
+    ...expandedDungeonEncounterCatalog.biomes,
+    ...addedBiomes.map(({ biome, poolId, bossId }) => ({ id: biome, poolId, bossId })),
+  ],
+  compositions: [
+    ...expandedDungeonEncounterCatalog.compositions,
+    ...desertCompositions,
+    ...newArenas.flatMap(({ patrol, guardian }) => [...patrol, ...guardian].map(arena => arena.composition)),
+  ],
+  pools: [
+    ...expandedDungeonEncounterCatalog.pools.map(pool => pool.biome === 'desert'
+      ? { ...pool, maps: pool.maps.map(map => ({
+        ...map,
+        compositionIds: [...map.compositionIds, ...(pool.id === 'desert'
+          ? desertCompositions.slice(0, -2) : desertCompositions.slice(-2)).map(composition => composition.id)],
+      })) }
+      : pool.biome === 'winter-tundra'
+        ? { ...pool, maps: [...pool.maps, ...(pool.id === 'winter_tundra' ? newArenas[0].patrol : newArenas[0].guardian).map(arena => arena.choice)] }
+        : pool),
+    ...addedBiomes.flatMap(({ biome, poolId, patrol, guardian }) => [
+      { id: poolId, biome, maps: patrol.map(arena => arena.choice) },
+      { id: `${poolId}_boss`, biome, maps: guardian.map(arena => arena.choice) },
+    ]),
+  ],
+  bosses: [
+    ...expandedDungeonEncounterCatalog.bosses,
+    ...addedBiomes.map(({ biome, poolId, bossId }) => ({
+      id: bossId, biome, poolId: `${poolId}_boss`, victory: 'all-enemies' as const,
+    })),
+  ],
+};
+export const fullBiomeDungeonEncounterIdentity = dungeonEncounterCatalogIdentity(fullBiomeDungeonEncounterCatalog);
+
+export function expandedEncounterBattleCatalog(
+  roster: readonly SpawnRecord[], mapId?: MapRecord['id'], catalog = expandedDungeonBattleCatalog,
+): ContentCatalog {
   const selected = new Set(roster.map(spawn => spawn.unitId));
   const enemies = { ...dungeonBattleCatalog.enemies };
   const assets = { ...dungeonBattleCatalog.assets };
   for (const spawn of roster) {
     if (spawn.side !== 'enemies' || Object.hasOwn(enemies, spawn.unitId)) continue;
-    const enemy = expandedDungeonBattleCatalog.enemies[spawn.unitId];
+    const enemy = catalog.enemies[spawn.unitId];
     enemies[enemy.id] = enemy;
-    assets[enemy.spriteAssetId] = expandedDungeonBattleCatalog.assets[enemy.spriteAssetId];
-    assets[enemy.portraitAssetId] = expandedDungeonBattleCatalog.assets[enemy.portraitAssetId];
+    assets[enemy.spriteAssetId] = catalog.assets[enemy.spriteAssetId];
+    assets[enemy.portraitAssetId] = catalog.assets[enemy.portraitAssetId];
   }
   const abilities = { ...dungeonBattleCatalog.abilities };
-  for (const ability of Object.values(expandedDungeonBattleCatalog.abilities)) {
+  for (const ability of Object.values(catalog.abilities)) {
     if (ability.id === 'ability:shield_bash' && !selected.has('hobgoblin_warrior')) continue;
     const owners = ability.owners.filter(owner => Object.hasOwn(enemies, owner) || Object.hasOwn(dungeonBattleCatalog.heroes, owner));
     if (owners.length) abilities[ability.id] = { ...ability, owners };
   }
-  const maps = mapId ? { [mapId]: expandedDungeonBattleCatalog.maps[mapId] } : dungeonBattleCatalog.maps;
+  const maps = mapId ? { [mapId]: catalog.maps[mapId] } : dungeonBattleCatalog.maps;
   return { ...dungeonBattleCatalog, enemies, assets, abilities, maps };
 }

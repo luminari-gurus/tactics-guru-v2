@@ -16,7 +16,7 @@ import { resolveBattlefield, sameBattlefield, layoutSeed, type BattlefieldDescri
 import { createBattle } from './turns';
 import { hasHealGoblinCap, readBattleState } from './battle';
 import type { BattleState } from './types';
-import { DUNGEON_ENCOUNTER_POLICY, EXPANDED_ENCOUNTER_POLICY, LEGACY_ENCOUNTER_POLICY, dungeonBiome, legacyDungeonEncounter, selectDungeonEncounter, readDungeonEncounterSelection,
+import { DUNGEON_ENCOUNTER_POLICY, isSeededEncounterPolicy, LEGACY_ENCOUNTER_POLICY, dungeonBiome, legacyDungeonEncounter, selectDungeonEncounter, readDungeonEncounterSelection,
   encounterBattleCatalog, projectDungeonEnemies, type EncounterSelection, type DungeonEncounterPolicy } from './dungeonEncounters';
 import { readBattlefieldDescriptor } from './battlefield';
 import { encounterHpLimit } from './effects';
@@ -151,7 +151,7 @@ export function newDungeonSeed(draw: () => number, previous?: number): number {
 }
 export function freshDungeon(id: string, seed: number, encounterPolicy: DungeonEncounterPolicy = DUNGEON_ENCOUNTER_POLICY, tracking = false): DungeonState {
   if (!/^[A-Za-z0-9-]{1,64}$/.test(id) || !seedOk(seed)) throw new RangeError('Invalid dungeon identity');
-  if (encounterPolicy !== DUNGEON_ENCOUNTER_POLICY && encounterPolicy !== EXPANDED_ENCOUNTER_POLICY && encounterPolicy !== LEGACY_ENCOUNTER_POLICY) throw new RangeError('Invalid encounter policy');
+  if (encounterPolicy !== LEGACY_ENCOUNTER_POLICY && !isSeededEncounterPolicy(encounterPolicy)) throw new RangeError('Invalid encounter policy');
   const descriptor = floorDescriptor(seed, 1, undefined, encounterPolicy);
   return { id, seed, encounterPolicy, revision: 0, depth: 1, floors: [{ descriptor, position: descriptor.upstairs, completed: 0, exploration: freshExploration(descriptor.seed, descriptor.upstairs, floorMap(descriptor)) }],
     party: HERO_IDS.map(heroId => progressHero(heroId, 0, dungeonContent.catalog.heroes[heroId].stats.maxHp, dungeonContent.catalog)),
@@ -243,7 +243,7 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
   const stats = tracked ? readRunStats(input.stats) : null;
   if (tracked && !stats) return fail('invalidState');
   const policy = input.encounterPolicy;
-  if (policy !== LEGACY_ENCOUNTER_POLICY && policy !== DUNGEON_ENCOUNTER_POLICY && policy !== EXPANDED_ENCOUNTER_POLICY) return fail('invalidPolicy');
+  if (policy !== LEGACY_ENCOUNTER_POLICY && !isSeededEncounterPolicy(policy)) return fail('invalidPolicy');
   const floors: DungeonFloor[] = [];
   for (let i = 0; i < input.floors.length; i++) {
     const f = input.floors[i];

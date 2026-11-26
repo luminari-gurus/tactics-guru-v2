@@ -24,7 +24,8 @@ import { AUTO_COLLECT_LOOT_KEY } from '../src/ui/autoCollectLootPreference';
 import { dungeonMovementGeometry, expectDungeonMovementVisible } from './helpers/dungeonLayout';
 
 const fixedSeedTest = test.extend({ pinDungeonSeed: 28 });
-const desertSeedTest = test.extend({ pinDungeonSeed: 16 });
+// New Game advances the pinned seed to 96, a v3 Desert start with one visible encounter.
+const desertSeedTest = test.extend({ pinDungeonSeed: 95 });
 test.beforeEach(async ({ context }) => { await installRailControls(context); });
 
 async function loadGroundLootBoundary(page: Page, state: DungeonState) {

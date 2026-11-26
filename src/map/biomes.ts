@@ -1,6 +1,6 @@
 import type { GeneratedMap } from './generate';
 
-export const BIOMES = [
+export const EXPANDED_BIOMES = [
   { id: 'grassland', label: 'Grassland', version: 'grassland-v1', open: 'Grass', blocked: 'Rock' },
   { id: 'forest', label: 'Forest', version: 'forest-v1', open: 'Clearing', blocked: 'Dense pines' },
   { id: 'desert', label: 'Desert', version: 'desert-v1', open: 'Sand', blocked: 'Rock' },
@@ -10,6 +10,11 @@ export const BIOMES = [
   { id: 'graveyard', label: 'Graveyard', version: 'graveyard-v1', open: 'Earth', blocked: 'Gravestones' },
   { id: 'ember-wastes', label: 'Ember Wastes', version: 'ember-wastes-v1', open: 'Ash', blocked: 'Lava' },
   { id: 'winter-tundra', label: 'Winter Tundra', version: 'winter-tundra-v1', open: 'Packed snow', blocked: 'Ice ridges' },
+] as const;
+export const BIOMES = [
+  ...EXPANDED_BIOMES,
+  { id: 'storm-coast', label: 'Storm Coast', version: 'storm-coast-v1', open: 'Shore', blocked: 'Surf' },
+  { id: 'shattered-citadel', label: 'Shattered Citadel', version: 'shattered-citadel-v1', open: 'Courtyard', blocked: 'Rubble' },
 ] as const;
 export type Biome = typeof BIOMES[number]['id'];
 export type Terrain = `${Biome}-open` | `${Biome}-blocked`;
