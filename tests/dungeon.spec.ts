@@ -663,6 +663,7 @@ test('battle log filters and keeps history across Hide and reopen', async ({ pag
  await openSavedDungeon(page,checkedDungeon(acceptDungeonBattle(witness.entry,state)));
  const game = page.locator('#game');
  await expect(game).toHaveAttribute('data-phase','player',{timeout:15_000});
+ const resumed = await readSession(page);
 
  const activate = async (button: Locator) => {
    if (isMobile) await button.tap();
@@ -684,6 +685,14 @@ test('battle log filters and keeps history across Hide and reopen', async ({ pag
    await activate(filterButton(name));
    await expect(filters.getByRole('button',{pressed:true})).toHaveText(name);
  };
+ const expectControlsFit = async () => {
+   await expect.poll(() => dialog.evaluate(element =>
+     element.scrollWidth <= element.clientWidth && [...element.querySelectorAll('button')].every(button => {
+       const {width,height} = button.getBoundingClientRect();
+       return width >= 44 && height >= 44;
+     }),
+   )).toBe(true);
+ };
 
  let launcher = await openLog();
  await expect(lines).toHaveText([/^Round 2: Fighter #1's turn$/]);
@@ -694,9 +703,19 @@ test('battle log filters and keeps history across Hide and reopen', async ({ pag
  await selectFilter('Status & Saves');
  await expect(lines).toHaveCount(0);
  await expect(dialog.getByRole('status')).toHaveText('No events for this filter.');
+ await expectControlsFit();
  await activate(hide);
  await expect(dialog).toBeHidden();
  if (!isMobile) await expect(launcher).toBeFocused();
+
+ // Keep the full keyboard and touch sequences on desktop Chromium and portrait
+ // WebKit. Other routine profiles keep their actual viewport and activation checks.
+ if (['mobile-portrait','mobile-landscape','desktop-webkit','landscape-webkit'].includes(test.info().project.name)) {
+   await openLog();
+   await expect(lines).toHaveText([/^Round 2: Fighter #1's turn$/]);
+   expect(await readSession(page)).toEqual(resumed);
+   return;
+ }
 
  await endTurn(page,selector => activate(page.locator(selector)));
  await expect.poll(async () => (await readSession(page)).state.commandCount).toBeGreaterThan(state.commandCount);
@@ -739,12 +758,7 @@ test('battle log filters and keeps history across Hide and reopen', async ({ pag
  expect(await readSession(page)).toEqual(before);
 
  if (!isMobile) await page.setViewportSize({width:360,height:600});
- await expect.poll(() => dialog.evaluate(element =>
-   element.scrollWidth <= element.clientWidth && [...element.querySelectorAll('button')].every(button => {
-     const {width,height} = button.getBoundingClientRect();
-     return width >= 44 && height >= 44;
-   }),
- )).toBe(true);
+ await expectControlsFit();
  if (isMobile) await activate(hide);
  else {
    await page.keyboard.press('w');

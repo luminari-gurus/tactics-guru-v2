@@ -121,5 +121,6 @@ export function readExploration(value: unknown, seed: number, position: number, 
   const live = pois.filter(p=>!(value.cleared as number[]).includes(p.encounterSlot)).map(p => poiCell(p, map.width));
   if (new Set(live).size !== live.length) return null;
   return {version:'exploration-v2',pois:pois.map(p=>({...p})),...memory,
-    cleared:[...value.cleared] as number[],active:value.active as number | null,movement:{rng:value.movement.rng,step:value.movement.step as number}};
+    cleared:[...value.cleared] as number[],active:value.active as number | null,
+    movement:{rng:{cursor:value.movement.rng.cursor,words:[...value.movement.rng.words]},step:value.movement.step as number}};
 }

@@ -74,8 +74,8 @@ export function dungeonSeed(seed: number, depth: number, purpose: 'floor' | 'bat
   if (!seedOk(seed) || !safeCount(depth, 1) || !safeCount(slot) || slot > 2) throw new RangeError('Invalid dungeon seed inputs');
   return Number.parseInt(hashJson({ seed, depth, purpose, slot, policy: 'dungeon-seeds-v1' }).slice(-8), 16);
 }
-// Saved movement validates the whole snapshot repeatedly. Cache only proven immutable
-// encounter facts, never floor progress or geometry; the complete key changes on tampering.
+// Saved movement validates the whole snapshot repeatedly. Cache only normalized,
+// immutable facts that can be reused in the same validation context.
 const MAX_DUNGEON_FLOORS = 8192;
 const admittedEncounters = new Map<string, true>();
 function admissionKey(seed: number, selection: EncounterSelection, battlefield: BattlefieldDescriptor) {
@@ -84,9 +84,11 @@ function admissionKey(seed: number, selection: EncounterSelection, battlefield: 
 // Only normalized descriptors enter this cache. Historical encounters must still
 // resolve their battlefield geometry the first time their floor becomes current.
 const checkedDescriptors = new WeakMap<FloorDescriptor, { seed: number; policy: DungeonEncounterPolicy; current: boolean }>();
-function freezeDescriptorParts(value: object): void {
+const checkedFloors = new WeakMap<DungeonFloor, { id: string; seed: number; policy: DungeonEncounterPolicy; current: boolean }>();
+function freezeDungeonParts(value: object): void {
+  if (checkedDescriptors.has(value as FloorDescriptor)) return;
   for (const part of Object.values(value)) {
-    if (part !== null && typeof part === 'object') freezeDescriptorParts(part);
+    if (part !== null && typeof part === 'object') freezeDungeonParts(part);
   }
   Object.freeze(value);
 }
@@ -237,6 +239,16 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
   const floors: DungeonFloor[] = [];
   for (let i = 0; i < input.floors.length; i++) {
     const f = input.floors[i];
+    const current = i + 1 === input.depth;
+    const floorContext = items === dungeonContent.items ? checkedFloors.get(f as DungeonFloor) : undefined;
+    if (floorContext?.id === input.id && floorContext.seed === input.seed && floorContext.policy === policy &&
+        floorContext.current === current) {
+      const floor = f as DungeonFloor;
+      if (floor.descriptor.depth !== i + 1 || i < input.floors.length - 1 && floor.completed !== 3) return fail('invalidFloor');
+      if (policy !== LEGACY_ENCOUNTER_POLICY && i > 0 && floor.descriptor.biome === floors[i - 1].descriptor.biome) return fail('invalidBiomeProgression');
+      floors.push(floor);
+      continue;
+    }
     const looted = f !== null && typeof f === 'object' && Object.hasOwn(f, 'loot');
     if (!hasShape(f, ['descriptor','position','completed','exploration', ...(looted ? ['loot'] : [])]) || !hasShape(f.descriptor, f.descriptor && typeof f.descriptor === 'object' && 'size' in f.descriptor ? ['depth','seed','template','generator','size', ...('height' in f.descriptor ? ['height'] : []),'biome','mapHash','upstairs','downstairs','encounters'] : ['depth','seed','template','generator','biome','mapHash','upstairs','downstairs','encounters']) ||
       !safeCount(f.completed) || f.completed > 3 || !safeCount(f.position) ||
@@ -292,7 +304,7 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
         const { encounters, ...geometry } = descriptor;
         if (canonical(geometry) !== canonical(floorGeometry(input.seed, input.depth, descriptor.biome, undefined, descriptor.generator, geometry.height))) return fail('invalidFloor');
       }
-      freezeDescriptorParts(descriptor);
+      freezeDungeonParts(descriptor);
       rememberCanonicalEncoding(descriptor);
       checkedDescriptors.set(descriptor, { seed: input.seed, policy, current: i + 1 === input.depth });
     }
@@ -317,7 +329,13 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
         loot.push({ ...expected, remaining: record.remaining });
       }
     }
-    floors.push({ descriptor, position: f.position, completed: f.completed, exploration, ...(loot ? { loot } : {}) });
+    const floor = { descriptor, position: f.position, completed: f.completed, exploration, ...(loot ? { loot } : {}) } as DungeonFloor;
+    if (items === dungeonContent.items) {
+      freezeDungeonParts(floor);
+      rememberCanonicalEncoding(floor);
+      checkedFloors.set(floor, { id: input.id, seed: input.seed, policy, current });
+    }
+    floors.push(floor);
   }
   const party: RunHero[] = [];
   for (let i = 0; i < 3; i++) {
