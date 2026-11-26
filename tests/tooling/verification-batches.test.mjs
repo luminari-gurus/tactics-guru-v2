@@ -469,7 +469,8 @@ test('automatic PR checks retain the shared VM reservation and durable pending q
   const source = readFileSync(new URL('../../.github/workflows/pr-verification.yml', import.meta.url), 'utf8').replaceAll('\r\n', '\n');
   for (const input of [source, source.replaceAll('\n', '\r\n')]) {
     const workflow = input.replaceAll('\r\n', '\n');
-    const concurrency = workflow.split('\nconcurrency:\n')[1]?.split(/\n\S/)[0];
+    const concurrency = workflow.match(/^  verify:\n(?:    [^\n]*\n)*?    concurrency:\n((?:      [^\n]*\n)+)/m)?.[1];
+    assert.ok(concurrency, 'Missing shared runner reservation in the verify job');
     assert.match(concurrency, /group: tactics-browser-tactics-browser-01/);
     assert.match(concurrency, /queue: max/);
     assert.match(concurrency, /cancel-in-progress: false/);
