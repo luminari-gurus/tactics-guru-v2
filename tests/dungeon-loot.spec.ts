@@ -109,10 +109,16 @@ async function finishVictory(page: Page, witness: Awaited<ReturnType<typeof load
 
 test.beforeEach(async ({ page }) => { await holdAutomaticStep(page); });
 
-test('auto loot defaults on: one delayed ordinary step, pickup, enemy tick and durable resume', { tag: '@desktop-chromium-portrait-webkit' }, async ({ page }, info) => {
+test('auto loot defaults on: one delayed ordinary step, pickup, enemy tick and durable resume', { tag: '@desktop-chromium-portrait-webkit' }, async ({ page, isMobile }, info) => {
   const witness = await loadBoundary(page);
   expect(await page.evaluate(key => localStorage.getItem(key), AUTO_COLLECT_LOOT_KEY)).toBeNull();
   const won = await finishVictory(page, witness), entry = witness.snapshot.encounterEntry!;
+  const exportLog = page.getByRole('button', { name: 'Export last battle log', exact: true });
+  const download = page.waitForEvent('download');
+  if (isMobile) await exportLog.tap();
+  else await exportLog.press('Enter');
+  expect((await download).suggestedFilename()).toBe('tactics-guru-combat-log.json');
+  expect(await page.evaluate(() => window.issue408AutoSteps[0].cancelled)).toBe(false);
   const expected = checkedDungeon(stepDungeon(won, { id: won.id, depth: won.depth, revision: won.revision, destination: entry.contact }));
   await releaseAutomaticStep(page);
   await expect.poll(async () => currentFloor(await dungeonSnapshot(page)).position).toBe(entry.contact);

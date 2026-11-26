@@ -72,7 +72,7 @@ Each command re-validates its snapshot against the content version. `contentVers
 
 ## Battle log and export
 
-**Battle log** groups the latest 40 visible events by round, acting unit and action. Filters narrow the display while keeping the context for each matching result. History begins at encounter entry or Continue and stays in memory until reload or the end of the encounter. After Continue, the first line marks the restored turn.
+**Battle log** groups the latest 40 visible events by round, acting unit and action. Filters narrow the display while keeping the context for each matching result. History begins at encounter entry or Continue. After Continue, the first line marks the restored turn. After a Dungeon victory, **Export last battle log** on the return screen includes the deciding action and result. This action is available until the next encounter, dungeon replacement, or reload.
 
 **Export combat log** downloads `tactics-guru-combat-log.json` with the complete retained excerpt, including events hidden by the current filter. The version 1 file contains the source build commit and dirty flag, the battle's rules, RNG and content version identifiers, history flags for resume and truncation, and the ordered action groups. Each group records the actor and includes readable lines and structured results such as rolls, damage, healing and remaining HP.
 
