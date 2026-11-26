@@ -646,7 +646,19 @@ test('records route transfer and map responsiveness against established budgets'
  await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text:encoded.text});
  await page.goto('./?game=dungeon');await expectDungeonResumed(page);
  const start=await dungeonSnapshot(page),f=start.floors[0],map=generateMap(f.descriptor.seed,'rooms'),neighbor=neighbors(f.position).find(n=>map.cells[n]&&n!==f.descriptor.downstairs&&!f.exploration.pois.some(p=>poiCell(p,map.width)===n))!;
- for(let i=0;i<20;i++)timings.push(await page.evaluate(destination=>{const begin=performance.now();const cell=document.querySelector<HTMLElement>(`#dungeon-map [data-cell="${destination}"]`)!;cell.click();return performance.now()-begin;},i%2===0?neighbor:f.position));
+ for(let i=0;i<20;i++){
+  const destination=i%2===0?neighbor:f.position;
+  timings.push(await page.evaluate(destination=>{const begin=performance.now();const cell=document.querySelector<HTMLElement>(`#dungeon-map [data-cell="${destination}"]`)!;cell.click();return performance.now()-begin;},destination));
+  // Dispatch returns before the save lock publishes the move. Start the idle
+  // window only after every timed command reached its exact durable boundary.
+  await page.waitForFunction(({revision,destination,key})=>{
+   const raw=localStorage.getItem(key);
+   if(!raw)return false;
+   const state=JSON.parse(raw).payload;
+   return state.revision===revision && state.floors[0].position===destination &&
+    document.querySelector<HTMLElement>('#dungeon-map')?.dataset.position===String(destination);
+  },{revision:start.revision+i+1,destination,key:DUNGEON_KEYS.primary});
+ }
  const frames=await page.evaluate(async({a,b})=>{
    const idle:number[]=[],steps:number[]=[];
    for(const [count,output] of [[30,idle],[40,steps]] as const){let previous=await new Promise<number>(r=>requestAnimationFrame(r));for(let i=0;i<count;i++){if(output===steps)document.querySelector<HTMLElement>(`#dungeon-map [data-cell="${i%2===0?b:a}"]`)!.click();const now=await new Promise<number>(r=>requestAnimationFrame(r));output.push((Math.round(now*1000)-Math.round(previous*1000))/1000);previous=now;}}
