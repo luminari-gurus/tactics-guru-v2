@@ -341,8 +341,8 @@ export class DungeonMap {
     const description = markerDescriptions.join(' ') || 'No visible encounters, loot or discovered stairs.';
     if (this.markerDescription.textContent !== description) this.markerDescription.textContent = description;
     const beneathParty = piles.get(f.position);
-    this.lootGuide.hidden = shownLoot.size === 0 || !!beneathParty || !!this.lootStatus.textContent;
-    this.lootHere.hidden = !beneathParty;
+    this.lootGuide.toggleAttribute('hidden', shownLoot.size === 0 || !!beneathParty || !!this.lootStatus.textContent);
+    this.lootHere.toggleAttribute('hidden', !beneathParty);
     const contentsHere = beneathParty ? `Loot here: ${dungeonLootContents(beneathParty)}. Items stay on the ground until they fit in your inventory.` : '';
     if (this.lootHere.textContent !== contentsHere) this.lootHere.textContent = contentsHere;
     const pois=new Map([...shownPois].sort((a,b)=>Number(cleared.includes(b.encounterSlot))-Number(cleared.includes(a.encounterSlot))).map(p=>[poiCell(p,map.width),p]));

@@ -95,7 +95,7 @@ function evidence(state:DungeonState=session.snapshot){
   publishedBattleRecord=session.completedBattle;
  }
 }
-function stop(){cancelAutomaticStep();loadGeneration++;deferredStart=null;loading=false;loadError=false;playing=false;host=null;engine?.scene.stop('battle');controls.hidden=true;container.style.visibility='hidden';playtime?.sync();}
+function stop(){cancelAutomaticStep();loadGeneration++;deferredStart=null;loading=false;loadError=false;playing=false;host=null;engine?.scene.stop('battle');engine?.pause();controls.hidden=true;container.style.visibility='hidden';playtime?.sync();}
 const goToMenu = () => location.replace(routeHref('menu', import.meta.env.BASE_URL));
 const explorationTools = el('div');
 const sandboxNotice = storage ? null : testingProgress('dungeon');
@@ -105,7 +105,9 @@ mountTelemetryPreferences(explorationTools);
 function render(){
  if(!live)return;const state=session.snapshot;guidanceForRun(state.id);evidence(state);
  if(playing){persistence.querySelector('span')!.textContent=session.status;playtime?.sync();return;}
- shell.hidden=true;panel.hidden=true;screen.hidden=false;
+ if(!shell.hidden)shell.hidden=true;
+ if(!panel.hidden)panel.hidden=true;
+ if(screen.hidden)screen.hidden=false;
  if(replacing){
   const title=el('h1','Starting new dungeon');title.tabIndex=-1;
   const message=el('p','Preparing your next journey.');message.setAttribute('role','status');
@@ -244,6 +246,7 @@ async function start(){
    // A pagehide can arrive while the engine's default textures are still loading.
    if(!live||generation!==loadGeneration)return;
    try {
+    currentEngine.resume();
     loading=false;playing=true;screen.hidden=true;shell.hidden=false;panel.hidden=false;controls.hidden=false;container.style.visibility='visible';
     const state=session.snapshot,title=`Dungeon · Floor ${state.depth} · ${dungeonBiomeLabel(state)} · ${dungeonEncounterLabel(state,state.floors[state.depth-1].exploration.active ?? state.floors[state.depth-1].completed)}`;
     document.querySelector<HTMLElement>('#battle-heading h1')!.textContent=title;
