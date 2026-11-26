@@ -309,7 +309,7 @@ for(const {saved,autoCollect,title} of [
  {saved:false,autoCollect:false,title:'testing dungeon legally clears a floor, descends and backtracks without accessing saves'},
  {saved:true,autoCollect:false,title:'saved menu dungeon keeps proof tools hidden across legal encounters'},
  {saved:true,autoCollect:true,title:'saved menu dungeon auto-collects loot across a complete first floor'},
-])(saved?savedWetlandsTest:fixedSeedTest)(title,async({page,isMobile})=>{
+])(saved?savedWetlandsTest:fixedSeedTest)(title, { tag: '@full-first-floor' }, async({page,isMobile})=>{
  test.setTimeout(300000); // Three complete battles plus normal exploration and stair input.
  const activateWithKeyboard = async (control: Locator) => {
   await expect(control).toBeVisible();
@@ -512,7 +512,13 @@ savedWetlandsTest('saved dungeon downloads only after explicit recovery export',
   expect(enemyTurn,'the legal witness must cross an enemy turn and return to player control').toBe(true);
  });
 
- const saved=await stored(),boundary=await snapshot(page),battle=(await readSession(page)).state;
+ const battle=(await readSession(page)).state;
+ // Battle commands publish before their queued save settles. Compare export and
+ // reload against the durable bytes for this exact accepted boundary.
+ await expect.poll(async()=>(await snapshot(page)).activeBattle).toEqual(battle);
+ const boundary=await snapshot(page);
+ await expect.poll(async()=>JSON.parse((await stored()).primary ?? 'null')?.payload).toEqual(boundary);
+ const saved=await stored();
  expect(saved.primary).not.toBeNull();expect(saved.backup).not.toBeNull();
  const unchanged=async()=>{
   expect(await stored()).toEqual(saved);
@@ -636,7 +642,7 @@ async function downloadCombatLog(page: Page, activate: (button: Locator) => Prom
  return JSON.parse(readFileSync(path, 'utf8')) as { groups: { entries: { text: string }[] }[] };
 }
 
-test('battle log filters and keeps history across Hide and reopen', async ({ page, isMobile }) => {
+async function openResumedBattleLog(page: Page, isMobile: boolean) {
  test.setTimeout(90_000);
  if (!isMobile) await page.setViewportSize({width:1280,height:800});
  await page.addInitScript(key => {
@@ -657,6 +663,7 @@ test('battle log filters and keeps history across Hide and reopen', async ({ pag
  await openSavedDungeon(page,checkedDungeon(acceptDungeonBattle(witness.entry,state)));
  const game = page.locator('#game');
  await expect(game).toHaveAttribute('data-phase','player',{timeout:15_000});
+ const resumed = await readSession(page);
 
  const activate = async (button: Locator) => {
    if (isMobile) await button.tap();
@@ -678,8 +685,16 @@ test('battle log filters and keeps history across Hide and reopen', async ({ pag
    await activate(filterButton(name));
    await expect(filters.getByRole('button',{pressed:true})).toHaveText(name);
  };
+ const expectControlsFit = async () => {
+   await expect.poll(() => dialog.evaluate(element =>
+     element.scrollWidth <= element.clientWidth && [...element.querySelectorAll('button')].every(button => {
+       const {width,height} = button.getBoundingClientRect();
+       return width >= 44 && height >= 44;
+     }),
+   )).toBe(true);
+ };
 
- let launcher = await openLog();
+ const launcher = await openLog();
  await expect(lines).toHaveText([/^Round 2: Fighter #1's turn$/]);
  if (!isMobile) {
    await filterButton('All').press('Tab');
@@ -688,15 +703,29 @@ test('battle log filters and keeps history across Hide and reopen', async ({ pag
  await selectFilter('Status & Saves');
  await expect(lines).toHaveCount(0);
  await expect(dialog.getByRole('status')).toHaveText('No events for this filter.');
+ await expectControlsFit();
  await activate(hide);
  await expect(dialog).toBeHidden();
  if (!isMobile) await expect(launcher).toBeFocused();
 
+ return { state, game, resumed, activate, dialog, filters, hide, groups, lines, openLog, selectFilter, expectControlsFit };
+}
+
+test('battle log controls fit and reset the filter when reopened', { tag: '@battle-log-controls' }, async ({ page, isMobile }) => {
+ const { openLog, lines, resumed } = await openResumedBattleLog(page, isMobile);
+ await openLog();
+ await expect(lines).toHaveText([/^Round 2: Fighter #1's turn$/]);
+ expect(await readSession(page)).toEqual(resumed);
+});
+
+test('battle log filters and keeps history across Hide and reopen', { tag: '@desktop-chromium-portrait-webkit' }, async ({ page, isMobile }) => {
+ const { state, game, activate, dialog, filters, hide, groups, lines, openLog, selectFilter, expectControlsFit } =
+   await openResumedBattleLog(page, isMobile);
  await endTurn(page,selector => activate(page.locator(selector)));
  await expect.poll(async () => (await readSession(page)).state.commandCount).toBeGreaterThan(state.commandCount);
  await expect(game).toHaveAttribute('data-phase','player',{timeout:15_000});
  const before = await readSession(page);
- launcher = await openLog();
+ const launcher = await openLog();
  await expect(lines).toContainText([/^Round 2:/,/Fighter #1 waits/,/Weakened expires/,/uses Heal Goblin/,/heals \d+ HP/,/: miss \(/]);
  await expect(groups).toContainText([/Round 2 · Fighter #1 · End turn/, /Goblin Shaman.* · Heal Goblin/]);
  const history = await lines.allTextContents();
@@ -733,12 +762,7 @@ test('battle log filters and keeps history across Hide and reopen', async ({ pag
  expect(await readSession(page)).toEqual(before);
 
  if (!isMobile) await page.setViewportSize({width:360,height:600});
- await expect.poll(() => dialog.evaluate(element =>
-   element.scrollWidth <= element.clientWidth && [...element.querySelectorAll('button')].every(button => {
-     const {width,height} = button.getBoundingClientRect();
-     return width >= 44 && height >= 44;
-   }),
- )).toBe(true);
+ await expectControlsFit();
  if (isMobile) await activate(hide);
  else {
    await page.keyboard.press('w');
@@ -788,7 +812,47 @@ dungeonTest('combat log exports when local storage is unavailable', { tag: '@des
  expect(await readSession(page)).toEqual(before);
 });
 
-test('Shaman production journey uses Hex and ally healing, reloads Weakened and replays a complete legal battle', { tag: '@desktop-chromium-portrait-webkit' }, async({page,isMobile},info)=>{
+test('resumed Shaman Hex shows the Weakened hero and accuracy penalty', { tag: '@desktop-chromium-portrait-webkit' }, async ({ page }) => {
+ const witness = shamanJourney(189);
+ const catalog = dungeonBattle(witness.entry)!.catalog;
+ let state = witness.entry.activeBattle!;
+ let lastPlayerTurn: BattleState | undefined;
+ for (const command of witness.commands) {
+  if (state.units.find(unit => unit.id === state.initiative[state.activeIndex])?.side === 'player') {
+   lastPlayerTurn = state;
+  }
+  const result = dispatch(state, command, catalog);
+  if (!result.ok) throw Error(result.reason);
+  state = result.state;
+  const actor = state.units.find(unit => unit.id === state.initiative[state.activeIndex]);
+  const weakened = state.units.find(unit => unit.weakenedBy !== undefined);
+  if (actor?.side !== 'player' || !weakened) continue;
+
+  if (!lastPlayerTurn) throw Error('No player turn before the Shaman cast');
+  expect(lastPlayerTurn.units.every(unit => unit.weakenedBy === undefined)).toBe(true);
+  await openSavedDungeon(page, checkedDungeon(acceptDungeonBattle(witness.entry, lastPlayerTurn)));
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  await playCommand(page, playerDecision(lastPlayerTurn, catalog), lastPlayerTurn);
+  await expect.poll(async () => {
+   const raw = await page.evaluate(key => localStorage.getItem(key), DUNGEON_KEYS.primary);
+   if (!raw) return null;
+   const saved = decodeDungeon(raw);
+   return saved.ok ? saved.state.activeBattle : null;
+  }).toEqual(state);
+  await page.reload();
+  await expectDungeonResumed(page);
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  expect((await readSession(page)).state).toEqual(state);
+  await (await battleTool(page, '#battle-party')).click();
+  await page.locator(`#inspect-unit-${weakened.id}`).click();
+  await expect(page.getByRole('dialog')).toContainText('Weakened by Goblin Shaman #6');
+  await expect(page.getByRole('dialog')).toContainText('−2 accuracy');
+  return;
+ }
+ throw Error('Shaman journey never reached a player turn with a Weakened hero');
+});
+
+test('Shaman production journey uses Hex and ally healing, reloads Weakened and replays a complete legal battle', { tag: '@extended-shaman' }, async({page,isMobile},info)=>{
  test.setTimeout(120000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  const witness=shamanJourney(189),catalog=dungeonBattle(witness.entry)!.catalog;
  // This is the canonical unplayed save: level 1, full HP, no fabricated inventory or combat boundary.
