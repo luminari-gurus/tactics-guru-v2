@@ -6,7 +6,18 @@
 
 ## Implementation status
 
-Implementation authorized November 26, 2026. The local worktree and published development branch are dedicated to #179. The [OpenSpec change](../../openspec/changes/issue-179-combat-log-export/proposal.md) tracks the grouped view, retention and download. The Linux verification checkout is `/home/aiwithapex/projects/tactics-179-verification.JyttLs/checkout`. Dependencies installed there with `npm ci --prefer-offline` after the strictly offline install found an uncached package. The history model, modal download and combat guide are implemented. Three focused unit cases and both type scopes passed against the implementation files before the browser assertions were added. The browser pass and ordinary PR checks are pending.
+Implementation authorized November 26, 2026. The grouped history and download are implemented on the dedicated worktree and published in [PR #629](https://github.com/luminari-gurus/tactics-guru-v2/pull/629), labeled enhancement. The [OpenSpec change](../../openspec/changes/issue-179-combat-log-export/proposal.md) tracks the delivery. The Linux verification checkout is `/home/aiwithapex/projects/tactics-179-verification.JyttLs/checkout`. Dependencies installed with `npm ci --prefer-offline` after the strictly offline install found an uncached package.
+
+### Verification evidence
+
+- The clean implementation commit `6d6fea6428a28304d3c542aa1d93ef2689addb32` passed 52 focused unit tests, 232 content cases, both TypeScript scopes and the production build. Local verification used WSL Linux x86-64, Node 24.15.0, npm 12.0.2 and Playwright 1.64.1. The lockfile SHA-256 was `e4768389a179a65df5f04502dab87e8875b465b939e55493d5820a7dc99a74ed`. The sorted distribution manifest SHA-256 was `7cf6a2386a020caaf6ce1a93b09f2be8b4a76e87c7ce13a10395311ba74c17c3`.
+- Root production preview passed four Chromium cases (desktop and emulated touch portrait/landscape) and four WebKit cases (desktop and emulated touch portrait/landscape). Both runs used one worker, zero retries and zero skips. Chromium was 156.0.8078.4 (1248) and WebKit was 27.2 (2370). Every actual JSON download identified the clean implementation commit. The matching `chromium.json` and `webkit.json` reports include exact test IDs and download attachments.
+- [Ordinary PR verification](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/45815061780) passed all six stages on the self-hosted runner, including 1,651 units, both type scopes, two build integrations and five core browser journeys. The tested merge checkout `318574f8863c37a1c1312b350fab63aa87784b30` and the implementation commit have the same tree (`0caeb4d5725217b152583e0c4c06295e031c9344`). The hosted receipt is under `github-ci/`.
+- The first portrait WebKit Shaman companion reached the log assertions, closed the modal and reloaded the battle. It then reached the test's 120-second limit while confirming a Ranger move in Round 5. The incomplete result and trace are retained under `shaman-webkit.json` and `shaman-webkit/`. A second traced run reached the same overall limit later in the battle. Its report and trace are in `shaman-webkit-repeat.json` and `shaman-webkit-repeat/`. The standard command without trace collection reached a 5-second turn-state wait limit after the same log and reload checkpoints (`shaman-webkit-default.json`). Under the same local standard command, pinned base `f3a0d2c4c43aa4dfb8bcdeea68456f0d888056ad` also hit the overall 120-second limit inside the legal battle loop (`shaman-webkit-base.json`). The trace and timing results remain separate from the focused export passes. The complete portrait WebKit journey passed on qualified `tactics-browser-02` capacity against clean source `6d6fea6428a28304d3c542aa1d93ef2689addb32`, with one worker, no retries and the original time limits. It took 67.8 seconds and verified the log text and closure, saved resume, complete legal battle and replay parity. The [qualified run](https://github.com/luminari-gurus/tactics-guru-v2/actions/runs/45816944132) and `qualified-shaman/shaman-webkit.json` identify test `e0f8639c387951b6a797-0223fd54c1e70f72c4bc`. The runner used Node 24.22.2 and its sorted distribution manifest SHA-256 was `6a89c462e9c834dda1878e9104b2115ee518bfe9f5feb763d4efe45f1aec13df`.
+
+The local verification checkout was restored to the candidate and its rebuilt byte manifest matched the first local build. OpenSpec strict validation and the Git whitespace check passed. The final handoff commit contains the evidence summary and the completed OpenSpec task.
+
+The reports, log attachments, build manifest and source receipt are under `/home/aiwithapex/projects/tactics-179-verification.JyttLs/combat-log-proof.jIUsWg`.
 
 ## Outcome
 
@@ -32,10 +43,11 @@ The grouping metadata is needed to retain context across filters, truncation and
 - Run the same focused witness on Chromium and WebKit using production preview and the existing profile selections. Check the existing Shaman production journey for healthy log text and close behavior. Trace the shared Rail/Radial launcher and use existing keyboard, modal and resize coverage for affected behavior. Run the ordinary PR checks and record exact source/build, test IDs and any skips or failures per [verification policy](../verification-policy.md). Playwright device emulation covers the device requirement.
 
 ~~~sh
-npm run test:unit -- tests/unit/battleLog.test.ts
+npm run test:unit -- tests/unit/battleLog.test.ts tests/unit/abilities.test.ts
+npm run build
 npm run verify:pr
-npx --no-install playwright test -c playwright.regression.config.ts tests/dungeon.spec.ts -g 'battle log filters and keeps history across Hide and reopen'
-npx --no-install playwright test -c playwright.exploration.config.ts tests/dungeon.spec.ts -g 'battle log filters and keeps history across Hide and reopen'
+npx --no-install playwright test -c playwright.regression.config.ts tests/dungeon.spec.ts -g 'battle log filters and keeps history|combat log exports when local storage is unavailable'
+npx --no-install playwright test -c playwright.exploration.config.ts tests/dungeon.spec.ts -g 'battle log filters and keeps history|combat log exports when local storage is unavailable'
 npx --no-install playwright test -c playwright.extended-webkit.config.ts tests/dungeon.spec.ts --project=portrait-webkit -g 'Shaman production journey'
 git diff --check
 ~~~

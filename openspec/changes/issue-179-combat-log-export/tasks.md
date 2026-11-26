@@ -7,4 +7,4 @@
 
 ## 2. Acceptance
 
-- [ ] 2.1 Verify the actual download, modal behavior, reload reset and unavailable storage on the affected Chromium and WebKit profiles. Record the results, companion Shaman journey and ordinary PR verification in the working plan.
+- [x] 2.1 Verify the actual download, modal behavior, reload reset and unavailable storage on the affected Chromium and WebKit profiles. Record the results, companion Shaman journey and ordinary PR verification in the working plan.
