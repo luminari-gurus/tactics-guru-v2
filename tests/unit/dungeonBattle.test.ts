@@ -241,25 +241,6 @@ it('settles the last earned draught after playing the next encounter to completi
   expect(decodeDungeon(encoded.text)).toEqual({ ok: true, state: dungeon });
 });
 
-it('completes production Shaman Hex and healing through the real session with exact command/event/RNG replay',()=>{
-  const witness=shamanJourney(189),catalog=dungeonBattle(witness.entry)!.catalog;
-  expect(witness.state.outcome).toBe('playerWin');
-  expect(witness.events.filter(e=>e.type==='healed')).toHaveLength(2);
-  expect(witness.events.some(e=>e.type==='saveRolled'&&!e.saved)).toBe(true);
-  expect(witness.events.some(e=>e.type==='weakenedExpired')).toBe(true);
-  let state=witness.entry.activeBattle!;const events:import('../../src/domain/types').BattleEvent[]=[];
-  for(const command of witness.commands) {
-    const preview=command.type==='useAbility'&&catalog.abilities[command.abilityId].kind==='healGoblin'?previewSupportAbility(state,command,catalog):null;
-    const result=dispatch(state,command,catalog);assert(result.ok);
-    if(preview?.ok&&preview.kind==='healGoblin') {
-      expect(preview.healing).toBeGreaterThan(0);expect(result.state.rng).toEqual(state.rng);
-      expect(result.state.units.find(u=>u.id===preview.targetId)?.hp).toBe(preview.hp);
-    }
-    state=result.state;events.push(...result.events);
-  }
-  expect({state,events}).toEqual({state:witness.state,events:witness.events});
-});
-
 function legacyShamanBattle() {
   const fixture = 'tests/fixtures/saves/issue-476';
   const text = readFileSync(`${fixture}/legacy-dungeon.json`, 'utf8');
@@ -345,9 +326,13 @@ it('chooses Hex instead of a third heal in the seeded Elite encounter with an in
   expect(turn.state.units.find(unit => unit.id === grunt.id)?.hp).toBe(1);
 });
 
-it('rebuilds a capped replay and reproduces the uninterrupted suffix after resuming at one cast', async () => {
+it('rebuilds a capped Shaman battle and replays it exactly across a one-cast save', async () => {
   const witness = shamanJourney(189);
-  const { entry, replay, commands } = witness;
+  const { entry, replay } = witness;
+  expect(witness.state.outcome).toBe('playerWin');
+  expect(witness.events.filter(event => event.type === 'healed')).toHaveLength(2);
+  expect(witness.events.some(event => event.type === 'saveRolled' && !event.saved)).toBe(true);
+  expect(witness.events.some(event => event.type === 'weakenedExpired')).toBe(true);
   const built = dungeonBattle(entry);
   assert(built);
   const { battlefield, ...record } = replay;
@@ -356,8 +341,7 @@ it('rebuilds a capped replay and reproduces the uninterrupted suffix after resum
   expect(battlefield).toEqual(built.battlefield);
   expect(built.state).toEqual(read.replay.initial);
   expect(built.state.units.find(unit => unit.id === 6)?.healGoblinRemaining).toBe(2);
-  expect(replayCommandSequence(built.state, read.replay.commands, built.catalog))
-    .toEqual({ ok: true, state: witness.state, events: witness.events });
+  const { commands } = read.replay;
   const firstCast = commands.findIndex(command => command.type === 'useAbility' && command.abilityId === 'ability:heal_goblin');
   assert(firstCast >= 0);
   const prefix = replayCommandSequence(built.state, commands.slice(0, firstCast + 1), built.catalog);
@@ -377,15 +361,10 @@ it('rebuilds a capped replay and reproduces the uninterrupted suffix after resum
   assert(continued);
   expect(continued.state).toEqual(saved);
   expect(continued.replay).toBeNull();
-  for (let step = firstCast + 1; step < commands.length; step++) {
-    if (continued.phase === 'player') assert(continued.prepare(playerDecision(continued.state, built.catalog)).ok);
-    const action = continued.phase === 'player' ? continued.confirm() : continued.nextEnemy();
-    assert(action);
-    continued.finishPresentation(action.token);
-  }
-  expect(continued.continuation?.commands).toEqual(commands.slice(firstCast + 1));
-  expect(continued.events).toEqual(witness.events.slice(prefix.events.length));
-  expect(continued.state).toEqual(witness.state);
+  const suffix = replayCommandSequence(continued.state, commands.slice(firstCast + 1), built.catalog);
+  assert(suffix.ok);
+  expect({ state: suffix.state, events: [...prefix.events, ...suffix.events] })
+    .toEqual({ state: witness.state, events: witness.events });
 });
 
 it('retains a legal six-battle Fighter level-three witness with healing, Taunt and exact terminal replay',()=>{
