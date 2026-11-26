@@ -61,6 +61,9 @@ const dexterity = {
   salt_rat: 1, tide_crab: 1, gull_harrier: 1, net_caster: 1, stormcaller_acolyte: 1,
   reef_stalker: 1, deckbreaker: 1, siren_shade: 1, barnacle_golem: 1, blackwake_captain: 1,
   admiral_blackwake: 1,
+  ruin_squire: 1, crossbow_levy: 1, rubble_imp: 1, gate_warden: 1, siege_engineer: 1,
+  banner_knight: 1, arcane_bailiff: 1, gargoyle_sentinel: 1, iron_ram: 1, crownless_champion: 1,
+  crownless_regent: 1,
 } as const;
 const base: ContentCatalog = copy(catalogFixture);
 const catalog: ContentCatalog = { ...base, maps: { [map.id]: map },
