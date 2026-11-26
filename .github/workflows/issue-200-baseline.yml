@@ -106,6 +106,32 @@ jobs:
           path: verification-receipts/
           retention-days: 30
           if-no-files-found: warn
+  tooling:
+    if: >-
+      github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' &&
+      inputs.mode == 'parallel-full' && inputs.extra_job != 'full-verify' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/208-full-parallel' || github.ref == 'refs/heads/work/issue-208-serial-batches')
+    runs-on: [self-hosted, tactics-browser, tactics-browser-02]
+    concurrency:
+      group: tactics-browser-tactics-browser-02
+      queue: max
+      cancel-in-progress: false
+    timeout-minutes: 15
+    steps:
+      - name: Check host disposition
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.PILOT_NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+        timeout-minutes: 10
+      - run: npm run test:verification-tooling && npm run test:verification-batches
+        timeout-minutes: 5
   prepare:
     if: github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || (endsWith(inputs.mode, '-pair') && github.ref == 'refs/heads/work/issue-208-matched-pair') || (inputs.mode == 'parallel-full' && github.ref == 'refs/heads/work/208-full-parallel') || github.ref == 'refs/heads/work/issue-208-serial-batches' || ((inputs.mode == 'pilot' || inputs.mode == 'parallel-pilot') && github.ref == 'refs/heads/work/issue-208-parallel-pilot'))
     runs-on: [self-hosted, tactics-browser, "${{ (startsWith(inputs.mode, 'parallel-') || inputs.mode == 'serial-pair') && 'tactics-browser-01' || inputs.runner || 'tactics-browser-01' }}"]
@@ -135,7 +161,8 @@ jobs:
         timeout-minutes: 10
       - run: npm run setup:browsers && npm run check:browsers
         timeout-minutes: 5
-      - run: npm run test:verification-tooling && npm run test:verification-batches
+      - if: inputs.mode != 'parallel-full'
+        run: npm run test:verification-tooling && npm run test:verification-batches
         timeout-minutes: 5
       - name: Discover exact coverage and build the ordinary artifact once
         id: prepare
@@ -161,8 +188,10 @@ jobs:
           retention-days: 30
           if-no-files-found: warn
   batch:
-    needs: prepare
-    if: always() && !cancelled() && needs.prepare.outputs.matrix != ''
+    needs: [prepare, tooling]
+    if: >-
+      always() && !cancelled() && needs.prepare.outputs.matrix != '' &&
+      (inputs.mode != 'parallel-full' || needs.tooling.result == 'success')
     runs-on: [self-hosted, tactics-browser, "${{ (startsWith(inputs.mode, 'parallel-') || inputs.mode == 'serial-pair') && matrix.runner || inputs.runner || 'tactics-browser-01' }}"]
     concurrency:
       group: ${{ (startsWith(inputs.mode, 'parallel-') || inputs.mode == 'serial-pair') && format('tactics-browser-{0}', matrix.runner) || format('issue208-batch-{0}-{1}', github.run_id, matrix.id) }}

@@ -391,7 +391,7 @@ test('workflow defaults to serial and pins the manual pilot to distinct per-VM l
   const rendezvous = workflow.indexOf('npm run verify:batches -- await-pilot');
   const execute = workflow.indexOf('65m npm run verify:batches -- run');
   assert.ok(preflight > 0 && preflight < publishReadiness && publishReadiness < rendezvous && rendezvous < execute);
-  const jobs = ['qualify', 'prepare', 'batch'].map(id => workflow.split(`\n  ${id}:\n`)[1].split(/\n  [a-z]+:\n/)[0]);
+  const jobs = ['qualify', 'tooling', 'prepare', 'batch'].map(id => workflow.split(`\n  ${id}:\n`)[1].split(/\n  [a-z]+:\n/)[0]);
   jobs.push(...['browser-setup.yml', 'issue-219-process-cleanup.yml'].map(file =>
     readFileSync(new URL('../../.github/workflows/' + file, import.meta.url), 'utf8')));
   for (const job of jobs) {
@@ -406,6 +406,17 @@ test('workflow defaults to serial and pins the manual pilot to distinct per-VM l
       assert.equal(spawnSync('sh', ['-c', guard], options).status, 1);
     } finally { rmSync(directory, { recursive: true, force: true }); }
   }
+});
+
+test('full parallel browsers require the independent tooling job on the second reserved VM', () => {
+  const workflow = readFileSync(new URL('../../.github/workflows/issue-200-baseline.yml', import.meta.url), 'utf8');
+  const job = id => workflow.split(`\n  ${id}:\n`)[1].split(/\n  [\w-]+:\n/)[0];
+  assert.match(job('tooling'), /inputs.mode == 'parallel-full'/);
+  assert.match(job('tooling'), /group: tactics-browser-tactics-browser-02/);
+  assert.match(job('tooling'), /npm run test:verification-tooling && npm run test:verification-batches/);
+  assert.match(job('prepare'), /if: inputs.mode != 'parallel-full'\s+run: npm run test:verification-tooling && npm run test:verification-batches/);
+  assert.match(job('batch'), /needs: \[prepare, tooling\]/);
+  assert.match(job('batch'), /inputs.mode != 'parallel-full' \|\| needs.tooling.result == 'success'/);
 });
 
 test('browser workflows share a non-cancelling lock for the selected VM', () => {
@@ -428,7 +439,7 @@ test('browser workflows share a non-cancelling lock for the selected VM', () => 
     const targets = [serialTarget];
     let group = 'tactics-browser-' + runner;
     if (file === 'issue-200-baseline.yml') {
-      targets.push('ubuntu-latest');
+      targets.push('ubuntu-latest', '[self-hosted, tactics-browser, tactics-browser-02]');
       group = "tactics-browser-${{ (startsWith(inputs.mode, 'parallel-') || inputs.mode == 'serial-pair') && inputs.extra_job == 'none' && 'parallel-pilot' || inputs.runner || 'tactics-browser-01' }}";
       for (const pilotRunner of ["'tactics-browser-01'", 'matrix.runner']) {
         targets.push(`[self-hosted, tactics-browser, "\${{ (startsWith(inputs.mode, 'parallel-') || inputs.mode == 'serial-pair') && ${pilotRunner} || inputs.runner || 'tactics-browser-01' }}"]`);

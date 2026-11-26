@@ -17,7 +17,8 @@ The manual `issue-200-baseline.yml` workflow has six modes:
   The build artifact lists byte-identical checkout assets in `build.json` under
   `fromPublic`. Each runner restores those files from `public/` and verifies the
   SHA-256 manifest for the complete build before running the browser checks.
-  VM 01 then runs Chromium while VM 02 runs WebKit and the asset checks, including
+  VM 02 runs the verification-tooling and batch tests during preparation. Both
+  browser jobs require those tests to pass. VM 01 then runs Chromium while VM 02 runs WebKit and the asset checks, including
   the prefix rebuild and root restoration. Each browser uses one worker. The
   aggregate checks the complete case list, build identity, overlap and performance
   result. A completed over-budget measurement still allows browser results to be collected.
