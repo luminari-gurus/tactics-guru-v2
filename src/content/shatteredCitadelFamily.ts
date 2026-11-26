@@ -19,7 +19,7 @@ type Illustrated = { readonly origin: 'canonical'; readonly repository: string; 
 const rightsNote = 'Canonical project artwork from owner repository. No per-file third-party license or generation method recorded; no third-party license asserted.';
 const illustrated = {
   origin: 'canonical', repository: 'https://github.com/luminari-gurus/tactics-guru-v2',
-  revision: '112cff9a57988bc5f60993105a245588c69aca38', rightsNote,
+  revision: 'baf32fc14caec6bd8f17d1cf83d6cf8afe8e101a', rightsNote,
 } as const;
 
 const enemy = <Id extends FamilyId>(id: Id, stats: UnitStats) => ({
