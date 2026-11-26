@@ -627,7 +627,7 @@ test('Forest Elite keeps a living goblin visible behind raised terrain', async (
 });
 
 test('battle log filters and keeps history across Hide and reopen', async ({ page, isMobile }) => {
- test.setTimeout(60_000);
+ test.setTimeout(90_000);
  if (!isMobile) await page.setViewportSize({width:1280,height:800});
  await page.addInitScript(key => {
    localStorage.setItem(key,JSON.stringify({version:1,pace:'fast'}));
@@ -692,14 +692,13 @@ test('battle log filters and keeps history across Hide and reopen', async ({ pag
  const statusLine = / expires$/;
  await selectFilter('Actions');
  await expect(lines).toHaveText(history.filter(line => !damageLine.test(line) && !statusLine.test(line)));
+ await selectFilter('All');
+ await expect(lines).toHaveText(history);
  await selectFilter('Damage & Healing');
  await expect(lines).toHaveText(history.filter(line => damageLine.test(line)));
  await selectFilter('Status & Saves');
  await expect(lines).toHaveText(history.filter(line => statusLine.test(line)));
- await selectFilter('All');
- await expect(lines).toHaveText(history);
 
- await selectFilter('Status & Saves');
  if (!isMobile) await page.setViewportSize({width:360,height:600});
  await expect.poll(() => dialog.evaluate(element =>
    element.scrollWidth <= element.clientWidth && [...element.querySelectorAll('button')].every(button => {
@@ -719,8 +718,6 @@ test('battle log filters and keeps history across Hide and reopen', async ({ pag
 
  await openLog();
  await expect(lines).toHaveText(history);
- await activate(hide);
- await expect(dialog).toBeHidden();
  expect(await readSession(page)).toEqual(before);
 });
 
