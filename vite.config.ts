@@ -5,6 +5,7 @@ import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
 import { defineConfig, type Plugin } from 'vite';
 import { battleAssets } from './src/content/assets.ts';
+import { regionalTerrainAssets } from './src/content/regionalTerrain';
 import { desertAssets } from './src/content/desertAssets.ts';
 import { forestBossAssets } from './src/content/forestBosses.ts';
 import { forestFamilyAssets } from './src/content/forestFamily.ts';
@@ -48,7 +49,7 @@ function gamePreloads(): Plugin {
   return {
     name: 'game-startup-preloads',
     config(_config, {command}) {
-      if (command === 'build') for (const asset of Object.values({...battleAssets,...desertAssets,...hobgoblinAssets,...goblinFamilyAssets,...forestFamilyAssets,...forestBossAssets,...wetlandsFamilyAssets,...cavernsFamilyAssets,...quarryFamilyAssets,...graveyardFamilyAssets,...emberWastesFamilyAssets,...winterTundraFamilyAssets,...sunscorchedDesertFamilyAssets,...stormCoastFamilyAssets,...shatteredCitadelFamilyAssets})) {
+      if (command === 'build') for (const asset of Object.values({...battleAssets,...desertAssets,...regionalTerrainAssets,...hobgoblinAssets,...goblinFamilyAssets,...forestFamilyAssets,...forestBossAssets,...wetlandsFamilyAssets,...cavernsFamilyAssets,...quarryFamilyAssets,...graveyardFamilyAssets,...emberWastesFamilyAssets,...winterTundraFamilyAssets,...sunscorchedDesertFamilyAssets,...stormCoastFamilyAssets,...shatteredCitadelFamilyAssets})) {
         const source = readFileSync(resolve('public', asset.runtimePath.slice(1)));
         const hash = createHash('sha256').update(source).digest('hex').slice(0,16);
         const fileName = `assets/${hash}${asset.runtimePath}`;

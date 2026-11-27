@@ -1,3 +1,4 @@
+import { regionalTerrainTints } from '../terrain/materials';
 import Phaser from 'phaser';
 import type { CellPosition, ContentCatalog, MapId } from '../content/types';
 import type { BattleEvent, BattleState } from '../domain/types';
@@ -177,7 +178,8 @@ export class BoardRenderer {
       const surface = scene.add.container(point.x, point.y).setScale(1, TILE_HEIGHT / TILE_WIDTH).setDepth(tile.depth + 1);
       const image = scene.add.image(0, 0, tile.surfaceAssetId).setOrigin(0.5)
         .setDisplaySize(TILE_WIDTH / Math.SQRT2, TILE_WIDTH / Math.SQRT2).setRotation(Math.PI / 4);
-      if (style?.surfaceTint !== undefined) image.setTint(style.surfaceTint);
+      const tint = style?.surfaceTint ?? regionalTerrainTints[tile.terrain];
+      if (tint !== undefined) image.setTint(tint);
       surface.add(image);
       this.surfaces.push({ tile, image });
       const highlight = scene.add.image(point.x - 44, point.y - 24, this.highlightTexture(0))

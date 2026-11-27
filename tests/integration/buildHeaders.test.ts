@@ -3,6 +3,7 @@ import { build } from 'vite';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { battleAssets } from '../../src/content/assets';
+import { regionalTerrainAssets } from '../../src/content/regionalTerrain';
 import { desertAssets } from '../../src/content/desertAssets';
 import { forestBossAssets } from '../../src/content/forestBosses';
 import { forestFamilyAssets } from '../../src/content/forestFamily';
@@ -35,7 +36,7 @@ for (const base of ['/', '/tactics/']) {
     const code = result.output.filter(file => /\.(js|css)$/.test(file.fileName));
     expect(code.length).toBeGreaterThan(0);
     expect(code.every(file => file.fileName.startsWith('assets/'))).toBe(true);
-    const images = Object.values({...battleAssets,...desertAssets,...hobgoblinAssets,...goblinFamilyAssets,...forestFamilyAssets,...forestBossAssets,...wetlandsFamilyAssets,...cavernsFamilyAssets,...quarryFamilyAssets,...graveyardFamilyAssets,...emberWastesFamilyAssets,...winterTundraFamilyAssets,...sunscorchedDesertFamilyAssets,...stormCoastFamilyAssets,...shatteredCitadelFamilyAssets}).map(asset => {
+    const images = Object.values({...battleAssets,...desertAssets,...regionalTerrainAssets,...hobgoblinAssets,...goblinFamilyAssets,...forestFamilyAssets,...forestBossAssets,...wetlandsFamilyAssets,...cavernsFamilyAssets,...quarryFamilyAssets,...graveyardFamilyAssets,...emberWastesFamilyAssets,...winterTundraFamilyAssets,...sunscorchedDesertFamilyAssets,...stormCoastFamilyAssets,...shatteredCitadelFamilyAssets}).map(asset => {
       const bytes = readFileSync(`public${asset.runtimePath}`);
       const hash = createHash('sha256').update(bytes).digest('hex').slice(0,16);
       const path = `assets/${hash}${asset.runtimePath}`;
@@ -72,7 +73,7 @@ for (const base of ['/', '/tactics/']) {
       const direct = preloads(`${base}${mode}`);
       expect(direct.length).toBeGreaterThan(0);
       expect(direct.every(link => link.href.startsWith(base))).toBe(true);
-      for (const asset of Object.values({...hobgoblinAssets, ...goblinFamilyAssets, ...forestFamilyAssets, ...forestBossAssets, ...wetlandsFamilyAssets, ...cavernsFamilyAssets, ...quarryFamilyAssets, ...graveyardFamilyAssets, ...emberWastesFamilyAssets, ...winterTundraFamilyAssets, ...sunscorchedDesertFamilyAssets, ...stormCoastFamilyAssets, ...shatteredCitadelFamilyAssets})) {
+      for (const asset of Object.values({...regionalTerrainAssets, ...hobgoblinAssets, ...goblinFamilyAssets, ...forestFamilyAssets, ...forestBossAssets, ...wetlandsFamilyAssets, ...cavernsFamilyAssets, ...quarryFamilyAssets, ...graveyardFamilyAssets, ...emberWastesFamilyAssets, ...winterTundraFamilyAssets, ...sunscorchedDesertFamilyAssets, ...stormCoastFamilyAssets, ...shatteredCitadelFamilyAssets})) {
         expect(direct.some(link => link.href.endsWith(asset.runtimePath))).toBe(false);
       }
       expect(preloads(base, `?game=${mode}`)).toEqual([]);
