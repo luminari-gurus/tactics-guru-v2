@@ -4,6 +4,7 @@ import type { ContentCatalog, MapCell, MapRecord } from '../content/types';
 import { hashJson, canonical } from './contentIdentity';
 import { hasShape } from './validation';
 import { seedRng, nextUint32 } from './rng';
+import { forestCandidate } from './forestBattlefield';
 import { grasslandCandidate } from './grasslandBattlefield';
 import { validateBattlefield, type BattlefieldFailure } from './battlefieldValidation';
 export type BattlefieldDescriptor = {
@@ -43,6 +44,7 @@ export function desertCandidate(encounter:BattlefieldEncounter,seed:number,attem
 }
 const battlefieldCandidates = {
   'desert-v1': desertCandidate,
+  'forest-v1': forestCandidate,
   'grassland-v1': grasslandCandidate,
 } satisfies Record<GeneratedBattlefieldSource['profileVersion'], typeof desertCandidate>;
 

@@ -8,14 +8,14 @@ import type { ContentCatalog, EnemyId } from '../../src/content/types';
 import { readBattlefieldDescriptor, resolveBattlefield } from '../../src/domain/battlefield';
 import { acceptDungeonBattle, currentFloor, dungeonBattle, freshDungeon, stepDungeon } from '../../src/domain/dungeon';
 import {
-  CURRENT_DUNGEON_ENCOUNTER_POLICY, ENDLESS_SCALING_POLICY, FULL_BIOME_ENCOUNTER_POLICY,
+  GRASSLAND_DUNGEON_ENCOUNTER_POLICY, ENDLESS_SCALING_POLICY, FULL_BIOME_ENCOUNTER_POLICY,
   dungeonBiome, encounterBattleCatalog, selectDungeonEncounter,
 } from '../../src/domain/dungeonEncounters';
 import { decodeDungeon, encodeDungeon } from '../../src/domain/dungeonSaveEnvelope';
 import { replayCommandSequence } from '../../src/domain/turns';
 import { atStairApproach, checkedDungeon, fighterJourney, walkWitness } from '../helpers/dungeonFixtures';
 
-const policy = CURRENT_DUNGEON_ENCOUNTER_POLICY;
+const policy = GRASSLAND_DUNGEON_ENCOUNTER_POLICY;
 const grassland = generatedBattlefieldSources['grassland-v1'];
 const firstGrasslandSeed = 5;
 
