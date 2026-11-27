@@ -1,5 +1,5 @@
 import { HEAL_GOBLIN_CAST_LIMIT } from '../src/domain/constants';
-import { FULL_BIOME_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
+import { CURRENT_DUNGEON_ENCOUNTER_POLICY } from '../src/domain/dungeonEncounters';
 import { dungeonContent } from '../src/content/dungeon';
 import { openSavedDungeon, walkDungeon, acceptedDungeonSnapshot, settledDungeonSnapshot, expectSameProgress, reenterDungeonStair, expectDungeonResumed, openDungeonInventory, collectDungeonEncounterLoot } from './helpers/dungeonTraversal';
 import { atEncounter, atStairApproach, checkedDungeon, hobgoblinDungeonBoundary, stagedMageAbility, snaredDefeatBoundary } from './helpers/dungeonFixtures';
@@ -981,6 +981,39 @@ fixedSeedTest('dungeon battle undo survives reload', { tag: '@desktop-chromium-p
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect((await readSession(page)).state).toEqual(restored);
  await expect(page.locator('#battle-undo')).toBeDisabled();
 });
+const grasslandSeed = 5;
+const savedGrasslandTest = test.extend({ pinDungeonSeed: grasslandSeed - 1 });
+savedGrasslandTest('generated Grassland renders, saves a real action and reloads the same battlefield', {
+ tag: '@desktop-chromium-portrait-webkit',
+}, async ({ page, isMobile }) => {
+ await page.goto('./');
+ await page.getByRole('button', { name: 'New Game', exact: true }).click();
+ await expect(page.locator('#dungeon-map')).toHaveAttribute('data-biome', 'grassland');
+ await expect.poll(async () => (await snapshot(page)).seed).toBe(grasslandSeed);
+ await walkDungeon(page, undefined, isMobile ? 'touch' : 'keyboard');
+ const game = page.locator('#game');
+ await expect(game).toHaveAttribute('data-phase', 'player');
+ const entry = await snapshot(page);
+ expect(entry.battlefield).toMatchObject({ kind: 'generated', biome: 'grassland', profileVersion: 'grassland-v1' });
+ expect(entry.activeBattle!.mapId).toBe(entry.battlefield!.mapId);
+ const map = dungeonBattle(entry)!.catalog.maps[entry.battlefield!.mapId];
+ expect(new Set(map.cells.map(cell => cell.terrainId))).toEqual(new Set(['grass', 'grass_path', 'forest']));
+
+ await endTurn(page);
+ await expect(game).toHaveAttribute('data-phase', 'player');
+ await expect.poll(async () => (await snapshot(page)).activeBattle!.commandCount).toBeGreaterThan(entry.activeBattle!.commandCount);
+ const saved = await settledDungeonSnapshot(page);
+ await expect.poll(() => page.evaluate(key => JSON.parse(localStorage.getItem(key)!).payload.activeBattle, DUNGEON_KEYS.primary))
+  .toEqual(saved.activeBattle);
+
+ await page.reload();
+ await expectDungeonResumed(page);
+ await expect(game).toHaveAttribute('data-phase', 'player');
+ const restored = await snapshot(page);
+ expectSameProgress(restored, saved);
+ expect(dungeonBattle(restored)!.catalog.maps[restored.battlefield!.mapId]).toEqual(map);
+});
+
 savedWetlandsTest('read-only entry, keyboard new dungeon, real action and active resume', { tag: '@desktop-chromium-portrait-webkit' }, async({page,isMobile})=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  await page.addInitScript(()=>{
@@ -1008,7 +1041,7 @@ savedWetlandsTest('read-only entry, keyboard new dungeon, real action and active
  await newGame.focus();await page.keyboard.press('Enter');
  await expect(map).toBeVisible();
  const exploration=await snapshot(page);
- expect(exploration.encounterPolicy).toBe(FULL_BIOME_ENCOUNTER_POLICY);
+ expect(exploration.encounterPolicy).toBe(CURRENT_DUNGEON_ENCOUNTER_POLICY);
  await expect(map).toHaveAttribute('data-biome', 'wetlands');
  await page.getByRole('link',{name:'Main menu',exact:true}).click();
  await expect(menu).toBeVisible();await expect(resume).toBeEnabled();

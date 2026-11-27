@@ -1,3 +1,4 @@
+import { generatedBattlefieldSources } from '../content/battlefieldTypes';
 import type { Exception } from '@posthog/core/error-tracking';
 import { events, rewardChoices } from './telemetry';
 export interface CaptureResult { uuid: string; event: string; timestamp?: Date; properties: Record<string, unknown>; $set?: Record<string, unknown> }
@@ -8,6 +9,7 @@ const allowed: Record<string, readonly unknown[]> = {
   operation: ['read','write','remove','reset'],
   failure: ['application_load','scene_load','battle_resolution','encounter_start','run_boundary','save_read','save_write','save_remove','save_reset','runtime_error','unhandled_rejection','verification'],
 };
+const battlefieldVersions = Object.values(generatedBattlefieldSources);
 const errorTypes = ['Error','TypeError','RangeError','ReferenceError','SyntaxError','URIError','EvalError','AggregateError'];
 /** Rebuild the envelope: SDK defaults, URL/referrer, messages, locals and causes never leave the browser. */
 export function sanitizeEvent(event: CaptureResult, origin: string, release: string, dirty: boolean, assetBase = '/'): CaptureResult | null {
@@ -19,7 +21,8 @@ export function sanitizeEvent(event: CaptureResult, origin: string, release: str
   for (const [key, values] of Object.entries(allowed)) if (values.includes(input[key])) properties[key] = input[key];
   if (event.event === 'battlefield_generation_measured') {
     const dimensions = { generation_status: ['generated','fallback','failed'], generation_context: ['entry','resume'],
-      biome: ['desert'], generator_version: [1], profile_version: ['desert-v1'] };
+      biome: battlefieldVersions.map(source => source.biome), generator_version: battlefieldVersions.map(source => source.generatorVersion),
+      profile_version: battlefieldVersions.map(source => source.profileVersion) };
     for (const [key, values] of Object.entries(dimensions)) if ((values as readonly unknown[]).includes(input[key])) properties[key] = input[key];
     const duration = input.generation_duration_ms, attempts = input.generation_attempts;
     if (typeof duration === 'number' && Number.isFinite(duration) && duration >= 0 && duration <= 600_000) properties.generation_duration_ms = duration;

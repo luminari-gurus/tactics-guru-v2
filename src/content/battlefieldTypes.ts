@@ -1,8 +1,26 @@
 import type { MapId, SpawnRecord } from './types';
 import type { EncounterId } from '../domain/run';
 import { hasShape, isDenseArray } from '../domain/validation';
-export type BattlefieldSource = { readonly kind: 'authored'; readonly mapId: MapId } |
-  { readonly kind: 'generated'; readonly biome: 'desert'; readonly generatorVersion: 1; readonly profileVersion: 'desert-v1' };
+export const generatedBattlefieldSources = {
+  'desert-v1': { kind: 'generated', biome: 'desert', generatorVersion: 1, profileVersion: 'desert-v1' },
+  'grassland-v1': { kind: 'generated', biome: 'grassland', generatorVersion: 1, profileVersion: 'grassland-v1' },
+} as const;
+export type GeneratedBattlefieldSource = typeof generatedBattlefieldSources[keyof typeof generatedBattlefieldSources];
+export type BattlefieldSource = { readonly kind: 'authored'; readonly mapId: MapId } | GeneratedBattlefieldSource;
+
+const generatedVersions = Object.values(generatedBattlefieldSources);
+export function isGeneratedBattlefieldVersion(biome: unknown, generatorVersion: unknown, profileVersion: unknown): boolean {
+  return generatedVersions.some(source => biome === source.biome && generatorVersion === source.generatorVersion &&
+    profileVersion === source.profileVersion);
+}
+const generatedMapPrefixes = {
+  'desert-v1': 'desert_',
+  'grassland-v1': 'grass_',
+} satisfies Record<GeneratedBattlefieldSource['profileVersion'], string>;
+export function generatedBattlefieldMapId(encounterId: string, profileVersion: GeneratedBattlefieldSource['profileVersion']): MapId {
+  return `map:${generatedMapPrefixes[profileVersion]}${encounterId.slice(10)}`;
+}
+
 export interface BattlefieldEncounter {
   readonly id: EncounterId;
   readonly source: BattlefieldSource;
@@ -10,8 +28,8 @@ export interface BattlefieldEncounter {
 }
 export function isBattlefieldSource(input: unknown): input is BattlefieldSource {
   return hasShape(input, ['kind','mapId']) && input.kind === 'authored' && typeof input.mapId === 'string' && /^map:[a-z][a-z0-9_]{0,63}$/.test(input.mapId) ||
-    hasShape(input, ['kind','biome','generatorVersion','profileVersion']) && input.kind === 'generated' && input.biome === 'desert' &&
-    input.generatorVersion === 1 && input.profileVersion === 'desert-v1';
+    hasShape(input, ['kind','biome','generatorVersion','profileVersion']) && input.kind === 'generated' &&
+    isGeneratedBattlefieldVersion(input.biome, input.generatorVersion, input.profileVersion);
 }
 
 /** Unknown encounter definitions must select exactly one supported source and a full stable roster. */
@@ -32,7 +50,7 @@ export function readBattlefieldEncounters(input:unknown,catalog:import('./types'
 export function readBattlefieldEncounter(e: unknown, catalog: import('./types').ContentCatalog):
   {ok:true;encounter:BattlefieldEncounter}|{ok:false;reason:string} {
     if(!hasShape(e,['id','source','roster'])||typeof e.id!=='string'||!/^encounter:[a-z][a-z0-9_]{0,63}$/.test(e.id)||!isBattlefieldSource(e.source))return {ok:false,reason:'Invalid encounter source or ID'};
-    if(e.source.kind==='generated'&&e.id.length>67)return {ok:false,reason:'Generated encounter ID exceeds descriptor map limit'};
+    if(e.source.kind==='generated'&&generatedBattlefieldMapId(e.id, e.source.profileVersion).length > 68)return {ok:false,reason:'Generated encounter ID exceeds descriptor map limit'};
     if(e.source.kind==='authored'&&!Object.hasOwn(catalog.maps,e.source.mapId))return {ok:false,reason:'Unknown authored map'};
     if(!isDenseArray(e.roster,64)||e.roster.length<4)return {ok:false,reason:'Invalid roster'};
     const roster=e.roster;
