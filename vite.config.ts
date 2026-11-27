@@ -5,6 +5,7 @@ import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
 import { defineConfig, type Plugin } from 'vite';
 import { battleAssets } from './src/content/assets.ts';
+import { regionalTerrainAssets } from './src/content/regionalTerrain';
 import { desertAssets } from './src/content/desertAssets.ts';
 import { forestBossAssets } from './src/content/forestBosses.ts';
 import { forestFamilyAssets } from './src/content/forestFamily.ts';
@@ -15,6 +16,9 @@ import { quarryFamilyAssets } from './src/content/quarryFamily.ts';
 import { graveyardFamilyAssets } from './src/content/graveyardFamily.ts';
 import { emberWastesFamilyAssets } from './src/content/emberWastesFamily.ts';
 import { winterTundraFamilyAssets } from './src/content/winterTundraFamily.ts';
+import { sunscorchedDesertFamilyAssets } from './src/content/sunscorchedDesertFamily.ts';
+import { stormCoastFamilyAssets } from './src/content/stormCoastFamily.ts';
+import { shatteredCitadelFamilyAssets } from './src/content/shatteredCitadelFamily.ts';
 import { wetlandsFamilyAssets } from './src/content/wetlandsFamily.ts';
 import { resolveAppEntry } from './src/app/routes.ts';
 import { APPLICATION_LOAD_FILES_MANIFEST, APPLICATION_LOAD_FILES_META } from './src/diagnostics/applicationLoadFailure.ts';
@@ -22,11 +26,8 @@ import { APPLICATION_LOAD_FILES_MANIFEST, APPLICATION_LOAD_FILES_META } from './
 const commit = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
 const dirty = execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8' }).trim().length > 0;
 
-// The game owns deterministic grid rules and uses no Matter physics. This stock
-// Phaser entry retains both renderers, audio and all scene/game APIs. Let Vite
-// bundle it once instead of embedding the package's nested webpack runtime.
-const phaserArcade = resolve(dirname(createRequire(import.meta.url).resolve('phaser/package.json')), 'src/phaser-arcade-physics.js');
-// Match phaser/config/webpack.dist.config.js's Arcade feature flags exactly.
+// Resolve Phaser's source once for both the production and dev dependency optimizers.
+const phaserSource = resolve(dirname(createRequire(import.meta.url).resolve('phaser/package.json')), 'src');
 const phaserDefines = {
   'typeof CANVAS_RENDERER': 'true',
   'typeof WEBGL_RENDERER': 'true',
@@ -48,7 +49,7 @@ function gamePreloads(): Plugin {
   return {
     name: 'game-startup-preloads',
     config(_config, {command}) {
-      if (command === 'build') for (const asset of Object.values({...battleAssets,...desertAssets,...hobgoblinAssets,...goblinFamilyAssets,...forestFamilyAssets,...forestBossAssets,...wetlandsFamilyAssets,...cavernsFamilyAssets,...quarryFamilyAssets,...graveyardFamilyAssets,...emberWastesFamilyAssets,...winterTundraFamilyAssets})) {
+      if (command === 'build') for (const asset of Object.values({...battleAssets,...desertAssets,...regionalTerrainAssets,...hobgoblinAssets,...goblinFamilyAssets,...forestFamilyAssets,...forestBossAssets,...wetlandsFamilyAssets,...cavernsFamilyAssets,...quarryFamilyAssets,...graveyardFamilyAssets,...emberWastesFamilyAssets,...winterTundraFamilyAssets,...sunscorchedDesertFamilyAssets,...stormCoastFamilyAssets,...shatteredCitadelFamilyAssets})) {
         const source = readFileSync(resolve('public', asset.runtimePath.slice(1)));
         const hash = createHash('sha256').update(source).digest('hex').slice(0,16);
         const fileName = `assets/${hash}${asset.runtimePath}`;
@@ -119,7 +120,10 @@ export default defineConfig({
         !(dungeonEngineChunk.test(filename) && dungeonEngineChunk.test(file))),
     },
   },
-  resolve: { alias: [{ find: /^phaser$/, replacement: phaserArcade }] },
+  resolve: { alias: [
+    { find: /^phaser$/, replacement: resolve('src/phaser/engine.js') },
+    { find: 'phaser-source', replacement: phaserSource },
+  ] },
   // Vite's dev dependency optimizer does not inherit the top-level define map.
   optimizeDeps: { rolldownOptions: { transform: { define: phaserDefines } } },
   define: { __BUILD_INFO__: JSON.stringify({ commit, dirty }), ...phaserDefines },

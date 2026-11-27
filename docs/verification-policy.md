@@ -55,6 +55,8 @@ Contents: [tiers](#choose-a-tier), [change matrix](#pr-readiness-selection-by-ch
 [evidence reuse](#evidence-reuse-and-final-source-identity),
 [self-hosted execution](#execution-capacity-and-follow-up-work).
 
+Routine verification clears three complete first floors. Desktop WebKit checks saved manual pickup, portrait Chromium checks saved automatic pickup, and landscape WebKit checks unsaved manual pickup. For first-floor certification across all six profiles, run `npm run test:extended -- -g @full-first-floor` and `npm run test:extended:webkit -- -g @full-first-floor`.
+
 ## Choose a tier
 
 | Tier | When | Required result |
@@ -179,7 +181,7 @@ PR readiness selects the applicable rows under the change matrix.
 | Aggregate bundle step | `npm run build:bundle` | Internal to full verification after successful units/content and both type scopes. Creates the root, prefix or restored-root bundle without revalidating unchanged prerequisites. Use `npm run build` directly outside that guarded sequence. |
 | Core E2E | `npm test` | Seven explicitly selected core journeys across desktop, Pixel touch and iPhone WebKit. |
 | Broad Chromium compatibility | `npm run test:regression` | Explicit regression files, desktop + mobile portrait/landscape; the three long progression journeys are in the extended suite below. |
-| Extended progression journeys | `npm run test:extended` and `npm run test:extended:webkit` | Complete Mage, Ranger and Fighter progression journeys and the Shaman battle across all six profiles. To certify only the Shaman battle, append `-- -g "Shaman production journey"` to each command. Routine verification runs that battle on desktop Chromium and portrait WebKit. |
+| Extended progression journeys | `npm run test:extended` and `npm run test:extended:webkit` | Complete Mage, Ranger and Fighter progression journeys and the Shaman battle across all six profiles. To certify only the Shaman battle, append `-- -g "Shaman production journey"` to each command. On desktop Chromium and portrait WebKit, routine verification plays the turn before Hex, waits for the Weakened state to reach storage, reloads, and inspects the hero’s accuracy penalty. Unit tests replay the complete battle and check healing, Hex and RNG. |
 | WebKit menu acceptance | `npx --no-install playwright test -c playwright.device-acceptance.config.ts` | Public menu and Dungeon entry, history, recovery and layout on iPhone portrait and landscape. |
 | WebKit dungeon/exploration | `npx --no-install playwright test -c playwright.exploration.config.ts` | Dungeon, exploration, lifecycle files; desktop and two mobile orientations. |
 | Root/prefix asset behavior | `npx --no-install playwright test -c playwright.regression.config.ts tests/public-asset-base.spec.ts` | Root preview in the broad Chromium suite keeps all three profiles. Full regression runs root-dev on desktop only, and prefix-preview/prefix-dev on desktop plus Pixel portrait `@touch-audio` cases; recipe below. |

@@ -1,29 +1,31 @@
+import { generatedBattlefieldMapId } from '../content/battlefieldTypes';
 import { awardHero, progressHero, readProgressHero } from './progression';
 import { HERO_PROGRESSION } from '../content/progression';
 import { freshArrivalExploration, freshExploration, readExploration, movableExploration, visit, poiCell, neighbors, type Exploration } from './exploration';
 import { HERO_IDS } from '../content/constants';
 import { dungeonContent, DUNGEON_TEMPLATE } from '../content/dungeon';
+import type { ContentCatalog } from '../content/types';
 import type { ItemCatalog, ItemId, ItemOwnership } from '../content/itemTypes';
 import { generateFrozenMap, type GeneratedMap } from '../map/generate';
 import { applyBiome, BIOMES } from '../map/biomes';
 import { DEFAULT_BEHAVIORS, stepMovement } from '../map/movement';
-import { canonical, hashJson } from './contentIdentity';
+import { canonical, hashJson, rememberCanonicalEncoding } from './contentIdentity';
 import { hasShape, isDenseArray } from './validation';
 import { emptyItemOwnership, readItemOwnership, changePreparation, projectOwnedCatalog, grantOwnedItem, settleDraughts, type ItemCommand } from './items';
 import { readRewardOffer, rewardOffer, type RewardOffer } from './rewards';
 import type { RunHero } from './run';
 import { resolveBattlefield, sameBattlefield, layoutSeed, type BattlefieldDescriptor } from './battlefield';
 import { createBattle } from './turns';
-import { readBattleState } from './battle';
+import { hasHealGoblinCap, readBattleState } from './battle';
 import type { BattleState } from './types';
-import { DUNGEON_ENCOUNTER_POLICY, EXPANDED_ENCOUNTER_POLICY, LEGACY_ENCOUNTER_POLICY, dungeonBiome, legacyDungeonEncounter, selectDungeonEncounter, readDungeonEncounterSelection,
+import { DUNGEON_ENCOUNTER_POLICY, isSeededEncounterPolicy, LEGACY_ENCOUNTER_POLICY, dungeonBiome, legacyDungeonEncounter, selectDungeonEncounter, readDungeonEncounterSelection,
   encounterBattleCatalog, projectDungeonEnemies, type EncounterSelection, type DungeonEncounterPolicy } from './dungeonEncounters';
 import { readBattlefieldDescriptor } from './battlefield';
 import { encounterHpLimit } from './effects';
 import { draughtHealing, enterWithDraughts, matchesDraughtStock } from './draughts';
 import { boundedStat, freshRunStats, readRunStats, type RunStats } from './runStats';
 import { nextUint32, seedRng } from './rng';
-import { UINT32_RANGE } from './constants';
+import { HEAL_GOBLIN_CAST_LIMIT, UINT32_RANGE } from './constants';
 
 export interface FloorDescriptor {
   readonly depth: number; readonly seed: number; readonly template: typeof DUNGEON_TEMPLATE;
@@ -74,12 +76,23 @@ export function dungeonSeed(seed: number, depth: number, purpose: 'floor' | 'bat
   if (!seedOk(seed) || !safeCount(depth, 1) || !safeCount(slot) || slot > 2) throw new RangeError('Invalid dungeon seed inputs');
   return Number.parseInt(hashJson({ seed, depth, purpose, slot, policy: 'dungeon-seeds-v1' }).slice(-8), 16);
 }
-// Saved movement validates the whole snapshot repeatedly. Cache only proven immutable
-// encounter facts, never floor progress or geometry; the complete key changes on tampering.
+// Saved movement validates the whole snapshot repeatedly. Cache only normalized,
+// immutable facts that can be reused in the same validation context.
 const MAX_DUNGEON_FLOORS = 8192;
 const admittedEncounters = new Map<string, true>();
 function admissionKey(seed: number, selection: EncounterSelection, battlefield: BattlefieldDescriptor) {
   return hashJson({ seed, selection, battlefield });
+}
+// Only normalized descriptors enter this cache. Historical encounters must still
+// resolve their battlefield geometry the first time their floor becomes current.
+const checkedDescriptors = new WeakMap<FloorDescriptor, { seed: number; policy: DungeonEncounterPolicy; current: boolean }>();
+const checkedFloors = new WeakMap<DungeonFloor, { id: string; seed: number; policy: DungeonEncounterPolicy; current: boolean }>();
+function freezeDungeonParts(value: object): void {
+  if (checkedDescriptors.has(value as FloorDescriptor)) return;
+  for (const part of Object.values(value)) {
+    if (part !== null && typeof part === 'object') freezeDungeonParts(part);
+  }
+  Object.freeze(value);
 }
 function rememberAdmission(key: string) {
   admittedEncounters.delete(key); admittedEncounters.set(key, true);
@@ -140,7 +153,7 @@ export function newDungeonSeed(draw: () => number, previous?: number): number {
 }
 export function freshDungeon(id: string, seed: number, encounterPolicy: DungeonEncounterPolicy = DUNGEON_ENCOUNTER_POLICY, tracking = false): DungeonState {
   if (!/^[A-Za-z0-9-]{1,64}$/.test(id) || !seedOk(seed)) throw new RangeError('Invalid dungeon identity');
-  if (encounterPolicy !== DUNGEON_ENCOUNTER_POLICY && encounterPolicy !== EXPANDED_ENCOUNTER_POLICY && encounterPolicy !== LEGACY_ENCOUNTER_POLICY) throw new RangeError('Invalid encounter policy');
+  if (encounterPolicy !== LEGACY_ENCOUNTER_POLICY && !isSeededEncounterPolicy(encounterPolicy)) throw new RangeError('Invalid encounter policy');
   const descriptor = floorDescriptor(seed, 1, undefined, encounterPolicy);
   return { id, seed, encounterPolicy, revision: 0, depth: 1, floors: [{ descriptor, position: descriptor.upstairs, completed: 0, exploration: freshExploration(descriptor.seed, descriptor.upstairs, floorMap(descriptor)) }],
     party: HERO_IDS.map(heroId => progressHero(heroId, 0, dungeonContent.catalog.heroes[heroId].stats.maxHp, dungeonContent.catalog)),
@@ -191,7 +204,11 @@ function pickupDungeonLoot(s: DungeonState): DungeonState {
   floors[s.depth - 1] = { ...floor, loot: floor.loot!.map(loot => pickup.collected.has(loot.id) ? { ...loot, remaining: 0 } : loot) };
   return { ...s, floors, ownership: pickup.ownership };
 }
+/** Rebuild the encounter origin using the active save's rules, or current rules for a new entry. */
 export function dungeonBattle(s: DungeonState) {
+  return buildDungeonBattle(s, !s.activeBattle || hasHealGoblinCap(s.activeBattle.units));
+}
+function buildDungeonBattle(s: DungeonState, cappedHealing: boolean) {
   const slot = activeDungeonSlot(s);
   if (slot >= 3) return null;
   const plan = currentFloor(s).descriptor.encounters[slot];
@@ -204,11 +221,15 @@ export function dungeonBattle(s: DungeonState) {
     : projectDungeonEnemies(s.depth, plan.selection.kind, authored, plan.selection.scalingPolicy, partyStrength);
   const projected = projectOwnedCatalog(s.ownership, s.party, baseline, dungeonContent.items);
   const map = { ...resolved.map, spawns: resolved.map.spawns.filter(p => p.side === 'enemies' || living.has(p.unitId)) };
-  const catalog = { ...projected, maps: { ...projected.maps, [map.id]: map } };
+  const catalog: ContentCatalog = { ...projected, maps: { ...projected.maps, [map.id]: map } };
   const created = createBattle(map.id, dungeonSeed(s.seed, s.depth, 'battle', slot), catalog);
   if (!created.ok) return null;
-  const checked = readBattleState({ ...created.state, ...enterWithDraughts(s.ownership, dungeonContent.items), units: created.state.units.map(u => u.side === 'player'
-    ? { ...u, hp: s.party.find(h => h.heroId === u.defId)!.hp } : u) }, catalog);
+  const units = created.state.units.map(unit => {
+    if (unit.side === 'player') return { ...unit, hp: s.party.find(hero => hero.heroId === unit.defId)!.hp };
+    if (cappedHealing && unit.defId === 'goblin_shaman') return { ...unit, healGoblinRemaining: HEAL_GOBLIN_CAST_LIMIT };
+    return unit;
+  });
+  const checked = readBattleState({ ...created.state, ...enterWithDraughts(s.ownership, dungeonContent.items), units }, catalog);
   return checked.ok ? { state: checked.state, catalog, battlefield: resolved.descriptor, selection: plan.selection } : null;
 }
 /** Validate unknown save data before it can reach generation or battle construction. */
@@ -224,17 +245,29 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
   const stats = tracked ? readRunStats(input.stats) : null;
   if (tracked && !stats) return fail('invalidState');
   const policy = input.encounterPolicy;
-  if (policy !== LEGACY_ENCOUNTER_POLICY && policy !== DUNGEON_ENCOUNTER_POLICY && policy !== EXPANDED_ENCOUNTER_POLICY) return fail('invalidPolicy');
+  if (policy !== LEGACY_ENCOUNTER_POLICY && !isSeededEncounterPolicy(policy)) return fail('invalidPolicy');
   const floors: DungeonFloor[] = [];
   for (let i = 0; i < input.floors.length; i++) {
     const f = input.floors[i];
+    const current = i + 1 === input.depth;
+    const floorContext = items === dungeonContent.items ? checkedFloors.get(f as DungeonFloor) : undefined;
+    if (floorContext?.id === input.id && floorContext.seed === input.seed && floorContext.policy === policy &&
+        floorContext.current === current) {
+      const floor = f as DungeonFloor;
+      if (floor.descriptor.depth !== i + 1 || i < input.floors.length - 1 && floor.completed !== 3) return fail('invalidFloor');
+      if (policy !== LEGACY_ENCOUNTER_POLICY && i > 0 && floor.descriptor.biome === floors[i - 1].descriptor.biome) return fail('invalidBiomeProgression');
+      floors.push(floor);
+      continue;
+    }
     const looted = f !== null && typeof f === 'object' && Object.hasOwn(f, 'loot');
     if (!hasShape(f, ['descriptor','position','completed','exploration', ...(looted ? ['loot'] : [])]) || !hasShape(f.descriptor, f.descriptor && typeof f.descriptor === 'object' && 'size' in f.descriptor ? ['depth','seed','template','generator','size', ...('height' in f.descriptor ? ['height'] : []),'biome','mapHash','upstairs','downstairs','encounters'] : ['depth','seed','template','generator','biome','mapHash','upstairs','downstairs','encounters']) ||
       !safeCount(f.completed) || f.completed > 3 || !safeCount(f.position) ||
-      f.descriptor.depth !== i + 1 || f.descriptor.seed !== dungeonSeed(input.seed, i + 1, 'floor') || f.descriptor.template !== DUNGEON_TEMPLATE ||
+      f.descriptor.depth !== i + 1 || f.descriptor.template !== DUNGEON_TEMPLATE ||
       !(f.descriptor.generator === 'rooms-v1' && f.descriptor.size === undefined || (f.descriptor.generator === 'sector-graph-v1' || f.descriptor.generator === 'arena-v1') && f.descriptor.size === floorSize(i + 1) && (f.descriptor.height === undefined || f.descriptor.height === extraFloorHeight(i + 1))) || typeof f.descriptor.mapHash !== 'string' || !/^sha256:[a-f0-9]{64}$/.test(f.descriptor.mapHash) ||
       !safeCount(f.descriptor.upstairs) || !safeCount(f.descriptor.downstairs) || f.descriptor.upstairs >= f.descriptor.downstairs ||
       (i < input.floors.length - 1 && f.completed !== 3)) return fail('invalidFloor');
+    const cached = checkedDescriptors.get(f.descriptor as unknown as FloorDescriptor);
+    if (cached?.seed !== input.seed && f.descriptor.seed !== dungeonSeed(input.seed, i + 1, 'floor')) return fail('invalidFloor');
     const width = Number(f.descriptor.size ?? 20);
     const area = width * Number(f.descriptor.height ?? width);
     if (f.position >= area || f.descriptor.downstairs >= area) return fail('invalidFloor');
@@ -243,7 +276,9 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
     if (!biome || policy === LEGACY_ENCOUNTER_POLICY && biome.id !== 'grassland' ||
       policy === DUNGEON_ENCOUNTER_POLICY && biome.id !== 'forest' && biome.id !== 'desert') return fail('invalidFloor');
     let descriptor: FloorDescriptor;
-    {
+    if (cached?.seed === input.seed && cached.policy === policy && (cached.current || i + 1 !== input.depth)) {
+      descriptor = f.descriptor as unknown as FloorDescriptor;
+    } else {
       if (!isDenseArray(f.descriptor.encounters, 3) || f.descriptor.encounters.length !== 3) return fail('invalidSelection');
       const encounters: FloorDescriptor['encounters'][number][] = [];
       for (const [slot, plan] of f.descriptor.encounters.entries()) {
@@ -260,7 +295,9 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
           if(source.kind==='authored') {
             if(plan.battlefield.mapId!==source.mapId)return fail('invalidSelection');
           } else if(plan.battlefield.kind!=='generated' || plan.battlefield.layoutSeed!==layoutSeed(seed,selection.encounter.id) ||
-            plan.battlefield.mapId!==`map:desert_${selection.encounter.id.slice(10)}`) return fail('invalidSelection');
+            plan.battlefield.biome!==source.biome || plan.battlefield.generatorVersion!==source.generatorVersion ||
+            plan.battlefield.profileVersion!==source.profileVersion ||
+            plan.battlefield.mapId!==generatedBattlefieldMapId(selection.encounter.id, source.profileVersion)) return fail('invalidSelection');
           // Historical facts keep their saved hash. Resolve graph geometry when that floor
           // becomes current, including candidate travel before it can be saved/published.
           if(i+1===input.depth) {
@@ -275,8 +312,15 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
         }
       }
       descriptor = { ...f.descriptor, encounters } as unknown as FloorDescriptor;
-      if (policy !== LEGACY_ENCOUNTER_POLICY && i > 0 && descriptor.biome === floors[i - 1].descriptor.biome) return fail('invalidBiomeProgression');
+      if (i + 1 === input.depth) {
+        const { encounters, ...geometry } = descriptor;
+        if (canonical(geometry) !== canonical(floorGeometry(input.seed, input.depth, descriptor.biome, undefined, descriptor.generator, geometry.height))) return fail('invalidFloor');
+      }
+      freezeDungeonParts(descriptor);
+      rememberCanonicalEncoding(descriptor);
+      checkedDescriptors.set(descriptor, { seed: input.seed, policy, current: i + 1 === input.depth });
     }
+    if (policy !== LEGACY_ENCOUNTER_POLICY && i > 0 && descriptor.biome === floors[i - 1].descriptor.biome) return fail('invalidBiomeProgression');
     const exploration = readExploration(f.exploration, descriptor.seed, f.position, floorMap(descriptor));
     if (!exploration || exploration.version === 'exploration-v2' && exploration.cleared!.length !== f.completed) return fail('invalidExploration');
     if (exploration.version === 'exploration-v2' && i + 1 !== input.depth && exploration.active !== null) return fail('invalidExploration');
@@ -297,7 +341,13 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
         loot.push({ ...expected, remaining: record.remaining });
       }
     }
-    floors.push({ descriptor, position: f.position, completed: f.completed, exploration, ...(loot ? { loot } : {}) });
+    const floor = { descriptor, position: f.position, completed: f.completed, exploration, ...(loot ? { loot } : {}) } as DungeonFloor;
+    if (items === dungeonContent.items) {
+      freezeDungeonParts(floor);
+      rememberCanonicalEncoding(floor);
+      checkedFloors.set(floor, { id: input.id, seed: input.seed, policy, current });
+    }
+    floors.push(floor);
   }
   const party: RunHero[] = [];
   for (let i = 0; i < 3; i++) {
@@ -326,8 +376,6 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
   }
   if (!['ready','battle','reward','defeat'].includes(input.phase as string)) return fail('invalidPhase');
   const state = { ...input, ...(stats ? { stats } : {}), encounterPolicy: policy, floors, party, ownership: owned.ownership } as unknown as DungeonState;
-  const { encounters, ...geometry } = currentFloor(state).descriptor;
-  if (canonical(geometry) !== canonical(floorGeometry(state.seed, state.depth, currentFloor(state).descriptor.biome, undefined, currentFloor(state).descriptor.generator, geometry.height))) return fail('invalidFloor');
   const slot = dungeonSlot(state), alive = party.some(h => h.hp > 0);
   if ((state.phase === 'defeat') === alive || state.phase === 'battle' && slot === 3 ||
     state.phase === 'reward' && (slot < 1 || currentFloor(state).loot?.some(loot => loot.rewardIndex === slot - 1)) ||
@@ -351,7 +399,8 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
       (state.phase === 'battle' ? exp.cleared!.includes(active) : !exp.cleared!.includes(active)))) return fail('invalidEncounterPosition');
   const admitted = entered ? { ...state, encounterEntry: { ...state.encounterEntry! } } : state;
   if (state.phase === 'battle') {
-    const battle = dungeonBattle(state);
+    // The snapshot is still untrusted. Resolve its catalog before reading any of its units.
+    const battle = buildDungeonBattle(state, false);
     const read = battle && readBattleState(state.activeBattle, battle.catalog);
     if (!battle || !read?.ok || !matchesDraughtStock(read.state.draughts, state.ownership, items) || !sameBattlefield(state.battlefield, battle.battlefield) ||
       read.state.seed !== battle.state.seed || read.state.mapId !== battle.state.mapId ||
@@ -402,9 +451,14 @@ export function startDungeonBattle(s: DungeonState, destination?: number): Dunge
 }
 /** Only the session owning this active battle may call this accepted-state boundary. */
 export function acceptDungeonBattle(s: DungeonState, battle: BattleState): DungeonResult {
-  if (s.phase !== 'battle') return fail('staleBoundary');
+  if (s.phase !== 'battle' || !s.activeBattle) return fail('staleBoundary');
   const checked = readDungeon({ ...s, activeBattle: battle });
   if (!checked.ok) return checked;
+  for (const [index, unit] of s.activeBattle.units.entries()) {
+    const before = unit.healGoblinRemaining;
+    const after = checked.state.activeBattle!.units[index].healGoblinRemaining;
+    if (before !== after && (before === undefined || after === undefined || after > before)) return fail('invalidBattle');
+  }
   if (battle.outcome === 'ongoing') return advance(s, { activeBattle: battle });
   const ownership = settleDraughts(s.ownership, battle.draughts);
   if (!ownership) return fail('invalidBattle');

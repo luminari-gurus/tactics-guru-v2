@@ -1,10 +1,10 @@
-import { expectDungeonResumed } from './helpers/dungeonTraversal';
+import { expectDungeonResumed, openSavedDungeon } from './helpers/dungeonTraversal';
 import { atEncounter } from './helpers/dungeonFixtures';
 import { expect, railTest as test, type Page } from './helpers/dungeonEntropy';
 import { writeFileSync } from 'node:fs';
 import { combatStats } from '../src/domain/effects';
 import { freshDungeon, startDungeonBattle, dungeonBattle } from '../src/domain/dungeon';
-import { encodeDungeon } from '../src/domain/dungeonSaveEnvelope';
+import { dispatch } from '../src/domain/turns';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
 import { guardedBoundary } from './helpers/guardedBoundary';
 import { endTurn, battleTool, readSession, playCommand } from './helpers/battlePolicy';
@@ -30,21 +30,20 @@ async function checkBadges(page:Page) {
   }
 }
 
-test('shared Guarded lifecycle: dungeon miss', async ({ page }) => {
-  test.setTimeout(180000);
+function guardedMissFixture() {
   // This seed misses the strike and draws an incoming attack before Guarded expires.
   const dungeon = startDungeonBattle(atEncounter(freshDungeon('guarded-browser', 10)));
   if (!dungeon.ok) throw Error(dungeon.reason);
   const { catalog } = dungeonBattle(dungeon.state)!;
   const initial = dungeon.state.activeBattle!;
-  const f = guardedBoundary(catalog, initial);
-  const saved = encodeDungeon({ ...dungeon.state, activeBattle: f.before });
-  if (!saved.ok) throw Error(saved.reason);
+  return { dungeon: dungeon.state, catalog, initial, f: guardedBoundary(catalog, initial) };
+}
+
+test('shared Guarded lifecycle: dungeon miss', async ({ page }) => {
+  test.setTimeout(180000);
+  const { dungeon, catalog, initial, f } = guardedMissFixture();
   const key = DUNGEON_KEYS.primary;
-  await page.goto('./');
-  await page.evaluate(({ key, text }) => localStorage.setItem(key, text), { key, text: saved.text });
-  await page.goto('./?game=dungeon');
-  await expectDungeonResumed(page);
+  await openSavedDungeon(page, { ...dungeon, activeBattle: f.before });
   await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
   expect((await readSession(page)).state).toEqual(f.before);
   await checkBadges(page);
@@ -106,4 +105,23 @@ test('shared Guarded lifecycle: dungeon miss', async ({ page }) => {
     }
   }
   throw Error('Guard did not expire');
+});
+
+test('landscape touch keeps the resumed Guarded badge visible and noninteractive', async ({ page }) => {
+  const { dungeon, catalog, f } = guardedMissFixture();
+  const cast = dispatch(f.before, f.command, catalog);
+  if (!cast.ok) throw Error(cast.reason);
+  await openSavedDungeon(page, { ...dungeon, activeBattle: cast.state });
+  await expect(page.locator('#game')).toHaveAttribute('data-phase', 'player');
+  await checkBadges(page);
+  const report = await boardReport(page);
+  const badge = report.units.find((unit: { id: number }) => unit.id === f.command.unitId).guard;
+  expect(badge.visible).toBe(true);
+  await page.touchscreen.tap(badge.screen.x, badge.screen.y);
+  expect((await readSession(page)).state).toEqual(cast.state);
+  await expect(page.locator('#battle-status')).toContainText('Guarded');
+  await page.screenshot({ path: test.info().outputPath('dungeon-guarded-resumed.png') });
+  await (await battleTool(page, '#battle-party')).click();
+  await expect(page.getByRole('dialog')).toContainText('Guarded (+2 AC, −2 attack rolls');
+  await page.screenshot({ path: test.info().outputPath('dungeon-guarded-inspection.png') });
 });

@@ -30,6 +30,20 @@ const wrap = (payload: unknown) => {
   return JSON.stringify({ ...body, digest: hashJson(body) });
 };
 
+it('rejects a dungeon healing counter in a standalone Shaman save', () => {
+  const original = battleCatalog.maps['map:forest_ruins'];
+  const map = { ...original, spawns: original.spawns.map(spawn => spawn.side === 'enemies' && spawn.id === 6
+    ? { ...spawn, unitId: 'goblin_shaman' as const } : spawn) };
+  const catalog = { ...battleCatalog, maps: { ...battleCatalog.maps, [map.id]: map } };
+  const created = createBattle(map.id, 17, catalog);
+  assert(created.ok);
+  expect(decodeBattleSave(encoded(created.state, catalog), catalog)).toEqual({ ok: true, state: created.state });
+  const capped = { ...created.state, units: created.state.units.map(unit => unit.defId === 'goblin_shaman'
+    ? { ...unit, healGoblinRemaining: 2 } : unit) };
+  expect(encodeBattleSave(capped, catalog)).toEqual({ ok: false, reason: 'invalidState' });
+  expect(decodeBattleSave(wrap(capped), catalog)).toEqual({ ok: false, reason: 'invalidState' });
+});
+
 describe('accepted snapshot boundaries', () => {
   it.each([1, 2, 3, 4, 5])('matches the uninterrupted queued continuation at every boundary: seed %i', seed => {
     const session = new BattleSession(battleCatalog, 'map:forest_ruins', seed);

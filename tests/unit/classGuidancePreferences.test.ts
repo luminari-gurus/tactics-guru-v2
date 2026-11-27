@@ -58,6 +58,21 @@ describe('independent class guidance preferences', () => {
     expect(storage.getItem.mock.calls.every(([name]) => name === key)).toBe(true);
   });
 
+  it('retains earlier dungeon dismissals when an acknowledged skill is later saved to another run', async () => {
+    const preferences = await load(), storage = memory();
+    const earlier = { runId: 'dungeon:earlier', ids: [mage] };
+    storage.setItem(key, JSON.stringify({ ...defaults, dismissedRuns: [earlier] }));
+    expect(preferences.markClassGuidanceSeen([fighter, rail], storage)).toBe(true);
+    expect(JSON.parse(storage.getItem(key)!)).toMatchObject({ seen: [fighter, rail], dismissedRuns: [earlier] });
+
+    expect(preferences.dismissClassGuidanceTip('dungeon:current', [fighter], storage)).toBe(true);
+    vi.resetModules();
+    const restored = await load();
+    expect(restored.readClassGuidanceDismissed('dungeon:earlier', storage)).toEqual([mage]);
+    expect(restored.readClassGuidanceDismissed('dungeon:current', storage)).toEqual([fighter]);
+    expect(restored.readClassGuidancePreferences(storage).seen).toEqual([fighter, rail]);
+  });
+
   it('preserves each run’s dismissals through toggling and clears them only on tutorial reset', async () => {
     const { readClassGuidanceDismissed, dismissClassGuidanceTip, readClassGuidancePreferences,
       setClassGuidanceEnabled, resetClassGuidanceTutorials } = await load();

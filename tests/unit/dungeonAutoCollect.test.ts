@@ -1,4 +1,5 @@
 import { assert, expect, it } from 'vitest';
+import { freshRunStats } from '../../src/domain/runStats';
 import { DungeonSession } from '../../src/app/DungeonSession';
 import { ITEM_BOUNDS } from '../../src/content/itemTypes';
 import { dungeonContent } from '../../src/content/dungeon';
@@ -36,6 +37,17 @@ it('completes exactly the ordinary interrupted step, including the same single e
   expect(currentFloor(automatic).exploration.movement!.step).toBe(currentFloor(won).exploration.movement!.step + 1);
   expect(currentFloor(automatic).loot![0].remaining).toBe(0);
   expect(autoCollectDungeon(automatic, intent)).toEqual({ ok: false, reason: 'staleBoundary' });
+});
+
+it('counts one move and awards the unassigned Aiming Charm after the seed 28 victory', () => {
+  const { won: victoryState, intent } = victory(28);
+  const won = { ...victoryState, stats: freshRunStats('since-upgrade') };
+  const automatic = good(autoCollectDungeon(won, intent));
+  expect(automatic.revision).toBe(won.revision + 1);
+  expect(automatic.stats!.movesTaken).toBe(won.stats!.movesTaken + 1);
+  expect(automatic.ownership.equipment).toEqual([{ instanceId: currentFloor(won).loot![0].id, itemId: 'item:aiming_charm' }]);
+  expect(automatic.ownership.assignments).toEqual(won.ownership.assignments);
+  expect(automatic.party).toEqual(won.party);
 });
 
 it('reviving a hero invalidates the pending pickup without moving the party or enemies', () => {

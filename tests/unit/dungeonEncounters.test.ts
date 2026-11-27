@@ -2,7 +2,7 @@ import { assert, expect, it, vi } from 'vitest';
 import { dungeonBattleCatalog, dungeonEncounterCatalog, dungeonEncounterCatalogIdentity, hobgoblinDungeonBattleCatalog, hobgoblinDungeonEncounterCatalog, readDungeonEncounterCatalog, ENCOUNTER_KINDS } from '../../src/content/dungeonEncounters';
 import { desertRunCatalog } from '../../src/content/desertCatalog';
 import { CONTENT_BOUNDS, ENEMY_IDS, HERO_IDS } from '../../src/content/constants';
-import { ENDLESS_SCALING_POLICY, PARTY_SCALING_POLICY, EXPANDED_ENCOUNTER_POLICY, dungeonBiome, encounterBattleCatalog, readDungeonEncounterSelection, encounterSelectionSeed, projectDungeonEnemies, scaleEnemyStat, selectDungeonEncounter } from '../../src/domain/dungeonEncounters';
+import { ENDLESS_SCALING_POLICY, ENEMY_SCALING_POLICY, PARTY_SCALING_POLICY, EXPANDED_ENCOUNTER_POLICY, FULL_BIOME_ENCOUNTER_POLICY, dungeonBiome, encounterBattleCatalog, readDungeonEncounterSelection, encounterSelectionSeed, projectDungeonEnemies, scaleEnemyStat, selectDungeonEncounter } from '../../src/domain/dungeonEncounters';
 import { resolveBattlefield, layoutSeed } from '../../src/domain/battlefield';
 import { createBattle } from '../../src/domain/turns';
 import * as encounterRules from '../../src/domain/dungeonEncounters';
@@ -12,11 +12,14 @@ import { freshExploration } from '../../src/domain/exploration';
 import { seedRng } from '../../src/domain/rng';
 import { battleCatalog } from '../../src/content/catalog';
 import { authoredEncounters, runCatalog } from '../../src/content/encounters';
-import { expandedDungeonBattleCatalog, expandedDungeonEncounterCatalog } from '../../src/content/expandedDungeonEncounters';
+import { expandedDungeonBattleCatalog, expandedDungeonEncounterCatalog, fullBiomeDungeonBattleCatalog, fullBiomeDungeonEncounterCatalog } from '../../src/content/expandedDungeonEncounters';
 import { validateContent } from '../../src/content/validate';
 import { decodeDungeon, encodeDungeon } from '../../src/domain/dungeonSaveEnvelope';
-import { BIOMES } from '../../src/map/biomes';
+import { BIOMES, EXPANDED_BIOMES } from '../../src/map/biomes';
 import { WINTER_TUNDRA_FAMILY_IDS } from '../../src/content/winterTundraFamily';
+import { SUNSCORCHED_DESERT_FAMILY_IDS } from '../../src/content/sunscorchedDesertFamily';
+import { STORM_COAST_FAMILY_IDS } from '../../src/content/stormCoastFamily';
+import { SHATTERED_CITADEL_FAMILY_IDS } from '../../src/content/shatteredCitadelFamily';
 
 it('admits every pool pairing, including generated guardian fallback and all survivor subsets', () => {
   const checked = readDungeonEncounterCatalog(hobgoblinDungeonEncounterCatalog, hobgoblinDungeonBattleCatalog); assert(checked.ok, JSON.stringify(checked));
@@ -168,19 +171,23 @@ it('rejects invalid seeds, slots, kinds and stat domains', () => {
 });
 
 
-it('admits the expanded catalog and reaches every enabled enemy, composition and encounter kind through seeded selection', () => {
-  const policy = EXPANDED_ENCOUNTER_POLICY;
-  const content = validateContent(expandedDungeonBattleCatalog);
+it.each([
+  { policy: EXPANDED_ENCOUNTER_POLICY, biomes: EXPANDED_BIOMES,
+    encounters: expandedDungeonEncounterCatalog, battleContent: expandedDungeonBattleCatalog },
+  { policy: FULL_BIOME_ENCOUNTER_POLICY, biomes: BIOMES,
+    encounters: fullBiomeDungeonEncounterCatalog, battleContent: fullBiomeDungeonBattleCatalog },
+] as const)('admits $policy and reaches every enabled enemy, composition and encounter kind', ({ policy, biomes, encounters, battleContent }) => {
+  const content = validateContent(battleContent);
   assert(content.ok, content.ok ? undefined : JSON.stringify(content));
-  const checked = readDungeonEncounterCatalog(expandedDungeonEncounterCatalog, expandedDungeonBattleCatalog);
+  const checked = readDungeonEncounterCatalog(encounters, battleContent);
   assert(checked.ok, JSON.stringify(checked));
   const seen = new Map<string, ReturnType<typeof selectDungeonEncounter>>();
   const kinds = new Set<string>();
   const startingBiomes = new Set<string>();
   for (let seed = 0; seed < 128; seed++) {
     startingBiomes.add(dungeonBiome(seed, 1, policy));
-    const cycle = Array.from({ length: BIOMES.length }, (_, i) => dungeonBiome(seed, i + 1, policy));
-    expect(new Set(cycle).size).toBe(BIOMES.length);
+    const cycle = Array.from({ length: biomes.length }, (_, i) => dungeonBiome(seed, i + 1, policy));
+    expect(new Set(cycle).size).toBe(biomes.length);
     expect(dungeonBiome(seed, cycle.length + 1, policy)).toBe(cycle[0]);
     for (let depth = 1; depth <= cycle.length * 2; depth++) for (let slot = 0; slot < 3; slot++) {
       const selection = selectDungeonEncounter(seed, depth, slot, policy);
@@ -188,11 +195,11 @@ it('admits the expanded catalog and reaches every enabled enemy, composition and
       kinds.add(`${selection.biome}:${selection.kind}`);
     }
   }
-  expect([...startingBiomes].sort()).toEqual(BIOMES.map(biome => biome.id).sort());
-  expect([...kinds].sort()).toEqual(BIOMES.flatMap(biome => ENCOUNTER_KINDS.map(kind => `${biome.id}:${kind}`)).sort());
+  expect([...startingBiomes].sort()).toEqual(biomes.map(biome => biome.id).sort());
+  expect([...kinds].sort()).toEqual(biomes.flatMap(biome => ENCOUNTER_KINDS.map(kind => `${biome.id}:${kind}`)).sort());
   expect([...seen.keys()].sort()).toEqual(checked.catalog.compositions.map(composition => composition.id).sort());
-  const catalogOnlyEnemies = new Set<string>(WINTER_TUNDRA_FAMILY_IDS);
-  const enabledEnemies = ENEMY_IDS.filter(id => !catalogOnlyEnemies.has(id));
+  const catalogOnlyEnemies = new Set<string>([...WINTER_TUNDRA_FAMILY_IDS, ...SUNSCORCHED_DESERT_FAMILY_IDS, ...STORM_COAST_FAMILY_IDS, ...SHATTERED_CITADEL_FAMILY_IDS]);
+  const enabledEnemies = ENEMY_IDS.filter(id => policy === FULL_BIOME_ENCOUNTER_POLICY || !catalogOnlyEnemies.has(id));
   expect([...new Set([...seen.values()].flatMap(selection => selection.encounter.roster
     .filter(spawn => spawn.side === 'enemies').map(spawn => spawn.unitId)))].sort()).toEqual(enabledEnemies.sort());
 
@@ -211,9 +218,11 @@ it('admits the expanded catalog and reaches every enabled enemy, composition and
   }
 }, 30000);
 
-it('round-trips a new dungeon in every biome and rejects selection identities from other policies', () => {
-  const policy = EXPANDED_ENCOUNTER_POLICY;
-  for (const biome of BIOMES) {
+it.each([
+  { policy: EXPANDED_ENCOUNTER_POLICY, biomes: EXPANDED_BIOMES },
+  { policy: FULL_BIOME_ENCOUNTER_POLICY, biomes: BIOMES },
+] as const)('round-trips $policy in every biome and rejects other selection identities', ({ policy, biomes }) => {
+  for (const biome of biomes) {
     const seed = Array.from({ length: 128 }, (_, index) => index).find(index => dungeonBiome(index, 1, policy) === biome.id)!;
     const state = freshDungeon(`expanded-${biome.id}`, seed, policy, true);
     expect(state.floors[0].descriptor.biome).toBe(biome.version);
@@ -224,6 +233,20 @@ it('round-trips a new dungeon in every biome and rejects selection identities fr
   const selection = selectDungeonEncounter(0, 1, 0, policy);
   expect(readDungeonEncounterSelection({ ...selection, catalogIdentity: dungeonEncounterCatalogIdentity() },
     1, 0, selection.biome, policy)).toBeNull();
+});
+
+it('requires endless scaling in v3 saves', () => {
+  const state = freshDungeon('v3-scaling-policy', 17, FULL_BIOME_ENCOUNTER_POLICY, true);
+  const floor = state.floors[0];
+  for (const [slot, plan] of floor.descriptor.encounters.entries()) {
+    const { selection } = plan;
+    assert(selection.policy === FULL_BIOME_ENCOUNTER_POLICY);
+    expect(selection.scalingPolicy).toBe(ENDLESS_SCALING_POLICY);
+    for (const scalingPolicy of [ENEMY_SCALING_POLICY, PARTY_SCALING_POLICY]) {
+      const edited = { ...selection, scalingPolicy };
+      expect(readDungeonEncounterSelection(edited, 1, slot, selection.biome, selection.policy)).toBeNull();
+    }
+  }
 });
 
 it('paces fresh expanded enemies against guaranteed floor XP and preserves saved projections', () => {
