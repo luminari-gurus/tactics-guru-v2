@@ -13,7 +13,7 @@ import { stormCoastFamilyBattleContent } from './stormCoastFamily';
 import { shatteredCitadelFamilyBattleContent } from './shatteredCitadelFamily';
 import { hobgoblinBattleContent, hobgoblinComposition, hobgoblinMap } from './hobgoblin';
 import { desertRunCatalog } from './desertCatalog';
-import { isBattlefieldSource, readBattlefieldEncounter, generatedBattlefieldSources, type BattlefieldSource } from './battlefieldTypes';
+import { isBattlefieldSource, readBattlefieldEncounter, generatedBattlefieldSources, type BattlefieldSource, type GeneratedBattlefieldSource } from './battlefieldTypes';
 import type { ContentCatalog, SpawnRecord } from './types';
 import { hasShape, isDenseArray } from '../domain/validation';
 import { resolveBattlefield } from '../domain/battlefield';
@@ -28,13 +28,18 @@ export interface DungeonMapChoice { readonly id: string; readonly source: Battle
 export interface DungeonMapPool { readonly id: string; readonly biome: DungeonBiome; readonly maps: readonly DungeonMapChoice[] }
 export interface DungeonBoss { readonly id: string; readonly biome: DungeonBiome; readonly poolId: string; readonly victory: 'all-enemies' }
 export interface DungeonEncounterCatalog {
-  readonly version: 1 | 2 | 3 | 4;
+  readonly version: 1 | 2 | 3 | 4 | 5;
   readonly kinds: readonly EncounterKind[];
   readonly biomes: readonly { readonly id: DungeonBiome; readonly poolId: string; readonly bossId: string }[];
   readonly pools: readonly DungeonMapPool[];
   readonly compositions: readonly DungeonComposition[];
   readonly bosses: readonly DungeonBoss[];
 }
+const firstGeneratedCatalog = {
+  desert: 1,
+  grassland: 4,
+  forest: 5,
+} satisfies Record<GeneratedBattlefieldSource['biome'], DungeonEncounterCatalog['version']>;
 const idOk = (id: unknown): id is string => typeof id === 'string' && /^[a-z][a-z0-9_]{0,47}$/.test(id);
 const list = (value: unknown): value is unknown[] => isDenseArray(value, 32) && value.length > 0;
 const biomeOk = (value: unknown): value is DungeonBiome => BIOMES.some(biome => biome.id === value);
@@ -44,13 +49,13 @@ export function readDungeonEncounterCatalog(input: unknown, content: ContentCata
   { readonly ok: true; readonly catalog: DungeonEncounterCatalog } | { readonly ok: false; readonly reason: string } {
   const fail = (reason: string) => ({ ok: false as const, reason });
   if (!hasShape(input, ['version', 'kinds', 'biomes', 'pools', 'compositions', 'bosses'])) return fail('Invalid catalog shape');
-  const biomeIds = input.version === 1 ? ['forest', 'desert']
-    : input.version === 2 ? EXPANDED_BIOMES.map(biome => biome.id)
-    : input.version === 3 || input.version === 4 ? BIOMES.map(biome => biome.id) : [];
-  if (!biomeIds.length ||
-    !isDenseArray(input.kinds, 4) || input.kinds.length !== 4 || new Set(input.kinds).size !== 4 || input.kinds.some(k => !ENCOUNTER_KINDS.includes(k as EncounterKind)) ||
+  const { version } = input;
+  if (version !== 1 && version !== 2 && version !== 3 && version !== 4 && version !== 5) return fail('Invalid catalog version');
+  const fullRoster = version >= 3;
+  const biomeIds = version === 1 ? ['forest', 'desert'] : (fullRoster ? BIOMES : EXPANDED_BIOMES).map(biome => biome.id);
+  if (!isDenseArray(input.kinds, 4) || input.kinds.length !== 4 || new Set(input.kinds).size !== 4 || input.kinds.some(k => !ENCOUNTER_KINDS.includes(k as EncounterKind)) ||
     !list(input.biomes) || input.biomes.length !== biomeIds.length ||
-    !list(input.pools) || !isDenseArray(input.compositions, input.version === 3 || input.version === 4 ? 96 : 64) || !input.compositions.length || !list(input.bosses)) return fail('Invalid catalog shape or version');
+    !list(input.pools) || !isDenseArray(input.compositions, fullRoster ? 96 : 64) || !input.compositions.length || !list(input.bosses)) return fail('Invalid catalog shape or version');
   const compositions = new Map<string, DungeonComposition>();
   for (const c of input.compositions) {
     if (!hasShape(c, ['id', 'roster']) || !idOk(c.id) || compositions.has(c.id) || !isDenseArray(c.roster, 64)) return fail('Invalid composition');
@@ -63,7 +68,7 @@ export function readDungeonEncounterCatalog(input: unknown, content: ContentCata
     for (const m of p.maps) {
       if (!hasShape(m, ['id', 'source', 'compositionIds']) || !idOk(m.id) || maps.has(m.id) || !isBattlefieldSource(m.source) ||
         (m.source.kind === 'generated'
-          ? m.source.biome !== p.biome || (input.version !== 4 && p.biome !== 'desert')
+          ? m.source.biome !== p.biome || version < firstGeneratedCatalog[m.source.biome]
           : p.biome === 'desert') ||
         !list(m.compositionIds) || new Set(m.compositionIds).size !== m.compositionIds.length) return fail('Invalid map choice');
       maps.add(m.id);
