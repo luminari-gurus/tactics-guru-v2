@@ -1,8 +1,10 @@
+import { generatedBattlefieldMapId } from '../content/battlefieldTypes';
 import { awardHero, progressHero, readProgressHero } from './progression';
 import { HERO_PROGRESSION } from '../content/progression';
 import { freshArrivalExploration, freshExploration, readExploration, movableExploration, visit, poiCell, neighbors, type Exploration } from './exploration';
 import { HERO_IDS } from '../content/constants';
 import { dungeonContent, DUNGEON_TEMPLATE } from '../content/dungeon';
+import type { ContentCatalog } from '../content/types';
 import type { ItemCatalog, ItemId, ItemOwnership } from '../content/itemTypes';
 import { generateFrozenMap, type GeneratedMap } from '../map/generate';
 import { applyBiome, BIOMES } from '../map/biomes';
@@ -219,7 +221,7 @@ function buildDungeonBattle(s: DungeonState, cappedHealing: boolean) {
     : projectDungeonEnemies(s.depth, plan.selection.kind, authored, plan.selection.scalingPolicy, partyStrength);
   const projected = projectOwnedCatalog(s.ownership, s.party, baseline, dungeonContent.items);
   const map = { ...resolved.map, spawns: resolved.map.spawns.filter(p => p.side === 'enemies' || living.has(p.unitId)) };
-  const catalog = { ...projected, maps: { ...projected.maps, [map.id]: map } };
+  const catalog: ContentCatalog = { ...projected, maps: { ...projected.maps, [map.id]: map } };
   const created = createBattle(map.id, dungeonSeed(s.seed, s.depth, 'battle', slot), catalog);
   if (!created.ok) return null;
   const units = created.state.units.map(unit => {
@@ -293,7 +295,9 @@ function readDungeonValue(input: unknown, items: ItemCatalog): DungeonResult {
           if(source.kind==='authored') {
             if(plan.battlefield.mapId!==source.mapId)return fail('invalidSelection');
           } else if(plan.battlefield.kind!=='generated' || plan.battlefield.layoutSeed!==layoutSeed(seed,selection.encounter.id) ||
-            plan.battlefield.mapId!==`map:desert_${selection.encounter.id.slice(10)}`) return fail('invalidSelection');
+            plan.battlefield.biome!==source.biome || plan.battlefield.generatorVersion!==source.generatorVersion ||
+            plan.battlefield.profileVersion!==source.profileVersion ||
+            plan.battlefield.mapId!==generatedBattlefieldMapId(selection.encounter.id, source.profileVersion)) return fail('invalidSelection');
           // Historical facts keep their saved hash. Resolve graph geometry when that floor
           // becomes current, including candidate travel before it can be saved/published.
           if(i+1===input.depth) {

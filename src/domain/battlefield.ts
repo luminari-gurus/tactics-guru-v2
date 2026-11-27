@@ -1,16 +1,17 @@
-import type { BattlefieldEncounter } from '../content/battlefieldTypes';
-import { isBattlefieldSource } from '../content/battlefieldTypes';
+import { generatedBattlefieldMapId, isBattlefieldSource, isGeneratedBattlefieldVersion, type BattlefieldEncounter,
+  type GeneratedBattlefieldSource } from '../content/battlefieldTypes';
 import type { ContentCatalog, MapCell, MapRecord } from '../content/types';
 import { hashJson, canonical } from './contentIdentity';
 import { hasShape } from './validation';
 import { seedRng, nextUint32 } from './rng';
+import { grasslandCandidate } from './grasslandBattlefield';
 import { validateBattlefield, type BattlefieldFailure } from './battlefieldValidation';
 export type BattlefieldDescriptor = {
   readonly encounterId: string; readonly kind: 'authored'; readonly mapId: MapRecord['id']; readonly mapHash: string;
-} | {
-  readonly encounterId: string; readonly kind: 'generated'; readonly mapId: MapRecord['id']; readonly mapHash: string;
-  readonly layoutSeed: number; readonly biome: 'desert'; readonly generatorVersion: 1; readonly profileVersion: 'desert-v1';
-};
+} | (GeneratedBattlefieldSource & {
+  readonly encounterId: string; readonly mapId: MapRecord['id']; readonly mapHash: string;
+  readonly layoutSeed: number;
+});
 export function layoutSeed(seed: number, encounterId: string): number {
   return Number.parseInt(hashJson({seed,encounterId,purpose:'battle-layout-v1'}).slice(-8),16);
 }
@@ -18,7 +19,7 @@ export function readBattlefieldDescriptor(input: unknown): input is BattlefieldD
   const common=['encounterId','kind','mapId','mapHash'];
   if(!hasShape(input,common)&&!hasShape(input,[...common,'layoutSeed','biome','generatorVersion','profileVersion']))return false;
   if(typeof input.encounterId!=='string'||!/^encounter:[a-z][a-z0-9_]{0,63}$/.test(input.encounterId)||typeof input.mapId!=='string'||!/^map:[a-z][a-z0-9_]{0,63}$/.test(input.mapId)||typeof input.mapHash!=='string'||!/^sha256:[a-f0-9]{64}$/.test(input.mapHash))return false;
-  return input.kind==='authored'?hasShape(input,common):input.kind==='generated'&&input.biome==='desert'&&input.generatorVersion===1&&input.profileVersion==='desert-v1'&&typeof input.layoutSeed==='number'&&Number.isInteger(input.layoutSeed)&&input.layoutSeed>=0&&input.layoutSeed<=0xffffffff;
+  return input.kind==='authored'?hasShape(input,common):input.kind==='generated'&&isGeneratedBattlefieldVersion(input.biome, input.generatorVersion, input.profileVersion)&&typeof input.layoutSeed==='number'&&Number.isInteger(input.layoutSeed)&&input.layoutSeed>=0&&input.layoutSeed<=0xffffffff;
 }
 function immutableMap(map:MapRecord):MapRecord {
   return Object.freeze({...map,cells:Object.freeze(map.cells.map(c=>Object.freeze({...c}))),spawns:Object.freeze(map.spawns.map(s=>Object.freeze({...s})))});
@@ -38,8 +39,13 @@ export function desertCandidate(encounter:BattlefieldEncounter,seed:number,attem
     const x=draw(2)?0:10,y=3+draw(5);
     for(let dy=0;dy<2;dy++)for(let dx=0;dx<2;dx++)cells[(y+dy)*12+x+dx]={x:x+dx,y:y+dy,terrainId:'sand',elevation:1};
   }
-  return {id:`map:desert_${encounter.id.slice(10)}`,width:12,height:12,cells,spawns:encounter.roster.map(s=>({...s}))};
+  return {id:generatedBattlefieldMapId(encounter.id, 'desert-v1'),width:12,height:12,cells,spawns:encounter.roster.map(s=>({...s}))};
 }
+const battlefieldCandidates = {
+  'desert-v1': desertCandidate,
+  'grassland-v1': grasslandCandidate,
+} satisfies Record<GeneratedBattlefieldSource['profileVersion'], typeof desertCandidate>;
+
 export function resolveBattlefield(encounter:BattlefieldEncounter,encounterSeed:number,catalog:ContentCatalog,
   options: { readonly rejectCandidate?: (attempt:number)=>boolean } = {}) {
   const fail=(errors:readonly BattlefieldFailure[])=>({ok:false as const,errors});
@@ -54,14 +60,17 @@ export function resolveBattlefield(encounter:BattlefieldEncounter,encounterSeed:
     const admitted=validateBattlefield(map,catalog);
     if(!admitted.ok)return admitted;
   }else {
+    const { profileVersion } = encounter.source;
+    const buildCandidate = battlefieldCandidates[profileVersion];
+    const desert = profileVersion === 'desert-v1';
     for(let i=0;i<4;i++) {
-      const candidate=desertCandidate(encounter,seed,i),admitted=validateBattlefield(candidate,catalog,true);
+      const candidate=buildCandidate(encounter,seed,i),admitted=validateBattlefield(candidate,catalog,desert);
       if(admitted.ok&&!options.rejectCandidate?.(i)){map=candidate;attempt=i;break;}
       failures.push(...(admitted.ok?[{code:'profile' as const,detail:'Forced candidate rejection'}]:admitted.errors));
     }
     if(!map) {
-      map=desertCandidate(encounter,seed,null);
-      const admitted=validateBattlefield(map,catalog,true);if(!admitted.ok)return admitted;
+      map=buildCandidate(encounter,seed,null);
+      const admitted=validateBattlefield(map,catalog,desert);if(!admitted.ok)return admitted;
     }
   }
   const common={encounterId:encounter.id,mapId:map.id,mapHash:hashJson(map)};

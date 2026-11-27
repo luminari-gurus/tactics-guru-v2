@@ -1,3 +1,4 @@
+import { isGeneratedBattlefieldVersion } from '../content/battlefieldTypes';
 import { HERO_PROGRESSION } from '../content/progression';
 import { itemCatalog, previousItemCatalog } from '../content/items';
 import { encounterHpLimit } from './effects';
@@ -104,7 +105,8 @@ export function decodeRunSave(text: string, context: RunSaveContext): RunSnapsho
     input.identity.items !== expected.items || input.identity.encounters !== expected.encounters) return { ok: false, reason: 'incompatible' };
   if((hasShape(input.payload,['items','activeBattle','battlefield']) || hasShape(input.payload,['items','activeBattle','battlefield','stats'])) &&
     hasShape(input.payload.battlefield,['encounterId','kind','mapId','mapHash','layoutSeed','biome','generatorVersion','profileVersion']) &&
-    input.payload.battlefield.kind==='generated' && (input.payload.battlefield.biome!=='desert' || input.payload.battlefield.generatorVersion!==1 || input.payload.battlefield.profileVersion!=='desert-v1')) return {ok:false,reason:'incompatible'};
+    input.payload.battlefield.kind==='generated' && !isGeneratedBattlefieldVersion(input.payload.battlefield.biome,
+      input.payload.battlefield.generatorVersion, input.payload.battlefield.profileVersion)) return {ok:false,reason:'incompatible'};
   const read = readRunSnapshot(input.payload, previous ? { ...context, items: previousItemCatalog } : context);
   if (!read.ok) return read;
   if ((input.format === COUNTER_RUN_SAVE_FORMAT || input.format === STATS_RUN_SAVE_FORMAT) !== (read.state.stats !== undefined)) return { ok: false, reason: 'invalidState' };

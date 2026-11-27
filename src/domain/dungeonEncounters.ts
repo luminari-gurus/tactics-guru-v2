@@ -12,11 +12,13 @@ import { BIOMES, EXPANDED_BIOMES } from '../map/biomes';
 import {
   expandedDungeonBattleCatalog, expandedDungeonEncounterCatalog, expandedDungeonEncounterIdentity, expandedEncounterBattleCatalog,
   fullBiomeDungeonBattleCatalog, fullBiomeDungeonEncounterCatalog, fullBiomeDungeonEncounterIdentity,
+  proceduralDungeonEncounterCatalog, proceduralDungeonEncounterIdentity,
 } from '../content/expandedDungeonEncounters';
 
 export const DUNGEON_ENCOUNTER_POLICY = 'dungeon-encounters-v1';
 export const EXPANDED_ENCOUNTER_POLICY = 'dungeon-encounters-v2';
 export const FULL_BIOME_ENCOUNTER_POLICY = 'dungeon-encounters-v3';
+export const CURRENT_DUNGEON_ENCOUNTER_POLICY = 'dungeon-encounters-v4';
 export const ENEMY_SCALING_POLICY = 'enemy-depth-v1';
 export const LEGACY_ENCOUNTER_POLICY = 'legacy-fixed-v1';
 export const PARTY_SCALING_POLICY = 'enemy-party-v1';
@@ -30,6 +32,10 @@ const expandedPolicies = {
   [FULL_BIOME_ENCOUNTER_POLICY]: {
     biomes: BIOMES, catalog: fullBiomeDungeonEncounterCatalog,
     identity: fullBiomeDungeonEncounterIdentity, content: fullBiomeDungeonBattleCatalog,
+  },
+  [CURRENT_DUNGEON_ENCOUNTER_POLICY]: {
+    biomes: BIOMES, catalog: proceduralDungeonEncounterCatalog,
+    identity: proceduralDungeonEncounterIdentity, content: fullBiomeDungeonBattleCatalog,
   },
 };
 type SeededEncounterPolicy = typeof DUNGEON_ENCOUNTER_POLICY | keyof typeof expandedPolicies;
@@ -73,7 +79,7 @@ export function readDungeonEncounterSelection(input: unknown, depth: number, slo
     input.policy !== policy || input.depth !== depth || input.biome !== biome ||
     (slot === 0 ? input.kind !== 'normal' : slot === 2 ? input.kind !== 'boss' : !['elite', 'vault'].includes(input.kind as string))) return null;
   const { scalingPolicy } = input;
-  if (policy === FULL_BIOME_ENCOUNTER_POLICY
+  if (policy === FULL_BIOME_ENCOUNTER_POLICY || policy === CURRENT_DUNGEON_ENCOUNTER_POLICY
     ? scalingPolicy !== ENDLESS_SCALING_POLICY
     : scalingPolicy !== ENEMY_SCALING_POLICY &&
       !(expanded && (scalingPolicy === PARTY_SCALING_POLICY || scalingPolicy === ENDLESS_SCALING_POLICY))) return null;
@@ -100,7 +106,9 @@ const depthOk = (depth: number) => Number.isSafeInteger(depth) && depth >= 1;
 export function encounterSelectionSeed(seed: number, depth: number, slot: number, purpose: 'biome' | 'kind' | 'map' | 'composition' | 'hobgoblin', policy: SeededEncounterPolicy = DUNGEON_ENCOUNTER_POLICY): number {
   if (!Number.isInteger(seed) || seed < 0 || seed > 0xffffffff || !depthOk(depth) || !Number.isInteger(slot) || slot < 0 || slot > 2 ||
     !['biome', 'kind', 'map', 'composition', 'hobgoblin'].includes(purpose)) throw new RangeError('Invalid encounter seed inputs');
-  return Number.parseInt(hashJson({ policy, seed, depth, slot, purpose }).slice(-8), 16);
+  // V4 changes battlefield sources while preserving the V3 biome, roster and kind draws.
+  const selectionStream = policy === CURRENT_DUNGEON_ENCOUNTER_POLICY ? FULL_BIOME_ENCOUNTER_POLICY : policy;
+  return Number.parseInt(hashJson({ policy: selectionStream, seed, depth, slot, purpose }).slice(-8), 16);
 }
 export function dungeonBiome(seed: number, depth: number, policy: SeededEncounterPolicy = DUNGEON_ENCOUNTER_POLICY): DungeonBiome {
   if (!depthOk(depth)) throw new RangeError('Invalid depth');

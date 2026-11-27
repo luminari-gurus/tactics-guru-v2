@@ -1,3 +1,4 @@
+import { generatedBattlefieldSources } from './battlefieldTypes';
 import {
   dungeonBattleCatalog, dungeonEncounterCatalog, dungeonEncounterCatalogIdentity, hobgoblinDungeonBattleCatalog,
   hobgoblinDungeonEncounterCatalog, type DungeonBiome, type DungeonComposition, type DungeonEncounterCatalog,
@@ -287,6 +288,16 @@ export const fullBiomeDungeonEncounterCatalog: DungeonEncounterCatalog = {
   ],
 };
 export const fullBiomeDungeonEncounterIdentity = dungeonEncounterCatalogIdentity(fullBiomeDungeonEncounterCatalog);
+
+export const proceduralDungeonEncounterCatalog: DungeonEncounterCatalog = {
+  ...fullBiomeDungeonEncounterCatalog,
+  version: 4,
+  pools: fullBiomeDungeonEncounterCatalog.pools.map(pool => pool.biome === 'grassland' ? {
+    ...pool,
+    maps: pool.maps.map(map => ({ ...map, source: generatedBattlefieldSources['grassland-v1'] })),
+  } : pool),
+};
+export const proceduralDungeonEncounterIdentity = dungeonEncounterCatalogIdentity(proceduralDungeonEncounterCatalog);
 
 export function expandedEncounterBattleCatalog(
   roster: readonly SpawnRecord[], mapId?: MapRecord['id'], catalog = expandedDungeonBattleCatalog,
