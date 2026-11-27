@@ -115,5 +115,8 @@ export const TERRAIN_TEXTURE_SPEC = {
   opaque: true, edgeTreatment: 'seamless-repeat', bakedGeometry: false,
 } as const;
 
+export const ORIGINAL_TERRAIN_TEXTURE_SPEC = { ...TERRAIN_TEXTURE_SPEC, sourceWidth: 1254, sourceHeight: 1254 } as const;
+export const OPTIONAL_TERRAIN_IDS = ['sand', 'rock', 'void', 'mud', 'ash', 'lava', 'snow', 'ice', 'crystal', 'rubble'] as const;
+
 /** 3.5E damage/count; slice targeting uses a five-tile maximum and three-tile target spread. */
 export const MAGIC_MISSILE = { damageDie: 4, damageBonus: 1, maxMissiles: 5, targetSpread: 3 } as const;

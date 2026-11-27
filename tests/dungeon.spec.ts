@@ -28,8 +28,8 @@ import { expectDungeonMovementVisible } from './helpers/dungeonLayout';
 import { BattleSession } from '../src/app/BattleSession';
 
 const fixedSeedTest = test.extend({ pinDungeonSeed: 28 });
-// Fresh saved runs avoid the initial dormant seed. Seed 10 clears Wetlands with the Fighter policy.
-const savedWetlandsSeed = 10;
+// Fresh saved runs avoid the initial dormant seed. Seed 22 clears generated Wetlands with the Fighter policy.
+const savedWetlandsSeed = 22;
 const savedWetlandsTest = test.extend({ pinDungeonSeed: savedWetlandsSeed - 1 });
 async function snapshot(page:Page):Promise<DungeonState>{return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!);}
 const boardReport=async(page:Page)=>JSON.parse((await page.locator('#game').getAttribute('data-battle-report'))!);
@@ -981,13 +981,23 @@ fixedSeedTest('dungeon battle undo survives reload', { tag: '@desktop-chromium-p
  await expect(page.locator('#game')).toHaveAttribute('data-phase','player');expect((await readSession(page)).state).toEqual(restored);
  await expect(page.locator('#battle-undo')).toBeDisabled();
 });
-for (const [biome, label] of [['grassland', 'Grassland'], ['forest', 'Forest']] as const) {
+for (const { biome, label, terrains, materials } of [
+ { biome: 'grassland', label: 'Grassland', terrains: ['grass', 'grass_path', 'forest'], materials: [] },
+ { biome: 'forest', label: 'Forest', terrains: ['grass', 'grass_path', 'forest'], materials: [] },
+ { biome: 'ember-wastes', label: 'Ember Wastes', terrains: ['ash', 'lava', 'rubble', 'stone'], materials: ['ash', 'lava'] },
+ { biome: 'winter-tundra', label: 'Winter Tundra', terrains: ['ice', 'rubble', 'snow'], materials: [] },
+] as const) {
  const seed = Array.from({ length: 128 }, (_, index) => index + 1)
   .find(seed => dungeonBiome(seed, 1, CURRENT_DUNGEON_ENCOUNTER_POLICY) === biome)!;
  const savedGeneratedTest = test.extend({ pinDungeonSeed: seed - 1 });
  savedGeneratedTest(`generated ${label} renders, saves a real action and reloads the same battlefield`, {
   tag: '@desktop-chromium-portrait-webkit',
  }, async ({ page, isMobile }) => {
+  const textures = new Set<string>();
+  page.on('response', response => {
+   const material = /\/textures\/terrain\/runtime\/([a-z]+)-top-down-v1\.png$/.exec(new URL(response.url()).pathname);
+   if (response.ok() && material) textures.add(material[1]);
+  });
   await page.goto('./');
   await page.getByRole('button', { name: 'New Game', exact: true }).click();
   await expect(page.locator('#dungeon-map')).toHaveAttribute('data-biome', biome);
@@ -999,7 +1009,8 @@ for (const [biome, label] of [['grassland', 'Grassland'], ['forest', 'Forest']] 
   expect(entry.battlefield).toMatchObject({ kind: 'generated', biome, profileVersion: `${biome}-v1` });
   expect(entry.activeBattle!.mapId).toBe(entry.battlefield!.mapId);
   const map = dungeonBattle(entry)!.catalog.maps[entry.battlefield!.mapId];
-  expect(new Set(map.cells.map(cell => cell.terrainId))).toEqual(new Set(['grass', 'grass_path', 'forest']));
+  expect(new Set(map.cells.map(cell => cell.terrainId))).toEqual(new Set(terrains));
+  for (const material of materials) expect(textures.has(material)).toBe(true);
 
   await endTurn(page);
   await expect(game).toHaveAttribute('data-phase', 'player');
@@ -1062,6 +1073,7 @@ savedWetlandsTest('read-only entry, keyboard new dungeon, real action and active
  await expect(game).toHaveAttribute('data-phase','player');
  expect(await mounts()).not.toContain('continuation');
  const shortcutEntry=await snapshot(page);
+ expect(shortcutEntry.battlefield).toMatchObject({ kind: 'generated', biome: 'wetlands', profileVersion: 'wetlands-v1' });
  await page.locator('canvas').focus();await page.keyboard.press('a');
  await expect(page.locator('[data-action=basic]')).toHaveAttribute('aria-pressed','true');
  await page.keyboard.press('m');await expect(page.locator('#battle-move')).toHaveAttribute('aria-pressed','true');

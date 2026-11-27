@@ -5,6 +5,7 @@ import { hashJson, canonical } from './contentIdentity';
 import { hasShape } from './validation';
 import { seedRng, nextUint32 } from './rng';
 import { forestCandidate } from './forestBattlefield';
+import { regionalBattlefieldCandidates } from './regionalBattlefields';
 import { grasslandCandidate } from './grasslandBattlefield';
 import { validateBattlefield, type BattlefieldFailure } from './battlefieldValidation';
 export type BattlefieldDescriptor = {
@@ -46,6 +47,7 @@ const battlefieldCandidates = {
   'desert-v1': desertCandidate,
   'forest-v1': forestCandidate,
   'grassland-v1': grasslandCandidate,
+  ...regionalBattlefieldCandidates,
 } satisfies Record<GeneratedBattlefieldSource['profileVersion'], typeof desertCandidate>;
 
 export function resolveBattlefield(encounter:BattlefieldEncounter,encounterSeed:number,catalog:ContentCatalog,

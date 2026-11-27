@@ -312,6 +312,17 @@ export const forestProceduralDungeonEncounterCatalog: DungeonEncounterCatalog = 
 };
 export const forestProceduralDungeonEncounterIdentity = dungeonEncounterCatalogIdentity(forestProceduralDungeonEncounterCatalog);
 
+export const allProceduralDungeonEncounterCatalog: DungeonEncounterCatalog = {
+  ...forestProceduralDungeonEncounterCatalog,
+  version: 6,
+  pools: forestProceduralDungeonEncounterCatalog.pools.map(pool => {
+    if (pool.biome === 'desert' || pool.biome === 'grassland' || pool.biome === 'forest') return pool;
+    const source = generatedBattlefieldSources[`${pool.biome}-v1`];
+    return { ...pool, maps: pool.maps.map(map => ({ ...map, source })) };
+  }),
+};
+export const allProceduralDungeonEncounterIdentity = dungeonEncounterCatalogIdentity(allProceduralDungeonEncounterCatalog);
+
 export function expandedEncounterBattleCatalog(
   roster: readonly SpawnRecord[], mapId?: MapRecord['id'], catalog = expandedDungeonBattleCatalog,
 ): ContentCatalog {

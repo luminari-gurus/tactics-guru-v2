@@ -5,6 +5,14 @@ export const generatedBattlefieldSources = {
   'desert-v1': { kind: 'generated', biome: 'desert', generatorVersion: 1, profileVersion: 'desert-v1' },
   'forest-v1': { kind: 'generated', biome: 'forest', generatorVersion: 1, profileVersion: 'forest-v1' },
   'grassland-v1': { kind: 'generated', biome: 'grassland', generatorVersion: 1, profileVersion: 'grassland-v1' },
+  'wetlands-v1': { kind: 'generated', biome: 'wetlands', generatorVersion: 1, profileVersion: 'wetlands-v1' },
+  'underdeep-caverns-v1': { kind: 'generated', biome: 'underdeep-caverns', generatorVersion: 1, profileVersion: 'underdeep-caverns-v1' },
+  'quarry-v1': { kind: 'generated', biome: 'quarry', generatorVersion: 1, profileVersion: 'quarry-v1' },
+  'graveyard-v1': { kind: 'generated', biome: 'graveyard', generatorVersion: 1, profileVersion: 'graveyard-v1' },
+  'ember-wastes-v1': { kind: 'generated', biome: 'ember-wastes', generatorVersion: 1, profileVersion: 'ember-wastes-v1' },
+  'winter-tundra-v1': { kind: 'generated', biome: 'winter-tundra', generatorVersion: 1, profileVersion: 'winter-tundra-v1' },
+  'storm-coast-v1': { kind: 'generated', biome: 'storm-coast', generatorVersion: 1, profileVersion: 'storm-coast-v1' },
+  'shattered-citadel-v1': { kind: 'generated', biome: 'shattered-citadel', generatorVersion: 1, profileVersion: 'shattered-citadel-v1' },
 } as const;
 export type GeneratedBattlefieldSource = typeof generatedBattlefieldSources[keyof typeof generatedBattlefieldSources];
 export type BattlefieldSource = { readonly kind: 'authored'; readonly mapId: MapId } | GeneratedBattlefieldSource;
@@ -18,6 +26,14 @@ const generatedMapPrefixes = {
   'desert-v1': 'desert_',
   'forest-v1': 'forest_',
   'grassland-v1': 'grass_',
+  'wetlands-v1': 'wetlands_',
+  'underdeep-caverns-v1': 'underdeep_caverns_',
+  'quarry-v1': 'quarry_',
+  'graveyard-v1': 'graveyard_',
+  'ember-wastes-v1': 'ember_wastes_',
+  'winter-tundra-v1': 'winter_tundra_',
+  'storm-coast-v1': 'storm_coast_',
+  'shattered-citadel-v1': 'shattered_citadel_',
 } satisfies Record<GeneratedBattlefieldSource['profileVersion'], string>;
 export function generatedBattlefieldMapId(encounterId: string, profileVersion: GeneratedBattlefieldSource['profileVersion']): MapId {
   return `map:${generatedMapPrefixes[profileVersion]}${encounterId.slice(10)}`;

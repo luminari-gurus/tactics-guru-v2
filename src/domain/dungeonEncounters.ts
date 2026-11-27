@@ -1,6 +1,7 @@
 import { dungeonBattleCatalog, dungeonEncounterCatalog, dungeonEncounterIdentity, hobgoblinDungeonBattleCatalog,
   hobgoblinDungeonEncounterCatalog, hobgoblinEncounterIdentity, type DungeonBiome, type EncounterKind } from '../content/dungeonEncounters';
 import { readBattlefieldEncounter, type BattlefieldEncounter } from '../content/battlefieldTypes';
+import { regionalTerrainContent } from '../content/regionalTerrain';
 import { HERO_PROGRESSION } from '../content/progression';
 import { CONTENT_BOUNDS } from '../content/constants';
 import type { ContentCatalog, EnemyId } from '../content/types';
@@ -14,6 +15,7 @@ import {
   fullBiomeDungeonBattleCatalog, fullBiomeDungeonEncounterCatalog, fullBiomeDungeonEncounterIdentity,
   proceduralDungeonEncounterCatalog, proceduralDungeonEncounterIdentity,
   forestProceduralDungeonEncounterCatalog, forestProceduralDungeonEncounterIdentity,
+  allProceduralDungeonEncounterCatalog, allProceduralDungeonEncounterIdentity,
 } from '../content/expandedDungeonEncounters';
 
 export const DUNGEON_ENCOUNTER_POLICY = 'dungeon-encounters-v1';
@@ -21,7 +23,8 @@ export const EXPANDED_ENCOUNTER_POLICY = 'dungeon-encounters-v2';
 export const FULL_BIOME_ENCOUNTER_POLICY = 'dungeon-encounters-v3';
 export const GRASSLAND_DUNGEON_ENCOUNTER_POLICY = 'dungeon-encounters-v4';
 export const FOREST_DUNGEON_ENCOUNTER_POLICY = 'dungeon-encounters-v5';
-export const CURRENT_DUNGEON_ENCOUNTER_POLICY = FOREST_DUNGEON_ENCOUNTER_POLICY;
+export const ALL_PROCEDURAL_DUNGEON_ENCOUNTER_POLICY = 'dungeon-encounters-v6';
+export const CURRENT_DUNGEON_ENCOUNTER_POLICY = ALL_PROCEDURAL_DUNGEON_ENCOUNTER_POLICY;
 export const ENEMY_SCALING_POLICY = 'enemy-depth-v1';
 export const LEGACY_ENCOUNTER_POLICY = 'legacy-fixed-v1';
 export const PARTY_SCALING_POLICY = 'enemy-party-v1';
@@ -48,6 +51,11 @@ const expandedPolicies = {
     identity: forestProceduralDungeonEncounterIdentity, content: fullBiomeDungeonBattleCatalog,
     selectionStream: FULL_BIOME_ENCOUNTER_POLICY, requiresEndlessScaling: true,
   },
+  [ALL_PROCEDURAL_DUNGEON_ENCOUNTER_POLICY]: {
+    biomes: BIOMES, catalog: allProceduralDungeonEncounterCatalog,
+    identity: allProceduralDungeonEncounterIdentity, content: fullBiomeDungeonBattleCatalog,
+    selectionStream: FULL_BIOME_ENCOUNTER_POLICY, requiresEndlessScaling: true,
+  },
 };
 type SeededEncounterPolicy = typeof DUNGEON_ENCOUNTER_POLICY | keyof typeof expandedPolicies;
 export function isSeededEncounterPolicy(value: unknown): value is SeededEncounterPolicy {
@@ -68,7 +76,8 @@ export type EncounterSelection = DungeonEncounterSelection | LegacyEncounterSele
 export function encounterBattleCatalog(selection: EncounterSelection): ContentCatalog {
   if (selection.policy !== LEGACY_ENCOUNTER_POLICY && selection.policy !== DUNGEON_ENCOUNTER_POLICY) {
     const { source, roster } = selection.encounter;
-    return expandedEncounterBattleCatalog(roster, source.kind === 'authored' ? source.mapId : undefined, expandedPolicies[selection.policy].content);
+    const catalog = expandedEncounterBattleCatalog(roster, source.kind === 'authored' ? source.mapId : undefined, expandedPolicies[selection.policy].content);
+    return source.kind === 'generated' ? regionalTerrainContent(catalog, source) : catalog;
   }
   return selection.policy === DUNGEON_ENCOUNTER_POLICY && selection.mapId === 'hobgoblin_formation'
     ? hobgoblinDungeonBattleCatalog : dungeonBattleCatalog;

@@ -1,3 +1,4 @@
+import { regionalTerrainTints } from '../terrain/materials';
 import Phaser from 'phaser';
 import type { CellPosition, ContentCatalog, MapId } from '../content/types';
 import type { BattleEvent, BattleState } from '../domain/types';
@@ -13,6 +14,7 @@ import { criticalImpacts, drawCriticalImpact, type CriticalImpact } from './crit
 import type { TargetOverlay, HoverPreview } from '../ui/targetPreview';
 import { readCombatPacePreference } from '../ui/combatPacePreference';
 import { drawDesertLandmark } from './desertLandmark';
+import { tintedTerrainSurface } from './terrainSurface';
 
 const REACHABLE_COLOR = 0x46d7c7;
 const ACTIVE_COLOR = 0xffd36a;
@@ -175,7 +177,10 @@ export class BoardRenderer {
       const column = scene.add.image(point.x + columnBounds.left, point.y + columnBounds.top, columnKey)
         .setOrigin(0).setDisplaySize(TILE_WIDTH, columnBounds.bottom - columnBounds.top).setDepth(tile.depth);
       const surface = scene.add.container(point.x, point.y).setScale(1, TILE_HEIGHT / TILE_WIDTH).setDepth(tile.depth + 1);
-      const image = scene.add.image(0, 0, tile.surfaceAssetId).setOrigin(0.5)
+      const tint = regionalTerrainTints[tile.terrain];
+      const surfaceKey = tint === undefined || style?.surfaceTint !== undefined ? tile.surfaceAssetId
+        : tintedTerrainSurface(scene.textures, tile.surfaceAssetId, tint);
+      const image = scene.add.image(0, 0, surfaceKey).setOrigin(0.5)
         .setDisplaySize(TILE_WIDTH / Math.SQRT2, TILE_WIDTH / Math.SQRT2).setRotation(Math.PI / 4);
       if (style?.surfaceTint !== undefined) image.setTint(style.surfaceTint);
       surface.add(image);

@@ -7,14 +7,14 @@ import type { EnemyId } from '../../src/content/types';
 import { resolveBattlefield } from '../../src/domain/battlefield';
 import { acceptDungeonBattle, currentFloor, dungeonBattle, freshDungeon } from '../../src/domain/dungeon';
 import {
-  CURRENT_DUNGEON_ENCOUNTER_POLICY, GRASSLAND_DUNGEON_ENCOUNTER_POLICY,
+  FOREST_DUNGEON_ENCOUNTER_POLICY, GRASSLAND_DUNGEON_ENCOUNTER_POLICY,
   dungeonBiome, selectDungeonEncounter,
 } from '../../src/domain/dungeonEncounters';
 import { decodeDungeon, encodeDungeon } from '../../src/domain/dungeonSaveEnvelope';
 import { dispatch } from '../../src/domain/turns';
 import { checkedDungeon, walkWitness } from '../helpers/dungeonFixtures';
 
-const policy = CURRENT_DUNGEON_ENCOUNTER_POLICY;
+const policy = FOREST_DUNGEON_ENCOUNTER_POLICY;
 const forest = generatedBattlefieldSources['forest-v1'];
 
 it('admits every eligible Forest roster on varied, connected boards with deterministic retries and fallback', () => {
