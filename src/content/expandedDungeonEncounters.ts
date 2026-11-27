@@ -299,6 +299,19 @@ export const proceduralDungeonEncounterCatalog: DungeonEncounterCatalog = {
 };
 export const proceduralDungeonEncounterIdentity = dungeonEncounterCatalogIdentity(proceduralDungeonEncounterCatalog);
 
+export const forestProceduralDungeonEncounterCatalog: DungeonEncounterCatalog = {
+  ...proceduralDungeonEncounterCatalog,
+  version: 5,
+  pools: proceduralDungeonEncounterCatalog.pools.map(pool => pool.biome === 'forest' ? {
+    ...pool,
+    // The scripted formation keeps its authored deployment and tactical board.
+    maps: pool.maps.map(map => map.id === 'hobgoblin_formation' ? map : {
+      ...map, source: generatedBattlefieldSources['forest-v1'],
+    }),
+  } : pool),
+};
+export const forestProceduralDungeonEncounterIdentity = dungeonEncounterCatalogIdentity(forestProceduralDungeonEncounterCatalog);
+
 export function expandedEncounterBattleCatalog(
   roster: readonly SpawnRecord[], mapId?: MapRecord['id'], catalog = expandedDungeonBattleCatalog,
 ): ContentCatalog {

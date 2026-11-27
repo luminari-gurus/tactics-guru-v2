@@ -3,6 +3,7 @@ import type { EncounterId } from '../domain/run';
 import { hasShape, isDenseArray } from '../domain/validation';
 export const generatedBattlefieldSources = {
   'desert-v1': { kind: 'generated', biome: 'desert', generatorVersion: 1, profileVersion: 'desert-v1' },
+  'forest-v1': { kind: 'generated', biome: 'forest', generatorVersion: 1, profileVersion: 'forest-v1' },
   'grassland-v1': { kind: 'generated', biome: 'grassland', generatorVersion: 1, profileVersion: 'grassland-v1' },
 } as const;
 export type GeneratedBattlefieldSource = typeof generatedBattlefieldSources[keyof typeof generatedBattlefieldSources];
@@ -15,6 +16,7 @@ export function isGeneratedBattlefieldVersion(biome: unknown, generatorVersion: 
 }
 const generatedMapPrefixes = {
   'desert-v1': 'desert_',
+  'forest-v1': 'forest_',
   'grassland-v1': 'grass_',
 } satisfies Record<GeneratedBattlefieldSource['profileVersion'], string>;
 export function generatedBattlefieldMapId(encounterId: string, profileVersion: GeneratedBattlefieldSource['profileVersion']): MapId {
