@@ -5,7 +5,7 @@ import { acceptDungeonBattle, currentFloor, dungeonBoundary, freshDungeon, readD
   type DungeonResult, type DungeonState } from '../../src/domain/dungeon';
 import { freshRunStats } from '../../src/domain/runStats';
 import { createDungeonStorage, DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
-import { atCell, dungeonContactApproach, dungeonGroundPileFixture, sharedGroundPile } from '../helpers/dungeonFixtures';
+import { atCell, dungeonCapacityFixture, dungeonContactApproach, dungeonGroundPileFixture, sharedGroundPile } from '../helpers/dungeonFixtures';
 
 const good = (result: DungeonResult) => { assert(result.ok, result.ok ? '' : result.reason); return result.state; };
 function memory() {
@@ -129,6 +129,26 @@ it.each([
   assert(restored.continue(restored.inspect()));
   expect(restored.snapshot).toEqual(collected);
   restored.dispose();
+});
+
+it('restores a Ranger charm assignment and saves its removal without changing the Fighter charm', async () => {
+  const initial = dungeonCapacityFixture();
+  const { owner, storage } = savedOwner(initial);
+  const rangerCharm = { heroId: 'ranger', slot: 'charm', instanceId: initial.ownership.equipment[1].instanceId } as const;
+  assert(await owner.dispatch({ ...dungeonBoundary(owner.snapshot), type: 'equipItem', ...rangerCharm }));
+  const equipped = { ...initial.ownership, assignments: [...initial.ownership.assignments, rangerCharm] };
+  expect(owner.snapshot.ownership).toEqual(equipped);
+  owner.dispose();
+
+  const resumed = new DungeonSession(initial, storage);
+  assert(resumed.continue(resumed.inspect()));
+  expect(resumed.snapshot.ownership).toEqual(equipped);
+  assert(await resumed.dispatch({ ...dungeonBoundary(resumed.snapshot), type: 'unequipItem', ...rangerCharm }));
+  expect(resumed.snapshot.ownership).toEqual(initial.ownership);
+  const saved = storage.inspect().primary;
+  assert(saved.status === 'valid');
+  expect(saved.state.ownership).toEqual(initial.ownership);
+  resumed.dispose();
 });
 
 it.each(['before', 'after'] as const)('does not publish a pickup when the primary write fails %s committing', async when => {
