@@ -264,11 +264,19 @@ export function validateBrowserResult(stage, row) {
     !row.checkpointError, 'Missing final checkpoints');
 }
 
+function hasCompletePerformanceCapture(row, source) {
+  return row.performance?.samples === 18 && row.performance.failures?.length === 0 &&
+    row.performance.measuredBuild?.commit === source.commit;
+}
+
+function commandCompleted(command, exitCode) {
+  return command?.exitCode === exitCode && !command.signal && !command.error && !command.timedOut && !command.interrupted;
+}
+
 export function validatePerformanceResult(row, source) {
-  invariant(row.performance?.samples === 18 && row.performance.failures?.length === 0 && row.performance.measuredBuild?.commit === source.commit,
-    'Missing/incomplete performance capture or wrong build');
-  invariant(row.evaluation?.exitCode === 0 && !row.evaluation.error && !row.evaluation.timedOut && !row.evaluation.interrupted &&
-    row.evaluationReport?.passed === true && row.evaluationReport.captureFailures?.length === 0, 'Performance evaluation missing or failed');
+  invariant(hasCompletePerformanceCapture(row, source), 'Missing/incomplete performance capture or wrong build');
+  invariant(commandCompleted(row.evaluation, 0) && row.evaluationReport?.passed === true &&
+    row.evaluationReport.captureFailures?.length === 0, 'Performance evaluation missing or failed');
 }
 
 export function quarantineCleanup(row, abort, toolCache = process.env.RUNNER_TOOL_CACHE) {
@@ -382,8 +390,13 @@ export function canDistributeBuild(mode, report) {
   if (report.passed) return true;
   if (mode !== 'parallel-full' || !report.complete || !report.inputsUnchanged || report.error) return false;
   const performance = report.stages.find(stage => stage.id === 'performance');
-  return performance?.status === 'failed' && preparationIds.every(id =>
-    report.stages.some(stage => stage.id === id && stage.status === 'passed'));
+  if (performance?.status !== 'failed' || !commandCompleted(performance, 0) ||
+      !hasCompletePerformanceCapture(performance, report.source) || !commandCompleted(performance.evaluation, 1)) return false;
+  const evaluation = performance.evaluationReport;
+  return evaluation?.passed === false && evaluation.captureFailures?.length === 0 &&
+    evaluation.rows?.length === performance.performance.samples &&
+    Number.isInteger(evaluation.failedSamples) && evaluation.failedSamples > 0 && evaluation.failedSamples <= evaluation.rows.length &&
+    preparationIds.every(id => report.stages.some(stage => stage.id === id && stage.status === 'passed'));
 }
 
 export function aggregate(plan, build, preparation, receipts, batchSkipReason) {
