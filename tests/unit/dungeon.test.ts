@@ -5,7 +5,7 @@ import { applyBiome } from '../../src/map/biomes';
 import { DEFAULT_BEHAVIORS, stepMovement } from '../../src/map/movement';
 import { HERO_PROGRESSION } from '../../src/content/progression';
 import { assert, describe, expect, it, vi } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { dungeonCapacityFixture, dungeonVictoryBoundary, walkWitness } from '../helpers/dungeonFixtures';
 import { dungeonStairStatus, clearedDungeonSlots, freshDungeon, newDungeonSeed, stepDungeon, dungeonBattle, dungeonOffer, floorDescriptor, floorMap, FloorCache, dungeonSeed, readDungeon, travelDungeon, startDungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, type DungeonState, type DungeonResult } from '../../src/domain/dungeon';
 import { encodeDungeon, decodeDungeon, encodeDungeonRollback, WALL_SIGHT_STATS_SAVE_FORMAT, utf8Bytes } from '../../src/domain/dungeonSaveEnvelope';
@@ -13,7 +13,7 @@ import { dungeonContent, dungeonIdentity, previousDungeonIdentity } from '../../
 import { bothDungeonSlotsMissing, createDungeonStorage, resumableDungeonSlot, serializeBrowserDungeonWrite, DUNGEON_BACKUP_CHECKPOINT_KEY, DUNGEON_KEYS, DUNGEON_RECENT_BACKUP_KEY } from '../../src/persistence/dungeonStorage';
 import { DungeonSession } from '../../src/app/DungeonSession';
 import { LEGACY_ENCOUNTER_POLICY, encounterBattleCatalog, selectDungeonEncounter } from '../../src/domain/dungeonEncounters';
-import { priorDungeonEnvelope } from '../helpers/dungeonFixtures';
+import { coldDungeonHistory, priorDungeonEnvelope } from '../helpers/dungeonFixtures';
 import { dispatch } from '../../src/domain/turns';
 import { canonical, hashJson } from '../../src/domain/contentIdentity';
 import { dungeonEncounterCatalog } from '../../src/content/dungeonEncounters';
@@ -1024,19 +1024,18 @@ describe('pre-progression save preservation', () => {
 });
 describe('durable encounter policies', () => {
   it('cold-decodes a bounded progression-format history by resolving only the current floor', async () => {
-    const base = freshDungeon('cold-current', 13);
-    const floors = Array.from({ length: 250 }, (_, i) => historicalFloor(base.seed, i + 1, 'upstairs', i === 249 ? 0 : 3));
-    const state={...base,depth:250,floors},encoded=encodeDungeon(state);if(!encoded.ok)throw Error(encoded.reason);
-    expect(utf8Bytes(encoded.text)).toBeLessThan(1024*1024);
+    const { state, text } = coldDungeonHistory();
+    expect(utf8Bytes(text)).toBeLessThan(1024*1024);
     vi.resetModules();
     const coldFields=await import('../../src/domain/battlefield'),coldEnvelope=await import('../../src/domain/dungeonSaveEnvelope');
     const resolver=vi.spyOn(coldFields,'resolveBattlefield');
     try {
-      const begin=performance.now(),decoded=coldEnvelope.decodeDungeon(encoded.text);
-      console.info(JSON.stringify({format:JSON.parse(encoded.text).format,floors:250,bytes:utf8Bytes(encoded.text),decodeMs:performance.now()-begin,resolutions:resolver.mock.calls.length}));
+      const begin=performance.now(),decoded=coldEnvelope.decodeDungeon(text);
+      console.info(JSON.stringify({format:JSON.parse(text).format,floors:250,bytes:utf8Bytes(text),decodeMs:performance.now()-begin,resolutions:resolver.mock.calls.length}));
       expect(decoded).toEqual({ok:true,state});expect(resolver).toHaveBeenCalledTimes(3);
-      expect(encodeDungeon(decoded.ok?decoded.state:null)).toEqual(encoded);
+      expect(encodeDungeon(decoded.ok?decoded.state:null)).toEqual({ ok: true, text });
     } finally {resolver.mockRestore();}
+    if (process.env.COLD_DUNGEON_HISTORY_FILE) writeFileSync(process.env.COLD_DUNGEON_HISTORY_FILE, text);
   },60000);
   it('rejects historical source mismatches immediately and geometry tampering before travel is published', async () => {
     const base=freshDungeon('lazy-history',43),first=base.floors[0],descriptor=floorDescriptor(base.seed,2);

@@ -1,4 +1,4 @@
-import { checkedDungeon, guardianFirstRewardFixture, dungeonSightTransition, savedBiomeEncounter, sharedGroundPile } from './helpers/dungeonFixtures';
+import { checkedDungeon, coldDungeonHistory, guardianFirstRewardFixture, dungeonSightTransition, savedBiomeEncounter, sharedGroundPile } from './helpers/dungeonFixtures';
 import { expect,test } from './helpers/startupDiagnostics';
 import type { Locator, Page } from '@playwright/test';
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
@@ -7,7 +7,7 @@ import { gzipSync } from 'node:zlib';
 import { openSavedDungeon, openDungeonWithStorage, dungeonSnapshot, acceptedDungeonSnapshot, expectSameProgress, walkDungeon, expectDungeonResumed, openDungeonInventory } from './helpers/dungeonTraversal';
 import { currentSight, neighbors, poiCell } from '../src/domain/exploration';
 import { generateMap } from '../src/map/generate';
-import { freshDungeon, floorDescriptor, FloorCache, floorMap, readDungeon, dungeonSeed, type DungeonState } from '../src/domain/dungeon';
+import { freshDungeon, floorDescriptor, floorMap, readDungeon, dungeonSeed, type DungeonState } from '../src/domain/dungeon';
 import { dungeonContent, legacyDungeonIdentity } from '../src/content/dungeon';
 import { canonical, hashJson } from '../src/domain/contentIdentity';
 import { DUNGEON_KEYS } from '../src/persistence/dungeonStorage';
@@ -588,26 +588,17 @@ function coldHistorySave(outputDir: string): string {
  const file = join(outputDir, 'cold-history-input.json');
  if (existsSync(file)) return readFileSync(file, 'utf8');
 
- const base = freshDungeon('cold-browser', 13);
- const depth = 250;
- const cache = new FloorCache(1);
- const floors = Array.from({ length: depth }, (_, index) => {
-  const descriptor = floorDescriptor(base.seed, index + 1, cache);
-  const position = descriptor.upstairs;
-  const exploration = freshExploration(descriptor.seed, position, floorMap(descriptor, cache));
-  return { descriptor, completed: index + 1 === depth ? 0 : 3, position, exploration };
- });
- const encoded = encodeDungeon({ ...base, depth, floors });
- if (!encoded.ok) throw Error(encoded.reason);
+ const { text } = coldDungeonHistory();
  mkdirSync(outputDir, { recursive: true });
  const temporary = file + '.' + process.pid;
- writeFileSync(temporary, encoded.text);
+ writeFileSync(temporary, text);
  renameSync(temporary, file);
- return encoded.text;
+ return text;
 }
 
 test('cold progression-format Continue retains a long saved history within the startup budget',async({page})=>{
- const text = coldHistorySave(test.info().project.outputDir);
+ const fixture = process.env.COLD_DUNGEON_HISTORY_FILE;
+ const text = fixture ? readFileSync(fixture, 'utf8') : coldHistorySave(test.info().project.outputDir);
  await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:DUNGEON_KEYS.primary,text});
  const begin=Date.now();await page.goto('./?game=dungeon');await expectDungeonResumed(page);
  await expect(page.locator('#dungeon-map')).toBeVisible();const coldUsableMs=Date.now()-begin;
