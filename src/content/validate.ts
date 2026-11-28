@@ -1,4 +1,4 @@
-import { ATTACK_BOUNDS, BASIC_ATTACK_OPTIONAL_ENEMY_IDS, CONTENT_BOUNDS, CORE_ENEMY_IDS, ENEMY_IDS, GUARDED_STRIKE_TRADEOFF, FIRST_MAP_TERRAIN_IDS, HERO_IDS, OPTIONAL_ENEMY_IDS, SHORTBOW_OPTIONAL_ENEMY_IDS, TERRAIN_TEXTURE_SPEC } from './constants';
+import { ATTACK_BOUNDS, BASIC_ATTACK_OPTIONAL_ENEMY_IDS, CONTENT_BOUNDS, CORE_ENEMY_IDS, ENEMY_IDS, GUARDED_STRIKE_TRADEOFF, FIRST_MAP_TERRAIN_IDS, HERO_IDS, OPTIONAL_ENEMY_IDS, OPTIONAL_TERRAIN_IDS, ORIGINAL_TERRAIN_TEXTURE_SPEC, SHORTBOW_OPTIONAL_ENEMY_IDS, TERRAIN_TEXTURE_SPEC } from './constants';
 import type { ContentCatalog } from './types';
 import { attackAbilities, shieldBash } from './abilities';
 import { hasShape, isDenseArray, isPlainRecord, type JsonRecord } from '../domain/validation';
@@ -42,7 +42,7 @@ export function validateContent(input: unknown): ContentValidation {
     const seen = new Set<string>();
     for (const [key, record] of Object.entries(v)) {
       const path = `${group}.${key}`;
-      if (fixed ? !fixed.some(id => id === key) && !(group === 'terrains' && ['sand','rock','void'].includes(key)) && !(group === 'enemies' && (OPTIONAL_ENEMY_IDS as readonly string[]).includes(key)) && !(group === 'abilities' && prefixedId(key, 'ability')) : !prefixedId(key, group === 'maps' ? 'map' : 'asset')) fail('id', path, 'Unknown or malformed catalog ID.');
+      if (fixed ? !fixed.some(id => id === key) && !(group === 'terrains' && (OPTIONAL_TERRAIN_IDS as readonly string[]).includes(key)) && !(group === 'enemies' && (OPTIONAL_ENEMY_IDS as readonly string[]).includes(key)) && !(group === 'abilities' && prefixedId(key, 'ability')) : !prefixedId(key, group === 'maps' ? 'map' : 'asset')) fail('id', path, 'Unknown or malformed catalog ID.');
       if (!isPlainRecord(record) || !hasShape(record, Object.keys(record))) { fail('shape', path, 'Expected a plain definition without accessors or hidden fields.'); continue; }
       if (record.id !== key) fail('id', `${path}.id`, 'Record ID must equal its catalog key.');
       if (typeof record.id === 'string') {
@@ -162,8 +162,10 @@ export function validateContent(input: unknown): ContentValidation {
     for (const key of ['sourceWidth','sourceHeight','runtimeWidth','runtimeHeight']) number(asset[key], 'imageDimension', `${path}.${key}`);
     if (asset.format !== 'png') fail('shape', `${path}.format`, 'Expected png.');
     if (asset.kind === 'terrain-surface') {
-      if (shape(asset.textureSpec, Object.keys(TERRAIN_TEXTURE_SPEC), `${path}.textureSpec`)) for (const [key, value] of Object.entries(TERRAIN_TEXTURE_SPEC)) if (asset.textureSpec[key] !== value) fail('shape', `${path}.textureSpec.${key}`, `Expected ${String(value)}.`);
-      for (const key of ['sourceWidth','sourceHeight','runtimeWidth','runtimeHeight'] as const) if (asset[key] !== TERRAIN_TEXTURE_SPEC[key]) fail('shape', `${path}.${key}`, `Expected surface dimension ${TERRAIN_TEXTURE_SPEC[key]}.`);
+      const spec = asset.sourceWidth === ORIGINAL_TERRAIN_TEXTURE_SPEC.sourceWidth
+        ? ORIGINAL_TERRAIN_TEXTURE_SPEC : TERRAIN_TEXTURE_SPEC;
+      if (shape(asset.textureSpec, Object.keys(spec), `${path}.textureSpec`)) for (const [key, value] of Object.entries(spec)) if (asset.textureSpec[key] !== value) fail('shape', `${path}.textureSpec.${key}`, `Expected ${String(value)}.`);
+      for (const key of ['sourceWidth','sourceHeight','runtimeWidth','runtimeHeight'] as const) if (asset[key] !== spec[key]) fail('shape', `${path}.${key}`, `Expected surface dimension ${spec[key]}.`);
     } else if (asset.kind === 'unit-sprite' || asset.kind === 'prop') {
       if (shape(asset.anchor, ['x','y'], `${path}.anchor`)) for (const [axis, dimension] of [['x','sourceWidth'],['y','sourceHeight']] as const) {
         const n = asset.anchor[axis];

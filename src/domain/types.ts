@@ -17,6 +17,8 @@ export type UnitState = {
   /** Guarded Strike is active until this unit's next turn; absence means inactive. */
   readonly guarded?: true;
   readonly secondWindUsed?: true;
+  /** Present on Shamans in capped dungeon battles, including when exhausted. */
+  readonly healGoblinRemaining?: number;
   /** One living opposing Fighter; expires after this unit's next accepted endTurn. */
   readonly tauntedBy?: number;
   /** One living opposing Ranger; consumed by the next player attack roll. */

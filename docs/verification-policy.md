@@ -4,7 +4,7 @@
 
 `npm run verify:pr` is the default automated PR check: all fast units (including
 content), both TypeScript scopes, both root/prefix build integrations, one ordinary
-production bundle, and six explicitly selected E2E journeys. It validates content
+production bundle, and five explicitly selected E2E journeys. It validates content
 and types once before bundling. `npm run test:pr -- --list` shows the browser list;
 `npm run test:pr -- <filters>` runs focused browser feedback after a successful build.
 The command records per-stage logs, unit/browser JSON and a source-bound summary
@@ -19,16 +19,16 @@ that the target was met. Measure successful job durations before claiming succes
 
 | Profile | Core use cases |
 | --- | --- |
-| Desktop Chromium (4) | New Game, Dungeon import recovery, map and character sheet, and active-battle resume |
+| Desktop Chromium (3) | Dungeon import recovery, New Game through map and character sheet, and active-battle resume |
 | Pixel touch portrait (1) | Native touch starts a dungeon and confirms replacement with a fresh seed while history storage is unavailable |
 | iPhone WebKit (1) | Dungeon creation, real action and active-battle resume |
 
 Playwright gameplay coverage is limited to Dungeon. The browser suites also cover
 the public menu, its Dungeon entry points, shared startup behavior,
 and asset delivery to those surfaces. The exact PR selection contract checks all
-six journeys and their devices.
+five journeys and their devices.
 
-`npm test` and direct `playwright test` now use this same six-journey selection.
+`npm test` and direct `playwright test` now use this same five-journey selection.
 `npm run test:regression -- <filters>` explicitly selects the broad Chromium
 compatibility matrix; special configs and `verify:full` retain their explicit
 regression/qualification purpose. New cases do not automatically join the core
@@ -54,6 +54,8 @@ Contents: [tiers](#choose-a-tier), [change matrix](#pr-readiness-selection-by-ch
 [suites and commands](#current-suite-inventory-and-commands),
 [evidence reuse](#evidence-reuse-and-final-source-identity),
 [self-hosted execution](#execution-capacity-and-follow-up-work).
+
+Routine verification clears three complete first floors. Desktop WebKit checks saved manual pickup, portrait Chromium checks saved automatic pickup, and landscape WebKit checks unsaved manual pickup. For first-floor certification across all six profiles, run `npm run test:extended -- -g @full-first-floor` and `npm run test:extended:webkit -- -g @full-first-floor`.
 
 ## Choose a tier
 
@@ -179,7 +181,8 @@ PR readiness selects the applicable rows under the change matrix.
 | Aggregate bundle step | `npm run build:bundle` | Internal to full verification after successful units/content and both type scopes. Creates the root, prefix or restored-root bundle without revalidating unchanged prerequisites. Use `npm run build` directly outside that guarded sequence. |
 | Core E2E | `npm test` | Seven explicitly selected core journeys across desktop, Pixel touch and iPhone WebKit. |
 | Broad Chromium compatibility | `npm run test:regression` | Explicit regression files, desktop + mobile portrait/landscape; the three long progression journeys are in the extended suite below. |
-| Extended progression journeys | `npm run test:extended` and `npm run test:extended:webkit` | Explicit, non-routine complete Mage, Ranger and Fighter progression journeys across three Chromium and three WebKit profiles; run when their full progression behavior needs certification. |
+| Extended progression journeys | `npm run test:extended` and `npm run test:extended:webkit` | Complete Mage, Ranger and Fighter progression journeys. |
+| Goblin Shaman | Routine regression on desktop Chromium and portrait WebKit, plus Vitest | Browser checks the Shaman sprite, ability details, failed Will save, Weakened after reload, and Heal Goblin counts at 2/2, 1/2, after reloading at 1/2, and 0/2. Vitest replays the complete battle and checks healing, Hex, RNG, persistence and victory settlement. |
 | WebKit menu acceptance | `npx --no-install playwright test -c playwright.device-acceptance.config.ts` | Public menu and Dungeon entry, history, recovery and layout on iPhone portrait and landscape. |
 | WebKit dungeon/exploration | `npx --no-install playwright test -c playwright.exploration.config.ts` | Dungeon, exploration, lifecycle files; desktop and two mobile orientations. |
 | Root/prefix asset behavior | `npx --no-install playwright test -c playwright.regression.config.ts tests/public-asset-base.spec.ts` | Root preview in the broad Chromium suite keeps all three profiles. Full regression runs root-dev on desktop only, and prefix-preview/prefix-dev on desktop plus Pixel portrait `@touch-audio` cases; recipe below. |
@@ -197,6 +200,10 @@ journeys, including touch pickup in both mobile orientations. The dungeon loot
 session units check that a persisted pickup counts one party move and advances
 the enemy movement counter only while enemies remain.
 
+The seven deferred encounter-loading cases run on both desktop engines. Each also
+runs on one touch orientation per engine. Landscape retains the HTTP module-failure
+and reload check used by the startup diagnostics workflow.
+
 ### Focused commands and base paths
 
 ```sh
@@ -206,7 +213,7 @@ npx --no-install playwright test -c playwright.regression.config.ts tests/main-m
 npx --no-install playwright test -c playwright.regression.config.ts tests/main-menu.spec.ts --project=desktop -g 'New Game starts immediately when no dungeon save exists' --list
 ```
 
-`npm test -- <filters>` narrows the six core journeys. For other cases use
+`npm test -- <filters>` narrows the five core journeys. For other cases use
 `npm run test:regression -- <filters>`, which forwards file, project and grep
 filters for the full Chromium Dungeon matrix.
 

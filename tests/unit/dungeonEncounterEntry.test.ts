@@ -53,6 +53,7 @@ describe('dungeon interrupted encounter entry', () => {
     expect(entered.activeBattle?.seed).toBe(dungeonSeed(tracked.seed, tracked.depth, 'battle', slot));
     expect(entered.phase).toBe('battle');
     expect(entered.encounterEntry).toEqual({ origin: floor.position, contact: target, slot });
+    expect(after.completed).toBe(0);
     expect(after.position).toBe(floor.position);
     expect(after.exploration.visited).toEqual(floor.exploration.visited);
     expect(after.exploration.revealed).toEqual(floor.exploration.revealed);

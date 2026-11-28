@@ -1,5 +1,7 @@
+import { encodeDungeon } from '../../src/domain/dungeonSaveEnvelope';
+import { freshRunStats } from '../../src/domain/runStats';
 import { freshExploration, movableExploration, neighbors, poiCell, reveal, visit } from '../../src/domain/exploration';
-import { freshDungeon, floorDescriptor, floorMap, dungeonOffer, dungeonLootReward, readDungeon, startDungeonBattle, dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, travelDungeon, stepDungeon, clearedDungeonSlots, type DungeonState, type DungeonResult, type DungeonItemCommand } from '../../src/domain/dungeon';
+import { freshDungeon, floorDescriptor, FloorCache, floorMap, dungeonOffer, dungeonLootReward, readDungeon, startDungeonBattle, dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, travelDungeon, stepDungeon, clearedDungeonSlots, type DungeonState, type DungeonResult, type DungeonItemCommand } from '../../src/domain/dungeon';
 import { generateMap } from '../../src/map/generate';
 import { BattleSession } from '../../src/app/BattleSession';
 import { playerDecision, fighterDecision, rangerDecision, mageDecision } from './playerPolicy';
@@ -17,6 +19,23 @@ import { DUNGEON_ENCOUNTER_POLICY, LEGACY_ENCOUNTER_POLICY, type DungeonEncounte
 import { legacyDungeonIdentity, priorDungeonIdentity } from '../../src/content/dungeon';
 import { canonical, hashJson } from '../../src/domain/contentIdentity';
 import { dungeonContent } from '../../src/content/dungeon';
+export function coldDungeonHistory() {
+  const base = freshDungeon('cold-browser', 13);
+  const depth = 250;
+  const cache = new FloorCache(1);
+  const floors = Array.from({ length: depth }, (_, index) => {
+    const descriptor = floorDescriptor(base.seed, index + 1, cache);
+    return {
+      descriptor, completed: index + 1 === depth ? 0 : 3, position: descriptor.upstairs,
+      exploration: freshExploration(descriptor.seed, descriptor.upstairs, floorMap(descriptor, cache)),
+    };
+  });
+  const state = { ...base, depth, floors };
+  const encoded = encodeDungeon(state);
+  if (!encoded.ok) throw Error(encoded.reason);
+  return { state, text: encoded.text };
+}
+
 /** Rebuild the terrain memory that the through-wall discovery rule would have saved. */
 export function withLegacySight(state: DungeonState): DungeonState {
   const floors = state.floors.map(floor => {
@@ -135,6 +154,21 @@ export function sharedGroundPile(ownedCount: number, occupied = false) {
  throw Error('No deterministic two-charm ground pile');
 }
 
+export function guardianFirstRewardFixture(): DungeonState {
+ const depth=5;
+ // Structural reward boundary isolates marker rendering, not preceding combat.
+ const fresh=freshDungeon('guardian-first',1,undefined,true);
+ const floors=Array.from({length:depth},(_,i)=>{
+  const descriptor=floorDescriptor(fresh.seed,i+1),map=floorMap(descriptor);
+  return {descriptor,position:descriptor.upstairs,completed:i===depth-1?0:3,
+   exploration:freshExploration(descriptor.seed,descriptor.upstairs,map)};
+ });
+ const base=atEncounter({...fresh,depth,floors},2),floor=base.floors[depth-1],map=floorMap(floor.descriptor);
+ const staged:DungeonState={...base,phase:'reward',floors:base.floors.map((f,i)=>i!==depth-1?f:{...floor,completed:1,
+  exploration:{...movableExploration(floor.exploration,floor.descriptor.seed,0,'ready'),cleared:[2],active:2,revealed:Array.from({length:map.cells.length},(_,i)=>i)}})};
+ return checkedDungeon(readDungeon({...staged,offer:dungeonOffer(staged)}));
+}
+
 export function savedBiomeEncounter(biome: 'forest' | 'desert', kind: 'normal' | 'elite' | 'vault' | 'boss') {
   const seeds = { forest: { normal: 0, elite: 9, vault: 0, boss: 0 }, desert: { normal: 1, elite: 2, vault: 1, boss: 1 } };
   const seed = seeds[biome][kind];
@@ -168,6 +202,14 @@ export function atCell(s: DungeonState, position: number): DungeonState {
   floors[s.depth-1] = { ...f, position, exploration: visit(f.exploration,position,floorMap(f.descriptor)) };
   return { ...s, floors };
 }
+// On seed 1 these legal steps move an encounter into or out of current sight.
+export function dungeonSightTransition(entering: boolean) {
+  const [position, destination, slot] = entering ? [47, 48, 1] : [307, 306, 0];
+  const before = atCell({ ...freshDungeon('sight-movement', 1), stats: freshRunStats('since-upgrade') }, position);
+  const after = checkedDungeon(stepDungeon(before, { id: before.id, depth: before.depth, revision: before.revision, destination }));
+  return { before, after, slot };
+}
+
 export function atEncounter(s: DungeonState, slot = s.floors[s.depth-1].completed): DungeonState {
   return slot >= 3 ? s : atCell(s, poiCell(s.floors[s.depth-1].exploration.pois[slot], s.floors[s.depth-1].descriptor.size ?? 20));
 }
@@ -234,7 +276,9 @@ export function shamanJourney(seed = 31) {
     if(!p)throw Error('Shaman witness stalled');battle.finishPresentation(p.token);
   }
   if(battle.state.outcome==='ongoing')throw Error('Shaman witness did not finish');
-  return {seed,entry,state:battle.state,commands:battle.replay?.commands??battle.continuation!.commands,events:battle.events};
+  const replay = battle.replay;
+  if (!replay) throw Error('Fresh Shaman journey did not record a full replay');
+  return {seed,entry,state:battle.state,commands:replay.commands,events:battle.events,replay};
 }
 
 /** Full Fighter acceptance witness; source-backed encounters may require a new deterministic seed. */

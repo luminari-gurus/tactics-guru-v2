@@ -139,6 +139,9 @@ describe('seeded dungeon ground loot', () => {
     const source = checkedDungeon(acceptDungeonBattle(witness.snapshot, final.state));
     const loot = currentFloor(source).loot;
     const start = currentFloor(source);
+    expect(source.phase).toBe('ready');
+    expect(source.offer).toBeNull();
+    expect(start.completed).toBe(3);
     const contact = witness.snapshot.encounterEntry!.contact;
     const map = floorMap(start.descriptor), target = start.descriptor.downstairs;
     expect([contact, start.position]).not.toContain(target);

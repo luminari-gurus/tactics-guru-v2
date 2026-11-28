@@ -21,7 +21,7 @@ const test = base.extend<{ applicationLoadDiagnostics: ApplicationLoadDiagnostic
 });
 const keys={battle:BATTLE_STORAGE_KEYS,run:RUN_STORAGE_KEYS,dungeon:DUNGEON_KEYS};
 
-test('main menu: an unsaved defeat retries history after reload without replaying the summary', async ({ page }) => {
+test('main menu: an unsaved defeat retries history after reload without replaying the summary', { tag: '@desktop-chromium-portrait-webkit' }, async ({ page }) => {
   const lockOwner = await page.context().newPage();
   try {
     await lockOwner.goto('./');
@@ -55,7 +55,7 @@ test('main menu: an unsaved defeat retries history after reload without replayin
   } finally { await lockOwner.close(); }
 });
 
-test('main menu: records display and reviewed export restore reset preserve active saves', async ({ page, isMobile }, info) => {
+test('main menu: records display and reviewed export restore reset preserve active saves', { tag: '@desktop-chromium-portrait-webkit' }, async ({ page, isMobile }, info) => {
   const rows: RunRecord[] = [
     { mode: 'run', id: 'authored-example', outcome: 'defeat', recordedAt: Date.UTC(2026, 10, 10, 12), battlesWon: 1, floorsCleared: null, deepestFloor: null },
     { mode: 'dungeon', id: 'dungeon-example', outcome: 'abandoned', recordedAt: Date.UTC(2026, 10, 10, 13), battlesWon: 6, floorsCleared: 2, deepestFloor: 3 },
@@ -102,7 +102,7 @@ test('main menu: records display and reviewed export restore reset preserve acti
   await activate('Close'); await expect(page.getByRole('button', { name: 'Hall of Records', exact: true })).toBeFocused();
 });
 
-test('main menu: records unavailable storage is honest and leaves gameplay navigation usable', async ({ page, isMobile }) => {
+test('main menu: records unavailable storage is honest and leaves gameplay navigation usable', { tag: '@desktop-chromium-portrait-webkit' }, async ({ page, isMobile }) => {
   await page.addInitScript(slots => {
     const original = Storage.prototype.getItem;
     Storage.prototype.getItem = function(key) {
@@ -132,7 +132,7 @@ test('main menu: records unavailable storage is honest and leaves gameplay navig
   await expect(page.locator('#dungeon-screen')).toContainText('Run history could not be confirmed');
 });
 
-test('main menu: records dungeon replacement withholds exploration until final history finishes', async ({ page }) => {
+test('main menu: records dungeon replacement withholds exploration until final history finishes', { tag: '@desktop-chromium-portrait-webkit' }, async ({ page }) => {
   await page.goto('./'); await page.getByRole('button', { name: 'New Game', exact: true }).click();
   await expect(page.locator('#dungeon-map')).toBeVisible();
   const map = await page.locator('#dungeon-map').elementHandle(); if (!map) throw Error('Missing exploration map');
@@ -158,7 +158,7 @@ test('main menu: records dungeon replacement withholds exploration until final h
   await expect.poll(async () => JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!).revision).toBe(revision + 1);
 });
 
-test('main menu: records replacing distinct saved and unsaved dungeon preserves both after interrupted history', async ({ page, isMobile }, info) => {
+test('main menu: records replacing distinct saved and unsaved dungeon preserves both after interrupted history', { tag: '@desktop-chromium-portrait-webkit' }, async ({ page, isMobile }, info) => {
   const mode = 'dungeon', slots = keys.dungeon, savedPayload = {...JSON.parse(menuFixture(mode)).payload,
     stats:{...freshRunStats(),enemiesKilled:0,movesTaken:6,activeMs:5000}};
   const encoded=encodeDungeon(savedPayload);
@@ -213,33 +213,30 @@ test('main menu: records replacing distinct saved and unsaved dungeon preserves 
   await page.screenshot({ path: info.outputPath('paired-records.png'), fullPage: true });
 });
 
-test('main menu: startup hides proof tools before application modules run',async({page})=>{
- let release!:()=>void;
- let held:Promise<void>;
- await page.route('**/*',async route=>{
-  if(route.request().resourceType()==='script'){await held;await route.abort();}
-  else if(route.request().resourceType()==='stylesheet')await route.abort();
-  else await route.continue();
- });
- try{
-  for(const route of ['', '?game=dungeon', 'dungeon']){
-   held=new Promise<void>(resolve=>{release=resolve;});
-   await page.goto('./'+route,{waitUntil:'commit'});
-   await expect(page.locator('#fit-status')).toBeVisible();
-   await expect(page.locator('#fit-status')).toHaveText('Loading');
-   await expect(page.getByRole('button',{name:'Restart proof scene',exact:true})).not.toBeVisible();
-   await expect(page.getByText('Board controls',{exact:true})).not.toBeVisible();
-   await expect(page.getByText('Measurements',{exact:true})).not.toBeVisible();
-   await expect(page.getByRole('complementary',{name:'Proof scene diagnostics'})).toHaveCount(0);
-   await expect(page.getByRole('complementary',{name:'Game status',exact:true})).toBeVisible();
-   await expect(page.locator('#fit-restart')).not.toBeVisible();
-   await expect(page.locator('#board-caption')).not.toBeVisible();
-   // WebKit waits for navigation to settle before capturing a screenshot.
-   // Reject the held modules after asserting the shell; no app code can run.
-   release();await page.waitForLoadState('load');
-   if(!route)await page.screenshot({path:test.info().outputPath('neutral-startup.png')});
-  }
- }finally{release();await page.unrouteAll({behavior:'wait'});}
+test('main menu: startup hides proof tools before application modules run',async({page,request})=>{
+ await page.route('**/*',route=>
+  ['script','stylesheet'].includes(route.request().resourceType()) ? route.abort() : route.continue());
+ const response=await page.goto('./');
+ if(!response)throw Error('Missing startup document response');
+ expect(response.ok()).toBe(true);
+ const shell=await response.text();
+ // All three entry URLs must serve the same unmounted document.
+ for(const path of ['./?game=dungeon','./dungeon']){
+  const entry=await request.get(path);
+  expect(entry.ok()).toBe(true);
+  expect(entry.headers()['content-type']).toBe(response.headers()['content-type']);
+  expect(await entry.text()).toBe(shell);
+ }
+ await expect(page.locator('#fit-status')).toBeVisible();
+ await expect(page.locator('#fit-status')).toHaveText('Loading');
+ await expect(page.getByRole('button',{name:'Restart proof scene',exact:true})).not.toBeVisible();
+ await expect(page.getByText('Board controls',{exact:true})).not.toBeVisible();
+ await expect(page.getByText('Measurements',{exact:true})).not.toBeVisible();
+ await expect(page.getByRole('complementary',{name:'Proof scene diagnostics'})).toHaveCount(0);
+ await expect(page.getByRole('complementary',{name:'Game status',exact:true})).toBeVisible();
+ await expect(page.locator('#fit-restart')).not.toBeVisible();
+ await expect(page.locator('#board-caption')).not.toBeVisible();
+ await page.screenshot({path:test.info().outputPath('neutral-startup.png')});
 });
 
 test('main menu: failed gameplay imports retain visible recovery without proof tools',async({page})=>{
@@ -308,7 +305,7 @@ test('main menu: read-only root, separate artwork and isolated loading',async({p
   await expect(page.locator('[data-menu-action]')).toHaveText(['Continue','New Game','Hall of Records','Settings']);
  }
 });
-test('main menu: legacy battle and run slots are ignored through launch and dungeon Continue',async({page})=>{
+test('main menu: legacy battle and run slots are ignored through launch and dungeon Continue', { tag: '@desktop-chromium-portrait-webkit' }, async({page,isMobile})=>{
   await page.goto('./?game=dungeon&entry=continue');
   await expect(page.locator('#main-menu')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Continue', exact: true })).toBeDisabled();
@@ -335,13 +332,11 @@ test('main menu: legacy battle and run slots are ignored through launch and dung
   await page.getByRole('link',{name:'Main menu',exact:true}).click();
   await expect(menu).toBeEnabled();
   const getValues = (names: string[]) => page.evaluate(names=>Object.fromEntries(names.map(key=>[key,localStorage.getItem(key)])),names);
-  const watched = [...Object.keys(seed),...Object.values(keys.dungeon),RUN_RECORD_KEYS.backup];
-  const before = await getValues(watched);
-
-  await menu.click();
+  const primary = await page.evaluate(key => localStorage.getItem(key), keys.dungeon.primary);
+  const dungeonId = JSON.parse(primary!).payload.id;
+  if (isMobile) await menu.tap(); else await menu.press('Enter');
   await expect(page).toHaveURL(/[?]game=dungeon$/);
   await expect(page.locator('#dungeon-map')).toBeVisible();
-  const dungeonId = JSON.parse(before[keys.dungeon.primary]!).payload.id;
   expect(JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!).id).toBe(dungeonId);
   await page.reload();
   await expect(page.locator('#dungeon-map')).toBeVisible();
@@ -349,7 +344,7 @@ test('main menu: legacy battle and run slots are ignored through launch and dung
   expect(await getValues(Object.keys(seed))).toEqual(seed);
 });
 
-test('main menu: save recovery lists only the dungeon backup',async({page})=>{
+test('main menu: save recovery lists only the dungeon backup', { tag: '@desktop-chromium-portrait-webkit' }, async({page})=>{
   await page.addInitScript(({keys,battle,run,dungeon})=>{
     localStorage.setItem(keys.battle.primary,battle);
     localStorage.setItem(keys.run.primary,run);
@@ -370,7 +365,7 @@ test('main menu: save recovery lists only the dungeon backup',async({page})=>{
     .toBe(JSON.parse(menuFixture('dungeon')).payload.id);
 });
 
-test('main menu: New Game confirms over the menu and preserves other save families',async({page})=>{
+test('main menu: New Game confirms over the menu and preserves other save families', { tag: '@desktop-chromium-portrait-webkit' }, async({page})=>{
  const text=menuFixture('dungeon');await page.addInitScript(({keys,text})=>{localStorage.setItem(keys.dungeon.backup,text);localStorage.setItem(keys.battle.primary,'battle sentinel');},{keys,text});
  await page.goto('./');await page.getByRole('button',{name:'New Game',exact:true}).click();
  await expect(page.locator('#main-menu')).toBeVisible();await expect(page.getByRole('dialog')).toContainText('Start new dungeon?');
@@ -385,7 +380,7 @@ test('main menu: New Game confirms over the menu and preserves other save famili
   .toMatchObject([{id:JSON.parse(text).payload.id,mode:'dungeon',outcome:'abandoned'}]);
 });
 
-test('main menu: records concurrent confirmed dungeon replacements retain one immutable old result',async({page,context,isMobile})=>{
+test('main menu: records concurrent confirmed dungeon replacements retain one immutable old result', { tag: '@desktop-chromium-portrait-webkit' }, async({page,context,isMobile})=>{
  const saved=menuFixture('dungeon'),id=JSON.parse(saved).payload.id;
  await page.goto('./');await page.evaluate(({keys,saved})=>{
   localStorage.setItem(keys.primary,saved);localStorage.setItem(keys.backup,saved);
@@ -418,7 +413,7 @@ test('main menu: New Game starts immediately when no dungeon save exists',async(
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.battle.primary)).toBe('battle sentinel');
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.run.primary)).toBe('run sentinel');
 });
-test.extend({pinDungeonSeed:13})('main menu: New Game stays playable after retrying an unreadable dungeon save',async({page,isMobile})=>{
+test.extend({pinDungeonSeed:13})('main menu: New Game stays playable after retrying an unreadable dungeon save', { tag: '@desktop-chromium-portrait-webkit' }, async({page,isMobile})=>{
  const corrupt='unreadable dungeon save';
  await page.addInitScript(({key,corrupt})=>localStorage.setItem(key,corrupt),{key:keys.dungeon.primary,corrupt});
  await page.goto('./');
@@ -441,7 +436,7 @@ test.extend({pinDungeonSeed:13})('main menu: New Game stays playable after retry
  await expect(screen).toContainText('Playing unsaved.');
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.dungeon.primary)).toBe(corrupt);
 });
-test('main menu: changed dungeon save requires a fresh confirmation',async({page})=>{
+test('main menu: changed dungeon save requires a fresh confirmation', { tag: '@desktop-chromium-portrait-webkit' }, async({page})=>{
  const text=menuFixture('dungeon');await page.goto('./');await page.evaluate(({key,text})=>localStorage.setItem(key,text),{key:keys.dungeon.primary,text});
  await page.getByRole('button',{name:'New Game',exact:true}).click();
  await page.evaluate(key=>localStorage.setItem(key,'changed while confirming'),keys.dungeon.primary);
@@ -462,22 +457,24 @@ test('main menu: unavailable storage and failed artwork keep native actions usab
  await expect(page.locator('#dungeon-screen')).toContainText('Playing unsaved.');
  await expect(page.getByRole('dialog')).toHaveCount(0);
 });
-test('main menu: portrait composition scrolls at narrow, short and enlarged text sizes',async({page})=>{
+test('main menu: portrait composition scrolls at narrow, short and enlarged text sizes', { tag: '@mobile-portrait' }, async({page})=>{
  await page.goto('./nonexistent');
  await expect(page).toHaveURL(new URL('./', test.info().project.use.baseURL!).href);
  await expect(page.locator('[data-menu-action]')).toHaveCount(4);
  await expect(page.locator('canvas')).toHaveCount(0);
+ await page.evaluate(()=>{document.documentElement.style.fontSize='200%';});
  for(const [width,height] of [[320,568],[915,412],[1280,720]]){
   await page.setViewportSize({width,height});
-  await page.evaluate(()=>{document.documentElement.style.fontSize='200%';});
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   const bounds=await page.locator('#main-menu').boundingBox();expect(bounds!.width).toBeLessThanOrEqual(512);
-  for(const button of await page.locator('[data-menu-action]').all())expect((await button.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  const heights=await page.locator('[data-menu-action]').evaluateAll(buttons=>buttons.map(button=>button.getBoundingClientRect().height));
+  expect(heights).toHaveLength(4);
+  for(const height of heights)expect(height).toBeGreaterThanOrEqual(44);
   await page.getByRole('link',{name:'Map inspection'}).scrollIntoViewIfNeeded();await expect(page.getByRole('link',{name:'Map inspection'})).toBeInViewport();
   await page.screenshot({path:test.info().outputPath(`menu-${width}x${height}.png`),fullPage:true});
  }
 });
-test('main menu: Continue opens recovery when a valid primary is paired with an unreadable backup',async({page})=>{
+test('main menu: Continue opens recovery when a valid primary is paired with an unreadable backup', { tag: '@desktop-chromium-portrait-webkit' }, async({page})=>{
  const primary=menuFixture('dungeon');
  await page.goto('./');
  await page.evaluate(({key,primary})=>localStorage.setItem(key,primary),{key:keys.dungeon.primary,primary});
@@ -503,7 +500,7 @@ test('main menu: Continue opens recovery when a valid primary is paired with an 
  await expect(page.locator('#main-menu')).toBeVisible();
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.dungeon.primary)).toBe(primary);
 });
-test('main menu: failed new-game write retains exportable recovery copies',async({page})=>{
+test('main menu: failed new-game write retains exportable recovery copies', { tag: '@desktop-chromium-portrait-webkit' }, async({page})=>{
  const text=menuFixture('dungeon');
  await page.addInitScript(({key,text})=>{
   localStorage.setItem(key,text);const original=Storage.prototype.setItem;
@@ -517,7 +514,7 @@ test('main menu: failed new-game write retains exportable recovery copies',async
  expect(await page.evaluate(key=>localStorage.getItem(key),keys.dungeon.primary)).toBe(text);
 });
 
-for(const path of ['unsaved play','failed replacement'] as const)test(`main menu: dungeon departure after rejected movement retains ${path} warning`,async({page})=>{
+for(const path of ['unsaved play','failed replacement'] as const)test(`main menu: dungeon departure after rejected movement retains ${path} warning`, { tag: '@desktop-chromium-portrait-webkit' }, async({page})=>{
  // Departure flushes playtime independently of rejected movement and export.
  await page.addInitScript(()=>{document.hasFocus=()=>false;});
  if(path==='failed replacement')await page.addInitScript(()=>{const set=Storage.prototype.setItem;Storage.prototype.setItem=function(key,value){if(key.includes(':dungeon:'))throw new DOMException('full','QuotaExceededError');set.call(this,key,value);};});
@@ -543,6 +540,10 @@ for(const path of ['unsaved play','failed replacement'] as const)test(`main menu
  }
  const before=await page.locator('#game').getAttribute('data-dungeon-snapshot');
  expect(JSON.parse(before!).phase).toBe('ready');await expect(page.locator('#dungeon-map')).toBeVisible();
+ if(path==='unsaved play'){
+  expect(JSON.parse(before!).seed).toBe(13);
+  expect(await page.evaluate(()=>Object.keys(localStorage).filter(key=>key.includes(':dungeon:')))).toEqual([]);
+ }
  const blocked=await page.locator('.dungeon-directions button:disabled').first().getAttribute('aria-label');
  const arrows:Record<string,string>={North:'ArrowUp',East:'ArrowRight',South:'ArrowDown',West:'ArrowLeft'};
  await page.locator('#dungeon-map').press(arrows[blocked!]);

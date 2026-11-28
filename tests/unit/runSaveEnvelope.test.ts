@@ -75,6 +75,11 @@ it('roundtrips enemy healing and active Weakened in a controlled run roster with
   const snapshot={...prepared,activeBattle:healed.state,battlefield:created.battlefield};
   const encoded=encodeRunSave(snapshot,context);assert(encoded.ok);
   const decoded=decodeRunSave(encoded.text,context);assert(decoded.ok);expect(decoded.state).toEqual(snapshot);
+  const capped = { ...snapshot, activeBattle: { ...healed.state, units: healed.state.units.map(unit => unit.id === source.id
+    ? { ...unit, healGoblinRemaining: 1 } : unit) } };
+  expect(encodeRunSave(capped, context)).toEqual({ ok: false, reason: 'invalidState' });
+  const { digest: _, ...body } = { ...JSON.parse(encoded.text), payload: capped };
+  expect(decodeRunSave(JSON.stringify({ ...body, digest: hashJson(body) }), context)).toEqual({ ok: false, reason: 'invalidState' });
   const target=healed.state.units.find(u=>u.side==='player')!,active={...healed.state,activeIndex:healed.state.initiative.indexOf(target.id)};
   const wait={type:'endTurn' as const,unitId:target.id};
   expect(dispatch({...decoded.state.activeBattle!,activeIndex:active.activeIndex},wait,created.catalog)).toEqual(dispatch(active,wait,created.catalog));

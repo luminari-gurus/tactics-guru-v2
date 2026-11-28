@@ -19,6 +19,7 @@ export const RULE_BOUNDS = {
   hp: { min: 0 },
 } as const;
 export const D20_SIDES = 20;
+export const HEAL_GOBLIN_CAST_LIMIT = 2;
 export const UINT32_RANGE = 0x100000000;
 export const RNG_WARMUP_DRAWS = 12;
 /** Legacy cardinal enumeration; search breaks frontier ties by cost, y, then x. */

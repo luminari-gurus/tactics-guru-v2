@@ -104,7 +104,7 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
   const keepParty=previousParty?.key===partyKey&&previousParty.node.parentElement===sidebar;
   for(const child of [...sidebar.children])if(!keepParty||child!==previousParty.node)child.remove();
   const itemTargets = new Map([...after.querySelectorAll('select')].map(select => [select.id, select.value]));
-  after.replaceChildren();
+  const previousInventory = after.querySelector<HTMLDetailsElement>('#dungeon-inventory');
   const disclosure = (id: string, label: string) => {
     const panel = el('details'), summary = el('summary', label);
     panel.id = id;
@@ -124,14 +124,6 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
   mapView.render(s,floorMap(floor.descriptor, cache),session.lootStatus);
   const canEnter=s.phase==='ready'&&floor.completed<3&&floor.exploration.pois.some(p=>!clearedDungeonSlots(floor).includes(p.encounterSlot)&&floor.position===poiCell(p, floor.descriptor.size ?? 20));
   if(canEnter)sidebar.prepend(button('Enter encounter',actions.start,false,'dungeon-start-encounter'));
-  const travel=disclosure('dungeon-travel','Travel and map guide');
-  travel.append(
-    el('p','Use the direction buttons around the map, tap an adjacent cell, or press the arrow keys or WASD (when enabled) to move. Scroll within the map to inspect the floor; the view follows your next step. Enemies move when you move.'),
-    el('p','● Player · M encounter or guardian · ◆ loot · ✓ cleared · ↑ upstairs · ↓ downstairs. Hatching marks remembered terrain.'),
-    el('p','Attempt to enter an uncleared enemy square to start combat before moving. Clear all three encounters to unlock descent. Loot can be left behind without blocking travel.'),
-    el('p','Stepping onto loot collects what fits. Remaining items stay on the ground. Freeing inventory space while standing on a pile retries pickup without moving enemies. Loot does not equip gear or use healing items.'),
-    el('p','Move onto an available stair to travel automatically. On arrival or after continuing a save, step off and back onto the stair to travel again. Upstairs is unavailable on floor 1.'),
-  );
   const { catalog, items } = dungeonContent;
   if(!keepParty){
   const party = el('section');
@@ -206,7 +198,10 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
   sidebar.append(party);
   partyPresentations.set(sidebar,{key:partyKey,node:party});
   }
-  const inventory=disclosure('dungeon-inventory','Owned items');
+  const emptyInventory = !s.ownership.consumables.length && !s.ownership.equipment.length;
+  // Empty inventory has no commands bound to a revision. Keep its disclosure and focus.
+  const reuseInventory = emptyInventory && previousInventory?.dataset.empty === 'true';
+  const inventory = reuseInventory ? previousInventory : disclosure('dungeon-inventory','Owned items');
   if(s.offer){const rewards=el('section');rewards.setAttribute('aria-label','Rewards');rewards.append(el('h2','Saved reward choice'));
     const nextStep = floor.completed === 3 ? 'unlock descent' : 'prepare the next encounter';
     for(const o of s.offer.options){const command:DungeonItemCommand={...dungeonBoundary(s),type:'claimReward',offerId:s.offer.id,itemId:o.itemId};rewards.append(button(`Claim ${dungeonContent.items[o.itemId].label}`,()=>review(`Claim ${dungeonContent.items[o.itemId].label} and ${nextStep}?`,command)));}
@@ -223,46 +218,63 @@ export function renderDungeon(root: HTMLElement, s: DungeonState, session: Dunge
     }
     header.append(rewards);
   }
-  inventory.append(el('p',`Charms ${s.ownership.equipment.length}/${ITEM_BOUNDS.equipmentInstances.max} · Discard a charm with confirmation to free space.`));
-  if(!s.ownership.consumables.length&&!s.ownership.equipment.length)inventory.append(el('p','No owned items yet.'));
-  for(const entry of [...s.ownership.consumables,...s.ownership.equipment]){
-    const def=dungeonContent.items[entry.itemId],row=el('div'),select=el('select');select.setAttribute('aria-label',`${def.label} target`);
-    const itemKey = 'quantity' in entry ? entry.itemId : entry.instanceId;
-    for(const h of s.party){
-      const preview=preparationItemTarget(def,h,s.party);
-      const o=el('option',preview.ok?h.heroId:`${h.heroId} (${preview.reason})`);
-      o.value=h.heroId;o.disabled=!preview.ok;select.append(o);
+  if (!reuseInventory) {
+    inventory.append(el('p',`Charms ${s.ownership.equipment.length}/${ITEM_BOUNDS.equipmentInstances.max} · Discard a charm with confirmation to free space.`));
+    if(!s.ownership.consumables.length&&!s.ownership.equipment.length)inventory.append(el('p','No owned items yet.'));
+    for(const entry of [...s.ownership.consumables,...s.ownership.equipment]){
+      const def=dungeonContent.items[entry.itemId],row=el('div'),select=el('select');select.setAttribute('aria-label',`${def.label} target`);
+      const itemKey = 'quantity' in entry ? entry.itemId : entry.instanceId;
+      for(const h of s.party){
+        const preview=preparationItemTarget(def,h,s.party);
+        const o=el('option',preview.ok?h.heroId:`${h.heroId} (${preview.reason})`);
+        o.value=h.heroId;o.disabled=!preview.ok;select.append(o);
+      }
+      select.id = `dungeon-target-${itemKey}`;
+      const enabledOptions = [...select.options].filter(option => !option.disabled);
+      select.value = (enabledOptions.find(option => option.value === itemTargets.get(select.id)) ?? enabledOptions[0])?.value ?? '';
+      row.append(el('p',`${def.label}${'quantity'in entry?` ×${entry.quantity}`:''}`),select);
+      if('quantity'in entry){
+        row.append(button(`Use ${def.label}`,()=>{
+          const hero=s.party.find(h=>h.heroId===select.value);
+          if(!hero)return;
+          const preview=preparationItemTarget(def,hero,s.party);
+          const result=preview.ok?`${hero.heroId} will have ${preview.hp}/${hero.maxHp} HP.`:`${hero.heroId} cannot use this item (${preview.reason}).`;
+          review(`Use ${def.label} on ${hero.heroId}? ${result}`,
+            {...dungeonBoundary(s),type:'useItem',itemId:def.id,heroId:hero.heroId});
+        },!select.value||!['ready','reward'].includes(s.phase),`dungeon-use-${itemKey}`));
+      }
+      else if(def.kind==='equipment'){row.dataset.instanceId=entry.instanceId;const instanceId=entry.instanceId,assignment=s.ownership.assignments.find(a=>a.instanceId===instanceId);
+        row.append(button(assignment?`Unequip ${def.label}`:`Equip ${def.label}`,()=>review(`${assignment?'Unequip':'Equip'} ${def.label}?`,{...dungeonBoundary(s),type:assignment?'unequipItem':'equipItem',instanceId,heroId:assignment?.heroId??select.value as HeroId,slot:def.slot}),(!assignment&&!select.value)||!['ready','reward'].includes(s.phase),`dungeon-equip-${itemKey}`));}
+      if('instanceId'in entry){
+        const command:DungeonItemCommand={...dungeonBoundary(s),type:'discardEquipment',instanceId:entry.instanceId};
+        const assignment=s.ownership.assignments.find(a=>a.instanceId===entry.instanceId);
+        const focus=()=>root.querySelector<HTMLElement>('h1')?.focus();
+        row.append(button(`Discard ${def.label}`,()=>dialogs.showChoices('Discard charm?',`Permanently discard ${def.label}${assignment?` and unequip it from ${assignment.heroId}`:''}? No item or currency is received.`,[
+          {id:'dungeon-discard-cancel',label:'Cancel',run:focus},
+          {id:'dungeon-discard-confirm',label:'Discard charm',run:async()=>{await session.dispatch(command);focus();}},
+        ],focus),!['ready','reward'].includes(s.phase),`dungeon-discard-${itemKey}`));
+      }
+      inventory.append(row);
     }
-    select.id = `dungeon-target-${itemKey}`;
-    const enabledOptions = [...select.options].filter(option => !option.disabled);
-    select.value = (enabledOptions.find(option => option.value === itemTargets.get(select.id)) ?? enabledOptions[0])?.value ?? '';
-    row.append(el('p',`${def.label}${'quantity'in entry?` ×${entry.quantity}`:''}`),select);
-    if('quantity'in entry){
-      row.append(button(`Use ${def.label}`,()=>{
-        const hero=s.party.find(h=>h.heroId===select.value);
-        if(!hero)return;
-        const preview=preparationItemTarget(def,hero,s.party);
-        const result=preview.ok?`${hero.heroId} will have ${preview.hp}/${hero.maxHp} HP.`:`${hero.heroId} cannot use this item (${preview.reason}).`;
-        review(`Use ${def.label} on ${hero.heroId}? ${result}`,
-          {...dungeonBoundary(s),type:'useItem',itemId:def.id,heroId:hero.heroId});
-      },!select.value||!['ready','reward'].includes(s.phase),`dungeon-use-${itemKey}`));
-    }
-    else if(def.kind==='equipment'){row.dataset.instanceId=entry.instanceId;const instanceId=entry.instanceId,assignment=s.ownership.assignments.find(a=>a.instanceId===instanceId);
-      row.append(button(assignment?`Unequip ${def.label}`:`Equip ${def.label}`,()=>review(`${assignment?'Unequip':'Equip'} ${def.label}?`,{...dungeonBoundary(s),type:assignment?'unequipItem':'equipItem',instanceId,heroId:assignment?.heroId??select.value as HeroId,slot:def.slot}),(!assignment&&!select.value)||!['ready','reward'].includes(s.phase),`dungeon-equip-${itemKey}`));}
-    if('instanceId'in entry){
-      const command:DungeonItemCommand={...dungeonBoundary(s),type:'discardEquipment',instanceId:entry.instanceId};
-      const assignment=s.ownership.assignments.find(a=>a.instanceId===entry.instanceId);
-      const focus=()=>root.querySelector<HTMLElement>('h1')?.focus();
-      row.append(button(`Discard ${def.label}`,()=>dialogs.showChoices('Discard charm?',`Permanently discard ${def.label}${assignment?` and unequip it from ${assignment.heroId}`:''}? No item or currency is received.`,[
-        {id:'dungeon-discard-cancel',label:'Cancel',run:focus},
-        {id:'dungeon-discard-confirm',label:'Discard charm',run:async()=>{await session.dispatch(command);focus();}},
-      ],focus),!['ready','reward'].includes(s.phase),`dungeon-discard-${itemKey}`));
-    }
-    inventory.append(row);
-  }after.append(inventory,travel);
-  if(actions.recover)after.append(button('Save recovery',actions.recover,false,'dungeon-recovery'));
-  after.append(button('Start new dungeon',actions.restart,false,'dungeon-restart'));
-  const nav=el('nav');for(const [path,label] of [['run','Three-battle scenario'],['battle','Single battle'],['map','Map prototype']]){const a=el('a',label);a.href=`${import.meta.env.BASE_URL}${path}`;a.id=`dungeon-link-${path}`;nav.append(a);}after.append(nav);
+    inventory.dataset.empty = String(emptyInventory);
+    if (previousInventory) previousInventory.replaceWith(inventory);
+    else after.prepend(inventory);
+  }
+  if (!after.querySelector('#dungeon-travel')) {
+    const travel=disclosure('dungeon-travel','Travel and map guide');
+    travel.append(
+      el('p','Use the direction buttons around the map, tap an adjacent cell, or press the arrow keys or WASD (when enabled) to move. Scroll within the map to inspect the floor; the view follows your next step. Enemies move when you move.'),
+      el('p','● Player · M encounter or guardian · ◆ loot · ✓ cleared · ↑ upstairs · ↓ downstairs. Hatching marks remembered terrain.'),
+      el('p','Attempt to enter an uncleared enemy square to start combat before moving. Clear all three encounters to unlock descent. Loot can be left behind without blocking travel.'),
+      el('p','Stepping onto loot collects what fits. Remaining items stay on the ground. Freeing inventory space while standing on a pile retries pickup without moving enemies. Loot does not equip gear or use healing items.'),
+      el('p','Move onto an available stair to travel automatically. On arrival or after continuing a save, step off and back onto the stair to travel again. Upstairs is unavailable on floor 1.'),
+    );
+    after.append(travel);
+    if(actions.recover)after.append(button('Save recovery',actions.recover,false,'dungeon-recovery'));
+    after.append(button('Start new dungeon',actions.restart,false,'dungeon-restart'));
+    const nav=el('nav');for(const [path,label] of [['run','Three-battle scenario'],['battle','Single battle'],['map','Map prototype']]){const a=el('a',label);a.href=`${import.meta.env.BASE_URL}${path}`;a.id=`dungeon-link-${path}`;nav.append(a);}after.append(nav);
+  }
+  mapView.fitPendingViewport();
   if (active && focusId && (document.activeElement !== active || active.matches(':disabled'))) {
     const target = root.querySelector<HTMLElement>(`#${CSS.escape(focusId)}`);
     const focusTarget = target && !target.matches(':disabled') ? target : root.querySelector<HTMLElement>('#dungeon-map');

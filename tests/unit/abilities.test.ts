@@ -115,6 +115,57 @@ function shamanSetup(secondShaman = false) {
   const state = activate({ ...created.state, units: created.state.units.map((u,i) => ({ ...u, cell: cells[i] })) }, 6);
   assert(readBattleState(state, catalog).ok); return { catalog, state };
 }
+it('spends only successful Heal Goblin casts and keeps two Shamans independent', () => {
+  const { catalog, state } = shamanSetup(true);
+  const initial = freeze({
+    ...state, units: state.units.map(unit => unit.defId === 'goblin_shaman'
+      ? { ...unit, healGoblinRemaining: 2 } : unit.id === 4 ? { ...unit, hp: 1 } : unit),
+  });
+  const otherShaman = { ...healGoblin, target: { unitId: 5 } };
+  expect(dispatch(initial, otherShaman, catalog)).toEqual({ ok: false, reason: 'fullHealth' });
+  expect(initial.units.find(unit => unit.id === 6)?.healGoblinRemaining).toBe(2);
+
+  const first = dispatch(initial, healGoblin, catalog);
+  assert(first.ok);
+  expect(first.events).toContainEqual({ type: 'healed', unitId: 4, healing: 4, hp: 5 });
+  expect(first.state.units.find(unit => unit.id === 6)).toMatchObject({ hasActed: true, healGoblinRemaining: 1 });
+  expect(first.state.rng).toEqual(initial.rng);
+  expect(first.state.units.find(unit => unit.id === 5)?.healGoblinRemaining).toBe(2);
+
+  const wounded = { ...first.state, units: first.state.units.map(unit => unit.id === 5 ? { ...unit, hp: unit.hp - 1 } : unit) };
+  const second = dispatch(activate(wounded, 6), otherShaman, catalog);
+  assert(second.ok);
+  expect(second.events).toContainEqual({ type: 'healed', unitId: 5, healing: 1, hp: catalog.enemies.goblin_shaman.stats.maxHp });
+  expect(second.state.units.find(unit => unit.id === 6)).toMatchObject({ hasActed: true, healGoblinRemaining: 0 });
+  expect(second.state.rng).toEqual(initial.rng);
+  const exhausted = freeze(activate(second.state, 6));
+  const before = structuredClone(exhausted);
+  expect(previewSupportAbility(exhausted, healGoblin, catalog)).toEqual({ ok: false, reason: 'useExhausted' });
+  expect(dispatch(exhausted, healGoblin, catalog)).toEqual({ ok: false, reason: 'useExhausted' });
+  expect(exhausted).toEqual(before);
+
+  const independent = dispatch(activate(exhausted, 5), { ...healGoblin, unitId: 5 }, catalog);
+  assert(independent.ok);
+  expect(independent.state.units.filter(unit => unit.defId === 'goblin_shaman').map(unit => unit.healGoblinRemaining))
+    .toEqual([1, 0]);
+});
+
+it('validates bounded counters only on Shamans and requires a complete capped roster', () => {
+  const { catalog, state } = shamanSetup(true);
+  const capped = { ...state, units: state.units.map(unit => unit.defId === 'goblin_shaman'
+    ? { ...unit, healGoblinRemaining: 2 } : unit) };
+  expect(readBattleState(capped, catalog).ok).toBe(true);
+  const patch = (id: number, value: unknown, commandCount = 1) => ({
+    ...capped, commandCount, units: capped.units.map(unit => unit.id === id ? { ...unit, healGoblinRemaining: value } : unit),
+  });
+  for (const invalid of [undefined, null, -1, 3, 1.5, '1']) expect(readBattleState(patch(5, invalid), catalog).ok).toBe(false);
+  expect(readBattleState(patch(4, 2), catalog).ok).toBe(false);
+  expect(readBattleState(patch(6, 1, 0), catalog).ok).toBe(false);
+  const mixed = { ...capped, units: capped.units.map(unit => unit.id === 5 ? state.units.find(old => old.id === 5)! : unit) };
+  expect(readBattleState(mixed, catalog).ok).toBe(false);
+  expect(readBattleState(patch(6, 0), catalog).ok).toBe(true);
+});
+
 it('Hex previews every face exactly, saves on equality, spends one action/d20 and otherwise changes only accuracy', () => {
   for (let natural = 1; natural <= 20; natural++) {
     const { catalog, state } = shamanSetup(), before = freeze(naturalState(state, natural));

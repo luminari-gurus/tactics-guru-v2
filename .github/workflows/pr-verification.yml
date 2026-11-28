@@ -9,17 +9,81 @@ on:
         default: false
 permissions:
   contents: read
-concurrency:
-  group: tactics-browser-tactics-browser-01
-  queue: max
-  cancel-in-progress: false
 jobs:
+  supersede:
+    # This job only reads PR metadata and cancels obsolete verification runs.
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      actions: write
+      pull-requests: read
+    outputs:
+      current: ${{ steps.cancel.outputs.current }}
+    steps:
+      - name: Cancel verification for superseded PR commits
+        id: cancel
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const pullRequest = { ...context.repo, pull_number: pr.number };
+            const isCurrent = async () => {
+              const { data } = await github.rest.pulls.get(pullRequest);
+              return data.state === 'open' && data.head.sha === pr.head.sha;
+            };
+            if (!await isCurrent()) return;
+
+            const active = ['requested', 'queued', 'pending', 'waiting', 'in_progress'];
+            const pages = await Promise.all(active.map(status => github.paginate(
+              github.rest.actions.listWorkflowRuns,
+              { ...context.repo, workflow_id: 'pr-verification.yml', event: 'pull_request',
+                branch: pr.head.ref, status, per_page: 100 }
+            )));
+            const seen = new Set();
+            for (const run of pages.flat()) {
+              if (seen.has(run.id) || run.id === context.runId || run.head_sha === pr.head.sha ||
+                  run.head_repository?.id !== pr.head.repo.id ||
+                  !run.pull_requests?.some(candidate => candidate.id === pr.id)) continue;
+              seen.add(run.id);
+              if (!await isCurrent()) return;
+              try {
+                await github.rest.actions.cancelWorkflowRun({ ...context.repo, run_id: run.id });
+              } catch (error) {
+                // The run may have completed or begun cancellation after listing.
+                if (error.status !== 409) throw error;
+              }
+            }
+            core.setOutput('current', await isCurrent());
   verify:
+    needs: supersede
     # Never execute untrusted fork code on a persistent self-hosted machine.
-    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    if: >-
+      !cancelled() && (github.event_name == 'workflow_dispatch' ||
+        (github.event.pull_request.head.repo.full_name == github.repository &&
+         needs.supersede.outputs.current == 'true'))
+    permissions:
+      contents: read
+      pull-requests: read
     runs-on: [self-hosted, tactics-browser, tactics-browser-01]
     timeout-minutes: 10
+    concurrency:
+      # Share VM 01 with manual browser workflows without cancelling them.
+      group: tactics-browser-tactics-browser-01
+      queue: max
+      cancel-in-progress: false
     steps:
+      # A job-only rerun can reuse a successful supersede result from its original attempt.
+      - name: Check that the PR commit is still current
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const { data } = await github.rest.pulls.get({ ...context.repo, pull_number: pr.number });
+            if (data.state !== 'open' || data.head.sha !== pr.head.sha) {
+              core.setFailed('This PR commit has been superseded.');
+            }
       - name: Check host disposition
         run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
       - uses: actions/checkout@v4

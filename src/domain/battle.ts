@@ -1,6 +1,6 @@
 import { CONTENT_BOUNDS, ENEMY_IDS, HERO_IDS } from '../content/constants';
 import type { ContentCatalog } from '../content/types';
-import { RNG_VERSION, RNG_WARMUP_DRAWS, RULES_VERSION, RULE_BOUNDS, STATE_FORMAT_VERSION, BASE_REPLAY_FORMAT_VERSION, REPLAY_FORMAT_VERSION, DRAUGHT_REPLAY_FORMAT_VERSION, UINT32_RANGE } from './constants';
+import { RNG_VERSION, RNG_WARMUP_DRAWS, RULES_VERSION, RULE_BOUNDS, STATE_FORMAT_VERSION, BASE_REPLAY_FORMAT_VERSION, REPLAY_FORMAT_VERSION, DRAUGHT_REPLAY_FORMAT_VERSION, HEAL_GOBLIN_CAST_LIMIT, UINT32_RANGE } from './constants';
 import { isIntegerIn, isRngState } from './rng';
 import type { BattleState, Command, CommandPreview, Replay, UnitState, Versions } from './types';
 import { hashJson, rulesContent } from './contentIdentity';
@@ -28,6 +28,9 @@ function versions(v: unknown, content: string): v is Versions {
 }
 function clone<T>(value: T): T { return JSON.parse(JSON.stringify(value)) as T; }
 export type StateRead = { readonly ok: true; readonly state: BattleState } | { readonly ok: false; readonly reason: 'invalidState' };
+export function hasHealGoblinCap(units: readonly UnitState[]): boolean {
+  return units.some(unit => unit.healGoblinRemaining !== undefined);
+}
 /** Untrusted snapshot validation, using only runtime-relevant references in a trusted catalog. */
 export function readBattleState(input: unknown, catalog: ContentCatalog): StateRead {
   const bad = { ok: false, reason: 'invalidState' } as const;
@@ -53,10 +56,14 @@ export function readBattleState(input: unknown, catalog: ContentCatalog): StateR
     if (u !== null && typeof u === 'object' && Object.hasOwn(u, 'guarded')) unitKeys.push('guarded');
     if (u !== null && typeof u === 'object' && Object.hasOwn(u, 'secondWindUsed')) unitKeys.push('secondWindUsed');
     if (u !== null && typeof u === 'object' && Object.hasOwn(u, 'tauntedBy')) unitKeys.push('tauntedBy');
-    for (const field of ['markedBy','movementBlock','weakenedBy']) if (u !== null && typeof u === 'object' && Object.hasOwn(u, field)) unitKeys.push(field);
+    for (const field of ['markedBy','movementBlock','weakenedBy','healGoblinRemaining']) if (u !== null && typeof u === 'object' && Object.hasOwn(u, field)) unitKeys.push(field);
     if (!shape(u, unitKeys) || (Object.hasOwn(u, 'guarded') && (u.guarded !== true || u.side !== 'player' || u.defId !== 'fighter')) ||
       (Object.hasOwn(u, 'secondWindUsed') && (u.secondWindUsed !== true || u.side !== 'player' || u.defId !== 'fighter' ||
         !Object.values(catalog.abilities).some(a=>a.kind==='secondWind' && a.owners.includes('fighter')))) ||
+      (Object.hasOwn(u, 'healGoblinRemaining') && (u.side !== 'enemy' || u.defId !== 'goblin_shaman' ||
+        catalog.abilities['ability:heal_goblin']?.kind !== 'healGoblin' ||
+        !isIntegerIn(u.healGoblinRemaining, { min: 0, max: HEAL_GOBLIN_CAST_LIMIT }) ||
+        (input.commandCount === 0 && u.healGoblinRemaining !== HEAL_GOBLIN_CAST_LIMIT))) ||
       (Object.hasOwn(u, 'tauntedBy') && (!unitId(u.tauntedBy) || u.side !== 'enemy' || u.hp === 0)) ||
       (Object.hasOwn(u, 'markedBy') && (!unitId(u.markedBy) || u.side !== 'enemy' || u.hp === 0)) ||
       (Object.hasOwn(u, 'weakenedBy') && (!unitId(u.weakenedBy) || u.side !== 'player' || u.hp === 0)) ||
@@ -79,6 +86,8 @@ export function readBattleState(input: unknown, catalog: ContentCatalog): StateR
     ids.add(u.id); previous = u.id;
     units.push(u as unknown as UnitState);
   }
+  if (hasHealGoblinCap(units) && units.some(unit => unit.defId === 'goblin_shaman' &&
+    unit.healGoblinRemaining === undefined)) return bad;
   for (const u of units) if (u.tauntedBy !== undefined) {
     const source = units.find(s=>s.id===u.tauntedBy);
     if (!source || source.hp===0 || source.side!=='player' || source.defId!=='fighter' ||

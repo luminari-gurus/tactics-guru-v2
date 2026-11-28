@@ -6,19 +6,22 @@ import { neighbors, poiCell } from '../../src/domain/exploration';
 import { clearedDungeonSlots, floorMap } from '../../src/domain/dungeon';
 import { dungeonContactDetour } from './dungeonFixtures';
 import { DUNGEON_KEYS } from '../../src/persistence/dungeonStorage';
-export async function openDungeonWithStorage(page: Page, entries: Record<string, string>) {
+// Most accepted steps publish on the next frame. Back off if storage or combat takes longer.
+const dungeonStepPoll = { intervals: [16, 32, 64, 100, 250, 500, 1000] };
+
+export async function openDungeonWithStorage(page: Page, entries: Record<string, string>, url = './?game=dungeon') {
  await page.addInitScript(({ values, marker }) => {
   // Reload and recovery must read the checkpoint written by the application.
   if (window !== window.top || sessionStorage.getItem(marker)) return;
   for (const [key, value] of Object.entries(values)) localStorage.setItem(key, value);
   sessionStorage.setItem(marker, '1');
  }, { values: entries, marker: `test:dungeon-fixture:${crypto.randomUUID()}` });
- await page.goto('./?game=dungeon');
+ await page.goto(url);
 }
-export async function openSavedDungeon(page: Page, state: DungeonState) {
+export async function openSavedDungeon(page: Page, state: DungeonState, url?: string) {
  const saved = encodeDungeon(state);
  if (!saved.ok) throw Error(saved.reason);
- await openDungeonWithStorage(page, { [DUNGEON_KEYS.primary]: saved.text });
+ await openDungeonWithStorage(page, { [DUNGEON_KEYS.primary]: saved.text }, url);
  await expectDungeonResumed(page);
 }
 export async function dungeonSnapshot(page: Page): Promise<DungeonState> { return JSON.parse((await page.locator('#game').getAttribute('data-dungeon-snapshot'))!); }
@@ -31,7 +34,7 @@ export async function acceptedDungeonSnapshot(page: Page, before: Pick<DungeonSt
     const ok = !!s && (!before || s.id !== before.id || (expected === undefined ? s.revision > before.revision : s.revision === expected));
     if (ok) accepted = s;
     return ok;
-  }).toBe(true);
+  }, dungeonStepPoll).toBe(true);
   return accepted!;
 }
 /** Drain storage writes queued behind the dungeon save lock before asserting that nothing changed. */
@@ -64,8 +67,9 @@ export async function walkDungeon(page: Page, target?: number, mode: 'keyboard'|
   const targetPoi=target===undefined ? undefined : floor.exploration.pois.find(p=>poiCell(p,floor.descriptor.size ?? 20)===target&&!clearedDungeonSlots(floor).includes(p.encounterSlot));
   const path:number[]=[];
   const seen=new Set<string>();let detour:number[]=[];
+  let current = initial;
   for(let attempt=0;attempt<400;attempt++) {
-    const s=await dungeonSnapshot(page), f=s.floors[s.depth-1];
+    const s=current, f=s.floors[s.depth-1];
     if(s.depth!==initial.depth||s.phase!=='ready')return path;
     const width=f.descriptor.size ?? 20;
     const live=f.exploration.pois.filter(p=>!clearedDungeonSlots(f).includes(p.encounterSlot));
@@ -101,15 +105,14 @@ export async function walkDungeon(page: Page, target?: number, mode: 'keyboard'|
     // Encounter contact interrupts the attempted step. Wait for the accepted
     // boundary without treating the destination as a completed exploration move.
     await expect.poll(async () => {
-      const after=await dungeonSnapshot(page);
-      return after.floors[s.depth-1].position===n || (after.phase==='battle' &&
-        after.encounterEntry?.origin===f.position && after.encounterEntry.contact===n);
-    }).toBe(true);
+      current=await dungeonSnapshot(page);
+      return current.floors[s.depth-1].position===n || (current.phase==='battle' &&
+        current.encounterEntry?.origin===f.position && current.encounterEntry.contact===n);
+    }, dungeonStepPoll).toBe(true);
     path.push(n);
-    const after=await dungeonSnapshot(page);
-    if(after.phase==='battle') {
-      expect(after.floors[s.depth-1].position).toBe(f.position);
-      expect(after.encounterEntry).toMatchObject({origin:f.position,contact:n});
+    if(current.phase==='battle') {
+      expect(current.floors[s.depth-1].position).toBe(f.position);
+      expect(current.encounterEntry).toMatchObject({origin:f.position,contact:n});
       return path;
     }
   }

@@ -1,8 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
-import base, { redundantFloorJourneys } from './playwright.regression.config';
+import base, { redundantProfileJourneys } from './playwright.regression.config';
 export default defineConfig({ ...base,
   // Native tab-focus witness is Chromium-only: WebKit's driver forces focus.
-  grepInvert: [/statistics: (actual background|Chromium BFCache)/, ...redundantFloorJourneys],
+  grepInvert: [/statistics: (actual background|Chromium BFCache)/, ...redundantProfileJourneys],
   testMatch: ['**/dungeon-exploration.spec.ts','**/dungeon.spec.ts','**/dungeon-lifecycle.spec.ts','**/dungeon-loot.spec.ts'],
   outputDir: 'test-results-webkit',
   use: { ...base.use, launchOptions: {} },

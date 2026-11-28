@@ -42,6 +42,16 @@ export const OPTIONAL_ENEMY_IDS = [
   'frost_gnawer', 'icebound_raider', 'snowblind_crow', 'drift_archer', 'rime_shaman',
   'glacier_ram', 'ice_wraith', 'yeti_bruiser', 'aurora_seer', 'frostforge_sentinel',
   'hroth_whitehorn_king',
+  'sand_jackal', 'dune_archer', 'mirage_pup', 'saltbone_howler', 'dune_jackal',
+  'sand_bandit', 'scarab_swarm', 'mirage_adept', 'camel_lancer', 'sand_mummy',
+  'glass_viper', 'obelisk_guardian', 'sandstorm_djinn', 'caravan_reaver',
+  'sirocco_jackal_king', 'saffron_colossus',
+  'salt_rat', 'tide_crab', 'gull_harrier', 'net_caster', 'stormcaller_acolyte',
+  'reef_stalker', 'deckbreaker', 'siren_shade', 'barnacle_golem', 'blackwake_captain',
+  'admiral_blackwake',
+  'ruin_squire', 'crossbow_levy', 'rubble_imp', 'gate_warden', 'siege_engineer',
+  'banner_knight', 'arcane_bailiff', 'gargoyle_sentinel', 'iron_ram', 'crownless_champion',
+  'crownless_regent',
 ] as const;
 export const ENEMY_IDS = [...CORE_ENEMY_IDS, ...OPTIONAL_ENEMY_IDS] as const;
 export const BASIC_ATTACK_OPTIONAL_ENEMY_IDS = [
@@ -71,12 +81,25 @@ export const BASIC_ATTACK_OPTIONAL_ENEMY_IDS = [
   'frost_gnawer', 'icebound_raider', 'snowblind_crow', 'glacier_ram',
   'yeti_bruiser', 'frostforge_sentinel',
   'hroth_whitehorn_king',
+  'sand_jackal', 'mirage_pup', 'saltbone_howler', 'dune_jackal',
+  'sand_bandit', 'scarab_swarm', 'camel_lancer', 'sand_mummy',
+  'glass_viper', 'obelisk_guardian', 'caravan_reaver',
+  'sirocco_jackal_king', 'saffron_colossus',
+  'salt_rat', 'tide_crab', 'gull_harrier', 'reef_stalker',
+  'deckbreaker', 'barnacle_golem', 'blackwake_captain',
+  'admiral_blackwake',
+  'ruin_squire', 'rubble_imp', 'gate_warden', 'banner_knight',
+  'gargoyle_sentinel', 'iron_ram', 'crownless_champion',
+  'crownless_regent',
 ] as const;
 export const SHORTBOW_OPTIONAL_ENEMY_IDS = [
   'ruin_lookout', 'cinder_archer', 'fungus_slinger', 'crystal_hermit', 'sling_sapper', 'quarry_vulture',
   'shard_hurler', 'skeleton_archer',
   'ember_cultist', 'pyre_oracle', 'smoke_wisp',
   'drift_archer', 'rime_shaman', 'ice_wraith', 'aurora_seer',
+  'dune_archer', 'mirage_adept', 'sandstorm_djinn',
+  'net_caster', 'stormcaller_acolyte', 'siren_shade',
+  'crossbow_levy', 'siege_engineer', 'arcane_bailiff',
 ] as const;
 /** Explicit eligible support targets; future enemy IDs do not acquire healing by name. */
 export const HEAL_GOBLIN_IDS = ['goblin_grunt', 'goblin_archer', 'goblin_shaman'] as const;
@@ -91,6 +114,9 @@ export const TERRAIN_TEXTURE_SPEC = {
   format: 'png', orientation: 'top-down', cellsPerTexture: 1,
   opaque: true, edgeTreatment: 'seamless-repeat', bakedGeometry: false,
 } as const;
+
+export const ORIGINAL_TERRAIN_TEXTURE_SPEC = { ...TERRAIN_TEXTURE_SPEC, sourceWidth: 1254, sourceHeight: 1254 } as const;
+export const OPTIONAL_TERRAIN_IDS = ['sand', 'rock', 'void', 'mud', 'ash', 'lava', 'snow', 'ice', 'crystal', 'rubble'] as const;
 
 /** 3.5E damage/count; slice targeting uses a five-tile maximum and three-tile target spread. */
 export const MAGIC_MISSILE = { damageDie: 4, damageBonus: 1, maxMissiles: 5, targetSpread: 3 } as const;
