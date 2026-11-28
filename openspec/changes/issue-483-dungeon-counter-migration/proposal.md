@@ -21,4 +21,4 @@ None. The change corrects test coverage for existing save behavior.
 
 ## Impact
 
-The save envelope exports its existing constant, and the migration case imports it. See [the implementation and verification plan](../../../docs/ongoing-projects/plan.md) for [#483](https://github.com/luminari-gurus/tactics-guru-v2/issues/483).
+The save envelope exports its existing constant, and the migration case imports it. See [the implementation and verification plan](../../../docs/ongoing-projects/issue-483-dungeon-counter-migration-plan.md) for [#483](https://github.com/luminari-gurus/tactics-guru-v2/issues/483).

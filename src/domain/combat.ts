@@ -232,6 +232,7 @@ export function previewSupportAbility(state: unknown, input: unknown, catalog: C
   if (!target) return { ok: false, reason: 'missingTarget' };
   if (target.hp === 0) return { ok: false, reason: 'targetDefeated' };
   if (profile.kind === 'healGoblin') {
+    if (actor.healGoblinRemaining === 0) return { ok: false, reason: 'useExhausted' };
     if (target.side !== actor.side || target.side !== 'enemy' || !HEAL_GOBLIN_IDS.some(id => id === target.defId))
       return { ok: false, reason: 'ineligibleAlly' };
     if (target.hp === stats(catalog, target).maxHp) return { ok: false, reason: 'fullHealth' };
@@ -269,9 +270,17 @@ function resolveSupportAbility(state: unknown, input: unknown, catalog: ContentC
       modifier: preview.modifier, total, dc: preview.dc, saved });
     if (!saved) events.push({ type: 'weakened', unitId: preview.targetId, sourceId: preview.sourceId });
   } else events.push({ type: 'healed', unitId: preview.targetId, healing: preview.healing, hp: preview.hp });
-  const units = snapshot.units.map((unit): UnitState => unit.id === preview.sourceId ? { ...unit, hasActed: true } :
-    unit.id !== preview.targetId ? unit : preview.kind === 'healGoblin' ? { ...unit, hp: preview.hp } :
-      saved ? unit : { ...unit, weakenedBy: preview.sourceId });
+  const units = snapshot.units.map((unit): UnitState => {
+    if (unit.id === preview.sourceId) {
+      const remaining = unit.healGoblinRemaining;
+      if (preview.kind === 'healGoblin' && remaining !== undefined)
+        return { ...unit, hasActed: true, healGoblinRemaining: remaining - 1 };
+      return { ...unit, hasActed: true };
+    }
+    if (unit.id !== preview.targetId) return unit;
+    if (preview.kind === 'healGoblin') return { ...unit, hp: preview.hp };
+    return saved ? unit : { ...unit, weakenedBy: preview.sourceId };
+  });
   return { ok: true, state: { ...snapshot, units, rng, commandCount: snapshot.commandCount + 1 }, events };
 }
 export type ControlPreview = { readonly ok: true; readonly command: Extract<Command,{type:'useAbility'}>;

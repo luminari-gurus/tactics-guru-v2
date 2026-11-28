@@ -1,7 +1,7 @@
 import { HERO_PROGRESSION } from '../content/progression';
 import { dungeonIdentity, previousDungeonIdentity } from '../content/dungeon';
 import { previousItemCatalog } from '../content/items';
-import { canonical, hashJson } from './contentIdentity';
+import { canonical, hashCanonical, hashJson } from './contentIdentity';
 import { readDungeon, type DungeonResult, type DungeonState } from './dungeon';
 import { reveal, WALL_SIGHT_VERSION } from './exploration';
 import { hasShape, isDenseArray } from './validation';
@@ -31,6 +31,7 @@ export function requiresFinalRewardSupport(state: DungeonState): boolean {
 }
 /** No DOM dependency in the authoritative save reader. Lone surrogates count as replacement characters. */
 export function utf8Bytes(text: string) {
+  if (!/[^\x00-\x7f]/.test(text)) return text.length;
   let n = 0;
   for (const char of text) { const c = char.codePointAt(0)!; n += c < 128 ? 1 : c < 2048 ? 2 : c < 65536 ? 3 : 4; }
   return n;
@@ -44,7 +45,9 @@ export function encodeDungeonWithState(input: unknown): { ok: true; text: string
     : draughts ? DRAUGHT_DUNGEON_SAVE_FORMAT : DUNGEON_SAVE_FORMAT;
   const identity = hasGroundLoot(checked.state) ? GROUND_LOOT_IDENTITY : checked.state.encounterEntry ? ENCOUNTER_ENTRY_IDENTITY : requiresFinalRewardSupport(checked.state) ? FINAL_REWARD_IDENTITY : CURRENT_IDENTITY;
   const body = { kind: 'tactics-guru:dungeon', format, identity, payload: checked.state };
-  const text = canonical({ ...body, digest: hashJson(body) });
+  // "digest" sorts before all body keys. Reuse the exact bytes that were hashed.
+  const serialized = canonical(body);
+  const text = '{"digest":' + JSON.stringify(hashCanonical(serialized)) + ',' + serialized.slice(1);
   return utf8Bytes(text) > DUNGEON_SAVE_MAX_BYTES ? { ok: false, reason: 'tooLarge' } : { ok: true, text, state: checked.state };
 }
 export function encodeDungeon(input: unknown): { ok: true; text: string } | { ok: false; reason: string } {

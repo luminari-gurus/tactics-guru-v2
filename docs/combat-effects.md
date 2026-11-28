@@ -36,10 +36,12 @@ the same exact twenty-face chance arithmetic. Immune effect-only casts reject
 before spending or RNG; production actors have no assigned immunities.
 
 Heal Goblin has allied range 1–4 and LOS, targets only living injured grunt,
-archer or Shaman, and applies `min(4, projectedMaxHp-hp)`. It consumes one ordinary
-action, no die/use pool/cooldown, and cannot revive or self-heal. Invalid casts
-leave state/events/budgets/RNG unchanged. Enemy healing remains within projected
-max HP and grants no hero-entry HP or Second Wind allowance.
+archer or Shaman, and applies `min(4, projectedMaxHp-hp)` with one action and no die roll.
+In newly entered dungeon battles, each Shaman can cast twice and shows its
+remaining casts in inspection (#476). Each accepted heal spends one cast. An
+invalid or exhausted cast leaves state, events, action budgets and RNG intact.
+Older active battles and replays keep their unlimited casts. Heal Goblin cannot
+revive or self-heal, exceed projected max HP, or grant hero-entry HP allowances.
 
 `src/domain/effects.ts` reads one closed `guarded` case with the Fighter instance as both source and target. Guarded Strike applies −2 attack and grants +2 AC after an accepted hit or miss; an active guard and a prospective Guarded Strike never double the penalty. Shared projection supplies combat previews/resolution, enemy expected-damage scoring through those previews, and HUD/inspection. Catalog stats already include equipment, which is not applied again.
 

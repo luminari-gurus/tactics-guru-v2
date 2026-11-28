@@ -1,3 +1,8 @@
+import { readFileSync } from 'node:fs';
+import { hasHealGoblinCap, readReplay } from '../../src/domain/battle';
+import { hashJson } from '../../src/domain/contentIdentity';
+import type { Replay } from '../../src/domain/types';
+import { DungeonSession } from '../../src/app/DungeonSession';
 import { showsSnareBadge } from '../../src/phaser/abilityPresentation';
 import { HERO_PROGRESSION } from '../../src/content/progression';
 import { progressHero } from '../../src/domain/progression';
@@ -236,23 +241,130 @@ it('settles the last earned draught after playing the next encounter to completi
   expect(decodeDungeon(encoded.text)).toEqual({ ok: true, state: dungeon });
 });
 
-it('completes production Shaman Hex and healing through the real session with exact command/event/RNG replay',()=>{
-  const witness=shamanJourney(189),catalog=dungeonBattle(witness.entry)!.catalog;
+function legacyShamanBattle() {
+  const fixture = 'tests/fixtures/saves/issue-476';
+  const text = readFileSync(`${fixture}/legacy-dungeon.json`, 'utf8');
+  const decoded = decodeDungeon(text);
+  assert(decoded.ok && decoded.state.activeBattle);
+  const built = dungeonBattle(decoded.state);
+  assert(built);
+  const record = JSON.parse(readFileSync(`${fixture}/legacy-replay.json`, 'utf8')) as {
+    seed: number; shamanId: number; casts: number; prefixCommands: number; outcome: string; resultHash: string;
+    replay: Replay & { battlefield: unknown };
+  };
+  const { battlefield, ...replay } = record.replay;
+  expect(battlefield).toEqual(built.battlefield);
+  const read = readReplay(replay, built.catalog);
+  assert(read.ok);
+  return { snapshot: decoded.state, active: decoded.state.activeBattle, text, built, record, replay: read.replay };
+}
+
+it('preserves the baseline Elite save, zero-command entry and third heal through Continue and replay', async () => {
+  const { snapshot, active, text, built, record, replay } = legacyShamanBattle();
+  expect(record).toMatchObject({ seed: 308, shamanId: 6, casts: 3, prefixCommands: 46, outcome: 'playerWin' });
+  expect(built.selection.kind).toBe('elite');
+  expect(hasHealGoblinCap(active.units)).toBe(false);
+  expect(built.state).toEqual(replay.initial);
+  expect(encodeDungeon(snapshot)).toEqual({ ok: true, text: text.trimEnd() });
+
+  const zero = await new DungeonSession({ ...snapshot, activeBattle: replay.initial }, null).startEncounter();
+  assert(zero);
+  expect(zero.state).toEqual(replay.initial);
+  expect(zero.replay?.initial).toEqual(replay.initial);
+
+  const prefix = replayCommandSequence(built.state, replay.commands.slice(0, record.prefixCommands), built.catalog);
+  assert(prefix.ok);
+  expect(prefix.state).toEqual(active);
+  expect(prefix.events.filter(event => event.type === 'healed')).toHaveLength(2);
+  const continued = replayCommandSequence(active, replay.commands.slice(record.prefixCommands), built.catalog);
+  assert(continued.ok);
+  expect(continued.events.filter(event => event.type === 'healed')).toHaveLength(1);
+  const full = replayCommandSequence(built.state, replay.commands, built.catalog);
+  assert(full.ok);
+  expect(full.state).toEqual(continued.state);
+  expect(full.events).toEqual([...prefix.events, ...continued.events]);
+  expect(full.state.outcome).toBe(record.outcome);
+  expect(hashJson({ state: full.state, events: full.events })).toBe(record.resultHash);
+
+  const completed = acceptDungeonBattle(snapshot, continued.state);
+  assert(completed.ok);
+  const next = startDungeonBattle(atEncounter(completed.state, 0));
+  assert(next.ok && next.state.activeBattle);
+  expect(next.state.activeBattle.units.filter(unit => unit.defId === 'goblin_shaman').map(unit => unit.healGoblinRemaining))
+    .toEqual([2]);
+});
+
+it('chooses Hex instead of a third heal in the seeded Elite encounter with an injured Grunt', () => {
+  const { built, record, replay } = legacyShamanBattle();
+  const beforeThird = replayCommandSequence(built.state, replay.commands.slice(0, 62), built.catalog);
+  assert(beforeThird.ok);
+  const { state } = beforeThird;
+  const grunt = state.units.find(unit => unit.defId === 'goblin_grunt')!;
+  const archer = state.units.find(unit => unit.defId === 'goblin_archer')!;
+  expect(state.initiative[state.activeIndex]).toBe(record.shamanId);
+  expect(grunt.hp).toBe(1);
+  // The legacy third heal targets the Archer. Place the injured Grunt on that clear healing line.
+  const capped = { ...state, units: state.units.map(unit => {
+    if (unit.id === record.shamanId) return { ...unit, healGoblinRemaining: 0 };
+    if (unit.id === grunt.id) return { ...unit, cell: archer.cell };
+    if (unit.id === archer.id) return { ...unit, cell: grunt.cell };
+    return unit;
+  }) };
+  const moved = dispatch(capped, { type: 'move', unitId: record.shamanId, to: { x: 8, y: 5 } }, built.catalog);
+  assert(moved.ok);
+  const hex = { type: 'useAbility', unitId: record.shamanId, abilityId: 'ability:weakening_hex', target: { unitId: 1 } } as const;
+  const heal = { ...hex, abilityId: 'ability:heal_goblin', target: { unitId: grunt.id } };
+  expect(previewSupportAbility(moved.state, hex, built.catalog).ok).toBe(true);
+  const available = { ...moved.state, units: moved.state.units.map(unit => unit.id === record.shamanId
+    ? { ...unit, healGoblinRemaining: 1 } : unit) };
+  expect(previewSupportAbility(available, heal, built.catalog)).toMatchObject({ ok: true, healing: 4 });
+  expect(dispatch(moved.state, heal, built.catalog)).toEqual({ ok: false, reason: 'useExhausted' });
+  const turn = runEnemyTurn(moved.state, record.shamanId, built.catalog);
+  assert(turn.ok);
+  expect(turn.commands).toEqual([hex, { type: 'endTurn', unitId: record.shamanId }]);
+  expect(turn.events.some(event => event.type === 'healed')).toBe(false);
+  expect(turn.state.units.find(unit => unit.id === grunt.id)?.hp).toBe(1);
+});
+
+it('rebuilds a capped Shaman battle and replays it exactly across a one-cast save', async () => {
+  const witness = shamanJourney(189);
+  const { entry, replay } = witness;
   expect(witness.state.outcome).toBe('playerWin');
-  expect(witness.events.filter(e=>e.type==='healed')).toHaveLength(2);
-  expect(witness.events.some(e=>e.type==='saveRolled'&&!e.saved)).toBe(true);
-  expect(witness.events.some(e=>e.type==='weakenedExpired')).toBe(true);
-  let state=witness.entry.activeBattle!;const events:import('../../src/domain/types').BattleEvent[]=[];
-  for(const command of witness.commands) {
-    const preview=command.type==='useAbility'&&catalog.abilities[command.abilityId].kind==='healGoblin'?previewSupportAbility(state,command,catalog):null;
-    const result=dispatch(state,command,catalog);assert(result.ok);
-    if(preview?.ok&&preview.kind==='healGoblin') {
-      expect(preview.healing).toBeGreaterThan(0);expect(result.state.rng).toEqual(state.rng);
-      expect(result.state.units.find(u=>u.id===preview.targetId)?.hp).toBe(preview.hp);
-    }
-    state=result.state;events.push(...result.events);
-  }
-  expect({state,events}).toEqual({state:witness.state,events:witness.events});
+  expect(witness.events.filter(event => event.type === 'healed')).toHaveLength(2);
+  expect(witness.events.some(event => event.type === 'saveRolled' && !event.saved)).toBe(true);
+  expect(witness.events.some(event => event.type === 'weakenedExpired')).toBe(true);
+  const built = dungeonBattle(entry);
+  assert(built);
+  const { battlefield, ...record } = replay;
+  const read = readReplay(record, built.catalog);
+  assert(read.ok);
+  expect(battlefield).toEqual(built.battlefield);
+  expect(built.state).toEqual(read.replay.initial);
+  expect(built.state.units.find(unit => unit.id === 6)?.healGoblinRemaining).toBe(2);
+  const { commands } = read.replay;
+  const firstCast = commands.findIndex(command => command.type === 'useAbility' && command.abilityId === 'ability:heal_goblin');
+  assert(firstCast >= 0);
+  const prefix = replayCommandSequence(built.state, commands.slice(0, firstCast + 1), built.catalog);
+  assert(prefix.ok);
+  const accepted = acceptDungeonBattle(entry, prefix.state);
+  assert(accepted.ok);
+  const encoded = encodeDungeon(accepted.state);
+  assert(encoded.ok);
+  const decoded = decodeDungeon(encoded.text);
+  assert(decoded.ok && decoded.state.activeBattle);
+  const saved = decoded.state.activeBattle;
+  expect(saved.units.find(unit => unit.id === 6)?.healGoblinRemaining).toBe(1);
+  expect(acceptDungeonBattle(decoded.state, built.state)).toEqual({ ok: false, reason: 'invalidBattle' });
+  const uncapped = { ...saved, units: saved.units.map(({ healGoblinRemaining: _, ...unit }) => unit) };
+  expect(acceptDungeonBattle(decoded.state, uncapped)).toEqual({ ok: false, reason: 'invalidBattle' });
+  const continued = await new DungeonSession(decoded.state, null).startEncounter();
+  assert(continued);
+  expect(continued.state).toEqual(saved);
+  expect(continued.replay).toBeNull();
+  const suffix = replayCommandSequence(continued.state, commands.slice(firstCast + 1), built.catalog);
+  assert(suffix.ok);
+  expect({ state: suffix.state, events: [...prefix.events, ...suffix.events] })
+    .toEqual({ state: witness.state, events: witness.events });
 });
 
 it('retains a legal six-battle Fighter level-three witness with healing, Taunt and exact terminal replay',()=>{
@@ -576,6 +688,14 @@ it('clears a Wetlands floor through live traversal and resumes its saved encount
   const witness = fighterJourney(5, EXPANDED_ENCOUNTER_POLICY, 1);
   expect(witness.records.map(record => record.state.outcome)).toEqual(['playerWin', 'playerWin', 'playerWin']);
   expect(witness.state.floors[0].completed).toBe(3);
+
+  for (const { entry } of witness.records) {
+    const { selection } = dungeonBattle(entry)!;
+    expect(selection).toMatchObject({ biome: 'wetlands', policy: EXPANDED_ENCOUNTER_POLICY });
+    const enemies = selection.encounter.roster.filter(spawn => spawn.side === 'enemies');
+    expect(entry.activeBattle!.units.filter(unit => unit.side === 'enemy').map(unit => unit.defId))
+      .toEqual(enemies.map(spawn => spawn.unitId));
+  }
 
   const entry = witness.records[0].entry;
   const encodedBattle = encodeDungeon(entry);

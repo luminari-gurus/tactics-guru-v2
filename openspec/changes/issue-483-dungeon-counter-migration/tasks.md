@@ -1,6 +1,6 @@
 # Tasks
 
-See the [implementation and verification plan](../../../docs/ongoing-projects/plan.md) for scope and commands.
+See the [implementation and verification plan](../../../docs/ongoing-projects/issue-483-dungeon-counter-migration-plan.md) for scope and commands.
 
 ## 1. Repair the browser assertion
 

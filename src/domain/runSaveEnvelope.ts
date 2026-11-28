@@ -1,3 +1,4 @@
+import { isGeneratedBattlefieldVersion } from '../content/battlefieldTypes';
 import { HERO_PROGRESSION } from '../content/progression';
 import { itemCatalog, previousItemCatalog } from '../content/items';
 import { encounterHpLimit } from './effects';
@@ -7,7 +8,7 @@ import type { BattlefieldEncounter } from '../content/battlefieldTypes';
 import { resolveBattlefield, sameBattlefield, type BattlefieldDescriptor } from './battlefield';
 import type { ContentCatalog } from '../content/types';
 import type { ItemCatalog } from '../content/itemTypes';
-import { contentVersion, readBattleState } from './battle';
+import { contentVersion, hasHealGoblinCap, readBattleState } from './battle';
 import { canonical, hashJson } from './contentIdentity';
 import { projectItemCatalog, readRunItems, type RunItems } from './items';
 import { itemCatalogIdentity, previousItemCatalogIdentity } from './rewards';
@@ -70,7 +71,7 @@ export function readRunSnapshot(input: unknown, context: RunSaveContext): RunSna
   const catalog = runBattleCatalog(items, context);
   if (!catalog) return invalid;
   const battle = readBattleState(input.activeBattle, catalog);
-  if (!battle.ok || !matchesDraughtStock(battle.state.draughts, items.ownership, context.items) || battle.state.mapId !== resolved.map.id ||
+  if (!battle.ok || hasHealGoblinCap(battle.state.units) || !matchesDraughtStock(battle.state.draughts, items.ownership, context.items) || battle.state.mapId !== resolved.map.id ||
     battle.state.seed !== deriveRunSeed(items.run.seed, 'encounter', items.run.encounterIndex)) return invalid;
   if (battle.state.units.some(u => u.side === 'player' && u.hp > encounterHpLimit(u,items.run.party.find(h => h.heroId === u.defId)!.hp,catalog,
     draughtHealing(battle.state.draughts,u.defId)))) return invalid;
@@ -104,7 +105,8 @@ export function decodeRunSave(text: string, context: RunSaveContext): RunSnapsho
     input.identity.items !== expected.items || input.identity.encounters !== expected.encounters) return { ok: false, reason: 'incompatible' };
   if((hasShape(input.payload,['items','activeBattle','battlefield']) || hasShape(input.payload,['items','activeBattle','battlefield','stats'])) &&
     hasShape(input.payload.battlefield,['encounterId','kind','mapId','mapHash','layoutSeed','biome','generatorVersion','profileVersion']) &&
-    input.payload.battlefield.kind==='generated' && (input.payload.battlefield.biome!=='desert' || input.payload.battlefield.generatorVersion!==1 || input.payload.battlefield.profileVersion!=='desert-v1')) return {ok:false,reason:'incompatible'};
+    input.payload.battlefield.kind==='generated' && !isGeneratedBattlefieldVersion(input.payload.battlefield.biome,
+      input.payload.battlefield.generatorVersion, input.payload.battlefield.profileVersion)) return {ok:false,reason:'incompatible'};
   const read = readRunSnapshot(input.payload, previous ? { ...context, items: previousItemCatalog } : context);
   if (!read.ok) return read;
   if ((input.format === COUNTER_RUN_SAVE_FORMAT || input.format === STATS_RUN_SAVE_FORMAT) !== (read.state.stats !== undefined)) return { ok: false, reason: 'invalidState' };

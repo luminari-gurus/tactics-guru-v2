@@ -8,9 +8,9 @@ on:
         options: [tactics-browser-01, tactics-browser-02]
         default: tactics-browser-01
       mode:
-        description: Qualification, serial pilot, two-runner pilot, matched pair, or serial capture
+        description: Qualification, serial pilot, two-runner pilot, matched pair, full two-runner verification, or serial capture
         type: choice
-        options: [qualify, pilot, parallel-pilot, serial-pair, parallel-pair, capture]
+        options: [qualify, pilot, parallel-pilot, serial-pair, parallel-pair, parallel-full, capture]
         default: qualify
       batches:
         description: Optional comma-separated batch IDs; empty capture selects the full plan
@@ -56,7 +56,7 @@ jobs:
       (github.repository != 'luminari-gurus/tactics-guru-v2' ||
       (inputs.extra_job != 'full-verify' &&
       !(github.ref == 'refs/heads/main' ||
-      (endsWith(inputs.mode, '-pair') && github.ref == 'refs/heads/work/issue-208-matched-pair') || github.ref == 'refs/heads/work/issue-208-serial-batches' ||
+      (endsWith(inputs.mode, '-pair') && github.ref == 'refs/heads/work/issue-208-matched-pair') || (inputs.mode == 'parallel-full' && github.ref == 'refs/heads/work/208-full-parallel') || github.ref == 'refs/heads/work/issue-208-serial-batches' ||
       (inputs.mode == 'qualify' && github.ref == 'refs/heads/work/issue-200-verification-timings') ||
       ((inputs.mode == 'pilot' || inputs.mode == 'parallel-pilot') &&
       github.ref == 'refs/heads/work/issue-208-parallel-pilot'))))
@@ -106,8 +106,43 @@ jobs:
           path: verification-receipts/
           retention-days: 30
           if-no-files-found: warn
+  tooling:
+    if: >-
+      github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' &&
+      inputs.mode == 'parallel-full' && inputs.extra_job != 'full-verify' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/work/208-full-parallel' || github.ref == 'refs/heads/work/issue-208-serial-batches')
+    runs-on: [self-hosted, tactics-browser, tactics-browser-02]
+    concurrency:
+      group: tactics-browser-tactics-browser-02
+      queue: max
+      cancel-in-progress: false
+    timeout-minutes: 15
+    steps:
+      - name: Check host disposition
+        run: test ! -f "$RUNNER_TOOL_CACHE/issue208-unsafe-host"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.PILOT_NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+        timeout-minutes: 10
+      - name: Discover the full browser case manifest
+        run: npm run verify:batches -- discover verification-receipts/serial/discovery-plan
+        timeout-minutes: 3
+      - uses: actions/upload-artifact@v4
+        with:
+          name: issue208-discovery-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/serial/discovery-plan/plan.json
+          retention-days: 30
+          if-no-files-found: error
+      - run: npm run test:verification-tooling && npm run test:verification-batches
+        timeout-minutes: 5
   prepare:
-    if: github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || (endsWith(inputs.mode, '-pair') && github.ref == 'refs/heads/work/issue-208-matched-pair') || github.ref == 'refs/heads/work/issue-208-serial-batches' || ((inputs.mode == 'pilot' || inputs.mode == 'parallel-pilot') && github.ref == 'refs/heads/work/issue-208-parallel-pilot'))
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || (endsWith(inputs.mode, '-pair') && github.ref == 'refs/heads/work/issue-208-matched-pair') || (inputs.mode == 'parallel-full' && github.ref == 'refs/heads/work/208-full-parallel') || github.ref == 'refs/heads/work/issue-208-serial-batches' || ((inputs.mode == 'pilot' || inputs.mode == 'parallel-pilot') && github.ref == 'refs/heads/work/issue-208-parallel-pilot'))
     runs-on: [self-hosted, tactics-browser, "${{ (startsWith(inputs.mode, 'parallel-') || inputs.mode == 'serial-pair') && 'tactics-browser-01' || inputs.runner || 'tactics-browser-01' }}"]
     concurrency:
       group: ${{ (startsWith(inputs.mode, 'parallel-') || inputs.mode == 'serial-pair') && format('tactics-browser-{0}', 'tactics-browser-01') || format('issue208-prepare-{0}', github.run_id) }}
@@ -115,7 +150,7 @@ jobs:
       cancel-in-progress: false
     timeout-minutes: 35
     outputs:
-      matrix: ${{ steps.prepare.outputs.matrix }}
+      matrix: ${{ steps.seal.outputs.matrix || steps.prepare.outputs.matrix }}
       bundle: issue208-build-${{ github.run_id }}-${{ github.run_attempt }}
     steps:
       - name: Record setup start and check host disposition
@@ -135,12 +170,34 @@ jobs:
         timeout-minutes: 10
       - run: npm run setup:browsers && npm run check:browsers
         timeout-minutes: 5
-      - run: npm run test:verification-tooling && npm run test:verification-batches
+      - if: inputs.mode != 'parallel-full'
+        run: npm run test:verification-tooling && npm run test:verification-batches
         timeout-minutes: 5
       - name: Discover exact coverage and build the ordinary artifact once
+        if: inputs.mode != 'parallel-full'
         id: prepare
         run: timeout --signal=TERM --kill-after=15s 15m npm run verify:batches -- prepare verification-receipts/serial/bundle
         timeout-minutes: 16
+      - name: Build and measure while tooling discovers the browser cases
+        if: inputs.mode == 'parallel-full'
+        run: timeout --signal=TERM --kill-after=15s 15m npm run verify:batches -- prepare-build verification-receipts/serial/bundle
+        timeout-minutes: 16
+      - name: Wait for the same-attempt browser case manifest
+        if: inputs.mode == 'parallel-full'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: npm run verify:batches -- await-discovery "issue208-discovery-${{ github.run_id }}-${{ github.run_attempt }}"
+        timeout-minutes: 3
+      - uses: actions/download-artifact@v4
+        if: inputs.mode == 'parallel-full'
+        with:
+          name: issue208-discovery-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification-receipts/serial/discovery-plan/
+      - name: Bind the build and receipt to the exact browser case manifest
+        if: inputs.mode == 'parallel-full'
+        id: seal
+        run: npm run verify:batches -- seal-build verification-receipts/serial/bundle verification-receipts/serial/discovery-plan/plan.json
+        timeout-minutes: 3
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -149,9 +206,22 @@ jobs:
           retention-days: 30
           compression-level: 1
           if-no-files-found: warn
+      - name: Upload preparation metadata for aggregation
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue208-build-${{ github.run_id }}-${{ github.run_attempt }}-metadata
+          path: |
+            verification-receipts/serial/bundle/plan.json
+            verification-receipts/serial/bundle/build.json
+            verification-receipts/serial/bundle/preparation/receipt.json
+          retention-days: 30
+          if-no-files-found: warn
   batch:
-    needs: prepare
-    if: always() && !cancelled() && needs.prepare.outputs.matrix != ''
+    needs: [prepare, tooling]
+    if: >-
+      always() && !cancelled() && needs.prepare.outputs.matrix != '' &&
+      (inputs.mode != 'parallel-full' || needs.tooling.result == 'success')
     runs-on: [self-hosted, tactics-browser, "${{ (startsWith(inputs.mode, 'parallel-') || inputs.mode == 'serial-pair') && matrix.runner || inputs.runner || 'tactics-browser-01' }}"]
     concurrency:
       group: ${{ (startsWith(inputs.mode, 'parallel-') || inputs.mode == 'serial-pair') && format('tactics-browser-{0}', matrix.runner) || format('issue208-batch-{0}-{1}', github.run_id, matrix.id) }}
@@ -225,8 +295,8 @@ jobs:
           if-no-files-found: warn
   aggregate:
     name: Serial verification aggregate
-    needs: [prepare, batch]
-    if: always() && github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || (endsWith(inputs.mode, '-pair') && github.ref == 'refs/heads/work/issue-208-matched-pair') || github.ref == 'refs/heads/work/issue-208-serial-batches' || ((inputs.mode == 'pilot' || inputs.mode == 'parallel-pilot') && github.ref == 'refs/heads/work/issue-208-parallel-pilot'))
+    needs: [prepare, batch, tooling]
+    if: always() && github.event_name == 'workflow_dispatch' && github.repository == 'luminari-gurus/tactics-guru-v2' && inputs.mode != 'qualify' && inputs.extra_job != 'full-verify' && (github.ref == 'refs/heads/main' || (endsWith(inputs.mode, '-pair') && github.ref == 'refs/heads/work/issue-208-matched-pair') || (inputs.mode == 'parallel-full' && github.ref == 'refs/heads/work/208-full-parallel') || github.ref == 'refs/heads/work/issue-208-serial-batches' || ((inputs.mode == 'pilot' || inputs.mode == 'parallel-pilot') && github.ref == 'refs/heads/work/issue-208-parallel-pilot'))
     runs-on: [self-hosted, tactics-browser, "${{ (startsWith(inputs.mode, 'parallel-') || inputs.mode == 'serial-pair') && 'tactics-browser-01' || inputs.runner || 'tactics-browser-01' }}"]
     concurrency:
       group: ${{ (startsWith(inputs.mode, 'parallel-') || inputs.mode == 'serial-pair') && format('tactics-browser-{0}', 'tactics-browser-01') || format('issue208-aggregate-{0}', github.run_id) }}
@@ -243,15 +313,18 @@ jobs:
           node-version: ${{ (inputs.mode == 'pilot' || (startsWith(inputs.mode, 'parallel-') || inputs.mode == 'serial-pair')) && env.PILOT_NODE_VERSION || '24' }}
       - uses: actions/download-artifact@v4
         with:
-          name: ${{ needs.prepare.outputs.bundle }}
+          name: ${{ needs.prepare.outputs.bundle }}-metadata
           path: verification-receipts/serial/bundle/
       - uses: actions/download-artifact@v4
         with:
           pattern: issue208-receipts-${{ github.run_id }}-*
           path: verification-receipts/serial/downloads/
       - name: Account for every expected batch, all attempts and scheduler overhead
+        if: ${{ !cancelled() }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          SERIAL_FULL_TOOLING_RESULT: ${{ inputs.mode == 'parallel-full' && needs.tooling.result || '' }}
+          SERIAL_FULL_BATCH_RESULT: ${{ inputs.mode == 'parallel-full' && needs.batch.result || '' }}
         run: node scripts/verification-batches.mjs aggregate verification-receipts/serial/bundle verification-receipts/serial/downloads verification-receipts/serial/aggregate
       - uses: actions/upload-artifact@v4
         if: always()
