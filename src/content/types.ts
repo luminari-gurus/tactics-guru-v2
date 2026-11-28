@@ -1,4 +1,4 @@
-import type { ENEMY_IDS, FIRST_MAP_TERRAIN_IDS, HERO_IDS, OPTIONAL_ENEMY_IDS, TERRAIN_TEXTURE_SPEC } from './constants';
+import type { ENEMY_IDS, FIRST_MAP_TERRAIN_IDS, HERO_IDS, OPTIONAL_ENEMY_IDS, OPTIONAL_TERRAIN_IDS, ORIGINAL_TERRAIN_TEXTURE_SPEC, TERRAIN_TEXTURE_SPEC } from './constants';
 
 // Template prefixes prevent mixing map/unit/asset references without runtime wrappers.
 export type MapId = `map:${string}`;
@@ -58,7 +58,7 @@ export type ShamanAbility = {
 export type Ability = AttackAbility | MagicMissileAbility | FighterAbility | RangerAbility | FrostSnareAbility | ShamanAbility;
 export type EffectImmunity = 'weakened' | 'debuff';
 /** `void` is open air: never walkable and never drawn (e.g. around the Q*bert pyramid). */
-export type TerrainId = typeof FIRST_MAP_TERRAIN_IDS[number] | 'sand' | 'rock' | 'void';
+export type TerrainId = typeof FIRST_MAP_TERRAIN_IDS[number] | typeof OPTIONAL_TERRAIN_IDS[number];
 
 /** Immutable baseline stats, not mutable battle HP. All numbers obey CONTENT_BOUNDS. */
 export interface UnitStats {
@@ -131,7 +131,7 @@ export type AssetProvenance =
       readonly sourceSha256: string; readonly rightsNote: string; readonly productionNotes: string };
 export type AssetRecord = AssetMetadata & (
   | { readonly kind: 'terrain-surface'; readonly provenance: Extract<AssetProvenance, { origin: 'generated' }>;
-      readonly textureSpec: typeof TERRAIN_TEXTURE_SPEC }
+      readonly textureSpec: typeof TERRAIN_TEXTURE_SPEC | typeof ORIGINAL_TERRAIN_TEXTURE_SPEC }
   | { readonly kind: 'unit-sprite' | 'prop'; readonly anchor: { readonly x: number; readonly y: number } }
   | { readonly kind: 'portrait' }
 );

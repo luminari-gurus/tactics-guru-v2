@@ -258,7 +258,9 @@ export function shamanJourney(seed = 31) {
     if(!p)throw Error('Shaman witness stalled');battle.finishPresentation(p.token);
   }
   if(battle.state.outcome==='ongoing')throw Error('Shaman witness did not finish');
-  return {seed,entry,state:battle.state,commands:battle.replay?.commands??battle.continuation!.commands,events:battle.events};
+  const replay = battle.replay;
+  if (!replay) throw Error('Fresh Shaman journey did not record a full replay');
+  return {seed,entry,state:battle.state,commands:replay.commands,events:battle.events,replay};
 }
 
 /** Full Fighter acceptance witness; source-backed encounters may require a new deterministic seed. */

@@ -12,6 +12,7 @@ import { measurements, setBattleAudioDiagnostics } from '../diagnostics/browser'
 import type { Point, BoardRegion } from '../geometry/iso';
 import { BattleHud, unitFeedback } from '../ui/hud';
 import { BattleDialogs } from '../ui/dialogs';
+import { createBattleLogContent, downloadBattleLog } from '../ui/battleLog';
 import { menuReturnLink } from '../ui/menuReturn';
 import { track } from '../telemetry/telemetry';
 import { hoverPreview } from '../ui/targetPreview';
@@ -31,7 +32,7 @@ export interface RunBattleHost {
   catalog: ContentCatalog; session: BattleSession; dialogs: BattleDialogs;
   guidance?: ClassGuidanceRun;
   sound: { enabled: boolean }; modalTransition: () => void;
-  ended: () => void; restart: () => void;
+  ended: (exportBattleLog: () => void) => void; restart: () => void;
 }
 export const FIRST_BATTLE_MAP_ID = 'map:forest_ruins';
 /** Alternate standalone (non-persistent) testing battle on another map, e.g. /qbert. */
@@ -145,7 +146,15 @@ export class BattleScene extends Phaser.Scene {
       game.dataset.session=JSON.stringify({state:session.state,replay:session.replay,continuation:session.continuation,events:session.events,pending:session.pending,phase:session.phase});
       if(session.phase!=='player' || (dialogs.open && !keepRadialDuringDialog))radial.hide();
       if(radial.mode!=='hold')restoreCaptionHeight();
-      if(ready && !dialogs.open && session.phase==='ended' && !outcomeShown){outcomeShown=true;if(this.host){queueMicrotask(()=>{if(live)this.host?.ended();});return;}dialogs.showChoices(session.state.outcome==='playerWin'?'Victory':'Defeat','Battle complete. Restart for a fresh battle.',[{id:'dialog-restart',label:'Restart battle',run:()=>this.requestRestart()},...(returnToMenu?[{id:'save-main-menu',label:'Main menu',run:returnToMenu}]:[])],()=>{});}
+      if(ready && !dialogs.open && session.phase==='ended' && !outcomeShown){
+        outcomeShown=true;
+        if(this.host){
+          const exportBattleLog = downloadBattleLog.bind(null,hud.logSnapshot(),__BUILD_INFO__,session.state.versions);
+          queueMicrotask(()=>{if(live)this.host?.ended(exportBattleLog);});
+          return;
+        }
+        dialogs.showChoices(session.state.outcome==='playerWin'?'Victory':'Defeat','Battle complete. Restart for a fresh battle.',[{id:'dialog-restart',label:'Restart battle',run:()=>this.requestRestart()},...(returnToMenu?[{id:'save-main-menu',label:'Main menu',run:returnToMenu}]:[])],()=>{});
+      }
     };
     const openRadial=(cell:CellPosition, mode:'hold'|'tap', origin:Point)=>{
       session.clearPrepared();
@@ -244,7 +253,7 @@ export class BattleScene extends Phaser.Scene {
       if(!step){refresh();return;}
       presentationStart=step.before;
       if(followPlan){planInFlight=true;planInterrupted=false;}
-      clear(followPlan);selection.selectedCell=null;removeInput.reset();hud.append(step.events);audio.present(step.token,step.events);
+      clear(followPlan);selection.selectedCell=null;removeInput.reset();hud.append(step.before, step.events);audio.present(step.token,step.events);
       refresh();animation=board.animate(step.before,step.after,step.events);
       const moving=step.events.some(event=>event.type==='moved' || event.type==='pushed');movingPresentation=moving;
       if(moving)measurements.workload('move',performance.now());
@@ -329,12 +338,12 @@ export class BattleScene extends Phaser.Scene {
       },
       danger:()=>{if(session.phase==='player' && !dialogs.open){selection.toggleDanger();refresh();}},
       target:cell=>{board.resetPicking();hovered=null;select(cell);},confirm,cancel,inspect:invoker=>inspect(undefined,invoker),inspectTarget:inspect,
-      log:(lines,invoker)=>{
-        dialogs.showChoices('Battle log',lines.length?'':'No events yet.',[{id:'log-close',label:'Close log',run:releaseRadial}],
-          releaseRadial, readOnlyTool(invoker));
-        const list=document.createElement('ol');list.id='battle-log';list.setAttribute('aria-label','Battle log');
-        list.append(...lines.map(text=>{const item=document.createElement('li');item.textContent=text;return item;}));
-        dialogs.element.querySelector('#battle-dialog-message')!.append(list);
+      log:(snapshot,invoker)=>{
+        const versions = session.state.versions;
+        dialogs.showChoices('Battle log',createBattleLogContent(snapshot.entries),[
+          {id:'log-export',label:'Export combat log',keepOpen:true,run:()=>downloadBattleLog(snapshot,__BUILD_INFO__,versions)},
+          {id:'log-close',label:'Hide',run:releaseRadial},
+        ],releaseRadial,readOnlyTool(invoker));
       },
       wait:()=>{
         if(!live || !ready || document.hidden || dialogs.open || session.phase!=='player')return;

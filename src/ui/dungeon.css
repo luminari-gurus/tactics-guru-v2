@@ -163,6 +163,10 @@ body:has(#dungeon-screen:not([hidden])) #battle-heading { display: none; }
 #dungeon-map [data-terrain="ember-wastes-blocked"] { background-color: #682f24; }
 #dungeon-map [data-terrain="winter-tundra-open"] { background-color: #a6b9c8; }
 #dungeon-map [data-terrain="winter-tundra-blocked"] { background-color: #416784; }
+#dungeon-map [data-terrain="storm-coast-open"] { background-color: #a18e65; }
+#dungeon-map [data-terrain="storm-coast-blocked"] { background-color: #28576a; }
+#dungeon-map [data-terrain="shattered-citadel-open"] { background-color: #7c7670; }
+#dungeon-map [data-terrain="shattered-citadel-blocked"] { background-color: #424147; }
 #dungeon-map .explore-hidden { background-color: #111a24; }
 #dungeon-map .explore-remembered { position: relative; isolation: isolate; }
 #dungeon-map .explore-remembered::before {
@@ -219,6 +223,10 @@ body:has(#dungeon-screen:not([hidden])) #battle-heading { display: none; }
 .dungeon-loot-messages .dungeon-loot-status:empty { padding: 0; margin: 0; }
 #dungeon-screen .dungeon-directions { position: relative; display: grid; grid-template: 44px auto 44px / 44px minmax(0, 1fr) 44px; gap: 4px; width: min(100%, 576px); }
 .dungeon-map-viewport { grid-area: 2 / 2; width: 100%; min-height: 64px; aspect-ratio: 1; max-height: var(--dungeon-map-max-height, calc(100dvh - 260px)); overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; background: #0b1119; }
+/* Keep the party buttons within reach beneath the compass on portrait phones. */
+@media (orientation: portrait) and (max-width: 520px) {
+  .dungeon-map-viewport { max-height: min(var(--dungeon-map-max-height, 100dvh), 32dvh); }
+}
 .dungeon-map-viewport:has(#dungeon-map:focus-visible) { outline: 3px solid #f4cf70; outline-offset: 1px; }
 #dungeon-screen .dungeon-directions button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; width: 44px; height: 64px; min-width: 44px; min-height: 44px; margin: 0; padding: 0; justify-self: center; align-self: center; border-radius: 8px; border-color: #a2a58a; background: #424a38; color: #f1edda; touch-action: manipulation; }
 #dungeon-screen .dungeon-directions button span { font-size: .7rem; line-height: 1; font-weight: bold; pointer-events: none; }

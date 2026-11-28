@@ -62,7 +62,7 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
       decoded.set(text, state);
       if (decoded.size > 3) decoded.delete(decoded.keys().next().value!);
     }
-    return {ok: true as const, state: structuredClone(state)};
+    return {ok: true as const, state};
   }
   const error = (e: unknown) => {
     try { return (e as { name?: string })?.name === 'QuotaExceededError' ? 'quota' : (e as { name?: string })?.name === 'SecurityError' ? 'security' : 'unavailable'; }
@@ -92,7 +92,7 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
               restoredBackup = { text, record, restored };
             }
             const restored = restoredBackup.restored;
-            if (restored) return { status: 'valid', text, checkpoint: restored.checkpoint, state: structuredClone(restored.state) };
+            if (restored) return { status: 'valid', text, checkpoint: restored.checkpoint, state: restored.state };
           }
         }
         return { status: 'valid', text, state: result.state };
@@ -100,7 +100,7 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
     };
     return { primary: slot('primary'), backup: slot('backup') };
   }
-  function inspect(): DungeonInspection { return withRecentBackup(inspectSlots()); }
+  function inspect(): DungeonInspection { return structuredClone(withRecentBackup(inspectSlots())); }
   function withRecentBackup(review: DungeonInspection): DungeonInspection {
     const { primary, backup } = review;
     if (backup.status !== 'valid' || hasHobgoblinFloor(backup.state) ||
@@ -242,7 +242,7 @@ export function createDungeonStorage(provider: RunStorageProvider = () => window
       try {
         decoded.clear();
         const previous = old.primary.status === 'valid' ? old.primary : old.backup.status === 'valid' ? old.backup : null;
-        if (previous && backup === previous.text && previous.checkpoint === undefined) decoded.set(previous.text, structuredClone(previous.state));
+        if (previous && backup === previous.text && previous.checkpoint === undefined) decoded.set(previous.text, previous.state);
         if (backup !== null && checkpoint !== null && checkpointRecord !== null && backupState) {
           restoredBackup = { text: backup, record: checkpointRecord, restored: { checkpoint, state: structuredClone(backupState) } };
         }
