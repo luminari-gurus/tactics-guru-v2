@@ -363,8 +363,30 @@ test('an isolated performance failure permits the browser jobs but fails the agg
   const value = fixture();
   value.plan.mode = 'parallel-full';
   value.preparation.passed = false;
-  value.preparation.stages.push({ id: 'performance', status: 'failed' });
+  value.preparation.stages.push({
+    id: 'performance', status: 'failed', exitCode: 0,
+    performance: { samples: 18, failures: [], measuredBuild: value.plan.source },
+    evaluation: { exitCode: 1 },
+    evaluationReport: { passed: false, captureFailures: [], rows: Array.from({ length: 18 }, () => ({})), failedSamples: 1 },
+  });
   assert.equal(canDistributeBuild(value.plan.mode, value.preparation), true);
+  for (const [description, corrupt] of [
+    ['missing capture', row => { delete row.performance; }],
+    ['partial capture', row => { row.performance.samples = 17; }],
+    ['capture failures', row => { row.performance.failures = ['browser closed']; }],
+    ['wrong build', row => { row.performance.measuredBuild = { commit: 'other' }; }],
+    ['capture command failure', row => { row.exitCode = 1; }],
+    ['missing evaluation', row => { delete row.evaluationReport; }],
+    ['evaluation timeout', row => { row.evaluation.timedOut = true; }],
+    ['evaluation signal', row => { row.evaluation.signal = 'SIGTERM'; }],
+    ['invalid evaluation', row => { row.evaluationReport.captureFailures = ['Malformed sample']; }],
+    ['partial evaluation', row => { row.evaluationReport.rows.pop(); }],
+    ['no budget violations', row => { row.evaluationReport.failedSamples = 0; }],
+  ]) {
+    const report = structuredClone(value.preparation);
+    corrupt(report.stages.at(-1));
+    assert.equal(canDistributeBuild(value.plan.mode, report), false, description);
+  }
   assert.ok(summarize(value).errors.includes('prepare: failed'));
   assert.equal(canDistributeBuild('capture', value.preparation), false);
   for (const patch of [{ complete: false }, { inputsUnchanged: false }, { error: 'interrupted' }]) {
