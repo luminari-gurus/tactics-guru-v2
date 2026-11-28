@@ -122,7 +122,11 @@ dialog button { touch-action: manipulation; }
 .battle-mode .battle-commit { grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
 .battle-mode dialog { color:var(--ink); background:var(--panel); border-color:var(--gold); }
 .battle-mode #battle-dialog-message { white-space:pre-line; overflow-wrap:anywhere; }
-.battle-mode #battle-log { padding-left:24px; }
+.battle-mode #battle-log-filters { display:flex; flex-wrap:wrap; gap:6px; }
+.battle-mode #battle-log-filters button { min-width:44px; }
+.battle-mode #battle-log { padding-inline-start:24px; }
+.battle-mode #battle-log > li + li { margin-top:8px; }
+.battle-mode #battle-log ol { padding-inline-start:20px; }
 @media (max-width:759px) and (min-height:501px), (orientation:portrait) {
   .battle-mode #battle-shell { grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(0,1fr) min(56%,510px); gap:8px; padding:max(8px,env(safe-area-inset-top),var(--safe-top,0px)) max(8px,env(safe-area-inset-right),var(--safe-right,0px)) max(8px,env(safe-area-inset-bottom),var(--safe-bottom,0px)) max(8px,env(safe-area-inset-left),var(--safe-left,0px)); }
   .battle-mode #battle-actor, .battle-mode #battle-scroll { padding:12px; }
@@ -235,8 +239,8 @@ dialog button { touch-action: manipulation; }
   .battle-mode #battle-heading p { display:none; }
   .battle-mode #battle-heading h1 { font-size:1.2rem; margin:0; }
   .battle-mode #battle-board-caption { padding:5px 12px; }
-  .battle-mode #battle-class-guidance { margin:10px 0 6px; }
-  .battle-mode #battle-actor, .battle-mode #battle-scroll { padding:10px 12px; }
+  .battle-mode #battle-class-guidance { margin:6px 0 4px; }
+  .battle-mode #battle-actor, .battle-mode #battle-scroll { padding:8px 12px; }
   .battle-mode .battle-identity { grid-template-columns:40px minmax(0,1fr); gap:8px; }
   .battle-mode .battle-portrait { display:block; width:40px; height:40px; }
   .battle-mode #battle-active { margin:0 0 4px; }

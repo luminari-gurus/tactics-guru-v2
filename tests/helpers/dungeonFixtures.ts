@@ -1,7 +1,7 @@
 import { encodeDungeon } from '../../src/domain/dungeonSaveEnvelope';
 import { freshRunStats } from '../../src/domain/runStats';
 import { freshExploration, movableExploration, neighbors, poiCell, reveal, visit } from '../../src/domain/exploration';
-import { freshDungeon, floorDescriptor, floorMap, dungeonOffer, dungeonLootReward, readDungeon, startDungeonBattle, dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, travelDungeon, stepDungeon, clearedDungeonSlots, type DungeonState, type DungeonResult, type DungeonItemCommand } from '../../src/domain/dungeon';
+import { freshDungeon, floorDescriptor, FloorCache, floorMap, dungeonOffer, dungeonLootReward, readDungeon, startDungeonBattle, dungeonBattle, acceptDungeonBattle, dungeonItem, dungeonBoundary, travelDungeon, stepDungeon, clearedDungeonSlots, type DungeonState, type DungeonResult, type DungeonItemCommand } from '../../src/domain/dungeon';
 import { generateMap } from '../../src/map/generate';
 import { BattleSession } from '../../src/app/BattleSession';
 import { playerDecision, fighterDecision, rangerDecision, mageDecision } from './playerPolicy';
@@ -22,11 +22,12 @@ import { dungeonContent } from '../../src/content/dungeon';
 export function coldDungeonHistory() {
   const base = freshDungeon('cold-browser', 13);
   const depth = 250;
+  const cache = new FloorCache(1);
   const floors = Array.from({ length: depth }, (_, index) => {
-    const descriptor = floorDescriptor(base.seed, index + 1);
+    const descriptor = floorDescriptor(base.seed, index + 1, cache);
     return {
       descriptor, completed: index + 1 === depth ? 0 : 3, position: descriptor.upstairs,
-      exploration: freshExploration(descriptor.seed, descriptor.upstairs, floorMap(descriptor)),
+      exploration: freshExploration(descriptor.seed, descriptor.upstairs, floorMap(descriptor, cache)),
     };
   });
   const state = { ...base, depth, floors };
@@ -275,7 +276,9 @@ export function shamanJourney(seed = 31) {
     if(!p)throw Error('Shaman witness stalled');battle.finishPresentation(p.token);
   }
   if(battle.state.outcome==='ongoing')throw Error('Shaman witness did not finish');
-  return {seed,entry,state:battle.state,commands:battle.replay?.commands??battle.continuation!.commands,events:battle.events};
+  const replay = battle.replay;
+  if (!replay) throw Error('Fresh Shaman journey did not record a full replay');
+  return {seed,entry,state:battle.state,commands:replay.commands,events:battle.events,replay};
 }
 
 /** Full Fighter acceptance witness; source-backed encounters may require a new deterministic seed. */

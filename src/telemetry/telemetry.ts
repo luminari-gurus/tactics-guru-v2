@@ -1,3 +1,4 @@
+import type { GeneratedBattlefieldSource } from '../content/battlefieldTypes';
 /** Application-only telemetry. No domain imports, save payloads, or gameplay RNG. */
 export const events = ['app_entered', 'battle_started', 'battle_continued', 'battle_outcome', 'run_started',
   'run_continued', 'encounter_started', 'encounter_outcome', 'reward_chosen', 'run_outcome', 'save_recovery_failed', 'battlefield_generation_measured'] as const;
@@ -8,7 +9,8 @@ export interface Context { visibility?: 'visible' | 'hidden'; route?: 'battle' |
 export interface Properties extends Context { outcome?: 'victory' | 'defeat'; choice?: typeof rewardChoices[number]; operation?: 'read' | 'write' | 'remove' | 'reset';
   generation_duration_ms?: number; generation_attempts?: number;
   generation_status?: 'generated' | 'fallback' | 'failed'; generation_context?: 'entry' | 'resume';
-  biome?: 'desert'; generator_version?: 1; profile_version?: 'desert-v1';
+  biome?: GeneratedBattlefieldSource['biome']; generator_version?: GeneratedBattlefieldSource['generatorVersion'];
+  profile_version?: GeneratedBattlefieldSource['profileVersion'];
 }
 export interface Sink { event(name: TelemetryEvent, properties: Properties, boundary?: string): void; error(error: unknown, failure: Failure, context: Context): void }
 let sink: Sink | undefined;

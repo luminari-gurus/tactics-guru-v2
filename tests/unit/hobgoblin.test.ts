@@ -175,6 +175,8 @@ it('restores a dungeon battle after the production AI bashes and displaces the F
   assert(turn.ok);
   expect(turn.state.commandCount).toBe(3);
   expect(turn.events).toContainEqual({ type: 'pushed', unitId: 1, path: [{ x: 3, y: 4 }, { x: 3, y: 5 }] });
+  expect(turn.events).toContainEqual(expect.objectContaining({ type: 'attackRolled', unitId: 4,
+    bonus: battle.catalog.enemies.hobgoblin_warrior.stats.accuracy + 1 }));
   const saved = acceptDungeonBattle(entry, turn.state);
   assert(saved.ok);
   const encoded = encodeDungeon(saved.state);
