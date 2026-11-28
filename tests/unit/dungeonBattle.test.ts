@@ -329,6 +329,9 @@ it('chooses Hex instead of a third heal in the seeded Elite encounter with an in
 it('rebuilds a capped Shaman battle and replays it exactly across a one-cast save', async () => {
   const witness = shamanJourney(189);
   const { entry, replay } = witness;
+  const entrySave = encodeDungeon(entry);
+  assert(entrySave.ok);
+  expect(decodeDungeon(entrySave.text)).toEqual({ ok: true, state: entry });
   expect(witness.state.outcome).toBe('playerWin');
   expect(witness.events.filter(event => event.type === 'healed')).toHaveLength(2);
   expect(witness.events.some(event => event.type === 'saveRolled' && !event.saved)).toBe(true);
@@ -365,6 +368,10 @@ it('rebuilds a capped Shaman battle and replays it exactly across a one-cast sav
   assert(suffix.ok);
   expect({ state: suffix.state, events: [...prefix.events, ...suffix.events] })
     .toEqual({ state: witness.state, events: witness.events });
+  const settled = acceptDungeonBattle(decoded.state, suffix.state);
+  assert(settled.ok);
+  expect(settled.state.activeBattle).toBeNull();
+  expect(settled.state.party.every(hero => !Object.hasOwn(hero, 'weakenedBy'))).toBe(true);
 });
 
 it('retains a legal six-battle Fighter level-three witness with healing, Taunt and exact terminal replay',()=>{

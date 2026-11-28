@@ -98,8 +98,8 @@ test('routine verification clears each first-floor scenario once and checks both
     assert.deepEqual(profilesFor('dungeon battle undo survives reload'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('saved dungeon downloads only after explicit recovery export'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('class guidance: unsaved dungeon keeps dismissals in memory until saving and resuming the same run'), [stage === 'chromium' ? desktop : portrait]);
-    assert.deepEqual(profilesFor('Shaman production journey uses Hex and ally healing, reloads Weakened and replays a complete legal battle'), []);
     assert.deepEqual(profilesFor('resumed Shaman Hex shows the Weakened hero and accuracy penalty'), [stage === 'chromium' ? desktop : portrait]);
+    assert.deepEqual(profilesFor('Shaman inspection shows spent Heal Goblin casts and preserves them on reload'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('a second dungeon encounter reuses the engine after a legal victory without reloading'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('declining a dungeon reward preserves inventory and updates stair progress'), [stage === 'chromium' ? desktop : portrait]);
     assert.deepEqual(profilesFor('corrupt bytes stay exportable and uncertain travel requires explicit recovery'), [stage === 'chromium' ? desktop : portrait]);
@@ -238,16 +238,16 @@ test('long progression journeys are excluded from routine selection and remain a
   }
   for (const config of ['playwright.extended.config.ts', 'playwright.extended-webkit.config.ts']) {
     const selection = discoverSelection(['-c', config]);
-    assert.equal(selection.tests.length, 21);
+    assert.equal(selection.tests.length, 18);
     for (const project of selection.projects) {
       const cases = selection.tests.filter(row => row.project === project.name);
-      assert.equal(cases.length, 7);
+      assert.equal(cases.length, 6);
       assert.deepEqual(cases.filter(row => row.tags.includes('@full-first-floor')).map(row => row.title).sort(), [
         'saved menu dungeon auto-collects loot across a complete first floor',
         'saved menu dungeon keeps proof tools hidden across legal encounters',
         'testing dungeon legally clears a floor, descends and backtracks without accessing saves',
       ]);
-      for (const title of [...titles, 'Shaman production journey']) assert.equal(cases.filter(row => row.title.startsWith(title)).length, 1);
+      for (const title of titles) assert.equal(cases.filter(row => row.title.startsWith(title)).length, 1);
     }
   }
 });

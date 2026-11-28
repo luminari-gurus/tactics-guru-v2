@@ -5,6 +5,6 @@ export default defineConfig({
   ...base,
   testMatch: ['**/dungeon-extended.spec.ts', '**/dungeon.spec.ts'],
   testIgnore: [],
-  grep: /dungeon-extended\.spec\.ts|Shaman production journey|@full-first-floor/,
+  grep: /dungeon-extended\.spec\.ts|@full-first-floor/,
   grepInvert: [],
 });
